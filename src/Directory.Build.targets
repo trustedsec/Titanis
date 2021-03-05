@@ -1,0 +1,7 @@
+<Project>
+
+
+	<!--<Target Name="PushNuGetPackage" AfterTargets="GenerateNuspec">
+		<Exec Command="dotnet nuget push $(ArtifactsPath)\package\$(Configuration)\$(ProjectName).$(PackageVersion).nupkg -s Local-$(Configuration)"></Exec>
+	</Target>-->
+</Project>

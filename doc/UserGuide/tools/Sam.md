@@ -1,0 +1,145 @@
+# Sam
+  Commands for interacting with a remote Security Accounts Manager
+
+## Synopsis
+```
+Sam <subcommand>
+```
+### Subcommands
+
+|Command|Description|
+|-|-|
+|[enumusers](#sam-enumusers)|Enumerates the users|
+
+
+  For help on a subcommand, use `Sam &lt;subcommand&gt; -?`
+# Sam enumusers
+  Enumerates the users
+
+## Synopsis
+```
+Sam enumusers [options] <ServerName>
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+||||**Possible values:**|
+||||  AccountName|
+||||  Id|
+||||  FullName|
+||||  AdminComment|
+||||  PasswordLastSet|
+||||  LastLogon|
+||||  BadPasswordCount|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+
+
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
+|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -Kdc||&lt;String&gt;|KDC address|
+|    -KdcPort||&lt;Int32&gt;|KDC port|
+||||  Default: 88|
+
+
+### Authentication (NTLM)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
+## Details
+
+  Sam enumusers attempts to query the general and account info for the users
+  returned by the server.
+  
+
+## Examples
+
+### Example 1 - Enumerate all accounts
+
+```
+Sam enumusers LUMON-DC1 -UserName milchick -Password Br3@kr00m!
+```

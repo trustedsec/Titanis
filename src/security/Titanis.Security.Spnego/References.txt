@@ -1,0 +1,2 @@
+﻿https://tools.ietf.org/html/rfc4178
+RFC 4178 - The Simple and Protected Generic Security Service Application Program Interface (GSS-API) Negotiation Mechanism

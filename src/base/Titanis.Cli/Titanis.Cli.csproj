@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Reflection" />
+		<PackageReference Include="System.Text.Json" />
+		<PackageReference Include="Titanis.Core" />
+		<PackageReference Include="Titanis.Reflection" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Titanis.Core\Titanis.Core.csproj" />
+	  <ProjectReference Include="..\Titanis.Reflection\Titanis.Reflection.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Messages.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Messages.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Messages.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Messages.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

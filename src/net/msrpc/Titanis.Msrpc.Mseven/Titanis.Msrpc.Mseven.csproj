@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Titanis.Core" />
+		<PackageReference Include="Titanis.IO" />
+		<PackageReference Include="Titanis.Net" />
+		<PackageReference Include="Titanis.Msrpc" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\base\Titanis.Reflection\Titanis.Reflection.csproj" />
+		<ProjectReference Include="..\..\..\base\Titanis.Winterop.ErrorCodes\Titanis.Winterop.ErrorCodes.csproj" />
+		<ProjectReference Include="..\..\..\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
+		<ProjectReference Include="..\..\..\build\Titanis.SourceGen\Titanis.SourceGen.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+		<ProjectReference Include="..\..\..\base\Titanis.Core\Titanis.Core.csproj" />
+		<ProjectReference Include="..\..\..\base\Titanis.IO\Titanis.IO.csproj" />
+		<ProjectReference Include="..\..\Titanis.Msrpc.Core\Titanis.Msrpc.Core.csproj" />
+		<ProjectReference Include="..\..\Titanis.Net\Titanis.Net.csproj" />
+	</ItemGroup>
+
+</Project>

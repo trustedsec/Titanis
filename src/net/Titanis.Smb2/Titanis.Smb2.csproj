@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <Compile Update="Messages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Messages.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Messages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Titanis.Core" />
+    <PackageReference Include="Titanis.Crypto.Aes128Cmac" />
+    <PackageReference Include="Titanis.Crypto.Rc4" />
+    <PackageReference Include="Titanis.Crypto.Sp800_108" />
+    <PackageReference Include="Titanis.IO" />
+    <PackageReference Include="Titanis.Security" />
+    <PackageReference Include="Titanis.Winterop.FileInfo" />
+    <PackageReference Include="Titanis.Winterop.Security" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <ProjectReference Include="..\..\base\Titanis.Winterop.ErrorCodes\Titanis.Winterop.ErrorCodes.csproj" />
+	  <ProjectReference Include="..\..\build\Titanis.SourceGen\Titanis.SourceGen.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+	  <ProjectReference Include="..\..\base\Titanis.Core\Titanis.Core.csproj" />
+    <ProjectReference Include="..\..\base\Titanis.IO\Titanis.IO.csproj" />
+    <ProjectReference Include="..\..\base\Titanis.Winterop.FileInfo\Titanis.Winterop.FileInfo.csproj" />
+    <ProjectReference Include="..\..\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
+    <ProjectReference Include="..\..\crypto\Titanis.Crypto.Aes128Cmac\Titanis.Crypto.Aes128Cmac.csproj" />
+    <ProjectReference Include="..\..\crypto\Titanis.Crypto.Rc4\Titanis.Crypto.Rc4.csproj" />
+    <ProjectReference Include="..\..\crypto\Titanis.Crypto.Sp800_108\Titanis.Crypto.Sp800_108.csproj" />
+    <ProjectReference Include="..\..\security\Titanis.Security.Spnego\Titanis.Security.Spnego.csproj" />
+    <ProjectReference Include="..\..\security\Titanis.Security\Titanis.Security.csproj" />
+    <ProjectReference Include="..\Titanis.Net\Titanis.Net.csproj" />
+  </ItemGroup>
+
+</Project>

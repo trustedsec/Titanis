@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+	</PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Security\ServiceAccessRule.cs" />
+    <Compile Remove="Security\ServiceAuditRule.cs" />
+    <Compile Remove="Security\ServiceSecurity.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Security.AccessControl" />
+    <PackageReference Include="Titanis.Core" />
+    <PackageReference Include="Titanis.IO" />
+    <!--<PackageReference Include="Titanis.Msrpc" />-->
+    <PackageReference Include="Titanis.Security" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\base\Titanis.Core\Titanis.Core.csproj" />
+    <ProjectReference Include="..\..\..\base\Titanis.IO\Titanis.IO.csproj" />
+    <ProjectReference Include="..\..\..\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
+    <ProjectReference Include="..\..\..\security\Titanis.Security\Titanis.Security.csproj" />
+    <ProjectReference Include="..\..\Titanis.Msrpc.Core\Titanis.Msrpc.Core.csproj" />
+    <ProjectReference Include="..\Titanis.Msrpc.Msscmr.Core\Titanis.Msrpc.Msscmr.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Security\" />
+  </ItemGroup>
+
+</Project>

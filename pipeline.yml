@@ -1,0 +1,39 @@
+parameters:
+- name: doBuild
+  displayName: Build code
+  default: true
+  type: boolean
+- name: doUnitTesting
+  displayName: Run unit tests
+  default: true
+  type: boolean
+- name: doPublish
+  displayName: Publish to Gitlab package repository
+  default: false
+  type: boolean
+- name: buildConfiguration
+  displayName: Build configuration
+  type: string
+  default: Release
+  values:
+  - Debug
+  - Release
+- name: publishTargets
+  displayName: Publish targets
+  type: string
+  default: win-x64;linux-x64
+  
+resources:
+  repositories:
+  - repository: pipeline
+    name: titanis
+    ref: ts-internal
+
+jobs:
+- template: pipeline/azure-pipelines-cs-ci.yml@pipeline
+  parameters:
+  - doBuild: ${{ doBuild }}
+  - doUnitTesting: ${{ doUnitTesting }}
+  - doPublish: ${{ doPublish }}
+  - buildConfiguration: ${{ buildConfiguration }}
+  - publishTargets: ${{ publishTargets }}

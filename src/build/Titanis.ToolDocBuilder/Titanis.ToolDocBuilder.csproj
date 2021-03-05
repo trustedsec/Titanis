@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <ArtifactsPath>$(ArtifactsBasePath)\build</ArtifactsPath>
+	  
+    <TargetFramework>net472</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" />
+    <PackageReference Include="System.Reflection.Metadata" />
+    <PackageReference Include="System.Reflection.MetadataLoadContext" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\base\Titanis.Cli\Titanis.Cli.csproj" />
+  </ItemGroup>
+
+</Project>

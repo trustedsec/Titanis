@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Titanis.Winterop</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Update="HresultMessageTable.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>HresultMessageTable.resx</DependentUpon>
+    </Compile>
+    <Compile Update="NtstatusMessageTable.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>NtstatusMessageTable.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Win32MessageTable.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Win32MessageTable.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="HresultMessageTable.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>HresultMessageTable.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="NtstatusMessageTable.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>NtstatusMessageTable.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Win32MessageTable.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Win32MessageTable.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

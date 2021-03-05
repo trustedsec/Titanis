@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net8.0</TargetFramework>
+
+	  <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DesTest.cs" />
+    <Compile Remove="NtlmClientTest.cs" />
+    <Compile Remove="NtlmServerTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.10.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.10.0" />
+    <PackageReference Include="coverlet.collector" Version="3.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\base\Titanis.Mocks\Titanis.Mocks.csproj" />
+    <ProjectReference Include="..\..\..\src\security\Titanis.Security.Ntlm\Titanis.Security.Ntlm.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Titanis.Cli</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\net\Titanis.Smb2\Titanis.Smb2.csproj" />
+    <ProjectReference Include="..\..\security\Titanis.Security.Kerberos\Titanis.Security.Kerberos.csproj" />
+    <ProjectReference Include="..\..\security\Titanis.Security.Ntlm\Titanis.Security.Ntlm.csproj" />
+    <ProjectReference Include="..\..\security\Titanis.Security.Spnego\Titanis.Security.Spnego.csproj" />
+    <ProjectReference Include="..\..\security\Titanis.Security\Titanis.Security.csproj" />
+    <ProjectReference Include="..\Titanis.Cli\Titanis.Cli.csproj" />
+  </ItemGroup>
+
+</Project>

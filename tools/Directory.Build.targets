@@ -1,0 +1,16 @@
+<Project>
+
+
+	<!--<Target Name="PushNuGetPackage" AfterTargets="GenerateNuspec">
+		<Exec Command="dotnet nuget push $(ArtifactsPath)\package\$(Configuration)\$(ProjectName).$(PackageVersion).nupkg -s Local-$(Configuration)"></Exec>
+	</Target>-->
+
+	<UsingTask Condition="'$(ArtifactsBasePath)'!=''" TaskName="Titanis.ToolDocBuilder.BuildToolDocTask" AssemblyFile="$(ArtifactsBasePath)\build\bin\Titanis.ToolDocBuilder\$(Configuration.ToLower())\Titanis.ToolDocBuilder.dll">
+
+	</UsingTask>
+
+	<Target Name="BuildDocs" AfterTargets="Build">
+		<Message Text="Building documentation" Importance="high" />
+		<BuildToolDocTask Condition="'$(ArtifactsBasePath)'!=''" AssemblyFile="$(OutputPath)$(AssemblyName)$(TargetExt)" DocFile="$(SolutionDir)doc\UserGuide\tools\$(AssemblyName).md" />
+	</Target>
+</Project>

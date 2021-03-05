@@ -1,0 +1,2 @@
+﻿In ReadQualifierSet, sometimes the encoding length is 0, which obviously doesn't include the length of EncodingLength itself.
+

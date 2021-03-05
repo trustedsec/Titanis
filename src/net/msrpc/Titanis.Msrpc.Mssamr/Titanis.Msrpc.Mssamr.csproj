@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+	</PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Security.AccessControl" />
+    <PackageReference Include="Titanis.Core" />
+    <PackageReference Include="Titanis.Crypto.Des" />
+    <PackageReference Include="Titanis.Crypto.Md4" />
+    <PackageReference Include="Titanis.Crypto.Md5" />
+    <PackageReference Include="Titanis.Crypto.Rc4" />
+    <PackageReference Include="Titanis.DceRpc" />
+    <PackageReference Include="Titanis.IO" />
+    <PackageReference Include="Titanis.Security.Ntlm" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\base\Titanis.Core\Titanis.Core.csproj" />
+    <ProjectReference Include="..\..\..\base\Titanis.IO\Titanis.IO.csproj" />
+    <ProjectReference Include="..\..\..\base\Titanis.Winterop.ErrorCodes\Titanis.Winterop.ErrorCodes.csproj" />
+    <ProjectReference Include="..\..\..\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
+    <ProjectReference Include="..\..\..\crypto\Titanis.Crypto.Des\Titanis.Crypto.Des.csproj" />
+    <ProjectReference Include="..\..\..\crypto\Titanis.Crypto.Md4\Titanis.Crypto.Md4.csproj" />
+    <ProjectReference Include="..\..\..\crypto\Titanis.Crypto.Md5\Titanis.Crypto.Md5.csproj" />
+    <ProjectReference Include="..\..\..\crypto\Titanis.Crypto.Rc4\Titanis.Crypto.Rc4.csproj" />
+    <ProjectReference Include="..\..\..\security\Titanis.Security.Ntlm\Titanis.Security.Ntlm.csproj" />
+    <ProjectReference Include="..\..\Titanis.DceRpc.Core\Titanis.DceRpc.Core.csproj" />
+    <ProjectReference Include="..\..\Titanis.DceRpc\Titanis.DceRpc.csproj" />
+    <ProjectReference Include="..\..\Titanis.Msrpc.Core\Titanis.Msrpc.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Messages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Messages.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Messages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

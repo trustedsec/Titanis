@@ -1,0 +1,74 @@
+parameters:
+- name: doBuild
+  displayName: Build code
+  default: true
+  type: boolean
+- name: doUnitTesting
+  displayName: Run unit tests
+  default: true
+  type: boolean
+- name: doPublish
+  displayName: Publish to Gitlab package repository
+  default: false
+  type: boolean
+- name: buildConfiguration
+  displayName: Build configuration
+  type: string
+  default: Release
+  values:
+  - Debug
+  - Release
+- name: publishTargets
+  displayName: Publish targets
+  type: string
+  default: win-x64;linux-x64
+
+resources:
+  repositories:
+  - repository: pipeline
+    name: pipeline
+    type: git
+
+
+trigger:
+- ts-internal
+- ci-test
+
+pool:
+  name: ab-dev
+
+
+variables:
+- group: BuildAgent
+- group: GitlabTokens
+- name: solution
+  value: '**/*.sln'
+- name: Build_Version
+  value: 0.9
+- name: Build_InfoVersion
+  ${{ if in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI') }}:
+    value: -ci
+  ${{ elseif in(variables['Build.Reason'], 'PullRequest') }}:
+    value: -pr
+  ${{ else }}:
+    value: 
+- name: Build_FileBuildNumber
+  value: $[ counter('Build_FileBuildNumber', 1) ]
+- name: buildConfiguration
+  value: ${{ parameters.buildConfiguration }}
+- name: cleanBuild
+  value: true
+
+name: $(Build_Version).$(Build_FileBuildNumber)$(Build_InfoVersion)
+
+extends:
+  template: azure-pipelines-ts-ci.yml@pipeline
+  parameters:
+    doBuild: ${{ parameters.doBuild }}
+    doUnitTesting: ${{ parameters.doUnitTesting }}
+    doPublish: ${{ parameters.doPublish }}
+    buildConfiguration: ${{ parameters.buildConfiguration }}
+    publishTargets: ${{ parameters.publishTargets }}
+
+# jobs:
+# - template: pipeline/azure-pipelines-ts-ci.yml@pipeline

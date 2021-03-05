@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net8.0</TargetFramework>
+
+	  <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="CertTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="TestData\gssapi-spnego-NegTokenInit2.bin" />
+    <None Remove="TestData\gssapi-spnego-NTLM_AUTH.bin" />
+    <None Remove="TestData\gssapi-spnego-NTLM_CHALLENGE.bin" />
+    <None Remove="TestData\gssapi-spnego-NTLM_NEGOTIATE.bin" />
+    <None Remove="TestData\spnego-NTLM_AUTH.bin" />
+    <None Remove="TestData\spnego-NTLM_CHALLENGE.bin" />
+    <None Remove="TestData\spnego-NTLM_NEGOTIATE.bin" />
+    <None Remove="TestData\spnego1.dat" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="TestData\gssapi-spnego-NegTokenInit2.bin" />
+    <EmbeddedResource Include="TestData\gssapi-spnego-NTLM_AUTH.bin" />
+    <EmbeddedResource Include="TestData\gssapi-spnego-NTLM_CHALLENGE.bin" />
+    <EmbeddedResource Include="TestData\gssapi-spnego-NTLM_NEGOTIATE.bin" />
+    <EmbeddedResource Include="TestData\spnego-NTLM_AUTH.bin" />
+    <EmbeddedResource Include="TestData\spnego-NTLM_CHALLENGE.bin" />
+    <EmbeddedResource Include="TestData\spnego-NTLM_NEGOTIATE.bin" />
+    <EmbeddedResource Include="TestData\spnego1.dat" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.10.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.10.0" />
+    <PackageReference Include="coverlet.collector" Version="3.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\base\Titanis.Reflection\Titanis.Reflection.csproj" />
+    <ProjectReference Include="..\..\..\src\formats\Titanis.Asn1\Titanis.Asn1.csproj" />
+    <ProjectReference Include="..\..\..\src\security\Titanis.Security.Ntlm\Titanis.Security.Ntlm.csproj" />
+    <ProjectReference Include="..\..\..\src\security\Titanis.Security.Spnego\Titanis.Security.Spnego.csproj" />
+  </ItemGroup>
+
+</Project>

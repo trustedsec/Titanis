@@ -1,0 +1,46 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <TitanisVersion>0.9.0</TitanisVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
+    <PackageVersion Include="Microsoft.Build.Framework" Version="17.14.8" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.183" />
+    <PackageVersion Include="System.Memory" Version="4.6.3" />
+    <PackageVersion Include="System.Net.NameResolution" Version="4.3.0" />
+    <PackageVersion Include="System.Reflection.MetadataLoadContext" Version="9.0.8" />
+    <PackageVersion Include="System.Security.AccessControl" Version="6.0.1" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.8" />
+    <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
+    <PackageVersion Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+    <PackageVersion Include="System.Reflection" Version="4.3.0" />
+    <PackageVersion Include="System.Data.Common" Version="4.3.0" />
+    <PackageVersion Include="System.Reflection.Emit" Version="4.7.0" />
+    <PackageVersion Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
+    <PackageVersion Include="System.Reflection.Metadata" Version="9.0.8" />
+    <PackageVersion Include="Titanis.Asn1" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Core" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Crypto" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Crypto.Aes128Cmac" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Crypto.Des" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Crypto.Md4" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Crypto.Md5" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Crypto.Rc4" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Crypto.Sp800_108" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.DceRpc" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.DceRpc.Core" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.IO" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Msrpc" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Net" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.NFold" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Reflection" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Security" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Security.Ntlm" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Winterop.FileInfo" Version="$(TitanisVersion)" />
+    <PackageVersion Include="Titanis.Winterop.Security" Version="$(TitanisVersion)" />
+  </ItemGroup>
+</Project>

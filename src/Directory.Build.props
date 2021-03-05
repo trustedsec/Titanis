@@ -1,0 +1,33 @@
+<!-- /src -->
+<Project>
+	<!-- Include global settings -->
+	<Import Project="$(SolutionDir)Directory.Build.props"/>
+	
+	<PropertyGroup>
+		<!-- Build settings -->
+		<TitanisSigningKeyFile Condition="'$(TitanisSigningKeyFile)'=='' and Exists('$(SolutionDir)\Titanis.snk')">$(SolutionDir)\Titanis.snk</TitanisSigningKeyFile>
+		<Nullable>enable</Nullable>
+		<LangVersion>13.0</LangVersion>
+
+		<ArtifactsPath>$(ArtifactsPath)/lib</ArtifactsPath>
+
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+
+		<!--<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>-->
+		<!--<PackageLicenseFile>LICENSE.md</PackageLicenseFile>-->
+
+<!--
+CS1573 - Missing XML documentation for parameter
+CS1591 - Missing XML documentation
+-->
+		<NoWarn>CS1591;CS1573</NoWarn>
+		
+		<!-- CS1998 - Async method lacks await -->
+		<WarningsAsErrors>$(WarningsAsErrors);CS1998</WarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+		<AssemblyOriginatorKeyFile>$(TitanisSigningKeyFile)</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+</Project>

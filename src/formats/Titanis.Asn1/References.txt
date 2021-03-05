@@ -1,0 +1,8 @@
+﻿A Layman's Guide to a Subset of ASN.1, BER, and DER
+http://luca.ntop.org/Teaching/Appunti/asn1.html
+
+X.690-0207 - 
+Information technology – ASN.1 encoding rules:
+Specification of Basic Encoding Rules (BER),
+Canonical Encoding Rules (CER)
+and Distinguished Encoding Rules (DER) 

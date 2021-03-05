@@ -1,0 +1,23 @@
+﻿RFC 4120 - The Kerberos Network Authentication Service (V5)
+https://datatracker.ietf.org/doc/html/rfc4120
+
+RFC 4121 - The Kerberos Version 5
+	Generic Security Service Application Program Interface (GSS-API)
+	Mechanism: Version 2
+https://datatracker.ietf.org/doc/html/rfc4121
+
+RFC 3961 - Encryption and Checksum Specifications
+    for Kerberos 5
+https://datatracker.ietf.org/doc/html/rfc3961
+
+RFC 3962 - Advanced Encryption Standard (AES) Encryption for Kerberos 5
+https://datatracker.ietf.org/doc/html/rfc3962
+
+RFC 4757 - The RC4-HMAC Kerberos Encryption Types Used by Microsoft Windows
+https://datatracker.ietf.org/doc/html/rfc4757
+
+[MS-KILE]
+
+[RFC 6806] - Kerberos Principal Name Canonicalization and Cross-Realm Referrals
+
+RFC 6113 - A Generalized Framework for Kerberos Pre-Authentication

@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net8.0</TargetFramework>
+
+	  <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ParseTest.cs" />
+    <Compile Remove="UnitTest1.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="TestData\aprep-cifs-dc1.bin" />
+    <None Remove="TestData\aprep-cifs-wks.bin" />
+    <None Remove="TestData\aprep-nrpc-dc1.bin" />
+    <None Remove="TestData\aprep2-nrpc-dc1.bin" />
+    <None Remove="TestData\apreq-cifs-dc1.bin" />
+    <None Remove="TestData\apreq-cifs-wks.bin" />
+    <None Remove="TestData\apreq-nrpc-dc1.bin" />
+    <None Remove="TestData\asrep-nopreauthtestuser.bin" />
+    <None Remove="TestData\asrep-testuser-preauth-req.bin" />
+    <None Remove="TestData\asrep-testuser.bin" />
+    <None Remove="TestData\asreq-nopreauthtestuser.bin" />
+    <None Remove="TestData\asreq-testuser-preauth.bin" />
+    <None Remove="TestData\asreq-testuser.bin" />
+    <None Remove="TestData\dcerpc-encStub.bin" />
+    <None Remove="TestData\dcerpc-encTrailer.bin" />
+    <None Remove="TestData\miclist-nrpc.bin" />
+    <None Remove="TestData\miclist-sig-nrpc.bin" />
+    <None Remove="TestData\tgsrep-testuser-cifs-dc1.bin" />
+    <None Remove="TestData\tgsrep-testuser-host-desktop.bin" />
+    <None Remove="TestData\tgsrep-testuser-ldap-dc1.bin" />
+    <None Remove="TestData\tgsreq-testuser-cifs-dc1.bin" />
+    <None Remove="TestData\tgsreq-testuser-host-desktop.bin" />
+    <None Remove="TestData\tgsreq-testuser-ldap-dc1.bin" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="TestData\aprep-cifs-dc1.bin" />
+    <EmbeddedResource Include="TestData\aprep-cifs-wks.bin" />
+    <EmbeddedResource Include="TestData\aprep-nrpc-dc1.bin" />
+    <EmbeddedResource Include="TestData\aprep2-nrpc-dc1.bin" />
+    <EmbeddedResource Include="TestData\apreq-cifs-dc1.bin" />
+    <EmbeddedResource Include="TestData\apreq-cifs-wks.bin" />
+    <EmbeddedResource Include="TestData\apreq-nrpc-dc1.bin" />
+    <EmbeddedResource Include="TestData\asrep-nopreauthtestuser.bin" />
+    <EmbeddedResource Include="TestData\asrep-testuser-preauth-req.bin" />
+    <EmbeddedResource Include="TestData\asrep-testuser.bin" />
+    <EmbeddedResource Include="TestData\asreq-nopreauthtestuser.bin" />
+    <EmbeddedResource Include="TestData\asreq-testuser-preauth.bin" />
+    <EmbeddedResource Include="TestData\asreq-testuser.bin" />
+    <EmbeddedResource Include="TestData\dcerpc-encStub.bin" />
+    <EmbeddedResource Include="TestData\dcerpc-encTrailer.bin" />
+    <EmbeddedResource Include="TestData\miclist-nrpc.bin" />
+    <EmbeddedResource Include="TestData\miclist-sig-nrpc.bin" />
+    <EmbeddedResource Include="TestData\tgsrep-testuser-cifs-dc1.bin" />
+    <EmbeddedResource Include="TestData\tgsrep-testuser-host-desktop.bin" />
+    <EmbeddedResource Include="TestData\tgsrep-testuser-ldap-dc1.bin" />
+    <EmbeddedResource Include="TestData\tgsreq-testuser-cifs-dc1.bin" />
+    <EmbeddedResource Include="TestData\tgsreq-testuser-host-desktop.bin" />
+    <EmbeddedResource Include="TestData\tgsreq-testuser-ldap-dc1.bin" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.10.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.10.0" />
+    <PackageReference Include="coverlet.collector" Version="3.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\base\Titanis.Reflection\Titanis.Reflection.csproj" />
+    <ProjectReference Include="..\..\..\src\security\Titanis.Security.Kerberos\Titanis.Security.Kerberos.csproj" />
+    <ProjectReference Include="..\..\..\src\security\Titanis.Security\Titanis.Security.csproj" />
+  </ItemGroup>
+
+</Project>

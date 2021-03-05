@@ -1,0 +1,4 @@
+﻿[MS-WMI]
+[MS-WMIO]
+
+[DMTF-DSP0004]

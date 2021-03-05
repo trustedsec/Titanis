@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Smb2Client_common_details" xml:space="preserve">
+    <value>The connection parameters affect the initial transport connection and negotiation.  The server name component of the UncPath is used for application-layer negotiation with the server.  It is also used to establish the transport-layer connection unless otherwise specified with -HostAddress , which may be a list of one or more host names or IP addresses.  If -HostAddress specifies a host name or is omitted, {0} uses local system resolution such as the hosts flie or DNS.  In this case, use -UseTcp4Only or -UseTcp6Only to filter the returned adress to the IPv4 or IPv6 address families respectively.
+
+By default, all dialects within the inclusive range of [SMB 2.0.2, SMB 3.1.1] are offered during the negotiation.  Use -Dialects to specify a list of one or more specific dialects.  No ordering is imposed; whatever order you specify is the order they are sent.  Duplicates are sent as specified.
+
+Use -RequireSigning and -Encrypt to enforce message signing or encryption respectively.  If the server does not support the requested security options, the command fails.
+
+Use -RequireSecureNegotiate to validate the negotiation after the connection has been established and authenticated.  This is generally not required and enables the client to detect MITM or downgrade attacks.
+
+The SMB client supports NTLM and Kerberos authentication.  Specify the user name with -UserName, or -Anonymous to request an anonymous session.  Note that -Anonymous is only available with NTLM and not with Kerberos.  The user name may include a leading domain separated by \ (e.g. DOMAIN\user) or a trailing domain separated by @ (user@domain.local).  Alternatively, you may specify the domain with -UserDomain.  If you do, and the user name contains tho domain, then the user name is sent as specified (e.g. including the domain component).  When using Kerberos, the domain should be specified as the FQDN.  Using the NetBIOS domain name will likely fail.  The SMB client will report a warning if you do this, but it is not considered an error.
+
+You may specify the credential either as a cleartext password using -Password or as a hash.  When specifying a hash (e.g. -NtlmHash), specify the hash as a hex-encoded string.  To enable Kerberos, specify the address of the KDC wiht -Kdc.  Despite the name, the -NtlmHash value may also be used for Kerberos authentication.</value>
+  </data>
+  <data name="Smb2Client_Detailed" xml:space="preserve">
+    <value>The &lt;UncPath&gt; parameter specifies the target of the command using the format \\&lt;server&gt;[:&lt;port&gt;]\&lt;share&gt;[\&lt;path&gt;] where &lt;port&gt; is an integer specifying the port to connect to.  If -HostAddress is specified, {0} resolves it either as an IP address (IPv4 or IPv6) or a DNS name.  If -HostAddress is not specified, &lt;server&gt; is resolved.  In either case, the resulting IP addresses may be filtered by address family using -4 or -6.  In either case, &lt;server&gt; is used to refer to the server within the SMB2 protocol.
+
+{0} supports both NTLM and Kerberos authentication.  The -UserName and -Password parameters apply to both NTLM and Kerberos.  You may also specify -NtlmHash for NTLM.  Each authentication mechanism has a variety of parameters to customize the negotiation.
+
+Kerberos is only enabled if you specify -kdc with the name or address of the KDC.  If you specify a name, {0} applies the same filtering rules for -4 and -6.</value>
+  </data>
+  <data name="Smb2Client_enumnics_Detailed" xml:space="preserve">
+    <value>Clients generally use this functionality to establish multiple channels.</value>
+  </data>
+  <data name="Smb2Client_enumopenfiles_Detailed" xml:space="preserve">
+    <value>Use -OpenBy to filter the results by the name of the user that has the file open.  The filtering is performed by the server.  The user name should be only the name of the user without the domain.  Including the domain will generate a warning and likely cause the all results to be filtered out.
+
+Use -BasePath to specify the path to filter by.  The filtering is performed by the server, which checks whether the path of each open file starts with the base path.  This must be an absolute path to succeed.  For files, the path must start with X: where X is the drive letter.  To search for named pipes, the path must begin with a backslash (e.g. \srvsvc).  Since -BasePath uses string filtering, the path need not be a valid object.  For example, filtering by 'C:\Win' would include results under C:\Windows.  Wildcards are not supported.</value>
+  </data>
+  <data name="Smb2Client_enumsessions_Detailed" xml:space="preserve">
+    <value>Use -ClientComputer and -ClientUserName to filter the results.  The filtering is processed on the server.  The protocol requires the computer name to begin with \\, even for IP addresses.  However, if you neglect to do this, {0} prepends \\ to the name you provide.  The user name provided to -ClientUserName should not contain a domain.  If it does, you'll receive a warning, but the value will still be passed to the server.</value>
+  </data>
+  <data name="Smb2Client_enumsnapshots_Detailed" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Smb2Client_enumstreams_Detailed" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Smb2Client_get_Detailed" xml:space="preserve">
+    <value>The &lt;UncPath&gt; parameter specifies the source file or directory to get via SMB.  The &lt;UncPath&gt; may also include a wildcard pattern (with * or ?).
+
+When copying a file, &lt;DestinationFileName&gt; is optional.  If &lt;DestinationFileName&gt; is specified, {0} fetches the file and writes it to the destination file.  If no destination file is specified, {0} writes the file to the console.
+
+When copying a directory, &lt;DestinationFileName&gt; is required and must indicate a directory that already exists or is to be created.  {0} traverses the directory tree, optionally filtering the contents by the wildcard specified in &lt;UncPath&gt;.  The traversal is limited by -Depth, where a depth of 0 indicates that only objects in the source directory are copied and a depth of -1 indicates no practical limit.  This includes files and directories in the sense that the subdirectories are created locally but not populated.  {0} does not exclude empty directories, nor does it skip hidden files.
+
+When copying the file, {0} fetches the file one chunk at a time.  The default chunk size is 32,768 bytes, which loosely resembles using the COPY command on a command prompt.  Use -ChunkSize to override the chunk size.  The chunk size must not exceed the MaxReadSize of the server.  You can view this by including the -Verbose switch.
+
+When writing a file locally, {0} applies the CreationTimeUtc and LastWriteTimeUtc timestamps as well as applying the same file attributes as the source file.</value>
+  </data>
+  <data name="Smb2Client_ls_Detailed" xml:space="preserve">
+    <value>{0} sends a request to the SMB server for a directory listing.  If &lt;UncPath&gt; is a directory, the contents of the directory are printed.  If &lt;UncPath&gt; is a file, the directory information for that file is printed.  If &lt;UncPath&gt; end with a wildcard pattern, only files matching the pattern are printed.  
+You may specify which fields to retrieve and print with the -Fields parameter.  If any of the selected fields are not contained in the directory listing, an additional QUERY_INFO request is sent for each file.  The default field set contains LinkTarget, which is not contained in this default set.  When requestinf the additional fields, the access mask is calculated depending on the fields requested.  For example, requesting the SACL requires ACCESS_SYSTEM_SECURITY; other security fields require READ_CONTROL.  If this access check fails, none of the fields in that request are retrieved.  The MaxAccess field sends a MAXIMAL_ACCESS_REQUEST when opening the file to retrieve additional info but does not itself result in an additional QUERY_INFO.  A failure to retrieve the additional details does not result in an error, but the fields values are omitted from the output.</value>
+  </data>
+  <data name="Smb2Client_mkdir_Detailed" xml:space="preserve">
+    <value>By default, parent directories are not created.  If the directory already exists, the server returns STATUS_OBJECT_NAME_COLLISION.  {0} only supports creating a single level directory at a time.  That is, if you try to create \\SERVER\Share\Dir1\Subdir2\Subdir3, then \\SERVER\Share\Dir1\Subdir2 must exist or the server returns STATUS_OBJECT_PATH_NOT_FOUND.
+
+If you specify -Parents, {0} attempts to create the directory with the full path, as above.  If the server returns STATUS_OBJECT_PATH_NOT_FOUND, it then starts at the root of the share and checks for each directory, creating if necessary.  If the specified directory already exists, no error is generated.  This does result in more traffic, as each directory level generates a CREATE request.</value>
+  </data>
+  <data name="Smb2Client_mklink_Detailed" xml:space="preserve">
+    <value>By default, &lt;TargetPath&gt; is interpreted as a full path, regardless of the form.  Use -Relative to specify a relative link.  For an absolute path to function properly, the actual link path must begin with `\??\`. If you don't specify this, it is added for you without a warning.
+
+If an object already exists &lt;UncPath&gt;, it must be of the correct type.  That is, it must be a file for a file link or a directory to a directory link.  If it does not exist, it is created.
+
+A symlink contains two components: the substitution path and the print path.  The substitution path specifies the target of the link, whereas the print path is displayed to the user in directory listings.  They do not have to correlate.  By default, {0} sets the print path to &lt;TargetPath&gt;, before prepending `\??\` (if applicable).  Use -PrintPath to explicitly set the print path.
+
+{0} cannot be used to create junctions.  For this, use mount.</value>
+  </data>
+  <data name="Smb2Client_mount_Detailed" xml:space="preserve">
+    <value>The TargetPath may be either a volume or directory.  For volumes, the target path should start with \??\ and end with a trailing backslash.  To mount a directory (a.k.a. junction), the target path should specify a full path starting with X:\ where X is the drive letter.  {0} checks the path and issues a warning if the path doesn't look quite right, but this does not generate an error and will pass the path unaltered to the server.
+
+A mount point contains two components: the substitution path and the print path.  The substitution path specifies the target of the, whereas the print path is displayed to the user in directory listings.  They do not have to correlate.  By default, {0} sets the print path to &lt;TargetPath&gt;, before prepending `\??\` (if applicable).  Use -PrintPath to explicitly set the print path.
+
+{0} does not require that the directory specified by &lt;UncPath&gt; already exists, and will create the directory if it doesn't exist.  If &lt;UncPath&gt;specifies a file instead of a directory, the server will likely fail the operation.</value>
+  </data>
+  <data name="Smb2Client_put_Detailed" xml:space="preserve">
+    <value>The &lt;UncPath&gt; parameter specifies the target file to write to via SMB.  If &lt;SourceFileName&gt; is specified, {0} opens the file and writes it to the destination file on the server.  If no source file is specified, {0} accepts input from the console.
+
+When copying the file, {0} fetches the file one chunk at a time.  The default chunk size is 32,768 bytes, which loosely resembles using the COPY command on a command prompt.  Use -ChunkSize to override the chunk size.</value>
+  </data>
+  <data name="Smb2Client_rmdir_Detailed" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Smb2Client_rm_Detailed" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Smb2Client_umount_Detailed" xml:space="preserve">
+    <value>{0} removes the mount point information from &lt;UncPath&gt;.  Although &lt;UncPath&gt; should be a directory, it doesn't have to be; therefore {0} may be used to remove mount point info from a file as well, should the need arise.
+
+By default, the directory specified to by &lt;UncPath&gt; is left intact.  Specify -RemoveDirectory to remove it.  Specifically, this sets the DeleteOnClose flag on the object, which may or may not succeed.</value>
+  </data>
+  <data name="Smb2Client_watch_Detailed" xml:space="preserve">
+    <value>Use -Recursive to watch for changes to the entire subtree.  Otherwise, only objects within &lt;UncPath&gt; are reported.  Note that changing an object within a subdirectory changes the subdirectory, so the subdirectory will be reported ever if -Recursive is not specified.
+
+When requesting change notifications, {0} must specify a maximum size for the output buffer.  The default is 2048 to reflect what Windows Explorer uses.  This is not sufficient for all cases.  Use -BufferSize to change the maximum size.
+
+If an error occurs, by default, {0} exits.  Use -ContinueOnErrors to ignore the error and continue waiting for notifications.
+
+Monitoring continues either until an error occurs (unless -ContinueOnErrors is specified), or until the user presses Ctrl+C.</value>
+  </data>
+</root>

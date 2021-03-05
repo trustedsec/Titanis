@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<LangVersion>12.0</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Titanis.Core" />
+		<PackageReference Include="Titanis.IO" />
+		<PackageReference Include="Titanis.Winterop.FileInfo" />
+		<PackageReference Include="Titanis.Winterop.Security" />
+		<PackageReference Include="Titanis.DceRpc.Core" />
+		<PackageReference Include="Titanis.DceRpc" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\base\Titanis.Core\Titanis.Core.csproj" />
+		<ProjectReference Include="..\..\..\base\Titanis.IO\Titanis.IO.csproj" />
+		<ProjectReference Include="..\..\..\base\Titanis.Winterop.ErrorCodes\Titanis.Winterop.ErrorCodes.csproj" />
+		<ProjectReference Include="..\..\..\base\Titanis.Winterop.FileInfo\Titanis.Winterop.FileInfo.csproj" />
+		<ProjectReference Include="..\..\..\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
+		<ProjectReference Include="..\..\Titanis.DceRpc.Core\Titanis.DceRpc.Core.csproj" />
+		<ProjectReference Include="..\..\Titanis.DceRpc\Titanis.DceRpc.csproj" />
+	</ItemGroup>
+
+</Project>

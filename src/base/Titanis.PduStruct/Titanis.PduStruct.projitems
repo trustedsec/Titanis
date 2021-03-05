@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>4ce43aec-a0a0-42fe-96bc-08ec122daf01</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Titanis.PduStruct</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)PduAlignmentAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduArgumentsAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduArraySizeAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduByteOrder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduByteOrderAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduConditionalAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduFieldAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduIgnoreAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduParameterAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduPositionAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduStringAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduStructAttribute.cs" />
+  </ItemGroup>
+</Project>

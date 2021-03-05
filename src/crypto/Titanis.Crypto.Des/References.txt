@@ -1,0 +1,15 @@
+﻿[HUERTAS] - Data Encryption Standard
+https://github.com/dhuertas/DES/blob/master/des.c
+
+// Inspired and adapted from: https://github.com/dhuertas/DES/blob/master/des.c
+// His citation is below
+/*
+ * Data Encryption Standard
+ * An approach to DES algorithm
+ * 
+ * By: Daniel Huertas Gonzalez
+ * Email: huertas.dani@gmail.com
+ * Version: 0.1
+ * 
+ * Based on the document FIPS PUB 46-3
+ */

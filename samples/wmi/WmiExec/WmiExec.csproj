@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\base\Titanis.Cli.CommonParameters\Titanis.Cli.CommonParameters.csproj" />
+    <ProjectReference Include="..\..\..\src\base\Titanis.Cli.DceRpc\Titanis.Cli.DceRpc.csproj" />
+    <ProjectReference Include="..\..\..\src\base\Titanis.Cli\Titanis.Cli.csproj" />
+    <ProjectReference Include="..\..\..\src\base\Titanis.Core\Titanis.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\base\Titanis.IO\Titanis.IO.csproj" />
+    <ProjectReference Include="..\..\..\src\net\msrpc\Titanis.Msrpc.Mswmi\Titanis.Msrpc.Mswmi.csproj" />
+    <ProjectReference Include="..\..\..\src\net\Titanis.DceRpc.Core\Titanis.DceRpc.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\net\Titanis.DceRpc\Titanis.DceRpc.csproj" />
+    <ProjectReference Include="..\..\..\src\security\Titanis.Security.Ntlm\Titanis.Security.Ntlm.csproj" />
+    <ProjectReference Include="..\..\..\src\security\Titanis.Security\Titanis.Security.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,1 @@
+﻿[RFC 1509]  - Generic Security Service API : C-bindings         

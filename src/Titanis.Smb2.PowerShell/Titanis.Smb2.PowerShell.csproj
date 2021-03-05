@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Format.ps1xml" />
+    <None Remove="Titanis.Smb2.Powershell.psd1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\src\tools\net\smb2\Smb2Client\FileAttributeFormatter.cs" Link="FileAttributeFormatter.cs" />
+    <Compile Include="..\src\tools\net\smb2\Smb2Client\StringHelper.cs" Link="StringHelper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Format.ps1xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Titanis.Smb2.Powershell.psd1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\base\Titanis.Cli\Titanis.Cli.csproj" />
+    <ProjectReference Include="..\src\base\Titanis.WinFileInfo\Titanis.WinFileInfo.csproj" />
+    <ProjectReference Include="..\src\net\Titanis.Smb2\Titanis.Smb2.csproj" />
+    <ProjectReference Include="..\src\security\Titanis.Security.Kerberos\Titanis.Security.Kerberos.csproj" />
+    <ProjectReference Include="..\src\security\Titanis.Security.Ntlm\Titanis.Security.Ntlm.csproj" />
+    <ProjectReference Include="..\src\security\Titanis.Security.Spnego\Titanis.Security.Spnego.csproj" />
+    <ProjectReference Include="..\src\security\Titanis.Security\Titanis.Security.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Titanis.Cli</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\net\Titanis.DceRpc.Core\Titanis.DceRpc.Core.csproj" />
+    <ProjectReference Include="..\..\net\Titanis.DceRpc.Epm\Titanis.DceRpc.Epm.csproj" />
+    <ProjectReference Include="..\..\net\Titanis.DceRpc\Titanis.DceRpc.csproj" />
+    <ProjectReference Include="..\..\net\Titanis.Smb2\Titanis.Smb2.csproj" />
+    <ProjectReference Include="..\Titanis.Cli.CommonParameters\Titanis.Cli.CommonParameters.csproj" />
+    <ProjectReference Include="..\Titanis.Cli\Titanis.Cli.csproj" />
+    <ProjectReference Include="..\Titanis.Core\Titanis.Core.csproj" />
+  </ItemGroup>
+
+</Project>
