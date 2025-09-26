@@ -59,7 +59,7 @@ namespace Titanis.Smb2.Cli
 		[Placeholder("UNC path")]
 		[Description("The UNC path of the target")]
 		[Category(ParameterCategories.Connection)]
-		public string? UncPath { get; set; }
+		public UncPath? UncPath { get; set; }
 
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public AuthenticationParameters AuthenticationParameters { get; set; }
@@ -81,14 +81,10 @@ namespace Titanis.Smb2.Cli
 		/// </summary>
 		protected virtual string? DefaultShareName => null;
 
-		/// <summary>
-		/// Gets the parsed <see cref="UncPath"/> provided on the command line.
-		/// </summary>
-		protected UncPath UncPathInfo { get; private set; }
-		protected string? ServerName => this.UncPathInfo?.ServerName;
-		protected string? ShareName => this.UncPathInfo?.ShareName;
-		protected string? ShareRelativePath => this.UncPathInfo?.ShareRelativePath;
-		protected int RemotePort => this.UncPathInfo?.Port ?? Smb2Client.TcpPort;
+		protected string? ServerName => this.UncPath?.ServerName;
+		protected string? ShareName => this.UncPath?.ShareName;
+		protected string? ShareRelativePath => this.UncPath?.ShareRelativePath;
+		protected int RemotePort => this.UncPath?.Port ?? Smb2Client.TcpPort;
 		#endregion
 
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
@@ -107,15 +103,9 @@ namespace Titanis.Smb2.Cli
 		{
 			this.NetParameters.ValidateParameters(context);
 
-			// Parse the UNC path into components
-			this.UncPathInfo = Titanis.UncPath.Parse(this.UncPath);
-
 			// Use default share if appropriate
-			if (string.IsNullOrEmpty(this.UncPathInfo.ShareName) && !string.IsNullOrEmpty(this.DefaultShareName))
-			{
-				this.UncPath = Path.Combine(this.UncPath, this.DefaultShareName);
-				this.UncPathInfo = Titanis.UncPath.Parse(this.UncPath);
-			}
+			if (string.IsNullOrEmpty(this.UncPath.ShareName) && !string.IsNullOrEmpty(this.DefaultShareName))
+				this.UncPath= this.UncPath.Append(this.DefaultShareName);
 
 			this.AuthenticationParameters.Validate(true, context, this.Log);
 			this.SmbParameters.Validate(context, this.AuthenticationParameters);

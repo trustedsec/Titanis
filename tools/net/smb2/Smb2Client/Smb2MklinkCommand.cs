@@ -54,7 +54,7 @@ namespace Titanis.Smb2.Cli
 				: (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.NonDirectory);
 
 			// Create or open the file/directory
-			await using (var file = await client.CreateFileAsync(this.UncPathInfo, new Smb2CreateInfo
+			await using (var file = await client.CreateFileAsync(this.UncPath, new Smb2CreateInfo
 			{
 				OplockLevel = Smb2OplockLevel.None,
 				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,

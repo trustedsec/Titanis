@@ -18,7 +18,7 @@ namespace Titanis.Smb2.Cli
 
 		protected override async Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
 		{
-			var share = await client.GetShare(this.UncPathInfo, cancellationToken);
+			var share = await client.GetShare(this.UncPath, cancellationToken);
 
 			// Query network interfaces
 			var nics = await share.QueryNetworkInterfacesAsync(cancellationToken);

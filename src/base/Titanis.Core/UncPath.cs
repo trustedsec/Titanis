@@ -51,6 +51,19 @@ namespace Titanis
 		/// <returns></returns>
 		public UncPath GetShare() => new UncPath(ServerName, Port, ShareName, null);
 
+		/// <summary>
+		/// Checks whether another <see cref="UncPath"/> matches the server and share name of this path.
+		/// </summary>
+		/// <param name="other">Other <see cref="UncPath"/> to check</param>
+		/// <returns><see langword="true"/> if the server and share of <paramref name="other"/> match; otherwise, <see langword="false"/></returns>
+		public bool MatchesServerAndShare(UncPath? other)
+		{
+			if (other is null) return false;
+			bool matches = this.ServerName.Equals(other.ServerName, StringComparison.OrdinalIgnoreCase) && string.Equals(this.ShareName, other.ShareName, StringComparison.OrdinalIgnoreCase)
+				&& (other.Port == this.Port);
+			return matches;
+		}
+
 		internal string? DfsSharePath
 			=> string.IsNullOrEmpty(ShareName) ? $@"\{ServerName}"
 			: $@"\{ServerName}\{ShareName}";

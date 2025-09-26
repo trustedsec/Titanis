@@ -310,6 +310,23 @@ FileInfoClass.NetworkOpenInfo), DefaultMaxResponseSize)
 		}
 
 		/// <summary>
+		/// Gets the Basic file information of the file
+		/// </summary>
+		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
+		public async Task<FileBasicInfo> GetBasicInfoAsync( CancellationToken cancellationToken )
+		{
+			var buffer = new byte[FileBasicInfoStruct.StructSize];
+			var req = new Smb2QueryInfoRequest(this.Handle, Smb2QueryFileInfo.Generic(Smb2FileInfoType.File, FileInfoClass.BasicInfo), DefaultMaxResponseSize)
+			{
+				outputBuffer = buffer
+			};
+			var response = (Pdus.Smb2QueryInfoResponse)await this.Tree.SendSyncPduAsync(req, cancellationToken ).ConfigureAwait(false);
+			var res = new ByteMemoryReader(response.outputBuffer);
+			var basicInfo = new FileBasicInfo(res.ReadFileBasicInfo());
+			return basicInfo;
+		}
+
+		/// <summary>
 		/// Sets the symbolic link info.
 		/// </summary>
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>

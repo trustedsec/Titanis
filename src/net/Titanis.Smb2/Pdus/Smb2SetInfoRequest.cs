@@ -77,7 +77,10 @@ namespace Titanis.Smb2.Pdus
 		internal Smb2FileHandle fileId;
 	}
 
-	abstract class Smb2FileInfo
+	/// <summary>
+	/// Describes file information.
+	/// </summary>
+	public abstract class Smb2FileInfo
 	{
 		internal abstract Smb2FileInfoType InfoType { get; }
 		internal abstract FileInfoClass InfoClass { get; }
@@ -105,9 +108,55 @@ namespace Titanis.Smb2.Pdus
 	}
 
 	// [MS-FSCC] § 2.4.7
-	sealed class FileBasicInfo : Smb2FileInfo
+	/// <summary>
+	/// Describes basic file information.
+	/// </summary>
+	public sealed class FileBasicInfo : Smb2FileInfo
 	{
 		internal FileBasicInfo(
+			DateTime? creationTime,
+			DateTime? lastAccessTime,
+			DateTime? lastWriteTime,
+			DateTime? changeTime,
+			FileAttributes attributes
+			)
+		{
+			this.struc.creationTime = creationTime.HasValue ? creationTime.Value.ToFileTimeUtc() : 0;
+			this.struc.lastAccessTime = lastAccessTime.HasValue ? lastAccessTime.Value.ToFileTimeUtc() : 0;
+			this.struc.lastWriteTime = lastWriteTime.HasValue ? lastWriteTime.Value.ToFileTimeUtc() : 0;
+			this.struc.changeTime = changeTime.HasValue ? changeTime.Value.ToFileTimeUtc() : 0;
+			this.struc.attributes = attributes;
+		}
+
+		internal FileBasicInfo(in FileBasicInfoStruct struc) => this.struc = struc;
+
+		internal sealed override Smb2FileInfoType InfoType => Smb2FileInfoType.File;
+		internal sealed override FileInfoClass InfoClass => FileInfoClass.BasicInfo;
+
+		internal FileBasicInfoStruct struc;
+
+		// TODO: Copy field descriptions from [MS-FSCC]
+		public DateTime CreationTime => DateTime.FromFileTimeUtc(this.struc.creationTime);
+		public DateTime LastAccessTime => DateTime.FromFileTimeUtc(this.struc.lastAccessTime);
+		public DateTime LastWriteTime => DateTime.FromFileTimeUtc(this.struc.lastWriteTime);
+		public DateTime ChangeTime => DateTime.FromFileTimeUtc(this.struc.changeTime);
+		public FileAttributes Attributes => this.struc.attributes;
+		//public int reserved => this.struc.reserved;
+
+		internal override void WriteTo(ByteWriter writer)
+		{
+			writer.WriteInt64LE(this.struc.creationTime);
+			writer.WriteInt64LE(this.struc.lastAccessTime);
+			writer.WriteInt64LE(this.struc.lastWriteTime);
+			writer.WriteInt64LE(this.struc.changeTime);
+			writer.WriteInt32LE((int)this.struc.attributes);
+			writer.WriteInt32LE(this.struc.reserved);
+		}
+	}
+
+	struct FileBasicInfoStruct
+	{
+		public FileBasicInfoStruct(
 			DateTime? creationTime,
 			DateTime? lastAccessTime,
 			DateTime? lastWriteTime,
@@ -121,26 +170,14 @@ namespace Titanis.Smb2.Pdus
 			this.changeTime = changeTime.HasValue ? changeTime.Value.ToFileTimeUtc() : 0;
 			this.attributes = attributes;
 		}
+		public static unsafe int StructSize => sizeof(FileBasicInfoStruct);
 
-		internal sealed override Smb2FileInfoType InfoType => Smb2FileInfoType.File;
-		internal sealed override FileInfoClass InfoClass => FileInfoClass.BasicInfo;
-
-		internal long creationTime;
-		internal long lastAccessTime;
-		internal long lastWriteTime;
-		internal long changeTime;
-		internal FileAttributes attributes;
-		internal int reserved;
-
-		internal override void WriteTo(ByteWriter writer)
-		{
-			writer.WriteInt64LE(this.creationTime);
-			writer.WriteInt64LE(this.lastAccessTime);
-			writer.WriteInt64LE(this.lastWriteTime);
-			writer.WriteInt64LE(this.changeTime);
-			writer.WriteInt32LE((int)this.attributes);
-			writer.WriteInt32LE(this.reserved);
-		}
+		public long creationTime;
+		public long lastAccessTime;
+		public long lastWriteTime;
+		public long changeTime;
+		public FileAttributes attributes;
+		public int reserved;
 	}
 
 	// [MS-FSCC] § 2.4.13

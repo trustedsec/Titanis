@@ -64,7 +64,7 @@ namespace Titanis.Smb2.Cli
 		protected sealed override async Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
 		{
 			// If the last part of the path contains * or ?, treat it as a seacrh pattern
-			var dirPath = this.UncPathInfo;
+			var dirPath = this.UncPath;
 			string searchPattern = "*";
 			if (dirPath.ShareRelativePath.Length > 0)
 			{

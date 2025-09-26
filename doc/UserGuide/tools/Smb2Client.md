@@ -20,6 +20,7 @@ Smb2Client <subcommand>
 |[mkdir](#smb2client-mkdir)|Creates a directory.|
 |[rmdir](#smb2client-rmdir)|Deletes a directory.|
 |[rm](#smb2client-rm)|Deletes a file.|
+|[touch](#smb2client-touch)|Updates the timestamps or attributes of a file or directory on an SMB share.|
 |[enumshares](#smb2client-enumshares)|Lists shares on the server|
 |[enumopenfiles](#smb2client-enumopenfiles)|Lists files open on the server.|
 |[enumsessions](#smb2client-enumsessions)|Lists active sessions on the server.|
@@ -66,6 +67,15 @@ Smb2Client enumnics [options] <UncPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -98,7 +108,7 @@ Smb2Client enumnics [options] <UncPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -131,14 +141,6 @@ Smb2Client enumnics [options] <UncPath>
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details
@@ -222,7 +224,7 @@ Smb2Client enumopenfiles [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -365,7 +367,7 @@ Smb2Client enumsessions [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -502,7 +504,7 @@ Smb2Client enumshares [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -601,6 +603,15 @@ Smb2Client enumsnapshots [options] <UncPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -630,7 +641,7 @@ Smb2Client enumsnapshots [options] <UncPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -663,14 +674,6 @@ Smb2Client enumsnapshots [options] <UncPath>
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details
@@ -732,6 +735,15 @@ Smb2Client enumstreams [options] <UncPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -762,7 +774,7 @@ Smb2Client enumstreams [options] <UncPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -795,14 +807,6 @@ Smb2Client enumstreams [options] <UncPath>
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details
@@ -879,6 +883,15 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -899,7 +912,7 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -932,14 +945,6 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details
@@ -1085,6 +1090,15 @@ Smb2Client ls [options] <UncPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -1105,7 +1119,7 @@ Smb2Client ls [options] <UncPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1138,14 +1152,6 @@ Smb2Client ls [options] <UncPath>
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details
@@ -1276,6 +1282,15 @@ Smb2Client mkdir [options] <UncPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -1296,7 +1311,7 @@ Smb2Client mkdir [options] <UncPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1329,14 +1344,6 @@ Smb2Client mkdir [options] <UncPath>
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details
@@ -1418,6 +1425,15 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -1438,7 +1454,7 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1471,14 +1487,6 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details
@@ -1588,6 +1596,15 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -1608,7 +1625,7 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1641,14 +1658,6 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details
@@ -1736,6 +1745,11 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |-|-|-|-|
 |    -ChunkSize||&lt;Int32&gt;|Size of chunks to copy|
 ||||  Default: 32768|
+|    -TimestampsFrom||&lt;UncPath&gt;|UNC Path of remote file to copy Creation, LastAccess, LastWrite and Change Time from.|
+|    -CreateTimestamp||&lt;DateTime&gt;|Create time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
+|    -LastAccessTimestamp||&lt;DateTime&gt;|Last access time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
+|    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
+|    -ChangeTimestamp||&lt;DateTime&gt;|Change time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
 
 
@@ -1759,11 +1773,20 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1779,7 +1802,7 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1814,14 +1837,6 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
 
 
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
 ## Details
 
   The &lt;UncPath&gt; parameter specifies the target file to write to via SMB.  If
@@ -1832,6 +1847,11 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
   When copying the file, Smb2Client put fetches the file one chunk at a time. 
   The default chunk size is 32,768 bytes, which loosely resembles using the COPY
   command on a command prompt.  Use -ChunkSize to override the chunk size.
+  
+  When specifying -UseBackupSemantics the server will check if the user has
+  SeBackupPrivilege and SeRestorePrivilege.  If they do they are allowed to
+  bypass security checks when accessing files. Notably bypassing security checks
+  does not bypass file locks or a file marked with the read-only attribute.
   
   The &lt;UncPath&gt; parameter specifies the target of the command using the format
   \\&lt;server&gt;[:&lt;port&gt;]\&lt;share&gt;[\&lt;path&gt;] where &lt;port&gt; is an integer specifying the
@@ -1888,6 +1908,15 @@ Smb2Client rm [options] <UncPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -1913,7 +1942,7 @@ Smb2Client rm [options] <UncPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1946,14 +1975,6 @@ Smb2Client rm [options] <UncPath>
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details
@@ -2015,6 +2036,15 @@ Smb2Client rmdir [options] <UncPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -2040,7 +2070,7 @@ Smb2Client rmdir [options] <UncPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -2075,14 +2105,6 @@ Smb2Client rmdir [options] <UncPath>
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
 
 
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
 ## Details
 
   
@@ -2104,6 +2126,241 @@ Smb2Client rmdir [options] <UncPath>
   KDC.  If you specify a name, Smb2Client rmdir applies the same filtering rules
   for -4 and -6.
   
+# Smb2Client touch
+  Updates the timestamps or attributes of a file or directory on an SMB share.
+
+## Synopsis
+```
+Smb2Client touch [options] <UncPath>
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;UncPath&gt;||&lt;UNC path&gt;|The UNC path of the target|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -CreateTimestamp||&lt;DateTime&gt;|Create time to set on the file (UTC).|
+|    -LastAccessTimestamp||&lt;DateTime&gt;|Last access time to set on the file (UTC).|
+|    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC).|
+|    -ChangeTimestamp||&lt;DateTime&gt;|Change time to set on the file (UTC).|
+|    -SetAttributes||&lt;FileAttributeSpec&gt;|File attributes to set on the file or directory. Accepts Formats: RHSATFMCOIEVX (string), 28312 (int), 0x80 (hex). See Detailed help for meaning|
+|    -UpdateAttributes||&lt;String&gt;|File attributes to modify existing attributes from. Accepts Format: (+-)RHSATFMCOIEVX. See Detailed help for more info.|
+|    -TimestampsFrom||&lt;UncPath&gt;|UNC Path of remote file to copy Creation, LastAccess, LastWrite and Change Time from.|
+|    -CopyFileAttributes||&lt;SwitchParam&gt;|If specified, also copy file attributes from TimestampsFrom|
+|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+||||**Possible values:**|
+||||  FileName|
+||||  RelativePath|
+||||  FileIndex|
+||||  CreationTime|
+||||  LastAccessTime|
+||||  LastWriteTime|
+||||  LastChangeTime|
+||||  Size|
+||||  SizeOnDisk|
+||||  FileAttributes|
+||||  IsDirectory|
+||||  EaSize|
+||||  ShortName|
+||||  FileId|
+||||  ReparseTag|
+||||  LinkTarget|
+||||  SecurityDescriptor|
+||||  SecurityDescriptorSddl|
+||||  Owner|
+||||  Group|
+||||  Dacl|
+||||  Sacl|
+||||  MaxAccess|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+
+
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
+|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -Kdc||&lt;String&gt;|KDC address|
+|    -KdcPort||&lt;Int32&gt;|KDC port|
+||||  Default: 88|
+
+
+### Authentication (NTLM)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+
+
+## Details
+
+  If the file specified at the UNC path does not exist it will be created.
+  If the file specified at the UNC path does exist the directory entry for the
+  file is updated.
+  
+  Any -*Timestamp arguments will override timestamps taken from -TimestampsFrom.
+  Only timestamps provided with a -*Timestamp argument or those taken from
+  -TimestampsFrom are used.  No default values are provided and last accessed
+  time is not updated automatically when this tool is used.
+  
+  The letters available for use in Attributes are as follows:
+  
+   R Read-only
+   H Hidden
+   S System
+   A Archive
+   T Temporary
+   F Sparse
+   M Reparse point
+   C Compressed
+   O Offline
+   I Not content indexed
+   E Encrypted
+   V Integrity
+   X No scrub
+  
+  -SetAttributes accepts strings such as:
+  * RHSA
+  * 128
+  * 0x80
+  You can provide any arbitrary integer or hex value, although the server may
+  reject it as an invalid parameter if it does not consist of known parameters.
+  
+  -UpdateAttributes accepts strings such as:
+  * +HST-IO (add Hidden, System, Temporary and remove Not content indexed,
+  Offline)
+  * +HST (add Hidden, System, Temporary)
+  * -H (remove Hidden)
+  
+  Removing attributes that are not already set is not an error, they simply
+  remain unset.
+  
+  The share may not respect some of these flags being set but since they can be
+  set in the structure we allow them to be passed here for experimentation.
+  
+  If -CopyFileAttributes is set it is used as the base modified by
+  -UpdateAttributes.  Otherwise the original files values are used as the base
+  value.  If no UpdateAttributes are specified the copied attributes are used as
+  is.
+  
+  In order to clear all set attributes, specify a -SetAttributes value of ""
+   
+  
+  
+  The &lt;UncPath&gt; parameter specifies the target of the command using the format
+  \\&lt;server&gt;[:&lt;port&gt;]\&lt;share&gt;[\&lt;path&gt;] where &lt;port&gt; is an integer specifying the
+  port to connect to.  If -HostAddress is specified, Smb2Client touch resolves it
+  either as an IP address (IPv4 or IPv6) or a DNS name.  If -HostAddress is not
+  specified, &lt;server&gt; is resolved.  In either case, the resulting IP addresses
+  may be filtered by address family using -4 or -6.  In either case, &lt;server&gt; is
+  used to refer to the server within the SMB2 protocol.
+  
+  Smb2Client touch supports both NTLM and Kerberos authentication.  The -UserName
+  and -Password parameters apply to both NTLM and Kerberos.  You may also specify
+  -NtlmHash for NTLM.  Each authentication mechanism has a variety of parameters
+  to customize the negotiation.
+  
+  Kerberos is only enabled if you specify -kdc with the name or address of the
+  KDC.  If you specify a name, Smb2Client touch applies the same filtering rules
+  for -4 and -6.
+  
+
+## Examples
+
+### Example 1 - Set hidden and Read-Only attributes on a file, overriding any previous state
+
+```
+Smb2Client touch \\SERVER\Share\file.txt -u User -ud DOMAIN -p password -SetAttributes RH
+```
+### Example 2 - Add Hidden and remove Archive and System attributes from a file
+
+```
+Smb2Client touch \\SERVER\Share\file.txt -u User -ud DOMAIN -p password -UpdateAttributes +H-AS
+```
+### Example 3 - Set the last access time on a file
+
+```
+Smb2Client touch \\SERVER\Share\file.txt -u User -ud DOMAIN -p password -LastAccessTimestamp "09/30/2023 13:23:55"
+```
+### Example 4 - Copy timestamps and attributes from another file
+
+```
+Smb2Client touch \\SERVER\Share\file.txt -u User -ud DOMAIN -p password  -TimestampsFrom \\SERVER\Share\otherfile.txt
+```
 # Smb2Client umount
   Unmounts a mount point.
 
@@ -2148,6 +2405,15 @@ Smb2Client umount [options] <UncPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -2168,7 +2434,7 @@ Smb2Client umount [options] <UncPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -2201,14 +2467,6 @@ Smb2Client umount [options] <UncPath>
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details
@@ -2290,6 +2548,15 @@ Smb2Client watch [options] <UncPath>
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -UseBackupSemantics||&lt;SwitchParam&gt;|Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -2310,7 +2577,7 @@ Smb2Client watch [options] <UncPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -2343,14 +2610,6 @@ Smb2Client watch [options] <UncPath>
 |-|-|-|-|
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 
 
 ## Details

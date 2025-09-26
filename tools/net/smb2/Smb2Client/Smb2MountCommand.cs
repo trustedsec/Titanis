@@ -49,7 +49,7 @@ namespace Titanis.Smb2.Cli
 		protected sealed override async Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
 		{
 			// Create or open the directory (fail if it's actually a file)
-			await using (var file = await client.CreateFileAsync(this.UncPathInfo, new Smb2CreateInfo
+			await using (var file = await client.CreateFileAsync(this.UncPath, new Smb2CreateInfo
 			{
 				OplockLevel = Smb2OplockLevel.None,
 				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,

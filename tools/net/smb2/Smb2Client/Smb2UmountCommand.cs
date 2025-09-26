@@ -38,7 +38,7 @@ namespace Titanis.Smb2.Cli
 				: Smb2FileAccessRights.WriteAttributes;
 
 			// Open the object
-			await using (var file = await client.CreateFileAsync(this.UncPathInfo, new Smb2CreateInfo
+			await using (var file = await client.CreateFileAsync(this.UncPath, new Smb2CreateInfo
 			{
 				OplockLevel = Smb2OplockLevel.None,
 				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,

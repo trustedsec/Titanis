@@ -102,15 +102,15 @@ namespace Titanis.Smb2.Cli
 				this.WriteWarning("The destination part appears to be a UNC path.  Note that the destination is resolved using the OS functions and not using configured parameters.");
 
 			// Determine whether the source is a directory
-			var rootObjectPath = this.UncPathInfo;
+			var rootObjectPath = this.UncPath;
 			WildcardPattern? pattern = null;
-			if (!string.IsNullOrEmpty(this.UncPathInfo.ShareRelativePath))
+			if (!string.IsNullOrEmpty(this.UncPath.ShareRelativePath))
 			{
-				string fileNamePart = this.UncPathInfo.GetFileName();
+				string fileNamePart = this.UncPath.GetFileName();
 				bool hasWildcard = !string.IsNullOrEmpty(fileNamePart) && WildcardPattern.ContainsWildcardCharacter(fileNamePart);
 				if (hasWildcard)
 				{
-					rootObjectPath = this.UncPathInfo.GetDirectoryPath();
+					rootObjectPath = this.UncPath.GetDirectoryPath();
 					pattern = new WildcardPattern(fileNamePart);
 				}
 			}
