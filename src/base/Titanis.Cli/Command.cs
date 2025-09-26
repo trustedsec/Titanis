@@ -378,7 +378,7 @@ namespace Titanis.Cli
 			{
 				if (0 != (group.Options & ParameterGroupOptions.AlwaysInstantiate))
 				{
-					group.GetGroupObject(this);
+					group.GetGroupObject(this, this);
 				}
 			}
 

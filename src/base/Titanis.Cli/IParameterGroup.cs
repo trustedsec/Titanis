@@ -9,6 +9,10 @@ namespace Titanis.Cli
 	/// </summary>
 	public interface IParameterGroup
 	{
-		void Initialize(Command command);
+		/// <summary>
+		/// Called by the command line parser when creating the parameter group.
+		/// </summary>
+		/// <param name="owner">Owning <see cref="Command"/></param>
+		void Initialize(Command owner);
 	}
 }

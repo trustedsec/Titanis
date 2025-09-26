@@ -6,7 +6,10 @@ using Titanis.Net;
 
 namespace Titanis.Cli
 {
-	public class NetworkParameters : INameResolverService
+	/// <summary>
+	/// Specifies parameters for network connections.
+	/// </summary>
+	public class NetworkParameters : ParameterGroupBase, INameResolverService
 	{
 		[Parameter]
 		[Alias("ha")]

@@ -8,9 +8,11 @@ using Titanis.Smb2;
 
 namespace Titanis.Cli
 {
-	public class SmbParameters
+	/// <summary>
+	/// Specifies parameters for SMB.
+	/// </summary>
+	public class SmbParameters : ParameterGroupBase
 	{
-
 		[Parameter]
 		[Description("List of SMB2 dialects to negotiate")]
 		[Category(ParameterCategories.Connection)]

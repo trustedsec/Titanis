@@ -30,12 +30,12 @@ namespace Titanis.Cli
 			this.GroupCategory = groupCategory;
 		}
 
-		internal object GetGroupObject(object command)
-			=> this.GetGroupObject(command, true)!;
-		internal object? GetGroupObject(object command, bool create)
+		internal object GetGroupObject(Command command, object owner)
+			=> this.GetGroupObject(command, owner, true)!;
+		internal object? GetGroupObject(Command command, object owner, bool create)
 		{
 			if (this.NestingGroup != null)
-				command = this.NestingGroup.GetGroupObject(command);
+				owner = this.NestingGroup.GetGroupObject(command, owner);
 
 			if (this.GroupProperty == null)
 			{
@@ -47,6 +47,8 @@ namespace Titanis.Cli
 				if (propValue == null && create)
 				{
 					propValue = this.Constructor.Invoke(null);
+					if (propValue is IParameterGroup parmGroup)
+						parmGroup.Initialize(command);
 					this.GroupProperty.SetValue(command, propValue);
 				}
 				return propValue;

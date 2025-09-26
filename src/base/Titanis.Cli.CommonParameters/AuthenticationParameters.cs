@@ -27,7 +27,7 @@ namespace Titanis.Cli
 	/// <summary>
 	/// Defines parameters for authentication.
 	/// </summary>
-	public class AuthenticationParameters
+	public class AuthenticationParameters : ParameterGroupBase
 	{
 		[Parameter]
 		[Category(ParameterCategories.Authentication)]

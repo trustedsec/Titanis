@@ -347,7 +347,7 @@ namespace Titanis.Cli
 			return this.GetConverter().ConvertFrom(context, null, rawValue);
 		}
 
-		private object GetGroupObject(object obj, ParameterGroupInfo? group) => group == null ? obj : group.GetGroupObject(obj);
+		private object GetGroupObject(Command command, object owner, ParameterGroupInfo? group) => group == null ? owner : group.GetGroupObject(command, owner);
 		/// <summary>
 		/// Sets the value of the parameter.
 		/// </summary>
@@ -358,11 +358,11 @@ namespace Titanis.Cli
 		/// <paramref name="argValue"/> must be of the correct type.
 		/// Use <see cref="ConvertValue(object, ITypeDescriptorContext?)"/> to convert the values if necessary.
 		/// </remarks>
-		public void SetValue(object command, object? argValue)
+		public void SetValue(Command command, object? argValue)
 		{
 			if (command is null) throw new ArgumentNullException(nameof(command));
 
-			var group = this.GetGroupObject(command, this.Group);
+			var group = this.GetGroupObject(command, command, this.Group);
 			this.Property.SetValue(group, argValue);
 		}
 	}

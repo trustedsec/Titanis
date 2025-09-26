@@ -9,7 +9,7 @@ using Titanis.Cli;
 
 namespace CommandSample
 {
-	internal class TimeParameters
+	internal class TimeParameters : ParameterGroupBase
 	{
 		[Parameter]
 		[Description("Duration to run the loop")]
