@@ -23,7 +23,7 @@ namespace Titanis.Cli
 
 		public override void WriteTaskError(Exception ex)
 		{
-			new FormattedText(
+			this.Terminal.WriteFormattedError(new FormattedText(
 				FormattedTextFactory.Text(" ["),
 				FormattedTextFactory.PushTextColor(ConsoleColor.Red),
 				FormattedTextFactory.Text("failed"),
@@ -34,18 +34,72 @@ namespace Titanis.Cli
 				FormattedTextFactory.Text(ex.ToString()),
 				FormattedTextFactory.LineBreak(),
 				FormattedTextFactory.PopTextColor()
-				).PrintTo(this.Terminal);
+				));
 		}
 		public override void MarkTaskComplete()
 		{
-			new FormattedText(
+			this.Terminal.WriteFormattedError(new FormattedText(
 				FormattedTextFactory.Text(" ["),
 				FormattedTextFactory.PushTextColor(ConsoleColor.Green),
 				FormattedTextFactory.Text("complete"),
 				FormattedTextFactory.PopTextColor(),
 				FormattedTextFactory.Text("]"),
 				FormattedTextFactory.LineBreak()
-				).PrintTo(this.Terminal);
+				));
 		}
+
+		public override void WriteMessage(LogMessage message)
+		{
+			base.WriteMessage(message);
+		}
+
+		protected override void WriteMessage(LogMessage message, bool lineBreak)
+		{
+			if (message is null) throw new ArgumentNullException(nameof(message));
+			if (message.Severity < LogLevel)
+				return;
+
+			if (this.Format is LogFormat.Text or LogFormat.TextWithTimestamp)
+			{
+				var logLine = FormatMessage(message, message.Severity);
+				this.Terminal.WriteFormattedError(logLine);
+				if (lineBreak)
+					this.Terminal.WriteErrorLine(null);
+			}
+			else
+			{
+				base.WriteMessage(message, lineBreak);
+			}
+		}
+
+		private FormattedText FormatMessage(LogMessage message, LogMessageSeverity severity)
+			=> this.Format switch
+			{
+				LogFormat.TextWithTimestamp => new FormattedText(
+					FormattedTextFactory.Text($"[{message.LogDate:O}]{(string.IsNullOrEmpty(message.Source) ? null : $"[{message.Source}]")} "),
+					FormattedTextFactory.PushTextColor(GetColorFor(severity)),
+					FormattedTextFactory.Text(GetLogLevelToken(severity)),
+					FormattedTextFactory.PopTextColor(),
+					FormattedTextFactory.Text($": {message.Text}")
+					),
+				_ => new FormattedText(
+					FormattedTextFactory.Text($"{(string.IsNullOrEmpty(message.Source) ? null : $"[{message.Source}]")} "),
+					FormattedTextFactory.PushTextColor(GetColorFor(severity)),
+					FormattedTextFactory.Text(GetLogLevelToken(severity)),
+					FormattedTextFactory.PopTextColor(),
+					FormattedTextFactory.Text($": {message.Text}")
+					)
+			};
+
+		private ConsoleColor GetColorFor(LogMessageSeverity severity)
+			=> severity switch
+			{
+				LogMessageSeverity.Error => ConsoleColor.Red,
+				LogMessageSeverity.Warning => ConsoleColor.Yellow,
+				LogMessageSeverity.Info => ConsoleColor.White,
+				LogMessageSeverity.Verbose => ConsoleColor.Cyan,
+				LogMessageSeverity.Diagnostic or LogMessageSeverity.Debug => ConsoleColor.DarkGray,
+				_ => ConsoleColor.Gray
+			};
 	}
 }

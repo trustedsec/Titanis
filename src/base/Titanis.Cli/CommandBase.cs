@@ -273,7 +273,7 @@ namespace Titanis.Cli
 		[Parameter]
 		[Alias("vv")]
 		[Category(ParameterCategories.Output)]
-		[Description("Prints verbose messages")]
+		[Description("Prints diagnostic messages")]
 		public SwitchParam Diagnostic
 		{
 			get => new SwitchParam((this.LogLevel <= LogMessageSeverity.Diagnostic) ? SwitchParamFlags.Set : SwitchParamFlags.None);

@@ -33,7 +33,7 @@ namespace Titanis.Cli
 			public Dictionary<string, string>? Parameters { get; set; }
 		}
 
-		protected void WriteMessage(LogMessage message, bool lineBreak)
+		protected virtual void WriteMessage(LogMessage message, bool lineBreak)
 		{
 			if (message is null) throw new ArgumentNullException(nameof(message));
 			if (message.Severity < LogLevel)
