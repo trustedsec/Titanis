@@ -29,39 +29,90 @@ namespace Titanis.Cli
 
 		public TextWriter OutputWriter => Console.Out;
 
+		/// <summary>
+		/// Used to synchronize output
+		/// </summary>
+		private object _outputLock = new object();
+
 		private Stack<ConsoleColor>? _textColorStack;
 		public void PopTextColor()
 		{
-			var stack = this._textColorStack;
-			if (stack is not null && stack.Count > 0)
-				Console.ForegroundColor = stack.Pop();
+			lock (this._outputLock)
+			{
+				var stack = this._textColorStack;
+				if (stack is not null && stack.Count > 0)
+					Console.ForegroundColor = stack.Pop();
+			}
 		}
 
 		public void PushTextColor(ConsoleColor color)
 		{
-			var stack = (this._textColorStack ??= new Stack<ConsoleColor>());
-			stack.Push(Console.ForegroundColor);
-			Console.ForegroundColor = color;
+			lock (this._outputLock)
+			{
+				var stack = (this._textColorStack ??= new Stack<ConsoleColor>());
+				stack.Push(Console.ForegroundColor);
+				Console.ForegroundColor = color;
+			}
 		}
 
 		public void WriteError(string? text)
+		{
+			lock (this._outputLock)
+			{
+				WriteErrorUnsync(text);
+			}
+		}
+
+		private static void WriteErrorUnsync(string? text)
 		{
 			Console.Error.Write(text);
 		}
 
 		public void WriteErrorLine(string? text)
 		{
-			Console.Error.WriteLine(text);
+			lock (this._outputLock)
+			{
+				Console.Error.WriteLine(text);
+			}
 		}
 
 		public void WriteOutput(string? text)
+		{
+			lock (this._outputLock)
+			{
+				WriteOutputUnsync(text);
+			}
+		}
+
+		private static void WriteOutputUnsync(string? text)
 		{
 			Console.Write(text);
 		}
 
 		public void WriteOutputLine(string? text)
 		{
-			Console.WriteLine(text);
+			lock (this._outputLock)
+			{
+				Console.WriteLine(text);
+			}
+		}
+
+		public void WriteFormattedOutput(FormattedText text)
+		{
+			if (text is null) throw new ArgumentNullException(nameof(text));
+			lock (this._outputLock)
+			{
+				text.PrintTo(new TerminalTarget(this, (t, s) => WriteOutputUnsync(s)));
+			}
+		}
+
+		public void WriteFormattedError(FormattedText text)
+		{
+			if (text is null) throw new ArgumentNullException(nameof(text));
+			lock (this._outputLock)
+			{
+				text.PrintTo(new TerminalTarget(this, (t, s) => WriteErrorUnsync(s)));
+			}
 		}
 	}
 }

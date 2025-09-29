@@ -36,12 +36,15 @@ namespace Titanis.Cli
 		/// <summary>
 		/// Prints the text to a terminal.
 		/// </summary>
-		/// <param name="terminal">Terminal</param>
-		internal void PrintTo(ITerminal terminal)
+		/// <param name="target">Target</param>
+		/// <seealso cref="ITerminal.WriteFormattedOutput(FormattedText)"/>
+		/// <seealso cref="ITerminal.WriteFormattedError(FormattedText)"/>
+		public void PrintTo(FormattedTextTarget target)
 		{
+			if (target is null) throw new ArgumentNullException(nameof(target));
 			foreach (var part in this.Parts)
 			{
-				part.PrintTo(terminal);
+				part.PrintTo(target);
 			}
 		}
 	}
@@ -63,8 +66,8 @@ namespace Titanis.Cli
 		/// <summary>
 		/// Prints the part to a terminal.
 		/// </summary>
-		/// <param name="terminal">Terminal</param>
-		public abstract void PrintTo(ITerminal terminal);
+		/// <param name="target">Print target</param>
+		internal abstract void PrintTo(FormattedTextTarget target);
 	}
 
 	public sealed class TextPart : FormattedTextPart
@@ -78,10 +81,10 @@ namespace Titanis.Cli
 		public sealed override string ToString()
 			=> this.Text;
 
-		public sealed override void PrintTo(ITerminal terminal)
+		internal sealed override void PrintTo(FormattedTextTarget target)
 		{
 			if (!string.IsNullOrEmpty(this.Text))
-				terminal.WriteOutput(this.Text);
+				target.WriteText(this.Text);
 		}
 	}
 
@@ -96,9 +99,9 @@ namespace Titanis.Cli
 		public sealed override string ToString()
 			=> $"<PushColor: {this.Color}>";
 
-		public sealed override void PrintTo(ITerminal terminal)
+		internal sealed override void PrintTo(FormattedTextTarget target)
 		{
-			terminal.PushTextColor(this.Color);
+			target.PushTextColor(this.Color);
 		}
 	}
 
@@ -111,9 +114,9 @@ namespace Titanis.Cli
 		public sealed override string ToString()
 			=> $"<PopColor>";
 
-		public sealed override void PrintTo(ITerminal terminal)
+		internal sealed override void PrintTo(FormattedTextTarget target)
 		{
-			terminal.PopTextColor();
+			target.PopTextColor();
 		}
 	}
 }

@@ -16,15 +16,7 @@ namespace Titanis.Cli
 		void WriteErrorLine(string? text);
 		void PushTextColor(ConsoleColor color);
 		void PopTextColor();
-	}
-
-	public static class TerminalExtensions
-	{
-		public static void Write(this ITerminal terminal, FormattedText text)
-		{
-			if (text is null) throw new ArgumentNullException(nameof(text));
-
-			text.PrintTo(terminal);
-		}
+		void WriteFormattedOutput(FormattedText text);
+		void WriteFormattedError(FormattedText text);
 	}
 }
