@@ -12,7 +12,7 @@ namespace Titanis.DceRpc
 {
 	public interface IRpcCallback
 	{
-		void OnBinding(RpcClientProxy proxy, RpcClientChannel channel, AuthClientContext? authContext, RpcAuthLevel authLevel);
+		void OnBindingProxy(RpcClientProxy proxy, RpcClientChannel channel, AuthClientContext? authContext, RpcAuthLevel authLevel);
 		void OnConnectingProxy(ISocket socket, EndPoint serviceEP, RpcClientProxy proxy);
 	}
 }

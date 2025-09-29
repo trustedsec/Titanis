@@ -15,12 +15,14 @@ namespace Titanis.Security.Ntlm
 		Auth,
 	}
 
+	[CallbackLogger]
 	public class NtlmDiagnosticLogger : INtlmClientCallback
 	{
-		public NtlmDiagnosticLogger(ILog log)
+		public NtlmDiagnosticLogger(ILog log, INtlmClientCallback? chainedCallback = null)
 		{
 			ArgumentNullException.ThrowIfNull(log);
 			this.Log = log;
+			this._chainedCallback = chainedCallback;
 		}
 
 		public ILog Log { get; }
@@ -30,6 +32,13 @@ namespace Titanis.Security.Ntlm
 		private static readonly LogMessageType SendingNegotiate = new LogMessageType(LogMessageSeverity.Diagnostic, SourceName, (int)NtlmLogMessageId.Negotiating, @"Negotiating NTLM
 	Flags: {0}
 	Version: {1}", "flags", "version");
+
+		void INtlmClientCallback.OnNegotiating(ref NegotiateFlags flags, NtlmVersion version)
+		{
+			this.Log.WriteMessage(SendingNegotiate.Create(flags, version));
+			this._chainedCallback?.OnNegotiating(ref flags, version);
+		}
+
 		private static readonly LogMessageType ReceivedChallenge = new LogMessageType(LogMessageSeverity.Diagnostic, SourceName, (int)NtlmLogMessageId.Challenge, @"Received NTLM challenge:
 	Server version: {8}
 	Target type: {0}
@@ -40,25 +49,6 @@ namespace Titanis.Security.Ntlm
 	Host DNS tree (DNS): {5}
 	Timestamp: {6:O}
 	Challenge: {7} (0x{7:X8})", "targetType", "nbComputerName", "nbDomainName", "dnsComputerName", "dnsDomainName", "dnsTree", "timestamp", "challenge", "serverVersion");
-		private static readonly LogMessageType SendingAuth = new LogMessageType(LogMessageSeverity.Diagnostic, SourceName, (int)NtlmLogMessageId.Auth, @"Sending NTLM_AUTHENTICATE:
-	Flags: {0}
-	Version: {1}
-	Workstation name: {2}
-	User name: {3}
-	User domain: {4}
-	Session base key: {5}
-	KX key: {6}
-	Exported session key: {7}
-	Signing key (client-to-server): {8}
-	Signing key (server-to-client): {9}
-	Sealing key (client-to-server): {10}
-	Sealing key (server-to-client): {11}", "flags", "version", "workstation", "userName", "userDomain", "sessionBaseKey", "keyExchangeKey", "exportedSessionKey", "signKeyC2S", "signKeyS2C", "sealKeyC2S", "sealKeyS2C");
-
-		void INtlmClientCallback.OnNegotiating(ref NegotiateFlags flags, NtlmVersion version)
-		{
-			this.Log.WriteMessage(SendingNegotiate.Create(flags, version));
-		}
-
 		void INtlmClientCallback.OnChallenge(NtlmChallenge challenge)
 		{
 			var negFlags = challenge.hdr.negotiateFlags;
@@ -74,7 +64,24 @@ namespace Titanis.Security.Ntlm
 				challenge.hdr.serverChallenge,
 				challenge.hdr.version
 				));
+
+			this._chainedCallback?.OnChallenge(challenge);
 		}
+
+		private static readonly LogMessageType SendingAuth = new LogMessageType(LogMessageSeverity.Diagnostic, SourceName, (int)NtlmLogMessageId.Auth, @"Sending NTLM_AUTHENTICATE:
+	Flags: {0}
+	Version: {1}
+	Workstation name: {2}
+	User name: {3}
+	User domain: {4}
+	Session base key: {5}
+	KX key: {6}
+	Exported session key: {7}
+	Signing key (client-to-server): {8}
+	Signing key (server-to-client): {9}
+	Sealing key (client-to-server): {10}
+	Sealing key (server-to-client): {11}", "flags", "version", "workstation", "userName", "userDomain", "sessionBaseKey", "keyExchangeKey", "exportedSessionKey", "signKeyC2S", "signKeyS2C", "sealKeyC2S", "sealKeyS2C");
+		private readonly INtlmClientCallback? _chainedCallback;
 
 		void INtlmClientCallback.OnAuth(ref NtlmAuthInfo authInfo, ref NtlmAuthResult authResult)
 		{
@@ -92,6 +99,8 @@ namespace Titanis.Security.Ntlm
 				authResult.sealKeyC2S.AsReadOnlySpan().ToHexString(),
 				authResult.sealKeyS2C.AsReadOnlySpan().ToHexString()
 				));
+
+			this._chainedCallback?.OnAuth(ref authInfo, ref authResult);
 		}
 	}
 }

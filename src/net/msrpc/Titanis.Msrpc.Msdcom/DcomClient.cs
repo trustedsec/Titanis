@@ -30,7 +30,7 @@ namespace Titanis.Msrpc.Msdcom
 	public interface IDcomCallback
 	{
 		void OnDcomConnected(ObjectExporterServerInfo info);
-		void OnActivating(Guid clsid, Guid iid);
+		void OnActivatingObject(Guid clsid, Guid iid);
 		void OnActivatedObject(Guid clsid, Guid iid, ActivationResult result);
 		void OnActivationFailed(Guid clsid, Guid iid, Exception ex);
 		void OnConnectingToExporter(ulong oxid, StringBinding binding);
@@ -259,7 +259,7 @@ namespace Titanis.Msrpc.Msdcom
 			};
 
 			ActivationResult result;
-			this._callback?.OnActivating(clsid, iid);
+			this._callback?.OnActivatingObject(clsid, iid);
 			try
 			{
 				if (this._scmActivator != null)

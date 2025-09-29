@@ -412,7 +412,7 @@ namespace Titanis.Smb2
 					}
 					catch (Exception ex)
 					{
-						this.traceCallback?.OnDfsReferralConnectFailed(uncPath, referral, preferred, ex);
+						this.traceCallback?.OnDfsReferralConnectFailed(uncPath, referral, preferred, refPath_, ex);
 					}
 
 				}
@@ -432,7 +432,7 @@ namespace Titanis.Smb2
 						}
 						catch (Exception ex)
 						{
-							this.traceCallback?.OnDfsReferralConnectFailed(uncPath, referral, entry, ex);
+							this.traceCallback?.OnDfsReferralConnectFailed(uncPath, referral, entry, refPath, ex);
 							continue;
 						}
 					}

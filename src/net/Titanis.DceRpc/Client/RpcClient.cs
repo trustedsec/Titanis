@@ -197,7 +197,7 @@ namespace Titanis.DceRpc.Client
 						channel = this.BindTo(stream);
 						stream = null;
 
-						this._callback?.OnBinding(proxy, channel, authContext, authLevel);
+						this._callback?.OnBindingProxy(proxy, channel, authContext, authLevel);
 						await proxy.BindToAsync(channel, true, authContext, authLevel, null, cancellationToken).ConfigureAwait(false);
 						channel = null;
 					}

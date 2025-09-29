@@ -37,7 +37,7 @@ namespace Titanis.Smb2
 		/// <param name="share">Connected share</param>
 		void OnShareConnected(UncPath uncPath, Smb2TreeConnect share);
 		void OnDfsReferralReceived(UncPath uncPath, DfsReferral referral);
-		void OnDfsReferralConnectFailed(UncPath uncPath, DfsReferral referral, DfsReferralEntry entry, Exception ex);
+		void OnDfsReferralConnectFailed(UncPath uncPath, DfsReferral referral, DfsReferralEntry entry, UncPath referredPath, Exception ex);
 		void OnDfsReferralFollowed(UncPath originalPath, Smb2TreeConnect referredShare, UncPath referredPath);
 	}
 }
