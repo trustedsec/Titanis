@@ -27,6 +27,7 @@ namespace Titanis.Msrpc.Msdcom
 	using System.Diagnostics.CodeAnalysis;
 	using Titanis.Winterop;
 
+	[Callback]
 	public interface IDcomCallback
 	{
 		void OnDcomConnected(ObjectExporterServerInfo info);

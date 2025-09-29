@@ -10,6 +10,7 @@ namespace Titanis.Smb2
 	/// <summary>
 	/// Receives callback notifications from <see cref="Smb2Client"/>.
 	/// </summary>
+	[Callback]
 	public interface ISmb2TraceCallback
 	{
 		/// <summary>

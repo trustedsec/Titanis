@@ -200,7 +200,7 @@ namespace Titanis.Cli
 
 			if (ntlmCred != null)
 			{
-				var ntlmContext = new NtlmClientContext(ntlmCred, true, callback: (log != null) ? new NtlmDiagnosticLogger(log) : null)
+				var ntlmContext = new NtlmClientContext(ntlmCred, true, callback: (log != null) ? new NtlmDiagnosticLogger(log, this.Owner?.GetCallback<INtlmClientCallback>()) : null)
 				{
 					Workstation = this.Workstation,
 					WorkstationDomain = domain,
@@ -293,7 +293,7 @@ namespace Titanis.Cli
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
 
 			KerberosClientContext? krbContext = null;
-			var logger = (log != null) ? new KerberosDiagnosticLogger(log) : null;
+				var logger = (log != null) ? new KerberosDiagnosticLogger(log, this.Owner?.GetCallback<IKerberosCallback>()) : null;
 
 			// Configure the Kerberos client
 			var krb = this._kerberosClient;

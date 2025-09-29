@@ -9,6 +9,7 @@ namespace Titanis.Security.Ntlm
 	/// <summary>
 	/// Receives callback notifications during an NTLM client negotiation.
 	/// </summary>
+	[Callback]
 	public interface INtlmClientCallback
 	{
 		/// <summary>

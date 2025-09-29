@@ -10,6 +10,7 @@ using Titanis.Security;
 
 namespace Titanis.DceRpc
 {
+	[Callback]
 	public interface IRpcCallback
 	{
 		void OnBindingProxy(RpcClientProxy proxy, RpcClientChannel channel, AuthClientContext? authContext, RpcAuthLevel authLevel);

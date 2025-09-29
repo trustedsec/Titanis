@@ -7,6 +7,7 @@ using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
 
 namespace Titanis.Security.Kerberos
 {
+	[Callback]
 	public interface IKerberosCallback
 	{
 

@@ -651,5 +651,15 @@ namespace Titanis.Cli
 		}
 
 		private static object UnsetValue = new object();
+
+		#region Callback support
+		public virtual TCallback? GetCallback<TCallback>()
+			where TCallback : class
+		{
+			if (this is TCallback callback)
+				return callback;
+			else return null;
+		}
+		#endregion
 	}
 }
