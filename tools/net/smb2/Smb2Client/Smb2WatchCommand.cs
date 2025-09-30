@@ -43,7 +43,7 @@ namespace Titanis.Smb2.Cli
 				this.BufferSize = 2048;
 
 			// Open directory
-			await using (var dir = await client.OpenDirectoryAsync(this.UncPath, cancellationToken))
+			await using (var dir = (Smb2Directory)await client.CreateFileAsync(this.UncPath, GetOpenDirectoryCreateInfo(), FileAccess.Read, cancellationToken))
 			{
 				WatchOptions options = WatchOptions.None;
 				if (this.ContinueOnErrors.IsSet)

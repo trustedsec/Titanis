@@ -187,7 +187,9 @@ namespace Titanis.Smb2.Cli {
         /// <summary>
         ///   Looks up a localized string similar to The &lt;UncPath&gt; parameter specifies the target file to write to via SMB.  If &lt;SourceFileName&gt; is specified, {0} opens the file and writes it to the destination file on the server.  If no source file is specified, {0} accepts input from the console.
         ///
-        ///When copying the file, {0} fetches the file one chunk at a time.  The default chunk size is 32,768 bytes, which loosely resembles using the COPY command on a command prompt.  Use -ChunkSize to override the chunk size..
+        ///When copying the file, {0} fetches the file one chunk at a time.  The default chunk size is 32,768 bytes, which loosely resembles using the COPY command on a command prompt.  Use -ChunkSize to override the chunk size.
+        ///
+        ///When specifying -UseBackupSemantics the s [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Smb2Client_put_Detailed {
             get {
@@ -210,6 +212,21 @@ namespace Titanis.Smb2.Cli {
         internal static string Smb2Client_rmdir_Detailed {
             get {
                 return ResourceManager.GetString("Smb2Client_rmdir_Detailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If the file specified at the UNC path does not exist it will be created.
+        ///If the file specified at the UNC path does exist the directory entry for the file is updated.
+        ///
+        ///Any -*Timestamp arguments will override timestamps taken from -TimestampsFrom.
+        ///Only timestamps provided with a -*Timestamp argument or those taken from -TimestampsFrom are used.  No default values are provided and last accessed time is not updated automatically when this tool is used.
+        ///
+        ///The letters available for use in Attributes are as  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Smb2Client_touch_Detailed {
+            get {
+                return ResourceManager.GetString("Smb2Client_touch_Detailed", resourceCulture);
             }
         }
         

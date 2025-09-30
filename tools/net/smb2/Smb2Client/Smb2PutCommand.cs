@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Titanis.Cli;
 using Titanis.IO;
 using Titanis.Smb2.Cli;
+using Titanis.Smb2.Pdus;
 
 namespace Titanis.Smb2.Cli
 {
@@ -26,6 +27,27 @@ namespace Titanis.Smb2.Cli
 		[DefaultValue(Smb2Client.DefaultChunkSize)]
 		public int ChunkSize { get; set; }
 
+		[Parameter]
+		[Description("UNC Path of remote file to copy Creation, LastAccess, LastWrite and Change Time from.")]
+		public UncPath? TimestampsFrom { get; set; }
+
+		[Parameter]
+		[Description("Create time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.")]
+		public DateTime? CreateTimestamp { get; set; }
+
+		[Parameter]
+		[Description("Last access time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.")]
+		public DateTime? LastAccessTimestamp { get; set; }
+
+		[Parameter]
+		[Description("Last write time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.")]
+		public DateTime? LastWriteTimestamp { get; set; }
+
+		[Parameter]
+		[Description("Change time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.")]
+		public DateTime? ChangeTimestamp { get; set; }
+
+
 
 		/// <inheritdoc/>
 		protected override void ValidateParameters(ParameterValidationContext context)
@@ -34,6 +56,15 @@ namespace Titanis.Smb2.Cli
 
 			if (this.ChunkSize < 0)
 				context.LogError(nameof(ChunkSize), "ChunkSize must be > 0");
+
+			// RemoteTimeFileName when Specified MUST reside on the same share as where we will be putting the target file
+			if (this.TimestampsFrom is not null)
+			{
+				if (!TimestampsFrom.MatchesServerAndShare(this.UncPath))
+				{
+					context.LogError($"When specifying {nameof(this.TimestampsFrom)}, the file specified must be on the same server and share used by {nameof(this.UncPath)}");
+				}
+			}
 		}
 
 		/// <inheritdoc/>
@@ -43,13 +74,13 @@ namespace Titanis.Smb2.Cli
 			await using (var sourceStream = this.GetSourceStream())
 			{
 				var sourceFileName = this.SourceFileName;
-
+				Winterop.FileAttributes fileAttributes = Winterop.FileAttributes.Normal;
 				// Get source file attributes
 				Winterop.FileAttributes attrs = string.IsNullOrEmpty(sourceFileName)
 					? Winterop.FileAttributes.Normal
 					: (Winterop.FileAttributes)File.GetAttributes(sourceFileName);
 
-				UncPath destPath = this.UncPathInfo;
+				UncPath destPath = this.UncPath;
 
 				// Check whether the remote target is a directory
 				bool isDestDir = false;
@@ -63,7 +94,7 @@ namespace Titanis.Smb2.Cli
 						FileAttributes = 0,
 						ShareAccess = Smb2ShareAccess.ReadWriteDelete,
 						CreateDisposition = Smb2CreateDisposition.Open,
-						CreateOptions = Smb2FileCreateOptions.OpenReparsePoint,
+						CreateOptions = GetCreateOptions(Smb2FileCreateOptions.OpenReparsePoint),
 						RequestMaximalAccess = true,
 						QueryOnDiskId = true
 					}, FileAccess.Read, cancellationToken))
@@ -94,7 +125,7 @@ namespace Titanis.Smb2.Cli
 						FileAttributes = 0,
 						ShareAccess = Smb2ShareAccess.ReadWriteDelete,
 						CreateDisposition = Smb2CreateDisposition.Open,
-						CreateOptions = Smb2FileCreateOptions.OpenReparsePoint,
+						CreateOptions = GetCreateOptions(Smb2FileCreateOptions.OpenReparsePoint),
 						RequestMaximalAccess = true,
 						QueryOnDiskId = true
 					}, FileAccess.Read, cancellationToken))
@@ -112,8 +143,20 @@ namespace Titanis.Smb2.Cli
 				}
 				catch { }
 
+				FileBasicInfo? fileBasicInfo = null;
 
-				await using (var file = await client.CreateFileAsync(this.UncPathInfo, attrs, cancellationToken))
+				//If we're copying timestamps from a remote target file, grab them.  This also validates the target file exists so we don't have a failure condition later.
+				if (this.TimestampsFrom != null)
+				{
+					var options = GetOpenFileCreateInfo();
+					options.DesiredAccess = (uint)(Smb2FileAccessRights.ReadAttributes | Smb2FileAccessRights.Synchronize);
+					await using (var file = (Smb2OpenFile)await client.CreateFileAsync(this.TimestampsFrom, options, FileAccess.Read, cancellationToken))
+					{
+						fileBasicInfo = await file.GetBasicInfoAsync(cancellationToken);
+					}
+				}
+
+				await using (var file = (Smb2OpenFile)await client.CreateFileAsync(this.UncPath, GetCreateFileCreateInfo(attrs), FileAccess.ReadWrite, cancellationToken))
 				{
 					if (sourceStream.CanSeek)
 					{
@@ -125,17 +168,33 @@ namespace Titanis.Smb2.Cli
 						await sourceStream.CopyToAsync2(destStream, this.ChunkSize, cancellationToken);
 					}
 
-					if (!string.IsNullOrEmpty(SourceFileName))
+					if (fileBasicInfo != null)
+					{
+						CreateTimestamp ??= fileBasicInfo.CreationTime;
+						LastAccessTimestamp ??= fileBasicInfo.LastAccessTime;
+						LastWriteTimestamp ??= fileBasicInfo.LastWriteTime;
+						ChangeTimestamp ??= fileBasicInfo.ChangeTime;
+					}
+					else if (!string.IsNullOrEmpty(SourceFileName))
 					{
 						DateTime dateTime = File.GetLastWriteTimeUtc(sourceFileName);
+						LastWriteTimestamp ??= dateTime;
+						ChangeTimestamp ??= dateTime;
+						fileAttributes = (Winterop.FileAttributes)File.GetAttributes(sourceFileName);
+					}
+
+					if (CreateTimestamp != null || LastAccessTimestamp != null || LastWriteTimestamp != null || ChangeTimestamp != null)
+					{
 						await file.SetBasicInfoAsync(
-							null,
-							dateTime,
-							dateTime,
-							(Winterop.FileAttributes)File.GetAttributes(sourceFileName),
+							CreateTimestamp,
+							LastAccessTimestamp,
+							LastWriteTimestamp,
+							ChangeTimestamp,
+							fileAttributes,
 							cancellationToken
 							);
 					}
+
 				}
 			}
 

@@ -50,8 +50,8 @@ namespace Titanis.Smb2.Cli
 		{
 			var flags = this.Relative.IsSet ? SymbolicLinkFlags.RelativePath : SymbolicLinkFlags.FullPathName;
 			var createOptions =
-				this.Directory.IsSet ? (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.Directory)
-				: (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.NonDirectory);
+				GetCreateOptions(this.Directory.IsSet ? (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.Directory)
+				: (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.NonDirectory));
 
 			// Create or open the file/directory
 			await using (var file = await client.CreateFileAsync(this.UncPath, new Smb2CreateInfo

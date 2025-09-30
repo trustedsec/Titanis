@@ -660,6 +660,7 @@ namespace Titanis.Smb2
 						DateTime dateTime = File.GetLastWriteTimeUtc(sourceFileName);
 						await file.SetBasicInfoAsync(
 							null,
+							null,
 							dateTime,
 							dateTime,
 							(Winterop.FileAttributes)File.GetAttributes(sourceFileName),

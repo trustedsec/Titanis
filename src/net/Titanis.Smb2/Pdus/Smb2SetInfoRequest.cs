@@ -154,7 +154,11 @@ namespace Titanis.Smb2.Pdus
 		}
 	}
 
-	struct FileBasicInfoStruct
+	/// <summary>
+	/// Represents the response from a Smb2QueryInfoRequest of the FileBasicInfo
+	/// Made public as the smb2client tool uses it directly and it makes sense to manipulate it directly.
+	/// </summary>
+	public struct FileBasicInfoStruct
 	{
 		public FileBasicInfoStruct(
 			DateTime? creationTime,

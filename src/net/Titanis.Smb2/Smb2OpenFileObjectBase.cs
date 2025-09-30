@@ -293,6 +293,7 @@ FileInfoClass.NetworkOpenInfo), DefaultMaxResponseSize)
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
 		public async Task SetBasicInfoAsync(
 			DateTime? createTime,
+			DateTime? lastAccessTime,
 			DateTime? lastWriteTime,
 			DateTime? lastChangeTime,
 			Winterop.FileAttributes attributes,
@@ -301,7 +302,7 @@ FileInfoClass.NetworkOpenInfo), DefaultMaxResponseSize)
 		{
 			var req = new Smb2SetInfoRequest(this.Handle, new FileBasicInfo(
 				createTime,
-				null,
+				lastAccessTime,
 				lastWriteTime,
 				lastChangeTime,
 				attributes));

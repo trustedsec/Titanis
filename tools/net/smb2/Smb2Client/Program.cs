@@ -25,6 +25,7 @@ namespace Titanis.Smb2.Cli
 	[Subcommand("mkdir", typeof(Smb2MkdirCommand))]
 	[Subcommand("rmdir", typeof(Smb2RmdirCommand))]
 	[Subcommand("rm", typeof(Smb2RmCommand))]
+	[Subcommand("touch", typeof(Smb2TouchCommand))]
 	[Subcommand("enumshares", typeof(Smb2EnumSharesCommand))]
 	[Subcommand("enumopenfiles", typeof(Smb2EnumOpenFilesCommand))]
 	[Subcommand("enumsessions", typeof(Smb2EnumSessionsCommand))]

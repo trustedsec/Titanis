@@ -29,8 +29,8 @@ namespace Titanis.Smb2.Cli
 		{
 			// Determine create options depending on whether to delete the object
 			Smb2FileCreateOptions createOptions =
-				this.RemoveDirectory.IsSet ? (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.DeleteOnClose)
-				: Smb2FileCreateOptions.DeleteOnClose;
+				GetCreateOptions(this.RemoveDirectory.IsSet ? (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.DeleteOnClose)
+				: Smb2FileCreateOptions.DeleteOnClose);
 
 			// Determine access rights
 			var access =

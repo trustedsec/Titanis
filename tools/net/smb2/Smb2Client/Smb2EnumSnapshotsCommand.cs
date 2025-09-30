@@ -30,7 +30,7 @@ namespace Titanis.Smb2.Cli
 				FileAttributes = Winterop.FileAttributes.ReparsePoint,
 				ShareAccess = Smb2ShareAccess.ReadWrite,
 				CreateDisposition = Smb2CreateDisposition.Open,
-				CreateOptions = Smb2FileCreateOptions.SynchronousIoNonalert,
+				CreateOptions = GetCreateOptions(Smb2FileCreateOptions.SynchronousIoNonalert),
 				RequestMaximalAccess = true,
 				QueryOnDiskId = false
 			}, FileAccess.Read, cancellationToken))

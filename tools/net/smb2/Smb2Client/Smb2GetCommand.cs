@@ -125,7 +125,7 @@ namespace Titanis.Smb2.Cli
 					DesiredAccess = (uint)(Smb2FileAccessRights.ReadData | Smb2FileAccessRights.ReadEa | Smb2FileAccessRights.ReadAttributes | Smb2FileAccessRights.Synchronize),
 					ShareAccess = Smb2ShareAccess.DefaultDirShare,
 					FileAttributes = Winterop.FileAttributes.None,
-					CreateOptions = Smb2FileCreateOptions.SynchronousIoNonalert,
+					CreateOptions = GetCreateOptions(Smb2FileCreateOptions.SynchronousIoNonalert),
 					ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
 					RequestMaximalAccess = true,
 					QueryOnDiskId = true,
@@ -293,9 +293,8 @@ namespace Titanis.Smb2.Cli
 
 						// Create local directory
 						Directory.CreateDirectory(destItemPath);
-
 						// Open the remote directory
-						await using (var subdir = await smb.OpenDirectoryAsync(itemPath, cancellationToken))
+						await using (var subdir = (Smb2Directory)await smb.CreateFileAsync(itemPath, this.GetOpenDirectoryCreateInfo(), FileAccess.Read, cancellationToken))
 						{
 							// Copy its contents
 							await this.CopyDirectory(
@@ -318,7 +317,7 @@ namespace Titanis.Smb2.Cli
 							continue;
 
 						// Open the file
-						await using (var file = await smb.OpenFileReadAsync(itemPath, cancellationToken))
+						await using (var file = (Smb2OpenFile)await smb.CreateFileAsync(itemPath, this.GetOpenFileCreateInfo(), FileAccess.Read, cancellationToken))
 						{
 							// Copy the file
 							await CopyFile(file, destItemPath, readOptions, cancellationToken);

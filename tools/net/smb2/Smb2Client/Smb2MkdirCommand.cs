@@ -25,7 +25,7 @@ namespace Titanis.Smb2.Cli
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			base.ValidateParameters(context);
-			if (string.IsNullOrEmpty(this.UncPathInfo.ShareRelativePath))
+			if (string.IsNullOrEmpty(this.UncPath.ShareRelativePath))
 				context.LogError(nameof(this.UncPath), "The path must include at least one level after the share name.");
 		}
 
@@ -34,7 +34,7 @@ namespace Titanis.Smb2.Cli
 			bool exists = false;
 			try
 			{
-				await using var file = await client.CreateDirectoryAsync(this.UncPathInfo, cancellationToken);
+				await using var file = await client.CreateFileAsync(this.UncPath, this.GetCreateDirectoryCreateInfo(), FileAccess.Read, cancellationToken);
 				exists = true;
 			}
 			catch (NtstatusException ex) when (this.Parents.IsSet && ex.StatusCode == Ntstatus.STATUS_OBJECT_PATH_NOT_FOUND)
@@ -47,7 +47,7 @@ namespace Titanis.Smb2.Cli
 			if (this.Parents.IsSet && !exists)
 			{
 				Stack<string> dirNames = new Stack<string>();
-				var path = this.UncPathInfo.ShareRelativePath;
+				var path = this.UncPath.ShareRelativePath;
 				do
 				{
 					var name = Path.GetFileName(path);
@@ -55,7 +55,7 @@ namespace Titanis.Smb2.Cli
 					path = Path.GetDirectoryName(path);
 				} while (!string.IsNullOrEmpty(path));
 
-				var dirPath = this.UncPathInfo.ShareUncPath;
+				var dirPath = this.UncPath.ShareUncPath;
 				while (dirNames.Count > 0)
 				{
 					dirPath = dirPath.Append(dirNames.Pop());
@@ -69,7 +69,7 @@ namespace Titanis.Smb2.Cli
 							DesiredAccess = (uint)Smb2FileAccessRights.DefaultCreateDirAccess,
 							ShareAccess = Smb2ShareAccess.ReadWrite,
 							FileAttributes = Winterop.FileAttributes.Normal,
-							CreateOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.SynchronousIoNonalert,
+							CreateOptions = GetCreateOptions(Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.SynchronousIoNonalert),
 							ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
 						}, FileAccess.Read, cancellationToken);
 					}

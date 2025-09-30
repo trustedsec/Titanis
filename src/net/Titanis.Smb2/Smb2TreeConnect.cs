@@ -288,6 +288,18 @@ namespace Titanis.Smb2
 			const int MaxSymlinkDepth = 32;
 			int symlinkDepth = MaxSymlinkDepth;
 
+			if(createInfo.OplockLevel == Smb2OplockLevel.Lease)
+			{
+				if (!this.Session.Connection.SupportsDirectoryLeasing)
+					createInfo.OplockLevel = Smb2OplockLevel.Level2;
+				else
+					createInfo.LeaseInfo = new Smb2LeaseInfo()
+					{
+						LeaseState = Smb2LeaseState.ReadCaching | Smb2LeaseState.HandleCaching,
+						UseV2Struct = this.Session.Connection.Dialect >= Smb2Dialect.Smb3_0
+					};
+			}
+
 			// TODO: Allow symlink depth to be configurable
 			do
 			{

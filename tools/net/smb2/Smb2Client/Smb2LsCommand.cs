@@ -184,7 +184,7 @@ namespace Titanis.Smb2.Cli
 				DesiredAccess = (uint)Smb2FileAccessRights.DefaultOpenDirAccess,
 				ShareAccess = Smb2ShareAccess.DefaultDirShare,
 				FileAttributes = Winterop.FileAttributes.None,
-				CreateOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.SynchronousIoNonalert,
+				CreateOptions = GetCreateOptions(Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.SynchronousIoNonalert),
 				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
 				RequestMaximalAccess = true,
 				QueryOnDiskId = true,

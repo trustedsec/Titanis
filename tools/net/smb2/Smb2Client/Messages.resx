@@ -193,7 +193,9 @@ A mount point contains two components: the substitution path and the print path.
   <data name="Smb2Client_put_Detailed" xml:space="preserve">
     <value>The &lt;UncPath&gt; parameter specifies the target file to write to via SMB.  If &lt;SourceFileName&gt; is specified, {0} opens the file and writes it to the destination file on the server.  If no source file is specified, {0} accepts input from the console.
 
-When copying the file, {0} fetches the file one chunk at a time.  The default chunk size is 32,768 bytes, which loosely resembles using the COPY command on a command prompt.  Use -ChunkSize to override the chunk size.</value>
+When copying the file, {0} fetches the file one chunk at a time.  The default chunk size is 32,768 bytes, which loosely resembles using the COPY command on a command prompt.  Use -ChunkSize to override the chunk size.
+
+When specifying -UseBackupSemantics the server will check if the user has SeBackupPrivilege and SeRestorePrivilege.  If they do they are allowed to bypass security checks when accessing files. Notably bypassing security checks does not bypass file locks or a file marked with the read-only attribute.</value>
   </data>
   <data name="Smb2Client_rmdir_Detailed" xml:space="preserve">
     <value />
@@ -214,5 +216,49 @@ When requesting change notifications, {0} must specify a maximum size for the ou
 If an error occurs, by default, {0} exits.  Use -ContinueOnErrors to ignore the error and continue waiting for notifications.
 
 Monitoring continues either until an error occurs (unless -ContinueOnErrors is specified), or until the user presses Ctrl+C.</value>
+  </data>
+  <data name="Smb2Client_touch_Detailed" xml:space="preserve">
+    <value>If the file specified at the UNC path does not exist it will be created.
+If the file specified at the UNC path does exist the directory entry for the file is updated.
+
+Any -*Timestamp arguments will override timestamps taken from -TimestampsFrom.
+Only timestamps provided with a -*Timestamp argument or those taken from -TimestampsFrom are used.  No default values are provided and last accessed time is not updated automatically when this tool is used.
+
+The letters available for use in Attributes are as follows:
+
+ R Read-only
+ H Hidden
+ S System
+ A Archive
+ T Temporary
+ F Sparse
+ M Reparse point
+ C Compressed
+ O Offline
+ I Not content indexed
+ E Encrypted
+ V Integrity
+ X No scrub
+
+-SetAttributes accepts strings such as:
+* RHSA
+* 128
+* 0x80
+You can provide any arbitrary integer or hex value, although the server may reject it as an invalid parameter if it does not consist of known parameters.
+
+-UpdateAttributes accepts strings such as:
+* +HST-IO (add Hidden, System, Temporary and remove Not content indexed, Offline)
+* +HST (add Hidden, System, Temporary)
+* -H (remove Hidden)
+
+Removing attributes that are not already set is not an error, they simply remain unset.
+
+The share may not respect some of these flags being set but since they can be set in the structure we allow them to be passed here for experimentation.
+
+If -CopyFileAttributes is set it is used as the base modified by -UpdateAttributes.  Otherwise the original files values are used as the base value.  If no UpdateAttributes are specified the copied attributes are used as is.
+
+In order to clear all set attributes, specify a -SetAttributes value of ""
+ 
+</value>
   </data>
 </root>
