@@ -87,15 +87,7 @@ namespace Titanis.Cli
 			}
 			else
 			{
-				try
-				{
-					props = TypeDescriptor.GetProperties(recordType);
-				}
-				catch
-				{
-					var descriptor = context.SurrogateDescriptor(recordType);
-					props = descriptor.GetProperties();
-				}
+				props = context.GetProperties(recordType);
 			}
 
 			List<OutputField> fields = new List<OutputField>(props.Count);

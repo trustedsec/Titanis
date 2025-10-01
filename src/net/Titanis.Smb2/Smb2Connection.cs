@@ -121,7 +121,6 @@ namespace Titanis.Smb2
 		/// <param name="serverName">Server host name</param>
 		/// <param name="cancellationToken">Cancellation token</param>
 		/// <returns>An <see cref="Smb2Connection"/> representing the connection</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="serverEP"/> is <see langword="null"/>.</exception>
 		public static async Task<Smb2Connection> ConnectToAsync(
 			Stream stream,
 			string serverName,

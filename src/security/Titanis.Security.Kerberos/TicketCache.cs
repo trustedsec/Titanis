@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Titanis.Security.Kerberos
 {
 
-	record struct TicketKey
+	public record struct TicketKey
 	{
-		public TicketKey(ServicePrincipalName spn)
+		public TicketKey(SecurityPrincipalName spn)
 		{
 			this.Spn = spn;
 		}
 
-		public ServicePrincipalName Spn { get; }
+		public SecurityPrincipalName Spn { get; }
 	}
 
 	/// <summary>
@@ -27,29 +28,50 @@ namespace Titanis.Security.Kerberos
 
 		}
 
-		private Dictionary<TicketKey, TicketInfo> _tickets = new Dictionary<TicketKey, TicketInfo>();
+		public TicketInfo? HomeTgt { get; private set; }
+		private List<TicketInfo> _tickets = new List<TicketInfo>();
+		private ConcurrentDictionary<SecurityPrincipalName, TicketInfo> _ticketsBySpn = new ConcurrentDictionary<SecurityPrincipalName, TicketInfo>();
+
+		public TicketInfo[] GetAllTickets() => this._tickets.ToArray();
 
 		/// <inheritdoc/>
-		public TicketInfo? GetTicketFromCache(ServicePrincipalName spn)
+		public TicketInfo? GetTicketFromCache(SecurityPrincipalName spn)
 		{
 			ArgumentNullException.ThrowIfNull(spn);
 
-			this._tickets.TryGetValue(new TicketKey(spn), out var ticket);
-			return ticket;
+			if (this._ticketsBySpn.TryGetValue(spn, out var ticket))
+			{
+				if (ticket.IsCurrent)
+					return ticket;
+			}
+
+			return null;
 		}
+
+		/// <summary>
+		/// Gets the number of tickets in the cache.
+		/// </summary>
+		public int TicketCount => this._tickets.Count;
 
 		/// <inheritdoc/>
-		public void AddTicket(ServicePrincipalName spn, TicketInfo ticket)
+		public void AddTicket(TicketInfo ticket)
 		{
-			this._tickets[new TicketKey(spn)] = ticket;
+			ArgumentNullException.ThrowIfNull(ticket);
+
+			if (ticket.IsCurrent)
+				this._ticketsBySpn[ticket.TargetSpn] = ticket;
+			this._tickets.Add(ticket);
+			if (
+				ticket.IsTgt
+				&& string.Equals(ticket.TicketRealm, ticket.ServiceInstance, StringComparison.OrdinalIgnoreCase)
+				)
+				this.HomeTgt = ticket;
+
+			this.OnTicketAdded(ticket.TargetSpn, ticket);
 		}
 
-		public TicketInfo Import(byte[] ticketBytes, byte[] encryptionKey)
+		protected virtual void OnTicketAdded(SecurityPrincipalName spn, TicketInfo ticket)
 		{
-			ArgumentNullException.ThrowIfNull(ticketBytes);
-			ArgumentNullException.ThrowIfNull(encryptionKey);
-
-			throw new NotImplementedException();
 		}
 	}
 }

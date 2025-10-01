@@ -34,7 +34,11 @@ namespace Titanis.Winterop
 		public static Exception GetException(this Win32ErrorCode errorCode)
 		{
 			string message = GetMessageForCode(errorCode, (uint)errorCode, Win32MessageTable.ResourceManager);
-			return new Win32Exception((int)errorCode, message);
+			switch (errorCode)
+			{
+				default:
+					return new Win32Exception((int)errorCode, message);
+			}
 		}
 
 		public static string GetErrorMessage(this Win32ErrorCode errorCode)

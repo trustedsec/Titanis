@@ -20,7 +20,6 @@ namespace Titanis.CredCoerce
 	{
 		internal CoercionContext(
 			Program command,
-			IClientCredentialService credService,
 			Smb2Client smbClient,
 			RpcClient rpcClient,
 			EpmClient epmClient,
@@ -28,7 +27,6 @@ namespace Titanis.CredCoerce
 			)
 		{
 			Command = command;
-			this.CredService = credService;
 			this.SmbClient = smbClient;
 			this.RpcClient = rpcClient;
 			this.EpmClient = epmClient;
@@ -38,7 +36,6 @@ namespace Titanis.CredCoerce
 		public Program Command { get; }
 		public string ServerName => this.Command.ServerName;
 		public string VictimPath => this.Command.VictimPath;
-		public IClientCredentialService CredService { get; }
 		public Smb2Client SmbClient { get; }
 		public RpcClient RpcClient { get; }
 		public EpmClient EpmClient { get; }

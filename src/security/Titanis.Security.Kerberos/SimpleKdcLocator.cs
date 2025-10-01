@@ -16,20 +16,20 @@ namespace Titanis.Security.Kerberos
 		/// <summary>
 		/// Initializes a new <see cref="SimpleKdcLocator"/>.
 		/// </summary>
-		/// <param name="defaultEP">Default endpoint if no other endpoint specified.</param>
-		public SimpleKdcLocator(EndPoint defaultEP)
+		/// <param name="homeEP">Endpoint of KDC for user's home domain</param>
+		public SimpleKdcLocator(EndPoint homeEP)
 		{
-			this.DefaultEP = defaultEP;
+			this.HomeEP = homeEP;
 		}
 
 		/// <summary>
-		/// Gets the endpoint returned for any realm not added with <see cref="AddEndpoint(string, EndPoint)"/>.
+		/// Gets the endpoint for the user's home domain.
 		/// </summary>
-		public EndPoint DefaultEP { get; }
+		public EndPoint HomeEP { get; }
 
 		private Dictionary<string, EndPoint> _endpoints = new Dictionary<string, EndPoint>(StringComparer.OrdinalIgnoreCase);
 		/// <summary>
-		/// Adds an endpoint.
+		/// Adds an endpoint for a realm.
 		/// </summary>
 		/// <param name="realm">Realm</param>
 		/// <param name="ep">KDC endpoint</param>
@@ -46,17 +46,20 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		/// <remarks>
 		/// If an endpoint has been provided for <paramref name="realm"/>, it is returned;
-		/// otherwise, <see cref="DefaultEP"/> is returned.
+		/// otherwise, <see cref="HomeEP"/> is returned.
 		/// </remarks>
-		public EndPoint FindKdc(string realm)
+		public EndPoint LocateKdc(string realm, LocateKdcOptions options)
 		{
+			if (0 != (options & LocateKdcOptions.Home))
+				return this.HomeEP;
+
 			if (string.IsNullOrEmpty(realm))
 				throw new ArgumentNullException(nameof(realm));
 
 			if (this._endpoints.TryGetValue(realm, out EndPoint ep))
 				return ep;
 			else
-				return this.DefaultEP;
+				return new DnsEndPoint(realm, KerberosClient.KdcTcpPort);
 		}
 	}
 }

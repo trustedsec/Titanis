@@ -13,6 +13,7 @@ using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
 using Titanis.DceRpc.Communication;
 using Titanis.IO;
+using Titanis.Security;
 
 namespace Titanis.DceRpc.Epm
 {
@@ -25,27 +26,43 @@ namespace Titanis.DceRpc.Epm
 		{
 		}
 
-		//public Task<IPEndPoint> MapTcp(RpcInterfaceId interfaceId)
-		//{
-		//	return MapTcp(interfaceId, IPAddress.Loopback);
-		//}
+		/// <inheritdoc/>
+		public sealed override string? ServiceClass => ServiceClassNames.Rpc;
+		// [MS-RPCE] § 2.1.1.2
+		/// <inheritdoc/>
+		public sealed override string? WellKnownPipeName => EPMapperPipeName;
+		// [MS-RPCE] § 2.1.1.1
+		/// <inheritdoc/>
+		public sealed override int WellKnownTcpPort => EPMapperPort;
+		// Observed in PCAP
+		/// <inheritdoc/>
+		public sealed override bool SupportsNdr64 => true;
+
 		public Task<IPEndPoint?> TryMapTcp(
 			RpcInterfaceId interfaceId,
-			IPAddress hostAddress,
 			CancellationToken cancellationToken)
 		{
-			if (hostAddress is null)
-				throw new ArgumentNullException(nameof(hostAddress));
-			return this.TryMapIpv4(interfaceId, ProtocolId.Tcp4, hostAddress, cancellationToken);
+			return this.TryMapIpv4(interfaceId, ProtocolId.Tcp4, IPAddress.None, cancellationToken);
+		}
+		public Task<IPEndPoint?> TryMapTcp(
+			RpcInterfaceId interfaceId,
+			IPAddress? hostAddress,
+			CancellationToken cancellationToken)
+		{
+			return this.TryMapIpv4(interfaceId, ProtocolId.Tcp4, hostAddress ?? IPAddress.None, cancellationToken);
 		}
 		public Task<IPEndPoint?> TryMapUdp(
 			RpcInterfaceId interfaceId,
-			IPAddress hostAddr,
 			CancellationToken cancellationToken)
 		{
-			if (hostAddr is null)
-				throw new ArgumentNullException(nameof(hostAddr));
-			return this.TryMapIpv4(interfaceId, ProtocolId.Udp4, hostAddr, cancellationToken);
+			return this.TryMapIpv4(interfaceId, ProtocolId.Udp4, IPAddress.None, cancellationToken);
+		}
+		public Task<IPEndPoint?> TryMapUdp(
+			RpcInterfaceId interfaceId,
+			IPAddress? hostAddress,
+			CancellationToken cancellationToken)
+		{
+			return this.TryMapIpv4(interfaceId, ProtocolId.Udp4, hostAddress ?? IPAddress.None, cancellationToken);
 		}
 		internal async Task<IPEndPoint?> TryMapIpv4(
 			RpcInterfaceId interfaceId,

@@ -50,7 +50,7 @@ public class UserInfo
 [Example("Enumerate all accounts", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!")]
 internal sealed class EnumUsersCommand : SamCommand
 {
-	protected sealed override SamServerAccess RequiredAccess => SamServerAccess.EnumerateDomains | SamServerAccess.LookupDomain;
+	protected sealed override SamServerAccess RequiredSamAccess => SamServerAccess.EnumerateDomains | SamServerAccess.LookupDomain;
 
 	protected override async Task<int> RunAsync(Sam sam, CancellationToken cancellationToken)
 	{

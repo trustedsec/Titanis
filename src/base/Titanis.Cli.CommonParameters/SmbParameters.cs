@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,10 +66,20 @@ namespace Titanis.Cli
 			}
 		}
 
-		public void ConfigureClient(Smb2Client client)
+		protected sealed override void Initialize(Command owner, IServiceContainer services)
 		{
-			ArgumentNullException.ThrowIfNull(client);
+			base.Initialize(owner, services);
+			services.AddService(typeof(ISmb2TraceCallback), this.CreateTraceLogger);
+		}
 
+		private ISmb2TraceCallback CreateTraceLogger(IServiceContainer container, Type serviceType)
+		{
+			return new Smb2Logger(this.Services.RequireService<ILog>(), this.Owner?.GetCallback<ISmb2TraceCallback>());
+		}
+
+		public Smb2Client CreateClient()
+		{
+			var client = this.Services.CreateSmb2Client();
 			client.FollowDfs = FollowDfs.GetValue(true);
 			client.DfsReferralBufferSize = DfsReferralBufferSize;
 			//UseMultiChannel = true
@@ -87,6 +98,8 @@ namespace Titanis.Cli
 
 			var sessionOptions = new Smb2SessionOptions(EncryptSmb.IsSet);
 			client.DefaultSessionOptions = sessionOptions;
+
+			return client;
 		}
 	}
 }

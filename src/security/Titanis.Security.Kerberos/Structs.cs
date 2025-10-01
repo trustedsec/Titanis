@@ -82,8 +82,8 @@ namespace Titanis.Security.Kerberos
 				keyvalue = keyBytes
 			};
 
-		internal static PrincipalName PrincipalName(NameType nameType, string name)
-			=> new PrincipalName
+		internal static Asn1.KerberosV5Spec2.PrincipalName PrincipalName(PrincipalNameType nameType, string name)
+			=> new Asn1.KerberosV5Spec2.PrincipalName
 			{
 				name_type = (int)nameType,
 				name_string = new GeneralString[]
@@ -92,31 +92,37 @@ namespace Titanis.Security.Kerberos
 				}
 			};
 
-		internal static PrincipalName PrincipalName(ServicePrincipalName spn)
-			=> new PrincipalName
-			{
-				name_type = (int)NameType.ServiceInstance,
-				name_string = new GeneralString[]
-				{
-					spn.ServiceClass, spn.ServiceInstance
-				}
-			};
-
-		internal static PrincipalName PrincipalName(NameType nameType, string name1, string name2)
-			=> new PrincipalName
+		internal static Asn1.KerberosV5Spec2.PrincipalName PrincipalName(PrincipalNameType nameType, string name, string instance)
+			=> new Asn1.KerberosV5Spec2.PrincipalName
 			{
 				name_type = (int)nameType,
 				name_string = new GeneralString[]
 				{
-					name1, name2
+					name,
+					instance
 				}
 			};
 
+		internal static Asn1.KerberosV5Spec2.PrincipalName PrincipalName(PrincipalNameType nameType, string[] nameParts)
+			=> new Asn1.KerberosV5Spec2.PrincipalName
+			{
+				name_type = (int)nameType,
+				name_string = Array.ConvertAll(nameParts, r => new GeneralString(r))
+			};
+
+		internal static Asn1.KerberosV5Spec2.PrincipalName PrincipalName(SecurityPrincipalName spn)
+			=> new Asn1.KerberosV5Spec2.PrincipalName
+			{
+				name_type = (int)spn.NameType,
+				name_string = Array.ConvertAll(spn.GetNameParts(), r => new GeneralString(r))
+			};
+
+
 		internal static KDC_REQ_BODY KdcReqBody(
 			TicketParameters ticketParameters,
-			PrincipalName cname,
+			Asn1.KerberosV5Spec2.PrincipalName cname,
 			string crealm,
-			PrincipalName sname,
+			Asn1.KerberosV5Spec2.PrincipalName sname,
 			uint nonce,
 			int[] etypes,
 			HostAddress[]? hostAddresses
@@ -143,7 +149,7 @@ namespace Titanis.Security.Kerberos
 			};
 
 		internal static Authenticator_Outer Authenticator(
-			PrincipalName cname,
+			Asn1.KerberosV5Spec2.PrincipalName cname,
 			string crealm,
 			Checksum cksum,
 			uint seqnbr,

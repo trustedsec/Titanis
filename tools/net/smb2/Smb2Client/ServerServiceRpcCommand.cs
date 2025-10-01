@@ -9,9 +9,6 @@ namespace Titanis.Smb2.Cli
 	internal abstract class ServerServiceRpcCommand : RpcCommand<ServerServiceClient>
 	{
 		protected sealed override Type InterfaceType => typeof(srvsvc);
-		protected sealed override bool SupportsDynamicTcp => false;
-
-		protected sealed override string? WellKnownPipeName => "srvsvc";
 
 		[Parameter]
 		[Description("Max size for response buffer")]

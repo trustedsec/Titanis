@@ -2,9 +2,10 @@
 
 [assembly: InternalsVisibleTo("Titanis.Security.Kerberos.Test")]
 
-namespace Titanis.Security.Kerberos
+namespace Titanis.Security
 {
-	enum NameType : int	// Underlying type used by CCache serializer
+	// [RFC 4120] 6.2 § Principal Names
+	public enum PrincipalNameType : int	// Underlying type used by CCache serializer
 	{
 		Unknown = 0,
 		Principal = 1,

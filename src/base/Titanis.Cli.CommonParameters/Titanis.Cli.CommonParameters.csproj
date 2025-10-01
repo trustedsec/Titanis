@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\net\Titanis.Smb2\Titanis.Smb2.csproj" />
+    <ProjectReference Include="..\..\net\Titanis.Socks\Titanis.Socks.csproj" />
     <ProjectReference Include="..\..\security\Titanis.Security.Kerberos\Titanis.Security.Kerberos.csproj" />
     <ProjectReference Include="..\..\security\Titanis.Security.Ntlm\Titanis.Security.Ntlm.csproj" />
     <ProjectReference Include="..\..\security\Titanis.Security.Spnego\Titanis.Security.Spnego.csproj" />

@@ -8,6 +8,7 @@ using Titanis.DceRpc.Client;
 namespace Titanis.Msrpc.Msdcom
 {
 	using ms_dcom;
+	using Titanis.Security;
 	using Titanis.Winterop;
 
 	class ActivationClient : RpcServiceClient<IActivationClientProxy>
@@ -70,6 +71,19 @@ namespace Titanis.Msrpc.Msdcom
 			};
 			return actInfo;
 		}
+
+		// [MS-DCOM] § 1.9
+		/// <inheritdoc/>
+		public sealed override bool SupportsDynamicTcp => true;
+		// [MS-DCOM] § 1.9
+		/// <inheritdoc/>
+		public sealed override int WellKnownTcpPort => 135;
+		// [MS-DCOM] § 3.2.4.1.1.2
+		/// <inheritdoc/>
+		public sealed override string? ServiceClass => ServiceClassNames.RpcSs;
+		// [MS-DCOM] § 2.2
+		/// <inheritdoc/>
+		public sealed override bool SupportsNdr64 => false;
 
 		internal static QueryInterfaceResult[] ProcessQiResults(int[] resultCodes, RpcPointer<MInterfacePointer>[] objrefs)
 		{

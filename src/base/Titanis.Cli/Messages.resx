@@ -123,8 +123,8 @@
   <data name="Cli_DuplicateParamName" xml:space="preserve">
     <value>There are more than one parameters with the name '{0}'.</value>
   </data>
-  <data name="Cli_MandatoryArgMissing_ParamName" xml:space="preserve">
-    <value>The parameter '{0}' is mandatory, but no value was specified.</value>
+  <data name="Cli_MandatoryArgMissing_ParamNames" xml:space="preserve">
+    <value>The command line is missing one or more required parameters: {0}.</value>
   </data>
   <data name="Cli_MissingParamValue" xml:space="preserve">
     <value>No value specified for parameter '{0}'.</value>

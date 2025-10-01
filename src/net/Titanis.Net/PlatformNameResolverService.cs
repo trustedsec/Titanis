@@ -72,7 +72,7 @@ namespace Titanis.Net
 				else
 				{
 					var entry = await Dns.GetHostEntryAsync(hostAddress, cancellationToken).ConfigureAwait(false);
-					log?.WriteMessage(LogMessage.Diagnostic(PlatformResolverSourceName, $"System DNS resolved {hostAddress} with [ {string.Join(",", (object[])entry.AddressList)} ]"));
+					log?.WriteMessage(LogMessage.Diagnostic(PlatformResolverSourceName, $"System DNS resolved {hostAddress} as [ {string.Join(",", (object[])entry.AddressList)} ]"));
 					addrs = entry.AddressList;
 				}
 

@@ -28,28 +28,29 @@ namespace Smb2GetSample
 
 			string outputPath = @"fetchedFile";
 
-			ClientCredentialService credService = new ClientCredentialService();
-			credService.AddCredential(new ServicePrincipalName(Smb2Client.ServiceClass, serverName), t =>
+			ClientCredentialDictionary credService = new ClientCredentialDictionary();
+			credService.DefaultCredentialFactory = (spn, caps) =>
 			{
 				// Configure the credentials
 				NtlmPasswordCredential cred = new NtlmPasswordCredential(userName, domain, password);
 				NtlmClientContext ntlmContext = new NtlmClientContext(cred, true);
-				ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity;
+				ntlmContext.RequiredCapabilities |= caps;
 
 				SpnegoClientContext negoContext = new SpnegoClientContext();
 				negoContext.Contexts.Add(ntlmContext);
 
 				return negoContext;
-			});
+			};
 
-			// Configure resolver
+			// Configure resolver and socket service
 			var resolver = new DictionaryNameResolver();
 			resolver.SetAddress(serverName, new IPAddress[] { hostAddress });
+			var socketService = new PlatformSocketService(resolver, this.Log);
 
 			// Configure the client
 			Smb2Client client = new Smb2Client(
 				credService,
-				nameResolver: resolver
+				socketService: socketService
 				);
 
 			// Open the file

@@ -21,29 +21,33 @@ namespace ShellExec
 			Guid clsidShell = new Guid("c08afd90-f2a1-11d1-8455-00a0c91f3880");
 
 			// Set parameters
-			string target = "10.73.0.101";
+			string target = "10.66.0.71";
 			string myWorkstationName = "TEST-WKS";
 			int myPid = 5151;
 			string commandLine = @"C:\Windows\system32\notepad.exe";
 
-			// Create credentials
-			var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential("milchick", "LUMON", "Br3@kr00m!"), true);
-			ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
-			ntlmContext.Workstation = myWorkstationName;
-			ntlmContext.ClientChannelBindingsUnhashed = new byte[16];
-			ntlmContext.TargetSpn = new ServicePrincipalName(ServiceClassNames.RestrictedKrbHost, target);
+			// Create credential dictionary
+			ClientCredentialDictionary creds = new ClientCredentialDictionary();
+			creds.DefaultCredentialFactory = (spn, caps) =>
+			{
+				// Set up credentials
+				var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential("milchick", "LUMON", "Br3@kr00m!"), true);
+				ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
+				ntlmContext.Workstation = myWorkstationName;
+				ntlmContext.ClientChannelBindingsUnhashed = new byte[16];
+				ntlmContext.TargetSpn = spn;
+				return ntlmContext;
+			};
+			this.Services.AddService(typeof(IClientCredentialService), creds);
 
 			// Create RPC client
-			RpcClient rpcClient = new RpcClient()
-			{
-				DefaultAuthLevel = RpcAuthLevel.PacketPrivacy
-			};
+			RpcClient rpcClient = this.CreateRpcClient();
+			rpcClient.DefaultAuthLevel = RpcAuthLevel.PacketPrivacy;
 
 			// Connect to DCOM service
 			DcomClient dcom = await DcomClient.ConnectTo(
 				target,
 				rpcClient,
-				ntlmContext,
 				cancellationToken);
 
 			// Start MMC

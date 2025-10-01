@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
+using Titanis.Security;
 using Titanis.Winterop;
 
 namespace Titanis.Msrpc.Mswkst
@@ -88,6 +89,22 @@ namespace Titanis.Msrpc.Mswkst
 		}
 
 		public const string PipeName = "srvsvc";
+
+		// Guess
+		/// <inheritdoc/>
+		public sealed override string? ServiceClass => ServiceClassNames.HostU;
+		// [MS-SRVS] Š 2.1
+		/// <inheritdoc/>
+		public sealed override string? WellKnownPipeName => PipeName;
+		// [MS-SRVS] Š 2.1
+		/// <inheritdoc/>
+		public sealed override bool SupportsDynamicTcp => false;
+		// Observed
+		/// <inheritdoc/>
+		public sealed override bool SupportsNdr64 => true;
+		// Observed
+		/// <inheritdoc/>
+		public sealed override bool SupportsReauthOverNamedPipes => false;
 
 		public async Task<IList<ConnectionInfo>> GetConnections(
 			string shareOrComputerName,

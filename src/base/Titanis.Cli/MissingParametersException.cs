@@ -7,25 +7,25 @@ namespace Titanis.Cli
 {
 
 	/// <summary>
-	/// Thrown when a command line does not specify a value for a mandatory parameter.
+	/// Thrown when a command line does not specify a value for one or more mandatory parameters.
 	/// </summary>
 	[Serializable]
-	public class MissingParameterException : ParameterSyntaxException
+	public class MissingParametersException : SyntaxException
 	{
 		/// <summary>
-		/// Initializes a new <see cref="MissingParameterException"/>.
+		/// Initializes a new <see cref="MissingParametersException"/>.
 		/// </summary>
-		/// <param name="parameterName">Name of problematic parameter</param>
-		public MissingParameterException(string parameterName) : base(parameterName, string.Format(Messages.Cli_MandatoryArgMissing_ParamName, parameterName))
+		/// <param name="missingParameterNames">Names of missing parameters</param>
+		public MissingParametersException(string[] missingParameterNames) : base(string.Format(Messages.Cli_MandatoryArgMissing_ParamNames, string.Join(", ", missingParameterNames)))
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new <see cref="MissingParameterException"/> with serialized data.
+		/// Initializes a new <see cref="MissingParametersException"/> with serialized data.
 		/// </summary>
 		/// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized object data</param>
 		/// <param name="context">The <see cref="StreamingContext"/> that contains contextual information</param>
-		protected MissingParameterException(
+		protected MissingParametersException(
 		  System.Runtime.Serialization.SerializationInfo info,
 		  System.Runtime.Serialization.StreamingContext context) : base(info, context)
 		{

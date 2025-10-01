@@ -85,6 +85,7 @@ namespace Titanis.Cli
 			writer.BeginCodeBlock();
 			writer.WriteBodyText($"{commandName} <subcommand>");
 			writer.EndCodeBlock();
+			writer.AppendLine();
 
 			writer.WriteSubheading("Subcommands");
 

@@ -326,8 +326,20 @@ namespace Titanis.Cli
 		/// <param name="paramType">Parameter type</param>
 		/// <returns>A <see cref="TypeConverter"/> that can convert to <paramref name="paramType"/>.</returns>
 		/// <exception cref="ArgumentException"><paramref name="paramType"/> does not have a <see cref="TypeConverter"/>.</exception>
-		public static TypeConverter GetScalarParamConverter(Type paramType)
+		public static TypeConverter GetScalarParamConverter(Type paramType, PropertyDescriptor? property = null)
 		{
+			var converterAttr = property?.GetCustomAttribute<TypeConverterAttribute>();
+			if (converterAttr is not null)
+			{
+				var converterType = Type.GetType(converterAttr.ConverterTypeName);
+				var converter_ = (TypeConverter)Activator.CreateInstance(converterType);
+				return converter_;
+			}
+
+			var converter = TypeDescriptor.GetConverter(paramType);
+			if (converter != null)
+				return converter;
+
 			if (paramType.GetTypeInfo().IsEnum)
 			{
 				return new EnumConverter(paramType);
@@ -337,14 +349,6 @@ namespace Titanis.Cli
 				TypeCode typeCode = Type.GetTypeCode(paramType);
 				switch (typeCode)
 				{
-					case TypeCode.Object:
-						{
-							var converter = TypeDescriptor.GetConverter(paramType);
-							if (converter == null)
-								throw new ArgumentException(string.Format(Messages.Cli_UnsupportedParamType, paramType.FullName));
-
-							return converter;
-						}
 					case TypeCode.Boolean: return Singleton.SingleInstance<BooleanConverter>();
 					case TypeCode.Char: return Singleton.SingleInstance<CharConverter>();
 					case TypeCode.SByte: return new IntegerConverter<sbyte>(Singleton.SingleInstance<SByteConverter>(), sbyte.Parse, 8);
@@ -530,6 +534,8 @@ namespace Titanis.Cli
 				if (argValue != UnsetValue)
 				{
 					parameter.SetValue(this, argValue);
+					if (setParams.ContainsKey(parameter))
+						throw new ParameterSyntaxException(parameter.Name, $"Parameter {parameter.Name} is specified more than once.");
 					setParams.Add(parameter, argValue);
 				}
 			}
@@ -541,8 +547,14 @@ namespace Titanis.Cli
 				{
 					if (!setParams.ContainsKey(param))
 					{
-						var envKey = $"TITANIS_DEFAULT_" + param.Name.ToUpper();
-						var envValue = this.Context.GetVariable(envKey);
+						object? envValue = null;
+						if (param.EnvironmentVariable is not null)
+							envValue = this.Context.GetVariable(param.EnvironmentVariable);
+						if (envValue is null)
+						{
+							var envKey = $"TITANIS_DEFAULT_" + param.Name.ToUpper();
+							envValue = this.Context.GetVariable(envKey);
+						}
 						if (envValue is not null)
 						{
 							if (param.IsList)
@@ -608,33 +620,39 @@ namespace Titanis.Cli
 				}
 			}
 
-			foreach (var param in metadata.Parameters)
 			{
-				if (!setParams.ContainsKey(param))
+				List<string>? missingParamNames = null;
+				foreach (var param in metadata.Parameters)
 				{
-					if (useEnvDefaults)
+					if (!setParams.ContainsKey(param))
 					{
-						var envKey = $"TITANIS_DEFAULT_" + param.Name.ToUpper();
-						var envValue = this.Context.GetVariable(envKey);
-						if (envValue is not null)
+						if (useEnvDefaults)
 						{
-							try
+							var envKey = $"TITANIS_DEFAULT_" + param.Name.ToUpper();
+							var envValue = this.Context.GetVariable(envKey);
+							if (envValue is not null)
 							{
-								converterContext.Parameter = param;
-								var value = param.ConvertValue(envValue, converterContext);
-							}
-							catch (Exception ex)
-							{
-								this.WriteWarning($"Failed to parse default value '{envValue}' for parameter '{param.Name}': {ex.Message}");
+								try
+								{
+									converterContext.Parameter = param;
+									var value = param.ConvertValue(envValue, converterContext);
+								}
+								catch (Exception ex)
+								{
+									this.WriteWarning($"Failed to parse default value '{envValue}' for parameter '{param.Name}': {ex.Message}");
+								}
 							}
 						}
-					}
 
-					if (param.IsMandatory)
-						throw new MissingParameterException(param.Name);
-					else if (param.HasDefaultValue)
-						param.SetValue(this, param.DefaultValue);
+						if (param.IsMandatory)
+							(missingParamNames ??= new()).Add(param.Name);
+						else if (param.HasDefaultValue)
+							param.SetValue(this, param.DefaultValue);
+					}
 				}
+
+				if (missingParamNames is not null)
+					throw new MissingParametersException(missingParamNames.ToArray());
 			}
 
 			{

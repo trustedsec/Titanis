@@ -32,8 +32,8 @@ namespace Titanis.Msrpc.Mslsar
 		/// </summary>
 		/// <param name="sids">SIDs to resolve</param>
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
-		/// <returns>An array of <see cref="LsaAccountMapping"/> for each entry in <paramref name="names"/></returns>
-		/// <exception cref="LsaAccountMappingException">Some but not all of <paramref name="names"/> could be resolved.</exception>
+		/// <returns>An array of <see cref="LsaAccountMapping"/> for each entry in <paramref name="sids"/></returns>
+		/// <exception cref="LsaAccountMappingException">Some but not all of <paramref name="sids"/> could be resolved.</exception>
 		public Task<LsaAccountMapping[]> ResolveSidsAsync(SecurityIdentifier[] sids, CancellationToken cancellationToken)
 			=> this._lsaClient.LookupSids(this._handle, sids, cancellationToken);
 

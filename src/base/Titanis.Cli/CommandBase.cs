@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace Titanis.Cli
 	/// Command implementations should derive from <see cref="Command"/> or <see cref="MultiCommand"/>,
 	/// which handle parsing of arguments.
 	/// </remarks>
-	public abstract class CommandBase
+	public abstract class CommandBase : IServiceProvider
 	{
 		/// <summary>
 		/// Invokes the command.
@@ -82,10 +83,29 @@ namespace Titanis.Cli
 			}
 		}
 
+		private ICommandContext? _context;
 		/// <summary>
 		/// Gets the context within which the command is running.
 		/// </summary>
-		public ICommandContext? Context { get; private set; }
+		public ICommandContext? Context
+		{
+			get => this._context;
+			private set
+			{
+				this._context = value;
+				if (value != null)
+				{
+					this._services = new ServiceContainer(value.Services);
+				}
+			}
+		}
+
+		private ServiceContainer? _services;
+		/// <summary>
+		/// Gets services available to the command.
+		/// </summary>
+		protected internal ServiceContainer Services => this._services;
+
 		/// <summary>
 		/// Gets a value indicating whether the command has a context.
 		/// </summary>
@@ -607,6 +627,12 @@ namespace Titanis.Cli
 			}
 
 			return sb.ToString();
+		}
+
+		/// <inheritdoc/>
+		public object? GetService(Type serviceType)
+		{
+			return _services?.GetService(serviceType);
 		}
 	}
 }

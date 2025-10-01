@@ -13,6 +13,7 @@ namespace Titanis.Msrpc.Msdcom
 	using ms_dcom;
 	using System.Diagnostics;
 	using System.Runtime.InteropServices;
+	using Titanis.Security;
 	using Titanis.Winterop;
 
 	internal class ScmActivatorClient : RpcServiceClient<IRemoteSCMActivatorClientProxy>
@@ -25,6 +26,20 @@ namespace Titanis.Msrpc.Msdcom
 		{
 			this._dcom = dcom;
 		}
+
+		// [MS-DCOM] § 1.9
+		/// <inheritdoc/>
+		public sealed override bool SupportsDynamicTcp => true;
+		// [MS-DCOM] § 1.9
+		/// <inheritdoc/>
+		public sealed override int WellKnownTcpPort => 135;
+		// [MS-DCOM] § 3.2.4.1.1.2
+		/// <inheritdoc/>
+		public sealed override string? ServiceClass => ServiceClassNames.RpcSs;
+		// [MS-DCOM] § 2.2
+		/// <inheritdoc/>
+		public sealed override bool SupportsNdr64 => false;
+
 
 		public async Task<ActivationResult> CreateInstance(
 			Guid clsid,

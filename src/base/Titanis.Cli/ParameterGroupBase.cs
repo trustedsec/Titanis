@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Text;
 
 namespace Titanis.Cli
@@ -13,16 +14,18 @@ namespace Titanis.Cli
 		/// Gets the <see cref="Command"/> owning the parameter group.
 		/// </summary>
 		protected Command? Owner { get; private set; }
+		protected IServiceContainer? Services { get; private set; }
 		/// <inheritdoc/>
-		void IParameterGroup.Initialize(Command command)
+		void IParameterGroup.Initialize(Command command, IServiceContainer services)
 		{
 			this.Owner = command;
-			this.Initialize(command);
+			this.Services = services;
+			this.Initialize(command, services);
 		}
 		/// <summary>
 		/// Called when the parameter group is initialized.
 		/// </summary>
 		/// <param name="owner"></param>
-		protected virtual void Initialize(Command owner) { }
+		protected virtual void Initialize(Command owner, IServiceContainer services) { }
 	}
 }

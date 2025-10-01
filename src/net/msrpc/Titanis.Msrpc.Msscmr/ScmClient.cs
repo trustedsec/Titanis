@@ -12,6 +12,7 @@ using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
 using Titanis.DceRpc.Communication;
 using Titanis.IO;
+using Titanis.Security;
 using Titanis.Winterop;
 using Titanis.Winterop.Security;
 
@@ -26,16 +27,45 @@ namespace Titanis.Msrpc.Msscmr
 		{
 		}
 
-		public const string PipeName = "svcctl";
+		public const string ScmPipeName = "svcctl";
 		private const int BufferSize = 1024;
+
+		// [MS-SCMR] § 2.1.2
+		// Spec specifies "host/" (lowercase), but "HOST/" was observed in a pcap.
+		/// <inheritdoc/>
+		public sealed override string? ServiceClass => ServiceClassNames.HostU;
+		// [MS-SCMR] § 2.1.1
+		/// <inheritdoc/>
+		public sealed override bool SupportsDynamicTcp => true;
+		/// <inheritdoc/>
+		public sealed override bool SupportsNdr64 => true;
+		// [MS-SCMR] § 2.1.1
+		/// <inheritdoc/>
+		public sealed override string? WellKnownPipeName => ScmPipeName;
+		// Observed
+		/// <inheritdoc/>
+		public sealed override bool RequiresEncryptionOverTcp => true;
+		/// <inheritdoc/>
+		// Binding succeeds, but operations report RPC_S_CANNOT_SUPPORT
+		public sealed override bool SupportsReauthOverNamedPipes => false;
 
 		public async Task<Scm> OpenScm(ScmAccess access, CancellationToken cancellationToken)
 		{
-			RpcPointer<RpcContextHandle> pHandle = new RpcPointer<RpcContextHandle>();
-			var res = (Win32ErrorCode)await this._proxy.ROpenSCManager2(null, (uint)access, pHandle, cancellationToken).ConfigureAwait(false);
-			res.CheckAndThrow();
+			try
+			{
+				RpcPointer<RpcContextHandle> pHandle = new RpcPointer<RpcContextHandle>();
+				var res = (Win32ErrorCode)await this._proxy.ROpenSCManager2(null, (uint)access, pHandle, cancellationToken).ConfigureAwait(false);
+				res.CheckAndThrow();
+				return new Scm(pHandle.value, this);
+			}
+			catch (NotSupportedException ex)
+			{
+				RpcPointer<RpcContextHandle> pHandle = new RpcPointer<RpcContextHandle>();
+				var res = (Win32ErrorCode)await this._proxy.ROpenSCManagerW(null, null, (uint)access, pHandle, cancellationToken).ConfigureAwait(false);
+				res.CheckAndThrow();
+				return new Scm(pHandle.value, this);
+			}
 
-			return new Scm(pHandle.value, this);
 		}
 
 		internal async Task<Service> CreateService(

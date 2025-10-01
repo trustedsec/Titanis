@@ -85,7 +85,6 @@ namespace Titanis.DceRpc.Communication
 		/// <param name="pduToSend">PDU to send</param>
 		/// <param name="bubbleCancel">Indicates whether to bubble <see cref="OperationCanceledException"/></param>
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
-		/// <returns>Number of bytes received into <paramref name="receiveBuffer"/></returns>
 		/// <remarks>
 		/// The implementation must ensure that a complete PDU is delivered.
 		/// In the event that the transceive operation returns a fragment,

@@ -89,7 +89,7 @@ namespace Titanis.Smb2.Cli
 		#endregion
 
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
-		public SmbParameters? SmbParameters { get; set; }
+		public SmbParameters SmbParameters { get; set; }
 
 
 		/// <summary>
@@ -108,23 +108,16 @@ namespace Titanis.Smb2.Cli
 			if (string.IsNullOrEmpty(this.UncPath.ShareName) && !string.IsNullOrEmpty(this.DefaultShareName))
 				this.UncPath= this.UncPath.Append(this.DefaultShareName);
 
-			this.AuthenticationParameters.Validate(true, context, this.Log);
+			this.AuthenticationParameters.Validate(true, context);
 			this.SmbParameters.Validate(context, this.AuthenticationParameters);
 		}
 
 		protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 		{
-			await using (Smb2Client client = CreateClient())
+			await using (Smb2Client client = this.SmbParameters.CreateClient())
 			{
 				return await this.RunAsync(client, cancellationToken);
 			}
-		}
-
-		private Smb2Client CreateClient()
-		{
-			var client = new Smb2Client(this.AuthenticationParameters.GetCredentialServiceFor(new ServicePrincipalName(ServiceClassNames.Cifs, this.ServerName), SecurityCapabilities.Integrity, this.Log), nameResolver: this.NetParameters, traceCallback: new Smb2Logger(this.Log));
-			this.SmbParameters?.ConfigureClient(client);
-			return client;
 		}
 	}
 }

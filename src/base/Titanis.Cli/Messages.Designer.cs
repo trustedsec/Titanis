@@ -79,11 +79,11 @@ namespace Titanis.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The parameter &apos;{0}&apos; is mandatory, but no value was specified..
+        ///   Looks up a localized string similar to The command line is missing one or more required parameters: {0}..
         /// </summary>
-        internal static string Cli_MandatoryArgMissing_ParamName {
+        internal static string Cli_MandatoryArgMissing_ParamNames {
             get {
-                return ResourceManager.GetString("Cli_MandatoryArgMissing_ParamName", resourceCulture);
+                return ResourceManager.GetString("Cli_MandatoryArgMissing_ParamNames", resourceCulture);
             }
         }
         

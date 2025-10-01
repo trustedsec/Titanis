@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace Titanis.Cli
@@ -18,7 +19,7 @@ namespace Titanis.Cli
 		internal ParameterGroupInfo(
 			Type groupType,
 			ParameterGroupInfo? nestingGroup,
-			PropertyInfo? groupProperty,
+			PropertyDescriptor? groupProperty,
 			ConstructorInfo? constructor,
 			string? groupCategory,
 			ParameterGroupOptions options)
@@ -48,7 +49,7 @@ namespace Titanis.Cli
 				{
 					propValue = this.Constructor.Invoke(null);
 					if (propValue is IParameterGroup parmGroup)
-						parmGroup.Initialize(command);
+						parmGroup.Initialize(command, command.Services);
 					this.GroupProperty.SetValue(command, propValue);
 				}
 				return propValue;
@@ -66,7 +67,7 @@ namespace Titanis.Cli
 		/// <summary>
 		/// Gets the <see cref="PropertyInfo"/> referencing this group.
 		/// </summary>
-		public PropertyInfo? GroupProperty { get; }
+		public PropertyDescriptor? GroupProperty { get; }
 		/// <summary>
 		/// Gets the constructor to create a new instance of this group.
 		/// </summary>

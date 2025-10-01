@@ -27,6 +27,10 @@ namespace Titanis
 
 			ShareRelativePath = shareRelativePath?.Replace('/', '\\');
 		}
+		public UncPath(string serverName, string? shareName, string? shareRelativePath)
+			: this(serverName, 445, shareName, shareRelativePath)
+		{
+		}
 
 		/// <summary>
 		/// Gets the host name.

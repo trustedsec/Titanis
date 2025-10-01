@@ -19,6 +19,21 @@ namespace Titanis.Cli
 		public MetadataResolver Resolver { get; }
 		public ComponentCatalog ComponentCatalog { get; }
 
+		public PropertyDescriptorCollection GetProperties(Type recordType)
+		{
+			try
+			{
+				if (!recordType.Assembly.ReflectionOnly)
+					return TypeDescriptor.GetProperties(recordType);
+			}
+			catch
+			{
+				// Fall through
+			}
+
+			var descriptor = this.SurrogateDescriptor(recordType);
+			return descriptor.GetProperties();
+		}
 		internal ICustomTypeDescriptor SurrogateDescriptor(Type recordType)
 		{
 			return new SurrogateTypeDescriptor(this, recordType);
@@ -69,7 +84,7 @@ namespace Titanis.Cli
 		}
 		public override PropertyDescriptorCollection GetProperties()
 		{
-			var props = this.type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+			var props = this.type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | BindingFlags.NonPublic);
 
 			var descriptors = Array.ConvertAll(props, r => TypeConv.CreatePropertyDescriptor(this.type, r, this.context.Resolver));
 			return new PropertyDescriptorCollection(descriptors, true);

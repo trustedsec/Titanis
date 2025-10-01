@@ -5,6 +5,7 @@ using Titanis.Msrpc;
 using Titanis.Msrpc.Msefsr;
 using Titanis.Net;
 using Titanis.Security;
+using Titanis.Smb2;
 
 namespace Titanis.CredCoerce
 {
@@ -33,14 +34,14 @@ namespace Titanis.CredCoerce
 					context.Log.WriteVerbose("EPM lookup for EFS time out; this usually indicates the service is already running on the target");
 				}
 
-				ServicePrincipalName targetSpn = new(context.ServerName, ServiceClassNames.Host);
+				ServicePrincipalName targetSpn = new(context.ServerName, ServiceClassNames.HostU);
 
 				var rpcClient = context.RpcClient;
 				var smbClient = context.SmbClient;
 
 				// Connect to EFS
 				efs = new EfsClient();
-				await rpcClient.ConnectPipe(efs, smbClient, $@"\\{context.ServerName}\IPC$\{EfsClient.EfsPipeName}", cancellationToken, authContext: context.CredService.GetAuthContextForService(targetSpn));
+				await rpcClient.ConnectPipe(efs, smbClient, new UncPath(context.ServerName, Smb2Client.IpcName, EfsClient.EfsPipeName), cancellationToken);
 
 				context.AddService(efs);
 			}

@@ -1,6 +1,7 @@
 ﻿using ms_lsar;
 using ms_scmr;
 using System.Net;
+using Titanis;
 using Titanis.Cli;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
@@ -48,38 +49,41 @@ namespace WeakServices
 				"TrustedInstaller",
 			};
 
-			var targetSpn = new ServicePrincipalName(ServiceClassNames.Host, targetServer);
-
-			// Create credentials
-			NtlmClientContext ntlmContext = CreateNtlmAuthContext(targetSpn.ToString(), myWorkstationName);
+			// Create credential dictionary
+			ClientCredentialDictionary creds = new ClientCredentialDictionary();
+			creds.DefaultCredentialFactory = (spn, caps) =>
+			{
+				// Set up credentials
+				var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential(UserName, Domain, Password), true);
+				ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
+				ntlmContext.Workstation = myWorkstationName;
+				ntlmContext.ClientChannelBindingsUnhashed = new byte[16];
+				ntlmContext.TargetSpn = spn;
+				ntlmContext.ClientChannelBindingsUnhashed = new byte[16];
+				return ntlmContext;
+			};
+			this.Services.AddService(typeof(IClientCredentialService), creds);
 
 			// Create RPC client
-			RpcClient rpcClient = new RpcClient()
-			{
-				DefaultAuthLevel = RpcAuthLevel.PacketPrivacy,
-			};
-
-			// Look up host address
-			var entry = Dns.GetHostEntry(targetServer);
-			var hostAddress = entry.AddressList[0];
+			RpcClient rpcClient = this.CreateRpcClient();
 
 			// Query endpoint for SCM
-			var epm = await rpcClient.ConnectTcp<EpmClient>(new IPEndPoint(hostAddress, EpmClient.EPMapperPort), cancellationToken);
-			var scmEP = await epm.TryMapTcp(RpcInterfaceId.GetForType(typeof(svcctl)), hostAddress, cancellationToken);
+			var epm = await rpcClient.ConnectTcp<EpmClient>(new DnsEndPoint(targetServer, EpmClient.EPMapperPort), null, cancellationToken);
+			var scmEP = await epm.TryMapTcp(RpcInterfaceId.GetForType(typeof(svcctl)), cancellationToken);
+
+			rpcClient.DefaultAuthLevel = RpcAuthLevel.PacketPrivacy;
 
 			// Set up SMB for LSA
-			var credService = new ClientCredentialService();
-			credService.DefaultCredential = (target => CreateNtlmAuthContext(target.ToString(), myWorkstationName));
-			var smbClient = new Smb2Client(credService);
+			var smbClient = new Smb2Client(creds);
 
 			// Connect to LSA
 			LsaClient lsaClient = new LsaClient();
-			await rpcClient.ConnectPipe(lsaClient, smbClient, $@"\\{targetServer}\IPC$\lsarpc", cancellationToken);
+			await rpcClient.ConnectPipe(lsaClient, smbClient, new UncPath(targetServer, Smb2Client.IpcName, "lsarpc"), cancellationToken);
 			using var lsap = await lsaClient.OpenPolicy(LsaPolicyAccess.LookupNames, cancellationToken);
 
 			// Connect to SCM
 			ScmClient scmClient = new ScmClient();
-			await rpcClient.ConnectTcp(scmClient, scmEP, cancellationToken, ntlmContext);
+			await rpcClient.ConnectTcp(scmClient, scmEP, null, cancellationToken);
 			using var scm = await scmClient.OpenScm(ScmAccess.Connect | ScmAccess.EnumerateService, cancellationToken);
 
 			// Start looping through services
@@ -145,18 +149,6 @@ namespace WeakServices
 			}
 
 			return 0;
-		}
-
-		private static NtlmClientContext CreateNtlmAuthContext(string target, string myWorkstationName)
-		{
-			var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential(UserName, Domain, Password), true)
-			{
-				Workstation = myWorkstationName,
-				ClientChannelBindingsUnhashed = new byte[16],
-				TargetSpn = new ServicePrincipalName(ServiceClassNames.Host, target)
-			};
-			ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
-			return ntlmContext;
 		}
 	}
 }

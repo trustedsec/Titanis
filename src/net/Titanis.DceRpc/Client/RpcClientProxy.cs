@@ -50,6 +50,7 @@ namespace Titanis.DceRpc.Client
 
 
 		private protected RpcBindContext? _bindContext;
+		public BindAuthContext? BoundAuthContext => this._bindContext?.authContext;
 		/// <summary>
 		/// Gets the underlying <see cref="RpcEncoding"/>.
 		/// </summary>
@@ -121,10 +122,10 @@ namespace Titanis.DceRpc.Client
 			var bindAuthContext = this._bindContext.authContext;
 			if (bindAuthContext != null)
 			{
-				if (bindAuthContext.authLevel > RpcAuthLevel.None)
+				if (bindAuthContext.AuthLevel > RpcAuthLevel.None)
 				{
 					AuthLevel authLevel2;
-					switch (bindAuthContext.authLevel)
+					switch (bindAuthContext.AuthLevel)
 					{
 						case RpcAuthLevel.Connect:
 							authLevel2 = AuthLevel.Authenticated;

@@ -154,8 +154,7 @@ internal class ExecCommand : WmiCommand
 
 			cmdLine += " 2>&1 >C:\\WINDOWS\\TEMP\\" + tempFileName;
 
-			smbClient = new Smb2Client(this.Authentication.GetCredentialServiceFor(new ServicePrincipalName(ServiceClassNames.Cifs, this.ServerName), SecurityCapabilities.Integrity, this.Log));
-			this.SmbParameters.ConfigureClient(smbClient);
+			smbClient = this.SmbParameters.CreateClient();
 
 			tempFilePath = new UncPath(this.ServerName, 445, "ADMIN$", $"Temp\\{tempFileName}");
 			outFile = (Smb2OpenFile)await smbClient.CreateFileAsync(tempFilePath, new Smb2CreateInfo

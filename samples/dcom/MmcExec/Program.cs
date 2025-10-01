@@ -27,23 +27,26 @@ namespace MmcExec
 			string commandLine = @"C:\Windows\system32\notepad.exe";
 
 			// Create credentials
-			var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential("milchick", "LUMON", "Br3@kr00m!"), true);
-			ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
-			ntlmContext.Workstation = myWorkstationName;
-			ntlmContext.ClientChannelBindingsUnhashed = new byte[16];
-			ntlmContext.TargetSpn = new ServicePrincipalName(ServiceClassNames.RestrictedKrbHost, target);
+			ClientCredentialDictionary creds = new ClientCredentialDictionary();
+			creds.DefaultCredentialFactory = (spn, caps) =>
+			{
+				var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential("milchick", "LUMON", "Br3@kr00m!"), true);
+				ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
+				ntlmContext.Workstation = myWorkstationName;
+				ntlmContext.ClientChannelBindingsUnhashed = new byte[16];
+				ntlmContext.TargetSpn = new ServicePrincipalName(ServiceClassNames.RestrictedKrbHost, target);
+				return ntlmContext;
+			};
+			this.Services.AddService(typeof(IClientCredentialService), creds);
 
 			// Create RPC client
-			RpcClient rpcClient = new RpcClient(Singleton.SingleInstance<PlatformSocketService>())
-			{
-				DefaultAuthLevel = RpcAuthLevel.PacketPrivacy
-			};
+			RpcClient rpcClient = this.CreateRpcClient();
+			rpcClient.DefaultAuthLevel = RpcAuthLevel.PacketPrivacy;
 
 			// Connect to DCOM service
 			DcomClient dcom = await DcomClient.ConnectTo(
 				target,
 				rpcClient,
-				ntlmContext,
 				cancellationToken);
 
 			// Start MMC

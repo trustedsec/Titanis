@@ -25,4 +25,15 @@ namespace Titanis.IO
 		void WriteTo(ByteWriter writer, T1 arg1, T2 arg2);
 		void WriteTo(ByteWriter writer, PduByteOrder byteOrder, T1 arg1, T2 arg2);
 	}
+
+	public static class PduStructExtensions
+	{
+		public static Memory<byte> ToBytes<TStruct>(this TStruct struc, ByteWriter writer)
+			where TStruct : struct, IPduStruct
+		{
+			writer.Reset();
+			writer.WritePduStruct(struc);
+			return writer.GetData();
+		}
+	}
 }

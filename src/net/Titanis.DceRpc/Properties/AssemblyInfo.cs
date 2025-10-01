@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Titanis;
 
@@ -18,3 +19,4 @@ using Titanis;
 [assembly: Guid("462893c9-2783-4af4-9953-ff4eab740552")]
 
 [assembly:PduByteOrder(PduByteOrder.LittleEndian)]
+[assembly:InternalsVisibleTo("Titanis.DceRpc.Epm")]

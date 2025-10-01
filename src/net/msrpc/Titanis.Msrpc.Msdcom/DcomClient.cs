@@ -25,8 +25,12 @@ namespace Titanis.Msrpc.Msdcom
 	using ms_dcom;
 	using ms_oaut;
 	using System.Diagnostics.CodeAnalysis;
+	using System.Reflection.Metadata;
 	using Titanis.Winterop;
 
+	/// <summary>
+	/// Receives notifications from <see cref="DcomClient"/>.
+	/// </summary>
 	[Callback]
 	public interface IDcomCallback
 	{
@@ -36,7 +40,7 @@ namespace Titanis.Msrpc.Msdcom
 		void OnActivationFailed(Guid clsid, Guid iid, Exception ex);
 		void OnConnectingToExporter(ulong oxid, StringBinding binding);
 	}
-
+	/// <seealso cref="ConnectTo(string, RpcClient, CancellationToken, IDcomCallback?)"/>
 	public class DcomClient : IObjrefMarshal
 	{
 		static DcomClient()
@@ -48,21 +52,16 @@ namespace Titanis.Msrpc.Msdcom
 
 		}
 		private DcomClient(
-			AuthClientContext authContext,
-			ISocketService? socketService = null,
+			RpcClient rpcClient,
 			IDcomCallback? callback = null
 			)
 		{
-			this._authContext = authContext;
-			this._socketService = socketService ?? Singleton.SingleInstance<PlatformSocketService>();
+			this._rpcClient = rpcClient;
 			this._callback = callback;
 		}
 
-		private readonly AuthClientContext _authContext;
-		private readonly ISocketService _socketService;
+		private readonly RpcClient _rpcClient;
 		private readonly IDcomCallback? _callback;
-
-		private RpcClient _rpcClient;
 
 		/// <summary>
 		/// Gets the host name to prefer when connecting to object exporter.
@@ -77,7 +76,7 @@ namespace Titanis.Msrpc.Msdcom
 		/// comparison.  Note that IP address are represented as strings.
 		/// <para>
 		/// This property is initialized to the host name provided to
-		/// <see cref="ConnectTo(string, RpcClient, AuthClientContext, CancellationToken, ISocketService?, IDcomCallback?)"/>.
+		/// <see cref="ConnectTo(string, RpcClient, CancellationToken, IDcomCallback?)"/>.
 		/// </para>
 		/// </remarks>
 		public string? PreferredHostName { get; set; }
@@ -102,104 +101,76 @@ namespace Titanis.Msrpc.Msdcom
 		// IRemoteSCMActivator
 		private ScmActivatorClient? _scmActivator;
 
-		internal static async Task<ObjectExporterServerInfo> GetServerInfo(
+		internal async Task<ObjectExporterServerInfo> GetServerInfo(
 			string host,
-			AuthClientContext authContext,
 			RpcAuthLevel authLevel,
-			CancellationToken cancellationToken,
-			ISocketService? socketService = null
+			CancellationToken cancellationToken
 			)
 		{
 			if (string.IsNullOrEmpty(host)) throw new ArgumentException($"'{nameof(host)}' cannot be null or empty.", nameof(host));
-			if (authContext is null) throw new ArgumentNullException(nameof(authContext));
 
-			socketService ??= Singleton.SingleInstance<PlatformSocketService>();
-
-			var socket = socketService.CreateSocket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			await using (socket.ConfigureAwait(false))
+			using (var exporter = await _rpcClient.ConnectTcp<ObjectExporterClient>(new DnsEndPoint(host, 135), null, authLevel, cancellationToken).ConfigureAwait(false))
 			{
-				await socket.ConnectAsync(new DnsEndPoint(host, 135), cancellationToken).ConfigureAwait(false);
-
-				using (var stream = socket.GetStream(false))
-				{
-					RpcClient rpcClient = new RpcClient()
-					{
-						DefaultAuthLevel = authLevel
-					};
-
-					using (var rpcChannel = rpcClient.BindTo(stream))
-					{
-						ObjectExporterClient exporter = new ObjectExporterClient();
-						await exporter.BindToAsync(rpcChannel, false, authContext, authLevel, cancellationToken).ConfigureAwait(false);
-						var info = await exporter.GetServerInfo(cancellationToken).ConfigureAwait(false);
-						return info;
-					}
-				}
+				var info = await exporter.GetServerInfo(cancellationToken).ConfigureAwait(false);
+				return info;
 			}
 		}
-
+		/// <summary>
+		/// Connects to the DCOM service on a network host.
+		/// </summary>
+		/// <param name="host">Name or address of host</param>
+		/// <param name="rpcClient"><see cref="RpcClient"/></param>
+		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
+		/// <param name="callback"><see cref="IDcomCallback"/> object that receives notifications.</param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException"><paramref name="host"/> is <see langword="null"/> or empty.</exception>
+		/// <exception cref="NotSupportedException">The DCOM server returned a version not supported by this implementation.</exception>
 		public static async Task<DcomClient> ConnectTo(
 			string host,
 			RpcClient rpcClient,
-			AuthClientContext authContext,
 			CancellationToken cancellationToken,
-			ISocketService? socketService = null,
 			IDcomCallback? callback = null
 			)
 		{
 			if (string.IsNullOrEmpty(host)) throw new ArgumentException($"'{nameof(host)}' cannot be null or empty.", nameof(host));
-			if (authContext is null) throw new ArgumentNullException(nameof(authContext));
+			ArgumentNullException.ThrowIfNull(rpcClient);
 
-			socketService ??= Singleton.SingleInstance<PlatformSocketService>();
+			DcomClient dcom = new DcomClient(rpcClient, callback);
+			dcom.PreferredHostName = host;
 
-			var socket = socketService.CreateSocket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			try
+			// Get server info
+			ObjectExporterClient exporter = new ObjectExporterClient();
+			dcom._oxClient = exporter;
+
+			// Connect to exporter service
+			await rpcClient.ConnectTcp(exporter, new DnsEndPoint(host, 135), null, cancellationToken).ConfigureAwait(false);
+			var info = await exporter.GetServerInfo(cancellationToken).ConfigureAwait(false);
+			dcom._serverInfo = info;
+			callback?.OnDcomConnected(info);
+
+			var rpcChannel = exporter.Proxy.Channel;
+
+			dcom.NegotiatedVersion = info.Version;
+			if (info.Version.MajorVersion != 5)
+				throw new NotSupportedException($"The remote server version ({info.Version.MajorVersion}.{info.Version.MinorVersion}) is not supported.");
+
+			// IActivation
+			var actClient = new ActivationClient();
+			dcom._activator = actClient;
+			await actClient.BindToAsync(rpcChannel, false, exporter.Proxy.BoundAuthContext?.AuthContext, exporter.Proxy.BoundAuthContext?.AuthLevel ?? RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
+
+			// SCMActivator
+			if (info.Version.MinorVersion >= 6)
 			{
-				DcomClient dcom = new DcomClient(authContext, socketService, callback)
-				{
-					DefaultAuthLevel = rpcClient.DefaultAuthLevel
-				};
-				dcom.PreferredHostName = host;
-
-				dcom._rpcClient = rpcClient;
-
-				// Get server info
-				ObjectExporterClient exporter = new ObjectExporterClient();
-				dcom._oxClient = exporter;
-
-				// Connect to exporter service
-				await rpcClient.ConnectTcp(exporter, new DnsEndPoint(host, 135), cancellationToken, authContext.Duplicate()).ConfigureAwait(false);
-				var info = await exporter.GetServerInfo(cancellationToken).ConfigureAwait(false);
-				dcom._serverInfo = info;
-				callback?.OnDcomConnected(info);
-
-				var rpcChannel = exporter.Proxy.Channel;
-
-				dcom.NegotiatedVersion = info.Version;
-				if (info.Version.MajorVersion != 5)
-					throw new NotSupportedException($"The remote server version ({info.Version.MajorVersion}.{info.Version.MinorVersion}) is not supported.");
-
-				// IActivation
-				var actClient = new ActivationClient();
-				dcom._activator = actClient;
-				await actClient.BindToAsync(rpcChannel, false, authContext, rpcClient.DefaultAuthLevel, cancellationToken).ConfigureAwait(false);
-
-				// SCMActivator
-				if (info.Version.MinorVersion >= 6)
-				{
-					var scmClient = new ScmActivatorClient(dcom);
-					dcom._scmActivator = scmClient;
-					await scmClient.BindToAsync(rpcChannel, false, authContext.Duplicate(), rpcClient.DefaultAuthLevel, cancellationToken).ConfigureAwait(false);
-				}
-
-				return dcom;
+				var scmClient = new ScmActivatorClient(dcom);
+				dcom._scmActivator = scmClient;
+				await scmClient.BindToAsync(rpcChannel, false, exporter.Proxy.BoundAuthContext?.AuthContext, exporter.Proxy.BoundAuthContext?.AuthLevel ?? RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
 			}
-			finally
-			{
-				socket?.Dispose();
-			}
+
+			return dcom;
 		}
 
+		#region Error stuff
 		private static AsyncLocal<object?> _lastError = new AsyncLocal<object?>();
 		internal static object? GetLastError() => _lastError.Value;
 		internal static void ClearLastError() => _lastError.Value = null;
@@ -219,30 +190,31 @@ namespace Titanis.Msrpc.Msdcom
 		{
 			return hr.GetException();
 		}
+		#endregion
 
-		public Task<OleAutomationObject> Activate(
-			Guid clsid,
-			CancellationToken cancellationToken
-			)
-			=> this.Activate(clsid, this.DefaultAuthLevel, cancellationToken);
+		/// <summary>
+		/// Activates an object.
+		/// </summary>
+		/// <param name="clsid">Class ID of object</param>
+		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
+		/// <returns>An <see cref="OleAutomationObject"/> representing the activated object</returns>
 		public async Task<OleAutomationObject> Activate(
 			Guid clsid,
-			RpcAuthLevel authLevel,
 			CancellationToken cancellationToken
 			)
 		{
-			var obj = await this.Activate<IDispatch>(clsid, authLevel, cancellationToken).ConfigureAwait(false);
+			var obj = await this.Activate<IDispatch>(clsid, cancellationToken).ConfigureAwait(false);
 			return new OleAutomationObject(obj, this);
 		}
-		public Task<TInterface> Activate<TInterface>(
-			Guid clsid,
-			CancellationToken cancellationToken
-			)
-			where TInterface : class, IRpcObject
-			=> this.Activate<TInterface>(clsid, this.DefaultAuthLevel, cancellationToken);
+		/// <summary>
+		/// Activates an object.
+		/// </summary>
+		/// <param name="clsid">Class ID of object</param>
+		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
+		/// <typeparam name="TInterface">Interface to query on activated object</typeparam>
+		/// <returns>An <see cref="OleAutomationObject"/> representing the activated object</returns>
 		public async Task<TInterface> Activate<TInterface>(
 			Guid clsid,
-			RpcAuthLevel authLevel,
 			CancellationToken cancellationToken
 			)
 			where TInterface : class, IRpcObject
@@ -292,21 +264,26 @@ namespace Titanis.Msrpc.Msdcom
 
 			this._callback?.OnActivatedObject(clsid, iid, result);
 
-			var exporter = await GetExporterInfo(result, cancellationToken).ConfigureAwait(false);
+			var exporter = await GetExporterRecord(result, cancellationToken).ConfigureAwait(false);
 
 			var proxy = await Unmarshal<TInterface>(
 				iid,
 				exporter,
 				result.QueryInterfaceResults[0].Objref,
-				authLevel, cancellationToken).ConfigureAwait(false);
+				cancellationToken).ConfigureAwait(false);
 			return proxy;
 		}
 
 		#region Exporters
 		private SemaphoreSlim _exporterLock = new SemaphoreSlim(1, 1);
-		private Dictionary<ulong, ObjectExporterInfo> _exporters = new Dictionary<ulong, ObjectExporterInfo>();
-
-		private async Task<ObjectExporterInfo> GetExporterInfo(ActivationResult result, CancellationToken cancellationToken)
+		private Dictionary<ulong, ObjectExporterRecord> _exporters = new Dictionary<ulong, ObjectExporterRecord>();
+		/// <summary>
+		/// Gets the exporter for an activation.
+		/// </summary>
+		/// <param name="result">Activation result</param>
+		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
+		/// <returns>An <see cref="ObjectExporterRecord"/> representing the exporter connection</returns>
+		private async Task<ObjectExporterRecord> GetExporterRecord(ActivationResult result, CancellationToken cancellationToken)
 		{
 			var oxid = result.Oxid;
 			if (this._exporters.TryGetValue(oxid, out var exporter))
@@ -327,7 +304,7 @@ namespace Titanis.Msrpc.Msdcom
 			}
 		}
 
-		private async Task<ObjectExporterInfo> ConnectExporter(
+		private async Task<ObjectExporterRecord> ConnectExporter(
 			ActivationResult result,
 			CancellationToken cancellationToken
 			)
@@ -349,15 +326,20 @@ namespace Titanis.Msrpc.Msdcom
 					(int)RpcAuthLevel.PacketIntegrity,
 					(int)this._rpcClient.DefaultAuthLevel
 				));
-			AuthClientContext authContext = this._authContext.Duplicate();
 
+			ServicePrincipalName? exporterSpn = null;
+			bool isUntrustedSpn = false;
 			foreach (var secbinding in bindings.SecurityBindings)
 			{
 				if (secbinding.AuthenticationService is RpcAuthType.Spnego or RpcAuthType.Kerberos)
 				{
-					authContext.IsTargetSpnUntrusted = true;
-					authContext.TargetSpn = ServicePrincipalName.Parse(secbinding.PrincipalName);
-					break;
+					isUntrustedSpn = true;
+					// When the initial connection to the resolver used NTLM, the binding may be <domain>\<user>, even for Kerberos/Spnego
+					if (ServicePrincipalName.TryParse(secbinding.PrincipalName, out var spn))
+					{
+						exporterSpn = spn;
+						break;
+					}
 				}
 			}
 
@@ -384,7 +366,8 @@ namespace Titanis.Msrpc.Msdcom
 					{
 						this._callback?.OnConnectingToExporter(result.Oxid, binding);
 
-						await this._rpcClient.ConnectTcp(remUnk, ep, cancellationToken, authContext.Duplicate(), authLevel).ConfigureAwait(false);
+						// TODO: This loses the "untrusted" bit
+						await this._rpcClient.ConnectTcp(remUnk, ep, exporterSpn, authLevel, cancellationToken).ConfigureAwait(false);
 						connected = true;
 						break;
 					}
@@ -399,7 +382,7 @@ namespace Titanis.Msrpc.Msdcom
 			if (!connected)
 				throw new Exception("DCOM failed to connect to the object exporter binding.");
 
-			var exporter = new ObjectExporterInfo
+			var exporter = new ObjectExporterRecord
 			{
 				oxid = result.Oxid,
 				channel = remUnk.Channel,
@@ -408,7 +391,7 @@ namespace Titanis.Msrpc.Msdcom
 				authHint = result.AuthLevelHint,
 				comVersion = result.ComVersion,
 				remunk = remUnk,
-				authContext = authContext
+				authLevel = authLevel,
 			};
 
 			this._exporters.Add(result.Oxid, exporter);
@@ -416,7 +399,7 @@ namespace Titanis.Msrpc.Msdcom
 			return exporter;
 		}
 
-		class ObjectExporterInfo
+		class ObjectExporterRecord
 		{
 			internal ulong oxid;
 			internal RpcClientChannel channel;
@@ -425,7 +408,7 @@ namespace Titanis.Msrpc.Msdcom
 			internal RpcAuthLevel authHint;
 			internal COMVERSION comVersion;
 			internal IRemUnknown2ClientProxy remunk;
-			internal AuthClientContext authContext;
+			internal RpcAuthLevel authLevel;
 		}
 		#endregion
 
@@ -484,7 +467,7 @@ namespace Titanis.Msrpc.Msdcom
 				DcomClient.CheckHresultAndThrow((Hresult)qires0.hResult);
 
 				var objref = new Objref_Standard(iid, qires0.std, null);
-				var typedProxy = await this.Unmarshal<TInterface>(iid, exporter, objref, this.DefaultAuthLevel, cancellationToken).ConfigureAwait(false);
+				var typedProxy = await this.Unmarshal<TInterface>(iid, exporter, objref, cancellationToken).ConfigureAwait(false);
 				return typedProxy;
 			}
 			else
@@ -494,22 +477,19 @@ namespace Titanis.Msrpc.Msdcom
 			}
 		}
 
-		public RpcAuthLevel DefaultAuthLevel { get; set; } = RpcAuthLevel.PacketIntegrity;
-
 		public async Task<T> Unwrap<T>(byte[] marshalData, CancellationToken cancellationToken)
 			where T : class, IRpcObject
 		{
 			var objref = Objref.Decode(marshalData);
 
 			var iid = typeof(T).GUID;
-			return await this.Unmarshal<T>(iid, null, objref, this.DefaultAuthLevel, cancellationToken).ConfigureAwait(false);
+			return await this.Unmarshal<T>(iid, null, objref, cancellationToken).ConfigureAwait(false);
 		}
 
 		private async Task<TInterface> Unmarshal<TInterface>(
 			Guid iid,
-			ObjectExporterInfo? exporter,
+			ObjectExporterRecord? exporter,
 			Objref objref,
-			RpcAuthLevel authLevel,
 			CancellationToken cancellationToken
 			)
 			where TInterface : class, IRpcObject
@@ -559,8 +539,8 @@ namespace Titanis.Msrpc.Msdcom
 							await objProxy.BindToAsync(
 								exporter.channel,
 								false,
-								exporter.authContext.Duplicate(),
-								authLevel,
+								exporter.remunk.BoundAuthContext?.AuthContext,
+								exporter.authLevel,
 								//(RpcAuthLevel)result.AuthLevelHint,
 								null,
 								cancellationToken).ConfigureAwait(false);
@@ -655,7 +635,7 @@ namespace Titanis.Msrpc.Msdcom
 			internal int publicRefCount;
 			internal int privateRefCount;
 
-			internal ObjectExporterInfo exporter;
+			internal ObjectExporterRecord exporter;
 			internal ObjectEntry objEntry;
 
 			private TaskCompletionSource<IRpcObjectProxy> proxySource;

@@ -12,18 +12,8 @@ namespace Titanis.Security.Kerberos.Asn1.KerberosV5Spec2
 
 	partial class PrincipalName
 	{
-		internal ServicePrincipalName ToServicePrincipalName()
-		{
-			var name = this;
-
-			Debug.Assert((NameType)name.name_type == NameType.ServiceInstance);
-			Debug.Assert(name.name_string.Length == 2);
-
-			return new ServicePrincipalName(
-				name.name_string[0].value,
-				name.name_string[1].value
-				);
-		}
+		internal SecurityPrincipalName ToSecurityPrincipalName()
+			=> SecurityPrincipalName.Create((PrincipalNameType)this.name_type, Array.ConvertAll(this.name_string, r => r.value));
 
 	}
 	public partial class KRB_ERROR_Err

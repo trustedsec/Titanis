@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Buffers.Binary;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -43,6 +44,8 @@ namespace Titanis.Security.Kerberos
 	/// </summary>
 	public partial class KerberosClient : IDisposable
 	{
+		public const string Krb5CacheVariableName = "KRB5CCNAME";
+
 		/// <summary>
 		/// Initializes a new <see cref="KerberosClient"/>.
 		/// </summary>
@@ -57,13 +60,13 @@ namespace Titanis.Security.Kerberos
 			IKerberosCallback? callback = null
 			)
 		{
-			this._ticketCache = new TicketCache();
 			this._locator = locator;
 			this._callback = callback;
 			if (locator != null)
 			{
 				// Only required for KDC locator
-				socketService ??= Singleton.SingleInstance<PlatformSocketService>();
+				// TODO: Log
+				socketService ??= new PlatformSocketService(null, null);
 				this._socketService = socketService;
 			}
 		}
@@ -72,15 +75,21 @@ namespace Titanis.Security.Kerberos
 		/// TCP port used by Kerberos servers.
 		/// </summary>
 		public const int KdcTcpPort = 88;
-		/// <summary>
-		/// Name of the ticket granting service
-		/// </summary>
-		public const string TgsServiceClass = "krbtgt";
 
 		private readonly IKdcLocator? _locator;
 		private readonly IKerberosCallback? _callback;
 		private readonly ISocketService? _socketService;
-		private readonly ITicketCache _ticketCache;
+
+		private TicketCache? _ticketCache;
+		public TicketCache TicketCache
+		{
+			get => this._ticketCache ??= new TicketCache();
+			set
+			{
+				ArgumentNullException.ThrowIfNull(value);
+				this._ticketCache = value;
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets the name of the workstation.
@@ -104,12 +113,13 @@ namespace Titanis.Security.Kerberos
 
 		private async Task<Kdc_rep_choice> TransceiveKdcAsync(
 			string realm,
+			LocateKdcOptions options,
 			Memory<byte> memory,
 			CancellationToken cancellationToken)
 		{
 			Debug.Assert(!string.IsNullOrEmpty(realm));
 
-			EndPoint kdcEP = this.VerifyKdcLocator().FindKdc(realm);
+			EndPoint kdcEP = this.VerifyKdcLocator().LocateKdc(realm, options);
 			if (kdcEP == null)
 				throw new NotSupportedException(string.Format(Messages.Krb5_NoKdc, realm));
 
@@ -241,14 +251,14 @@ namespace Titanis.Security.Kerberos
 		public async Task<TicketInfo> RequestTgt(
 			string targetRealm,
 			KerberosCredential credential,
-			ServicePrincipalName? targetSpn,
+			SecurityPrincipalName? targetSpn,
 			TicketParameters? ticketParameters,
 			EType[]? encTypes,
 			CancellationToken cancellationToken)
 		{
 			ArgumentException.ThrowIfNullOrEmpty(targetRealm);
 			ArgumentNullException.ThrowIfNull(credential);
-			targetSpn ??= new ServicePrincipalName(TgsServiceClass, targetRealm);
+			targetSpn ??= new ServicePrincipalName(ServiceClassNames.Krbtgt, targetRealm);
 
 			if (ticketParameters == null)
 				ticketParameters = GetDefaultTgtOptions();
@@ -276,7 +286,7 @@ namespace Titanis.Security.Kerberos
 				paInfo,
 				Structs.KdcReqBody(
 					ticketParameters,
-					Structs.PrincipalName(NameType.Principal, credential.UserName),
+					Structs.PrincipalName(PrincipalNameType.Principal, credential.UserName),
 					credential.Realm,
 					Structs.PrincipalName(targetSpn),
 					context.nonce,
@@ -288,7 +298,7 @@ namespace Titanis.Security.Kerberos
 
 			Memory<byte> pduBytes = BuildPdu(asreq);
 			var sendTime = DateTime.UtcNow;
-			var rep = await this.TransceiveKdcAsync(targetRealm, pduBytes, cancellationToken).ConfigureAwait(false);
+			var rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, pduBytes, cancellationToken).ConfigureAwait(false);
 			var recvTime = DateTime.UtcNow;
 			// TODO: Add a max loop count to avoid getting stuck.
 			while (rep.err != null)
@@ -305,7 +315,7 @@ namespace Titanis.Security.Kerberos
 
 						pduBytes = BuildPdu(asreq);
 						sendTime = DateTime.UtcNow;
-						rep = await this.TransceiveKdcAsync(targetRealm, pduBytes, cancellationToken).ConfigureAwait(false);
+						rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, pduBytes, cancellationToken).ConfigureAwait(false);
 						recvTime = DateTime.UtcNow;
 						continue;
 					}
@@ -346,9 +356,9 @@ namespace Titanis.Security.Kerberos
 				paInfo,
 				Structs.KdcReqBody(
 					GetDefaultTgtOptions(),
-					Structs.PrincipalName(NameType.Principal, userName),
+					Structs.PrincipalName(PrincipalNameType.Principal, userName),
 					targetRealm,
-					Structs.PrincipalName(NameType.ServiceInstance, TgsServiceClass, targetRealm),
+					Structs.PrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.Krbtgt, targetRealm),
 					context.nonce,
 					this.GetAllETypes(),
 					this.MakeHostAddress()
@@ -356,7 +366,7 @@ namespace Titanis.Security.Kerberos
 
 			Memory<byte> pduBytes = BuildPdu(asreq);
 			var sendTime = DateTime.UtcNow;
-			var rep = await this.TransceiveKdcAsync(targetRealm, pduBytes, cancellationToken).ConfigureAwait(false);
+			var rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, pduBytes, cancellationToken).ConfigureAwait(false);
 			if (rep.err != null)
 			{
 				if ((KerberosErrorCode)rep.err.error_code is KerberosErrorCode.KDC_ERR_PREAUTH_REQUIRED)
@@ -441,19 +451,9 @@ namespace Titanis.Security.Kerberos
 
 			TicketInfo tgtInfo = new TicketInfo(asrep.ticket, this.CreateSessionKeyFor(encPart.key), encPart, asrep.cname.name_string[0].value, asrep.crealm.value);
 			this._callback?.OnReceivedTgt(tgtInfo);
-			return tgtInfo;
-		}
 
-		private bool CheckSName(PrincipalName sname, string serviceClass, string host)
-		{
-			if ((NameType)sname.name_type == NameType.ServiceInstance && sname.name_string.Length == 2)
-			{
-				bool matches =
-					serviceClass.Equals(sname.name_string[0].value, StringComparison.OrdinalIgnoreCase)
-					&& host.Equals(sname.name_string[1].value, StringComparison.OrdinalIgnoreCase);
-				return matches;
-			}
-			return false;
+			this.TicketCache.AddTicket(tgtInfo);
+			return tgtInfo;
 		}
 
 		private EncKDCRepPart ExtractASRepEncPart(
@@ -482,13 +482,22 @@ namespace Titanis.Security.Kerberos
 			return encPart;
 		}
 
+		private ConcurrentDictionary<string, string> _realmMapping = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
 		private async Task<TicketInfo> GetTgt(
 			string realm,
 			KerberosCredential? credential,
 			CancellationToken cancellationToken)
 		{
-			var spn = new ServicePrincipalName(TgsServiceClass, realm);
-			var ticket = this._ticketCache.GetTicketFromCache(spn);
+			var spn = new ServicePrincipalName(ServiceClassNames.Krbtgt, realm);
+			var ticket = this.TicketCache.GetTicketFromCache(spn);
+			if (ticket == null)
+			{
+				if (this._realmMapping.TryGetValue(realm, out string mapped))
+					realm = mapped;
+				ticket = this.TicketCache.GetTicketFromCache(spn);
+			}
+
 			if (ticket != null)
 			{
 				return ticket;
@@ -498,10 +507,12 @@ namespace Titanis.Security.Kerberos
 				if (credential == null)
 					throw new InvalidOperationException($"Cannot request a TGT for realm {realm} because there are no credentials to present, and no TGT is present in the cache.  Either provide credentials or import a TGT.");
 				ticket = await this.RequestTgt(realm, credential, cancellationToken).ConfigureAwait(false);
-				this._ticketCache.AddTicket(spn, ticket);
-				if (ticket.TicketRealm.Equals(realm))
-					// Realm may have been normalized; set both entries to this ticket
-					this._ticketCache.AddTicket(new ServicePrincipalName(spn.ServiceClass, realm), ticket);
+				this.TicketCache.AddTicket(ticket);
+				if (!string.Equals(ticket.TicketRealm, realm))
+				{
+					// Realm may have been normalized; set mapping
+					this._realmMapping[realm] = ticket.TicketRealm;
+				}
 				return ticket;
 			}
 		}
@@ -516,7 +527,7 @@ namespace Titanis.Security.Kerberos
 		{
 			ArgumentNullException.ThrowIfNull(targetSpn);
 
-			var ticket = this._ticketCache.GetTicketFromCache(targetSpn);
+			var ticket = this.TicketCache.GetTicketFromCache(targetSpn);
 			if (ticket != null)
 				return ticket;
 
@@ -526,18 +537,41 @@ namespace Titanis.Security.Kerberos
 			ticket = await this.RequestTicket(
 				tgt,
 				targetSpn,
-				realm,
+				tgt.TicketRealm,
 				null,
 				ticketParameters,
 				cancellationToken).ConfigureAwait(false);
-			this._ticketCache.AddTicket(targetSpn, ticket);
+			this.TicketCache.AddTicket(ticket);
 
 			return ticket;
 		}
 
 		public async Task<TicketInfo> RequestTicket(
 			TicketInfo tgt,
-			ServicePrincipalName spn,
+			SecurityPrincipalName spn,
+			string realm,
+			EType[]? encTypes,
+			TicketParameters? ticketParameters,
+			CancellationToken cancellationToken)
+		{
+			var ticket = await RequestTicketCore(tgt, spn, realm, encTypes, ticketParameters, cancellationToken).ConfigureAwait(false);
+			if (ticket.IsTgt)
+			{
+				HashSet<string> referralNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+				referralNames.Add(realm);
+				while (referralNames.Add(ticket.ServiceInstance) && ticket.IsTgt)
+				{
+					this._callback?.OnReferralReceived(spn, ticket);
+
+					var nextTicket = await RequestTicketCore(ticket, spn, ticket.ServiceInstance, encTypes, ticketParameters, cancellationToken).ConfigureAwait(false);
+					ticket = nextTicket;
+				}
+			}
+			return ticket;
+		}
+		public async Task<TicketInfo> RequestTicketCore(
+			TicketInfo tgt,
+			SecurityPrincipalName spn,
 			string realm,
 			EType[]? encTypes,
 			TicketParameters? ticketParameters,
@@ -557,10 +591,10 @@ namespace Titanis.Security.Kerberos
 
 			var tgsreq = this.CreateTgsReq(spn, tgt, encTypes, ticketParameters, context);
 
-			this._callback?.OnRequestingTicket(spn, realm, tgt, (KdcOptions)tgsreq.tgsreq.req_body.kdc_options.ToUInt32());
+			this._callback?.OnRequestingTicket(spn, tgt, (KdcOptions)tgsreq.tgsreq.req_body.kdc_options.ToUInt32());
 
 			Memory<byte> pduBytes = BuildPdu(tgsreq);
-			var rep = await this.TransceiveKdcAsync(tgt.TicketRealm, pduBytes, cancellationToken).ConfigureAwait(false);
+			var rep = await this.TransceiveKdcAsync(realm, string.Equals(realm, tgt.UserRealm) ? LocateKdcOptions.Home : LocateKdcOptions.None, pduBytes, cancellationToken).ConfigureAwait(false);
 
 			if (rep.tgsrep != null)
 				return ProcessTgsRep(rep.tgsrep, tgt.SessionKey, context);
@@ -727,7 +761,7 @@ namespace Titanis.Security.Kerberos
 		}
 
 		private Kdc_req_choice CreateTgsReq(
-			ServicePrincipalName spn,
+			SecurityPrincipalName spn,
 			TicketInfo tgt,
 			EType[]? etypes,
 			TicketParameters ticketParameters,
@@ -736,15 +770,16 @@ namespace Titanis.Security.Kerberos
 		{
 			ArgumentNullException.ThrowIfNull(ticketParameters);
 
-			var cname = Structs.PrincipalName(NameType.Principal, tgt.UserName);
-			string crealm = tgt.UserRealm;
+			Debug.Assert(tgt.IsTgt);
+
+			var cname = Structs.PrincipalName(PrincipalNameType.Principal, tgt.UserName);
 
 			uint seqnbr = (uint)GenerateNonce();
 
 			KDC_REQ_BODY reqBody = Structs.KdcReqBody(
 				ticketParameters,
 				cname,
-				crealm,
+				tgt.ServiceInstance,
 				Structs.PrincipalName(spn),
 				context.nonce,
 				(etypes == null) ? this.GetAllETypes() : Array.ConvertAll(etypes, r => (int)r),
@@ -758,7 +793,7 @@ namespace Titanis.Security.Kerberos
 					KeyUsage.TgsreqPatgsreqPadataApreqAuthChecksum_TgsSessionKey_IncludesAuthSubkey,
 					Asn1DerEncoder.EncodeTlv(Structs.Authenticator(
 						cname,
-						crealm,
+						tgt.UserRealm,
 						ComputeChecksum(Asn1DerEncoder.EncodeTlv(reqBody).Span),
 						seqnbr,
 						null
@@ -787,7 +822,7 @@ namespace Titanis.Security.Kerberos
 			)
 		{
 			// Use from ticket instead of credentials
-			var cname = Structs.PrincipalName(NameType.Principal, ticket.UserName);
+			var cname = Structs.PrincipalName(PrincipalNameType.Principal, ticket.UserName);
 			string crealm = ticket.UserRealm;
 
 			//var reqBodyBytes = Asn1DerEncoder.EncodeTlv(reqBody);
@@ -937,13 +972,13 @@ namespace Titanis.Security.Kerberos
 			ArgumentNullException.ThrowIfNull(tickets);
 			foreach (var ticket in tickets)
 			{
-				this._ticketCache.AddTicket(ticket.Spn, ticket);
+				this.TicketCache.AddTicket(ticket);
 			}
 		}
 		public void ImportTicket(TicketInfo ticket)
 		{
 			ArgumentNullException.ThrowIfNull(ticket);
-			this._ticketCache.AddTicket(ticket.Spn, ticket);
+			this.TicketCache.AddTicket(ticket);
 		}
 		public byte[] ExportTickets(IList<TicketInfo> tickets, KerberosFileFormat format)
 		{
@@ -952,7 +987,7 @@ namespace Titanis.Security.Kerberos
 			return format switch
 			{
 				KerberosFileFormat.Kirbi => ExportKirbi(tickets),
-				KerberosFileFormat.Ccache => ExportCcache(tickets),
+				KerberosFileFormat.Ccache => ExportCcacheBytes(tickets),
 			};
 		}
 
@@ -969,9 +1004,9 @@ namespace Titanis.Security.Kerberos
 				{
 					key = ticket.SessionKey.key,
 					prealm = new GeneralString(ticket.UserRealm),
-					pname = new PrincipalName
+					pname = new Asn1.KerberosV5Spec2.PrincipalName
 					{
-						name_type = (int)NameType.Principal,
+						name_type = (int)PrincipalNameType.Principal,
 						name_string = new GeneralString[]
 						{
 							new GeneralString(ticket.UserName)
@@ -982,15 +1017,7 @@ namespace Titanis.Security.Kerberos
 					endtime = ticket.EndTime,
 					renew_till = ticket.RenewTill,
 					srealm = new GeneralString(ticket.ServiceRealm),
-					sname = new PrincipalName
-					{
-						name_type = (int)NameType.ServiceInstance,
-						name_string = new GeneralString[]
-						{
-							new GeneralString(ticket.ServiceClass),
-							new GeneralString(ticket.Host)
-						}
-					},
+					sname = Structs.PrincipalName(ticket.TargetSpn),
 					// TODO caddr
 					authtime = null
 				};
@@ -1022,38 +1049,7 @@ namespace Titanis.Security.Kerberos
 			return krbcredBytes;
 		}
 
-		private static CCachePrincipal FromTicketClient(TicketInfo ticket)
-		{
-			return new CCachePrincipal()
-			{
-				version = 4,
-				componentCount = 1,
-				nameType = NameType.Principal,
-				realm = new CCacheStringData(ticket.UserRealm),
-				components = new CCacheStringData[]
-				{
-					new CCacheStringData(ticket.UserName)
-				},
-			};
-		}
-
-		private static CCachePrincipal FromTicketService(TicketInfo ticket)
-		{
-			return new CCachePrincipal()
-			{
-				version = 4,
-				componentCount = 2,
-				nameType = NameType.ServiceInstance,
-				realm = new CCacheStringData(ticket.ServiceRealm),
-				components = new CCacheStringData[]
-				{
-					new CCacheStringData(ticket.ServiceClass),
-					new CCacheStringData(ticket.Host),
-				},
-			};
-		}
-
-		private byte[] ExportCcache(IList<TicketInfo> tickets)
+		private byte[] ExportCcacheBytes(IList<TicketInfo> tickets)
 		{
 			CCache ccache = new CCache
 			{
@@ -1065,7 +1061,7 @@ namespace Titanis.Security.Kerberos
 					headerSize = 0x0C,
 					headerData = new byte[] { 0, 1, 0, 8, 0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0 },
 				},
-				defaultPrincipal = FromTicketClient(tickets[0]),
+				defaultPrincipal = CCachePrincipal.FromTicketClient(tickets[0]),
 				credList = new CCacheCredentialList
 				{
 					credentials = tickets.Select(ToCCacheCred).ToArray()
@@ -1082,8 +1078,8 @@ namespace Titanis.Security.Kerberos
 			CCacheCredential cred = new CCacheCredential
 			{
 				version = 4,
-				client = FromTicketClient(ticket),
-				server = FromTicketService(ticket),
+				client = CCachePrincipal.FromTicketClient(ticket),
+				server = CCachePrincipal.FromTicketService(ticket),
 				key = new CCacheKeyBlock
 				{
 					encType = ticket.SessionKey.EType,
@@ -1171,6 +1167,19 @@ namespace Titanis.Security.Kerberos
 
 			return tickets;
 		}
+
+
+		public const string CCacheExtension = ".ccache";
+
+		public static KerberosFileFormat GetFormatFromFileName(string fileName)
+		{
+			ArgumentException.ThrowIfNullOrEmpty(fileName);
+
+			if (fileName.EndsWith(CCacheExtension, StringComparison.OrdinalIgnoreCase))
+				return KerberosFileFormat.Ccache;
+			else
+				return KerberosFileFormat.Kirbi;
+		}
 	}
 
 	internal class KerbTrace
@@ -1201,7 +1210,7 @@ namespace Titanis.Security.Kerberos
 		#region TGS-REQ
 		public KDC_REQ Tgsreq { get; private set; }
 		public int TgsNonce { get; private set; }
-		public ServicePrincipalName TargetSpn { get; private set; }
+		public SecurityPrincipalName TargetSpn { get; private set; }
 		#endregion
 		#region TGS-REP
 		public KDC_REP Tgsrep { get; private set; }
@@ -1261,7 +1270,7 @@ namespace Titanis.Security.Kerberos
 			this.Tgsreq = tgsreq;
 			this.TgsNonce = tgsreq.req_body.nonce;
 
-			this.TargetSpn = tgsreq.req_body.sname.ToServicePrincipalName();
+			this.TargetSpn = tgsreq.req_body.sname.ToSecurityPrincipalName();
 
 			var tgsreq_options = (KdcOptions)tgsreq.req_body.kdc_options.ToUInt32();
 			AP_REQ? tgsreq_apreq = null;
@@ -1279,12 +1288,12 @@ namespace Titanis.Security.Kerberos
 				}
 			}
 
-			this.callback?.OnRequestingTicket(this.TargetSpn, this.AuthRealm, this.Tgt, tgsreq_options);
+			this.callback?.OnRequestingTicket(this.TargetSpn, this.Tgt, tgsreq_options);
 		}
 
 		internal void TraceTgsrep(byte[] tgsrepBytes)
 			=> TraceTgsrep(tgsrepBytes, this.TargetSpn, this.TgsNonce, this.TgtSessionKey);
-		internal void TraceTgsrep(byte[] tgsrepBytes, ServicePrincipalName spn, int tgsNonce, SessionKey tgtSessionKey)
+		internal void TraceTgsrep(byte[] tgsrepBytes, SecurityPrincipalName spn, int tgsNonce, SessionKey tgtSessionKey)
 		{
 			var tgsrep = Asn1DerDecoder.Decode<Asn1.KerberosV5Spec2.KDC_REP>(tgsrepBytes);
 			var ticket = this.kerb.ProcessTgsRep(tgsrep, tgtSessionKey, new TicketRequestContext(credential)
@@ -1329,7 +1338,7 @@ namespace Titanis.Security.Kerberos
 				gssFlags = token.capabilities;
 			}
 
-			this.callback?.OnSendingApreq(null, this.TargetSpn, this.credential, gssFlags, ticketSessionKey, this.SendSeqNbr);
+			this.callback?.OnSendingApreq(null, this.TargetSpn, null, this.credential, gssFlags, ticketSessionKey, this.SendSeqNbr);
 		}
 
 		internal void TraceAprep(byte[] aprepBytes,
@@ -1409,5 +1418,20 @@ namespace Titanis.Security.Kerberos
 		Unknown = 0,
 		Kirbi,
 		Ccache,
+	}
+
+	public static class ServiceExtensions
+	{
+		public static KerberosClient CreateKerberosClient(this IServiceProvider services, IKdcLocator? locator)
+		{
+			var callback = services.GetService<IKerberosCallback>();
+			if (callback == null)
+			{
+				var log = services.GetService<ILog>();
+				if (log != null)
+					callback = new KerberosDiagnosticLogger(log);
+			}
+			return new KerberosClient(locator, services.GetService<ISocketService>(), callback);
+		}
 	}
 }

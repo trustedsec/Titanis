@@ -21,9 +21,6 @@ public abstract class EpmCommand : RpcCommand<EpmClient>
 	const int DefaultPageSize = 32;
 
 	protected sealed override Type InterfaceType => typeof(epm.ept);
-	protected sealed override int WellKnownPort => 135;
-
-	protected sealed override string? WellKnownPipeName => "epmapper";
 
 	protected override void ValidateParameters(ParameterValidationContext context)
 	{

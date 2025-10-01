@@ -11,6 +11,7 @@ namespace Titanis.Cli
 	{
 		ITerminal Terminal { get; }
 		string WorkingDirectory { get; }
+		IServiceProvider Services { get; }
 
 		CommandMetadataContext MetadataContext { get; }
 		object? GetVariable(string name);

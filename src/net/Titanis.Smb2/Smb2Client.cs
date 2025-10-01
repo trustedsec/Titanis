@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -31,15 +32,13 @@ namespace Titanis.Smb2
 		public Smb2Client(
 			IClientCredentialService credentialService,
 			ISocketService? socketService = null,
-			INameResolverService? nameResolver = null,
 			ISmbOptionsService? optionsService = null,
 			ISmb2TraceCallback? traceCallback = null,
 			ILog? log = null
 			)
 		{
-			this.socketService = socketService ?? Singleton.SingleInstance<PlatformSocketService>();
+			this.socketService = socketService ?? new PlatformSocketService(null, log);
 			this.credentialService = credentialService;
-			this.nameResolver = nameResolver ?? new PlatformNameResolverService(log: log);
 			this.optionsService = optionsService;
 			this.traceCallback = traceCallback;
 		}
@@ -67,7 +66,6 @@ namespace Titanis.Smb2
 
 		private readonly ISocketService socketService;
 		private readonly IClientCredentialService credentialService;
-		private readonly INameResolverService nameResolver;
 		private readonly ISmbOptionsService? optionsService;
 		private readonly ISmb2TraceCallback? traceCallback;
 
@@ -165,9 +163,6 @@ namespace Titanis.Smb2
 
 		private async Task<ConnectionGroup> ConnectToAsync(string serverName, int port, CancellationToken cancellationToken)
 		{
-			// Resolve the host address
-			IPAddress[]? addrs = await this.nameResolver.ResolveAsync(serverName, cancellationToken).ConfigureAwait(false);
-
 			Smb2ConnectionOptions options = null;
 			if (this.optionsService != null)
 			{
@@ -180,31 +175,28 @@ namespace Titanis.Smb2
 			// Try each of the resolved addresses
 			Exception? exception = null;
 			this._connections.TryGetValue(new ConnectionKey(serverName, port), out ConnectionGroup? connGroup);
-			for (int i = 0; i < addrs.Length; i++)
+			var remoteEP = new DnsEndPoint(serverName, port);
+			try
 			{
-				IPAddress? addr = addrs[i];
-				var remoteEP = new IPEndPoint(addr, port);
-				try
+				// Connect to the server
+				var conn = await this.ConnectToAsync(remoteEP, serverName, options, cancellationToken).ConfigureAwait(false);
+				if (connGroup == null)
 				{
-					// Connect to the server
-					var conn = await this.ConnectToAsync(remoteEP, serverName, options, cancellationToken).ConfigureAwait(false);
-					if (connGroup == null)
-					{
-						connGroup ??= new ConnectionGroup(conn);
-						this._connections.Add(new ConnectionKey(serverName, port), connGroup);
-					}
-					else
-					{
-						connGroup.connections.Add(conn);
-					}
+					connGroup ??= new ConnectionGroup(conn);
+					this._connections.Add(new ConnectionKey(serverName, port), connGroup);
+				}
+				else
+				{
+					connGroup.connections.Add(conn);
+				}
 
-					if (!this.UseMultiChannel || conn.Dialect < Smb2Dialect.Smb3_1_1)
-						break;
-				}
-				catch (Exception ex)
-				{
-					exception = ex;
-				}
+				// UNDONE: MultiChannel pushed
+				//if (!this.UseMultiChannel || conn.Dialect < Smb2Dialect.Smb3_1_1)
+				//	break;
+			}
+			catch (Exception ex)
+			{
+				exception = ex;
 			}
 
 			if (connGroup != null)
@@ -258,7 +250,7 @@ namespace Titanis.Smb2
 			var connGroup = await this.GetConnectionAsync(serverName, port, cancellationToken).ConfigureAwait(false);
 			var conn0 = connGroup.SelectConnection();
 
-			var authContext = this.credentialService.GetAuthContextForService(new ServicePrincipalName(ServiceClass, serverName));
+			var authContext = this.credentialService.GetAuthContextForService(new ServicePrincipalName(ServiceClass, serverName), SecurityCapabilities.Integrity);
 
 			const int SpnegoRpcType = 9;
 			if (authContext == null)
@@ -758,4 +750,23 @@ namespace Titanis.Smb2
 		}
 	}
 
+	public static class ServiceExtensions
+	{
+		public static Smb2Client CreateSmb2Client(this IServiceProvider services)
+		{
+			ISmb2TraceCallback? callback = services.GetService<ISmb2TraceCallback>();
+			if (callback is null)
+			{
+				var log = services.GetService<ILog>();
+				if (log is not null)
+					callback = new Smb2Logger(log);
+			}
+			return new Smb2Client(
+				services.RequireService<IClientCredentialService>(),
+				services.GetService<ISocketService>(),
+				services.GetService<ISmbOptionsService>(),
+				callback
+				);
+		}
+	}
 }

@@ -96,7 +96,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 			bool matches =
 				(!this.Current.IsSpecified || (ticket.IsCurrent == this.Current.IsSet))
 				&& MatchesPattern(ticket.UserName, this._userNamePatterns)
-				&& MatchesPattern(ticket.Spn.ToString(), this._spnPatterns)
+				&& MatchesPattern(ticket.TargetSpn.ToString(), this._spnPatterns)
 				&& ((this.MatchingEncType == null) || this.MatchingEncType.Contains(ticket.EType))
 				;
 			return matches;
@@ -106,7 +106,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 		{
 			List<TicketInfo> allTickets = new List<TicketInfo>();
 
-			KerberosClient krb = new KerberosClient(null, callback: new KerberosDiagnosticLogger(this.Log));
+			KerberosClient krb = this.CreateKerberosClient(null);
 
 			byte[]? keyBytes = this.TicketKey?.Bytes;
 
@@ -133,7 +133,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 						{
 							foreach (var ticket in selected)
 							{
-								var authzData= krb.GetTicketAuthorizationData(ticket, keyBytes);
+								var authzData = krb.GetTicketAuthorizationData(ticket, keyBytes);
 							}
 						}
 						allTickets.AddRange(selected);
@@ -146,7 +146,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 			if (this.Into != null)
 			{
 				var outFileName = this.ResolveFsPath(this.Into);
-				var bytes = krb.ExportTickets(allTickets, AsreqCommand.FormatFromFileName(outFileName));
+				var bytes = krb.ExportTickets(allTickets, KerberosClient.GetFormatFromFileName(outFileName));
 
 				if (File.Exists(outFileName) && !this.Overwrite.IsSet)
 				{

@@ -110,7 +110,6 @@ namespace Titanis.DceRpc.Client
 			CancellationToken cancellationToken
 			)
 		{
-			authContext?.Initialize();
 
 			SyntaxId[] TransferSyntaxes = new SyntaxId[]
 			{
@@ -128,12 +127,13 @@ namespace Titanis.DceRpc.Client
 				existingAuthContext = this._authContextByOriginal.TryGetValue(authContext, out bindAuthContext);
 				if (!existingAuthContext)
 				{
+					authContext.Initialize();
 					bindAuthContext = new BindAuthContext(
 						authContext,
 						this.GetNextAuthContextId(),
 						authLevel
 						);
-					this.RegisterAuthContext(bindAuthContext.contextId, bindAuthContext);
+					this.RegisterAuthContext(bindAuthContext.ContextId, bindAuthContext);
 
 					lock (this._authContextByOriginal)
 					{
@@ -215,13 +215,13 @@ namespace Titanis.DceRpc.Client
 			int pad = writer.Align(AuthVerifierHeader.Alignment);
 			AuthVerifierHeader hdr = new AuthVerifierHeader
 			{
-				auth_type = (RpcAuthType)bindAuthContext.authContext.RpcAuthType,
-				auth_level = bindAuthContext.authLevel,
+				auth_type = (RpcAuthType)bindAuthContext.AuthContext.RpcAuthType,
+				auth_level = bindAuthContext.AuthLevel,
 				auth_pad_length = (byte)pad,
-				auth_context_id = bindAuthContext.contextId
+				auth_context_id = bindAuthContext.ContextId
 			};
 			writer.WritePduStruct(hdr);
-			var authToken = bindAuthContext.authContext.Token;
+			var authToken = bindAuthContext.AuthContext.Token;
 			writer.WriteBytes(authToken);
 			authLength = authToken.Length;
 			return authLength;
@@ -539,7 +539,7 @@ namespace Titanis.DceRpc.Client
 
 					if (auth != null)
 					{
-						AuthClientContext? authContext = bindreq.authContext?.authContext;
+						AuthClientContext? authContext = bindreq.authContext?.AuthContext;
 						Debug.Assert(authContext != null);
 						authContext.Initialize(auth.token);
 						bindreq.bindContext = bindContext;
@@ -605,7 +605,7 @@ namespace Titanis.DceRpc.Client
 
 			if (auth != null)
 			{
-				AuthClientContext? authContext = bindreq.authContext?.authContext;
+				AuthClientContext? authContext = bindreq.authContext?.AuthContext;
 				Debug.Assert(authContext != null);
 				authContext.Initialize(auth.token);
 				//if (!authContext.IsComplete)
@@ -710,7 +710,10 @@ namespace Titanis.DceRpc.Client
 		}
 	}
 
-	class BindAuthContext
+	/// <summary>
+	/// Describes the authentication context of a bound RPC proxy.
+	/// </summary>
+	public class BindAuthContext
 	{
 		internal BindAuthContext(
 			AuthClientContext authContext,
@@ -718,19 +721,22 @@ namespace Titanis.DceRpc.Client
 			RpcAuthLevel authLevel
 			)
 		{
-			this.authContext = authContext;
-			this.contextId = contextId;
-			this.authLevel = authLevel;
+			this.AuthContext = authContext;
+			this.ContextId = contextId;
+			this.AuthLevel = authLevel;
 		}
 
-		internal readonly uint contextId;
-		internal readonly AuthClientContext authContext;
-		internal readonly RpcAuthLevel authLevel;
+		/// <summary>
+		/// Gets the ID of the bound authentication context.
+		/// </summary>
+		public uint ContextId { get; }
+		public AuthClientContext AuthContext { get; }
+		public RpcAuthLevel AuthLevel { get; }
 
 		internal int MessageAuthTokenSize
 			=>
-				(this.authLevel == RpcAuthLevel.PacketIntegrity) ? this.authContext.SignTokenSize
-				: (this.authLevel == RpcAuthLevel.PacketPrivacy) ? (this.authContext.SealHeaderSize + this.authContext.SealTrailerSize)
+				(this.AuthLevel == RpcAuthLevel.PacketIntegrity) ? this.AuthContext.SignTokenSize
+				: (this.AuthLevel == RpcAuthLevel.PacketPrivacy) ? (this.AuthContext.SealHeaderSize + this.AuthContext.SealTrailerSize)
 				: 0;
 	}
 }

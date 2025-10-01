@@ -15,21 +15,15 @@ namespace Titanis.Smb2.Cli
 		/// <inheritdoc/>
 		protected sealed override Type InterfaceType => typeof(samr);
 
-		/// <inheritdoc/>
-		protected sealed override bool SupportsDynamicTcp => true;
-
 		/// <summary>
 		/// Gets the access rights required to run the command.
 		/// </summary>
-		protected abstract SamServerAccess RequiredAccess { get; }
-
-		/// <inheritdoc/>
-		protected sealed override bool RequiresEncryption => true;
+		protected abstract SamServerAccess RequiredSamAccess { get; }
 
 		/// <inheritdoc/>
 		protected sealed override async Task<int> RunAsync(SamClient client, CancellationToken cancellationToken)
 		{
-			using (var sam = await client.Connect(this.RequiredAccess, this.ServerName, cancellationToken))
+			using (var sam = await client.Connect(this.RequiredSamAccess, this.ServerName, cancellationToken))
 			{
 				return await this.RunAsync(sam, cancellationToken);
 			}

@@ -42,7 +42,7 @@ namespace Titanis.Security.Kerberos
 
 		void IKerberosCallback.OnRequestingTgt(string targetRealm, KerberosCredential credential, int nonce)
 		{
-			WriteMessage($"Requesting TGT for realm {targetRealm} for user {credential.UserName} (nonce={nonce}).");
+			WriteMessage($"Requesting TGT for realm {targetRealm} for user {credential.UserName} (nonce={nonce})");
 
 			this._chainedCallback?.OnRequestingTgt(targetRealm, credential, nonce);
 		}
@@ -58,7 +58,7 @@ namespace Titanis.Security.Kerberos
 		{
 			foreach (var item in etypeInfos)
 			{
-				WriteMessage($"KDC supports EType {(EType)item.etype}.");
+				WriteMessage($"KDC supports EType {(EType)item.etype}");
 			}
 
 			this._chainedCallback?.OnProcessETypes(etypeInfos);
@@ -68,7 +68,7 @@ namespace Titanis.Security.Kerberos
 		{
 			foreach (var item in etypeInfos)
 			{
-				WriteMessage($"KDC supports EType {(EType)item.etype} salt={((item.salt.HasValue) ? item.salt.Value.value : "<none>")}.");
+				WriteMessage($"KDC supports EType {(EType)item.etype} salt={((item.salt.HasValue) ? item.salt.Value.value : "<none>")}");
 			}
 
 			this._chainedCallback?.OnProcessETypes(etypeInfos);
@@ -76,30 +76,32 @@ namespace Titanis.Security.Kerberos
 
 		void IKerberosCallback.OnReceivedTgt(TicketInfo tgtInfo)
 		{
-			this.WriteMessage($"Received TGT: {tgtInfo.SessionKey.EType} session key {tgtInfo.SessionKey.KeyBytes.ToHexString()}");
+			this.WriteMessage($"Received TGT for realm {tgtInfo.TicketRealm}: {tgtInfo.SessionKey.EType} session key {tgtInfo.SessionKey.KeyBytes.ToHexString()}");
 
 			this._chainedCallback?.OnReceivedTgt(tgtInfo);
 		}
 
-		void IKerberosCallback.OnRequestingTicket(ServicePrincipalName spn, string realm, TicketInfo tgt, KdcOptions kdcOptions)
+		void IKerberosCallback.OnRequestingTicket(SecurityPrincipalName spn, TicketInfo tgt, KdcOptions kdcOptions)
 		{
-			this.WriteMessage($"Requesting ticket for {spn} within {realm} for user {tgt.UserName}@{tgt.UserRealm} (KDC options = {kdcOptions})");
+			// Since this is a TGT, the TicketRealm indicates the issuing realm,
+			// but ServiceInstance indicates the target realm
+			this.WriteMessage($"Requesting ticket for {spn} within {tgt.ServiceInstance} for user {tgt.UserName}@{tgt.UserRealm} (KDC options = {kdcOptions})");
 
-			this._chainedCallback?.OnRequestingTicket(spn, realm, tgt, kdcOptions);
+			this._chainedCallback?.OnRequestingTicket(spn, tgt, kdcOptions);
 		}
 
 		void IKerberosCallback.OnReceivedTicket(TicketInfo ticketInfo)
 		{
-			this.WriteMessage($"Received ticket: {ticketInfo.SessionKey.EType} session key {ticketInfo.SessionKey.KeyBytes.ToHexString()}");
+			this.WriteMessage($"Received ticket for {ticketInfo.TargetSpn} within {ticketInfo.TicketRealm} for user {ticketInfo.UserName}@{ticketInfo.UserRealm}: {ticketInfo.SessionKey.EType} session key {ticketInfo.SessionKey.KeyBytes.ToHexString()}");
 
 			this._chainedCallback?.OnReceivedTicket(ticketInfo);
 		}
 
-		void IKerberosCallback.OnSendingApreq(KerberosClientContext? authContext, ServicePrincipalName targetSpn, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, uint sendSeqNbr)
+		void IKerberosCallback.OnSendingApreq(KerberosClientContext? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, uint sendSeqNbr)
 		{
-			this.WriteMessage($"Sending AP-REQ to {targetSpn} for user {credential.UserName}@{credential.Realm} with session key {sessionKey.EType} {sessionKey.KeyBytes.ToHexString()} (sendSeqNbr={sendSeqNbr})(gssFlags={caps})");
+			this.WriteMessage($"Sending AP-REQ to {targetSpn} for user {ticket.UserName}@{ticket.UserRealm} with session key {sessionKey.EType} {sessionKey.KeyBytes.ToHexString()} (sendSeqNbr={sendSeqNbr})(gssFlags={caps})");
 
-			this._chainedCallback?.OnSendingApreq(authContext, targetSpn, credential, caps, sessionKey, sendSeqNbr);
+			this._chainedCallback?.OnSendingApreq(authContext, targetSpn, ticket, credential, caps, sessionKey, sendSeqNbr);
 		}
 
 		void IKerberosCallback.OnReceivedAprep(KerberosClientContext? authContext, uint recvSeqNbr, SessionKey? acceptorSubkey)
@@ -108,6 +110,11 @@ namespace Titanis.Security.Kerberos
 			this.WriteMessage($"Received AP-REP {((acceptorSubkey != null) ? $"with session key {acceptorSubkey.EType} {acceptorSubkey.KeyBytes.ToHexString()} (recvSeqNbr={recvSeqNbr})" : "(no session key)")}");
 
 			this._chainedCallback?.OnReceivedAprep(authContext, recvSeqNbr, acceptorSubkey);
+		}
+
+		void IKerberosCallback.OnReferralReceived(SecurityPrincipalName spn, TicketInfo ticket)
+		{
+			this.WriteMessage($"Received referral for {spn} to realm {ticket.ServiceInstance}");
 		}
 	}
 }

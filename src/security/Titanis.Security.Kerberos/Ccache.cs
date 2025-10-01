@@ -71,7 +71,7 @@ namespace Titanis.Security.Kerberos
 		private bool OverVersion1 => this.version > 1;
 
 		[PduConditional(nameof(OverVersion1))]
-		internal NameType nameType;
+		internal PrincipalNameType nameType;
 
 		internal int componentCount;
 		internal CCacheStringData realm;
@@ -82,6 +82,33 @@ namespace Titanis.Security.Kerberos
 
 		public sealed override string ToString()
 			=> $"{this.nameType}: {string.Join("/", this.components.Select(r => r.str))}";
+
+		internal static CCachePrincipal FromTicketClient(TicketInfo ticket)
+		{
+			return new CCachePrincipal()
+			{
+				version = 4,
+				componentCount = 1,
+				nameType = PrincipalNameType.Principal,
+				realm = new CCacheStringData(ticket.UserRealm),
+				components = new CCacheStringData[]
+				{
+					new CCacheStringData(ticket.UserName)
+				},
+			};
+		}
+
+		internal static CCachePrincipal FromTicketService(TicketInfo ticket)
+		{
+			return new CCachePrincipal()
+			{
+				version = 4,
+				componentCount = 2,
+				nameType = ticket.TargetSpn.NameType,
+				realm = new CCacheStringData(ticket.ServiceRealm),
+				components = Array.ConvertAll(ticket.TargetSpn.GetNameParts(), r => new CCacheStringData(r))
+			};
+		}
 	}
 
 	[PduStruct]

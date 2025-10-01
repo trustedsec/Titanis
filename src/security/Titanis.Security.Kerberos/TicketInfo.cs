@@ -26,7 +26,7 @@ namespace Titanis.Security.Kerberos
 			this.SessionKey = sessionKey;
 
 			var names = ticket.sname.name_string;
-			this.Spn = ticket.sname.ToServicePrincipalName();
+			this.TargetSpn = ticket.sname.ToSecurityPrincipalName();
 		}
 		internal TicketInfo(
 			Asn1.KerberosV5Spec2.Ticket_Ticket ticket,
@@ -45,7 +45,7 @@ namespace Titanis.Security.Kerberos
 			this.UserRealm = credInfo.prealm?.value;
 			this.RenewTill = credInfo.renew_till?.value;
 
-			this.Spn = credInfo.sname.ToServicePrincipalName();
+			this.TargetSpn = credInfo.sname.ToSecurityPrincipalName();
 			this.ServiceRealm = credInfo.srealm?.value;
 		}
 		internal TicketInfo(
@@ -64,7 +64,7 @@ namespace Titanis.Security.Kerberos
 			this.UserRealm = userRealm;
 			this.RenewTill = encPart.renew_till?.value;
 
-			this.Spn = encPart.sname.ToServicePrincipalName();
+			this.TargetSpn = encPart.sname.ToSecurityPrincipalName();
 			this.ServiceRealm = encPart.srealm.value;
 		}
 
@@ -75,7 +75,7 @@ namespace Titanis.Security.Kerberos
 
 			this.UserName = cred.client.components[0].str;
 			this.UserRealm = cred.client.realm.str;
-			this.Spn = new ServicePrincipalName(cred.server.components[0].str, cred.server.components[1].str);
+			this.TargetSpn = SecurityPrincipalName.Create(cred.server.nameType, Array.ConvertAll(cred.server.components, r => r.str));
 			this.ServiceRealm = cred.server.realm.str;
 			this.KdcOptions = cred.ticketFlags;
 
@@ -84,11 +84,11 @@ namespace Titanis.Security.Kerberos
 			this.RenewTill = FromCcacheTime(cred.renewTill);
 		}
 
-		public TicketInfo(string? userName, string? userRealm, string? ticketRealm, ServicePrincipalName spn, string? serviceRealm, KdcOptions kdcOptions, DateTime? endTime, DateTime? startTime, DateTime? renewTill, SessionKey sessionKey, byte[] encodedTicket)
+		public TicketInfo(string? userName, string? userRealm, string? ticketRealm, SecurityPrincipalName spn, string? serviceRealm, KdcOptions kdcOptions, DateTime? endTime, DateTime? startTime, DateTime? renewTill, SessionKey sessionKey, byte[] encodedTicket)
 		{
 			this.UserName = userName;
 			this.UserRealm = userRealm;
-			this.Spn = spn;
+			this.TargetSpn = spn;
 			this.ServiceRealm = serviceRealm;
 			this.KdcOptions = kdcOptions;
 			this.EndTime = endTime;
@@ -120,15 +120,20 @@ namespace Titanis.Security.Kerberos
 		/// <summary>
 		/// Gets the target service.
 		/// </summary>
-		public ServicePrincipalName Spn { get; }
+		public SecurityPrincipalName TargetSpn { get; }
 		/// <summary>
 		/// Gets the name of the target service.
 		/// </summary>
-		public string ServiceClass => this.Spn.ServiceClass;
+		public string? ServiceClass => (this.TargetSpn as ServicePrincipalName)?.ServiceClass;
+		/// <summary>
+		/// Gets a value indicating whether this is a ticket-granting ticket.
+		/// </summary>
+		[Browsable(false)]
+		public bool IsTgt => string.Equals(this.ServiceClass, ServiceClassNames.Krbtgt, StringComparison.OrdinalIgnoreCase);
 		/// <summary>
 		/// Gets the name of the target host (or realm for TGT).
 		/// </summary>
-		public string Host => this.Spn.ServiceInstance;
+		public string? ServiceInstance => (this.TargetSpn as ServicePrincipalName)?.ServiceInstance;
 
 		[DisplayName("Service realm")]
 		public string? ServiceRealm { get; }
@@ -182,12 +187,12 @@ namespace Titanis.Security.Kerberos
 			switch (etype)
 			{
 				case EType.Rc4Hmac or EType.Rc4HmacExp:
-					sb.Append($"$krb5tgs${(int)etype}$*{this.Spn.ToString().Replace(':', '~')}*${bytes.AsSpan(0, 16).ToHexString()}${bytes.AsSpan(16).ToHexString()}");
+					sb.Append($"$krb5tgs${(int)etype}$*{this.TargetSpn.ToString().Replace(':', '~')}*${bytes.AsSpan(0, 16).ToHexString()}${bytes.AsSpan(16).ToHexString()}");
 					break;
 				default:
 					{
 						var cbChecksum = encProf.ChecksumSizeBytes;
-						sb.Append($"$krb5tgs${(int)etype}${this.UserName}${this.TicketRealm}$*{this.Spn.ToString().Replace(':', '~')}*${bytes.AsSpan(bytes.Length - cbChecksum).ToHexString()}${bytes.AsSpan(0, bytes.Length - cbChecksum).ToHexString()}");
+						sb.Append($"$krb5tgs${(int)etype}${this.UserName}${this.TicketRealm}$*{this.TargetSpn.ToString().Replace(':', '~')}*${bytes.AsSpan(bytes.Length - cbChecksum).ToHexString()}${bytes.AsSpan(0, bytes.Length - cbChecksum).ToHexString()}");
 					}
 					break;
 			}

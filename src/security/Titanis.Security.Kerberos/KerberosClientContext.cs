@@ -192,7 +192,7 @@ namespace Titanis.Security.Kerberos
 			var encoder = Asn1DerEncoding.CreateDerEncoder();
 			encoder.EncodeObjTlv(apreq);
 
-			this._callback?.OnSendingApreq(this, this.TargetSpn, this.Credential, gssFlags, sessionKey, sendSeqNbr);
+			this._callback?.OnSendingApreq(this, this.TargetSpn, ticket, this.Credential, gssFlags, sessionKey, sendSeqNbr);
 
 			if (!this.IsDceRpcStyle)
 			{

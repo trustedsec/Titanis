@@ -17,8 +17,24 @@ namespace Titanis.Msrpc.Mslsar
 {
 	public class LsaClient : RpcServiceClient<ms_lsar.lsarpcClientProxy>
 	{
-		public const string PipeName = "lsarpc";
+		public const string LsaPipeName = "lsarpc";
 		private const int MaxBufferSize = 1024;
+
+		// [MS-LSAT] § 2.1
+		/// <inheritdoc/>
+		public sealed override string? WellKnownPipeName => LsaPipeName;
+		// [MS-LSAT] § 2.1
+		/// <inheritdoc/>
+		public sealed override bool SupportsDynamicTcp => true;
+		// Observed
+		/// <inheritdoc/>
+		public sealed override bool SupportsNdr64 => true;
+		// Guess
+		/// <inheritdoc/>
+		public sealed override string? ServiceClass => ServiceClassNames.HostU;
+		// Observed
+		/// <inheritdoc/>
+		public sealed override bool SupportsReauthOverNamedPipes => true;
 
 		public async Task<LsaPolicy> OpenPolicy(LsaPolicyAccess access, CancellationToken cancellationToken)
 		{

@@ -23,31 +23,35 @@ namespace WmiRegistry
 			int myPid = 5151;
 			string commandLine = @"C:\Windows\system32\notepad.exe";
 
-			// Create credentials
-			var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential("milchick", "LUMON", "Br3@kr00m!"), true);
-			ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
-			ntlmContext.Workstation = myWorkstationName;
-			ntlmContext.ClientChannelBindingsUnhashed = new byte[16];
-			ntlmContext.TargetSpn = new ServicePrincipalName(ServiceClassNames.RestrictedKrbHost, target);
+			// Create credential dictionary
+			ClientCredentialDictionary creds = new ClientCredentialDictionary();
+			creds.DefaultCredentialFactory = (spn, caps) =>
+			{
+				// Set up credentials
+				var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential("milchick", "LUMON", "Br3@kr00m!"), true);
+				ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
+				ntlmContext.Workstation = myWorkstationName;
+				ntlmContext.ClientChannelBindingsUnhashed = new byte[16];
+				ntlmContext.TargetSpn = spn;
+				return ntlmContext;
+			};
+			this.Services.AddService(typeof(IClientCredentialService), creds);
 
 			// Create RPC client
-			RpcClient rpcClient = new RpcClient()
-			{
-				DefaultAuthLevel = RpcAuthLevel.PacketPrivacy
-			};
+			RpcClient rpcClient = this.CreateRpcClient();
+			rpcClient.DefaultAuthLevel = RpcAuthLevel.PacketPrivacy;
 
 			// Connect to DCOM service
 			DcomClient dcom = await DcomClient.ConnectTo(
 				target,
 				rpcClient,
-				ntlmContext,
 				cancellationToken);
 
 			// Connect to WMI service
 			var wmi = await WmiClient.ConnectTo(myWorkstationName, myPid, dcom, cancellationToken);
 
 			// Open root\default namespace
-			var cimv2 = await wmi.OpenNamespace(@"root\default", "en-US", cancellationToken);
+			var cimv2 = await wmi.OpenNamespace(WmiClient.RootCimV2Namespace, "en-US", cancellationToken);
 
 			// Get the StdRegProv
 			var regProv = await cimv2.GetObjectAsync("StdRegProv", cancellationToken);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -19,10 +20,19 @@ namespace Titanis.Net
 	/// </remarks>
 	public class PlatformSocketService : ISocketService
 	{
+		public PlatformSocketService(INameResolverService? resolver, ILog? log)
+		{
+			this._resolver = resolver;
+			this._log = log;
+		}
+
+		internal readonly INameResolverService? _resolver;
+		private readonly ILog? _log;
+
 		public PlatformSocket CreateSocket(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
 		{
 			var socket = new Socket(addressFamily, socketType, protocolType);
-			return new PlatformSocket(socket);
+			return new PlatformSocket(socket, addressFamily, this._resolver);
 		}
 		ISocket ISocketService.CreateSocket(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
 			=> this.CreateSocket(addressFamily, socketType, protocolType);
@@ -33,11 +43,15 @@ namespace Titanis.Net
 	public class PlatformSocket : ISocket
 	{
 		private readonly Socket _socket;
+		private readonly AddressFamily _addrFamily;
+		private readonly INameResolverService? _resolver;
 
-		internal PlatformSocket(Socket socket)
+		internal PlatformSocket(Socket socket, AddressFamily addrFamily, INameResolverService? resolver)
 		{
 			Debug.Assert(socket is not null);
 			this._socket = socket;
+			this._addrFamily = addrFamily;
+			this._resolver = resolver;
 		}
 
 		/// <inheritdoc/>
@@ -83,8 +97,19 @@ namespace Titanis.Net
 		}
 
 		/// <inheritdoc/>
-		public ValueTask ConnectAsync(EndPoint remoteEP, CancellationToken cancellationToken)
-			=> this._socket.ConnectAsync(remoteEP, cancellationToken);
+		public async ValueTask ConnectAsync(EndPoint remoteEP, CancellationToken cancellationToken)
+		{
+			if (remoteEP is DnsEndPoint dnsep && this._resolver is not null)
+			{
+				var hostEntry = await _resolver.ResolveAsync(dnsep.Host, cancellationToken).ConfigureAwait(false);
+				var addr = hostEntry.FirstOrDefault(r => r.AddressFamily == this._addrFamily);
+				if (addr is null)
+					throw new ArgumentException($"Unable to resolve {dnsep.Host} to an address with family {this._addrFamily}");
+
+				remoteEP = new IPEndPoint(addr, dnsep.Port);
+			}
+			await _socket.ConnectAsync(remoteEP, cancellationToken).ConfigureAwait(false);
+		}
 
 		/// <inheritdoc/>
 		public int Receive(Span<byte> buffer, SocketFlags flags)

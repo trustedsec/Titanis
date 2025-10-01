@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -58,6 +59,30 @@ namespace Titanis
 
 			var runtimeType = asm.GetType(reflectedType.FullName);
 			return runtimeType;
+		}
+	}
+
+	public static class MetadataHelper
+	{
+		public static bool IsDefined<TAttribute>(this PropertyDescriptor property)
+			where TAttribute : Attribute
+		{
+			foreach (var attr in property.Attributes)
+			{
+				if (attr is TAttribute)
+					return true;
+			}
+			return false;
+		}
+		public static TAttribute? GetCustomAttribute<TAttribute>(this PropertyDescriptor property, bool inherited = true)
+			where TAttribute : Attribute
+		{
+			foreach (var attr in property.Attributes)
+			{
+				if (attr is TAttribute typed)
+					return typed;
+			}
+			return null;
 		}
 	}
 

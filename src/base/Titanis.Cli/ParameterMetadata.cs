@@ -61,7 +61,7 @@ namespace Titanis.Cli
 	public class ParameterMetadata
 	{
 		internal ParameterMetadata(
-			PropertyInfo property,
+			PropertyDescriptor property,
 			ParameterAttribute attr,
 			ParameterGroupInfo? group,
 			CommandMetadata command,
@@ -78,7 +78,7 @@ namespace Titanis.Cli
 			var resolver = context.Resolver;
 
 			// Mandatory
-			if (resolver.IsDefined(property, typeof(MandatoryAttribute)))
+			if (property.IsDefined<MandatoryAttribute>())
 				flags |= ParameterFlags.Mandatory;
 
 			if (property.PropertyType == typeof(SwitchParam))
@@ -104,21 +104,24 @@ namespace Titanis.Cli
 
 			// Aliases
 			{
-				AliasAttribute aliasAttr = resolver.GetCustomAttribute<AliasAttribute>(property, true);
+				AliasAttribute? aliasAttr = property.GetCustomAttribute<AliasAttribute>(true);
 				this.Aliases = aliasAttr?.Aliases ?? Array.Empty<string>();
 			}
 			// Description
-			this.Description = resolver.GetCustomAttribute<DescriptionAttribute>(property, true)?.Description;
+			this.Description = property.Description;
 			// Category
-			this.Category = resolver.GetCustomAttribute<CategoryAttribute>(property, true)?.Category;
+			// Don't use property.Category, since this returns "Misc" if no category is specified.
+			this.Category = property.GetCustomAttribute<CategoryAttribute>()?.Category;
+			// Environment
+			this.EnvironmentVariable = attr.EnvironmentVariable;
 			// Placeholder
 			this.Placeholder = (0 == (flags & ParameterFlags.IsSwitch))
-				? (resolver.GetCustomAttribute<PlaceholderAttribute>(property, true)?.Name ?? PlaceholderFromType(property.PropertyType))
+				? (property.GetCustomAttribute<PlaceholderAttribute>(true)?.Name ?? PlaceholderFromType(property.PropertyType))
 				: null;
 
 			// Default value
 			{
-				var atrDefault = resolver.GetCustomAttribute<DefaultValueAttribute>(property, true);
+				var atrDefault = property.GetCustomAttribute<DefaultValueAttribute>(true);
 				object? defaultValue = null;
 				if (atrDefault != null)
 				{
@@ -130,7 +133,7 @@ namespace Titanis.Cli
 
 			// Value list
 			{
-				var atrValueList = resolver.GetCustomAttribute<ValueListProviderAttribute>(property, true);
+				var atrValueList = property.GetCustomAttribute<ValueListProviderAttribute>(true);
 				if (atrValueList == null)
 					atrValueList = resolver.GetCustomAttribute<ValueListProviderAttribute>(elementType, true);
 
@@ -156,9 +159,9 @@ namespace Titanis.Cli
 						//throw new MetadataException($"An error occurred while creating the value list provider for parameter '{property.Name}': {ex.Message}", property.Name, ex);
 					}
 				}
-				else if (resolver.IsDefined(property, typeof(EnumNameListAttribute)))
+				else if (property.IsDefined<EnumNameListAttribute>())
 				{
-					var enumNameAttrs = resolver.GetCustomAttribute<EnumNameListAttribute>(property, true).EnumTypes;
+					var enumNameAttrs = property.GetCustomAttribute<EnumNameListAttribute>(true).EnumTypes;
 					this._valueListProvider = new EnumNameListProvider(enumNameAttrs);
 				}
 				else if (this.ElementType.IsEnum)
@@ -201,7 +204,7 @@ namespace Titanis.Cli
 		/// <summary>
 		/// Gets the property implementing the parameter.
 		/// </summary>
-		public PropertyInfo Property { get; }
+		public PropertyDescriptor Property { get; }
 		/// <summary>
 		/// Gets the group containing this parameter.
 		/// </summary>
@@ -252,10 +255,15 @@ namespace Titanis.Cli
 		/// </summary>
 		public string? Category { get; }
 
+		/// <summary>
+		/// Gets the name of the environment variable corresponding to this parameter.
+		/// </summary>
+		public string? EnvironmentVariable { get; }
+
 		// Converter
 		private TypeConverter GetConverter()
 		{
-			var paramConverter = Command.GetScalarParamConverter(this.ElementType);
+			var paramConverter = Command.GetScalarParamConverter(this.ElementType, this.Property);
 			return paramConverter;
 		}
 

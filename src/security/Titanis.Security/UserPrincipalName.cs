@@ -15,7 +15,7 @@ namespace Titanis.Security
 	/// Represents a user principal name.
 	/// </summary>
 	[TypeConverter(typeof(UserPrincipalNameConverter))]
-	public sealed class UserPrincipalName : IEquatable<UserPrincipalName?>
+	public sealed class UserPrincipalName : SecurityPrincipalName, IEquatable<UserPrincipalName?>
 	{
 		/// <summary>
 		/// Initializes a new <see cref="UserPrincipalName"/>.
@@ -26,7 +26,10 @@ namespace Titanis.Security
 		{
 			UserName = userName;
 			Realm = realm;
+			this.Text = $"{userName}@{realm}";
 		}
+
+		public string Text { get; set; }
 
 		/// <summary>
 		/// Gets the name of the user.
@@ -36,6 +39,15 @@ namespace Titanis.Security
 		/// Gets the name of the realm.
 		/// </summary>
 		public string Realm { get; }
+
+		public sealed override PrincipalNameType NameType => PrincipalNameType.Enterprise;
+		public sealed override string[] GetNameParts() => new string[] { this.Text };
+		public sealed override int NamePartCount => 1;
+		public sealed override string GetNamePart(int index) => index switch
+		{
+			0 => this.Text,
+			_ => throw new ArgumentOutOfRangeException(nameof(index))
+		};
 
 		private static readonly Regex rgxUpn = new Regex(@"^(?<u>[^@]+)@(?<r>.*)$");
 		public static UserPrincipalName Parse(string text)

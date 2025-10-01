@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -19,6 +20,8 @@ namespace Titanis.Cli
 			this._rootFrame = new CommandFrame(null);
 			this._currentFrame = this._rootFrame;
 			Console.CancelKeyPress += this.Console_CancelKeyPress;
+
+			this._services.AddService(typeof(ILog), this.Log);
 		}
 
 		private CommandFrame _rootFrame;
@@ -43,6 +46,9 @@ namespace Titanis.Cli
 		public string WorkingDirectory { get; }
 
 		public CommandMetadataContext MetadataContext { get; }
+
+		private ServiceContainer _services = new ServiceContainer();
+		public IServiceProvider Services => this._services;
 
 		public Stream OpenRawInputStream()
 		{

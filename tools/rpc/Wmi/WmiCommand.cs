@@ -13,6 +13,7 @@ using Titanis.DceRpc.Client;
 using Titanis.DceRpc.Epm;
 using Titanis.Msrpc.Msdcom;
 using Titanis.Msrpc.Mswmi;
+using Titanis.Net;
 using Titanis.Security;
 using Titanis.Smb2;
 
@@ -39,7 +40,7 @@ internal abstract class WmiCommand : Command
 	{
 		base.ValidateParameters(context);
 
-		Authentication?.Validate(false, context, Log);
+		Authentication?.Validate(false, context);
 
 		if (this.NetworkParameters.HostAddress.IsNullOrEmpty())
 			this.NetworkParameters.HostAddress = new string[] { ServerName };
@@ -51,13 +52,6 @@ internal abstract class WmiCommand : Command
 
 	protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 	{
-		const string TargetServiceClass = ServiceClassNames.RestrictedKrbHost;
-
-		RpcAuthLevel authLevel = EncryptRpc.IsSet ? RpcAuthLevel.PacketPrivacy : RpcAuthLevel.PacketIntegrity;
-		RpcClient rpcClient = new RpcClient()
-		{
-			DefaultAuthLevel = authLevel
-		};
 		var remoteAddrs = await this.NetworkParameters.ResolveAsync(ServerName, cancellationToken).ConfigureAwait(false);
 
 		if (remoteAddrs.IsNullOrEmpty())
@@ -68,30 +62,25 @@ internal abstract class WmiCommand : Command
 
 		var remoteAddr = remoteAddrs[0];
 
-		SecurityCapabilities rpcRequiredCaps = 0;
-		AuthOptions rpcAuthOptions = AuthOptions.None;
+		SecurityCapabilities rpcRequiredCaps = SecurityCapabilities.DceStyle | SecurityCapabilities.Integrity;
+		RpcAuthLevel authLevel;
 		if (EncryptRpc.IsSet)
+		{
 			rpcRequiredCaps |= SecurityCapabilities.Confidentiality;
-		ServicePrincipalName targetSpn = new(TargetServiceClass.ToUpper(), ServerName);
-		AuthClientContext? rpcAuthContext = Authentication?.CreateAuthContext(
-			targetSpn,
-			rpcAuthOptions,
-			rpcRequiredCaps | SecurityCapabilities.DceStyle,
-			Log
-			);
+			authLevel = RpcAuthLevel.PacketPrivacy;
+		}
+		else
+			authLevel = RpcAuthLevel.PacketIntegrity;
 
-		if (rpcAuthContext != null)
-			rpcClient.DefaultAuthLevel =
-				EncryptRpc.IsSet ? RpcAuthLevel.PacketPrivacy
-				: RpcAuthLevel.PacketIntegrity;
+		var credService = this.RequireService<IClientCredentialService>();
 
-		const int port = 135;
+		var rpcClient = this.CreateRpcClient();
+		rpcClient.DefaultAuthLevel = authLevel;
 
 		// If the endpoint doesn't have a well-known port, use the EP mapper
-		IPEndPoint remoteEP = new IPEndPoint(remoteAddr, port);
+		IPEndPoint remoteEP = new IPEndPoint(remoteAddr, WmiClient.WellKnownTcpPort);
 
-		var authContext = this.Authentication.CreateAuthContext(targetSpn, AuthOptions.None, SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality, this.Log);
-		DcomClient dcom = await DcomClient.ConnectTo(this.ServerName, rpcClient, authContext, cancellationToken, null, callback: new DcomLogger(this.Log));
+		DcomClient dcom = await DcomClient.ConnectTo(this.ServerName, rpcClient, cancellationToken, callback: new DcomLogger(this.Log));
 		WmiClient wmi = await WmiClient.ConnectTo(this.Authentication.Workstation, Random.Shared.Next(1024, 65536) & ~0x03, dcom, cancellationToken);
 
 		return await RunAsync(wmi, cancellationToken).ConfigureAwait(false);

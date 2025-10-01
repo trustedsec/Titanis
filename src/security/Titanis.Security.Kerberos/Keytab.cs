@@ -128,7 +128,7 @@ namespace Titanis.Security.Kerberos
 		[PduArraySize(nameof(count))]
 		public KeytabString[] components;
 
-		public NameType nameType;
+		public PrincipalNameType nameType;
 	}
 
 	[PduStruct]

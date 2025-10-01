@@ -47,7 +47,7 @@ namespace Titanis.CredCoerce
 		{
 			base.ValidateParameters(context);
 
-			this.Authentication.Validate(true, context, this.Log);
+			this.Authentication.Validate(true, context);
 			this.NetworkParameters.ValidateParameters(context);
 		}
 
@@ -56,30 +56,29 @@ namespace Titanis.CredCoerce
 
 		protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 		{
-			// Initialize services
-			var socketService = Singleton.SingleInstance<PlatformSocketService>();
-
 			// Create RPC client
-			RpcClient rpcClient = new RpcClient(socketService: socketService)
-			{
-				DefaultAuthLevel = RpcAuthLevel.PacketPrivacy,
-				ConnectTimeout = TimeSpan.FromSeconds(60)
-			};
+			RpcClient rpcClient = this.CreateRpcClient();
+			rpcClient.DefaultAuthLevel = RpcAuthLevel.PacketPrivacy;
+			rpcClient.ConnectTimeout = TimeSpan.FromSeconds(60);
 
 			// Look up host address
 			var hostAddress = await this.NetworkParameters.ResolveAsync(this.ServerName, cancellationToken);
 
 			// Set up credentials
-			ServicePrincipalName targetSpn = new(this.ServerName, ServiceClassNames.Host);
-			var credService = this.Authentication.GetCredentialServiceFor(targetSpn, SecurityCapabilities.Confidentiality | SecurityCapabilities.Integrity, this.Log);
+			ServicePrincipalName targetSpn = new(this.ServerName, ServiceClassNames.HostU);
 
 			// Set up SMB for named pipes
-			var smbClient = new Smb2Client(credService, socketService: socketService);
+			var smbClient = this.CreateSmb2Client();
 
 			// Set up EPM
 			using var epm = new EpmClient();
-			await rpcClient.ConnectTcp(epm, new IPEndPoint(hostAddress[0], EpmClient.EPMapperPort), cancellationToken, null);
-			var context = new CoercionContext(this, credService, smbClient, rpcClient, epm, this.Log);
+			await rpcClient.ConnectTcp(epm, new IPEndPoint(hostAddress[0], EpmClient.EPMapperPort), null, cancellationToken);
+			var context = new CoercionContext(
+				this,
+				this.CreateSmb2Client(),
+				rpcClient,
+				epm,
+				this.Log);
 
 			ArgumentNullException.ThrowIfNull(context);
 

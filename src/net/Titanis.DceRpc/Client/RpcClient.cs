@@ -21,16 +21,32 @@ namespace Titanis.DceRpc.Client
 	/// </summary>
 	public class RpcClient
 	{
+		/// <summary>
+		/// Initializes a new <see cref="RpcClient"/>.
+		/// </summary>
+		/// <param name="socketService"></param>
+		/// <param name="callback"></param>
 		public RpcClient(
 			ISocketService? socketService = null,
+			IClientCredentialService? credentialService = null,
+			INameResolverService? resolver = null,
+			ILog? log = null,
 			IRpcCallback? callback = null
 			)
 		{
-			this._socketService = socketService ?? Singleton.SingleInstance<PlatformSocketService>();
+			this._socketService = socketService ?? new PlatformSocketService(null, log);
+			this._credentialService = credentialService;
+			this._resolver = resolver;
+			this._log = log;
 			this._callback = callback;
+
+			this.DefaultAuthLevel = (credentialService is null) ? RpcAuthLevel.None : RpcAuthLevel.Connect;
 		}
 
-		private readonly ISocketService _socketService;
+		internal readonly ISocketService _socketService;
+		internal readonly IClientCredentialService? _credentialService;
+		internal readonly INameResolverService? _resolver;
+		internal readonly ILog? _log;
 		private readonly IRpcCallback? _callback;
 
 		/// <summary>
@@ -58,7 +74,7 @@ namespace Titanis.DceRpc.Client
 		/// <summary>
 		/// Gets or sets a value specifying the default authentication level.
 		/// </summary>
-		public RpcAuthLevel DefaultAuthLevel { get; set; } = RpcAuthLevel.Connect;
+		public RpcAuthLevel DefaultAuthLevel { get; set; }
 		/// <summary>
 		/// Gets a value indicating whether to prefer AUTH3 when possible when binding.
 		/// </summary>
@@ -95,13 +111,12 @@ namespace Titanis.DceRpc.Client
 		/// <typeparam name="TClient">Type of service client</typeparam>
 		/// <param name="serviceEP">Remote service endpoint</param>
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
-		/// <param name="authContext">Authentication context used to authenticate</param>
 		/// <returns>A connected instance of <typeparamref name="TClient"/></returns>
 		/// <exception cref="ArgumentNullException"></exception>
 		public async Task<TClient> ConnectTcp<TClient>(
 			EndPoint serviceEP,
-			CancellationToken cancellationToken,
-			AuthClientContext? authContext = null
+			ServicePrincipalName? spn,
+			CancellationToken cancellationToken
 			)
 			where TClient : RpcServiceClient, new()
 		{
@@ -109,43 +124,67 @@ namespace Titanis.DceRpc.Client
 				throw new ArgumentNullException(nameof(serviceEP));
 
 			TClient svc = new TClient();
-			await this.ConnectTcp(svc, serviceEP, cancellationToken, authContext).ConfigureAwait(false);
+			await this.ConnectTcp(svc, serviceEP, spn, this.DefaultAuthLevel, cancellationToken).ConfigureAwait(false);
+			return svc;
+		}
+
+		/// <summary>
+		/// Connects a service client over TCP
+		/// </summary>
+		/// <typeparam name="TClient">Type of service client</typeparam>
+		/// <param name="serviceEP">Remote service endpoint</param>
+		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
+		/// <returns>A connected instance of <typeparamref name="TClient"/></returns>
+		/// <exception cref="ArgumentNullException"></exception>
+		public async Task<TClient> ConnectTcp<TClient>(
+			EndPoint serviceEP,
+			ServicePrincipalName? spn,
+			RpcAuthLevel authLevel,
+			CancellationToken cancellationToken
+			)
+			where TClient : RpcServiceClient, new()
+		{
+			if (serviceEP is null)
+				throw new ArgumentNullException(nameof(serviceEP));
+
+			TClient svc = new TClient();
+			await this.ConnectTcp(svc.Proxy, serviceEP, spn, authLevel, cancellationToken).ConfigureAwait(false);
 			return svc;
 		}
 
 		public async Task ConnectTcp(
 			RpcServiceClient svc,
 			EndPoint serviceEP,
+			ServicePrincipalName? spn,
 			CancellationToken cancellationToken
 			)
 		{
-			await this.ConnectTcp(svc.Proxy, serviceEP, cancellationToken, null, RpcAuthLevel.None).ConfigureAwait(false);
+			await this.ConnectTcp(svc, serviceEP, spn, this.DefaultAuthLevel, cancellationToken).ConfigureAwait(false);
 		}
 
 		public async Task ConnectTcp(
 			RpcServiceClient svc,
 			EndPoint serviceEP,
-			CancellationToken cancellationToken,
-			AuthClientContext? authContext = null
+			ServicePrincipalName? spn,
+			RpcAuthLevel authLevel,
+			CancellationToken cancellationToken
 			)
 		{
-			await this.ConnectTcp(svc.Proxy, serviceEP, cancellationToken, authContext, this.DefaultAuthLevel).ConfigureAwait(false);
+			if (spn is null && serviceEP.TryGetHostAndPort(out var host, out var port))
+			{
+				if (host is not null)
+					spn = new ServicePrincipalName(svc.ServiceClass ?? ServiceClassNames.RestrictedKrbHost, host);
+			}
+			await this.ConnectTcp(svc.Proxy, serviceEP, spn, authLevel, cancellationToken).ConfigureAwait(false);
 		}
 
 		public Task ConnectTcp(
 			RpcClientProxy proxy,
 			EndPoint serviceEP,
+			ServicePrincipalName? spn,
 			CancellationToken cancellationToken
 			)
-			=> this.ConnectTcp(proxy, serviceEP, cancellationToken, null, RpcAuthLevel.None);
-
-		public Task ConnectTcp(
-			RpcClientProxy proxy,
-			EndPoint serviceEP,
-			CancellationToken cancellationToken,
-			AuthClientContext? authContext
-			)
-			=> this.ConnectTcp(proxy, serviceEP, cancellationToken, authContext, this.DefaultAuthLevel);
+			=> this.ConnectTcp(proxy, serviceEP, spn, this.DefaultAuthLevel, cancellationToken);
 
 		/// <summary>
 		/// Connects a client proxy over TCP.
@@ -153,15 +192,22 @@ namespace Titanis.DceRpc.Client
 		/// <param name="proxy">Client proxy to connect</param>
 		/// <param name="serviceEP">Remote service endpoint</param>
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
-		/// <param name="authContext">Authentication context used to authenticate</param>
 		public async Task ConnectTcp(
 			RpcClientProxy proxy,
 			EndPoint serviceEP,
-			CancellationToken cancellationToken,
-			AuthClientContext? authContext,
-			RpcAuthLevel authLevel
+			ServicePrincipalName? spn,
+			RpcAuthLevel authLevel,
+			CancellationToken cancellationToken
 			)
 		{
+			ArgumentNullException.ThrowIfNull(serviceEP);
+
+			if (spn is null && serviceEP.TryGetHostAndPort(out var host, out var port))
+			{
+				if (host is not null)
+					spn = new ServicePrincipalName(ServiceClassNames.RestrictedKrbHost, host);
+			}
+
 			ISocket? socket = null;
 			try
 			{
@@ -191,20 +237,8 @@ namespace Titanis.DceRpc.Client
 				{
 					stream = socket.GetStream(true);
 					socket = null;
-					RpcClientChannel? channel = null;
-					try
-					{
-						channel = this.BindTo(stream);
-						stream = null;
-
-						this._callback?.OnBindingProxy(proxy, channel, authContext, authLevel);
-						await proxy.BindToAsync(channel, true, authContext, authLevel, null, cancellationToken).ConfigureAwait(false);
-						channel = null;
-					}
-					finally
-					{
-						channel?.Dispose();
-					}
+					await BindProxyToStream(proxy, spn, authLevel, stream, cancellationToken).ConfigureAwait(false);
+					stream = null;
 				}
 				finally
 				{
@@ -215,6 +249,101 @@ namespace Titanis.DceRpc.Client
 			{
 				socket?.Dispose();
 			}
+		}
+
+		/// <summary>
+		/// Binds a proxy to a stream
+		/// </summary>
+		/// <param name="proxy">The proxy to bind</param>
+		/// <param name="spn"><see cref="ServicePrincipalName"/> for authentication</param>
+		/// <param name="authLevel"><see cref="RpcAuthLevel"/> to negotiate</param>
+		/// <param name="stream"><see cref="Stream"/> to bind to</param>
+		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
+		/// <remarks>
+		/// <paramref name="spn"/> is required unless <paramref name="authLevel"/> is <see cref="RpcAuthLevel.None"/>.
+		/// </remarks>
+		public async Task BindProxyToStream(
+			RpcClientProxy proxy,
+			ServicePrincipalName? spn,
+			RpcAuthLevel authLevel,
+			Stream? stream,
+			CancellationToken cancellationToken
+			)
+		{
+			ArgumentNullException.ThrowIfNull(proxy);
+
+			if (authLevel is RpcAuthLevel.ConfiguredDefault)
+				authLevel = this.DefaultAuthLevel;
+			if (authLevel is RpcAuthLevel.ConfiguredDefault)
+				authLevel = RpcAuthLevel.Connect;
+
+			if (spn is null && authLevel > RpcAuthLevel.None)
+				throw new ArgumentException($"{nameof(authLevel)} requires authentication, but no SPN provided to get credentials.");
+
+			RpcClientChannel? channel = null;
+			try
+			{
+				channel = this.BindTo(stream);
+
+				AuthClientContext? authContext;
+				if (authLevel is RpcAuthLevel.None)
+					authContext = null;
+				else
+				{
+					var credService = this._credentialService;
+					if (credService == null)
+						throw new ArgumentException($"Cannot use authentication level {authLevel} because the RpcClient is not configured with {nameof(IClientCredentialService)}.");
+
+					SecurityCapabilities caps = SecurityCapabilities.DceStyle;
+					if (authLevel is > RpcAuthLevel.Connect and < RpcAuthLevel.PacketIntegrity)
+						authLevel = RpcAuthLevel.PacketIntegrity;
+					if (authLevel >= RpcAuthLevel.PacketIntegrity)
+						caps |= SecurityCapabilities.Integrity;
+					if (authLevel >= RpcAuthLevel.PacketPrivacy)
+						caps |= SecurityCapabilities.Confidentiality;
+
+					if (spn is not null)
+					{
+						authContext = this._credentialService?.GetAuthContextForService(spn, caps, AuthOptions.PreferSpnego);
+						if (authContext is null)
+							authContext = this._credentialService?.GetAuthContextForService(spn.WithServiceClass(ServiceClassNames.HostU), caps, AuthOptions.PreferSpnego);
+					}
+					else
+						authContext = null;
+
+					if (authContext is null)
+						throw new InvalidOperationException($"Cannot bind proxy {proxy.GetType().FullName} because no authentication context is available and authentication level is set to {authLevel}.");
+				}
+
+				this._callback?.OnBindingProxy(proxy, channel, authContext, authLevel);
+				await proxy.BindToAsync(channel, true, authContext, authLevel, null, cancellationToken).ConfigureAwait(false);
+				channel = null;
+			}
+			finally
+			{
+				channel?.Dispose();
+			}
+		}
+	}
+
+	public static class ServiceExtensions
+	{
+		public static RpcClient CreateRpcClient(this IServiceProvider services)
+		{
+			IRpcCallback? callback = services.GetService<IRpcCallback>();
+			if (callback is null)
+			{
+				var log = services.GetService<ILog>();
+				if (log is not null)
+					callback = new RpcLogger(log);
+			}
+			var rpcClient = new RpcClient(
+				services.GetService<ISocketService>(),
+				services.GetService<IClientCredentialService>(),
+				services.GetService<INameResolverService>(),
+				services.GetService<ILog>(),
+				callback);
+			return rpcClient;
 		}
 	}
 }

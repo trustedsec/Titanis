@@ -18,9 +18,11 @@ namespace Titanis.Security.Kerberos
 		void OnProcessETypes(IList<ETYPE_INFO2_ENTRY> etypeInfos) { }
 		void OnReceivedTgt(TicketInfo tgtInfo) { }
 
-		void OnRequestingTicket(ServicePrincipalName spn, string realm, TicketInfo tgt, KdcOptions kdcOptions);
+		void OnRequestingTicket(SecurityPrincipalName spn, TicketInfo tgt, KdcOptions kdcOptions);
 		void OnReceivedTicket(TicketInfo ticketInfo) { }
-		void OnSendingApreq(KerberosClientContext? authContext, ServicePrincipalName targetSpn, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, uint sendSeqNbr);
+		void OnSendingApreq(KerberosClientContext? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, uint sendSeqNbr);
 		void OnReceivedAprep(KerberosClientContext? authContext, uint recvSeqNbr, SessionKey? acceptorSubkey) { }
+
+		void OnReferralReceived(SecurityPrincipalName spn, TicketInfo ticket);
 	}
 }

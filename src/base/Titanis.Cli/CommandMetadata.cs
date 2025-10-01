@@ -48,11 +48,11 @@ namespace Titanis.Cli
 					var groupType = group.GroupType;
 					groups.Add(group);
 
-					var props = groupType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-					foreach (var prop in props)
+					var props = context.GetProperties(groupType);
+					foreach (PropertyDescriptor prop in props)
 					{
-						ParameterAttribute attr = context.Resolver.GetCustomAttribute<ParameterAttribute>(prop, true);
-						ParameterGroupAttribute groupAttr = context.Resolver.GetCustomAttribute<ParameterGroupAttribute>(prop, true);
+						ParameterAttribute? attr = prop.GetCustomAttribute<ParameterAttribute>(true);
+						ParameterGroupAttribute? groupAttr = prop.GetCustomAttribute<ParameterGroupAttribute>(true);
 						if (groupAttr is not null)
 						{
 							if (attr is not null)
@@ -73,7 +73,7 @@ namespace Titanis.Cli
 								group,
 								prop,
 								ctor,
-								context.Resolver.GetCustomAttribute<CategoryAttribute>(prop, true)?.Category,
+								prop.GetCustomAttribute<CategoryAttribute>(true)?.Category,
 								groupAttr.Options
 								);
 							groupQueue.Enqueue(subgroup);
@@ -115,7 +115,7 @@ namespace Titanis.Cli
 
 
 		private ParameterMetadata CreateParameter(
-			PropertyInfo property,
+			PropertyDescriptor property,
 			ParameterAttribute attr,
 			ParameterGroupInfo? group,
 			CommandMetadataContext context)

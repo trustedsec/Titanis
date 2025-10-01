@@ -58,6 +58,8 @@ namespace Titanis.Msrpc.Mswmi
 		internal readonly DcomClient dcomClient;
 		private IWbemLevel1Login _login;
 
+		public const int WellKnownTcpPort = 135;
+
 		/// <summary>
 		/// Creates an exception for a <see cref="WBEMSTATUS"/> value.
 		/// </summary>

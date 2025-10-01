@@ -5,6 +5,7 @@ using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
 using Titanis.DceRpc.Epm;
 using Titanis.Msrpc.Mssamr;
+using Titanis.Net;
 using Titanis.Security;
 using Titanis.Security.Ntlm;
 
@@ -23,30 +24,34 @@ namespace EnumUsers
 			string myWorkstationName = "TEST-WKS";
 
 			// Create credentials
-			var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential("milchick", "LUMON", "Br3@kr00m!"), true)
+			var credService = new ClientCredentialDictionary();
+			credService.DefaultCredentialFactory = (s, c) =>
 			{
-				Workstation = myWorkstationName,
-				ClientChannelBindingsUnhashed = new byte[16],
-				TargetSpn = new ServicePrincipalName(ServiceClassNames.Host, target)
+				var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential("milchick", "LUMON", "Br3@kr00m!"), true)
+				{
+					Workstation = myWorkstationName,
+					ClientChannelBindingsUnhashed = new byte[16],
+					TargetSpn = new ServicePrincipalName(ServiceClassNames.HostU, target)
+				};
+				ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
+				return ntlmContext;
 			};
-			ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
+			this.Services.AddService(typeof(IClientCredentialService), credService);
 
 			// Create RPC client
-			RpcClient rpcClient = new RpcClient()
-			{
-				DefaultAuthLevel = RpcAuthLevel.PacketPrivacy,
-			};
+			RpcClient rpcClient = this.CreateRpcClient();
+			rpcClient.DefaultAuthLevel = RpcAuthLevel.PacketPrivacy;
 
 			var entry = Dns.GetHostEntry(target);
 
 			// Query endpoint
 			var hostAddress = entry.AddressList[0];
-			var epm = await rpcClient.ConnectTcp<EpmClient>(new IPEndPoint(hostAddress, EpmClient.EPMapperPort), cancellationToken);
-			var remoteEP = await epm.TryMapTcp(RpcInterfaceId.GetForType(typeof(samr)), hostAddress, cancellationToken);
+			var epm = await rpcClient.ConnectTcp<EpmClient>(new IPEndPoint(hostAddress, EpmClient.EPMapperPort), null, cancellationToken);
+			var remoteEP = await epm.TryMapTcp(RpcInterfaceId.GetForType(typeof(samr)), cancellationToken);
 
 			SamClient sam = new SamClient();
-			await rpcClient.ConnectTcp(sam, remoteEP, cancellationToken, ntlmContext);
-			using var db = await sam.Connect(SamServerAccess.Connect | SamServerAccess.EnumerateDomains, target, cancellationToken);
+			await rpcClient.ConnectTcp(sam, remoteEP, null, cancellationToken);
+			using var db = await sam.Connect(SamServerAccess.Connect | SamServerAccess.EnumerateDomains | SamServerAccess.LookupDomain, target, cancellationToken);
 			var doms = await db.GetDomains(cancellationToken);
 			foreach (var domInfo in doms)
 			{
@@ -58,7 +63,7 @@ namespace EnumUsers
 				}
 			}
 
-			throw new NotImplementedException();
+			return 0;
 		}
 	}
 }

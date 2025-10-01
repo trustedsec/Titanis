@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Titanis.Crypto;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
+using Titanis.Security;
 using Titanis.Winterop;
 using Titanis.Winterop.Security;
 
@@ -70,6 +71,27 @@ namespace Titanis.Msrpc.Mssamr
 		public SamClient()
 		{
 		}
+
+		#region Connection parameters
+		// Just a guess
+		/// <inheritdoc/>
+		public sealed override string ServiceClass => ServiceClassNames.HostU;
+		// [MS-SAMR] § 2.1
+		/// <inheritdoc/>
+		public sealed override string? WellKnownPipeName => PipeName;
+		// [MS-SAMR] § 2.1
+		/// <inheritdoc/>
+		public sealed override bool SupportsDynamicTcp => true;
+		// [MS-SAMR] § 2.1
+		/// <inheritdoc/>
+		public sealed override bool SupportsNdr64 => true;
+		// [MS-SAMR] § 2.1
+		/// <inheritdoc/>
+		public sealed override bool SupportsReauthOverNamedPipes => false;
+		// [MS-SAMR] § 2.1
+		/// <inheritdoc/>
+		public sealed override bool RequiresEncryptionOverTcp => true;
+		#endregion
 
 		/// <summary>
 		/// Name of the pipe for RPC

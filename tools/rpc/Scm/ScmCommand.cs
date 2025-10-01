@@ -15,16 +15,10 @@ namespace Titanis.Cli.ScmTool
 		/// <inheritdoc/>
 		protected sealed override Type InterfaceType => typeof(svcctl);
 
-		/// <inheritdoc/>
-		protected sealed override bool SupportsDynamicTcp => true;
-
 		/// <summary>
 		/// Gets the access rights required to run the command.
 		/// </summary>
 		protected abstract ScmAccess RequiredScmAccess { get; }
-
-		/// <inheritdoc/>
-		protected sealed override bool RequiresEncryption => true;
 
 		/// <inheritdoc/>
 		protected sealed override async Task<int> RunAsync(ScmClient client, CancellationToken cancellationToken)

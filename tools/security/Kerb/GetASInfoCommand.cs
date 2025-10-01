@@ -36,9 +36,12 @@ If the user exists but does not require preauthentication, the KDC will instead 
 		[Description("Host name or address of KDC")]
 		public string Kdc { get; set; }
 
+		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
+		public NetworkParameters NetParameters { get; set; }
+
 		protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 		{
-			KerberosClient krb = new KerberosClient(new SimpleKdcLocator(new DnsEndPoint(this.Kdc, KerberosClient.KdcTcpPort)));
+			KerberosClient krb = this.CreateKerberosClient(new SimpleKdcLocator(new DnsEndPoint(this.Kdc, KerberosClient.KdcTcpPort)));
 
 			var asInfo = await krb.GetASInfo(Realm, this.UserName, cancellationToken).ConfigureAwait(false);
 

@@ -47,5 +47,10 @@ namespace Titanis.Cli
 		/// is not treated as an absolute position.
 		/// </remarks>
 		public int Position { get; } = NoPosition;
+
+		/// <summary>
+		/// Gets the name of the environment variable to check for a default value for this parameter.
+		/// </summary>
+		public string? EnvironmentVariable { get; set; }
 	}
 }

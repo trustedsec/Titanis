@@ -7,11 +7,26 @@ using System.Threading;
 using System.Threading.Tasks;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
+using Titanis.Security;
 
 namespace Titanis.Msrpc.Msdcom
 {
 	internal class ObjectExporterClient : RpcServiceClient<IObjectExporterClientProxy>
 	{
+
+		// [MS-DCOM] § 1.9
+		/// <inheritdoc/>
+		public sealed override bool SupportsDynamicTcp => true;
+		// [MS-DCOM] § 1.9
+		/// <inheritdoc/>
+		public sealed override int WellKnownTcpPort => 135;
+		// [MS-DCOM] § 3.2.4.1.1.2
+		/// <inheritdoc/>
+		public sealed override string? ServiceClass => ServiceClassNames.RpcSs;
+		// [MS-DCOM] § 2.2
+		/// <inheritdoc/>
+		public sealed override bool SupportsNdr64 => false;
+
 		public async Task<ObjectExporterServerInfo> GetServerInfo(CancellationToken cancellationToken)
 		{
 			DceRpc.RpcPointer<COMVERSION> pComVersion = new DceRpc.RpcPointer<COMVERSION>();

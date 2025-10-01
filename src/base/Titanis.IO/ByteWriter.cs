@@ -35,6 +35,12 @@ namespace Titanis.IO
 			this._options = options;
 		}
 
+		public void Reset()
+		{
+			this._pos = 0;
+			this.Length = 0;
+		}
+
 		public byte[] GetBuffer() => this._buffer;
 		public int Position => this._pos;
 		public int WriteIndex => this.IsReverse ? (this._buffer.Length - this.Position) : this.Position;

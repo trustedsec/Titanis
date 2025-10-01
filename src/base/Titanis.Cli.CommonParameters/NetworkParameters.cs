@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using Titanis.Net;
+using Titanis.Socks;
 
 namespace Titanis.Cli
 {
@@ -28,6 +30,28 @@ namespace Titanis.Cli
 		[Description("Only use TCP over IPv4 endpoint")]
 		[Category(ParameterCategories.Connection)]
 		public SwitchParam UseTcp4Only { get; set; }
+
+		[Parameter]
+		[Description("End point of SOCKS 5 server to use")]
+		[TypeConverter(typeof(EndPointConverter))]
+		public EndPoint Socks5 { get; set; }
+
+		protected sealed override void Initialize(Command owner, IServiceContainer services)
+		{
+			base.Initialize(owner, services);
+			services.AddService(typeof(ISocketService), this.CreateSocketService);
+		}
+
+		private ISocketService? CreateSocketService(IServiceContainer container, Type serviceType)
+		{
+			ISocketService socketService = new PlatformSocketService(this.GetPlatformResolver(), this.Log);
+			if (this.Socks5 != null)
+			{
+				socketService = new Socks5Client(this.Socks5, socketService, container.GetService<ILog>());
+			}
+
+			return socketService;
+		}
 
 		public void ValidateParameters(ParameterValidationContext context)
 		{

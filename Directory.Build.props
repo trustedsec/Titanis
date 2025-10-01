@@ -31,6 +31,8 @@
 		<WarningsAsErrors>$(WarningsAsErrors);CS0108</WarningsAsErrors>
 		<!-- CS0114 - Hides -->
 		<WarningsAsErrors>$(WarningsAsErrors);CS0114</WarningsAsErrors>
+		<!-- CS0252 - Possible unintended reference comparison; left hand side needs cast -->
+		<WarningsAsErrors>$(WarningsAsErrors);CS0252</WarningsAsErrors>
 		<!-- CS1570 - XML comment badly formed -->
 		<WarningsAsErrors>$(WarningsAsErrors);CS1570</WarningsAsErrors>
 		<!-- CS1571 - XML comment has duplicate param -->
@@ -43,6 +45,8 @@
 		<WarningsAsErrors>$(WarningsAsErrors);CS1584</WarningsAsErrors>
 		<!-- CS1717 - Unnecessary assignment -->
 		<WarningsAsErrors>$(WarningsAsErrors);CS1717</WarningsAsErrors>
+		<!-- CS1734 - XML comment has a paramref tag, but there is no parameter by that name -->
+		<WarningsAsErrors>$(WarningsAsErrors);CS1734</WarningsAsErrors>
 		<!-- CS4814 - Async method not awaited -->
 		<WarningsAsErrors>$(WarningsAsErrors);CS4814</WarningsAsErrors>
 		<!-- CS8786 - Generator didn't work -->

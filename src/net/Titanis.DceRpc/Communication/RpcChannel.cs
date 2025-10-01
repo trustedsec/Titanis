@@ -93,7 +93,7 @@ namespace Titanis.DceRpc.Communication
 			in Span<byte> message,
 			BindAuthContext authContext)
 		{
-			authContext.authContext.VerifyMessage(
+			authContext.AuthContext.VerifyMessage(
 				new MessageVerifyParams(
 					message.Slice(message.Length - header.authLength, header.authLength),
 					SecBufferList.Create(
@@ -136,7 +136,7 @@ namespace Titanis.DceRpc.Communication
 
 			int cbRespHeader = RequestPduHeader.StructSize;
 			int cbBody = message.Length - cbRespHeader - header.authLength - AuthVerifierHeader.PduStructSize;
-			authContext.authContext.UnsealMessage(
+			authContext.AuthContext.UnsealMessage(
 				new MessageSealParams(
 					default,
 					SecBufferList.Create(
@@ -216,11 +216,11 @@ namespace Titanis.DceRpc.Communication
 					if (this._bindAuthContexts.TryGetValue(authVerifier.hdr.auth_context_id, out var bindAuthContext))
 					{
 						var stubData = frag.Slice(PduHeader.PduStructSize);
-						if (bindAuthContext.authLevel == RpcAuthLevel.PacketIntegrity)
+						if (bindAuthContext.AuthLevel == RpcAuthLevel.PacketIntegrity)
 						{
 							VerifyPdu(hdr, stubData.Span, bindAuthContext);
 						}
-						else if (bindAuthContext.authLevel == RpcAuthLevel.PacketPrivacy)
+						else if (bindAuthContext.AuthLevel == RpcAuthLevel.PacketPrivacy)
 						{
 							UnsealResponse(hdr, stubData.Span, bindAuthContext);
 						}
@@ -360,19 +360,19 @@ namespace Titanis.DceRpc.Communication
 
 			int cbFrag = buffer.Length;
 
-			if (authContext.authLevel == RpcAuthLevel.PacketIntegrity)
+			if (authContext.AuthLevel == RpcAuthLevel.PacketIntegrity)
 			{
 				int cbBody = cbFrag - authLength;
-				authContext.authContext.SignMessage(
+				authContext.AuthContext.SignMessage(
 					message: buffer.Slice(0, cbBody),
 					macBuffer: buffer.Slice(cbBody, authLength),
 					MessageSignOptions.None);
 			}
-			else if (authContext.authLevel == RpcAuthLevel.PacketPrivacy)
+			else if (authContext.AuthLevel == RpcAuthLevel.PacketPrivacy)
 			{
 				int cbHeader = PduHeader.PduStructSize + ((0 != (pduFlags & PfcFlags.ObjectUuid)) ? RequestPduHeader.StructSizeWithObjectId : RequestPduHeader.StructSize);
 				int cbBody = cbFrag - cbHeader - authLength - AuthVerifierHeader.PduStructSize;
-				authContext.authContext.SealMessage(
+				authContext.AuthContext.SealMessage(
 					new MessageSealParams(
 						default,
 						SecBufferList.Create(
@@ -476,11 +476,11 @@ namespace Titanis.DceRpc.Communication
 						ref AuthVerifierHeader authver = ref MemoryMarshal.AsRef<AuthVerifierHeader>(fragbuf.AsSpan().Slice(cbHeader + cbChunk, AuthVerifierHeader.PduStructSize));
 						authver = new AuthVerifierHeader
 						{
-							auth_type = (RpcAuthType)authContext.authContext.RpcAuthType,
-							auth_level = authContext.authLevel,
+							auth_type = (RpcAuthType)authContext.AuthContext.RpcAuthType,
+							auth_level = authContext.AuthLevel,
 							auth_pad_length = (byte)0,
 							auth_reserved = 0,
-							auth_context_id = authContext.contextId
+							auth_context_id = authContext.ContextId
 						};
 					}
 
@@ -508,18 +508,18 @@ namespace Titanis.DceRpc.Communication
 			{
 				// No fragmentation necessary
 
-				bool includeAuthTrailer = (authContext != null) && (authContext.authLevel >= RpcAuthLevel.PacketIntegrity);
+				bool includeAuthTrailer = (authContext != null) && (authContext.AuthLevel >= RpcAuthLevel.PacketIntegrity);
 
 				if (includeAuthTrailer && authContext != null)
 				{
 					int pad = writer.Align(AuthVerifierHeader.Alignment, -24);
 					writer.WritePduStruct(new AuthVerifierHeader
 					{
-						auth_type = (RpcAuthType)authContext.authContext.RpcAuthType,
-						auth_level = authContext.authLevel,
+						auth_type = (RpcAuthType)authContext.AuthContext.RpcAuthType,
+						auth_level = authContext.AuthLevel,
 						auth_pad_length = (byte)pad,
 						auth_reserved = 0,
-						auth_context_id = authContext.contextId
+						auth_context_id = authContext.ContextId
 					});
 
 					int macSize = authContext.MessageAuthTokenSize;
