@@ -6,6 +6,8 @@ using System.ComponentModel;
 using DescriptionAttribute = System.ComponentModel.DescriptionAttribute;
 using System.Threading.Tasks;
 using System.Threading;
+using Titanis.Mocks;
+using System.ComponentModel.Design;
 
 [assembly: TestDataSourceOptions(TestDataSourceUnfoldingStrategy.Unfold)]
 
@@ -38,7 +40,20 @@ namespace Titanis.Cli.Test
 		{
 			TCommand cmd = new TCommand();
 			var tokens = CommandLineParser.Tokenize(cmdline);
-			var result = cmd.InvokeAsync("cmd", tokens, 0, CancellationToken.None).Result;
+
+			CommandMetadataContext mdContext = new CommandMetadataContext(MetadataResolver.Default);
+			var md = Command.GetCommandMetadata(typeof(TCommand), mdContext);
+			var log = new TestLog();
+
+			ServiceContainer services = new ServiceContainer();
+			MockRepository mocks = new Mocks.MockRepository();
+			var cmdContext = mocks.Create<ICommandContext>();
+			cmdContext.Expect(r => r.Services).Return(services);
+			cmdContext.Expect(r => r.GetVariable(Arg.Matches<string>(r => !string.IsNullOrEmpty(r)))).Return(null);
+			cmdContext.Expect(r => r.MetadataContext).Return(mdContext);
+			cmdContext.Expect(r => r.Log).Return(log);
+
+			var result = cmd.InvokeAsync(cmdContext.Object, "cmd", tokens, 0, CancellationToken.None).Result;
 			return cmd;
 		}
 
@@ -176,5 +191,27 @@ namespace Titanis.Cli.Test
 		//			var help = CommandLineParser.GetHelpString(cmd, false, "someCommandname");
 		//			Console.Write(help);
 		//		}
+	}
+
+	class TestLog : ILog
+	{
+		public LogMessageSeverity LogLevel { get; set; }
+		public LogFormat Format { get; set; }
+
+		public void MarkTaskComplete()
+		{
+		}
+
+		public void WriteMessage(LogMessage message)
+		{
+		}
+
+		public void WriteTaskError(Exception ex)
+		{
+		}
+
+		public void WriteTaskStart(string description)
+		{
+		}
 	}
 }

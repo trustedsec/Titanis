@@ -47,7 +47,7 @@ namespace Titanis.Mocks
 				? new Type[] { mockType }
 				: Type.EmptyTypes;
 
-			stubType = this._gen.GenerateTypeStub(baseType, typeName);
+			stubType = this._gen.GenerateTypeStub(baseType, typeName, interfaceTypes);
 			this._stubTypes.Add(mockType, stubType);
 			return stubType;
 		}

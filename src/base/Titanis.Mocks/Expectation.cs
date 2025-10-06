@@ -11,7 +11,7 @@ namespace Titanis.Mocks
 	enum ExpectationType
 	{
 		Action = 0,
-		Func,
+		MethodCall,
 		AsyncAction,
 		AsyncFunc,
 		Setter,

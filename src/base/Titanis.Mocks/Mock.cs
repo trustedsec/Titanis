@@ -137,7 +137,7 @@ namespace Titanis.Mocks
 				{
 					if (type == ExpectationType.Setter)
 						return new ExpectPattern(propertyInfo.SetMethod, null);
-					else
+					else if (type is ExpectationType.MethodCall)
 						return new ExpectPattern(propertyInfo.GetMethod, null);
 				}
 			}
@@ -153,7 +153,7 @@ namespace Titanis.Mocks
 			=> this.ExpectInternal<int>(lambda, ExpectationType.Action);
 
 		public IExpect<T, TReturn> Expect<TReturn>(Expression<Func<T, TReturn>> lambda)
-			=> this.ExpectInternal<TReturn>(lambda, ExpectationType.Func);
+			=> this.ExpectInternal<TReturn>(lambda, ExpectationType.MethodCall);
 
 		public IExpectAsync Expect(Expression<Func<T, Task>> lambda)
 			=> this.ExpectAsyncInternal(lambda, ExpectationType.AsyncAction);

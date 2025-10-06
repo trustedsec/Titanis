@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\base\Titanis.Cli\Titanis.Cli.csproj" />
+    <ProjectReference Include="..\..\..\src\base\Titanis.Mocks\Titanis.Mocks.csproj" />
   </ItemGroup>
 
 </Project>
