@@ -6,5 +6,6 @@ Each Titanis release includes a set of tools as binaries built for both Windows 
 
 * [Common Command Line Syntax](syntax.md) - Overview of the command line syntax and how it is parsed
     * [Authentication Parameters](syntax-auth.md) - Describes how to control authentication with parameters
+    * [Parameter Defaults](param-defaults.md) - Explains how to set default parameter values
     * [Handling Tool Output](output.md) - Describes parameters that control the output of the tool
 * [Tools Index](tools/index.md) - Lists the tools by name and by task
