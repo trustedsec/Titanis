@@ -9,18 +9,19 @@ namespace Titanis.Socks
 	/// <summary>
 	/// Implements <see cref="ISocket"/> over a SOCKS connection.
 	/// </summary>
-	/// <seealso cref="SocksClient"/>
+	/// <seealso cref="Socks5Client"/>
 	public partial class SocksSocket : ISocket
 	{
-		internal SocksSocket(SocksClient socksClient, in SocketInfo socketInfo)
+		internal SocksSocket(Socks5Client socksClient, in SocketInfo socketInfo)
 		{
 			this._socksClient = socksClient;
 			this._socketInfo = socketInfo;
 		}
 
-		private SocksClient _socksClient;
+		private Socks5Client _socksClient;
 		private readonly SocketInfo _socketInfo;
 		private ISocket? _innerSocket;
+		private EndPoint? _remoteBindEP;
 
 		/// <inheritdoc/>
 		public int ReceiveTimeout { get; set; }
@@ -56,21 +57,8 @@ namespace Titanis.Socks
 			ArgumentNullException.ThrowIfNull(remoteEP);
 			this.VerifyNotConnected();
 
-			var socket = this._socksClient.CreateSocket(this._socketInfo);
-			try
-			{
-				await socket.ConnectAsync(this._socksClient.ServerEP, cancellationToken).ConfigureAwait(false);
-
-
-
-				this._innerSocket = socket;
-				this._state = SocksState.Connected;
-			}
-			finally
-			{
-				if (socket != null)
-					await socket.DisposeAsync().ConfigureAwait(false);
-			}
+			(this._innerSocket, this._remoteBindEP) = await _socksClient.ConnectSocksAsync(_socketInfo, remoteEP, cancellationToken).ConfigureAwait(false);
+			this._state = SocksState.Connected;
 		}
 
 		/// <inheritdoc/>
