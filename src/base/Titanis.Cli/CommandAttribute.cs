@@ -9,6 +9,8 @@ namespace Titanis.Cli
 		{
 		}
 
-		public string HelpText { get; set; }
+		// TODO: Complete deprecation
+		[Obsolete("Use DescriptionAttribute instead.", false)]
+		public string? HelpText { get; set; }
 	}
 }

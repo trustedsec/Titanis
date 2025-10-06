@@ -65,7 +65,7 @@ namespace Titanis.Reflection
 			return true;
 		}
 
-		public static MethodBase TryFindMethod(IEnumerable<MethodBase> methods, params Type[] argTypes)
+		public static MethodBase? TryFindMethod(IEnumerable<MethodBase> methods, params Type[] argTypes)
 		{
 			foreach (var method in methods)
 			{
@@ -75,14 +75,14 @@ namespace Titanis.Reflection
 			return null;
 		}
 
-		public static ConstructorInfo TryFindConstructor(this Type type, params Type[] argTypes)
+		public static ConstructorInfo? TryFindConstructor(this Type type, params Type[] argTypes)
 		{
-			return (ConstructorInfo)TryFindMethod(type.GetTypeInfo().DeclaredConstructors, argTypes);
+			return (ConstructorInfo?)TryFindMethod(type.GetTypeInfo().DeclaredConstructors, argTypes);
 		}
 
-		public static MethodInfo TryFindMethod(this Type type, string methodName, params Type[] argTypes)
+		public static MethodInfo? TryFindMethod(this Type type, string methodName, params Type[] argTypes)
 		{
-			return (MethodInfo)TryFindMethod(type.GetTypeInfo().GetDeclaredMethods(methodName), argTypes);
+			return (MethodInfo?)TryFindMethod(type.GetTypeInfo().GetDeclaredMethods(methodName), argTypes);
 		}
 
 

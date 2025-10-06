@@ -21,7 +21,7 @@ namespace Titanis.Cli
 		/// </summary>
 		/// <param name="message">Message that describes the error</param>
 		/// <param name="propertyName">Name of property with metadata problem</param>
-		public MetadataException(string message, string propertyName, Exception? innerException = null)
+		public MetadataException(string message, string? propertyName, Exception? innerException = null)
 			: base(message, innerException)
 		{
 			this.PropertyName = propertyName;

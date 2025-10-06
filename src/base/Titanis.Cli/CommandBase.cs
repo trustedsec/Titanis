@@ -123,7 +123,7 @@ namespace Titanis.Cli
 		/// The entire array of arguments is provided so that a command may analyze
 		/// what came before its own arguments.
 		/// </remarks>
-		public abstract Task<int> InvokeAsync(string command, Token[] args, int startIndex, CancellationToken cancellationToken);
+		protected abstract Task<int> InvokeAsync(string command, Token[] args, int startIndex, CancellationToken cancellationToken);
 		/// <summary>
 		/// Runs a program implemented as a command.
 		/// </summary>
@@ -193,7 +193,7 @@ namespace Titanis.Cli
 			catch (OperationCanceledException ex)
 			{
 				context.WriteError("Operation canceled");
-				return -1;
+				return ex.HResult;
 			}
 			catch (SyntaxException ex)
 			{
@@ -425,7 +425,7 @@ namespace Titanis.Cli
 
 			this.FlushOutput();
 
-			if (style is OutputStyle.Table or OutputStyle.List && fields.IsNullOrEmpty())
+			if ((style is OutputStyle.Table or OutputStyle.List) && fields.IsNullOrEmpty())
 			{
 				var recordType = this.GetType().GetCustomAttribute<OutputRecordTypeAttribute>()?.RecordType;
 				if (recordType != null)
@@ -475,13 +475,15 @@ namespace Titanis.Cli
 			}
 			this._outputFieldNames = fieldNames;
 
-			if (style == OutputStyle.Table)
+			if (style is OutputStyle.Table)
 			{
+				Debug.Assert(fields != null);
+
 				TextTable tbl = new TextTable();
 				{
 					var trHeader = tbl.AddRow();
 					var trLine = tbl.AddRow();
-					foreach (var field in fields)
+					foreach (var field in fields!)
 					{
 						trHeader.AddCell(field.Caption);
 						trLine.AddCell(new TextTableCell() { Padding = '-' });
@@ -495,13 +497,13 @@ namespace Titanis.Cli
 		protected Stream OpenRawOutputStream()
 		{
 			this.VerifyContext();
-			return this.Context.OpenRawOutputStream();
+			return this.VerifyContext().OpenRawOutputStream();
 		}
 
 		protected Stream OpenRawInputStream()
 		{
 			this.VerifyContext();
-			return this.Context.OpenRawInputStream();
+			return this.VerifyContext().OpenRawInputStream();
 		}
 
 		protected void WriteRecords(IEnumerable records)
@@ -518,40 +520,50 @@ namespace Titanis.Cli
 		{
 			this._recordsExpected = true;
 			this._recordsWritten++;
+			var context = this.VerifyContext();
 
 			switch (this._style)
 			{
 				case OutputStyle.Freeform:
-					this.Context.WriteOutputLine(record?.ToString());
+					context.WriteOutputLine(record?.ToString());
 					break;
 				case OutputStyle.Table:
 					{
-						Debug.Assert(this._resultTable != null);
-						Debug.Assert(this._outputFields != null);
-
-						this._resultsPending = true;
-
-						var tr = this._resultTable.AddRow();
-						foreach (var field in this._outputFields)
+						var tbl = this._resultTable;
+						if (tbl != null)
 						{
-							var value = field.GetValue(record);
-							var formatted = field.FormatValue(value, this._style);
+							Debug.Assert(this._outputFields != null);
 
-							tr.AddCell(formatted, field.Alignment);
+							this._resultsPending = true;
+
+							var tr = tbl.AddRow();
+							if (record is not null)
+							{
+								foreach (var field in this._outputFields!)
+								{
+									var value = field.GetValue(record);
+									var formatted = field.FormatValue(value, this._style);
+
+									tr.AddCell(formatted, field.Alignment);
+								}
+							}
 						}
 					}
 					break;
 				case OutputStyle.List:
 					Debug.Assert(this._outputFields != null);
 
-					foreach (var field in this._outputFields)
+					if (record is not null)
 					{
-						var value = field.GetValue(record);
-						var formatted = field.FormatValue(value, this._style);
+						foreach (var field in this._outputFields!)
+						{
+							var value = field.GetValue(record);
+							var formatted = field.FormatValue(value, this._style);
 
-						this.Context.WriteOutputLine($"{field.Caption}: {formatted}");
+							context.WriteOutputLine($"{field.Caption}: {formatted}");
+						}
 					}
-					this.Context.WriteOutputLine(string.Empty);
+					context.WriteOutputLine(string.Empty);
 					break;
 				default:
 					break;
@@ -562,7 +574,7 @@ namespace Titanis.Cli
 		{
 			if (this._resultsPending && this._resultTable != null)
 			{
-				this.Context.WriteOutputLine(this._resultTable.ToString());
+				this.VerifyContext().WriteOutputLine(this._resultTable.ToString());
 				this._resultsPending = false;
 				this._resultTable = null;
 			}
@@ -609,7 +621,7 @@ namespace Titanis.Cli
 						{
 							var detailedText = det.GetText(context) ?? string.Empty;
 							sb.Insert(0, detailedText);
-							sb.Insert(det.GetText(context).Length, Environment.NewLine + Environment.NewLine);
+							sb.Insert(detailedText.Length, Environment.NewLine + Environment.NewLine);
 						}
 					}
 					else

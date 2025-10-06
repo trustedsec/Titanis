@@ -2,10 +2,17 @@
 
 namespace Titanis.Dynamic
 {
-	public class MethodDeclInfo
+	class MethodDeclInfo
 	{
-		public Type[] paramTypes { get; set; }
-		public Type[][] reqmods { get; set; }
-		public Type[][] optmods { get; set; }
+		public MethodDeclInfo(Type[] paramTypes, Type[][] reqmods, Type[][] optmods)
+		{
+			this.paramTypes = paramTypes;
+			this.reqmods = reqmods;
+			this.optmods = optmods;
+		}
+
+		public Type[] paramTypes { get; }
+		public Type[][] reqmods { get; }
+		public Type[][] optmods { get; }
 	}
 }

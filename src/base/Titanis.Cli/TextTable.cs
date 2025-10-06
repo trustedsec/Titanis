@@ -15,7 +15,7 @@ namespace Titanis.Cli
 	/// Represents a table that is rendered to text.
 	/// </summary>
 	/// <remarks>
-	/// Use <see cref="ToString"/> to render the table as text.
+	/// Use <see cref="ToString()"/> or one its overloads to render the table as text.
 	/// </remarks>
 	public class TextTable
 	{
@@ -135,7 +135,7 @@ namespace Titanis.Cli
 					{
 						bool shouldPadRight = (i + 1 < columnCount) || !string.IsNullOrEmpty(rightMargin) || cell.Padding != ' ';
 
-						var cellText = cell.RenderedText;
+						var cellText = cell.RenderedText!;
 						if (cellText.Length == colWidth)
 							sb.Append(cellText);
 						else if (cellText.Length == 0)
@@ -275,6 +275,7 @@ namespace Titanis.Cli
 		public char Padding { get; set; } = ' ';
 
 		public TextStyleOptions StyleOptions { get; set; }
+
 		internal string? RenderedText { get; set; }
 	}
 }

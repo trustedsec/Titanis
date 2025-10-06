@@ -235,8 +235,9 @@ namespace Titanis.DceRpc.Client
 			internal readonly TaskCompletionSource<RpcDecoder> _taskSource = new TaskCompletionSource<RpcDecoder>();
 			internal readonly RpcCallContext callContext;
 			internal readonly RpcBindContext bindContext;
+
 			internal CancellationTokenRegistration cancelCallback;
-			internal CancellationTokenSource callCancel;
+			internal CancellationTokenSource? callCancel;
 
 			internal PendingRequest(
 				int callId,
@@ -701,7 +702,7 @@ namespace Titanis.DceRpc.Client
 		internal TaskCompletionSource<RpcBindContext> _taskSource = new TaskCompletionSource<RpcBindContext>();
 		internal BindPdu bindPdu;
 		internal BindAuthContext? authContext;
-		internal RpcBindContext bindContext;
+		internal RpcBindContext? bindContext;
 
 		public BindRequest(int callId, BindPdu bindPdu)
 		{

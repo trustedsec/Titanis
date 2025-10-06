@@ -41,9 +41,10 @@ namespace Titanis.Cli
 		{
 			var fmt = this.EffectiveFormatString;
 			return
-				(this.formatter is not null) ? this.formatter.FormatValue(value, fmt, this, outputStyle)
-				: (!string.IsNullOrEmpty(fmt) && (value is IFormattable f)) ? (
-					(fmt.Contains("{0")) ? string.Format(fmt, f) : f.ToString(fmt, null)
+				(fmt is not null) ? (
+					(this.formatter is not null) ? this.formatter.FormatValue(value, fmt, this, outputStyle)
+					: (value is IFormattable f) ? (fmt.Contains("{0") ? string.Format(fmt, f) : f.ToString(fmt, null))
+					: value?.ToString()
 				) : value?.ToString();
 		}
 
@@ -183,7 +184,7 @@ namespace Titanis.Cli
 		public OutputField(
 			string name,
 			string caption,
-			string format,
+			string? format,
 			DisplayAlignment alignment = DisplayAlignment.Left
 			)
 		{
@@ -195,7 +196,7 @@ namespace Titanis.Cli
 
 		public sealed override string Name { get; }
 		public sealed override string Caption { get; }
-		public sealed override string FormatString { get; }
+		public sealed override string? FormatString { get; }
 		public sealed override DisplayAlignment Alignment { get; }
 
 		public abstract object? GetValue(TRecord rec);
@@ -219,11 +220,9 @@ namespace Titanis.Cli
 			: base(name, caption, format, alignment)
 		{
 			this.Selector = selector;
-			this.Format = format;
 		}
 
 		public Func<TRecord, TValue> Selector { get; }
-		public string? Format { get; }
 
 		public override object? GetValue(TRecord rec)
 			=> this.Selector(rec);

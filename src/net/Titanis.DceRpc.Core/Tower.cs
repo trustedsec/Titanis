@@ -298,12 +298,12 @@ namespace Titanis.DceRpc
 		public SyntaxId SyntaxId { get; }
 		public ProtocolId RpcProtocolId { get; }
 		public RpcVersion RpcProtocolVersion { get; }
-		public ProtocolId TransportProtocol { get; set; }
+		public ProtocolId TransportProtocol { get; }
 		public ushort Port { get; }
 		public string? HostName { get; }
-		public IPAddress NetworkAddress { get; }
+		public IPAddress? NetworkAddress { get; }
 		public TowerFloor[] Floors { get; }
-		public string PipeName { get; }
+		public string? PipeName { get; }
 
 		internal twr_t _twr;
 

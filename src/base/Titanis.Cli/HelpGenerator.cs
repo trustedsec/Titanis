@@ -13,7 +13,7 @@ namespace Titanis.Cli
         private const string OPTIONALHELP = "Optional Arguments:\r\n";
         private const string POSITIONALHELP = "Positional Arguments:\r\n";
 
-        public static string GenerateFullHelp(Type commandType, StringBuilder fullHelp, CommandMetadataContext context, bool showLongHelp = false, string commandName = null)
+        public static string GenerateFullHelp(Type commandType, StringBuilder fullHelp, CommandMetadataContext context, bool showLongHelp = false, string? commandName = null)
         {
 			if (context is null) throw new ArgumentNullException(nameof(context));
 
@@ -74,11 +74,6 @@ namespace Titanis.Cli
             if (optionalHelp.Length > OPTIONALHELP.Length)
             {
                 fullHelp.AppendLine(optionalHelp.ToString());
-            }
-
-            if (metadata.longHelp != null && showLongHelp)
-            {
-                fullHelp.AppendLine(metadata.ToString());
             }
 
             return fullHelp.ToString();

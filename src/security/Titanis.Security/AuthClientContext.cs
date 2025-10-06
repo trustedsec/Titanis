@@ -151,7 +151,7 @@ namespace Titanis.Security
 		/// Gets or sets the target service principal name.
 		/// </summary>
 		/// <remarks>
-		/// This property must be initialized before calling <see cref="Initialize"/>
+		/// This property must be initialized before calling <see cref="Initialize()"/>
 		/// </remarks>
 		public abstract ServicePrincipalName? TargetSpn { get; set; }
 		/// <summary>

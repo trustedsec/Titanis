@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Globalization;
 using System.Linq;
@@ -42,11 +43,16 @@ namespace Titanis.Cli
 		#endregion
 
 		/// <inheritdoc/>
-		public sealed override Task<int> InvokeAsync(string command, Token[] args, int startIndex, CancellationToken cancellationToken)
+		protected sealed override Task<int> InvokeAsync(string command, Token[]? args, int startIndex, CancellationToken cancellationToken)
 		{
-			if (args != null && args.Length > startIndex && args[startIndex].Text == "-?")
+			Debug.Assert(this.Context != null);
+			args ??= Array.Empty<Token>();
+
+			var context = this.Context!;
+
+			if (args.Length > startIndex && args[startIndex].Text == "-?")
 			{
-				string helpText = this.GetHelpText(command, this.Context.MetadataContext);
+				string helpText = this.GetHelpText(command, context.MetadataContext);
 				this.WriteMessage(helpText);
 				return Task.FromResult(0);
 			}
@@ -55,7 +61,7 @@ namespace Titanis.Cli
 				// Check for environmental options
 				{
 					string optionsVar = command.Replace(' ', '_').ToUpper() + "_OPTIONS";
-					var envOptions = this.Context.GetVariable(optionsVar);
+					var envOptions = context.GetVariable(optionsVar);
 					if (envOptions is string str)
 					{
 						try
@@ -75,7 +81,7 @@ namespace Titanis.Cli
 					}
 				}
 
-				CommandMetadata metadata = GetCommandMetadata(this.GetType(), this.Context.MetadataContext);
+				CommandMetadata metadata = GetCommandMetadata(this.GetType(), context.MetadataContext);
 
 				var validation = this.Parse(args, startIndex, metadata, true);
 				if (validation.Errors.Count > 0)
@@ -85,7 +91,7 @@ namespace Titanis.Cli
 				{
 					if (metadata.OutputRecordType is not null)
 					{
-						var fields = OutputField.GetFieldsFor(metadata.OutputRecordType, this.Context.MetadataContext, this.OutputFields ?? metadata.DefaultOutputFields);
+						var fields = OutputField.GetFieldsFor(metadata.OutputRecordType, context.MetadataContext, this.OutputFields ?? metadata.DefaultOutputFields);
 						this.SetOutputFormat(this.ConsoleOutputStyle ?? metadata.DefaultOutputStyle, fields);
 					}
 				}
@@ -208,20 +214,21 @@ namespace Titanis.Cli
 			var examples = GetExamples(commandType, context);
 			if (examples.Count > 0)
 			{
-				writer.AppendLine().WriteHeading("Examples").AppendLine();
+				writer.AppendLine().WriteHeading("Examples");
 
 				int index = 0;
 				foreach (var example in examples)
 				{
 					index++;
 
+					writer.AppendLine();
 					writer.WriteSubheading($"Example {index} - {example.Caption}").AppendLine();
 					writer.BeginCodeBlock();
 					writer.WriteBodyTextLine(example.CommandLine.Replace("{0}", commandName) /* Use a simple Replace call instead of string.Format so that other { and } don't need to be escaped. string.Format(example.CommandLine, commandName) */ );
 					writer.EndCodeBlock();
 
 					if (!string.IsNullOrEmpty(example.Explanation))
-						writer.WriteBodyTextLine(example.Explanation.Replace("{0}", commandName));
+						writer.WriteBodyTextLine(example.Explanation!.Replace("{0}", commandName));
 				}
 			}
 		}
@@ -375,8 +382,7 @@ namespace Titanis.Cli
 		private ParameterValidationContext Parse(IList<Token> tokens, int startIndex, CommandMetadata metadata, bool useEnvDefaults)
 		{
 			Dictionary<ParameterMetadata, object?> setParams = new();
-
-			ParameterConverterContext converterContext = new ParameterConverterContext(this);
+			var context = this.Context;
 
 			foreach (var group in metadata.ParameterGroups)
 			{
@@ -389,6 +395,7 @@ namespace Titanis.Cli
 			bool isFinalPos = false;
 			bool endOfOptions = false;
 
+			ParameterConverterContext converterContext = new ParameterConverterContext(this);
 			int positionalIndex = 0;
 			for (int i = startIndex; i < tokens.Count; i++)
 			{
@@ -522,7 +529,7 @@ namespace Titanis.Cli
 						try
 						{
 							converterContext.Parameter = parameter;
-							argValue = parameter.ConvertValue(argText, converterContext);
+							argValue = argText != null ? parameter.ConvertValue(argText, converterContext) : null;
 						}
 						catch (Exception ex)
 						{
@@ -549,11 +556,11 @@ namespace Titanis.Cli
 					{
 						object? envValue = null;
 						if (param.EnvironmentVariable is not null)
-							envValue = this.Context.GetVariable(param.EnvironmentVariable);
+							envValue = context?.GetVariable(param.EnvironmentVariable);
 						if (envValue is null)
 						{
 							var envKey = $"TITANIS_DEFAULT_" + param.Name.ToUpper();
-							envValue = this.Context.GetVariable(envKey);
+							envValue = context?.GetVariable(envKey);
 						}
 						if (envValue is not null)
 						{
@@ -629,7 +636,7 @@ namespace Titanis.Cli
 						if (useEnvDefaults)
 						{
 							var envKey = $"TITANIS_DEFAULT_" + param.Name.ToUpper();
-							var envValue = this.Context.GetVariable(envKey);
+							var envValue = context?.GetVariable(envKey);
 							if (envValue is not null)
 							{
 								try

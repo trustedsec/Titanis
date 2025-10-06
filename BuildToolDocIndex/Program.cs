@@ -11,6 +11,7 @@ internal class Program : Command
 	static void Main(string[] args)
 		=> RunProgramAsync<Program>(args);
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 	[Parameter]
 	[Mandatory]
 	public string DocPath { get; set; }
@@ -22,25 +23,11 @@ internal class Program : Command
 	[Parameter]
 	[Mandatory]
 	public string Configuration { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-	class Entry
-	{
-		public string CommandName { get; set; }
-		public Type ImplementingType { get; set; }
-	}
-
-	class NameEntry
-	{
-		public string Command { get; set; }
-		public string Description { get; set; }
-	}
-
-	class TaskEntry
-	{
-		public string? Category { get; set; }
-		public string Task { get; set; }
-		public string Command { get; set; }
-	}
+	record Entry(string CommandName, Type ImplementingType);
+	record NameEntry(string Command, string? Description);
+	record TaskEntry(string? Category, string Task, string Command);
 
 	protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 	{
@@ -78,13 +65,13 @@ internal class Program : Command
 						//nsm.AddNamespace("doc", string.Empty);
 					}
 
-					commandEntries.Enqueue(new Entry { CommandName = toolName, ImplementingType = progClass });
+					commandEntries.Enqueue(new Entry(toolName, progClass));
 					while (commandEntries.Count > 0)
 					{
 						var entry = commandEntries.Dequeue();
 
 						var descr = entry.ImplementingType.GetCustomAttribute<DescriptionAttribute>();
-						nameEntries.Add(new NameEntry { Command = entry.CommandName, Description = descr?.Description });
+						nameEntries.Add(new NameEntry(entry.CommandName, descr?.Description));
 
 						{
 							string xmlKey = "T:" + entry.ImplementingType.FullName;
@@ -94,7 +81,7 @@ internal class Program : Command
 								var cat = taskNode.Attributes["category"]?.Value?.Split(';') ?? new string[] { null };
 								var text = taskNode.InnerText;
 
-								tasks.AddRange(cat.Select(r => new TaskEntry { Category = r, Task = text, Command = entry.CommandName }));
+								tasks.AddRange(cat.Select(r => new TaskEntry(r, text, entry.CommandName)));
 							}
 						}
 
@@ -103,7 +90,7 @@ internal class Program : Command
 							var subs = entry.ImplementingType.GetCustomAttributes<SubcommandAttribute>();
 							foreach (var sub in subs)
 							{
-								commandEntries.Enqueue(new Entry { CommandName = entry.CommandName + ' ' + sub.Name, ImplementingType = sub.CommandType });
+								commandEntries.Enqueue(new Entry(entry.CommandName + ' ' + sub.Name, sub.CommandType));
 							}
 						}
 					}

@@ -18,6 +18,7 @@ namespace Titanis.Cli
 		public ParameterSyntaxException(string parameterName, string message)
 			: base(message)
 		{
+			this.ParameterName = parameterName;
 		}
 		/// <summary>
 		/// Initializes a new <see cref="ParameterSyntaxException"/>.
@@ -28,6 +29,7 @@ namespace Titanis.Cli
 		public ParameterSyntaxException(string parameterName, string message, Exception? innerException)
 			: base(message, innerException)
 		{
+			this.ParameterName = parameterName;
 		}
 		/// <summary>
 		/// Initializes a new <see cref="UnrecognizedParameterException"/> with serialized data.

@@ -37,6 +37,7 @@ namespace Titanis
 		/// <param name="value">Value to receive newly-created object</param>
 		/// <param name="sync">Synchronization object</param>
 		/// <param name="factory">Factory to create new object</param>
+		/// <typeparam name="TFactory">Type of factory</typeparam>
 		/// <returns>The newly-created object</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="sync"/> is <c>null</c></exception>
 		/// <remarks>

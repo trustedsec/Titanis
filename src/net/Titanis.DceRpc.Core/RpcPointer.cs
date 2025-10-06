@@ -18,7 +18,7 @@ namespace Titanis.DceRpc
 	/// </summary>
 	public sealed class RpcPointer<T> : RpcPointer
 	{
-		public T value;
+		public T? value;
 
 		public RpcPointer()
 		{

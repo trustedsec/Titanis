@@ -10,8 +10,15 @@ namespace Titanis.Smb2.Pdus
 	// [MS-DFSC] § 2.2.2
 	class DfsGetReferralInfoRequest
 	{
-		public ushort MaxReferralLevel { get; set; } = 4;
-		public string Path { get; set; }
+		public DfsGetReferralInfoRequest(ushort maxReferralLevel, string path)
+		{
+			MaxReferralLevel = maxReferralLevel;
+			Path = path;
+		}
+
+		public ushort MaxReferralLevel { get; }
+		public string Path { get; }
+
 		internal void WriteTo(ByteWriter writer)
 		{
 			writer.WriteUInt16LE(this.MaxReferralLevel);

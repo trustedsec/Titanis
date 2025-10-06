@@ -17,14 +17,27 @@ namespace Titanis.Cli
 		enum SegmentType
 		{
 			Literal,
-			Asterisk,
-			QMark
+			Asterisk = '*',
+			QMark = '?'
 		}
 
 		struct Segment
 		{
-			internal string? text;
-			internal SegmentType type;
+			public Segment(string text)
+			{
+				this.text = text;
+				this.type = SegmentType.Literal;
+			}
+			public Segment(SegmentType type)
+			{
+				this.type = type;
+			}
+
+			internal readonly string? text;
+			internal readonly SegmentType type;
+
+			public static Segment Asterisk => new Segment(SegmentType.Asterisk);
+			public static Segment QMark => new Segment(SegmentType.QMark);
 		}
 
 		private readonly Segment[] _segments;
@@ -63,10 +76,10 @@ namespace Titanis.Cli
 						{
 							int segLength = i - startIndex;
 							minLength += segLength;
-							segs.Add(new Segment { type = SegmentType.Literal, text = pattern.Substring(startIndex, segLength) });
+							segs.Add(new Segment(pattern.Substring(startIndex, segLength)));
 						}
 
-						segs.Add(new Segment { type = c switch { '*' => SegmentType.Asterisk, '?' => SegmentType.QMark } });
+						segs.Add(new Segment((SegmentType)c));
 						if (c == '?')
 							minLength++;
 
@@ -77,7 +90,7 @@ namespace Titanis.Cli
 				{
 					int segLength = i - startIndex;
 					minLength += segLength;
-					segs.Add(new Segment { type = SegmentType.Literal, text = pattern.Substring(startIndex, segLength) });
+					segs.Add(new Segment(pattern.Substring(startIndex, segLength)));
 				}
 			}
 
@@ -104,31 +117,35 @@ namespace Titanis.Cli
 			{
 				var seg = this._segments[segIndex];
 				bool matches = false;
-				switch (seg.type)
+				if (seg.text != null)
 				{
-					case SegmentType.Literal:
-						if (text.Length - charIndex >= seg.text.Length)
-						{
-							matches = 0 == string.Compare(text, charIndex, seg.text, 0, seg.text.Length, true);
-							if (matches)
-								charIndex += seg.text.Length;
-						}
-						break;
-					case SegmentType.Asterisk:
-						for (int j = charIndex; j < text.Length; j++)
-						{
-							matches = this.Matches(text, charIndex + j, segIndex + 1);
-							if (matches)
-								return true;
-						}
-						return false;
-					case SegmentType.QMark:
-						if (text.Length - charIndex > 0)
-						{
-							matches = true;
-							charIndex++;
-						}
-						break;
+					if (text.Length - charIndex >= seg.text.Length)
+					{
+						matches = 0 == string.Compare(text, charIndex, seg.text, 0, seg.text.Length, true);
+						if (matches)
+							charIndex += seg.text.Length;
+					}
+				}
+				else
+				{
+					switch (seg.type)
+					{
+						case SegmentType.Asterisk:
+							for (int j = charIndex; j < text.Length; j++)
+							{
+								matches = this.Matches(text, charIndex + j, segIndex + 1);
+								if (matches)
+									return true;
+							}
+							return false;
+						case SegmentType.QMark:
+							if (text.Length - charIndex > 0)
+							{
+								matches = true;
+								charIndex++;
+							}
+							break;
+					}
 				}
 
 				if (!matches)

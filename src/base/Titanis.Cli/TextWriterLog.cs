@@ -23,13 +23,29 @@ namespace Titanis.Cli
 			WriteMessage(message, true);
 		}
 
+		/// <summary>
+		/// Represents a log record with a JSON context.
+		/// </summary>
+		/// <remarks>
+		/// This class is used to serialize log messages to JSON.
+		/// </remarks>
 		class LogRecord
 		{
-			public string Severity { get; set; }
-			public LogMessageSeverity SeverityValue { get; set; }
+			public LogRecord() { }
+			public LogRecord(string severity, LogMessageSeverity severityValue, string? source, int messageId, string? messageText)
+			{
+				Severity = severity;
+				SeverityValue = severityValue;
+				Source = source;
+				MessageId = messageId;
+				MessageText = messageText;
+			}
+
+			public string? Severity { get; set; }
+			public LogMessageSeverity? SeverityValue { get; set; }
 			public string? Source { get; set; }
 			public int MessageId { get; set; }
-			public string MessageText { get; set; }
+			public string? MessageText { get; set; }
 			public Dictionary<string, string>? Parameters { get; set; }
 		}
 
@@ -57,14 +73,13 @@ namespace Titanis.Cli
 
 		private string FormatJson(LogMessage message)
 		{
-			LogRecord rec = new LogRecord()
-			{
-				Severity = message.Severity.ToString(),
-				SeverityValue = message.Severity,
-				Source = message.Source,
-				MessageId = message.MessageId,
-				MessageText = message.Text,
-			};
+			LogRecord rec = new LogRecord(
+				message.Severity.ToString(),
+				message.Severity,
+				message.Source,
+				message.MessageId,
+				message.Text
+			);
 
 			if (message.MessageType != null)
 			{

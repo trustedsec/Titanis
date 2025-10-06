@@ -310,7 +310,7 @@ namespace Titanis.DceRpc.Communication
 			await this.HandleBind(header, message, bind, authVerifier, cancellationToken).ConfigureAwait(false);
 		}
 
-		protected virtual Task HandleBind(
+		private protected virtual Task HandleBind(
 			PduHeader header,
 			Memory<byte> message,
 			BindPdu bind,

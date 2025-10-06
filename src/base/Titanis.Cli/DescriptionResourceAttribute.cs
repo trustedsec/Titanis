@@ -26,7 +26,7 @@ namespace Titanis.Cli
 		private static string GetText(Type resourceClass, string propertyName)
 		{
 			PropertyInfo prop = resourceClass.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static);
-			string desc = prop?.GetValue(null, null) as string;
+			var desc = prop?.GetValue(null, null) as string;
 			return desc ?? $"{resourceClass.FullName}.{propertyName}";
 		}
 

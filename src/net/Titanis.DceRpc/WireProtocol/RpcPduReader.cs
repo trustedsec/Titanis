@@ -10,11 +10,10 @@ namespace Titanis.DceRpc.WireProtocol
 	{
 		internal static unsafe AuthVerifier ReadAuthVerifier(this ByteMemoryReader reader, int authLength)
 		{
-			return new AuthVerifier
-			{
-				hdr = reader.ReadPduStruct<AuthVerifierHeader>(),
-				token = reader.ReadBytes(authLength)
-			};
+			return new AuthVerifier(
+				reader.ReadPduStruct<AuthVerifierHeader>(),
+				reader.ReadBytes(authLength)
+			);
 		}
 
 		internal static BindNakPdu ReadBindNak(this ByteMemoryReader reader)

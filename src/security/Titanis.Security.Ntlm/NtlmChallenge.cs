@@ -9,7 +9,7 @@ namespace Titanis.Security.Ntlm
 	public class NtlmChallenge
 	{
 		public NtlmChallengeHeader hdr;
-		public string serverName;
+		public string? serverName;
 		public NtlmAvInfo? targetInfo;
 
 		public static NtlmChallenge Parse(ReadOnlySpan<byte> token)

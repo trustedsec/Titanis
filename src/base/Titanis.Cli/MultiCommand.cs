@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -18,25 +19,27 @@ namespace Titanis.Cli
 	public abstract class MultiCommand : CommandBase
 	{
 		/// <inheritdoc/>
-		public sealed override Task<int> InvokeAsync(string command, Token[] args, int startIndex, CancellationToken cancellationToken)
+		protected sealed override Task<int> InvokeAsync(string command, Token[] args, int startIndex, CancellationToken cancellationToken)
 		{
+			Debug.Assert(this.Context != null);
+			var context = this.Context!;
+
 			if (args != null && ((args.Length <= startIndex) || (args.Length > startIndex && args[startIndex].Text == "-?")))
 			{
-				string helpText = this.GetHelpText(command, this.Context.MetadataContext);
-				this.Context.WriteMessage(helpText);
+				string helpText = this.GetHelpText(command, context.MetadataContext);
+				context.WriteMessage(helpText);
 				return Task.FromResult(0);
 			}
-			else
-
-			if (args is null)
+			else if (args is null)
 				throw new ArgumentNullException(nameof(args));
+
 			if (startIndex < args.Length)
 			{
 				string subcmdName = args[startIndex].Text;
-				CommandBase subcmd = this.TryGetSubcommand(subcmdName);
+				var subcmd = this.TryGetSubcommand(subcmdName);
 				if (subcmd != null)
 				{
-					return subcmd.InvokeAsync(this.Context, command + " " + subcmdName, args, startIndex + 1, cancellationToken);
+					return subcmd.InvokeAsync(context, command + " " + subcmdName, args, startIndex + 1, cancellationToken);
 				}
 				else
 				{
@@ -74,7 +77,7 @@ namespace Titanis.Cli
 		{
 			if (context is null) throw new ArgumentNullException(nameof(context));
 
-			string desc = context.Resolver.GetCustomAttribute<DescriptionAttribute>(commandType, true)?.Description;
+			var desc = context.Resolver.GetCustomAttribute<DescriptionAttribute>(commandType, true)?.Description;
 
 			writer
 				.WriteBodyTextLine(desc)

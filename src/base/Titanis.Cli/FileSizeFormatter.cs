@@ -23,7 +23,7 @@ namespace Titanis.Cli
 
 		public static string? FormatValue(object? value, string format)
 		{
-			Match m = (format != null) ? rgx.Match(format) : null;
+			var m = (format != null) ? rgx.Match(format) : null;
 			if (m != null && m.Success)
 			{
 				var gScale = m.Groups["s"];

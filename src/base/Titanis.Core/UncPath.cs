@@ -68,10 +68,10 @@ namespace Titanis
 			return matches;
 		}
 
-		internal string? DfsSharePath
+		internal string DfsSharePath
 			=> string.IsNullOrEmpty(ShareName) ? $@"\{ServerName}"
 			: $@"\{ServerName}\{ShareName}";
-		public string? PathForDfsReferral
+		public string PathForDfsReferral
 			=> string.IsNullOrEmpty(ShareName) ? $@"\{ServerName}"
 			: string.IsNullOrEmpty(ShareRelativePath) ? $@"\{ServerName}\{ShareName}"
 			: $@"\{ServerName}\{ShareName}\{ShareRelativePath}";

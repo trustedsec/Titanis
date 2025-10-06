@@ -32,7 +32,7 @@ namespace Titanis.Cli
 			this.HResult = E_INVALIDARG;
 		}
 
-		internal string commandPrefix;
+		internal string? commandPrefix;
 		internal CommandBase? command;
 
 		/// <summary>

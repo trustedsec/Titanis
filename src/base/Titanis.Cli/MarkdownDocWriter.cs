@@ -113,8 +113,8 @@ namespace Titanis.Cli
 			if (!this.InCodeBlock)
 			{
 				text = text
-					.Replace("<", "&lt;")
-					.Replace(">", "&gt;")
+					?.Replace("<", "&lt;")
+					?.Replace(">", "&gt;")
 					;
 				sb.Append(text);
 			}
@@ -151,7 +151,7 @@ namespace Titanis.Cli
 
 		protected override string RenderLinkTo(string linkText, string? target)
 		{
-			return $"[{linkText}]({target.ToLower().Replace(" ", "-")})";
+			return $"[{linkText}]({target?.ToLower()?.Replace(" ", "-")})";
 		}
 	}
 }

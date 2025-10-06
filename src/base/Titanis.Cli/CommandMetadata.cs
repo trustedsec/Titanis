@@ -130,8 +130,6 @@ namespace Titanis.Cli
 			return parm;
 		}
 
-		internal string longHelp;
-
 		public string? Description { get; }
 		public Type ImplementingType { get; }
 		public IReadOnlyList<ParameterGroupInfo> ParameterGroups { get; }

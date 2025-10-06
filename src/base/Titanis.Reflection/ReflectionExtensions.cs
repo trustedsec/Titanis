@@ -40,7 +40,7 @@ namespace Titanis.Reflection
 			if (ctor == null)
 				throw new ArgumentException(Messages.Reflection_NoDefaultConstructor, nameof(type));
 
-			var obj = ctor.Invoke(new object[] { arg1 });
+			var obj = ctor.Invoke([arg1]);
 			return obj;
 		}
 

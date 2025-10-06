@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
@@ -103,7 +104,7 @@ namespace Titanis
 
 	public class LogMessage
 	{
-		public LogMessage(LogMessageSeverity severity, string? source, string text)
+		public LogMessage(LogMessageSeverity severity, string? source, string? text)
 		{
 			if (text is null) throw new ArgumentNullException(nameof(text));
 			this.LogDate = DateTime.UtcNow;
@@ -126,28 +127,30 @@ namespace Titanis
 			this._messageFormat = messageType.MessageFormat;
 		}
 
-		public LogMessageType MessageType { get; }
+		public LogMessageType? MessageType { get; }
 		public int MessageId { get; }
 		public DateTime LogDate { get; }
 		public LogMessageSeverity Severity { get; }
 		public string? Source { get; }
 		public object?[] Parameters { get; }
 
-		private string _messageFormat;
+		private string? _messageFormat;
 
 
 		private string? _text;
-		public string Text
+		public string? Text
 		{
 			get
 			{
-				this._text ??= this.BuildMessageText();
+				if (this._text is null && this._messageFormat is not null)
+					this._text = this.BuildMessageText();
 				return _text;
 			}
 		}
 
-		private string? BuildMessageText()
+		private string BuildMessageText()
 		{
+			Debug.Assert(this._messageFormat is not null);
 			return string.Format(this._messageFormat, this.Parameters);
 		}
 

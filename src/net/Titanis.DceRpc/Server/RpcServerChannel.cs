@@ -34,7 +34,7 @@ namespace Titanis.DceRpc.Server
 			return this._bindContexts.TryGetValue(contextId);
 		}
 
-		protected sealed override async Task HandleBind(
+		private protected sealed override async Task HandleBind(
 			PduHeader header,
 			Memory<byte> message,
 			BindPdu bind,

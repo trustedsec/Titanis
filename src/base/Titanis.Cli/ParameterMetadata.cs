@@ -153,15 +153,15 @@ namespace Titanis.Cli
 
 						this._valueListProvider = provider;
 					}
-					catch (Exception ex)
+					catch (Exception)
 					{
 						// UNDONE: Silently fail
 						//throw new MetadataException($"An error occurred while creating the value list provider for parameter '{property.Name}': {ex.Message}", property.Name, ex);
 					}
 				}
-				else if (property.IsDefined<EnumNameListAttribute>())
+				else if (property.GetCustomAttribute<EnumNameListAttribute>() is EnumNameListAttribute enumNameListAttr)
 				{
-					var enumNameAttrs = property.GetCustomAttribute<EnumNameListAttribute>(true).EnumTypes;
+					var enumNameAttrs = enumNameListAttr.EnumTypes;
 					this._valueListProvider = new EnumNameListProvider(enumNameAttrs);
 				}
 				else if (this.ElementType.IsEnum)

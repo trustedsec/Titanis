@@ -9,20 +9,21 @@ namespace Titanis.Cli
 	/// <summary>
 	/// Type converter for integer values.
 	/// </summary>
-	/// <typeparam name="T">Type of integer</typeparam>
+	/// <typeparam name="TResult">Type of integer</typeparam>
 	/// <remarks>
 	/// This implementation enhances the built in <see cref="Int32Converter"/> et al.
 	/// by parsing strings prefixed with <c>0x</c> for hex or <c>0b</c> for binary.
 	/// </remarks>
-	internal sealed class IntegerConverter<T> : TypeConverter
+	internal sealed class IntegerConverter<TResult> : TypeConverter
+		where TResult : struct
 	{
 		private readonly TypeConverter _baseConv;
-		private readonly Func<string, NumberStyles, T> _parseFunc;
+		private readonly Func<string, NumberStyles, TResult> _parseFunc;
 		private readonly int _maxBits;
 
 		public IntegerConverter(
 			TypeConverter baseConverter,
-			Func<string, NumberStyles, T> parseFunc,
+			Func<string, NumberStyles, TResult> parseFunc,
 			int maxBits
 			)
 		{
@@ -65,7 +66,7 @@ namespace Titanis.Cli
 						}
 					}
 
-					return Convert.ChangeType(uval, Type.GetTypeCode(typeof(T)));
+					return Convert.ChangeType(uval, Type.GetTypeCode(typeof(TResult)));
 					// UNDONE: The type converter will not even attempt narrowing
 					//return this._baseConv.ConvertFrom(uval);
 				}

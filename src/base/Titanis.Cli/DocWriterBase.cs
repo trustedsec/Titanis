@@ -64,10 +64,13 @@ namespace Titanis.Cli
 
 
 
-		protected void WriteText(string text)
+		protected void WriteText(string? text)
 		{
-			this.MarkDirty(text.Length);
-			this.WriteTextImpl(text);
+			if (!string.IsNullOrEmpty(text))
+			{
+				this.MarkDirty(text!.Length);
+				this.WriteTextImpl(text);
+			}
 		}
 
 		protected abstract void WriteTextImpl(string text);
@@ -80,7 +83,7 @@ namespace Titanis.Cli
 
 			var maxWidth = this.MaxLineWidth;
 
-			text = ReplaceDocMacros(text);
+			text = ReplaceDocMacros(text)!;
 
 			DocHelper.DocContext context = new DocHelper.DocContext(text!);
 			DocHelper.TextRunInfo run;
@@ -135,13 +138,12 @@ namespace Titanis.Cli
 		#region Doc macros
 		private const string TokenSequence = "##doc[";
 
-		private StringBuilder? _tempSB;
 		protected string? ReplaceDocMacros(string? text)
 		{
-			if (string.IsNullOrEmpty(text) || !text.Contains(TokenSequence))
+			if (text is null || !text.Contains(TokenSequence))
 				return text;
 
-			var sb = (this._tempSB ?? new StringBuilder());
+			var sb = new StringBuilder();
 			this.ReplaceDocMacros(text, sb);
 			text = sb.ToString();
 			sb.Clear();
@@ -149,7 +151,7 @@ namespace Titanis.Cli
 		}
 		protected void ReplaceDocMacros(string? text, StringBuilder sb)
 		{
-			if (string.IsNullOrEmpty(text) || !text.Contains(TokenSequence))
+			if ((text is null) || !text!.Contains(TokenSequence))
 			{
 				RenderText(text, sb);
 				return;

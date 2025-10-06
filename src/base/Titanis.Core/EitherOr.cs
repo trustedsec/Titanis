@@ -114,6 +114,7 @@ namespace Titanis
 	/// </summary>
 	/// <typeparam name="T1">First type option</typeparam>
 	/// <typeparam name="T2">Second type option</typeparam>
+	/// <typeparam name="T3">Third type option</typeparam>
 	/// <remarks>
 	/// The actual value is not exposed directly.  Use
 	/// <see cref="Apply(Action{T1}, Action{T2}, Action{T3})"/> (or one of its overloads)

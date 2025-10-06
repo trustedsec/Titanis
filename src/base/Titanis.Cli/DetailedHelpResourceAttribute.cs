@@ -25,29 +25,26 @@ namespace Titanis.Cli
 			this.PropertyName = propertyName;
 		}
 
-		public sealed override string GetText(CommandMetadataContext context)
-		{
-			return GetText(ResourceClass, this.PropertyName);
-		}
 		private static string GetText(Type resourceClass, string propertyName)
 		{
 			PropertyInfo prop = resourceClass.GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+
+			string? desc;
 			try
 			{
-				string desc = prop?.GetValue(null, null) as string;
-				return desc ?? $"{resourceClass.FullName}.{propertyName}";
+				desc = prop?.GetValue(null, null) as string;
 			}
-			catch (InvalidOperationException ex)
+			catch (InvalidOperationException)
 			{
 				var resStream = resourceClass.Assembly.GetManifestResourceStream(resourceClass.FullName + ".resources");
 				if (resStream is null)
 					throw;
 
 				ResourceSet resSet = new ResourceSet(resStream);
-				var value = resSet.GetObject(propertyName);
-
-				return value as string;
+				desc = resSet.GetObject(propertyName)?.ToString();
 			}
+
+			return desc ?? $"{resourceClass.FullName}.{propertyName}";
 		}
 
 		public Type ResourceClass { get; }

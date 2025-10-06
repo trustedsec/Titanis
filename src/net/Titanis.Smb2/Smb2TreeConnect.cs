@@ -483,11 +483,7 @@ namespace Titanis.Smb2
 				fileId = new Smb2FileHandle { high = 0xFFFFFFFF_FFFFFFFF, low = 0xFFFFFFFF_FFFFFFFF }
 			}, FileAccess.Read);
 
-			DfsGetReferralInfoRequest req = new DfsGetReferralInfoRequest()
-			{
-				MaxReferralLevel = 4,
-				Path = path.PathForDfsReferral
-			};
+			DfsGetReferralInfoRequest req = new DfsGetReferralInfoRequest(4, path.PathForDfsReferral);
 			ByteWriter writer = new ByteWriter();
 			req.WriteTo(writer);
 

@@ -62,7 +62,7 @@ namespace Titanis.Net
 	/// Implements <see cref="IClientCredentialService"/> as a simple dictionary.
 	/// </summary>
 	/// <remarks>
-	/// Add credentials by calling <see cref="AddCredential"/>.
+	/// Add credentials by calling <see cref="AddCredential(ServicePrincipalName, Func{ServicePrincipalName, SecurityCapabilities, AuthClientContext})"/> or related methods.
 	/// </remarks>
 	public class ClientCredentialDictionary : IClientCredentialService
 	{

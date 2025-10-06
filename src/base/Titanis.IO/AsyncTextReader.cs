@@ -32,10 +32,6 @@ namespace Titanis.IO
 		public abstract ValueTask<int> ReadAsync(char[] buffer, int index, int count, CancellationToken cancellationToken);
 		public abstract ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken);
 
-		public ValueTask<int> PeekAsync()
-		{
-			return this.PeekAsync(CancellationToken.None);
-		}
 		public abstract ValueTask<int> PeekAsync(CancellationToken cancellationToken);
 	}
 }

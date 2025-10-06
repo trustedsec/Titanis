@@ -74,13 +74,15 @@ namespace Titanis.Cli
 	{
 		public TextPart(string? text)
 		{
-			this.Text = text;
+			this.Text = text ?? string.Empty;
 		}
 
-		public string? Text { get; }
+		public string Text { get; }
+		/// <inheritdoc/>
 		public sealed override string ToString()
 			=> this.Text;
 
+		/// <inheritdoc/>
 		internal sealed override void PrintTo(FormattedTextTarget target)
 		{
 			if (!string.IsNullOrEmpty(this.Text))

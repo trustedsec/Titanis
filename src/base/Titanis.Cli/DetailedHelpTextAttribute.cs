@@ -40,14 +40,14 @@ namespace Titanis.Cli
 
 		protected DetailedHelpTextAttribute() { }
 
-		private string _text;
+		private string? _text;
 
 		/// <summary>
 		/// Gets the detailed help text.
 		/// </summary>
 		/// <param name="context"></param>
 		/// <returns></returns>
-		public virtual string GetText(CommandMetadataContext context) => this._text;
+		public virtual string? GetText(CommandMetadataContext context) => this._text;
 
 		/// <summary>
 		/// Gets a <see cref="DocumentationPlacement"/> value specifying the placement of the documentation

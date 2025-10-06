@@ -5,10 +5,16 @@ using System.Text;
 
 namespace Titanis.DceRpc.WireProtocol
 {
-	public partial class AuthVerifier
+	internal partial class AuthVerifier
 	{
-		internal AuthVerifierHeader hdr;
-		internal byte[] token;
+		internal readonly AuthVerifierHeader hdr;
+		internal readonly byte[] token;
+
+		public AuthVerifier(in AuthVerifierHeader hdr, byte[] token)
+		{
+			this.hdr = hdr;
+			this.token = token;
+		}
 	}
 
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]

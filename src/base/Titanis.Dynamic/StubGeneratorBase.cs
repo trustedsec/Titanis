@@ -255,7 +255,7 @@ namespace Titanis.Dynamic
 			ilgen.Call(baseCtor).Ret();
 		}
 
-		public static MethodDeclInfo GetMethodDeclInfo(ParameterInfo[] parms)
+		internal static MethodDeclInfo GetMethodDeclInfo(ParameterInfo[] parms)
 		{
 			Type[] paramTypes = new Type[parms.Length];
 			Type[][] reqmods = new Type[paramTypes.Length][];
@@ -268,12 +268,11 @@ namespace Titanis.Dynamic
 				reqmods[i] = Type.EmptyTypes;
 				optmods[i] = Type.EmptyTypes;
 			}
-			MethodDeclInfo declInfo = new MethodDeclInfo
-			{
-				paramTypes = paramTypes,
-				reqmods = reqmods,
-				optmods = optmods
-			};
+			MethodDeclInfo declInfo = new MethodDeclInfo(
+				paramTypes,
+				reqmods,
+				optmods
+			);
 			return declInfo;
 		}
 	}
