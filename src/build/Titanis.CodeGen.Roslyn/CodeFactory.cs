@@ -28,11 +28,11 @@ namespace Titanis.CodeGen
 		#region Syntax lists
 		public static SyntaxList<T> List<T>(params T[]? elements)
 			where T : SyntaxNode
-			=> SyntaxList.Create<T>(elements);
+			=> SyntaxFactory.List(elements ?? Array.Empty<T>());
 
 		public static SeparatedSyntaxList<T> SeparatedList<T>(params T[]? elements)
 			where T : SyntaxNode
-			=> SeparatedSyntaxList.Create<T>(elements);
+			=> SyntaxFactory.SeparatedList(elements);
 
 		public static AttributeArgumentSyntax AsAttributeArg(this ExpressionSyntax expression)
 			=> SyntaxFactory.AttributeArgument(expression);
@@ -260,6 +260,7 @@ namespace Titanis.CodeGen
 				TypeKind.Interface => SyntaxKind.InterfaceDeclaration,
 				TypeKind.Delegate => SyntaxKind.DelegateDeclaration,
 				TypeKind.Enum => SyntaxKind.EnumDeclaration,
+				_ => throw new ArgumentException($"Unsupported typeKind {typeKind}")
 			};
 
 		public static TypeDeclarationSyntax DeclareType(
@@ -283,6 +284,7 @@ namespace Titanis.CodeGen
 					SyntaxKind.StructDeclaration => SyntaxKind.StructKeyword,
 					SyntaxKind.ClassDeclaration => SyntaxKind.ClassKeyword,
 					SyntaxKind.InterfaceDeclaration => SyntaxKind.InterfaceKeyword,
+					_ => throw new ArgumentException($"Unsupported SyntaxKind {kind}")
 				}),
 				SyntaxFactory.Identifier(name),
 				typeParams,
@@ -340,6 +342,7 @@ namespace Titanis.CodeGen
 					SpecialType.System_Single => SyntaxKind.FloatKeyword,
 					SpecialType.System_Double => SyntaxKind.DoubleKeyword,
 					SpecialType.System_Decimal => SyntaxKind.DecimalKeyword,
+					_ => throw new ArgumentException($"Unsupported SpecialType {type.SpecialType}")
 				})),
 				_ => SyntaxFactory.ParseTypeName(type.FullName())
 			};
@@ -409,6 +412,7 @@ namespace Titanis.CodeGen
 					TypeCode.UInt16 => SyntaxKind.UShortKeyword,
 					TypeCode.UInt32 => SyntaxKind.UIntKeyword,
 					TypeCode.UInt64 => SyntaxKind.ULongKeyword,
+					_ => throw new ArgumentException($"Unsupported TypeCode {tc}")
 				})),
 				_ => type switch
 				{
@@ -436,7 +440,8 @@ namespace Titanis.CodeGen
 				uint n => SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(n)),
 				string n => SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(n)),
 				bool n => BooleanLiteral(n),
-				Enum n => TypeRef(value.GetType()).FieldOf(Enum.GetName(value.GetType(), value))
+				Enum n => TypeRef(value.GetType()).FieldOf(Enum.GetName(value.GetType(), value)),
+				_ => throw new ArgumentException($"Unsupported primitive value type {value.GetType().FullName}")
 			};
 			return expr;
 		}

@@ -7,7 +7,6 @@
 		<!-- Build settings -->
 		<TitanisSigningKeyFile Condition="'$(TitanisSigningKeyFile)'=='' and Exists('$(SolutionDir)\Titanis.snk')">$(SolutionDir)\Titanis.snk</TitanisSigningKeyFile>
 		<Nullable>enable</Nullable>
-		<LangVersion>13.0</LangVersion>
 
 		<ArtifactsPath>$(ArtifactsPath)/lib</ArtifactsPath>
 

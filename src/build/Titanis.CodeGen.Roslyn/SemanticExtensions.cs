@@ -19,18 +19,18 @@ namespace Titanis.CodeGen
 		public static bool IsDefined(this ISymbol symbol, Type attributeType)
 		{
 			var isDefined = symbol.GetAttributes()
-				.Any(r => r.AttributeClass.Matches(attributeType));
+				.Any(r => r.AttributeClass?.Matches(attributeType) ?? false);
 			return isDefined;
 		}
 
 		public static AttributeData? TryGetAttribute(this ISymbol symbol, Type attributeType)
 		{
 			var attr = symbol.GetAttributes()
-				.FirstOrDefault(r => r.AttributeClass.Matches(attributeType));
+				.FirstOrDefault(r => r.AttributeClass?.Matches(attributeType) ?? false);
 			return attr;
 		}
 
-		public static bool TryGetArgument<TValue>(this AttributeData? attribute, string argName, out TValue value)
+		public static bool TryGetArgument<TValue>(this AttributeData? attribute, string argName, out TValue? value)
 		{
 			if (attribute != null)
 			{
@@ -57,7 +57,7 @@ namespace Titanis.CodeGen
 			ISymbol member,
 			SourceProductionContext context)
 		{
-			if (attribute.TryGetArgument(argName, out string memberName))
+			if (attribute.TryGetArgument(argName, out string? memberName))
 			{
 				var argNode = attribute.NamedArgNode(argName, CancellationToken.None);
 				if (argNode != null)
@@ -67,8 +67,8 @@ namespace Titanis.CodeGen
 					{
 						context.ReportDiagnostic(Diagnostic.Create(
 							Diagnostics.MemberRefNotNameof_Type_Member_AttrType_AttributeArg_Member,
-							(argNode?.Expression ?? attribute.ApplicationSyntaxReference.GetSyntax(context.CancellationToken)).GetLocation(),
-							containingType.FullName(), member.Name, attribute.AttributeClass.Name, argName, memberName
+							(argNode?.Expression ?? attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken))?.GetLocation(),
+							containingType.FullName(), member.Name, attribute.AttributeClass?.Name, argName, memberName
 							));
 					}
 				}
@@ -78,8 +78,8 @@ namespace Titanis.CodeGen
 				{
 					context.ReportDiagnostic(Diagnostic.Create(
 						Diagnostics.UndefinedMemberRef_Type_Member_AttrType_AttributeArg_Member,
-						(argNode?.Expression ?? attribute.ApplicationSyntaxReference.GetSyntax(context.CancellationToken)).GetLocation(),
-						containingType.FullName(), member.Name, attribute.AttributeClass.Name, argName, memberName
+						(argNode?.Expression ?? attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken))?.GetLocation(),
+						containingType.FullName(), member.Name, attribute.AttributeClass?.Name, argName, memberName
 						));
 				}
 				return namedMember;
@@ -96,13 +96,15 @@ namespace Titanis.CodeGen
 				: null;
 		}
 
-		public static ISymbol? TryGetArgument(this AttributeData? attribute,
+		public static ISymbol? TryGetArgument(this AttributeData attribute,
 			int argIndex,
 			INamedTypeSymbol containingType,
 			ISymbol member,
 			SourceProductionContext context)
 		{
-			if (attribute.TryGetArgument(argIndex, out string memberName))
+			if (attribute is null) throw new ArgumentNullException(nameof(attribute));
+
+			if (attribute.TryGetArgument(argIndex, out string? memberName))
 			{
 				var argNode = attribute.NamedArgNode(argIndex, CancellationToken.None);
 				if (argNode != null)
@@ -112,8 +114,8 @@ namespace Titanis.CodeGen
 					{
 						context.ReportDiagnostic(Diagnostic.Create(
 							Diagnostics.MemberRefNotNameof_Type_Member_AttrType_AttributeArg_Member,
-							(argNode?.Expression ?? attribute.ApplicationSyntaxReference.GetSyntax(context.CancellationToken)).GetLocation(),
-							containingType.FullName(), member.Name, attribute.AttributeClass.Name, "#" + argIndex, memberName
+							(argNode?.Expression ?? attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken))?.GetLocation(),
+							containingType.FullName(), member.Name, attribute.AttributeClass?.Name, "#" + argIndex, memberName
 							));
 					}
 				}
@@ -123,8 +125,8 @@ namespace Titanis.CodeGen
 				{
 					context.ReportDiagnostic(Diagnostic.Create(
 						Diagnostics.UndefinedMemberRef_Type_Member_AttrType_AttributeArg_Member,
-						(argNode?.Expression ?? attribute.ApplicationSyntaxReference.GetSyntax(context.CancellationToken)).GetLocation(),
-						containingType.FullName(), member.Name, attribute.AttributeClass.Name, "#" + argIndex, memberName
+						(argNode?.Expression ?? attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken))?.GetLocation(),
+						containingType.FullName(), member.Name, attribute.AttributeClass?.Name, "#" + argIndex, memberName
 						));
 				}
 				return namedMember;
@@ -133,10 +135,13 @@ namespace Titanis.CodeGen
 			return null;
 		}
 
-		public static SyntaxNode ArgSyntaxOrAttribute(this AttributeSyntax attribute, int argIndex) => argIndex < attribute.ArgumentList.Arguments.Count ? attribute.ArgumentList.Arguments[argIndex] : attribute;
-		public static SyntaxNode ArgSyntaxOrAttribute(this AttributeData attribute, int argIndex) => ((AttributeSyntax)attribute.ApplicationSyntaxReference.GetSyntax()).ArgSyntaxOrAttribute(argIndex);
+		/// <summary>
+		/// Returns the <see cref="SyntaxNode"/> of an attribute argument, or the attribute itself if the argument isn't found.
+		/// </summary>
+		public static SyntaxNode ArgSyntaxOrAttribute(this AttributeSyntax attribute, int argIndex) => (attribute.ArgumentList != null && argIndex < attribute.ArgumentList.Arguments.Count) ? attribute.ArgumentList.Arguments[argIndex] : attribute;
+		public static SyntaxNode ArgSyntaxOrAttribute(this AttributeData attribute, int argIndex) => ((AttributeSyntax)attribute.ApplicationSyntaxReference!.GetSyntax()).ArgSyntaxOrAttribute(argIndex);
 
-		public static bool TryGetArgument<TValue>(this AttributeData? attribute, int argIndex, out TValue value)
+		public static bool TryGetArgument<TValue>(this AttributeData? attribute, int argIndex, out TValue? value)
 		{
 			if (attribute != null)
 			{
@@ -179,7 +184,7 @@ namespace Titanis.CodeGen
 		}
 
 		public static bool HasModifier(this MemberDeclarationSyntax? memberDecl, SyntaxKind kind)
-			=> memberDecl.Modifiers.Any(r => r.IsKind(kind));
+			=> memberDecl?.Modifiers.Any(r => r.IsKind(kind)) ?? false;
 
 		public static bool IsPartial(this MemberDeclarationSyntax? memberDecl)
 			=> memberDecl.HasModifier(SyntaxKind.PartialKeyword);
@@ -237,7 +242,9 @@ namespace Titanis.CodeGen
 		/// <returns>A <see cref="AttributeArgumentListSyntax"/> representing the named argument, if specified; otherwise, <see langword="null"/></returns>
 		public static AttributeArgumentSyntax? NamedArgNode(this AttributeData attribute, string argName, CancellationToken cancellationToken)
 		{
-			var app = attribute.ApplicationSyntaxReference.GetSyntax(cancellationToken) as AttributeSyntax;
+			if (attribute is null) throw new ArgumentNullException(nameof(attribute));
+
+			var app = attribute.ApplicationSyntaxReference?.GetSyntax(cancellationToken) as AttributeSyntax;
 			if (app?.ArgumentList != null)
 			{
 				foreach (var arg in app.ArgumentList.Arguments)
@@ -260,7 +267,9 @@ namespace Titanis.CodeGen
 		/// <returns>A <see cref="AttributeArgumentListSyntax"/> representing the named argument, if specified; otherwise, <see langword="null"/></returns>
 		public static AttributeArgumentSyntax? NamedArgNode(this AttributeData attribute, int argIndex, CancellationToken cancellationToken)
 		{
-			var app = attribute.ApplicationSyntaxReference.GetSyntax(cancellationToken) as AttributeSyntax;
+			if (attribute is null) throw new ArgumentNullException(nameof(attribute));
+
+			var app = attribute.ApplicationSyntaxReference?.GetSyntax(cancellationToken) as AttributeSyntax;
 			if (app?.ArgumentList != null)
 			{
 				// TODO: This may retrieve named arguments

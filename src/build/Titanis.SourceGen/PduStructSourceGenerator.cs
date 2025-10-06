@@ -94,7 +94,7 @@ namespace Titanis.SourceGen
 			{
 				return PduStructFilterPredicate(node, token);
 			}
-			catch (OperationCanceledException ex)
+			catch (OperationCanceledException)
 			{
 				throw;
 			}
@@ -151,11 +151,20 @@ namespace Titanis.SourceGen
 		}
 		class PduTypeInfo
 		{
-			internal INamedTypeSymbol typeSymbol;
-			internal ImmutableArray<ISymbol> members;
-			internal TypeDeclarationSyntax decl;
-			internal SemanticModel model;
-			internal PduParamInfo[] parameters;
+			internal readonly INamedTypeSymbol typeSymbol;
+			internal readonly ImmutableArray<ISymbol> members;
+			internal readonly TypeDeclarationSyntax decl;
+			internal readonly SemanticModel model;
+
+			internal PduParamInfo[]? parameters;
+
+			public PduTypeInfo(INamedTypeSymbol typeSymbol, ImmutableArray<ISymbol> members, TypeDeclarationSyntax decl, SemanticModel model)
+			{
+				this.typeSymbol = typeSymbol;
+				this.members = members;
+				this.decl = decl;
+				this.model = model;
+			}
 		}
 
 		private PduTypeInfo? GetPduStructOrNullWrapper(GeneratorSyntaxContext context, CancellationToken token)
@@ -164,7 +173,7 @@ namespace Titanis.SourceGen
 			{
 				return this.GetPduStructOrNull(context, token);
 			}
-			catch (OperationCanceledException ex)
+			catch (OperationCanceledException)
 			{
 				throw;
 			}
@@ -190,13 +199,12 @@ namespace Titanis.SourceGen
 
 			if (HasPduStructAttribute(type))
 			{
-				return new PduTypeInfo
-				{
-					typeSymbol = type,
-					members = type.GetMembers(),
-					decl = typeDecl,
-					model = context.SemanticModel
-				};
+				return new PduTypeInfo(
+					type,
+					type.GetMembers(),
+					typeDecl,
+					context.SemanticModel
+				);
 			}
 
 			return null;
@@ -213,7 +221,7 @@ namespace Titanis.SourceGen
 			{
 				GeneratePduStructCode(context, pduTypes);
 			}
-			catch (OperationCanceledException ex)
+			catch (OperationCanceledException)
 			{
 				throw;
 			}
@@ -562,9 +570,9 @@ namespace Titanis.SourceGen
 
 			var comp = SyntaxFactory.CompilationUnit(
 				default,
-				SyntaxList.Create<UsingDirectiveSyntax>(new UsingDirectiveSyntax[] { Code.Using(Titanis_IO) }),
+				SyntaxFactory.List<UsingDirectiveSyntax>(new UsingDirectiveSyntax[] { Code.Using(Titanis_IO) }),
 				default,
-				SyntaxList.Create<MemberDeclarationSyntax>(new MemberDeclarationSyntax[] { topNode })
+				SyntaxFactory.List<MemberDeclarationSyntax>(new MemberDeclarationSyntax[] { topNode })
 				);
 
 			comp = comp.NormalizeWhitespace();
@@ -1081,7 +1089,7 @@ namespace Titanis.SourceGen
 							: byteOrderArg;
 
 						var attrArgs = member.TryGetAttribute(typeof(PduArgumentsAttribute));
-						ISymbol[] args;
+						ISymbol?[] args;
 						if (attrArgs != null && attrArgs.ConstructorArguments.Length == 1)
 						{
 							var argNames = attrArgs.ConstructorArguments[0].Values;

@@ -174,12 +174,12 @@ namespace Titanis.Security
 		public readonly Span<byte> Trailer { get; }
 	}
 
-	public interface ISecBufferList
-	{
-		SecBuffer GetBuffer(int index);
-	}
+	//public interface ISecBufferList
+	//{
+	//	SecBuffer GetBuffer(int index);
+	//}
 
-	public readonly ref struct SecBufferList : ISecBufferList
+	public readonly ref struct SecBufferList /* : ISecBufferList */
 	{
 		public static SecBufferList Create(SecBuffer buf1) => new SecBufferList(1, buf1, default, default);
 		public static SecBufferList Create(SecBuffer buf1, SecBuffer buf2) => new SecBufferList(2, buf1, buf2, default);

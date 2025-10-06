@@ -91,14 +91,15 @@ FileInfoClass.NetworkOpenInfo), DefaultMaxResponseSize)
 				var reader = new ByteMemoryReader(resp.outputBuffer);
 				var dirInfo = reader.ReadFileNetOpenInfo();
 
-				ref var fileInfo = ref this._info.attrs;
-				fileInfo.creationTime = dirInfo.creationTime;
-				fileInfo.lastAccessTime = dirInfo.lastAccessTime;
-				fileInfo.lastWriteTime = dirInfo.lastWriteTime;
-				fileInfo.changeTime = dirInfo.changeTime;
-				fileInfo.allocationSize = (long)dirInfo.allocationSize;
-				fileInfo.endOfFile = (long)dirInfo.endOfFile;
-				fileInfo.fileAttributes = dirInfo.fileAttributes;
+				this._info.attrs = new Smb2OpenFileAttributes {
+					creationTime = dirInfo.creationTime,
+					lastAccessTime = dirInfo.lastAccessTime,
+					lastWriteTime = dirInfo.lastWriteTime,
+					changeTime = dirInfo.changeTime,
+					allocationSize = (long)dirInfo.allocationSize,
+					endOfFile = (long)dirInfo.endOfFile,
+					fileAttributes = dirInfo.fileAttributes
+				};
 			}
 		}
 

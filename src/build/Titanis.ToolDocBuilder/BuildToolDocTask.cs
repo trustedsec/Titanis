@@ -1,52 +1,102 @@
 ﻿using Microsoft.Build.Framework;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Titanis.Cli;
 
 namespace Titanis.ToolDocBuilder
 {
 	public class BuildToolDocTask : ITask
 	{
-		public IBuildEngine BuildEngine { get; set; }
-		public ITaskHost HostObject { get; set; }
+		public IBuildEngine? BuildEngine { get; set; }
+		public ITaskHost? HostObject { get; set; }
 
 		[Required]
-		public string AssemblyFile { get; set; }
+		public string? AssemblyFile { get; set; }
 
 		[Required]
-		public string DocFile { get; set; }
+		public string? DocFile { get; set; }
 
 		public bool Execute()
 		{
+			if (this.BuildEngine is null)
+				throw new InvalidOperationException($"This {nameof(BuildToolDocTask)} has not been initialized with a {nameof(BuildEngine)} and cannot execute.");
+			if (this.AssemblyFile is null || this.DocFile is null)
+				throw new InvalidOperationException($"This {nameof(BuildToolDocTask)} has not been initialized with required parameters {nameof(AssemblyFile)} and {nameof(DocFile)}.");
+
+			Debug.Assert(this.AssemblyFile is not null);
+			Debug.Assert(this.DocFile is not null);
+
 			try
 			{
-				return this.ExecuteImpl();
+				return GenerateDoc(this.BuildEngine, this.AssemblyFile!, this.DocFile!);
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex);
-				int x = 42;
 				throw;
 			}
-			return false;
 		}
-		public bool ExecuteImpl()
-		{
-			string[] searchDirs = new string[]
-			{
-				Path.GetDirectoryName(this.AssemblyFile),
-				@"C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.20",
-				@"C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.19",
-				//@"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\netstandard\v4.0_2.0.0.0__cc7b13ffcd2ddd51"
-			};
 
-			var asmResolver = new DirAssemblyResolver(searchDirs);
+		public static bool GenerateDoc(IBuildEngine buildEngine, string assemblyFile, string docFile)
+		{
+			List<string> searchDirs = new List<string>();
+			searchDirs.Add(Path.GetDirectoryName(assemblyFile));
+
+			string? netInstallBase;
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				netInstallBase = @"C:\Program Files\dotnet";
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				netInstallBase = File.ReadAllLines(@"/etc/dotnet/install_location").FirstOrDefault();
+			}
+			else
+				netInstallBase = null;
+
+			if (!string.IsNullOrEmpty(netInstallBase))
+			{
+				netInstallBase = Path.Combine(netInstallBase, @"shared/Microsoft.NETCore.App");
+				buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Search dotnet install base: {netInstallBase}", null, "Titanis.ToolDocBuilder", MessageImportance.Low));
+				try
+				{
+					var runtimes = Directory.GetDirectories(netInstallBase, "8.*");
+					if (runtimes.Length == 0)
+					{
+						buildEngine.LogErrorEvent(new BuildErrorEventArgs("doc", "sdk", null, 0, 0, 0, 0, $"No .NET 8 files found.  Install the .NET 8 SDK", null, "Titanis.ToolDocBuilder"));
+					}
+
+					Array.Sort(runtimes, (x, y) =>
+					{
+						if (Version.TryParse(Path.GetFileName(x), out var xver) && Version.TryParse(Path.GetFileName(y), out var yver))
+						{
+							return -xver.CompareTo(yver);
+						}
+						else
+							return 0;
+					});
+					foreach (var item in runtimes)
+					{
+						buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Found runtime: {item}", null, "Titanis.ToolDocBuilder", MessageImportance.Low));
+						Console.WriteLine($"Found runtime: {item}");
+					}
+					searchDirs.AddRange(runtimes);
+				}
+				catch (Exception)
+				{
+					throw;
+				}
+			}
+
+			var asmResolver = new DirAssemblyResolver(searchDirs.ToArray());
 			var loadContext = new MetadataLoadContext(asmResolver, "System.Private.CoreLib");
 
 			var mdResolver = new ContextResolver(loadContext);
-			mdResolver.RuntimeSearchDirectories.Add(Path.GetDirectoryName(this.AssemblyFile));
+			mdResolver.RuntimeSearchDirectories.Add(Path.GetDirectoryName(assemblyFile));
 			var asmNetStandard = loadContext.LoadFromAssemblyName("netstandard");
 			//var asmNetStandard = Assembly.LoadFrom(@"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\netstandard\v4.0_2.0.0.0__cc7b13ffcd2ddd51\netstandard.dll");
 			CommandMetadataContext mdContext = new CommandMetadataContext(mdResolver);
@@ -56,13 +106,13 @@ namespace Titanis.ToolDocBuilder
 			var commandType = cliAssembly.GetType("Titanis.Cli.Command");
 			var multiCommandType = cliAssembly.GetType("Titanis.Cli.MultiCommand");
 
-			var asm = loadContext.LoadFromAssemblyPath(this.AssemblyFile);
+			var asm = loadContext.LoadFromAssemblyPath(assemblyFile);
 			var programType = asm.EntryPoint.DeclaringType;
 
 			bool isCommand = (commandBaseType.IsAssignableFrom(programType));
 			if (isCommand)
 			{
-				using var fileWriter = File.CreateText(this.DocFile);
+				using var fileWriter = File.CreateText(docFile);
 				var docWriter = new MarkdownDocWriter(fileWriter, 80);
 
 
@@ -80,11 +130,11 @@ namespace Titanis.ToolDocBuilder
 					{
 						var md = Command.GetCommandMetadata(commandInfo.CommandType, mdContext);
 						if (string.IsNullOrEmpty(md.Description))
-							this.BuildEngine.LogErrorEvent(MakeMissingDescError(commandName));
+							buildEngine.LogErrorEvent(MakeMissingDescError(commandName));
 						foreach (var param in md.Parameters)
 						{
 							if (string.IsNullOrEmpty(param.Description))
-								this.BuildEngine.LogErrorEvent(MakeMissingDescError(commandName, param.Name));
+								buildEngine.LogErrorEvent(MakeMissingDescError(commandName, param.Name));
 						}
 
 						Command.BuildCommandHelpText(type, docWriter, commandName, null, mdContext);
@@ -93,7 +143,7 @@ namespace Titanis.ToolDocBuilder
 					{
 						var desc = mdResolver.GetCustomAttribute<DescriptionAttribute>(type, true)?.Description;
 						if (string.IsNullOrEmpty(desc))
-							this.BuildEngine.LogErrorEvent(MakeMissingDescError(commandName));
+							buildEngine.LogErrorEvent(MakeMissingDescError(commandName));
 
 						MultiCommand.BuildCommandHelpText(type.GetTypeInfo(), docWriter, commandName, mdContext);
 
@@ -195,7 +245,7 @@ namespace Titanis.ToolDocBuilder
 				{
 					asm = context.LoadFromAssemblyName(sourceType.Assembly.GetName());
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					asm = context.LoadFromAssemblyName("netstandard");
 				}

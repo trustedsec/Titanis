@@ -5,7 +5,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <LangVersion>10.0</LangVersion>
 	  <RootNamespace>Titanis.Smb2.Cli</RootNamespace>
   </PropertyGroup>
 

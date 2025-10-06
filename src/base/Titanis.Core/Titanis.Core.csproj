@@ -5,7 +5,6 @@
 		<RootNamespace>Titanis</RootNamespace>
 		<Title>Titanis Core</Title>
 		<Description>Implements lightweight convenience functions for use in other libraries.</Description>
-		<LangVersion>13.0</LangVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

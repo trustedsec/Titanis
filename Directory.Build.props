@@ -6,6 +6,8 @@
 		<ArtifactsPath Condition="'$(ArtifactsPath)'==''">$(SolutionDir)artifacts\</ArtifactsPath>
 		<ArtifactsBasePath>$(ArtifactsPath)</ArtifactsBasePath>
 
+		<LangVersion>12.0</LangVersion>
+
 		<!-- Versioning and Packaging -->
 		<Build_InfoVersion Condition="'$(Build_InfoVersion)'==''">dev</Build_InfoVersion>
 		<Build_Version Condition="'$(Build_Version)'==''">0.9</Build_Version>

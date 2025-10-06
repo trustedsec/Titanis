@@ -8,7 +8,8 @@ namespace Titanis.IO
 	/// <summary>
 	/// Implements <see cref="IByteBufferReadOnly"/> as a ref struct wrapping a <see cref="ReadOnlySpan{T}"/> of <see cref="byte"/>.
 	/// </summary>
-	public ref struct ByteSpanReaderContext : IByteBufferReadOnly
+	// TODO: Reimplement interface with move to C# 13
+	public ref struct ByteSpanReaderContext /* : IByteBufferReadOnly */
 	{
 		private readonly ReadOnlySpan<byte> _bytes;
 		private int _position;
@@ -21,19 +22,19 @@ namespace Titanis.IO
 		/// <inheritdoc/>
 		public readonly bool CanSeek => true;
 
-		/// <inheritdoc/>
-		readonly long IByteSource.Length => this._bytes.Length;
+		///// <inheritdoc/>
+		//readonly long IByteSource.Length => this._bytes.Length;
 		/// <summary>
 		/// Gets the length of the byte source.
 		/// </summary>
 		public readonly int Length => this._bytes.Length;
 
-		/// <inheritdoc/>
-		long IByteSource.Position
-		{
-			readonly get => _position;
-			set => _position = CheckPosition(value);
-		}
+		///// <inheritdoc/>
+		//long IByteSource.Position
+		//{
+		//	readonly get => _position;
+		//	set => _position = CheckPosition(value);
+		//}
 		/// <summary>
 		/// Gets or sets the position of the next operation.
 		/// </summary>

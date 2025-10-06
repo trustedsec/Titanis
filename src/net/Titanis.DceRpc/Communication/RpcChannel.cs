@@ -441,8 +441,7 @@ namespace Titanis.DceRpc.Communication
 				// Copy header
 				buf.Span.Slice(0, cbHeader).CopyTo(fragbuf);
 
-				ref PduHeader fraghdr = ref MemoryMarshal.AsRef<PduHeader>(fragbuf);
-				fraghdr = new PduHeader
+				MemoryMarshal.AsRef<PduHeader>(fragbuf) = new PduHeader
 				{
 					rpcVersMajor = (byte)version.Major,
 					rpcVersMinor = (byte)version.Minor,
@@ -456,25 +455,25 @@ namespace Titanis.DceRpc.Communication
 				{
 					var cbChunk = cbStubData - iFrag;
 
-					fraghdr.pfc_flags = pduFlags;
+					PfcFlags fragFlags = pduFlags;
 					if ((iFrag == 0))
-						fraghdr.pfc_flags |= PfcFlags.FirstFrag;
+						fragFlags |= PfcFlags.FirstFrag;
 
 					bool isLast = cbChunk <= cbMaxFragBody;
 					if (isLast)
-						fraghdr.pfc_flags |= PfcFlags.LastFrag;
+						fragFlags |= PfcFlags.LastFrag;
 					else
 						cbChunk = cbMaxFragBody;
 
 					// Copy chunk from the PDU
 					buf.Span.Slice(cbHeader + iFrag, cbChunk).CopyTo(fragbuf.AsSpan().Slice(cbHeader, cbChunk));
 
-					fraghdr.fragLength = (ushort)(cbChunk + cbHeader);
+					var fragLength = (ushort)(cbChunk + cbHeader);
+
 					if (authLength > 0)
 					{
-						fraghdr.fragLength += (ushort)(authLength + AuthVerifierHeader.PduStructSize);
-						ref AuthVerifierHeader authver = ref MemoryMarshal.AsRef<AuthVerifierHeader>(fragbuf.AsSpan().Slice(cbHeader + cbChunk, AuthVerifierHeader.PduStructSize));
-						authver = new AuthVerifierHeader
+						fragLength += (ushort)(authLength + AuthVerifierHeader.PduStructSize);
+						MemoryMarshal.AsRef<AuthVerifierHeader>(fragbuf.AsSpan().Slice(cbHeader + cbChunk, AuthVerifierHeader.PduStructSize)) = new AuthVerifierHeader
 						{
 							auth_type = (RpcAuthType)authContext.AuthContext.RpcAuthType,
 							auth_level = authContext.AuthLevel,
@@ -484,10 +483,12 @@ namespace Titanis.DceRpc.Communication
 						};
 					}
 
+					SetFragFlagsAndLength(fragbuf, fragFlags, fragLength);
+
 					if (authContext != null && pduType is PduType.Request or PduType.Response)
 					{
 						ApplyMessageSecurity(
-							fragbuf.Slice(0, fraghdr.fragLength),
+							fragbuf.Slice(0, fragLength),
 							pduFlags,
 							authLength,
 							authContext);
@@ -497,7 +498,7 @@ namespace Titanis.DceRpc.Communication
 					if (isLast && pduType is PduType.Request or PduType.Bind or PduType.AlterContext)
 						sendOptions |= RpcChannelSendOptions.ExpectsResponse;
 					await this.SendPduAsync(
-						fragbuf.AsMemory().Slice(0, fraghdr.fragLength),
+						fragbuf.AsMemory().Slice(0, fragLength),
 						sendOptions,
 						cancellationToken).ConfigureAwait(false);
 
@@ -527,10 +528,9 @@ namespace Titanis.DceRpc.Communication
 				}
 
 				cbPdu = writer.Length;
-				var buf = writer.GetData().Span;
+				var buf = writer.GetData();
 
-				ref PduHeader pduhdr = ref MemoryMarshal.AsRef<PduHeader>(buf);
-				pduhdr = new PduHeader
+				MemoryMarshal.AsRef<PduHeader>(buf.Span) = new PduHeader
 				{
 					rpcVersMajor = (byte)version.Major,
 					rpcVersMinor = (byte)version.Minor,
@@ -545,7 +545,7 @@ namespace Titanis.DceRpc.Communication
 				if (authContext != null && pduType is PduType.Request or PduType.Response)
 				{
 					ApplyMessageSecurity(
-						buf,
+						buf.Span,
 						pduFlags,
 						authLength,
 						authContext);
@@ -556,6 +556,14 @@ namespace Titanis.DceRpc.Communication
 					sendOptions |= RpcChannelSendOptions.ExpectsResponse;
 				await this.SendPduAsync(writer.GetData(), sendOptions, cancellationToken).ConfigureAwait(false);
 			}
+		}
+
+		private static PduHeader SetFragFlagsAndLength(byte[] fragbuf, PfcFlags fragFlags, ushort fragLength)
+		{
+			ref PduHeader fraghdr = ref MemoryMarshal.AsRef<PduHeader>(fragbuf);
+			fraghdr.pfc_flags = fragFlags;
+			fraghdr.fragLength = fragLength;
+			return fraghdr;
 		}
 
 		protected async Task SendPduAsync(
