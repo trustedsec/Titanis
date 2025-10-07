@@ -272,7 +272,7 @@ namespace Titanis.Smb2
 		private bool _firstPdu = true;
 		internal Task<Smb2Pdu> SendSyncPduAsync(Pdus.Smb2Pdu req, bool encrypt, CancellationToken cancellationToken)
 		{
-			if (this._firstPdu)
+			if (this._firstPdu || req.Command == Smb2Command.TreeConnect)
 			{
 				if (!encrypt)
 					req.pduhdr.flags |= Smb2PduFlags.Signed;
