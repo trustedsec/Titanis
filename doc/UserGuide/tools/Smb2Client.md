@@ -5,6 +5,7 @@
 ```
 Smb2Client <subcommand>
 ```
+
 ### Subcommands
 
 |Command|Description|
@@ -86,6 +87,7 @@ Smb2Client enumnics [options] <UncPath>
 ||||  LinkSpeed|
 ||||  AddressFamily|
 ||||  EndPoint|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -130,9 +132,8 @@ Smb2Client enumnics [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -192,6 +193,8 @@ Smb2Client enumopenfiles [options] <ServerName>
 |    -BasePath||&lt;String&gt;|Select files starting with this path|
 |    -BufferSize||&lt;Int32&gt;|Max size for response buffer|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -202,6 +205,7 @@ Smb2Client enumopenfiles [options] <ServerName>
 ||||  LockCount|
 ||||  Path|
 ||||  UserName|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -246,9 +250,8 @@ Smb2Client enumopenfiles [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -332,6 +335,8 @@ Smb2Client enumsessions [options] <ServerName>
 |    -ClientUserName||&lt;String&gt;|Select sessions connected to by this computer|
 |-B, -BufferSize||&lt;Int32&gt;|Max size for response buffer|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -345,6 +350,7 @@ Smb2Client enumsessions [options] <ServerName>
 ||||  UserFlags|
 ||||  ClientType|
 ||||  Transport|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -389,9 +395,8 @@ Smb2Client enumsessions [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -467,6 +472,8 @@ Smb2Client enumshares [options] <ServerName>
 ||||  Level503|
 |-B, -BufferSize||&lt;Int32&gt;|Max size for response buffer|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -482,6 +489,7 @@ Smb2Client enumshares [options] <ServerName>
 ||||  Path|
 ||||  SecurityDescriptorSddl|
 ||||  Flags|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -526,9 +534,8 @@ Smb2Client enumshares [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -619,6 +626,7 @@ Smb2Client enumsnapshots [options] <UncPath>
 ||||**Possible values:**|
 ||||  Token|
 ||||  Timestamp|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -663,9 +671,8 @@ Smb2Client enumsnapshots [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -752,6 +759,7 @@ Smb2Client enumstreams [options] <UncPath>
 ||||  Name|
 ||||  Size|
 ||||  AllocationSize|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -796,9 +804,8 @@ Smb2Client enumstreams [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -861,6 +868,7 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continues copying after an error occurs|
 |    -TimeWarpToken||&lt;TimeWarpToken&gt;|Snapshot version, either as a date/time or a @GMT token|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -934,9 +942,8 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1002,12 +1009,14 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 Smb2Client get \\SERVER\Share\File.txt -u DOMAIN\User -p Password
 ```
   Copies File.txt from SERVER and prints to the terminal
+
 ### Example 2 - Copies a file
 
 ```
 Smb2Client get \\SERVER\Share\File.txt LocalFile.txt -u DOMAIN\User -p Password
 ```
   Copies File.txt from SERVER and saves it to a local file named LocalFile.txt
+
 ### Example 3 - Copies a directory tree of *.txt files
 
 ```
@@ -1015,6 +1024,7 @@ Smb2Client get \\SERVER\Share\*.txt LocalTextFiles -depth 20 -u DOMAIN\User -p P
 ```
   Copies all files matching *.txt from a directory tree, up to a depth of 20,
   into a local directory named LocalTextFiles
+
 ### Example 4 - Copies a directory tree structure (no files)
 
 ```
@@ -1068,6 +1078,7 @@ Smb2Client ls [options] <UncPath>
 ||||  Dacl|
 ||||  Sacl|
 ||||  MaxAccess|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -1141,9 +1152,8 @@ Smb2Client ls [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1199,11 +1209,13 @@ Smb2Client ls [options] <UncPath>
 ```
 Smb2Client ls \\SERVER\Share -u User -ud DOMAIN -p password
 ```
+
 ### Example 2 - Listing named pipes
 
 ```
 Smb2Client ls \\SERVER\IPC$ -u User -ud DOMAIN -p password
 ```
+
 ### Example 3 - Listing the contents of a share with an alternate host name
 
 ```
@@ -1211,6 +1223,7 @@ Smb2Client ls \\SERVER\Share -ha fileserver.domain.local -u User -ud DOMAIN -p p
 ```
   In this example, the command line specifies a host name differing from the
   server name to resolve for connecting to the server.
+
 ### Example 4 - Listing the contents of a share with an alternate host address
 
 ```
@@ -1218,12 +1231,14 @@ Smb2Client ls \\SERVER\Share -ha 10.0.0.1 -u User -ud DOMAIN -p password
 ```
   In this example, the command line specifies the host address explicitly so that
   SERVER does not need to be resolved.
+
 ### Example 5 - Passing the hash
 
 ```
 Smb2Client ls \\SERVER\Share -u User -ud DOMAIN -NtlmHash 8846F7EAEE8FB117AD06BDD830B7586C
 ```
   This command line provides the password as an NTLM hash.
+
 ### Example 6 - Customizing NTLM
 
 ```
@@ -1231,6 +1246,7 @@ Smb2Client ls \\SERVER\Share -u User -ud DOMAIN -p password -ntlmver 10.0.0.0 -w
 ```
   This command line specifies a different NTLM version and workstation name to
   send during authentication.
+
 ### Example 7 - Using Kerberos with a password
 
 ```
@@ -1260,6 +1276,7 @@ Smb2Client mkdir [options] <UncPath>
 |-|-|-|-|
 |    -Parents||&lt;SwitchParam&gt;|Create parent directories|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -1333,9 +1350,8 @@ Smb2Client mkdir [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1403,6 +1419,7 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |    -Directory||&lt;SwitchParam&gt;|Creates the symlink as a directory|
 |    -Relative||&lt;SwitchParam&gt;|Create the link as a relative path|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -1476,9 +1493,8 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1536,6 +1552,7 @@ Smb2Client mklink \\SERVER\Share\Symlink -Relative ActualFile.txt
 ```
   Creates a symlink at \\SERVER\Share\Symlink that points to ActualFile.txt
   within the same directory
+
 ### Example 2 - Creates a symlink to a directory
 
 ```
@@ -1543,6 +1560,7 @@ Smb2Client mklink \\SERVER\Share\SymlinkDir -Directory -Relative ActualDir
 ```
   Creates a symlink directory at \\SERVER\Share\SymlinkDir that points to
   ActualFir within the same directory
+
 ### Example 3 - Creates a symlink to a directory with a different label
 
 ```
@@ -1574,6 +1592,7 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |-|-|-|-|
 |    -PrintPath||&lt;String&gt;|The path to display to the user in directory listings (defaults to &lt;TargetPath&gt;)|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -1647,9 +1666,8 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1708,6 +1726,7 @@ Smb2Client mount \\SERVER\Share\MountPoint \??\Volume{12345678-1234-1234-1234-12
 ```
   Creates a mount point at \\SERVER\Share\MountPoint that points to the volume
   {12345678-1234-1234-1234-123456789ABC}
+
 ### Example 2 - Creates a junction
 
 ```
@@ -1715,6 +1734,7 @@ Smb2Client mount \\SERVER\Share\Junction \??\C:\WINDOWS
 ```
   Creates a junction at \\SERVER\Share\Junction that points to C:\WINDOWS on the
   remote system
+
 ### Example 3 - Creates a junction with a different label
 
 ```
@@ -1751,6 +1771,7 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -ChangeTimestamp||&lt;DateTime&gt;|Change time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -1824,9 +1845,8 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1920,6 +1940,7 @@ Smb2Client rm [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1964,9 +1985,8 @@ Smb2Client rm [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -2048,6 +2068,7 @@ Smb2Client rmdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -2092,9 +2113,8 @@ Smb2Client rmdir [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -2157,7 +2177,6 @@ Smb2Client touch [options] <UncPath>
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
 |-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
-||||  FileName|
 ||||  RelativePath|
 ||||  FileIndex|
 ||||  CreationTime|
@@ -2167,19 +2186,18 @@ Smb2Client touch [options] <UncPath>
 ||||  Size|
 ||||  SizeOnDisk|
 ||||  FileAttributes|
-||||  IsDirectory|
 ||||  EaSize|
 ||||  ShortName|
 ||||  FileId|
 ||||  ReparseTag|
 ||||  LinkTarget|
-||||  SecurityDescriptor|
 ||||  SecurityDescriptorSddl|
 ||||  Owner|
 ||||  Group|
 ||||  Dacl|
 ||||  Sacl|
 ||||  MaxAccess|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -2253,9 +2271,8 @@ Smb2Client touch [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -2350,16 +2367,19 @@ Smb2Client touch [options] <UncPath>
 ```
 Smb2Client touch \\SERVER\Share\file.txt -u User -ud DOMAIN -p password -SetAttributes RH
 ```
+
 ### Example 2 - Add Hidden and remove Archive and System attributes from a file
 
 ```
 Smb2Client touch \\SERVER\Share\file.txt -u User -ud DOMAIN -p password -UpdateAttributes +H-AS
 ```
+
 ### Example 3 - Set the last access time on a file
 
 ```
 Smb2Client touch \\SERVER\Share\file.txt -u User -ud DOMAIN -p password -LastAccessTimestamp "09/30/2023 13:23:55"
 ```
+
 ### Example 4 - Copy timestamps and attributes from another file
 
 ```
@@ -2387,6 +2407,7 @@ Smb2Client umount [options] <UncPath>
 |-|-|-|-|
 |    -RemoveDirectory||&lt;SwitchParam&gt;|Deletes the directory after unmounting|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -2460,9 +2481,8 @@ Smb2Client umount [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -2530,6 +2550,7 @@ Smb2Client watch [options] <UncPath>
 ||||  Action|
 ||||  FileName|
 ||||  OldFileName|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -2603,9 +2624,8 @@ Smb2Client watch [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)

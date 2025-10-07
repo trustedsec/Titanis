@@ -5,6 +5,7 @@
 ```
 Wmi <subcommand>
 ```
+
 ### Subcommands
 
 |Command|Description|
@@ -45,6 +46,7 @@ Wmi backup [options] <ServerName> <FileName>
 |-|-|-|-|
 |-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -67,7 +69,7 @@ Wmi backup [options] <ServerName> <FileName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -89,9 +91,8 @@ Wmi backup [options] <ServerName> <FileName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -151,6 +152,7 @@ Wmi exec [options] <ServerName> <CommandLine>
 |    -EnvironmentVariables||&lt;String[]&gt;|Environment variables to pass to the command|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -173,7 +175,7 @@ Wmi exec [options] <ServerName> <CommandLine>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -222,9 +224,8 @@ Wmi exec [options] <ServerName> <CommandLine>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -276,11 +277,13 @@ Wmi exec [options] <ServerName> <CommandLine>
 ```
 Wmi exec -UserName milchick -Password Br3@kr00m! LUMON-DC1 -Verbose SystemInfo.exe
 ```
+
 ### Example 2 - Specifying an environment variable
 
 ```
 Wmi exec -UserName milchick -Password Br3@kr00m! LUMON-DC1 -Verbose "ECHO %MYVAR%" -EnvironmentVariables MYVAR=me
 ```
+
 ### Example 3 - Specifying a polling interval
 
 ```
@@ -317,7 +320,9 @@ Wmi get [options] <ServerName> <ObjectPath>
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  RelativePath|
+||||  ObjectFlags|
 ||||  ObjectType|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -340,7 +345,7 @@ Wmi get [options] <ServerName> <ObjectPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -362,9 +367,8 @@ Wmi get [options] <ServerName> <ObjectPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -400,6 +404,7 @@ Wmi get [options] <ServerName> <ObjectPath>
 ```
 Wmi get -namespace root\cimv2 -UserName milchick -Password "Br3@kr00m!" LUMON-FS1 Win32_Process
 ```
+
 ### Example 2 - Gets the Win32_LogicalDisk for C:
 
 ```
@@ -435,6 +440,7 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 |    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 |-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -457,7 +463,7 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -479,9 +485,8 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -508,11 +513,13 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 ```
 Wmi invoke -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-DC1 Win32_Process Create C:\WINDOWS\explorer.exe
 ```
+
 ### Example 2 - Terminate a process by PID
 
 ```
 Wmi invoke -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-DC1 Win32_Process.Handle=8008 Terminate
 ```
+
 ### Example 3 - Terminate a process by name
 
 ```
@@ -550,10 +557,15 @@ Wmi lsclass [options] <ServerName>
 |-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  RelativePath|
+||||  ClassPartBytes|
 ||||  HasMethodPart|
+||||  ObjectFlags|
 ||||  Name|
 ||||  BaseClassName|
+||||  NdValueTableLength|
+||||  ValueTableLength|
 ||||  ObjectType|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -576,7 +588,7 @@ Wmi lsclass [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -598,9 +610,8 @@ Wmi lsclass [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -661,6 +672,7 @@ Wmi lsmethod [options] <ServerName> <ObjectPath>
 ||||  ShortDescription|
 ||||  FullDescription|
 ||||  IsStatic|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -683,7 +695,7 @@ Wmi lsmethod [options] <ServerName> <ObjectPath>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -705,9 +717,8 @@ Wmi lsmethod [options] <ServerName> <ObjectPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -747,11 +758,13 @@ Wmi lsmethod [options] <ServerName> <ObjectPath>
 ```
 Wmi lsmethod -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 Win32_Process
 ```
+
 ### Example 2 - List only the static methods of the Win32_Process class
 
 ```
 Wmi lsmethod -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 -WithQualifiers static Win32_Process
 ```
+
 ### Example 3 - List the methods of the Win32_Process class that require the SeDebugPrivilege
 
 ```
@@ -787,6 +800,7 @@ Wmi lsns [options] <ServerName>
 |-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
 |-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -809,7 +823,7 @@ Wmi lsns [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -831,9 +845,8 @@ Wmi lsns [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -894,6 +907,7 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 ||||  ShortDescription|
 ||||  FullDescription|
 ||||  IsStatic|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -916,7 +930,7 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -938,9 +952,8 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -980,6 +993,7 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 ```
 Wmi lsprop -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 Win32_Process
 ```
+
 ### Example 2 - List the properties of the Win32_Process class that require the SeDebugPrivilege
 
 ```
@@ -1015,6 +1029,7 @@ Wmi query [options] <ServerName> <Query>
 |    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 |-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1037,7 +1052,7 @@ Wmi query [options] <ServerName> <Query>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1059,9 +1074,8 @@ Wmi query [options] <ServerName> <Query>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1088,6 +1102,7 @@ Wmi query [options] <ServerName> <Query>
 ```
 Wmi query LUMON-FS1 -UserName milchick -Password "Br3@kr00m!" "SELECT * FROM Win32_Process"
 ```
+
 ### Example 2 - Query running processes with select fields
 
 ```
@@ -1117,6 +1132,7 @@ Wmi restore [options] <ServerName> <FileName>
 |    -ForceShutdown||&lt;SwitchParam&gt;|Forces any active clients to shut down|
 |-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1139,7 +1155,7 @@ Wmi restore [options] <ServerName> <FileName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1161,9 +1177,8 @@ Wmi restore [options] <ServerName> <FileName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1190,6 +1205,7 @@ Wmi restore [options] <ServerName> <FileName>
 ```
 Wmi restore -UserName milchick -Password Br3@kr00m! LUMON-FS1 C:\wmibackup.bak
 ```
+
 ### Example 2 - Restore from C:\wmibackup.bak, shutting down clients
 
 ```

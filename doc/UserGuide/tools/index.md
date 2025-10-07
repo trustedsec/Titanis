@@ -54,6 +54,7 @@ This index lists the tools by command name as well as by task.
 |[Smb2Client put](Smb2Client.md#smb2client-put)|Sends a file to the server.|
 |[Smb2Client rm](Smb2Client.md#smb2client-rm)|Deletes a file.|
 |[Smb2Client rmdir](Smb2Client.md#smb2client-rmdir)|Deletes a directory.|
+|[Smb2Client touch](Smb2Client.md#smb2client-touch)|Updates the timestamps or attributes of a file or directory on an SMB share.|
 |[Smb2Client umount](Smb2Client.md#smb2client-umount)|Unmounts a mount point.|
 |[Smb2Client watch](Smb2Client.md#smb2client-watch)|Watches for modifications to a directory or subtree.|
 |[Wmi](Wmi.md#wmi)|Commands for interacting with the Windows Management Instrumentation service|
@@ -150,12 +151,15 @@ This index lists the tools by command name as well as by task.
 |**SMB**|
 |Create a directory junction or mount point on an SMB share|[Smb2Client mount](Smb2Client.md#smb2client-mount)|
 |Create a directory on an SMB share|[Smb2Client mkdir](Smb2Client.md#smb2client-mkdir)|
+|Create a file on an SMB share|[Smb2Client touch](Smb2Client.md#smb2client-touch)|
 |Create a filesystem link on an SMB share|[Smb2Client mklink](Smb2Client.md#smb2client-mklink)|
 |Delete a directory on an SMB share|[Smb2Client rmdir](Smb2Client.md#smb2client-rmdir)|
 |Delete a file in SMB share|[Smb2Client rm](Smb2Client.md#smb2client-rm)|
 |Get a file from an SMB server|[Smb2Client get](Smb2Client.md#smb2client-get)|
 |List the contents of directory on an SMB share|[Smb2Client ls](Smb2Client.md#smb2client-ls)|
 |Remove a directory junction or mount point within an SMB share|[Smb2Client umount](Smb2Client.md#smb2client-umount)|
+|Timestomp a file on an SMB share|[Smb2Client touch](Smb2Client.md#smb2client-touch)|
+|Update directory entry attributes and timestamps for a new or existing file on an SMB share|[Smb2Client touch](Smb2Client.md#smb2client-touch)|
 |Upload a file to an SMB share|[Smb2Client put](Smb2Client.md#smb2client-put)|
 |Watch a file or directory on an SMB server for changes|[Smb2Client watch](Smb2Client.md#smb2client-watch)|
 |**WMI**|

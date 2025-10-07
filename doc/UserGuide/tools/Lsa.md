@@ -5,6 +5,7 @@
 ```
 Lsa <subcommand>
 ```
+
 ### Subcommands
 
 |Command|Description|
@@ -81,11 +82,14 @@ Lsa addpriv [options] <ServerName> <Privileges>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -108,7 +112,7 @@ Lsa addpriv [options] <ServerName> <Privileges>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -130,9 +134,8 @@ Lsa addpriv [options] <ServerName> <Privileges>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -189,6 +192,7 @@ Lsa addpriv [options] <ServerName> <Privileges>
 ```
 Lsa addpriv LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administrators SeLoadDriver SeTcb
 ```
+
 ### Example 2 - Add SeLoadDriverPrivilege and SeTcbPrivilege to S-1-5-32-646
 
 ```
@@ -216,9 +220,12 @@ Lsa createaccount [options] <ServerName> <Sid>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -241,7 +248,7 @@ Lsa createaccount [options] <ServerName> <Sid>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -263,9 +270,8 @@ Lsa createaccount [options] <ServerName> <Sid>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -331,6 +337,8 @@ Lsa enumaccounts [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -339,6 +347,7 @@ Lsa enumaccounts [options] <ServerName>
 ||||  Sid|
 ||||  AccountName|
 ||||  DomainName|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -361,7 +370,7 @@ Lsa enumaccounts [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -383,9 +392,8 @@ Lsa enumaccounts [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -437,6 +445,7 @@ Lsa enumaccounts [options] <ServerName>
 ```
 Lsa enumaccounts LUMON-FS1 -UserName milchick -Password Br3@kr00m!
 ```
+
 ### Example 2 - Get account SIDs with account name and domain
 
 ```
@@ -510,6 +519,8 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 ||||  SeRemoteInteractiveLogonRight|
 ||||  SeDenyRemoteInteractiveLogonRight|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -518,6 +529,7 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 ||||  Sid|
 ||||  AccountName|
 ||||  DomainName|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -540,7 +552,7 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -562,9 +574,8 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -630,6 +641,8 @@ Lsa getprivs [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -640,6 +653,7 @@ Lsa getprivs [options] <ServerName>
 ||||  PrivilegeName|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -662,7 +676,7 @@ Lsa getprivs [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -684,9 +698,8 @@ Lsa getprivs [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -740,11 +753,13 @@ Lsa getprivs [options] <ServerName>
 ```
 Lsa getprivs LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-32-544
 ```
+
 ### Example 2 - Get privileges for account by name
 
 ```
 Lsa getprivs LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administrator
 ```
+
 ### Example 3 - Get privileges for account by name, look up privilege names
 
 ```
@@ -771,6 +786,8 @@ Lsa getrights [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -779,6 +796,7 @@ Lsa getrights [options] <ServerName>
 ||||  Name|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -801,7 +819,7 @@ Lsa getrights [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -823,9 +841,8 @@ Lsa getrights [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -870,6 +887,7 @@ Lsa getrights [options] <ServerName>
 ```
 Lsa getrights LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-32-544
 ```
+
 ### Example 2 - Get privileges and rights by name
 
 ```
@@ -896,6 +914,8 @@ Lsa getsysaccess [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -904,6 +924,7 @@ Lsa getsysaccess [options] <ServerName>
 ||||  Value|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -926,7 +947,7 @@ Lsa getsysaccess [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -948,9 +969,8 @@ Lsa getsysaccess [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -995,6 +1015,7 @@ Lsa getsysaccess [options] <ServerName>
 ```
 Lsa getsysaccess LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-32-544
 ```
+
 ### Example 2 - Get system access rights by account name
 
 ```
@@ -1022,6 +1043,8 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -1033,6 +1056,7 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 ||||  DomainSid|
 ||||  AccountRid|
 ||||  AccountSid|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1055,7 +1079,7 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1077,9 +1101,8 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1151,6 +1174,8 @@ Lsa lookupsid [options] <ServerName> <Sids>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -1162,6 +1187,7 @@ Lsa lookupsid [options] <ServerName> <Sids>
 ||||  DomainSid|
 ||||  AccountRid|
 ||||  AccountSid|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1184,7 +1210,7 @@ Lsa lookupsid [options] <ServerName> <Sids>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1206,9 +1232,8 @@ Lsa lookupsid [options] <ServerName> <Sids>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1315,11 +1340,14 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1342,7 +1370,7 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1364,9 +1392,8 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1427,11 +1454,13 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 ```
 Lsa rmpriv LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administrators SeTcb
 ```
+
 ### Example 2 - Remove SeTcbPrivilege from S-1-5-32-646
 
 ```
 Lsa rmpriv LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-32-646 SeTcb
 ```
+
 ### Example 3 - Remove all privileges from S-1-5-32-646
 
 ```
@@ -1472,6 +1501,8 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 |-|-|-|-|
 |    -Reset||&lt;SwitchParam&gt;|Clears any rights already set on the account|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -1480,6 +1511,7 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 ||||  Value|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1502,7 +1534,7 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1524,9 +1556,8 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1579,6 +1610,7 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 ```
 Lsa setsysaccess LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-32-544 SeBatchLogonRight
 ```
+
 ### Example 2 - Set system access rights by account name
 
 ```
@@ -1605,13 +1637,19 @@ Lsa whoami [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
 |-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
+||||  Text|
 ||||  UserName|
 ||||  Realm|
+||||  NameType|
+||||  NamePartCount|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1634,7 +1672,7 @@ Lsa whoami [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -1656,9 +1694,8 @@ Lsa whoami [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)

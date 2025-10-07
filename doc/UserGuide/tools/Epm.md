@@ -5,6 +5,7 @@
 ```
 Epm <subcommand>
 ```
+
 ### Subcommands
 
 |Command|Description|
@@ -41,6 +42,8 @@ Epm lsep [options] <ServerName>
 |-M, -MajorVersion||&lt;UInt16&gt;|Filter for major version|
 |    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -49,6 +52,7 @@ Epm lsep [options] <ServerName>
 ||||  ObjectGuid|
 ||||  annotation|
 ||||  Tower|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -71,7 +75,7 @@ Epm lsep [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -93,9 +97,8 @@ Epm lsep [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)

@@ -5,6 +5,7 @@
 ```
 Kerb <subcommand>
 ```
+
 ### Subcommands
 
 |Command|Description|
@@ -21,7 +22,7 @@ Kerb <subcommand>
 
 ## Synopsis
 ```
-Kerb asreq [options] -UserName <String> -Realm <String> -Kdc <String> -OutputFileName <String>
+Kerb asreq [options] -UserName <String> -Realm <String> -Kdc <EndPoint>
 ```
 
 ## Options
@@ -31,7 +32,7 @@ Kerb asreq [options] -UserName <String> -Realm <String> -Kdc <String> -OutputFil
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-U, -UserName||&lt;String&gt;|Name of user (no domain)|
+|    -UserName||&lt;String&gt;|Name of user (no domain)|
 |    -Password||&lt;String&gt;|Password|
 |-N, -NtlmHash||&lt;HexString&gt;|NTLM hash (hex-encoded, no colons)|
 |    -Aes128Key||&lt;HexString&gt;|AES 128 key|
@@ -45,7 +46,8 @@ Kerb asreq [options] -UserName <String> -Realm <String> -Kdc <String> -OutputFil
 ||||  DesCbcMd5|
 ||||  DesCbcCrc|
 |    -Realm||&lt;String&gt;|Name of realm (domain)|
-|-K, -Kdc||&lt;String&gt;|Host name or address of KDC|
+|-T, -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|Host name or address of KDC|
 |-F, -Forwardable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
 |    -Proxiable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
 |    -Postdate||&lt;DateTime&gt;|Requests a postdated ticket with the specified start date|
@@ -58,7 +60,7 @@ Kerb asreq [options] -UserName <String> -Realm <String> -Kdc <String> -OutputFil
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-S, -Spn||&lt;ServicePrincipalName&gt;|Service principal name to request ticket for|
+|    -Spn||&lt;SecurityPrincipalName&gt;|Service principal name to request ticket for|
 |    -OutputFileName||&lt;String&gt;|Name of file to write ticket to|
 |    -Overwrite||&lt;SwitchParam&gt;|Overwrites the output file, if it exists|
 |    -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
@@ -78,8 +80,8 @@ Kerb asreq [options] -UserName <String> -Realm <String> -Kdc <String> -OutputFil
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
-|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
 |Name|Aliases|Value|Description|
@@ -90,9 +92,9 @@ Kerb asreq [options] -UserName <String> -Realm <String> -Kdc <String> -OutputFil
 ||||  UserName|
 ||||  UserRealm|
 ||||  TicketRealm|
-||||  Spn|
+||||  TargetSpn|
 ||||  ServiceClass|
-||||  Host|
+||||  ServiceInstance|
 ||||  ServiceRealm|
 ||||  KdcOptions|
 ||||  EndTime|
@@ -104,6 +106,16 @@ Kerb asreq [options] -UserName <String> -Realm <String> -Kdc <String> -OutputFil
 ||||  TgsrepHashcatMethod|
 ||||  TicketHash|
 ||||  IsCurrent|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
 
 ## Details
@@ -142,26 +154,31 @@ Kerb asreq [options] -UserName <String> -Realm <String> -Kdc <String> -OutputFil
 ```
 Kerb asreq -UserName milchick -Realm LUMON -Password Br3@kr00m! -Kdc 10.66.0.11 -v -OutputFileName milchick-tgt.kirbi -Overwrite
 ```
+
 ### Example 2 - Requesting a TGT with a password request Rc4Hmac
 
 ```
 Kerb asreq -UserName milchick -Realm LUMON -Password Br3@kr00m! -EncTypes Rc4Hmac -Kdc 10.66.0.11 -v -OutputFileName milchick-tgt.kirbi -Overwrite
 ```
+
 ### Example 3 - Requesting a TGT with a password request AES 128 or AES 256
 
 ```
 Kerb asreq -UserName milchick -Realm LUMON -Password Br3@kr00m! -EncTypes Aes128CtsHmacSha1_96, Aes256CtsHmacSha1_96 -Kdc 10.66.0.11 -v -OutputFileName milchick-tgt.kirbi -Overwrite
 ```
+
 ### Example 4 - Requesting a TGT with an NTLM Hash
 
 ```
 Kerb asreq -UserName milchick -NtlmHash B406A01772D0AD225D7B1C67DD81496F -Kdc 10.66.0.11 -Realm LUMON -v -OutputFileName milchick-tgt.kirbi -Overwrite
 ```
+
 ### Example 5 - Requesting a TGT with an AES 128 key
 
 ```
 Kerb asreq -UserName milchick -Aes c5673764957bc2839e367ba7b82f32e1 -Kdc 10.66.0.11 -Realm LUMON -v -OutputFileName milchick-tgt.kirbi -Overwrite
 ```
+
 ### Example 6 - Requesting a TGT with an AES 256 key
 
 ```
@@ -182,7 +199,7 @@ Kerb getasinfo [options] -UserName <String> -Realm <String> -Kdc <String>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-U, -UserName||&lt;String&gt;|Name of user (no domain)|
+|    -UserName||&lt;String&gt;|Name of user (no domain)|
 |-R, -Realm||&lt;String&gt;|Name of realm (domain)|
 |-K, -Kdc||&lt;String&gt;|Host name or address of KDC|
 
@@ -194,6 +211,7 @@ Kerb getasinfo [options] -UserName <String> -Realm <String> -Kdc <String>
 ||||**Possible values:**|
 ||||  EType|
 ||||  SaltText|
+|-S, -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -216,8 +234,17 @@ Kerb getasinfo [options] -UserName <String> -Realm <String> -Kdc <String>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
-|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
 
 ## Details
@@ -275,15 +302,14 @@ Kerb select [options] <From>
 ||||  UserName|
 ||||  UserRealm|
 ||||  TicketRealm|
-||||  Spn|
+||||  TargetSpn|
 ||||  ServiceClass|
-||||  Host|
+||||  ServiceInstance|
 ||||  ServiceRealm|
 ||||  KdcOptions|
 ||||  EndTime|
 ||||  StartTime|
 ||||  RenewTill|
-||||  SessionKey|
 ||||  EType|
 ||||  SessionKeyText|
 ||||  TicketEncryptionType|
@@ -312,7 +338,7 @@ Kerb select [options] <From>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -337,26 +363,31 @@ Kerb select [options] <From>
 ```
 Kerb select -From milchick*.kirbi
 ```
+
 ### Example 2 - Combine tickets from all mlichick*.kirbi files
 
 ```
 Kerb select -From milchick*.kirbi -Into all-milchick.kirbi
 ```
+
 ### Example 3 - Print only current tickets from all mlichick*.kirbi files
 
 ```
 Kerb select -From milchick*.kirbi -Current
 ```
+
 ### Example 4 - Print only TGTs
 
 ```
 Kerb select -From milchick*.kirbi -MatchingSpn krbtgt/.*
 ```
+
 ### Example 5 - Print only tickets for CIFS
 
 ```
 Kerb select -From milchick*.kirbi -MatchingSpn cifs/.*
 ```
+
 ### Example 6 - Print only tickets targeting LUMON-FS1
 
 ```
@@ -367,14 +398,14 @@ Kerb select -From milchick*.kirbi -MatchingSpn .*/LUMON-FS1
 
 ## Synopsis
 ```
-Kerb tgsreq [options] -Kdc <String> -Tgt <String> -OutputFileName <String> <Targets>
+Kerb tgsreq [options] -Kdc <EndPoint> <Targets>
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;Targets&gt;||&lt;ServicePrincipalName[]&gt;|SPNs to request tickets for|
+|&lt;Targets&gt;||&lt;SecurityPrincipalName[]&gt;|SPNs to request tickets for|
 
 
 ## Options
@@ -384,7 +415,6 @@ Kerb tgsreq [options] -Kdc <String> -Tgt <String> -OutputFileName <String> <Targ
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-K, -Kdc||&lt;String&gt;|Host name or address of KDC|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -EncTypes||&lt;EType[]&gt;|Encryption types to request in response|
 ||||**Possible values:**|
@@ -394,12 +424,40 @@ Kerb tgsreq [options] -Kdc <String> -Tgt <String> -OutputFileName <String> <Targ
 ||||  Rc4HmacExp|
 ||||  DesCbcMd5|
 ||||  DesCbcCrc|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|Host name or address of KDC|
 |-F, -Forwardable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
 |    -Proxiable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
 |    -Postdate||&lt;DateTime&gt;|Requests a postdated ticket with the specified start date|
 |    -RenewTill||&lt;DateTime&gt;|Requests a ticket renewable until the specified time|
 |    -EndTime||&lt;DateTime&gt;|End time|
 |    -RenewableOk||&lt;SwitchParam&gt;|Accepts a renewable ticket if the end time is over the limit|
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Realm||&lt;String&gt;|Realm of the KDC|
+|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
+||||**Possible values:**|
+||||  UserName|
+||||  UserRealm|
+||||  TicketRealm|
+||||  TargetSpn|
+||||  ServiceClass|
+||||  ServiceInstance|
+||||  ServiceRealm|
+||||  KdcOptions|
+||||  EndTime|
+||||  StartTime|
+||||  RenewTill|
+||||  EType|
+||||  SessionKeyText|
+||||  TicketEncryptionType|
+||||  TgsrepHashcatMethod|
+||||  TicketHash|
+||||  IsCurrent|
+|-S, -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -425,33 +483,17 @@ Kerb tgsreq [options] -Kdc <String> -Tgt <String> -OutputFileName <String> <Targ
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
-|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
+
+### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  UserName|
-||||  UserRealm|
-||||  TicketRealm|
-||||  Spn|
-||||  ServiceClass|
-||||  Host|
-||||  ServiceRealm|
-||||  KdcOptions|
-||||  EndTime|
-||||  StartTime|
-||||  RenewTill|
-||||  SessionKey|
-||||  EType|
-||||  SessionKeyText|
-||||  TicketEncryptionType|
-||||  TgsrepHashcatMethod|
-||||  TicketHash|
-||||  IsCurrent|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
 
 ## Details
@@ -474,6 +516,7 @@ Kerb tgsreq [options] -Kdc <String> -Tgt <String> -OutputFileName <String> <Targ
 ```
 Kerb tgsreq -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi cifs/LUMON-FS1 -OutputFile milchick-LUMON-FS1.kirbi
 ```
+
 ### Example 2 - Requesting a ticket for SMB and Host
 
 ```

@@ -6,6 +6,7 @@
 ```
 Scm <subcommand>
 ```
+
 ### Subcommands
 
 |Command|Description|
@@ -75,9 +76,12 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 |    -DisplayName||&lt;String&gt;|Service display name|
 |    -Start||&lt;SwitchParam&gt;|Start the service once created|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -100,7 +104,7 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -122,9 +126,8 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -191,9 +194,12 @@ Scm delete [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -216,7 +222,7 @@ Scm delete [options] <ServerName> <ServiceName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -238,9 +244,8 @@ Scm delete [options] <ServerName> <ServiceName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -307,6 +312,8 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -317,6 +324,7 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 ||||  TriggerTypeDescription|
 ||||  Action|
 ||||  Data0|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -339,7 +347,7 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -361,9 +369,8 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -435,6 +442,8 @@ Scm query [options] <ServerName>
 ||||  Inactive|
 ||||  All|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -446,6 +455,7 @@ Scm query [options] <ServerName>
 ||||  State|
 ||||  Win32ExitCode|
 ||||  SpecificExitCode|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -468,7 +478,7 @@ Scm query [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -490,9 +500,8 @@ Scm query [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -552,9 +561,12 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -577,7 +589,7 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -599,9 +611,8 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -646,6 +657,7 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 ```
 Scm start LUMON-DC1 -UserName milchick -Password Br3@kr00m! -EncryptRpc myservice
 ```
+
 ### Example 2 - Start a service with arguments
 
 ```
@@ -673,9 +685,12 @@ Scm stop [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -698,7 +713,7 @@ Scm stop [options] <ServerName> <ServiceName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -720,9 +735,8 @@ Scm stop [options] <ServerName> <ServiceName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)

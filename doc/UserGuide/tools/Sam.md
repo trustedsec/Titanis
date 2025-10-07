@@ -5,6 +5,7 @@
 ```
 Sam <subcommand>
 ```
+
 ### Subcommands
 
 |Command|Description|
@@ -34,6 +35,8 @@ Sam enumusers [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
@@ -46,6 +49,7 @@ Sam enumusers [options] <ServerName>
 ||||  PasswordLastSet|
 ||||  LastLogon|
 ||||  BadPasswordCount|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -68,7 +72,7 @@ Sam enumusers [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -90,9 +94,8 @@ Sam enumusers [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)

@@ -37,6 +37,7 @@ CredCoerce [options] -Techniques <ComponentSelector`1[]> <ServerName> <VictimPat
 ||||  Efs.SetEncryptedFileMetadata|
 ||||  Efs.EncryptFileExSrv|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -59,7 +60,7 @@ CredCoerce [options] -Techniques <ComponentSelector`1[]> <ServerName> <VictimPat
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
@@ -81,9 +82,8 @@ CredCoerce [options] -Techniques <ComponentSelector`1[]> <ServerName> <VictimPat
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -Kdc||&lt;String&gt;|KDC address|
-|    -KdcPort||&lt;Int32&gt;|KDC port|
-||||  Default: 88|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
