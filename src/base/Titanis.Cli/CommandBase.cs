@@ -421,7 +421,8 @@ namespace Titanis.Cli
 
 		protected void SetOutputFormat(OutputStyle style, OutputField[]? fields)
 		{
-			this._recordsExpected = true;
+			if (style is not OutputStyle.Raw)
+				this._recordsExpected = true;
 
 			this.FlushOutput();
 
