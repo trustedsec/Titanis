@@ -81,7 +81,7 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -127,7 +127,7 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -199,7 +199,7 @@ Scm delete [options] <ServerName> <ServiceName>
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -245,7 +245,7 @@ Scm delete [options] <ServerName> <ServiceName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -324,7 +324,7 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 ||||  TriggerTypeDescription|
 ||||  Action|
 ||||  Data0|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -370,7 +370,7 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -455,7 +455,7 @@ Scm query [options] <ServerName>
 ||||  State|
 ||||  Win32ExitCode|
 ||||  SpecificExitCode|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -501,7 +501,7 @@ Scm query [options] <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -566,7 +566,7 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -612,7 +612,7 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -690,7 +690,7 @@ Scm stop [options] <ServerName> <ServiceName>
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -736,7 +736,7 @@ Scm stop [options] <ServerName> <ServiceName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)

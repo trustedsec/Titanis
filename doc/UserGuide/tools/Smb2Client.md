@@ -87,7 +87,7 @@ Smb2Client enumnics [options] <UncPath>
 ||||  LinkSpeed|
 ||||  AddressFamily|
 ||||  EndPoint|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -133,7 +133,7 @@ Smb2Client enumnics [options] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -205,7 +205,7 @@ Smb2Client enumopenfiles [options] <ServerName>
 ||||  LockCount|
 ||||  Path|
 ||||  UserName|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -251,7 +251,7 @@ Smb2Client enumopenfiles [options] <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -350,7 +350,7 @@ Smb2Client enumsessions [options] <ServerName>
 ||||  UserFlags|
 ||||  ClientType|
 ||||  Transport|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -396,7 +396,7 @@ Smb2Client enumsessions [options] <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -489,7 +489,7 @@ Smb2Client enumshares [options] <ServerName>
 ||||  Path|
 ||||  SecurityDescriptorSddl|
 ||||  Flags|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -535,7 +535,7 @@ Smb2Client enumshares [options] <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -626,7 +626,7 @@ Smb2Client enumsnapshots [options] <UncPath>
 ||||**Possible values:**|
 ||||  Token|
 ||||  Timestamp|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -672,7 +672,7 @@ Smb2Client enumsnapshots [options] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -759,7 +759,7 @@ Smb2Client enumstreams [options] <UncPath>
 ||||  Name|
 ||||  Size|
 ||||  AllocationSize|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -805,7 +805,7 @@ Smb2Client enumstreams [options] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -868,7 +868,7 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continues copying after an error occurs|
 |    -TimeWarpToken||&lt;TimeWarpToken&gt;|Snapshot version, either as a date/time or a @GMT token|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -943,7 +943,7 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1078,7 +1078,7 @@ Smb2Client ls [options] <UncPath>
 ||||  Dacl|
 ||||  Sacl|
 ||||  MaxAccess|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -1153,7 +1153,7 @@ Smb2Client ls [options] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1276,7 +1276,7 @@ Smb2Client mkdir [options] <UncPath>
 |-|-|-|-|
 |    -Parents||&lt;SwitchParam&gt;|Create parent directories|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -1351,7 +1351,7 @@ Smb2Client mkdir [options] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1419,7 +1419,7 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |    -Directory||&lt;SwitchParam&gt;|Creates the symlink as a directory|
 |    -Relative||&lt;SwitchParam&gt;|Create the link as a relative path|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -1494,7 +1494,7 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1592,7 +1592,7 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |-|-|-|-|
 |    -PrintPath||&lt;String&gt;|The path to display to the user in directory listings (defaults to &lt;TargetPath&gt;)|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -1667,7 +1667,7 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1771,7 +1771,7 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -ChangeTimestamp||&lt;DateTime&gt;|Change time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -1846,7 +1846,7 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1940,7 +1940,7 @@ Smb2Client rm [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1986,7 +1986,7 @@ Smb2Client rm [options] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -2068,7 +2068,7 @@ Smb2Client rmdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -2114,7 +2114,7 @@ Smb2Client rmdir [options] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -2197,7 +2197,7 @@ Smb2Client touch [options] <UncPath>
 ||||  Dacl|
 ||||  Sacl|
 ||||  MaxAccess|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -2272,7 +2272,7 @@ Smb2Client touch [options] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -2407,7 +2407,7 @@ Smb2Client umount [options] <UncPath>
 |-|-|-|-|
 |    -RemoveDirectory||&lt;SwitchParam&gt;|Deletes the directory after unmounting|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -2482,7 +2482,7 @@ Smb2Client umount [options] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -2550,7 +2550,7 @@ Smb2Client watch [options] <UncPath>
 ||||  Action|
 ||||  FileName|
 ||||  OldFileName|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -2625,7 +2625,7 @@ Smb2Client watch [options] <UncPath>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)

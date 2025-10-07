@@ -89,7 +89,7 @@ Lsa addpriv [options] <ServerName> <Privileges>
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -135,7 +135,7 @@ Lsa addpriv [options] <ServerName> <Privileges>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -225,7 +225,7 @@ Lsa createaccount [options] <ServerName> <Sid>
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -271,7 +271,7 @@ Lsa createaccount [options] <ServerName> <Sid>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -347,7 +347,7 @@ Lsa enumaccounts [options] <ServerName>
 ||||  Sid|
 ||||  AccountName|
 ||||  DomainName|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -393,7 +393,7 @@ Lsa enumaccounts [options] <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -529,7 +529,7 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 ||||  Sid|
 ||||  AccountName|
 ||||  DomainName|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -575,7 +575,7 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -653,7 +653,7 @@ Lsa getprivs [options] <ServerName>
 ||||  PrivilegeName|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -699,7 +699,7 @@ Lsa getprivs [options] <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -796,7 +796,7 @@ Lsa getrights [options] <ServerName>
 ||||  Name|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -842,7 +842,7 @@ Lsa getrights [options] <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -924,7 +924,7 @@ Lsa getsysaccess [options] <ServerName>
 ||||  Value|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -970,7 +970,7 @@ Lsa getsysaccess [options] <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1056,7 +1056,7 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 ||||  DomainSid|
 ||||  AccountRid|
 ||||  AccountSid|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1102,7 +1102,7 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1187,7 +1187,7 @@ Lsa lookupsid [options] <ServerName> <Sids>
 ||||  DomainSid|
 ||||  AccountRid|
 ||||  AccountSid|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1233,7 +1233,7 @@ Lsa lookupsid [options] <ServerName> <Sids>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1347,7 +1347,7 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 |    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1393,7 +1393,7 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1511,7 +1511,7 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 ||||  Value|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1557,7 +1557,7 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
@@ -1649,7 +1649,7 @@ Lsa whoami [options] <ServerName>
 ||||  Realm|
 ||||  NameType|
 ||||  NamePartCount|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -1695,7 +1695,7 @@ Lsa whoami [options] <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)

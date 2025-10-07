@@ -86,6 +86,7 @@ namespace Titanis.Cli
 		[Description("KDC endpoint")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[DefaultPort(KerberosClient.KdcTcpPort)]
+		[Placeholder("host-or-ip:port")]
 		[TypeConverter(typeof(EndPointConverter))]
 		public EndPoint? Kdc { get; set; }
 

@@ -106,7 +106,7 @@ Kerb asreq [options] -UserName <String> -Realm <String> -Kdc <EndPoint>
 ||||  TgsrepHashcatMethod|
 ||||  TicketHash|
 ||||  IsCurrent|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -211,7 +211,7 @@ Kerb getasinfo [options] -UserName <String> -Realm <String> -Kdc <String>
 ||||**Possible values:**|
 ||||  EType|
 ||||  SaltText|
-|-S, -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -457,7 +457,7 @@ Kerb tgsreq [options] -Kdc <EndPoint> <Targets>
 ||||  TgsrepHashcatMethod|
 ||||  TicketHash|
 ||||  IsCurrent|
-|-S, -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output

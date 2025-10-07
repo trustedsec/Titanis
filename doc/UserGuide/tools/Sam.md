@@ -49,7 +49,7 @@ Sam enumusers [options] <ServerName>
 ||||  PasswordLastSet|
 ||||  LastLogon|
 ||||  BadPasswordCount|
-|    -Socks5||&lt;EndPoint&gt;|End point of SOCKS 5 server to use|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -95,7 +95,7 @@ Sam enumusers [options] <ServerName>
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;EndPoint&gt;|KDC endpoint|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 
 
 ### Authentication (NTLM)
