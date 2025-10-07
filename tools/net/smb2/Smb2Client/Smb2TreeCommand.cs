@@ -22,7 +22,7 @@ namespace Titanis.Smb2.Cli
 
 		[Parameter]
 		[Category(ParameterCategories.ClientBehavior)]
-		[Description("Attempt to open remote resources using FILE_OPEN_FOR_BACKUP_INTENT")]
+		[Description("Opens remote resource with backup semantics")]
 		public SwitchParam UseBackupSemantics { get; set; }
 
 		protected override void ValidateParameters(ParameterValidationContext context)

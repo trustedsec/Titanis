@@ -120,7 +120,7 @@ namespace Titanis.Smb2.Pdus
 
 		internal static ref readonly FileBasicInfoStruct ReadFileBasicInfo(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, FileBasicInfoStruct>(reader.Consume(FileBasicInfoStruct.StructSize))[0];
-		internal static unsafe List<Smb2NicInfo> ReadNicInfoList(this ByteMemoryReader reader)
+		internal static List<Smb2NicInfo> ReadNicInfoList(this ByteMemoryReader reader)
 		{
 			List<Smb2NicInfo> list = new List<Smb2NicInfo>();
 

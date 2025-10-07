@@ -20,7 +20,7 @@ namespace Titanis.Smb2.Cli
 	{
 		protected sealed override async Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
 		{
-			await client.CreateFileAsync(this.UncPath, GetRemoveDirectoryCreateInfo(), FileAccess.Read, cancellationToken);
+			await client.RemoveDirectoryAsync(this.UncPath, cancellationToken);
 			return 0;
 		}
 	}

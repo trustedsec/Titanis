@@ -322,8 +322,8 @@ FileInfoClass.NetworkOpenInfo), DefaultMaxResponseSize)
 				outputBuffer = buffer
 			};
 			var response = (Pdus.Smb2QueryInfoResponse)await this.Tree.SendSyncPduAsync(req, cancellationToken ).ConfigureAwait(false);
-			var res = new ByteMemoryReader(response.outputBuffer);
-			var basicInfo = new FileBasicInfo(res.ReadFileBasicInfo());
+			var reader = new ByteMemoryReader(response.outputBuffer);
+			var basicInfo = new FileBasicInfo(reader.ReadFileBasicInfo());
 			return basicInfo;
 		}
 

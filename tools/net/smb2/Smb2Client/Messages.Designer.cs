@@ -216,13 +216,13 @@ namespace Titanis.Smb2.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If the file specified at the UNC path does not exist it will be created.
-        ///If the file specified at the UNC path does exist the directory entry for the file is updated.
+        ///   Looks up a localized string similar to This command may be used with any object within an SMB share, such as files, directories, or pipes.
+        ///
+        ///If the file specified at the UNC path does not exist, it will be created.
+        ///If the file specified at the UNC path does exist, the directory entry for the file is updated.
         ///
         ///Any -*Timestamp arguments will override timestamps taken from -TimestampsFrom.
-        ///Only timestamps provided with a -*Timestamp argument or those taken from -TimestampsFrom are used.  No default values are provided and last accessed time is not updated automatically when this tool is used.
-        ///
-        ///The letters available for use in Attributes are as  [rest of string was truncated]&quot;;.
+        ///Only timestamps provided with a -*Timestamp argument or those taken from -TimestampsFrom are used.  No default values are provided and last accessed time is [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Smb2Client_touch_Detailed {
             get {

@@ -77,9 +77,10 @@ namespace Titanis.Smb2
 		public bool RequestDurableHandle { get; set; }
 		public bool RequestMaximalAccess { get; set; }
 		public bool QueryOnDiskId { get; set; }
-		/// <summary>
-		/// Lease info is automatically populated when requested by <see cref="OplockLevel"/>
-		/// </summary>
+		/// <remarks>
+		/// Lease info is set when this parameter is passed to one of the <see cref="Smb2TreeConnect"/>
+		/// methods if <see cref="OplockLevel"/> is set to <see cref="Smb2OplockLevel.Lease"/>.
+		/// </remarks>
 		internal Smb2LeaseInfo? LeaseInfo { get; set; }
 
 		public long? AllocationSize { get; set; }

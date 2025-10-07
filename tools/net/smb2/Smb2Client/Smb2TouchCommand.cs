@@ -13,6 +13,8 @@ using Titanis.Smb2.Pdus;
 namespace Titanis.Smb2.Cli
 {
 	/// <task category="SMB">Update directory entry attributes and timestamps for a new or existing file on an SMB share</task>
+	/// <task category="SMB">Create a file on an SMB share</task>
+	/// <task category="SMB">Timestomp a file on an SMB share</task>
 	[OutputRecordType(typeof(Smb2DirEntry), DefaultFields = new string[] {
 		nameof(Smb2DirEntry.FileName),
 		nameof(Smb2DirEntry.CreationTime),
@@ -31,27 +33,27 @@ namespace Titanis.Smb2.Cli
 	{
 
 		[Parameter]
-		[Description("Create time to set on the file (UTC).")]
+		[Description("Create time to set on the file (UTC)")]
 		public DateTime? CreateTimestamp { get; set; }
 		[Parameter]
-		[Description("Last access time to set on the file (UTC).")]
+		[Description("Last access time to set on the file (UTC)")]
 		public DateTime? LastAccessTimestamp { get; set; }
 		[Parameter]
-		[Description("Last write time to set on the file (UTC).")]
+		[Description("Last write time to set on the file (UTC)")]
 		public DateTime? LastWriteTimestamp { get; set; }
 		[Parameter]
-		[Description("Change time to set on the file (UTC).")]
+		[Description("Change time to set on the file (UTC)")]
 		public DateTime? ChangeTimestamp { get; set; }
 		[Parameter]
 		[Description("File attributes to set on the file or directory. Accepts Formats: RHSATFMCOIEVX (string), 28312 (int), 0x80 (hex). See Detailed help for meaning")]
 		public FileAttributeSpec? SetAttributes { get; set; }
 
 		[Parameter]
-		[Description("File attributes to modify existing attributes from. Accepts Format: (+-)RHSATFMCOIEVX. See Detailed help for more info.")]
+		[Description("File attributes modifications")]
 		public string? UpdateAttributes { get; set; }
 
 		[Parameter]
-		[Description("UNC Path of remote file to copy Creation, LastAccess, LastWrite and Change Time from.")]
+		[Description("UNC Path of remote file to copy timestamps from")]
 		public UncPath? TimestampsFrom { get; set; }
 
 		[Parameter]
