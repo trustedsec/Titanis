@@ -47,7 +47,7 @@ namespace Titanis.Cli
 			ISocketService socketService = new PlatformSocketService(this.GetPlatformResolver(), this.Log);
 			if (this.Socks5 != null)
 			{
-				socketService = new Socks5Client(this.Socks5, socketService, container.GetService<ILog>());
+				socketService = new Socks5Client(this.Socks5, socketService, new Socks5Logger(this.Log));
 			}
 
 			return socketService;

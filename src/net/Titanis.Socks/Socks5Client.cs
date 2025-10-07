@@ -39,17 +39,19 @@ namespace Titanis.Socks
 	public class Socks5Client : ISocketService
 	{
 		private readonly ISocketService _socketService;
+		private readonly ISocks5Callback? _callback;
 
 		public Socks5Client(
 			EndPoint serverEP,
 			ISocketService? underlyingSocketService = null,
-			ILog? log = null
+			ISocks5Callback? callback = null
 			)
 		{
 			ArgumentNullException.ThrowIfNull(serverEP);
 
 			this.ServerEP = serverEP;
-			this._socketService = underlyingSocketService ?? new PlatformSocketService(null, log);
+			this._socketService = underlyingSocketService ?? new PlatformSocketService(null, null);
+			this._callback = callback;
 			this._serverAddrFamily = serverEP.AddressFamily;
 			if (this._serverAddrFamily == AddressFamily.Unspecified)
 				// TODO: How to specify this default?
@@ -77,6 +79,8 @@ namespace Titanis.Socks
 		/// </summary>
 		internal async Task<(ISocket socket, EndPoint remoteBindEP)> ConnectSocksAsync(SocketInfo socketInfo, EndPoint remoteEP, CancellationToken cancellationToken)
 		{
+			this._callback?.OnConnecting(this.ServerEP, remoteEP);
+
 			var serverEP = this.ServerEP;
 			var socket = this._socketService.CreateSocket(this._serverAddrFamily, SocketType.Stream, ProtocolType.Tcp);
 			await socket.ConnectAsync(serverEP, cancellationToken).ConfigureAwait(false);
@@ -126,6 +130,9 @@ namespace Titanis.Socks
 				throw new Socks5Exception(resp.resultCode);
 
 			var remoteBindEP = resp.bindEP.ToSocketEndpoint();
+
+			this._callback?.OnConnected(this.ServerEP, remoteEP, remoteBindEP);
+
 			return (socket, remoteBindEP);
 		}
 
