@@ -23,6 +23,9 @@ Titanis is a library of protocol implementations and command line utilities, wri
 		* Support for .kirbi and [ccache](https://web.mit.edu/kerberos/krb5-1.21/doc/formats/ccache_file_format.html) files
 		* Support for [keytab](https://web.mit.edu/kerberos/krb5-devel/doc/formats/keytab_file_format.html) files
 	* SP-NEGO ([MS-SPNG](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-SPNG/%5bMS-SPNG%5d.pdf))
+* Integrated SOCKS 5 support (`-Socks5` parameter) ([RFC1928](https://datatracker.ietf.org/doc/html/rfc1928))
+
+For recent changes, see the [change log](CHANGELOG.md)
 
 The toolset implements callbacks and logging features to integrate into your operational environment.
 
@@ -34,6 +37,9 @@ For a list of command line tools and tasks you can perform with them, check the 
 *  **System administrators** - Perform administrative tasks
 
 # Getting Started
+
+[Build Instructions](BUILD.md)
+
 If you are a user, see the [User Guide](doc/UserGuide/toc.md) for a list of command line utilities and how to use them.
 
 If you are a developer, see the [Developer Guide](doc/DevGuide/toc.md) for information on how to enhance the code base.
@@ -43,7 +49,7 @@ If you are a developer, see the [Developer Guide](doc/DevGuide/toc.md) for infor
 * LDAP and LDAP-based tooling ([RFC4511](https://datatracker.ietf.org/doc/html/rfc4511), portions of [MS-ADTS](https://winprotocoldoc.z19.web.core.windows.net/MS-ADTS/[MS-ADTS].pdf))
 * Simplified credential management
 * DCSync and secret-dumping functionality ([MS-DRSR](https://winprotocoldoc.z19.web.core.windows.net/MS-DRSR/[MS-DRSR].pdf))
-* Integrated SOCKS 4a and SOCKS 5 ([RFC1928](https://datatracker.ietf.org/doc/html/rfc1928))
+* Integrated SOCKS 4a
 
 # Project Organization
 *  **doc/** - Project documentation
