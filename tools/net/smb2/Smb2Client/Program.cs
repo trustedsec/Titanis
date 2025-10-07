@@ -65,17 +65,8 @@ namespace Titanis.Smb2.Cli
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public AuthenticationParameters AuthenticationParameters { get; set; }
 
-		private NetworkParameters? _netParameters;
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
-		public NetworkParameters? NetParameters
-		{
-			get => _netParameters;
-			set
-			{
-				_netParameters = value;
-				if (value != null) value.Log = this.Log;
-			}
-		}
+		public NetworkParameters? NetParameters { get; set; }
 
 		/// <summary>
 		/// Gets the share name to use when the user doesn't provide one.

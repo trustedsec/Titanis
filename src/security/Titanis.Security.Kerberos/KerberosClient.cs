@@ -562,11 +562,13 @@ namespace Titanis.Security.Kerberos
 				while (referralNames.Add(ticket.ServiceInstance) && ticket.IsTgt)
 				{
 					this._callback?.OnReferralReceived(spn, ticket);
+					this.TicketCache?.AddTicket(ticket);
 
 					var nextTicket = await RequestTicketCore(ticket, spn, ticket.ServiceInstance, encTypes, ticketParameters, cancellationToken).ConfigureAwait(false);
 					ticket = nextTicket;
 				}
 			}
+			this.TicketCache?.AddTicket(ticket);
 			return ticket;
 		}
 		public async Task<TicketInfo> RequestTicketCore(
@@ -1079,7 +1081,7 @@ namespace Titanis.Security.Kerberos
 			{
 				version = 4,
 				client = CCachePrincipal.FromTicketClient(ticket),
-				server = CCachePrincipal.FromTicketService(ticket),
+				server = CCachePrincipal.FromSpn(ticket.TargetSpn, ticket.ServiceRealm),
 				key = new CCacheKeyBlock
 				{
 					encType = ticket.SessionKey.EType,

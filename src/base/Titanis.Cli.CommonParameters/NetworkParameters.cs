@@ -36,21 +36,30 @@ namespace Titanis.Cli
 		[TypeConverter(typeof(EndPointConverter))]
 		public EndPoint Socks5 { get; set; }
 
+
+		private ILog? _log;
 		protected sealed override void Initialize(Command owner, IServiceContainer services)
 		{
 			base.Initialize(owner, services);
 			services.AddService(typeof(ISocketService), this.CreateSocketService);
+			this._log = services.GetService<ILog>();
 		}
 
 		private ISocketService? CreateSocketService(IServiceContainer container, Type serviceType)
 		{
-			ISocketService socketService = new PlatformSocketService(this.GetPlatformResolver(), this.Log);
-			if (this.Socks5 != null)
+			var log = container.GetService<ILog>();
+			if (log != null)
 			{
-				socketService = new Socks5Client(this.Socks5, socketService, new Socks5Logger(this.Log));
-			}
+				ISocketService socketService = new PlatformSocketService(this.GetPlatformResolver(), log);
+				if (this.Socks5 != null)
+				{
+					socketService = new Socks5Client(this.Socks5, socketService, new Socks5Logger(log));
+				}
 
-			return socketService;
+				return socketService;
+			}
+			else
+				return null;
 		}
 
 		public void ValidateParameters(ParameterValidationContext context)
@@ -61,23 +70,18 @@ namespace Titanis.Cli
 		}
 
 		private INameResolverService? _resolver;
-		private INameResolverService GetPlatformResolver() => _resolver ??= new PlatformNameResolverService(ResolverOptions, Log);
+		private INameResolverService GetPlatformResolver() => _resolver ??= new PlatformNameResolverService(ResolverOptions, this._log);
 		private NameResolverOptions ResolverOptions =>
 			UseTcp4Only.IsSet ? NameResolverOptions.UseTcp4Only
 			: UseTcp6Only.IsSet ? NameResolverOptions.UseTcp6Only
 			: NameResolverOptions.Default;
-
-		/// <summary>
-		/// Gets or sets the <see cref="ILog"/> to log to.
-		/// </summary>
-		public ILog? Log { get; set; }
 
 		private async Task<IPAddress[]> ResolveStaticAsync(string hostName, CancellationToken cancellationToken)
 		{
 			if (hostName != null && HostAddress == null)
 				HostAddress = new string[] { hostName };
 
-			var log = Log;
+			var log = this._log;
 
 			// Resolve the host address
 			List<IPAddress> addrs = new List<IPAddress>();

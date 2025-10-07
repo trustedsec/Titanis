@@ -98,15 +98,19 @@ namespace Titanis.Security.Kerberos
 			};
 		}
 
-		internal static CCachePrincipal FromTicketService(TicketInfo ticket)
+		internal static CCachePrincipal FromSpn(SecurityPrincipalName spn, string realm)
 		{
+			ArgumentNullException.ThrowIfNull(spn);
+			ArgumentException.ThrowIfNullOrEmpty(realm);
+
+			var parts = spn.GetNameParts();
 			return new CCachePrincipal()
 			{
 				version = 4,
-				componentCount = 2,
-				nameType = ticket.TargetSpn.NameType,
-				realm = new CCacheStringData(ticket.ServiceRealm),
-				components = Array.ConvertAll(ticket.TargetSpn.GetNameParts(), r => new CCacheStringData(r))
+				componentCount =parts.Length,
+				nameType = spn.NameType,
+				realm = new CCacheStringData(realm),
+				components = Array.ConvertAll(parts, r => new CCacheStringData(r))
 			};
 		}
 	}

@@ -27,10 +27,9 @@ By default, all supported encryption types are sent in the request.  To limit th
 		public SecurityPrincipalName[] Targets { get; set; }
 
 		[Parameter]
-		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Name of file containing a ticket-granting ticket (.kirbi or ccache)")]
-		public string Tgt { get; set; }
+		public string? Tgt { get; set; }
 
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
@@ -47,25 +46,32 @@ By default, all supported encryption types are sent in the request.  To limit th
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			base.ValidateParameters(context);
+			if (string.IsNullOrEmpty(this.Tgt) && string.IsNullOrEmpty(this.TicketCache))
+				context.LogError($"Either -{nameof(Tgt)} or -{nameof(TicketCache)} must be specified.");
 		}
 
 		protected sealed override async Task<IList<TicketInfo>?> RequestTickets(KerberosClient krb, CancellationToken cancellationToken)
 		{
-			string tgtFileName = this.ResolveFsPath(this.Tgt);
-			this.WriteVerbose($"Reading TGT from {tgtFileName}");
-			var tgtStore = krb.LoadTicketsFromFile(File.ReadAllBytes(tgtFileName), out _);
+			string ticketStoreFile;
+			if (!string.IsNullOrEmpty(this.Tgt)) ticketStoreFile = this.ResolveFsPath(this.Tgt);
+			else if (!string.IsNullOrEmpty(this.TicketCache)) ticketStoreFile = this.ResolveFsPath(this.TicketCache);
+			else throw new InvalidOperationException($"The command is not configured with -{nameof(Tgt)} -{nameof(TicketCache)}.");
+
+			this.WriteVerbose($"Reading TGT from {ticketStoreFile}");
+			var tgtStore = krb.LoadTicketsFromFile(File.ReadAllBytes(ticketStoreFile), out _);
+
 			TicketInfo sourceTicket;
 			{
-				if (tgtStore.Length == 0)
+				if (ticketStoreFile.Length == 0)
 				{
-					this.WriteError($"The file {tgtFileName} does not contain any tickets.");
+					this.WriteError($"The file {ticketStoreFile} does not contain any tickets.");
 					return null;
 				}
 
 				var tgtCandidates = tgtStore.Where(r => r.IsCurrent && r.IsTgt).ToList();
 				if (tgtCandidates.Count == 0)
 				{
-					this.WriteError($"The file {tgtFileName} does not contain any ticket-granting-tickets.");
+					this.WriteError($"The file {ticketStoreFile} does not contain any ticket-granting-tickets.");
 					return null;
 				}
 

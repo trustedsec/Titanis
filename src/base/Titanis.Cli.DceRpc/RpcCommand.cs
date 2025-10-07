@@ -35,17 +35,8 @@ namespace Titanis.Cli
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public AuthenticationParameters? Authentication { get; set; }
 
-		private NetworkParameters? _netParameters;
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
-		public NetworkParameters NetParameters
-		{
-			get => _netParameters;
-			set
-			{
-				_netParameters = value;
-				if (value != null) value.Log = Log;
-			}
-		}
+		public NetworkParameters NetParameters { get; set; }
 
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public SmbParameters SmbParameters { get; set; }

@@ -19,6 +19,7 @@ namespace Titanis.Socks
 
 		public Socks5Logger(ILog log)
 		{
+			if (log is null)throw new ArgumentNullException(nameof(log));
 			this._log = log;
 		}
 

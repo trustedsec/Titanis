@@ -47,7 +47,7 @@ namespace Titanis
 				if (mult == 0)
 					throw new FormatException($"The value '{str}' does not indicate the unit of time.");
 
-				double amount = double.Parse(str.Substring(0, str.Length - cchSuffix));
+				double amount = double.Parse(str.Substring(0, str.Length - cchSuffix)) * mult;
 				return new Duration(TimeSpan.FromMilliseconds(amount));
 			}
 
