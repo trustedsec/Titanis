@@ -14,16 +14,16 @@
     <PackageVersion Include="Microsoft.Windows.CsWin32" Version="0.3.183" />
     <PackageVersion Include="System.Memory" Version="4.6.3" />
     <PackageVersion Include="System.Net.NameResolution" Version="4.3.0" />
-    <PackageVersion Include="System.Reflection.MetadataLoadContext" Version="9.0.8" />
+    <PackageVersion Include="System.Reflection.MetadataLoadContext" Version="9.0.9" />
     <PackageVersion Include="System.Security.AccessControl" Version="6.0.1" />
-    <PackageVersion Include="System.Text.Json" Version="9.0.8" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.9" />
     <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
     <PackageVersion Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
     <PackageVersion Include="System.Reflection" Version="4.3.0" />
     <PackageVersion Include="System.Data.Common" Version="4.3.0" />
     <PackageVersion Include="System.Reflection.Emit" Version="4.7.0" />
     <PackageVersion Include="System.Reflection.Emit.ILGeneration" Version="4.7.0" />
-    <PackageVersion Include="System.Reflection.Metadata" Version="9.0.8" />
+    <PackageVersion Include="System.Reflection.Metadata" Version="9.0.9" />
     <PackageVersion Include="Titanis.Asn1" Version="$(TitanisVersion)" />
     <PackageVersion Include="Titanis.Core" Version="$(TitanisVersion)" />
     <PackageVersion Include="Titanis.Crypto" Version="$(TitanisVersion)" />
