@@ -174,7 +174,7 @@ namespace Titanis.Msrpc.Mswmi
 				string value = keyField.Value?.ToString() ?? string.Empty;
 				value = value.Replace(@"\", @"\\");
 				value = value.Replace("\"", "\\\"");
-				string path = $"{this.WmiClass.Name}=\"{value}\"";
+				string path = $"{this.WmiClass.Name}.{this.KeyProperty.ClassProperty.Name}=\"{value}\"";
 				return path;
 			}
 		}

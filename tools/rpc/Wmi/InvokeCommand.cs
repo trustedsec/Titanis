@@ -22,12 +22,12 @@ internal class InvokeCommand : WmiNamespaceCommandBase
 {
 	[Parameter(10)]
 	[Mandatory]
-	[Description("Path of class or object to inspect")]
+	[Description("Path to object or WQL query of objects to invoke on")]
 	public string ObjectPathOrWqlQuery { get; set; }
 
 	[Parameter(20)]
 	[Mandatory]
-	[Description("Method name")]
+	[Description("Method to invoke")]
 	public string Method { get; set; }
 
 	[Parameter(30)]
@@ -36,6 +36,8 @@ internal class InvokeCommand : WmiNamespaceCommandBase
 
 	protected sealed override async Task<int> RunAsync(WmiScope ns, CancellationToken cancellationToken)
 	{
+		int count = 0;
+
 		if (
 			this.ObjectPathOrWqlQuery.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase)
 			|| this.ObjectPathOrWqlQuery.StartsWith("ASSOCIATORS OF", StringComparison.OrdinalIgnoreCase)
@@ -43,17 +45,24 @@ internal class InvokeCommand : WmiNamespaceCommandBase
 		{
 			var wql = this.ObjectPathOrWqlQuery;
 			var query = await ns.ExecuteWqlQueryAsync(wql, 1, cancellationToken);
+			bool hasObject = false;
 			while (await query.ReadAsync(cancellationToken))
 			{
+				hasObject = true;
 				try
 				{
+					this.WriteDiagnostic($"Invoking on object {query.Current.RelativePath}");
 					await InvokeOn(query.Current, cancellationToken);
+					count++;
 				}
 				catch (Exception ex)
 				{
 					this.WriteError($"Method invocation failed: {ex.Message}");
 				}
 			}
+
+			if (!hasObject)
+				this.WriteWarning("No invocations because the query did not yield any instances");
 		}
 		else
 		{
@@ -61,7 +70,9 @@ internal class InvokeCommand : WmiNamespaceCommandBase
 			var obj = await ns.GetObjectAsync(objPath, cancellationToken);
 			if (obj != null)
 			{
+				this.WriteDiagnostic($"Invoking on object {obj.RelativePath}");
 				await InvokeOn(obj, cancellationToken);
+				count++;
 			}
 			else
 			{
@@ -69,6 +80,7 @@ internal class InvokeCommand : WmiNamespaceCommandBase
 			}
 		}
 
+		this.WriteVerbose($"Invoked on {count} instance(s)");
 		return 0;
 	}
 

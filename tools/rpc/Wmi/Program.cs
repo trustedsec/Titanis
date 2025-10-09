@@ -14,6 +14,7 @@ namespace Wmi;
 [Subcommand("get", typeof(GetObjectCommand))]
 [Subcommand("exec", typeof(ExecCommand))]
 [Subcommand("invoke", typeof(InvokeCommand))]
+[Subcommand("delete", typeof(DeleteCommand))]
 internal class Program : MultiCommand
 {
 	static void Main(string[] args)
