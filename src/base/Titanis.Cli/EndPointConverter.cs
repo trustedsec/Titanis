@@ -40,6 +40,9 @@ namespace Titanis.Cli
 				if (string.IsNullOrEmpty(str))
 					return null;
 
+				if (str.Contains("://"))
+					throw new ArgumentException($"An endpoint is expected, but the provided value '{str}' appears to be a URL.  Specify the endpoint as <host>:<ip>");
+
 				string host;
 				int port;
 				int isep = str.LastIndexOf(':');
@@ -48,7 +51,7 @@ namespace Titanis.Cli
 					host = str;
 					port = -1;
 				}
-				else if (int.TryParse(str.AsSpan(isep + 1), out port))
+				else if (int.TryParse(str.Substring(isep + 1), out port))
 				{
 					host = str.Substring(0, isep);
 				}

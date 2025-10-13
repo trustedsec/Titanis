@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -345,7 +346,17 @@ namespace Titanis.Cli
 
 			var converter = TypeDescriptor.GetConverter(paramType);
 			if (converter != null)
+			{
+				if (converter.GetType() == typeof(TypeConverter))
+				{
+					// This is the default converter, which probably won't work
+					if (paramType == typeof(EndPoint))
+					{
+						return new EndPointConverter();
+					}
+				}
 				return converter;
+			}
 
 			if (paramType.GetTypeInfo().IsEnum)
 			{

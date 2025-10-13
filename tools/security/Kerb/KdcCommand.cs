@@ -20,7 +20,6 @@ internal abstract class KdcCommand : Command
 	[Mandatory]
 	[Category(ParameterCategories.AuthenticationKerberos)]
 	[Description("Host name or address of KDC")]
-	[TypeConverter(typeof(EndPointConverter))]
 	[DefaultPort(KerberosClient.KdcTcpPort)]
 	public EndPoint Kdc { get; set; }
 

@@ -114,7 +114,7 @@ namespace Titanis.Cli
 					}
 					catch (FileNotFoundException ex)
 					{
-						throw new ArgumentException("A string value must be prefixed with '0x' to interpret as a hex string or 'b64:' to interpret as a Base64 string, or a valid file name.", nameof(text), ex);
+						throw new ArgumentException("A string value must be prefixed with '0x' to interpret as a hex string or 'b64:' to interpret as a Base64 string, or be a valid file name.", nameof(text), ex);
 					}
 				}
 
