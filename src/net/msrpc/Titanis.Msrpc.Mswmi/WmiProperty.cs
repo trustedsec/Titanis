@@ -15,7 +15,7 @@ namespace Titanis.Msrpc.Mswmi
 			int classOfOriginIndex,
 			string classOfOrigin,
 			int declarationOrder,
-			WmiQualifier[] qualifiers,
+			WmiQualifier[]? qualifiers,
 			uint valueOffset,
 			object? defaultValue,
 			NdFlags ndFlags

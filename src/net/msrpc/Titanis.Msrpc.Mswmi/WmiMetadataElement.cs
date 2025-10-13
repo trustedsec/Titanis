@@ -17,7 +17,7 @@ namespace Titanis.Msrpc.Mswmi
 		{
 			this.Name = name;
 			this.ClassOfOrigin = classOfOrigin;
-			this.Qualifiers = qualifiers;
+			this.Qualifiers = qualifiers ?? Array.Empty<WmiQualifier>();
 
 			if (this.Qualifiers != null)
 			{
@@ -96,7 +96,7 @@ namespace Titanis.Msrpc.Mswmi
 		public string? QualifiersText => (this._qualifiersText ??= this.BuildQualifiersText());
 
 		#region Qualifier metadata
-		public string Subtype { get; }
+		public string? Subtype { get; }
 		private CimSubtype _subtypeCode;
 		public CimSubtype SubtypeCode => this._subtypeCode;
 

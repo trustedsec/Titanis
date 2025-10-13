@@ -13,7 +13,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 			this.value = value;
 		}
 
-		public string? value;
+		public string value;
 		public override string ToString()
 			=> this.value;
 		public void ReadFrom(IByteSource reader)

@@ -166,7 +166,7 @@ namespace Titanis.Smb2
 		private int _nextChannelId;
 
 		private List<Smb2ChannelBindingInfo> _channelList = new List<Smb2ChannelBindingInfo>();
-		public async Task EstablishNewChannel(
+		public Task EstablishNewChannel(
 			Smb2Connection connection,
 			CancellationToken cancellationToken
 			)
@@ -177,9 +177,7 @@ namespace Titanis.Smb2
 			if (connection.Dialect != this.Connection.Dialect)
 				throw new ArgumentException("The provided connection does not use the same SMB dialect as the original connection, which is required for session binding.");
 
-			var authContext = this._authContext.Duplicate();
-			await connection.AuthenticateAsync(authContext, this.MustEncryptData, this, (ushort)Interlocked.Increment(ref this._nextChannelId), cancellationToken).ConfigureAwait(false);
-			this._channelList.Add(new Smb2ChannelBindingInfo(0, connection, null, null));
+			return Task.FromException(new NotImplementedException());
 		}
 		internal void BindChannel(
 			Smb2Connection connection,

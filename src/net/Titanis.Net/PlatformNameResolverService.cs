@@ -100,6 +100,10 @@ namespace Titanis.Net
 				log?.WriteMessage(LogMessage.Verbose(PlatformResolverSourceName, $"Resolved {hostAddress} with [ {string.Join(",", (object[])addrs)} ]"));
 				return addrs;
 			}
+			catch (SocketException ex)
+			{
+				throw new SocketException(ex.ErrorCode, $"Failed to resolve host {hostAddress}: {ex.Message}");
+			}
 			catch (Exception ex)
 			{
 				log?.WriteMessage(LogMessage.Error(PlatformResolverSourceName, ex));
