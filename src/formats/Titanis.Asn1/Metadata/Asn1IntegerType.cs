@@ -11,10 +11,6 @@ namespace Titanis.Asn1.Metadata
 		public override Asn1TypeKind Kind => Asn1TypeKind.CustomInteger;
 		public override Asn1Tag Tag => Asn1PredefTag.Integer;
 
-		internal Asn1IntegerType()
-		{
-
-		}
 		public Asn1IntegerType(Asn1NamedNumber[] namedNumbers)
 		{
 			if (namedNumbers == null)

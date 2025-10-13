@@ -55,7 +55,7 @@ abstract class TicketRequestCommand : KdcCommand
 		}
 	}
 
-	protected abstract Task<IList<TicketInfo>> RequestTickets(KerberosClient krb, CancellationToken cancellationToken);
+	protected abstract Task<IList<TicketInfo>?> RequestTickets(KerberosClient krb, CancellationToken cancellationToken);
 
 	protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 	{

@@ -9,9 +9,12 @@ namespace Titanis.Asn1
 		where T : IAsn1DerEncodableTlv, new()
 	{
 		public Asn1Tag Tag => new Asn1Tag(Asn1PredefTag.Sequence, Asn1TagFlags.Constructed);
-		public List<T> Values { get; set; }
+		public IList<T> Values { get; set; }
 
-		public Asn1SequenceOf() { }
+		public Asn1SequenceOf()
+		{
+			this.Values = Array.Empty<T>();
+		}
 
 		public void DecodeTlv(Asn1DerDecoder decoder)
 		{
@@ -23,7 +26,8 @@ namespace Titanis.Asn1
 
 		public void DecodeValue(Asn1DerDecoder decoder)
 		{
-			List<T> values = this.Values = new List<T>();
+			List<T> values = new List<T>();
+			this.Values = values;
 			while (!decoder.IsEndOfTuple)
 			{
 				T elem = new T();

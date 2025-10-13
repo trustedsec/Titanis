@@ -19,7 +19,7 @@ namespace Titanis.Asn1.Metadata
 		public Asn1Type FieldType { get; }
 		public bool IsOptional => (0 != (this.Options & Asn1FieldOptions.Optional));
 		public bool HasDefaultValue => (0 != (this.Options & Asn1FieldOptions.HasDefaultValue));
-		public object DefaultValue { get; }
+		public object? DefaultValue { get; }
 
 		public Asn1Field(
 			string name,

@@ -8,7 +8,7 @@ namespace Titanis.Asn1.Metadata
 	{
 		internal static readonly Asn1AnyType Instance = new Asn1AnyType();
 
-		public Asn1Field DefinedBy { get; internal set; }
+		public Asn1Field? DefinedBy { get; internal set; }
 		public override Asn1TypeKind Kind => Asn1TypeKind.Any;
 		public override bool HasStaticTag => false;
 

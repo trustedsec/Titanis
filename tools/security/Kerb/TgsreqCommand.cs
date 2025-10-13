@@ -20,11 +20,13 @@ By default, all supported encryption types are sent in the request.  To limit th
 	[Example("Requesting a ticket for SMB and Host", "{0} -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi cifs/LUMON-FS1, HOST/LUMON-FS1 -OutputFile milchick-LUMON-FS1.kirbi")]
 	internal class RequestTicketCommand : TicketRequestCommand
 	{
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 		[Parameter(0)]
 		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("SPNs to request tickets for")]
 		public SecurityPrincipalName[] Targets { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
@@ -37,7 +39,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 		public EType[]? EncTypes { get; set; }
 
 		[ParameterGroup]
-		public TicketParameterGroup TicketParamGroup { get; set; }
+		public TicketParameterGroup? TicketParamGroup { get; set; }
 
 		[Parameter]
 		[Description("Realm of the KDC")]
@@ -82,12 +84,10 @@ By default, all supported encryption types are sent in the request.  To limit th
 
 			TicketParameters ticketParameters = this.TicketParamGroup?.GetTicketParameters(this.Log) ?? krb.GetDefaultTicketOptions(sourceTicket);
 
-			bool hasSuccess = false;
 			List<TicketInfo> newTickets = new List<TicketInfo>(this.Targets.Length);
 			foreach (var spn in this.Targets)
 			{
 				var ticket = await krb.RequestTicket(sourceTicket, spn, this.Realm ?? sourceTicket.TicketRealm, this.EncTypes, ticketParameters, cancellationToken).ConfigureAwait(false);
-				hasSuccess = true;
 				newTickets.Add(ticket);
 
 				this.WriteRecord(ticket);

@@ -6,7 +6,7 @@ namespace Titanis.Asn1
 	public struct Asn1OidPart : IEquatable<Asn1OidPart>
 	{
 		public long? Value { get; }
-		public string Name { get; }
+		public string? Name { get; }
 
 		public Asn1OidPart(long? value)
 		{
@@ -24,7 +24,7 @@ namespace Titanis.Asn1
 			this.Name = name;
 		}
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return obj is Asn1OidPart part && Equals(part);
 		}

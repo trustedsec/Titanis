@@ -67,8 +67,8 @@ namespace Titanis.Asn1.Metadata
 		public Asn1TypeDef[] TypeDefinitions { get; }
 		public Asn1ValueDef[] ValueDefinitions { get; }
 
-		private Dictionary<string, Asn1ValueDef> _valuesByName;
-		private Dictionary<string, Asn1TypeDef> _typesByName;
+		private readonly Dictionary<string, Asn1ValueDef> _valuesByName;
+		private readonly Dictionary<string, Asn1TypeDef> _typesByName;
 
 		public Asn1Module(
 			string name,
@@ -83,13 +83,16 @@ namespace Titanis.Asn1.Metadata
 			if (!IsValidName(name))
 				throw new ArgumentException(string.Format(Messages.Asn1_TypeNameInvalid, name), nameof(name));
 
+			types ??= Array.Empty<Asn1TypeDef>();
+			values ??= Array.Empty<Asn1ValueDef>();
+
 			this.Name = name;
 			this.ModuleId = moduleId;
 			this.TypeDefinitions = types;
 			this.ValueDefinitions = values;
 
-			this._valuesByName = values?.ToDictionary(v => v.Name);
-			this._typesByName = types?.ToDictionary(t => t.Name);
+			this._valuesByName = values.ToDictionary(v => v.Name);
+			this._typesByName = types.ToDictionary(t => t.Name);
 
 			foreach (var type in types)
 			{
@@ -112,20 +115,20 @@ namespace Titanis.Asn1.Metadata
 
 		public Asn1Type[] GetAllTypes() => this._allTypes.ToArray();
 
-		public Asn1TypeDef TryResolveType(string name)
+		public Asn1TypeDef? TryResolveType(string name)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			return this._typesByName?.TryGetValue(name);
+			return this._typesByName.TryGetValue(name);
 		}
 
-		public Asn1ValueDef TryResolveValue(string name)
+		public Asn1ValueDef? TryResolveValue(string name)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			return this._valuesByName?.TryGetValue(name);
+			return this._valuesByName.TryGetValue(name);
 		}
 
 		public static bool IsValidName(string name)

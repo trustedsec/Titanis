@@ -18,6 +18,7 @@ If the account does not exist or the realm name is wrong, the KDC returns an err
 If the user exists but does not require preauthentication, the KDC will instead reply with a TGT without providing encryption types.  In that case, use the requesttgt command to analyze the ticket.")]
 	internal class GetASInfoCommand : Command
 	{
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 		[Parameter]
 		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
@@ -38,6 +39,7 @@ If the user exists but does not require preauthentication, the KDC will instead 
 
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public NetworkParameters NetParameters { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
 		protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 		{

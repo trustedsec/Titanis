@@ -12,13 +12,6 @@ namespace Titanis.Asn1.Metadata
 
 		//}
 
-		internal Asn1ConstrainedType(
-			Asn1Type baseType
-			)
-			: base(baseType)
-		{
-		}
-
 		public Asn1ConstrainedType(
 			Asn1Type baseType,
 			Asn1Constraint[] constraints

@@ -10,10 +10,6 @@ namespace Titanis.Asn1.Metadata
 		public override Asn1TypeKind Kind => Asn1TypeKind.CustomBitstring;
 		public override Asn1Tag Tag => Asn1PredefTag.BitString;
 
-		internal Asn1BitStringType()
-		{
-
-		}
 		public Asn1BitStringType(Asn1NamedNumber[] namedNumbers)
 		{
 			if (namedNumbers == null)

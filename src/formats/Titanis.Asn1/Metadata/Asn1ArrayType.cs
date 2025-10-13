@@ -13,11 +13,6 @@ namespace Titanis.Asn1.Metadata
 	{
 		public Asn1Type ElementType { get; internal set; }
 
-		internal Asn1ArrayType()
-		{
-
-		}
-
 		private protected Asn1ArrayType(Asn1Type elementType)
 		{
 			if (elementType is null)

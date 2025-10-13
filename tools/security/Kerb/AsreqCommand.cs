@@ -33,11 +33,19 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 	[Example("Requesting a TGT with an AES 256 key", "{0} -UserName milchick -Aes 76332deee4296dcb20200888630755268e605c8576e50ff38db2d8b92351f4e4 -Kdc 10.66.0.11 -Realm LUMON -v -OutputFileName milchick-tgt.kirbi -Overwrite")]
 	internal class AsreqCommand : TicketRequestCommand
 	{
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 		[Parameter]
 		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Name of user (no domain)")]
 		public string UserName { get; set; }
+
+		[Parameter]
+		[Mandatory]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		[Description("Name of realm (domain)")]
+		public string Realm { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
@@ -63,12 +71,6 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Encryption types to request in response")]
 		public EType[]? EncTypes { get; set; }
-
-		[Parameter]
-		[Mandatory]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("Name of realm (domain)")]
-		public string Realm { get; set; }
 
 
 		[ParameterGroup]

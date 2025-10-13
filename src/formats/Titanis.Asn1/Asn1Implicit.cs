@@ -9,7 +9,7 @@ namespace Titanis.Asn1
 		where T : IAsn1DerEncodable, new()
 	{
 		public Asn1Tag Tag { get; set; }
-		public T Value { get; set; }
+		public T? Value { get; set; }
 
 		public Asn1Implicit() { }
 		public Asn1Implicit(Asn1Tag tag)
@@ -29,12 +29,12 @@ namespace Titanis.Asn1
 
 		public void DecodeValue(Asn1DerDecoder decoder)
 		{
-			this.Value.DecodeValue(decoder);
+			(this.Value ?? new()).DecodeValue(decoder);
 		}
 
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
-			this.Value.EncodeValue(encoder);
+			(this.Value ?? new()).EncodeValue(encoder);
 		}
 
 		public bool TryDecodeTlv(Asn1DerDecoder decoder)

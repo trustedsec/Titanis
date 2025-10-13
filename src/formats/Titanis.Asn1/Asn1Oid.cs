@@ -49,7 +49,7 @@ namespace Titanis.Asn1
 			this._part0 = part0;
 			this._mask = 1;
 			this._part1 = 0;
-			this._subparts = null;
+			this._subparts = Array.Empty<Asn1OidPart>();
 		}
 
 		public Asn1Oid(string str)
@@ -93,21 +93,21 @@ namespace Titanis.Asn1
 			{
 				this._part0 = this._part1 = this._mask = 0;
 			}
-			this._subparts = null;
+			this._subparts = Array.Empty<Asn1OidPart>();
 		}
 
 		public Asn1Oid(
 			Asn1OidPart part0,
 			Asn1OidPart part1,
-			params Asn1OidPart[] parts)
+			params Asn1OidPart[]? parts)
 		{
 			this._part0 = part0;
 			this._part1 = part1;
 			this._mask = 1 | 2;
-			this._subparts = parts;
+			this._subparts = parts ?? Array.Empty<Asn1OidPart>();
 		}
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return obj is Asn1Oid oid && Equals(oid);
 		}
@@ -144,7 +144,7 @@ namespace Titanis.Asn1
 		{
 			Asn1OidPart part0 = new Asn1OidPart();
 			Asn1OidPart part1 = new Asn1OidPart();
-			Asn1OidPart[] etc = null;
+			Asn1OidPart[]? etc = null;
 			if (parts != null)
 			{
 				if (parts.Length > 0)

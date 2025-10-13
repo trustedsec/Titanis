@@ -11,11 +11,6 @@ namespace Titanis.Asn1.Metadata
 		public override Asn1TypeKind Kind => Asn1TypeKind.CustomEnumeration;
 		public override Asn1Tag Tag => Asn1PredefTag.Enumerated;
 
-		internal Asn1EnumeratedType()
-		{
-
-		}
-
 		public Asn1EnumeratedType(Asn1Enumeration[] enumerations)
 		{
 			if (enumerations == null)

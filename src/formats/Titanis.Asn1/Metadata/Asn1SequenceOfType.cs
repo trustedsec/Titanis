@@ -9,10 +9,6 @@ namespace Titanis.Asn1.Metadata
 		public override bool HasStaticTag => true;
 		public override Asn1Tag Tag => new Asn1Tag(Asn1PredefTag.Sequence, Asn1TagFlags.Constructed);
 
-		internal Asn1SequenceOfType()
-		{
-
-		}
 		public Asn1SequenceOfType(Asn1Type elementType)
 			: base(elementType)
 		{

@@ -17,6 +17,11 @@ namespace Titanis.Dynamic
 
 		class StubInfo
 		{
+			internal StubInfo(FieldBuilder handlerField)
+			{
+				this.handlerField = handlerField;
+			}
+
 			internal FieldBuilder handlerField;
 		}
 
@@ -35,7 +40,7 @@ namespace Titanis.Dynamic
 				.Ret()
 				;
 			tb.DefineMethodOverride(mbSetHandler, ReflectionHelper.MethodOf<IStub>(r => r.SetHandler(null)));
-			return new StubInfo { handlerField = handlerField };
+			return new StubInfo(handlerField);
 		}
 
 		private static readonly MethodInfo handleMethod = ReflectionHelper.MethodOf<IStubHandler>(r => r.HandleCall(null));

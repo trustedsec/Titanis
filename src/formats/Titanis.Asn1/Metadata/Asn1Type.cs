@@ -19,9 +19,9 @@ namespace Titanis.Asn1.Metadata
 
 		public virtual Asn1Type CanonicalType => this;
 
-		public string Name { get; protected set; }
+		public string? Name { get; protected set; }
 		public Asn1Module Module { get; private set; }
-		public Asn1Type EnclosingType { get; private set; }
+		public Asn1Type? EnclosingType { get; private set; }
 		public bool IsPrimitiveType => this.IsPrimitiveInternal;
 		internal virtual bool IsPrimitiveInternal => false;
 
@@ -67,7 +67,7 @@ namespace Titanis.Asn1.Metadata
 			// UNDONE: Silently don't attach.  This may be a reference to a type from another module.
 			//throw new InvalidOperationException(Messages.Asn1_TypeAlreadyAttachedToModule);
 		}
-		internal void OnAttached(Asn1Type enclosingType, string name)
+		internal void OnAttached(Asn1Type? enclosingType, string? name)
 		{
 			Debug.Assert(this.Module != null);
 

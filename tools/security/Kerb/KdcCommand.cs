@@ -15,6 +15,7 @@ namespace Kerb;
 /// </summary>
 internal abstract class KdcCommand : Command
 {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 	[Parameter]
 	[Mandatory]
 	[Category(ParameterCategories.AuthenticationKerberos)]
@@ -25,6 +26,7 @@ internal abstract class KdcCommand : Command
 
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 	public NetworkParameters NetworkParameters { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
 	protected KerberosClient CreateKerberosClient()
 	{

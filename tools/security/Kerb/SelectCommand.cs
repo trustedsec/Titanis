@@ -27,10 +27,12 @@ Specify the source files using -From.  You may specify multiple files and multip
 	[Example("Print only tickets targeting LUMON-FS1", @"{0} -From milchick*.kirbi -MatchingSpn .*/LUMON-FS1")]
 	internal class SelectCommand : Command
 	{
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 		[Parameter(0)]
 		[Mandatory]
 		[Description("File names or patterns")]
 		public string[] From { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
 		[Parameter]
 		[Description("Target file name")]
@@ -114,6 +116,8 @@ Specify the source files using -From.  You may specify multiple files and multip
 			{
 				var pattern = this.ResolveFsPath(item);
 				var dir = Path.GetDirectoryName(pattern);
+				if (string.IsNullOrEmpty(dir))
+					dir = ".";
 				pattern = Path.GetFileName(pattern);
 				var fileNames = Directory.GetFiles(dir, pattern);
 				if (fileNames.Length == 0)

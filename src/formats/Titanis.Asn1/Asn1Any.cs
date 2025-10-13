@@ -8,7 +8,7 @@ namespace Titanis.Asn1
 {
 	public class Asn1Any : IAsn1Tag, IAsn1DerEncodableTlv
 	{
-		private byte[] _tlvData;
+		private byte[]? _tlvData;
 		private Memory<byte> _innerData;
 		public Asn1Tag Tag { get; private set; }
 
