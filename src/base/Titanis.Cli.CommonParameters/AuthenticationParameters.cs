@@ -469,17 +469,33 @@ namespace Titanis.Cli
 			if (cred != null && ((this.Kdc is not null) || foundMatchingTicket))
 			{
 				var logger = this.Services.GetService<IKerberosCallback>();
-				krbContext = new KerberosClientContext(
-					cred,
-					this._kerberosClient,
-					targetSpn,
-					this.UserDomain,
-					callback: logger
-					)
+
+				// TODO: This should be truly asynchronous.
+				try
 				{
-					RequiredCapabilities = 0
-						| SecurityCapabilities.MutualAuthentication | SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality | SecurityCapabilities.SequenceDetection | SecurityCapabilities.ReplayDetection
-				};
+					var ticket = Task.Factory.StartNew(() => this._kerberosClient.GetTicketAsync(
+						targetSpn,
+						this.UserDomain,
+						cred,
+						null,
+						CancellationToken.None), TaskCreationOptions.LongRunning).Unwrap().Result;
+
+					krbContext = new KerberosClientContext(
+						cred,
+						this._kerberosClient,
+						targetSpn,
+						ticket,
+						callback: logger
+						)
+					{
+						RequiredCapabilities = 0
+							| SecurityCapabilities.MutualAuthentication | SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality | SecurityCapabilities.SequenceDetection | SecurityCapabilities.ReplayDetection
+					};
+				}
+				catch (Exception ex)
+				{
+					log?.WriteWarning($"Unable to get Kerberos ticket for {targetSpn}: {ex.Message}");
+				}
 			}
 			else
 			{

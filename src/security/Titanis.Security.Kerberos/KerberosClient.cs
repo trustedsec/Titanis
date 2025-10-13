@@ -517,15 +517,17 @@ namespace Titanis.Security.Kerberos
 			}
 		}
 
-		internal async Task<TicketInfo> GetTicketAsync(
+		public async Task<TicketInfo> GetTicketAsync(
 			ServicePrincipalName targetSpn,
 			string realm,
 			KerberosCredential credential,
-			TicketParameters ticketParameters,
+			TicketParameters? ticketParameters,
 			CancellationToken cancellationToken
 			)
 		{
 			ArgumentNullException.ThrowIfNull(targetSpn);
+			ArgumentException.ThrowIfNullOrEmpty(realm);
+			ArgumentNullException.ThrowIfNull(credential);
 
 			var ticket = this.TicketCache.GetTicketFromCache(targetSpn);
 			if (ticket != null)

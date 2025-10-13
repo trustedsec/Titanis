@@ -115,7 +115,7 @@ namespace Titanis.Security.Kerberos
 		/// Gets the realm of the target the ticket is valid in.
 		/// </summary>
 		[DisplayName("Ticket realm")]
-		public string? TicketRealm => this.ticket.realm.value;
+		public string TicketRealm => this.ticket.realm.value;
 
 		/// <summary>
 		/// Gets the target service.

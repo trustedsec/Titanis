@@ -53,33 +53,6 @@ namespace Titanis.Security
 	/// </summary>
 	public abstract class AuthClientContext : AuthContext
 	{
-
-		/// <summary>
-		/// Creates a new <see cref="AuthClientContext"/> with the same credentials that may be used
-		/// for another authentication operation.
-		/// </summary>
-		/// <returns>The duplicate <see cref="AuthClientContext"/>.</returns>
-		public AuthClientContext Duplicate()
-		{
-			var dup = this.DuplicateImpl();
-			CopyFieldsTo(dup);
-			return dup;
-		}
-
-		protected void CopyFieldsTo(AuthClientContext dup)
-		{
-			dup.TargetSpn = this.TargetSpn;
-			dup.IsTargetSpnUntrusted = this.IsTargetSpnUntrusted;
-			dup.RequiredCapabilities = this.RequiredCapabilities;
-		}
-
-		/// <summary>
-		/// Creates a new <see cref="AuthClientContext"/> with the same credentials that may be used
-		/// for another authentication operation.
-		/// </summary>
-		/// <returns>The duplicate <see cref="AuthClientContext"/>.</returns>
-		protected abstract AuthClientContext DuplicateImpl();
-
 		/// <summary>
 		/// Gets the name of the user.
 		/// </summary>

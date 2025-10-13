@@ -19,24 +19,12 @@ namespace Titanis.Security.Spnego
 	{
 		public static readonly Oid SpnegoOid = new Oid("1.3.6.1.5.5.2");
 
+		/// <summary>
+		/// Initializes a new <see cref="SpnegoClientContext"/>.
+		/// </summary>
 		public SpnegoClientContext()
 		{
 
-		}
-
-		/// <inheritdoc/>
-		protected sealed override AuthClientContext DuplicateImpl()
-			=> this.DuplicateSpnego();
-		public SpnegoClientContext DuplicateSpnego()
-		{
-			var dup = new SpnegoClientContext();
-			foreach (var ctx in this.Contexts)
-			{
-				var dup2 = ctx.Duplicate();
-				dup.Contexts.Add(dup2);
-			}
-			this.CopyFieldsTo(dup);
-			return dup;
 		}
 
 		/// <summary>

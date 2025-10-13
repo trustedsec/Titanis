@@ -57,28 +57,6 @@ namespace Titanis.Security.Ntlm
 		public sealed override int Legs => 3;
 
 		/// <inheritdoc/>
-		protected sealed override AuthClientContext DuplicateImpl()
-			=> this.DuplicateNtlm();
-		public NtlmClientContext DuplicateNtlm()
-		{
-			var dup = new NtlmClientContext(this.Credential, this.UseNtlmV2, this._callback)
-			{
-				Workstation = this.Workstation,
-				WorkstationDomain = this.WorkstationDomain,
-				TargetSpn = this.TargetSpn,
-				ClientConfigFlags = this.ClientConfigFlags,
-				RequiredCapabilities = this.RequiredCapabilities,
-				_options = this._options,
-				Version = this.Version,
-				AuthFlags = this.AuthFlags,
-
-				ClientChannelBindingsUnhashed = this.ClientChannelBindingsUnhashed,
-			};
-			this.CopyFieldsTo(dup);
-			return dup;
-		}
-
-		/// <inheritdoc/>
 		public sealed override string UserName => this.Credential.UserName;
 
 		/// <summary>
