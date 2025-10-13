@@ -1,4 +1,5 @@
-﻿using Titanis.Cli;
+﻿using System.ComponentModel;
+using Titanis.Cli;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
 using Titanis.Msrpc.Msdcom;
@@ -9,7 +10,8 @@ using Titanis.Security.Ntlm;
 
 namespace WmiRegistry
 {
-	[Command(HelpText = "Manipulates the registry of a remote computer via WMI")]
+	[Command]
+	[Description("Manipulates the registry of a remote computer via WMI")]
 	internal class Program : Command
 	{
 		static int Main(string[] args)

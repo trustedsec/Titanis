@@ -9,8 +9,9 @@ using Titanis.Msrpc.Mswkst;
 
 namespace Titanis.Smb2.Cli
 {
+	[Command]
 	[OutputRecordType(typeof(ShareInfo))]
-	[Command(HelpText = "Creates a new share")]
+	[Description("Creates a new share")]
 	internal sealed class Smb2NewShareCommand : ServerServiceRpcCommand
 	{
 		protected sealed override Task<int> RunAsync(ServerServiceClient client, CancellationToken cancellationToken)

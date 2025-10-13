@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Titanis.Cli;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
@@ -9,7 +10,8 @@ using Titanis.Security.Ntlm;
 
 namespace ShellExec
 {
-	[Command(HelpText = "Executes a remote command via the Windows Shell interface")]
+	[Command]
+	[Description("Executes a remote command via the Windows Shell interface")]
 	internal class Program : Command
 	{
 		static async Task Main(string[] args)

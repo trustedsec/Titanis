@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.ComponentModel;
+using System.Threading;
 using Titanis.Cli;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
@@ -9,7 +10,8 @@ using Titanis.Security.Ntlm;
 
 namespace WordMacroExec
 {
-	[Command(HelpText = "Executes a remote command via Microsoft Word")]
+	[Command]
+	[Description("Executes a remote command via Microsoft Word")]
 	internal class Program : Command
 	{
 		static async Task Main(string[] args)

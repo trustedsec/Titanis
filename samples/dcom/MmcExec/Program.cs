@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Titanis;
 using Titanis.Cli;
 using Titanis.DceRpc;
@@ -10,7 +11,8 @@ using Titanis.Security.Ntlm;
 
 namespace MmcExec
 {
-	[Command(HelpText = "Executes a remote command using the MMC interface")]
+	[Command]
+	[Description("Executes a remote command using the MMC interface")]
 	internal class Program : Command
 	{
 		static async Task Main(string[] args)

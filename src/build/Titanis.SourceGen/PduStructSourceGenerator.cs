@@ -506,8 +506,8 @@ namespace Titanis.SourceGen
 					}, readStatements_BE.AsBlock()));
 				// void ReadFrom(IByteSource source, ByteOrder byteOrder)
 				readStatements.Switch(byteOrderArg,
-					Code.EnumField(PduByteOrder.LittleEndian).Case(Code.This.MethodOf(ReadFromName + LE_Suffix).Call(readerArg, byteOrderArg).Do()),
-					Code.EnumField(PduByteOrder.BigEndian).Case(Code.This.MethodOf(ReadFromName + BE_Suffix).Call(readerArg, byteOrderArg).Do()),
+					Code.EnumField(PduByteOrder.LittleEndian).Case(Code.This.MethodOf(ReadFromName + LE_Suffix).Call(readerArg, byteOrderArg).Do(), Code.Break),
+					Code.EnumField(PduByteOrder.BigEndian).Case(Code.This.MethodOf(ReadFromName + BE_Suffix).Call(readerArg, byteOrderArg).Do(), Code.Break),
 					Code.DefaultCase(Code.TypeRef(typeof(ArgumentOutOfRangeException)).New(Code.Primitive(ByteOrderParamName)).Throw().Do())
 					);
 				// this.OnAfterReadPdu()
@@ -532,8 +532,8 @@ namespace Titanis.SourceGen
 
 				// void WriteTo(ByteWriter writer, ByteOrder byteOrder)
 				writeStatements.Switch(byteOrderArg,
-					Code.EnumField(PduByteOrder.LittleEndian).Case(Code.This.MethodOf(WriteToName + LE_Suffix).Call(writerArg, byteOrderArg).Do()),
-					Code.EnumField(PduByteOrder.BigEndian).Case(Code.This.MethodOf(WriteToName + BE_Suffix).Call(writerArg, byteOrderArg).Do())
+					Code.EnumField(PduByteOrder.LittleEndian).Case(Code.This.MethodOf(WriteToName + LE_Suffix).Call(writerArg, byteOrderArg).Do(), Code.Break),
+					Code.EnumField(PduByteOrder.BigEndian).Case(Code.This.MethodOf(WriteToName + BE_Suffix).Call(writerArg, byteOrderArg).Do(), Code.Break)
 					);
 				// this.OnAfterWritePdu()
 				writeStatements.Do(Code.This.MethodOf(OnAfterWritePdu).Call(writerArg));

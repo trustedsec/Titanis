@@ -1,5 +1,6 @@
 ﻿using ms_lsar;
 using ms_scmr;
+using System.ComponentModel;
 using System.Net;
 using Titanis;
 using Titanis.Cli;
@@ -17,7 +18,8 @@ using Titanis.Winterop.Security;
 
 namespace WeakServices
 {
-	[Command(HelpText = "Checks a remote computer for services with a weak DACL")]
+	[Command]
+	[Description("Checks a remote computer for services with a weak DACL")]
 	internal class Program : Command
 	{
 		static void Main(string[] args)

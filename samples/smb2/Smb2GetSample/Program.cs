@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.ComponentModel;
+using System.Net;
 using Titanis;
 using Titanis.Cli;
 using Titanis.Net;
@@ -9,7 +10,8 @@ using Titanis.Smb2;
 
 namespace Smb2GetSample
 {
-	[Command(HelpText = "Gets a file from a remote computer via SMB")]
+	[Command]
+	[Description("Gets a file from a remote computer via SMB")]
 	internal class Program : Command
 	{
 		static async Task Main(string[] args)

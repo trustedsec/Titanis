@@ -1,4 +1,5 @@
 ﻿using ms_samr;
+using System.ComponentModel;
 using System.Net;
 using Titanis.Cli;
 using Titanis.DceRpc;
@@ -11,7 +12,8 @@ using Titanis.Security.Ntlm;
 
 namespace EnumUsers
 {
-	[Command(HelpText = "Enumerates users on a remote system")]
+	[Command]
+	[Description("Enumerates users on a remote system")]
 	internal class Program : Command
 	{
 		static void Main(string[] args)

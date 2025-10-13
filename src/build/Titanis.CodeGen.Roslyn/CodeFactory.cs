@@ -615,15 +615,15 @@ namespace Titanis.CodeGen
 		}
 
 		public static BreakStatementSyntax Break => SyntaxFactory.BreakStatement();
-		public static SwitchSectionSyntax DefaultCase(StatementSyntax statement)
+		public static SwitchSectionSyntax DefaultCase(params StatementSyntax[] statements)
 			=> SyntaxFactory.SwitchSection(
 				List<SwitchLabelSyntax>(SyntaxFactory.DefaultSwitchLabel()),
-				List(statement, Break)
+				List(statements)
 				);
-		public static SwitchSectionSyntax Case(this ExpressionSyntax test, StatementSyntax statement)
+		public static SwitchSectionSyntax Case(this ExpressionSyntax test, params StatementSyntax[] statements)
 			=> SyntaxFactory.SwitchSection(
 				List<SwitchLabelSyntax>(SyntaxFactory.CaseSwitchLabel(test)),
-				List(statement, Break)
+				List(statements)
 				);
 
 		public static BlockSyntax Block(params StatementSyntax[] statements)
