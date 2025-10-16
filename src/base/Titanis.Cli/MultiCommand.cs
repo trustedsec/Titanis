@@ -24,7 +24,7 @@ namespace Titanis.Cli
 			Debug.Assert(this.Context != null);
 			var context = this.Context!;
 
-			if (args != null && ((args.Length <= startIndex) || (args.Length > startIndex && args[startIndex].Text == "-?")))
+			if (args != null && ((args.Length <= startIndex) || (args.Length > startIndex && IsDistressCall(args[startIndex].Text))))
 			{
 				string helpText = this.GetHelpText(command, context.MetadataContext);
 				context.WriteMessage(helpText);
@@ -43,7 +43,7 @@ namespace Titanis.Cli
 				}
 				else
 				{
-					this.WriteError($"The subcommand `{subcmdName}` is not implemented.  Use -? to see a list of available subcommands.");
+					this.WriteError($"The subcommand `{subcmdName}` is not implemented.  Use -h to see a list of available subcommands.");
 					return Task.FromResult<int>(-1);
 				}
 			}
@@ -101,7 +101,7 @@ namespace Titanis.Cli
 				tbl.AddRow($"##doc[link;{attr.Name};#{commandName} {attr.Name}]", subdesc);
 			}
 			writer.WriteTable(tbl, "Command", "Description");
-			writer.AppendLine().WriteBodyTextLine($"For help on a subcommand, use `{commandName} <subcommand> -?`");
+			writer.AppendLine().WriteBodyTextLine($"For help on a subcommand, use `{commandName} <subcommand> -h`");
 		}
 	}
 }

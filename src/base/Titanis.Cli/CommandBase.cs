@@ -24,6 +24,14 @@ namespace Titanis.Cli
 	public abstract class CommandBase : IServiceProvider
 	{
 		/// <summary>
+		/// Determines whether a token indicates whether the user is requesting help.
+		/// </summary>
+		/// <param name="candidate">Token to check</param>
+		/// <returns><see langword="true"/></returns>
+		protected static bool IsDistressCall(string candidate)
+			=> candidate is "-?" or "-h" or "--help";
+
+		/// <summary>
 		/// Invokes the command.
 		/// </summary>
 		/// <param name="args">Arguments to the command</param>

@@ -51,7 +51,7 @@ namespace Titanis.Cli
 
 			var context = this.Context!;
 
-			if (args.Length > startIndex && args[startIndex].Text == "-?")
+			if (args.Length > startIndex && IsDistressCall(args[startIndex].Text))
 			{
 				string helpText = this.GetHelpText(command, context.MetadataContext);
 				this.WriteMessage(helpText);
