@@ -1,10 +1,7 @@
 ﻿namespace Titanis.Asn1.Metadata
 {
-	public class Asn1SizeConstraint : Asn1Constraint
+	public sealed class Asn1SizeConstraint : Asn1Constraint
 	{
-		public long? MinSize { get; }
-		public long? MaxSize { get; }
-
 		public Asn1SizeConstraint(long size)
 		{
 			this.MinSize = size;
@@ -15,5 +12,12 @@
 			this.MinSize = min;
 			this.MaxSize = max;
 		}
+
+		public long? MinSize { get; }
+		public long? MaxSize { get; }
+
+		public sealed override string ToString()
+			=> (this.MinSize.HasValue && this.MinSize == this.MaxSize) ? $"SIZE({this.MinSize.ToString()})"
+			: $"SIZE({new Asn1Int64Range(this.MinSize, true, this.MaxSize, true)})";
 	}
 }

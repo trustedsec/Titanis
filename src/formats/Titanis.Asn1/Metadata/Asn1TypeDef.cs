@@ -4,9 +4,6 @@ namespace Titanis.Asn1.Metadata
 {
 	public class Asn1TypeDef
 	{
-		public string Name { get; private set; }
-		public Asn1Type Definition { get; private set; }
-
 		public Asn1TypeDef(string name, Asn1Type definition)
 		{
 			if (string.IsNullOrEmpty(name))
@@ -21,9 +18,15 @@ namespace Titanis.Asn1.Metadata
 			this.Definition = definition;
 		}
 
-		public void Visit(IModuleVisitor visitor)
+		public string Name { get; private set; }
+		public Asn1Type Definition { get; private set; }
+
+		public sealed override string ToString() => $"{this.Name} ::= {this.Definition.DefinitionString}";
+
+		public void Accept(IModuleVisitor visitor)
 		{
-			visitor.VisitType(this);
+			ArgumentNullException.ThrowIfNull(visitor);
+			visitor.Visit(this);
 		}
 
 		public static bool IsValidName(string name)

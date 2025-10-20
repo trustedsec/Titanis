@@ -4,31 +4,37 @@ using System.Text;
 
 namespace Titanis.Asn1.Metadata
 {
-	public class Asn1AnyType : Asn1Type
+	/// <summary>
+	/// Represents ANY type.
+	/// </summary>
+	/// <remarks>
+	/// Although a value of type ANY may be of a constructed type,
+	/// this implementation treats the value as an octet string.
+	/// </remarks>
+	public sealed class Asn1AnyType : Asn1Type
 	{
-		internal static readonly Asn1AnyType Instance = new Asn1AnyType();
-
-		public Asn1Field? DefinedBy { get; internal set; }
-		public override Asn1TypeKind Kind => Asn1TypeKind.Any;
-		public override bool HasStaticTag => false;
-
-		public override bool IsConstructed => false;
-
-		internal Asn1AnyType()
+		public Asn1AnyType(string? definedBy)
 		{
-
-		}
-
-		public Asn1AnyType(Asn1Field definedBy)
-		{
-			if (definedBy is null)
-				throw new ArgumentNullException(nameof(definedBy));
 			this.DefinedBy = definedBy;
 		}
 
-		public override object Visit(ITypeVisitor visitor)
-		{
-			return visitor.VisitAny(this);
-		}
+		internal static readonly Asn1AnyType Instance = new Asn1AnyType(null);
+
+		/// <inheritdoc/>
+		public sealed override string DefinitionString => (this.DefinedBy is null) ? $"ANY" : $"ANY DEFINED BY {this.DefinedBy}";
+
+		/// <summary>
+		/// Gets the field that defines the type of values of this type.
+		/// </summary>
+		public string? DefinedBy { get; }
+		///<inheritdoc/>
+		public override Asn1TypeKind Kind => Asn1TypeKind.Any;
+		/// <inheritdoc/>
+		public sealed override bool HasStaticTag => false;
+		/// <inheritdoc/>
+		public sealed override bool IsConstructed => false;
+
+		/// <inheritdoc/>
+		public sealed override T Accept<T>(ITypeVisitor<T> visitor) => visitor.Visit(this);
 	}
 }

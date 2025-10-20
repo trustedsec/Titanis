@@ -1,24 +1,38 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Titanis.Asn1.Metadata
 {
+	/// <summary>
+	/// Represents a CHOICE defined in ASN.1.
+	/// </summary>
 	public sealed class Asn1ChoiceType : Asn1ComplexType
 	{
-		public override bool HasStaticTag => false;
+		public Asn1ChoiceType(Asn1Field[] members, bool isExtensible) : base(members)
+		{
+			foreach (var member in members)
+			{
+				if (!member.FieldType.HasStaticTag)
+					throw new ArgumentException($"Member '{member.Name}' does not have a static tag and cannot be included within a CHOICE.");
+			}
 
-		public override Asn1TypeKind Kind => Asn1TypeKind.Choice;
+			this.IsExtensible = isExtensible;
+		}
+
+		/// <inheritdoc/>
+		public sealed override string DefinitionString => "CHOICE {...}";
+
+		/// <inheritdoc/>
+		public sealed override bool HasStaticTag => false;
+		/// <inheritdoc/>
+		public sealed override Asn1TypeKind Kind => Asn1TypeKind.Choice;
+
+		/// <inheritdoc/>
+		public sealed override bool IsExtensible { get; }
+
 		//public bool HasDynamicMember => this.Members.Any(m => !m.FieldType.HasStaticTag);
 
-		public Asn1ChoiceType(Asn1Field[] members) : base(members)
-		{
-		}
-		public Asn1ChoiceType() : base()
-		{
-		}
-
-		public override object Visit(ITypeVisitor visitor)
-		{
-			return visitor.VisitChoice(this);
-		}
+		/// <inheritdoc/>
+		public sealed override T Accept<T>(ITypeVisitor<T> visitor) => visitor.Visit(this);
 	}
 }

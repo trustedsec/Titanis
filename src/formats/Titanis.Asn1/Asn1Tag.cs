@@ -14,7 +14,7 @@ namespace Titanis.Asn1
 		private const int TagNumberMask = 0x1FFFFFFF;
 		internal const int ConstructedFlag = 0x2000_0000;
 
-		private Asn1Tag(uint rawValue)
+		public Asn1Tag(uint rawValue)
 		{
 			this._value = rawValue;
 		}
@@ -38,13 +38,16 @@ namespace Titanis.Asn1
 
 			this._value = (uint)tagNumber | (uint)flags << 24;
 		}
+		public Asn1Tag(Asn1TagClass tagClass, int tagNumber)
+			: this(tagNumber, (Asn1TagFlags)tagClass)
+		{
+		}
 		public Asn1Tag(Asn1PredefTag tag, Asn1TagFlags flags)
 		{
 			this._value = (uint)tag | (uint)flags << 24;
 		}
 
-		public override string ToString()
-			=> $"0x{this._value:X2}";
+		public override string ToString() => this.TagClass switch { Asn1TagClass.Universal => "UNIVERSAL ", Asn1TagClass.Application => "APPLICATION ", Asn1TagClass.Private => "PRIVATE ", _ => string.Empty } + this.TagNumber.ToString();
 
 		public static implicit operator Asn1Tag(Asn1PredefTag predef)
 			=> new Asn1Tag(predef);
@@ -52,6 +55,7 @@ namespace Titanis.Asn1
 		public static Asn1Tag Empty => new Asn1Tag();
 
 		internal readonly uint _value;
+		public uint RawValue => this._value;
 		public uint TagNumber => (this._value & TagNumberMask);
 		public bool IsEmpty => this._value == 0;
 		public Asn1TagClass TagClass => (Asn1TagClass)((this._value >> 24) & (uint)Asn1TagClass.Mask);
@@ -63,14 +67,19 @@ namespace Titanis.Asn1
 		public Asn1Tag AsConstructed()
 			=> new Asn1Tag(this._value | ConstructedFlag);
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return obj is Asn1Tag tag && this.Equals(tag);
 		}
 
-		public bool Equals(Asn1Tag other)
+		public bool EqualsExactly(Asn1Tag other)
 		{
 			return this._value == other._value;
+		}
+
+		public bool Equals(Asn1Tag other)
+		{
+			return (this._value | ConstructedFlag) == (other._value | ConstructedFlag);
 		}
 
 		public override int GetHashCode()

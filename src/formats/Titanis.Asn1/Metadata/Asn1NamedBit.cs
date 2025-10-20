@@ -4,21 +4,21 @@ using System.Text;
 
 namespace Titanis.Asn1.Metadata
 {
-	public sealed class Asn1NamedBit
+	public sealed class Asn1NamedNumber
 	{
-		public Asn1NamedBit(string name, int position)
+		public Asn1NamedNumber(string name, long value)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
 			this.Name = name;
-			this.Position = position;
+			this.Value = value;
 		}
 
 		/// <inheritdoc/>
-		public sealed override string ToString() => $"{this.Name}({this.Position})";
+		public sealed override string ToString() => $"{this.Name}({this.Value})";
 
 		public string Name { get; }
-		public int Position { get; }
+		public long Value { get; }
 	}
 }

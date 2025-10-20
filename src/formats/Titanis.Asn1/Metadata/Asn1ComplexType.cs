@@ -5,38 +5,42 @@ using System.Text;
 
 namespace Titanis.Asn1.Metadata
 {
+	/// <summary>
+	/// Represents a type composed of fields.
+	/// </summary>
 	public abstract class Asn1ComplexType : Asn1ConstructedType
 	{
-		private IList<Asn1Field> _members;
-		private int _extensionIndex = -1;
-
-		public Asn1Field[] GetMembers() => this._members.ToArray();
-		public int MemberCount => this._members.Count;
-
-		public bool HasDynamicMember { get; private set; }
-
-		private protected Asn1ComplexType(IList<Asn1Field> members)
+		private protected Asn1ComplexType(IReadOnlyList<Asn1Field> members, int extensionIndex = -1)
 		{
 			this._members = members;
 			this.HasDynamicMember = members.Any(m => !m.FieldType.HasStaticTag);
+			this._extensionIndex = extensionIndex;
 		}
 		private protected Asn1ComplexType()
 		{
-			this._members = new List<Asn1Field>();
+			this._members = Array.Empty<Asn1Field>();
 		}
 
-		internal void AddField(Asn1Field field)
-		{
-			if (field is null)
-				throw new ArgumentNullException(nameof(field));
-			this._members.Add(field);
-			this.HasDynamicMember |= !field.FieldType.HasStaticTag;
-		}
+		private IReadOnlyList<Asn1Field> _members;
+		private int _extensionIndex = -1;
 
-		internal void SetExtension()
-		{
-			this._extensionIndex = this._members.Count;
-		}
+		/// <summary>
+		/// Gets the members of the type.
+		/// </summary>
+		/// <returns></returns>
+		public Asn1Field[] GetMembers() => this._members.ToArray();
+		/// <summary>
+		/// Gets the number of members.
+		/// </summary>
+		public int MemberCount => this._members.Count;
+		/// <summary>
+		/// Gets a value indicating whether the type has a member without a static tag.
+		/// </summary>
+		public bool HasDynamicMember { get; }
+		/// <summary>
+		/// Gets a value indicating whether the type is extensible.
+		/// </summary>
+		public abstract bool IsExtensible { get; }
 
 		protected override void OnAttachedOverride()
 		{
@@ -46,8 +50,7 @@ namespace Titanis.Asn1.Metadata
 			{
 				foreach (var member in this._members)
 				{
-					member.FieldType.OnAttaching(this.Module, member.Name);
-					member.FieldType.OnAttached(this, member.Name);
+					member.FieldType.OnAttached(this.DeclaringModule, this, member.Name);
 				}
 			}
 		}

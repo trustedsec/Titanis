@@ -9,54 +9,38 @@ namespace Titanis.Asn1
 	/// Wraps an ASN.1 TLV in a TLV with an explicit tag.
 	/// </summary>
 	/// <typeparam name="T">Type of inner TLV</typeparam>
-	public class Asn1Explicit<T> : IAsn1DerEncodableTlv
-		where T : IAsn1DerEncodableTlv, new()
+	public class Asn1Explicit<T> : IAsn1DerEncodableTlv, IAsn1DerEncodableValue
+		where T : IAsn1DerEncodableTlv, IAsn1DerDecodableTlv<T>
 	{
-		public Asn1Tag Tag { get; set; }
-		public T? Value { get; set; }
-
-		public Asn1Explicit() { }
-		public Asn1Explicit(Asn1Tag tag)
+		/// <summary>
+		/// Initializes a new <see cref="Asn1Explicit{T}"/>.
+		/// </summary>
+		/// <param name="tag">Tag</param>
+		public Asn1Explicit(Asn1Tag tag, T value)
 		{
 			this.Tag = tag;
+			this.Value = value;
 		}
 
-		public void DecodeTlv(Asn1DerDecoder decoder)
-		{
-			var end = decoder.DecodeTlvStart(this.Tag);
-			if (this.Value == null)
-				this.Value = new T();
+		/// <summary>
+		/// Gets the tag of the outer TLV.
+		/// </summary>
+		public Asn1Tag Tag { get; }
+		/// <summary>
+		/// Gets the value.
+		/// </summary>
+		public T Value { get; }
 
-			this.Value.DecodeTlv(decoder);
-			decoder.CloseTlv(end);
-		}
-
-		public void DecodeValue(Asn1DerDecoder decoder)
+		public void EncodeTlv(Asn1DerEncoder encoder)
 		{
-			(this.Value ??= new()).DecodeTlv(decoder);
+			var pos = encoder.Position;
+			this.Value.EncodeTlv(encoder);
+			encoder.EncodeCloseTlvHeader(this.Tag, pos);
 		}
 
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
-			encoder.EncodeObjTlv((this.Value ?? new()));
-		}
-
-		public bool TryDecodeTlv(Asn1DerDecoder decoder)
-		{
-			if (decoder.CheckTag(this.Tag))
-			{
-				var end = decoder.DecodeTlvStart(this.Tag);
-				if (this.Value == null)
-					this.Value = new T();
-
-				this.Value.DecodeTlv(decoder);
-				decoder.CloseTlv(end);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			this.Value.EncodeTlv(encoder);
 		}
 	}
 }

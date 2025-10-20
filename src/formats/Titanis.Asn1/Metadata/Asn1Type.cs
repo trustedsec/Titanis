@@ -11,77 +11,114 @@ namespace Titanis.Asn1.Metadata
 		TopLevel = (1 << 1),
 	}
 
+	/// <summary>
+	/// Represents an ASN.1 type.
+	/// </summary>
 	public abstract class Asn1Type
 	{
-		private protected Asn1Type()
+		protected Asn1Type()
 		{
 		}
 
+		/// <summary>
+		/// Gets the canonical type for this type.
+		/// </summary>
+		/// <remarks>
+		/// For derived types, this returns the type it is based on.
+		/// </remarks>
 		public virtual Asn1Type CanonicalType => this;
-
+		/// <summary>
+		/// Gets the name of this type, if it is named.
+		/// </summary>
 		public string? Name { get; protected set; }
-		public Asn1Module Module { get; private set; }
+		internal string? ComponentName { get; private set; }
+		/// <summary>
+		/// Gets the module that declared this type.
+		/// </summary>
+		/// <remarks>
+		/// Universal types return <see langword="null"/>.
+		/// </remarks>
+		public Asn1Module? DeclaringModule { get; private set; }
+		/// <summary>
+		/// Gets the type that encloses this type.
+		/// </summary>
 		public Asn1Type? EnclosingType { get; private set; }
-		public bool IsPrimitiveType => this.IsPrimitiveInternal;
-		internal virtual bool IsPrimitiveInternal => false;
-
-		internal string SuggestedName { get; private set; }
-		internal void SuggestName(string suggestedName)
-		{
-			if (this.SuggestedName == null)
-				this.SuggestedName = suggestedName;
-			var canonical = this.CanonicalType;
-			if (canonical != this)
-				canonical.SuggestName(suggestedName);
-		}
-
+		/// <summary>
+		/// Gets a value indicating whether this is a constructed type.
+		/// </summary>
+		/// <remarks>
+		/// Constructed types are composed of elements.
+		/// </remarks>
 		public abstract bool IsConstructed { get; }
+		/// <summary>
+		/// Gets a <see cref="Asn1TypeKind"/> value for this type.
+		/// </summary>
+		public abstract Asn1TypeKind Kind { get; }
+		public Asn1TypeKind CanonicalKind => this.CanonicalType.Kind;
 
-		public override string ToString() => this.Name;
+		private const string UnnamedTypeName = "<unnamed>";
 
-		public virtual Asn1Tag Tag => throw new NotSupportedException();
-		public virtual Asn1Tag EffectiveTag => this.HasStaticTag ? this.Tag : Asn1PredefTag.Unspecified;
+		/// <inheritdoc/>
+		public sealed override string ToString() => (this.Name is null) ? this.DefinitionString : $"{this.Name} ::= {this.DefinitionString}";
+		/// <summary>
+		/// Gets the definition as a string.
+		/// </summary>
+		public abstract string DefinitionString { get; }
+
+		/// <summary>
+		/// Gets a value indicating whether this type has a tag that doesn't change.
+		/// </summary>
 		public abstract bool HasStaticTag { get; }
+		/// <summary>
+		/// Gets the static tag for this type.
+		/// </summary>
+		/// <remarks>
+		/// If <see cref="HasStaticTag"/> is <see langword="false"/>, this property
+		/// throws <see cref="NotImplementedException"/>.
+		/// </remarks>
+		public virtual Asn1Tag StaticTag => throw new NotSupportedException();
+		//public virtual Asn1Tag EffectiveTag => this.HasStaticTag ? this.Tag : Asn1PredefTag.Unspecified;
 
 		private Asn1TypeFlags _flags;
 		private bool IsAttached => (0 != (this._flags & Asn1TypeFlags.Attached));
 		private bool IsTopLevel => (0 != (this._flags & Asn1TypeFlags.TopLevel));
 
-		internal void AttachTopLevel(Asn1Module module, string name)
+		/// <summary>
+		/// Attaches the type as a top-level type defined within a module.
+		/// </summary>
+		/// <param name="declaringModule">Module declaring the type</param>
+		/// <param name="name">Assigned name</param>
+		internal void AttachTopLevel(Asn1Module declaringModule, string name)
 		{
-			if (!this.IsAttached)
+			if (!this.IsAttached && this.Kind is not Asn1TypeKind.Primitive)
 			{
 				this._flags |= Asn1TypeFlags.TopLevel;
-				this.OnAttaching(module, name);
-			}
-		}
 
-		internal void OnAttaching(Asn1Module module, string name)
-		{
-			if (!this.IsAttached)
-			{
-				this.Module = module;
+				this.DeclaringModule = declaringModule;
 				if (string.IsNullOrEmpty(this.Name))
 					this.Name = name;
 			}
-			// UNDONE: Silently don't attach.  This may be a reference to a type from another module.
-			//throw new InvalidOperationException(Messages.Asn1_TypeAlreadyAttachedToModule);
 		}
-		internal void OnAttached(Asn1Type? enclosingType, string? name)
-		{
-			Debug.Assert(this.Module != null);
 
-			if (!this.IsAttached)
+		internal void OnAttached(
+			Asn1Module? declaringModule,
+			Asn1Type? enclosingType,
+			string? componentName)
+		{
+			if (!this.IsAttached && this.Kind is not Asn1TypeKind.Primitive)
 			{
 				this._flags |= Asn1TypeFlags.Attached;
+
+				if (this.DeclaringModule == null)
+					this.DeclaringModule = declaringModule;
 
 				if (this.EnclosingType == null)
 					this.EnclosingType = enclosingType;
 
-				if (string.IsNullOrEmpty(this.Name))
-					this.Name = name;
+				if (string.IsNullOrEmpty(this.ComponentName))
+					this.ComponentName = componentName;
 
-				this.Module.AddType(this);
+				this.DeclaringModule?.AddType(this);
 
 				this.OnAttachedOverride();
 			}
@@ -91,14 +128,24 @@ namespace Titanis.Asn1.Metadata
 		{
 		}
 
-		public virtual Asn1Field TryGetMember(string name)
+		public abstract T Accept<T>(ITypeVisitor<T> visitor);
+
+		public Asn1Type Tagged(Asn1Tag tag, Asn1TagMode tagMode)
 		{
-			throw new NotSupportedException();
+			var type = this;
+			if (tagMode is Asn1TagMode.Implicit)
+			{
+				if (type is Asn1AnyType or Asn1ChoiceType)
+					throw new InvalidOperationException("Cannot wrap ANY or CHOICE with an implicit tag");
+				if (type is Asn1TaggedType tagged && tagged.TagMode is Asn1TagMode.Implicit)
+					type = tagged.BaseType;
+			}
+
+			if (tagMode is Asn1TagMode.Explicit || type.IsConstructed)
+				tag = tag.AsConstructed();
+
+				return new Asn1TaggedType(type, tag, tagMode);
 		}
-
-		public abstract Asn1TypeKind Kind { get; }
-
-		public abstract object Visit(ITypeVisitor visitor);
 	}
 
 	public static class Asn1Types

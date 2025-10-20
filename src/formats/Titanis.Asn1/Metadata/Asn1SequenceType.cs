@@ -4,23 +4,25 @@ namespace Titanis.Asn1.Metadata
 {
 	public sealed class Asn1SequenceType : Asn1ComplexType
 	{
-		public override Asn1TypeKind Kind => Asn1TypeKind.Sequence;
-		public override bool HasStaticTag => true;
-		public override Asn1Tag Tag => new Asn1Tag(Asn1PredefTag.Sequence, Asn1TagFlags.Constructed);
-
-		public Asn1SequenceType()
+		public Asn1SequenceType(Asn1Field[] members, bool isExtensible) : base(members)
 		{
-
+			this.IsExtensible = isExtensible;
 		}
 
-		public Asn1SequenceType(Asn1Field[] members) : base(members)
-		{
-		}
+		/// <inheritdoc/>
+		public sealed override string DefinitionString => "SEQUENCE";
+		/// <inheritdoc/>
+		public sealed override Asn1TypeKind Kind => Asn1TypeKind.Sequence;
+		/// <inheritdoc/>
+		public sealed override bool HasStaticTag => true;
+		/// <inheritdoc/>
+		public sealed override Asn1Tag StaticTag => new Asn1Tag(Asn1PredefTag.Sequence, Asn1TagFlags.Constructed);
 
-		public override object Visit(ITypeVisitor visitor)
-		{
-			return visitor.VisitSequence(this);
-		}
+		/// <inheritdoc/>
+		public sealed override bool IsExtensible { get; }
+
+		/// <inheritdoc/>
+		public sealed override T Accept<T>(ITypeVisitor<T> visitor) => visitor.Visit(this);
 	}
 
 }

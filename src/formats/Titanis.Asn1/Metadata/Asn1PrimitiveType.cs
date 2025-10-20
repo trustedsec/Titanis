@@ -19,15 +19,11 @@ namespace Titanis.Asn1.Metadata
 		UInt64,
 	}
 
+	/// <summary>
+	/// Represents a primitive (non-constructed) type.
+	/// </summary>
 	public sealed class Asn1PrimitiveType : Asn1PrimitiveTypeBase
 	{
-		public override Asn1Tag Tag => this.PredefTag;
-		public Asn1PredefTag PredefTag { get; }
-		internal override bool IsPrimitiveInternal => true;
-
-		public override Asn1TypeKind Kind => Asn1TypeKind.Primitive;
-		public Asn1PrimitiveSubtype Subtype { get; }
-
 		public Asn1PrimitiveType(Asn1PredefTag tag)
 		{
 			this.PredefTag = tag;
@@ -40,9 +36,24 @@ namespace Titanis.Asn1.Metadata
 			this.Subtype = subtype;
 		}
 
-		public override object Visit(ITypeVisitor visitor)
-		{
-			return visitor.VisitPrimitive(this);
-		}
+		// TODO: Put the actual ASN.1 name.
+		/// <inheritdoc/>
+		public sealed override string DefinitionString => this.Name;
+
+		/// <inheritdoc/>
+		protected sealed override Asn1Tag PrimitiveTag => this.PredefTag;
+		/// <summary>
+		/// Gets the <see cref="Asn1PredefTag"/> for this type.
+		/// </summary>
+		public Asn1PredefTag PredefTag { get; }
+		/// <inheritdoc/>
+		public override Asn1TypeKind Kind => Asn1TypeKind.Primitive;
+		/// <summary>
+		/// Gets a <see cref="Asn1PrimitiveSubtype"/> indicating the subtype.
+		/// </summary>
+		public Asn1PrimitiveSubtype Subtype { get; }
+
+		/// <inheritdoc/>
+		public sealed override T Accept<T>(ITypeVisitor<T> visitor) => visitor.Visit(this);
 	}
 }

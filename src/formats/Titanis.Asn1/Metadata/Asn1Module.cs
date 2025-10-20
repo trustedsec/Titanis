@@ -6,11 +6,58 @@ using System.Text;
 
 namespace Titanis.Asn1.Metadata
 {
+	/// <summary>
+	/// Represents an ASN.1 module.
+	/// </summary>
 	public class Asn1Module
+
 	{
+		public Asn1Module(
+			string name,
+			Asn1Oid? moduleId,
+			Asn1TypeDef[]? types,
+			Asn1ValueDef[]? values)
+		{
+			if (string.IsNullOrEmpty(name))
+				throw new ArgumentNullException(nameof(name));
+			if (!IsValidName(name))
+				throw new ArgumentException(string.Format(Messages.Asn1_TypeNameInvalid, name), nameof(name));
+
+			types ??= Array.Empty<Asn1TypeDef>();
+			values ??= Array.Empty<Asn1ValueDef>();
+
+			this.Name = name;
+			this.ModuleId = moduleId;
+			this.TypeDefinitions = types;
+			this.ValueDefinitions = values;
+
+			this._valuesByName = values.ToDictionary(v => v.Name);
+			this._typesByName = types.ToDictionary(t => t.Name);
+
+			foreach (var type in types)
+			{
+				if (type.Definition.DeclaringModule is null)
+					type.Definition.AttachTopLevel(this, type.Name);
+			}
+			foreach (var type in types)
+			{
+				if (type.Definition.DeclaringModule == this)
+					type.Definition.OnAttached(this, null, null);
+			}
+		}
+
+		/// <summary>
+		/// Gets the name of the module.
+		/// </summary>
 		public string Name { get; }
+		/// <summary>
+		/// Gets the OID for the module.
+		/// </summary>
 		public Asn1Oid? ModuleId { get; }
 
+		/// <summary>
+		/// Gets the module representing types defined by ASN.1.
+		/// </summary>
 		public static Asn1Module SystemModule = new Asn1Module(
 			"System",
 			Asn1Oids.Asn1Modules,
@@ -49,62 +96,26 @@ namespace Titanis.Asn1.Metadata
 				new Asn1TypeDef("GeneralizedTime", Asn1Types.GeneralizedTime),
 				new Asn1TypeDef("UTCTime", Asn1Types.UtcTime),
 			},
-			new Asn1ValueDef[0]
+			Array.Empty<Asn1ValueDef>()
 			);
 
-		public void Visit(IModuleVisitor visitor)
+		public void Accept(IModuleVisitor visitor)
 		{
 			foreach (var type in this.TypeDefinitions)
 			{
-				type.Visit(visitor);
+				type.Accept(visitor);
 			}
 			foreach (var value in this.ValueDefinitions)
 			{
-				value.Visit(visitor);
+				value.Accept(visitor);
 			}
 		}
 
 		public Asn1TypeDef[] TypeDefinitions { get; }
 		public Asn1ValueDef[] ValueDefinitions { get; }
 
-		private readonly Dictionary<string, Asn1ValueDef> _valuesByName;
-		private readonly Dictionary<string, Asn1TypeDef> _typesByName;
-
-		public Asn1Module(
-			string name,
-			Asn1Oid? moduleId,
-			Asn1TypeDef[] types,
-			Asn1ValueDef[] values)
-		{
-			if (string.IsNullOrEmpty(name))
-				throw new ArgumentNullException(nameof(name));
-			//if (moduleId.IsEmpty)
-			//	throw new ArgumentNullException(nameof(moduleId));
-			if (!IsValidName(name))
-				throw new ArgumentException(string.Format(Messages.Asn1_TypeNameInvalid, name), nameof(name));
-
-			types ??= Array.Empty<Asn1TypeDef>();
-			values ??= Array.Empty<Asn1ValueDef>();
-
-			this.Name = name;
-			this.ModuleId = moduleId;
-			this.TypeDefinitions = types;
-			this.ValueDefinitions = values;
-
-			this._valuesByName = values.ToDictionary(v => v.Name);
-			this._typesByName = types.ToDictionary(t => t.Name);
-
-			foreach (var type in types)
-			{
-				if (type.Definition.Module == null)
-					type.Definition.OnAttaching(this, type.Name);
-			}
-			foreach (var type in types)
-			{
-				if (type.Definition.Module == this)
-					type.Definition.OnAttached(null, null);
-			}
-		}
+		private Dictionary<string, Asn1ValueDef> _valuesByName;
+		private Dictionary<string, Asn1TypeDef> _typesByName;
 
 		private List<Asn1Type> _allTypes = new List<Asn1Type>();
 		internal void AddType(Asn1Type type)
@@ -115,20 +126,20 @@ namespace Titanis.Asn1.Metadata
 
 		public Asn1Type[] GetAllTypes() => this._allTypes.ToArray();
 
-		public Asn1TypeDef? TryResolveType(string name)
+		public Asn1TypeDef TryResolveType(string name)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			return this._typesByName.TryGetValue(name);
+			return this._typesByName?.TryGetValue(name);
 		}
 
-		public Asn1ValueDef? TryResolveValue(string name)
+		public Asn1ValueDef TryResolveValue(string name)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
 
-			return this._valuesByName.TryGetValue(name);
+			return this._valuesByName?.TryGetValue(name);
 		}
 
 		public static bool IsValidName(string name)

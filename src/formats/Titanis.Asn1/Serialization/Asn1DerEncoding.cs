@@ -12,17 +12,17 @@ namespace Titanis.Asn1.Serialization
 
 		public override Asn1Decoder CreateDecoder(IByteSource reader)
 		{
-			return new Asn1DerDecoder(reader);
+			return new Asn1DerDecoder(reader, false);
 		}
 
 		public static Asn1DerDecoder CreateDerDecoder(IByteSource reader)
 		{
-			return new Asn1DerDecoder(reader);
+			return new Asn1DerDecoder(reader, false);
 		}
 
 		public static Asn1DerDecoder CreateDerDecoder(ReadOnlyMemory<byte> buffer)
 		{
-			return new Asn1DerDecoder(new ByteMemoryReader(buffer));
+			return new Asn1DerDecoder(new ByteMemoryReader(buffer), false);
 		}
 
 		public override Asn1Encoder CreateEncoder()

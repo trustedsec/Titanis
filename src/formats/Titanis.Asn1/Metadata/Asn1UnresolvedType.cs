@@ -11,15 +11,19 @@ namespace Titanis.Asn1.Metadata
 			this.Name = name;
 		}
 
-		public override bool IsConstructed => true;
+		/// <inheritdoc/>
+		public sealed override string DefinitionString => "<unresolved>";
 
-		public override bool HasStaticTag => false;
+		/// <inheritdoc/>
+		public sealed override bool IsConstructed => false;
 
-		public override Asn1TypeKind Kind => Asn1TypeKind.Unknown;
+		/// <inheritdoc/>
+		public sealed override bool HasStaticTag => false;
 
-		public override object Visit(ITypeVisitor visitor)
-		{
-			return visitor.VisitUnresolved(this);
-		}
+		/// <inheritdoc/>
+		public sealed override Asn1TypeKind Kind => Asn1TypeKind.Unknown;
+
+		/// <inheritdoc/>
+		public sealed override T Accept<T>(ITypeVisitor<T> visitor) => visitor.Visit(this);
 	}
 }

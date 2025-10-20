@@ -5,54 +5,26 @@ using Titanis.Asn1.Serialization;
 
 namespace Titanis.Asn1
 {
-	public class Asn1Implicit<T> : IAsn1DerEncodableTlv
-		where T : IAsn1DerEncodable, new()
+	public class Asn1Implicit<T> : IAsn1DerEncodableTlv, IAsn1DerEncodableValue
+		where T : IAsn1DerEncodableValue, IAsn1DerDecodableValue<T>
 	{
-		public Asn1Tag Tag { get; set; }
-		public T? Value { get; set; }
-
-		public Asn1Implicit() { }
-		public Asn1Implicit(Asn1Tag tag)
+		public Asn1Implicit(Asn1Tag tag, T value)
 		{
 			this.Tag = tag;
+			this.Value = value;
 		}
 
-		public void DecodeTlv(Asn1DerDecoder decoder)
-		{
-			var end = decoder.DecodeTlvStart(this.Tag);
-			if (this.Value == null)
-				this.Value = new T();
-
-			this.Value.DecodeValue(decoder);
-			decoder.CloseTlv(end);
-		}
-
-		public void DecodeValue(Asn1DerDecoder decoder)
-		{
-			(this.Value ?? new()).DecodeValue(decoder);
-		}
+		public Asn1Tag Tag { get; }
+		public T Value { get; }
 
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
-			(this.Value ?? new()).EncodeValue(encoder);
+			this.Value.EncodeValue(encoder);
 		}
 
-		public bool TryDecodeTlv(Asn1DerDecoder decoder)
+		public void EncodeTlv(Asn1DerEncoder encoder)
 		{
-			if (decoder.CheckTag(this.Tag))
-			{
-				var end = decoder.DecodeTlvStart(this.Tag);
-				if (this.Value == null)
-					this.Value = new T();
-
-				this.Value.DecodeValue(decoder);
-				decoder.CloseTlv(end);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			encoder.EncodeValueTlv(this, this.Tag);
 		}
 	}
 }

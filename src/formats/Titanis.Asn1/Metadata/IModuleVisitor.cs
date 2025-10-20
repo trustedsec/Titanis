@@ -2,7 +2,7 @@
 {
 	public interface IModuleVisitor
 	{
-		void VisitType(Asn1TypeDef typeDef);
-		void VisitValue(Asn1ValueDef asn1ValueDef);
+		void Visit(Asn1TypeDef typeDef);
+		void Visit(Asn1ValueDef valueDef);
 	}
 }

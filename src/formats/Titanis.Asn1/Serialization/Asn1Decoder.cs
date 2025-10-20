@@ -17,10 +17,16 @@ namespace Titanis.Asn1.Serialization
 	/// </remarks>
 	public struct Asn1DecoderFrame
 	{
-		internal long endIndex;
-		internal Asn1Tag tag;
+		internal readonly long endPosition;
+		internal readonly Asn1Tag tag;
 
-		internal bool IsIndefiniteLength => (this.endIndex < 0);
+		public Asn1DecoderFrame(long endPosition, Asn1Tag tag)
+		{
+			this.endPosition = endPosition;
+			this.tag = tag;
+		}
+
+		internal bool IsIndefiniteLength => (this.endPosition < 0);
 		internal bool IsConstructed => this.tag.IsConstructed;
 	}
 
@@ -83,24 +89,26 @@ namespace Titanis.Asn1.Serialization
 		/// Decodes a <c>BOOLEAN</c> value
 		/// </summary>
 		/// <returns>A <see cref="bool"/> value decoded from the data</returns>
-		public abstract bool DecodeBool();
-		/// <summary>
-		/// Decodes an ANSI <see cref="char"/> from the data.
-		/// </summary>
-		/// <returns>The <see cref="char"/> value decoded from the data</returns>
-		public abstract char DecodeAnsiChar();
-		/// <summary>
-		/// Decodes a UTF-8 <see cref="char"/> from the data.
-		/// </summary>
-		/// <returns>The <see cref="char"/> value decoded from the data</returns>
-		/// <exception cref="InvalidDataException">The underlying data is not a valid encoding of a UTF-8 <see cref="char"/>.</exception>
-		public abstract char DecodeUtf8Char();
-		/// <summary>
-		/// Decodes a UTF-8 <see cref="Rune"/> from the data.
-		/// </summary>
-		/// <returns>The <see cref="Rune"/> value decoded from the data</returns>
-		/// <exception cref="InvalidDataException">The underlying data is not a valid encoding of a UTF-8 <see cref="Rune"/>.</exception>
-		public abstract Rune DecodeUtf8Rune();
+		public bool DecodeBoolTlv() => DecodeBoolTlv(Asn1PredefTag.Boolean);
+		public abstract bool DecodeBoolTlv(Asn1Tag tag);
+		///// <summary>
+		///// Decodes an ANSI <see cref="char"/> from the data.
+		///// </summary>
+		///// <returns>The <see cref="char"/> value decoded from the data</returns>
+		///// </remarks>
+		//public abstract char DecodeAnsiChar();
+		///// <summary>
+		///// Decodes a UTF-8 <see cref="char"/> from the data.
+		///// </summary>
+		///// <returns>The <see cref="char"/> value decoded from the data</returns>
+		///// <exception cref="InvalidDataException">The underlying data is not a valid encoding of a UTF-8 <see cref="char"/>.</exception>
+		//public abstract char DecodeUtf8Char();
+		///// <summary>
+		///// Decodes a UTF-8 <see cref="Rune"/> from the data.
+		///// </summary>
+		///// <returns>The <see cref="Rune"/> value decoded from the data</returns>
+		///// <exception cref="InvalidDataException">The underlying data is not a valid encoding of a UTF-8 <see cref="Rune"/>.</exception>
+		//protected abstract Rune DecodeUtf8Rune();
 		#region Integers
 		/// <summary>
 		/// Decodes a <see cref="byte"/> from the data.
@@ -112,102 +120,131 @@ namespace Titanis.Asn1.Serialization
 		/// may read multiple bytes from the underlying source, depending on the
 		/// encoding.
 		/// </remarks>
-		public abstract byte DecodeByte();
+		public byte DecodeIntegerTlvAsByte() => this.DecodeIntegerTlvAsByte(Asn1PredefTag.Integer);
+		public abstract byte DecodeIntegerTlvAsByte(Asn1Tag tag);
 		/// <summary>
 		/// Decodes an integer as a <see cref="sbyte"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="sbyte"/> value.</returns>
-		public abstract sbyte DecodeSByte();
+		public sbyte DecodeIntegerTlvAsSByte() => this.DecodeIntegerTlvAsSByte(Asn1PredefTag.Integer);
+		public abstract sbyte DecodeIntegerTlvAsSByte(Asn1Tag tag);
 		/// <summary>
 		/// Decodes an integer as a <see cref="BigInteger"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="BigInteger"/> value.</returns>
-		public abstract BigInteger DecodeBigInteger();
+		public BigInteger DecodeIntegerTlvAsBigInteger() => this.DecodeIntegerTlvAsBigInteger(Asn1PredefTag.Integer);
+		public abstract BigInteger DecodeIntegerTlvAsBigInteger(Asn1Tag tag);
 		/// <summary>
 		/// Decodes an integer as a <see cref="short"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="short"/> value.</returns>
-		public abstract short DecodeInt16();
+		public short DecodeIntegerTlvAsInt16() => this.DecodeIntegerTlvAsInt16(Asn1PredefTag.Integer);
+		public abstract short DecodeIntegerTlvAsInt16(Asn1Tag tag);
 		/// <summary>
 		/// Decodes an integer as a <see cref="ushort"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="ushort"/> value.</returns>
-		public abstract ushort DecodeUInt16();
+		public ushort DecodeIntegerTlvAsUInt16() => this.DecodeIntegerTlvAsUInt16(Asn1PredefTag.Integer);
+		public abstract ushort DecodeIntegerTlvAsUInt16(Asn1Tag tag);
 		/// <summary>
 		/// Decodes an integer as a <see cref="int"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="int"/> value.</returns>
-		public abstract int DecodeInt32();
+		public int DecodeIntegerTlvAsInt32() => this.DecodeIntegerTlvAsInt32(Asn1PredefTag.Integer);
+		public abstract int DecodeIntegerTlvAsInt32(Asn1Tag tag);
 		/// <summary>
 		/// Decodes an integer as a <see cref="uint"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="uint"/> value.</returns>
-		public abstract uint DecodeUInt32();
+		public uint DecodeIntegerTlvAsUInt32() => this.DecodeIntegerTlvAsUInt32(Asn1PredefTag.Integer);
+		public abstract uint DecodeIntegerTlvAsUInt32(Asn1Tag tag);
 		/// <summary>
 		/// Decodes an integer as a <see cref="long"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="long"/> value.</returns>
-		public abstract long DecodeInt64();
+		public long DecodeIntegerTlvAsInt64() => this.DecodeIntegerTlvAsInt64(Asn1PredefTag.Integer);
+		public abstract long DecodeIntegerTlvAsInt64(Asn1Tag tag);
 		/// <summary>
 		/// Decodes an integer as a <see cref="ulong"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="ulong"/> value.</returns>
-		public abstract ulong DecodeUInt64();
+		public ulong DecodeIntegerTlvAsUInt64() => this.DecodeIntegerTlvAsUInt64(Asn1PredefTag.Integer);
+		public abstract ulong DecodeIntegerTlvAsUInt64(Asn1Tag tag);
 		#endregion
 		#region Floating-point
 		/// <summary>
 		/// Decodes a REAL value as a <see cref="float"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="float"/> value.</returns>
-		public abstract float DecodeSingle();
+		public float DecodeRealTlvAsSingle() => this.DecodeRealTlvAsSingle(Asn1PredefTag.Real);
+		public abstract float DecodeRealTlvAsSingle(Asn1Tag tag);
 		/// <summary>
 		/// Decodes a REAL value as a <see cref="double"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="double"/> value.</returns>
-		public abstract double DecodeDouble();
+		public double DecodeRealTlvAsDouble() => this.DecodeRealTlvAsDouble(Asn1PredefTag.Real);
+		public abstract double DecodeRealTlvAsDouble(Asn1Tag tag);
 		/// <summary>
 		/// Decodes a REAL value as a <see cref="decimal"/>.
 		/// </summary>
 		/// <returns>The decoded <see cref="decimal"/> value.</returns>
-		public abstract decimal DecodeDecimal();
+		public decimal DecodeRealTlvAsDecimal() => this.DecodeRealTlvAsDecimal(Asn1PredefTag.Real);
+		public abstract decimal DecodeRealTlvAsDecimal(Asn1Tag tag);
 		#endregion
 		/// <summary>
 		/// Decodes a BITSTRING value.
 		/// </summary>
 		/// <returns>The decoded <see cref="Asn1BitString"/> value.</returns>
-		public abstract Asn1BitString DecodeBitString();
+		public Asn1BitString DecodeBitStringTlv() => this.DecodeBitStringTlv(Asn1PredefTag.BitString);
+		public abstract Asn1BitString DecodeBitStringTlv(Asn1Tag tag);
+
 		/// <summary>
 		/// Decodes an OCTET STRING value
 		/// </summary>
 		/// <returns>A byte array containing the value of the decoded octet string.</returns>
-		public abstract byte[] DecodeOctetString();
+		public byte[] DecodeOctetStringTlv() => this.DecodeOctetStringTlv(Asn1PredefTag.OctetString);
+		public abstract byte[] DecodeOctetStringTlv(Asn1Tag tag);
 		/// <summary>
 		/// Decodes a <c>NULL</c> value.
 		/// </summary>
-		/// <returns><see cref="DBNull.Value"/></returns>
+		/// <returns><see cref="Asn1Null"/></returns>
 		/// <remarks>
 		/// Since <c>NULL</c> values don't contain any data, this method does not
 		/// read from the <see cref="IByteSource"/>.
 		/// </remarks>
-		public abstract DBNull DecodeNull();
-		public abstract Asn1Oid DecodeOid();
-		public abstract Asn1OidPart[] DecodeRelativeOid();
+		public Asn1Null DecodeNullTlv() => DecodeNullTlv(Asn1PredefTag.Null);
+		public abstract Asn1Null DecodeNullTlv(Asn1Tag tag);
+		public Asn1Oid DecodeOidTlv() => DecodeOidTlv(Asn1PredefTag.ObjectIdentifier);
+		public abstract Asn1Oid DecodeOidValue();
+		public abstract Asn1Oid DecodeOidTlv(Asn1Tag tag);
+		public Asn1OidPart[] DecodeRelativeOidTlv() => DecodeRelativeOidTlv(Asn1PredefTag.RelativeOid);
+		public abstract Asn1OidPart[] DecodeRelativeOidTlv(Asn1Tag tag);
 		// TODO: Decode IRIs
 		#region Strings
-		public abstract string DecodeUtf8tring();
+		public string DecodeUtf8StringTlv() => DecodeUtf8StringTlv(Asn1PredefTag.UTF8String);
+		public abstract string DecodeUtf8StringTlv(Asn1Tag tag);
 		#endregion
 		#region Date/time
-		public abstract DateTime DecodeUtcTime();
-		public abstract DateTime DecodeDateTime();
+		public DateTime DecodeUtcTimeTlv() => DecodeUtcTimeTlv(Asn1PredefTag.UtcTime);
+		public abstract DateTime DecodeUtcTimeTlv(Asn1Tag tag);
+		public TDate DecodeDateTimeTlv<TDate>() where TDate : IAsn1DateTime<TDate> => TDate.CreateFromValue(DecodeDateTimeTlv(TDate.StaticTag));
+		public GeneralizedTime DecodeDateTimeTlv() => new GeneralizedTime(DecodeDateTimeTlv(Asn1PredefTag.GeneralizedTime));
+		public abstract DateTime DecodeDateTimeTlv(Asn1Tag tag);
 		#endregion
 
-		public T DecodeString<T>() where T : struct, IAsn1String
+		public T DecodeStringTlv<T>() where T : struct, IAsn1String
 		{
-			return new T { Value = this.DecodeUtf8tring() };
+			var t = new T();
+			t.Value = this.DecodeUtf8StringTlv(t.Tag);
+			return t;
 		}
-		public T DecodeDateTime<T>() where T : struct, IAsn1DateTime
+		public T DecodeStringTlv<T>(Asn1Tag expectedTag) where T : struct, IAsn1String
 		{
-			return new T { Value = this.DecodeDateTime() };
+			return new T { Value = this.DecodeUtf8StringTlv(expectedTag) };
+		}
+		public T DecodeDateTimeTlv<T>(Asn1Tag expectedTag) where T : struct, IAsn1DateTime
+		{
+			return new T { Value = this.DecodeDateTimeTlv(expectedTag) };
 		}
 
 		//internal static readonly MethodInfo method_IsEndOfTuple = ReflectionHelper.MethodOf<Asn1DerDecoder>(r => r.IsEndOfTuple());

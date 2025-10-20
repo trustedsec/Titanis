@@ -1,92 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Titanis.Asn1.Serialization;
 using Titanis.IO;
 
 namespace Titanis.Asn1
 {
-	public class Asn1Any : IAsn1Tag, IAsn1DerEncodableTlv
+	/// <summary>
+	/// Represents a value marked <c>ANY</c>.
+	/// </summary>
+	public class Asn1Any : IAsn1Tag, IAsn1DerEncodableTlv, IAsn1DerDecodableTlv<Asn1Any>
 	{
-		private byte[]? _tlvData;
-		private Memory<byte> _innerData;
-		public Asn1Tag Tag { get; private set; }
-
-		public Asn1Any()
+		public Asn1Any(Asn1Tag tag, byte[] tlvBytes)
 		{
+			if (tag.IsEmpty) throw new ArgumentNullException(nameof(tag));
+			if (tlvBytes is null) throw new ArgumentNullException(nameof(tlvBytes));
 
+			this.Tag = tag;
+			this.TlvBytes = tlvBytes;
+
+#if DEBUG
+			Asn1DerDecoder testDecoder = new Asn1DerDecoder(new ByteMemoryReader(tlvBytes), true);
+			var actualTag = testDecoder.PeekTag();
+			Debug.Assert(actualTag == tag);
+#endif
 		}
 
-		public static Asn1Any CreateFrom<T>(T obj)
+		/// <summary>
+		/// Bytes of entire TLV.
+		/// </summary>
+		public byte[] TlvBytes { get; }
+		/// <inheritdoc/>
+		public Asn1Tag Tag { get; }
+
+		public static Asn1Any CreateFromObject<T>(T obj)
 			where T : IAsn1DerEncodableTlv
 		{
-			var any = new Asn1Any
-			{
-				Tag = obj.Tag
-			};
-			any.SetTlvData(Asn1DerEncoder.EncodeTlv(obj).ToArray());
+			var writer = new ByteWriter(0, ByteWriterOptions.Reverse);
+			Asn1DerEncoder encoder = new Asn1DerEncoder(Asn1DerEncoding.Instance, writer);
+			obj.EncodeTlv(encoder);
+
+			return new Asn1Any(obj.Tag, encoder.GetBytes().ToArray());
+		}
+
+		static Asn1Any IAsn1DerDecodableTlv<Asn1Any>.DecodeTlvFrom(Asn1DerDecoder decoder)
+		{
+			var tag = decoder.PeekTag();
+			var content = decoder.DecodeNextTupleAsBytes();
+			var any = new Asn1Any(tag, content);
 			return any;
 		}
 
-		private void SetTlvData(byte[] tlvData)
+		static bool IAsn1DerDecodableTlv<Asn1Any>.TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out Asn1Any? instance)
 		{
-			this._tlvData = tlvData;
-			byte lengthByte = tlvData[1];
-			int offData;
-			if (lengthByte < 0x80)
+			var tag = decoder.PeekTag();
+			if (tag.IsEmpty)
 			{
-				offData = 2;
+				instance = null;
+				return false;
 			}
 			else
 			{
-				offData = 2 + (lengthByte - 0x80);
+				var content = decoder.DecodeNextTupleAsBytes();
+				instance = new Asn1Any(tag, content);
+				return true;
 			}
-
-			this._innerData = new Memory<byte>(tlvData, offData, tlvData.Length - offData);
 		}
 
-		public T DecodeAs<T>()
-			where T : IAsn1DerEncodableTlv, new()
+		/// <inheritdoc/>
+		public void EncodeTlv(Asn1DerEncoder encoder)
 		{
-			T obj = new T();
-
-			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(this._tlvData));
-			obj.DecodeTlv(decoder);
-			return obj;
-		}
-
-		public void DecodeTlv(Asn1DerDecoder decoder)
-		{
-			var tlvData = decoder.DecodeOctetString();
-			if (tlvData.Length > 0)
-			{
-				// TODO: Do this without instantiating a reader and decoder
-				var subreader = new ByteMemoryReader(tlvData);
-				var subdec = new Asn1DerDecoder(subreader);
-				this.Tag = subdec.PeekTag();
-			}
-			else
-			{
-				this.Tag = Asn1PredefTag.Unspecified;
-			}
-
-			this.SetTlvData(tlvData);
-		}
-
-		public void DecodeValue(Asn1DerDecoder decoder)
-		{
-			this._innerData = decoder.DecodeOctetString();
-		}
-
-		public bool TryDecodeTlv(Asn1DerDecoder decoder)
-		{
-			this.DecodeTlv(decoder);
-			return true;
-		}
-
-		public void EncodeValue(Asn1DerEncoder encoder)
-		{
-			encoder.EncodeOctetString(this._innerData.Span);
+			encoder.WriteBytes(this.TlvBytes.AsSpan());
 		}
 	}
 }

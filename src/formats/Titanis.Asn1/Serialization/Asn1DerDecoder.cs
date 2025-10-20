@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -21,29 +22,35 @@ namespace Titanis.Asn1.Serialization
 	/// <seealso cref="Asn1DerEncoding"/>
 	public class Asn1DerDecoder : Asn1Decoder
 	{
-		internal Asn1DerDecoder(IByteSource reader)
+		internal Asn1DerDecoder(IByteSource reader, bool allowBer)
 		{
 			if (reader is null)
 				throw new ArgumentNullException(nameof(reader));
 
 			this._reader = reader;
+			this._allowBer = allowBer;
 			if (reader is IByteSource seekable && seekable.CanSeek)
 				this._sourceLength = seekable.Length - seekable.Position;
 			else
 				this._sourceLength = UnboundedLength;
-			this._frame = new Asn1DecoderFrame { endIndex = this._sourceLength };
+
+			this._frame = new Asn1DecoderFrame(this._sourceLength, Asn1Tag.Empty);
 		}
 
 		private IByteSource _reader;
 		private long _sourceLength;
+		private bool _allowBer;
+		private bool AllowBer => this._allowBer;
 
-
+		/// <summary>
+		/// The value indicating an unbounded length.  Used for BER.
+		/// </summary>
 		private const long UnboundedLength = long.MinValue;
 
 		private Asn1DecoderFrame _frame;
-		private long _endIndex => this._frame.endIndex;
+		private long FrameEndPosition => this._frame.endPosition;
 		private bool IsIndefiniteLength => this._frame.IsIndefiniteLength;
-		private long BytesLeft => (this.IsIndefiniteLength) ? UnboundedLength : this._endIndex - this.Position;
+		private long BytesLeftInTuple => (this.IsIndefiniteLength) ? UnboundedLength : this.FrameEndPosition - this.Position;
 
 		/// <inheritdoc/>
 		public override bool IsEndOfTuple => this.IsIndefiniteLength
@@ -51,42 +58,38 @@ namespace Titanis.Asn1.Serialization
 			: this.IsEndOfDefTuple;
 
 		private bool IsEndOfDefTuple
-			=> (this.Position >= this._endIndex);
+			=> (this.Position >= this.FrameEndPosition);
 
-		private long _position = 0;
-		private long Position => this._position;
+		//private long _position = 0;
+		private long Position
+		{
+			get => this._reader.Position;
+			set => this._reader.Position = value;
+		}
 
 		public IByteSource GetReader() => this._reader;
 		private byte _ReadNextByte()
 		{
+			Debug.Assert(!this.HasPeekTag);
+
 			var b = this._reader.ReadByte();
-			this._position++;
 			return b;
 		}
 		private void _Advance(long count)
 		{
-			this._position += count;
+			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
+
+			Debug.Assert(!this.HasPeekTag);
+
 			this._reader.Advance(count);
 		}
 		private ReadOnlySpan<byte> _Consume(int count)
 		{
-			this._position += count;
+			Debug.Assert(!this.HasPeekTag);
+
 			return this._reader.Consume(count);
 		}
 
-		///// <summary>
-		///// Reads the next byte from the source without advancing.
-		///// </summary>
-		///// <returns>The value of the next byte, if available; otherwise, <c>-1</c>.</returns>
-		///// <remarks>
-		///// IF the decoder is at the end of the current TLV, this method returns
-		///// <c>-1</c>, even though more bytes may be available from the
-		///// underlying <see cref="IByteSource"/>.
-		///// </remarks>
-		//internal int PeekByte()
-		//	=> (!this.IsEndOfTuple)
-		//		? this._reader.PeekByte()
-		//		: -1;
 		/// <summary>
 		/// Reads the next byte from the source.
 		/// </summary>
@@ -98,21 +101,25 @@ namespace Titanis.Asn1.Serialization
 				: throw new EndOfStreamException();
 
 		private Asn1Tag _peekedTag;
-		private bool _hasPeekTag;
+		private long _peekIndex = -1;
+		private bool HasPeekTag => this._peekIndex >= 0;
 		private long _peekedLength;
 
 		/// <inheritdoc/>
 		public override Asn1Tag PeekTag()
 		{
-			if (!this._hasPeekTag)
+			if (!this.HasPeekTag)
 			{
 				// DecodeTag and DecodeLength call IsEndOfTuple
 
 				if (this._frame.IsIndefiniteLength || !this.IsEndOfDefTuple)
 				{
+					long peekPos = this.Position;
+
 					this._peekedTag = this.DecodeTag();
 					this._peekedLength = this.DecodeLength();
-					this._hasPeekTag = true;
+
+					this._peekIndex = peekPos;
 				}
 				else
 				{
@@ -123,10 +130,32 @@ namespace Titanis.Asn1.Serialization
 			return this._peekedTag;
 		}
 
-		public static void DoSomething<TClass>(TClass t)
-			where TClass : class
+		public static T DecodeTlv<T>(ReadOnlyMemory<byte> bytes)
+			where T : IAsn1DerDecodableTlv<T>
 		{
+			Debug.Assert(bytes.Span[0] != 0);
+			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(bytes), true);
+			var value = decoder.DecodeTlv<T>();
+			return value;
+		}
 
+		public T DecodeTlv<T>()
+			where T : IAsn1DerDecodableTlv<T>
+		{
+			return T.DecodeTlvFrom(this);
+		}
+
+		public static bool TryDecodeTlv<T>(ReadOnlyMemory<byte> bytes, out T? value)
+			where T : IAsn1DerDecodableTlv<T>
+		{
+			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(bytes), true);
+			return T.TryDecodeTlvFrom(decoder, out value);
+		}
+
+		public bool TryDecodeTlv<T>([NotNullWhen(true)] out T? value)
+			where T : IAsn1DerDecodableTlv<T>
+		{
+			return T.TryDecodeTlvFrom(this, out value);
 		}
 
 		// [X.690] § 8.1.2
@@ -169,13 +198,15 @@ namespace Titanis.Asn1.Serialization
 		/// <inheritdoc/>
 		public override Asn1DecoderFrame DecodeTlvStart(Asn1Tag expectedTag)
 		{
+			if (expectedTag.IsEmpty) throw new ArgumentNullException(nameof(expectedTag));
+
 			Asn1Tag tag;
 			long length;
-			if (this._hasPeekTag)
+			if (this.HasPeekTag)
 			{
 				tag = this._peekedTag;
 				length = this._peekedLength;
-				this.ClearPeekState();
+				this.ConsumePeekState();
 			}
 			else
 			{
@@ -183,11 +214,8 @@ namespace Titanis.Asn1.Serialization
 				length = this.DecodeLength();
 			}
 
-			if (
-				!expectedTag.IsEmpty
-				&& ((tag._value | Asn1Tag.ConstructedFlag) != (expectedTag._value | Asn1Tag.ConstructedFlag))
-				)
-				throw new FormatException(string.Format(Messages.Asn1_UnexpectedTag, expectedTag.TagNumber, tag));
+			if (((tag._value | Asn1Tag.ConstructedFlag) != (expectedTag._value | Asn1Tag.ConstructedFlag)))
+				throw new InvalidDataException(string.Format(Messages.Asn1_UnexpectedTag, expectedTag.TagNumber, tag));
 
 			long innerEndIndex;
 			if (length < 0)
@@ -196,7 +224,7 @@ namespace Titanis.Asn1.Serialization
 					throw new InvalidDataException(Messages.AsnDerDecoder_IndefLengthPrimitive);
 
 				// Indefinite length encoding
-				innerEndIndex = -Math.Abs(this._endIndex);
+				innerEndIndex = -Math.Abs(this.FrameEndPosition);
 			}
 			else
 			{
@@ -205,22 +233,27 @@ namespace Titanis.Asn1.Serialization
 				//	return 0;
 
 				innerEndIndex = this.Position + length;
-				if (innerEndIndex > Math.Abs(this._endIndex))
+				if (innerEndIndex > Math.Abs(this.FrameEndPosition))
 					throw new InvalidDataException(Messages.Asn1DerDecoder_InnerLengthOverflow);
 			}
 
 			Asn1DecoderFrame outerFrame = this._frame;
-			this._frame = new Asn1DecoderFrame()
-			{
-				endIndex = innerEndIndex,
-				tag = tag
-			};
+			this._frame = new Asn1DecoderFrame(innerEndIndex, tag);
 			return outerFrame;
 		}
 
-		private void ClearPeekState()
+		private void ConsumePeekState()
 		{
-			this._hasPeekTag = false;
+			this._peekIndex = -1;
+		}
+
+		private void DiscardPeekState()
+		{
+			if (this.HasPeekTag)
+			{
+				this.Position = this._peekIndex;
+				this._peekIndex = -1;
+			}
 		}
 
 		private void EnsurePrimitive()
@@ -237,6 +270,8 @@ namespace Titanis.Asn1.Serialization
 		/// <exception cref="EndOfStreamException"></exception>
 		public long DecodeLength()
 		{
+			Debug.Assert(!this.HasPeekTag);
+
 			if (!this._frame.IsConstructed && this.IsEndOfDefTuple)
 				throw new EndOfStreamException();
 
@@ -288,7 +323,7 @@ namespace Titanis.Asn1.Serialization
 			}
 			else
 			{
-				this._Advance(this.BytesLeft);
+				this._Advance(this.BytesLeftInTuple);
 			}
 		}
 
@@ -297,55 +332,176 @@ namespace Titanis.Asn1.Serialization
 		{
 			// TODO: Does ''frame'' need to be verified?
 
+			this.DiscardPeekState();
 			this.SkipTlvs();
-			this.ClearPeekState();
 			this._frame = frame;
 		}
 
-		/// <summary>
-		/// Decodes a value from ASN.1 DER-encoded data.
-		/// </summary>
-		/// <typeparam name="T">Type of value to decode</typeparam>
-		/// <param name="bytes">Bytes to decode</param>
-		/// <returns>The value decoded.</returns>
-		public static T Decode<T>(ReadOnlyMemory<byte> bytes)
-			where T : IAsn1DerEncodableTlv, new()
+		public T[] DecodeListTlv<T>(Asn1Tag listTag)
+			where T : IAsn1DerDecodableTlv<T>
 		{
-			T obj = new T();
-			Decode(bytes, obj);
-			return obj;
+			var frame = this.DecodeTlvStart(listTag);
+			List<T> elems = new List<T>();
+			while (!this.IsEndOfTuple)
+			{
+				var elem = T.DecodeTlvFrom(this);
+				elems.Add(elem);
+			}
+
+			this.CloseTlv(frame);
+
+			return elems.ToArray();
 		}
-		/// <summary>
-		/// Decodes a value from ASN.1 DER-encoded data.
-		/// </summary>
-		/// <typeparam name="T">Type of value to decode</typeparam>
-		/// <param name="token">Bytes to decode</param>
-		/// <param name="obj">Object to decode into</param>
-		/// <returns>The value decoded.</returns>
-		public static void Decode<T>(ReadOnlyMemory<byte> token, T obj)
-			where T : IAsn1DerEncodableTlv, new()
+
+		public T[] DecodeListTlv<T>(Asn1Tag listTag, Func<Asn1DerDecoder, T> decodeItemFunc)
 		{
-			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(token));
-			obj.DecodeTlv(decoder);
+			var frame = this.DecodeTlvStart(listTag);
+			List<T> elems = new List<T>();
+			while (!this.IsEndOfTuple)
+			{
+				var elem = decodeItemFunc(this);
+				elems.Add(elem);
+			}
+
+			this.CloseTlv(frame);
+
+			return elems.ToArray();
 		}
-		/// <summary>
-		/// Decodes a value.
-		/// </summary>
-		/// <typeparam name="T">Type of value to decode</typeparam>
-		/// <returns>The value decoded.</returns>
-		public T Decode<T>() where T : IAsn1DerEncodableTlv, new()
+
+		public T DecodeTaggedValue<T>(Asn1Tag tag, Func<Asn1DerDecoder, T> decodeFunc)
 		{
-			T obj = new T();
-			obj.DecodeTlv(this);
-			return obj;
+			var frame = this.DecodeTlvStart(tag);
+			var inner = decodeFunc(this);
+			this.CloseTlv(frame);
+
+			return inner;
+		}
+
+		public T DecodeExplicitTaggedTlv<T>(Asn1Tag tag)
+			where T : IAsn1DerDecodableTlv<T>
+		{
+			var frame = this.DecodeTlvStart(tag);
+			var inner = T.DecodeTlvFrom(this);
+			this.CloseTlv(frame);
+
+			return inner;
+		}
+
+		public static T DecodeValue<T>(ReadOnlyMemory<byte> bytes)
+			where T : IAsn1DerDecodableValue<T>
+		{
+			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(bytes), true);
+			var value = decoder.DecodeValue<T>();
+			return value;
+		}
+
+		struct StringWrapper<TString> : IAsn1DerDecodableTlv<StringWrapper<TString>>, IAsn1DerDecodableValue<StringWrapper<TString>>
+			where TString : struct, IAsn1String, IAsn1String<TString>
+		{
+			private StringWrapper(string str)
+			{
+				this.str = str;
+			}
+
+			internal string str;
+
+			public static StringWrapper<TString> DecodeTlvFrom(Asn1DerDecoder decoder)
+			{
+				var str = decoder.DecodeStringTlv<TString>();
+				return new StringWrapper<TString>(str.Value);
+			}
+
+			public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out StringWrapper<TString> value)
+			{
+				if (decoder.CheckTag(TString.StaticTag))
+				{
+					value = DecodeTlvFrom(decoder);
+					return true;
+				}
+				else
+				{
+					value = default;
+					return false;
+				}
+			}
+
+			public static StringWrapper<TString> DecodeValueFrom(Asn1DerDecoder decoder)
+			{
+				return new StringWrapper<TString>(decoder.DecodeValue<StringWrapper<TString>>().str);
+			}
+		}
+
+		public static string DecodeStringTlv<T>(ReadOnlyMemory<byte> bytes)
+			where T : struct, IAsn1String, IAsn1String<T>
+		{
+			return DecodeTlv<StringWrapper<T>>(bytes).str;
+		}
+
+		public T DecodeValue<T>()
+			where T : IAsn1DerDecodableValue<T>
+		{
+			var inner = T.DecodeValueFrom(this);
+			return inner;
+		}
+
+		public T DecodeTaggedValue<T>(Asn1Tag tag)
+			where T : IAsn1DerDecodableValue<T>
+		{
+			var frame = this.DecodeTlvStart(tag);
+			var inner = T.DecodeValueFrom(this);
+			this.CloseTlv(frame);
+
+			return inner;
+		}
+
+		public bool TryDecodeExplicitTaggedTlv<T>(Asn1Tag tag, [NotNullWhen(true)] out T? value)
+			where T : IAsn1DerDecodableTlv<T>
+		{
+			if (this.PeekTag() == tag)
+			{
+				var frame = this.DecodeTlvStart(tag);
+				var inner = T.DecodeTlvFrom(this);
+				this.CloseTlv(frame);
+
+				value = inner;
+				return true;
+			}
+			else
+			{
+				value = default;
+				return false;
+			}
+		}
+
+		public bool TryDecodeTaggedValue<T>(Asn1Tag tag, [NotNullWhen(true)] out T? value)
+			where T : IAsn1DerDecodableValue<T>
+		{
+			if (this.PeekTag() == tag)
+			{
+				var frame = this.DecodeTlvStart(tag);
+				var inner = T.DecodeValueFrom(this);
+				this.CloseTlv(frame);
+
+				value = inner;
+				return true;
+			}
+			else
+			{
+				value = default;
+				return false;
+			}
 		}
 
 		/// <inheritdoc/>
 		// [X690] § 8.2
-		public override bool DecodeBool()
+		public override bool DecodeBoolTlv(Asn1Tag tag)
 		{
+			var frame = this.DecodeTlvStart(tag);
 			this.EnsurePrimitive();
-			return (0 != this.ReadNextByteWithinTuple());
+			var value = (0 != this.ReadNextByteWithinTuple());
+			this.CloseTlv(frame);
+
+			return value;
 		}
 		#region Integers
 		/// <summary>
@@ -358,13 +514,15 @@ namespace Titanis.Asn1.Serialization
 		/// If the high bit of the first byte is set, the number is sign-extended.
 		/// </remarks>
 		// [X690] § 8.3
-		private long DecodeInteger(int byteLimit, bool signed)
+		private long DecodeIntegerTlv(Asn1Tag expectedTag, int byteLimit, bool signed)
 		{
+			var frame = this.DecodeTlvStart(expectedTag);
+
 			EnsurePrimitive();
 
 			byte b0 = this.ReadNextByteWithinTuple();
 			long value = signed ? (sbyte)b0 : b0;
-			while (this.BytesLeft > 0)
+			while (this.BytesLeftInTuple > 0)
 			{
 				if (value != 0)
 					byteLimit--;
@@ -374,36 +532,48 @@ namespace Titanis.Asn1.Serialization
 				value <<= 8;
 				value |= this.ReadNextByteWithinTuple();
 			}
+
+			this.CloseTlv(frame);
 			return value;
 		}
 		/// <inheritdoc/>
-		public override byte DecodeByte()
-			=> (byte)this.DecodeInteger(1, true);
+		public override byte DecodeIntegerTlvAsByte(Asn1Tag tag)
+			=> (byte)this.DecodeIntegerTlv(tag, 1, true);
 		/// <inheritdoc/>
-		public override sbyte DecodeSByte()
-			=> (sbyte)this.DecodeInteger(1, true);
+		public override sbyte DecodeIntegerTlvAsSByte(Asn1Tag tag)
+			=> (sbyte)this.DecodeIntegerTlv(tag, 1, true);
 		/// <inheritdoc/>
-		public override short DecodeInt16()
-			=> (short)DecodeInteger(2, true);
+		public override short DecodeIntegerTlvAsInt16(Asn1Tag tag)
+			=> (short)DecodeIntegerTlv(tag, 2, true);
 		/// <inheritdoc/>
-		public override int DecodeInt32()
-			=> (int)DecodeInteger(4, true);
+		public override int DecodeIntegerTlvAsInt32(Asn1Tag tag)
+			=> (int)DecodeIntegerTlv(tag, 4, true);
 		/// <inheritdoc/>
-		public override long DecodeInt64()
-			=> this.DecodeInteger(8, true);
+		public override long DecodeIntegerTlvAsInt64(Asn1Tag tag)
+			=> this.DecodeIntegerTlv(tag, 8, true);
 
 		#region Unsigned
 		/// <inheritdoc/>
-		public override ushort DecodeUInt16()
-			=> (ushort)this.DecodeInteger(2, false);
+		public override ushort DecodeIntegerTlvAsUInt16(Asn1Tag tag)
+			=> (ushort)this.DecodeIntegerTlv(tag, 2, false);
 		/// <inheritdoc/>
-		public override uint DecodeUInt32()
-			=> (uint)this.DecodeInteger(4, false);
+		public override uint DecodeIntegerTlvAsUInt32(Asn1Tag tag)
+			=> (uint)this.DecodeIntegerTlv(tag, 4, false);
 		/// <inheritdoc/>
-		public override ulong DecodeUInt64()
-			=> (ulong)this.DecodeInteger(8, false);
+		public override ulong DecodeIntegerTlvAsUInt64(Asn1Tag tag)
+			=> (ulong)this.DecodeIntegerTlv(tag, 8, false);
 		/// <inheritdoc/>
-		public override BigInteger DecodeBigInteger()
+		public override BigInteger DecodeIntegerTlvAsBigInteger(Asn1Tag tag)
+		{
+			var frame = this.DecodeTlvStart(tag);
+
+			BigInteger bigint = this.DecodeBigIntegerValue();
+			this.CloseTlv(frame);
+
+			return bigint;
+		}
+
+		public BigInteger DecodeBigIntegerValue()
 		{
 			var byteCount = this.GetLength();
 			byte[] bytes = this._Consume(byteCount).ToArray();
@@ -414,90 +584,128 @@ namespace Titanis.Asn1.Serialization
 		}
 		#endregion
 		#endregion
+
+		public long DecodeEnumeratedTlv() => this.DecodeIntegerTlv(Asn1PredefTag.Enumerated, 8, false);
+		public long DecodeEnumeratedTlv(Asn1Tag tag) => this.DecodeIntegerTlv(tag, 8, false);
+
 		#region Floating-point
 		// [X690] § 8.5
-		public override decimal DecodeDecimal()
+		public override decimal DecodeRealTlvAsDecimal(Asn1Tag tag)
 		{
 			// TODO: Floating-point encodings
 			throw new NotImplementedException();
 		}
 		// [X690] § 8.5
-		public override double DecodeDouble()
+		public override double DecodeRealTlvAsDouble(Asn1Tag tag)
 		{
 			throw new NotImplementedException();
 		}
 		// [X690] § 8.5
-		public override float DecodeSingle()
+		public override float DecodeRealTlvAsSingle(Asn1Tag tag)
 		{
 			throw new NotImplementedException();
 		}
 		#endregion
+
+		public override Asn1BitString DecodeBitStringTlv(Asn1Tag tag)
+		{
+			var frame = this.DecodeTlvStart(tag);
+			var bitstring = this.DecodeBitStringValue();
+			this.CloseTlv(frame);
+
+			return bitstring;
+		}
 		/// <inheritdoc/>
 		// [X690] § 8.6
-		public override Asn1BitString DecodeBitString()
+		public Asn1BitString DecodeBitStringValue()
 		{
-			MemoryStream bits = new MemoryStream();
-			int unused = -1;
-			MemoryStream lastBits = new MemoryStream();
-			this.DecodeByteStringInto(Asn1PredefTag.BitString, (b, f) =>
+			if (this.IsIndefiniteLength)
 			{
-				if (f)
+				MemoryStream bits = new MemoryStream();
+				int unusedBits = -1;
+				this.DecodeTupleContentInto((b, f) =>
 				{
-					if (unused >= 0)
+					Debug.Assert(b.Length > 0);
+					if (unusedBits < 0)
 					{
-						bits.WriteByte((byte)unused);
-						lastBits.Position = 0;
-						lastBits.CopyTo(bits);
+						unusedBits = b[0];
+						b = b.Slice(1);
 					}
-					unused = b[0];
-					lastBits.SetLength(0);
-					lastBits.Write(b.Slice(1));
-				}
-				else
-				{
-					lastBits.Write(b);
-				}
-			});
-			lastBits.Position = 0;
-			if (bits.Length > 0)
-			{
-				lastBits.CopyTo(bits);
+
+					bits.Write(b);
+				});
+
+				if (unusedBits == -1)
+					// This is an empty bitstring
+					unusedBits = 0;
+
+				return new Asn1BitString(bits.ToArray(), (byte)unusedBits);
 			}
 			else
 			{
-				bits = lastBits;
+				if (this.BytesLeftInTuple == 0)
+				{
+					return new Asn1BitString(Array.Empty<byte>(), 0);
+				}
+				else
+				{
+					byte unusedBits = this.ReadNextByteWithinTuple();
+					var bits = this._Consume(checked((int)this.BytesLeftInTuple)).ToArray();
+					return new Asn1BitString(bits, unusedBits);
+				}
 			}
-
-			return new Asn1BitString(bits.ToArray(), (byte)unused);
 		}
 
 		/// <inheritdoc/>
 		// [X690] § 8.7
-		public override byte[] DecodeOctetString()
+		public override byte[] DecodeOctetStringTlv(Asn1Tag tag)
 		{
-			return this.DecodeByteString(Asn1PredefTag.OctetString);
+			var frame = this.DecodeTlvStart(tag);
+			byte[] bytes = this.DecodeOctetStringValue();
+			this.CloseTlv(frame);
+			return bytes;
 		}
+
+		public byte[] DecodeOctetStringValue()
+		{
+			return this.DecodeTupleContent();
+		}
+
 		/// <inheritdoc/>
 		// [X690] § 8.8
-		public override DBNull DecodeNull()
+		public override Asn1Null DecodeNullTlv(Asn1Tag tag)
+		{
+			var frame = this.DecodeTlvStart(tag);
+			this.DecodeNullValue();
+			this.CloseTlv(frame);
+
+			return new Asn1Null();
+		}
+
+		public void DecodeNullValue()
 		{
 			if (this._frame.IsConstructed)
 				throw new InvalidDataException(Messages.Asn1DerDecoder_ConstructedNotPermitted);
-			if (this.BytesLeft > 0)
+			if (this.BytesLeftInTuple > 0)
 				throw new InvalidDataException(Messages.Asn1DerDecoder_NullHasValue);
-
-			return DBNull.Value;
 		}
 
 		/// <inheritdoc/>
 		// [X690] § 8.19
-		public override Asn1Oid DecodeOid()
+		public override Asn1Oid DecodeOidTlv(Asn1Tag tag)
 		{
-			if (this._frame.IsConstructed)
-				throw new InvalidDataException(Messages.Asn1DerDecoder_ConstructedNotPermitted);
+			var frame = this.DecodeTlvStart(tag);
+			this.EnsurePrimitive();
 
+			var oid = this.DecodeOidValue();
+			this.CloseTlv(frame);
+
+			return oid;
+		}
+		public override Asn1Oid DecodeOidValue()
+		{
 			var bytes = this._Consume(this.GetLength());
-			return DecodeOid(bytes);
+			return DecodeOidBytes(bytes);
 		}
 
 		/// <summary>
@@ -507,7 +715,7 @@ namespace Titanis.Asn1.Serialization
 		/// <returns></returns>
 		/// <exception cref="FormatException"><paramref name="bytes"/> is improperly formatted</exception>
 		// [X690] § 8.19
-		public static Asn1Oid DecodeOid(ReadOnlySpan<byte> bytes)
+		public static Asn1Oid DecodeOidBytes(ReadOnlySpan<byte> bytes)
 		{
 			if (bytes.Length == 0)
 				throw new FormatException(Messages.Asn1DerDecoder_BadOidBytes);
@@ -516,7 +724,7 @@ namespace Titanis.Asn1.Serialization
 			Asn1OidPart[] etc;
 			if (bytes.Length > 1)
 			{
-				etc = DecodeRelativeOid(bytes);
+				etc = DecodeRelativeOidValueFromBytes(bytes);
 			}
 			else
 			{
@@ -524,26 +732,27 @@ namespace Titanis.Asn1.Serialization
 			}
 
 			var oid = new Asn1Oid(
-				new Asn1OidPart(initial / 40),
-				new Asn1OidPart(initial % 40),
-				etc
-				);
+				[
+				new Asn1OidPart(initial / 40U),
+				new Asn1OidPart(initial % 40U),
+				..etc
+				]);
 			return oid;
 		}
 
 		// [X690] § 8.20
-		public static Asn1OidPart[] DecodeRelativeOid(ReadOnlySpan<byte> bytes)
+		public static Asn1OidPart[] DecodeRelativeOidValueFromBytes(ReadOnlySpan<byte> bytes)
 		{
 			Asn1OidPart[] etc;
 			List<Asn1OidPart> parts = null;
-			int value = 0;
+			uint value = 0;
 			for (int i = 1; i < bytes.Length; i++)
 			{
 				byte b = bytes[i];
 				value <<= 7;
 				if (b >= 0x80)
 				{
-					value |= (b & 0x7F);
+					value |= (b & 0x7FU);
 				}
 				else
 				{
@@ -562,74 +771,83 @@ namespace Titanis.Asn1.Serialization
 		}
 
 		// [X690] § 8.20
-		public override Asn1OidPart[] DecodeRelativeOid()
+		public override Asn1OidPart[] DecodeRelativeOidTlv(Asn1Tag tag)
 		{
-			Asn1OidPart[] etc = DecodeRelativeOid(this._Consume(this.GetLength()));
+			var frame = this.DecodeTlvStart(tag);
+
+			Asn1OidPart[] etc = DecodeRelativeOidValueFromBytes(this._Consume(this.GetLength()));
+
+			this.CloseTlv(frame);
+
 			return etc;
 		}
 
-		/// <inheritdoc/>
-		public override char DecodeAnsiChar()
-			=> (char)this.ReadNextByteWithinTuple();
-		/// <inheritdoc/>
-		public override char DecodeUtf8Char()
-		{
-			var r = this.DecodeUtf8Rune();
-			uint value = (uint)r.Value;
-			if (value < 0xD800)
-				return (char)value;
-			else if (value < 0xE000)
-				// Surrogate range
-				throw new NotSupportedException(Messages.Asn1DerDecoder_Utf8CharOverflow);
-			else if (value < 0x10000)
-				return (char)value;
-			else
-				throw new NotSupportedException(Messages.Asn1DerDecoder_Utf8CharOverflow);
-		}
-		/// <inheritdoc/>
-		public override Rune DecodeUtf8Rune()
-		{
-			byte b0 = this.ReadNextByteWithinTuple();
-			if (b0 < 0x80)
-				return new Rune(b0);
-			else
-			{
-				int value = (b0 & 0x1F);
-				int count =
-					((b0 & 0xE0) == 0xC0) ? 1
-					: ((b0 & 0xF0) == 0xE0) ? 2
-					: ((b0 & 0xF1) == 0xF0) ? 3
-					: throw new InvalidDataException(Messages.Asn1DerDecoder_Utf8CharOverflow);
-				while (--count >= 0)
-				{
-					byte b1 = this.ReadNextByteWithinTuple();
-					if ((b1 & 0xC0) != 0x80)
-						throw new InvalidDataException(Messages.Asn1DerDecoder_InvalidUtf8Data);
+		///// <inheritdoc/>
+		//public override char DecodeAnsiChar()
+		//	=> (char)this.ReadNextByteWithinTuple();
+		///// <inheritdoc/>
+		//public override char DecodeUtf8Char()
+		//{
+		//	var r = this.DecodeUtf8Rune();
+		//	uint value = (uint)r.Value;
+		//	if (value < 0xD800)
+		//		return (char)value;
+		//	else if (value < 0xE000)
+		//		// Surrogate range
+		//		throw new NotSupportedException(Messages.Asn1DerDecoder_Utf8CharOverflow);
+		//	else if (value < 0x10000)
+		//		return (char)value;
+		//	else
+		//		throw new NotSupportedException(Messages.Asn1DerDecoder_Utf8CharOverflow);
+		//}
+		///// <inheritdoc/>
+		//protected override Rune DecodeUtf8Rune()
+		//{
+		//	byte b0 = this.ReadNextByteWithinTuple();
+		//	if (b0 < 0x80)
+		//		return new Rune(b0);
+		//	else
+		//	{
+		//		int value = (b0 & 0x1F);
+		//		int count =
+		//			((b0 & 0xE0) == 0xC0) ? 1
+		//			: ((b0 & 0xF0) == 0xE0) ? 2
+		//			: ((b0 & 0xF1) == 0xF0) ? 3
+		//			: throw new InvalidDataException(Messages.Asn1DerDecoder_Utf8CharOverflow);
+		//		while (--count >= 0)
+		//		{
+		//			byte b1 = this.ReadNextByteWithinTuple();
+		//			if ((b1 & 0xC0) != 0x80)
+		//				throw new InvalidDataException(Messages.Asn1DerDecoder_InvalidUtf8Data);
 
-					value <<= 6;
-					value |= (b1 & 0x3F);
-				}
+		//			value <<= 6;
+		//			value |= (b1 & 0x3F);
+		//		}
 
-				return new Rune(value);
-			}
-		}
+		//		return new Rune(value);
+		//	}
+		//}
 
 		/// <inheritdoc/>
 		// [X690] § 8.23
-		public override string DecodeUtf8tring()
+		public override string DecodeUtf8StringTlv(Asn1Tag tag)
 		{
+			var frame = this.DecodeTlvStart(tag);
+
+			string str;
 			if (this._frame.IsConstructed)
 			{
-				var bytes = this.DecodeByteString(Asn1PredefTag.UTF8String);
-				string str = Encoding.UTF8.GetString(bytes);
-				return str;
+				var bytes = this.DecodeTupleContent();
+				str = Encoding.UTF8.GetString(bytes);
 			}
 			else
 			{
 				var byteCount = this.GetLength();
-				string str = Encoding.UTF8.GetString(this._Consume(byteCount));
-				return str;
+				str = Encoding.UTF8.GetString(this._Consume(byteCount));
 			}
+
+			this.CloseTlv(frame);
+			return str;
 		}
 
 		private static int ParseDigit(byte c)
@@ -652,11 +870,13 @@ namespace Titanis.Asn1.Serialization
 			}
 			return true;
 		}
-		public override DateTime DecodeUtcTime()
+		public override DateTime DecodeUtcTimeTlv(Asn1Tag tag)
 		{
+			var frame = this.DecodeTlvStart(tag);
+
 			//"20370913024805Z"
 			// TODO: Verify actual format used
-			var str = this.DecodeByteString(Asn1PredefTag.UtcTime);
+			var str = this.DecodeTupleContent();
 			if (
 				str.Length < 12
 				|| !IsNumeric(str.AsSpan()[..12])
@@ -677,15 +897,19 @@ namespace Titanis.Asn1.Serialization
 			if (str.Length > 12 && str[12] == '.')
 				;
 
+			this.CloseTlv(frame);
+
 			DateTime dt = new DateTime(year, month, day, hour, minute, seconds);
 			return dt;
 		}
 
-		public override DateTime DecodeDateTime()
+		public override DateTime DecodeDateTimeTlv(Asn1Tag tag)
 		{
+			var frame = this.DecodeTlvStart(tag);
+
 			//"20370913024805Z"
 			// TODO: Verify actual format used
-			var str = this.DecodeByteString(Asn1PredefTag.DateTime);
+			var str = this.DecodeTupleContent();
 			if (
 				str.Length < 8
 				|| !IsNumeric(str.AsSpan().Slice(0, 8))
@@ -710,6 +934,8 @@ namespace Titanis.Asn1.Serialization
 			if (str.Length > 16 && str[14] == '.')
 				;
 
+			this.CloseTlv(frame);
+
 			DateTime dt = new DateTime(year, month, day, hour, minute, seconds);
 			return dt;
 		}
@@ -726,7 +952,7 @@ namespace Titanis.Asn1.Serialization
 		/// </remarks>
 		private int GetLength()
 		{
-			var byteCount = this.BytesLeft;
+			var byteCount = this.BytesLeftInTuple;
 			if (byteCount > int.MaxValue)
 				throw new InvalidDataException(Messages.Asn1DerDecoder_LengthOverflow);
 			return (int)byteCount;
@@ -734,17 +960,14 @@ namespace Titanis.Asn1.Serialization
 
 		private delegate void ChunkReceiver(ReadOnlySpan<byte> data, bool isFirstInTuple);
 
-		private void DecodeByteStringInto(
-			Asn1PredefTag tag,
-			ChunkReceiver receiver
-			)
+		private void DecodeTupleContentInto(ChunkReceiver receiver)
 		{
 			if (this._frame.IsIndefiniteLength)
 			{
-				while (this.PeekTag().TagNumber == (uint)tag)
+				while (this.PeekTag() == this._frame.tag)
 				{
-					var outer = this.DecodeTlvStart(tag);
-					this.DecodeByteStringInto(tag, receiver);
+					var outer = this.DecodeTlvStart(this._frame.tag);
+					this.DecodeTupleContentInto(receiver);
 					this.CloseTlv(outer);
 				}
 			}
@@ -753,25 +976,39 @@ namespace Titanis.Asn1.Serialization
 				bool first = true;
 				do
 				{
-					var block = this._Consume((int)Math.Min(4096, this.BytesLeft));
+					var block = this._Consume((int)Math.Min(4096, this.BytesLeftInTuple));
 					receiver(block, first);
 					first = false;
-				} while (this.BytesLeft > 0);
+				} while (this.BytesLeftInTuple > 0);
 			}
 		}
 
 		/// <summary>
-		/// Reads a string of bytes.
+		/// Reads the next tuple as a string of bytes.
 		/// </summary>
-		/// <param name="tag">Tag denoting type of string</param>
 		/// <returns></returns>
-		/// <exception cref="InvalidDataException"></exception>
-		private byte[] DecodeByteString(Asn1PredefTag tag)
+		public byte[] DecodeNextTupleAsBytes()
 		{
-			if (this._frame.IsConstructed)
+			var tag = this.PeekTag();
+			var startPos = this._peekIndex;
+			var length = (this.Position + this._peekedLength) - this._peekIndex;
+
+			this.DiscardPeekState();
+			var bytes = this._reader.ReadBytes(checked((int)length));
+			return bytes;
+		}
+
+		/// <summary>
+		/// Reads the contents of the current tuple as bytes.
+		/// </summary>
+		/// <returns>A byte array containing the content</returns>
+		/// <exception cref="InvalidDataException"></exception>
+		public byte[] DecodeTupleContent()
+		{
+			if (this._frame.IsIndefiniteLength)
 			{
 				MemoryStream memstream = new MemoryStream();
-				this.DecodeByteStringInto(tag, (b, _) => memstream.Write(b));
+				this.DecodeTupleContentInto((b, _) => memstream.Write(b));
 				return memstream.ToArray();
 			}
 			else
@@ -779,49 +1016,5 @@ namespace Titanis.Asn1.Serialization
 				return this._Consume(this.GetLength()).ToArray();
 			}
 		}
-
-		//public void DecodeObjTlv<T>(T value)
-		//	where T : IAsn1DerEncodable
-		//{
-		//	value.DecodeTlv(this);
-		//}
-
-		//public void DecodeObjTlv<T>(Asn1Tag tag, T value)
-		//	where T : IAsn1DerEncodable
-		//{
-		//	int endIndex = this.ReadTlvStart((byte)tag);
-		//	value.DecodeValue(this);
-		//	this.CloseTlv(endIndex);
-		//}
-
-		//public T DecodeObjTlv<T, TNode>(TNode node)
-		//	where TNode : IAsn1Node<T>
-		//{
-		//	return node.DecodeTlv(this);
-		//}
-
-		//public T DecodeObjTlv<T, TNode>(Asn1Tag expectedTag, TNode node)
-		//	where TNode : IAsn1Node<T>
-		//{
-		//	int outerEndIndex = this.ReadTlvStart(expectedTag);
-		//	T value = node.DecodeValue(this);
-		//	this.CloseTlv(outerEndIndex);
-		//	return value;
-		//}
-
-		//public bool TryDecodeObjTlv<T, TNode>(Asn1Tag expectedTag, TNode node, out T value)
-		//	where TNode : IAsn1Node<T>
-		//{
-		//	if (this.PeekTag() == expectedTag)
-		//	{
-		//		value = this.DecodeObjTlv<T, TNode>(expectedTag, node);
-		//		return true;
-		//	}
-		//	else
-		//	{
-		//		value = default;
-		//		return false;
-		//	}
-		//}
 	}
 }

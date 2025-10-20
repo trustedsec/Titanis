@@ -1,19 +1,19 @@
 ﻿namespace Titanis.Asn1.Metadata
 {
-	public interface ITypeVisitor
+	public interface ITypeVisitor<T>
 	{
-		object VisitAny(Asn1AnyType type);
-		object VisitBitString(Asn1BitStringType type);
-		object VisitChoice(Asn1ChoiceType type);
-		object VisitConstrained(Asn1ConstrainedType type);
-		object VisitSet(Asn1SetType type);
-		object VisitSequence(Asn1SequenceType type);
-		object VisitSetOf(Asn1SetOfType type);
-		object VisitEnumerated(Asn1EnumeratedType type);
-		object VisitSequenceOf(Asn1SequenceOfType type);
-		object VisitUnresolved(Asn1UnresolvedType type);
-		object VisitInteger(Asn1IntegerType type);
-		object VisitTagged(Asn1TaggedType type);
-		object VisitPrimitive(Asn1PrimitiveType type);
+		T Visit(Asn1AnyType type);
+		T Visit(Asn1BitStringType type);
+		T Visit(Asn1ChoiceType type);
+		T Visit(Asn1ConstrainedType type);
+		T Visit(Asn1SetType type);
+		T Visit(Asn1SequenceType type);
+		T Visit(Asn1SetOfType type);
+		T Visit(Asn1EnumeratedType type);
+		T Visit(Asn1SequenceOfType type);
+		T Visit(Asn1UnresolvedType type);
+		T Visit(Asn1IntegerType type);
+		T Visit(Asn1TaggedType type);
+		T Visit(Asn1PrimitiveType type);
 	}
 }

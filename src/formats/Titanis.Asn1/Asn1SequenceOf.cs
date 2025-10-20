@@ -1,66 +1,73 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Titanis.Asn1.Serialization;
 
 namespace Titanis.Asn1
 {
-	public class Asn1SequenceOf<T> : IAsn1DerEncodableTlv
-		where T : IAsn1DerEncodableTlv, new()
+	public abstract class Asn1SequenceOf : IAsn1DerEncodableTlv, IAsn1DerEncodableValue
 	{
-		public Asn1Tag Tag => new Asn1Tag(Asn1PredefTag.Sequence, Asn1TagFlags.Constructed);
-		public IList<T> Values { get; set; }
+		public static Asn1SequenceOf<T> Create<T>(T[] values)
+			where T : IAsn1DerEncodableTlv, IAsn1DerDecodableTlv<T>
+			=> new Asn1SequenceOf<T>(values);
 
-		public Asn1SequenceOf()
+		public abstract Asn1Tag Tag { get; }
+		public abstract void EncodeTlv(Asn1DerEncoder encoder);
+		public abstract void EncodeValue(Asn1DerEncoder encoder);
+	}
+	public class Asn1SequenceOf<T> : Asn1SequenceOf, IEnumerable<T>, IAsn1DerDecodableTlv<Asn1SequenceOf<T>>, IAsn1DerDecodableValue<Asn1SequenceOf<T>>
+		where T : IAsn1DerEncodableTlv, IAsn1DerDecodableTlv<T>
+	{
+		public Asn1SequenceOf(T[] values)
 		{
-			this.Values = Array.Empty<T>();
-		}
-
-		public void DecodeTlv(Asn1DerDecoder decoder)
-		{
-			var end = decoder.DecodeTlvStart(this.Tag);
-
-			this.DecodeValue(decoder);
-			decoder.CloseTlv(end);
-		}
-
-		public void DecodeValue(Asn1DerDecoder decoder)
-		{
-			List<T> values = new List<T>();
+			ArgumentNullException.ThrowIfNull(values);
 			this.Values = values;
-			while (!decoder.IsEndOfTuple)
-			{
-				T elem = new T();
-				elem.DecodeTlv(decoder);
-				values.Add(elem);
-			}
 		}
 
-		public void EncodeValue(Asn1DerEncoder encoder)
+		public override Asn1Tag Tag => new Asn1Tag(Asn1PredefTag.Sequence, Asn1TagFlags.Constructed);
+		public T[] Values { get; }
+
+		public override void EncodeValue(Asn1DerEncoder encoder)
 		{
 			if (this.Values != null)
 			{
-				for (int i = this.Values.Count - 1; i >= 0; i--)
+				for (int i = this.Values.Length - 1; i >= 0; i--)
 				{
 					var elem = this.Values[i];
-					encoder.EncodeObjTlv(elem);
+					elem.EncodeTlv(encoder);
 				}
 			}
 		}
 
-		public bool TryDecodeTlv(Asn1DerDecoder decoder)
+		public override void EncodeTlv(Asn1DerEncoder encoder)
 		{
-			if (decoder.CheckTag(this.Tag))
-			{
-				var end = decoder.DecodeTlvStart(this.Tag);
-				this.DecodeValue(decoder);
-				decoder.CloseTlv(end);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			encoder.EncodeValueTlv(this, this.Tag);
+		}
+
+		public IEnumerator<T> GetEnumerator()
+		{
+			return ((IEnumerable<T>)this.Values).GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.Values.GetEnumerator();
+		}
+
+		static Asn1SequenceOf<T> IAsn1DerDecodableTlv<Asn1SequenceOf<T>>.DecodeTlvFrom(Asn1DerDecoder decoder)
+		{
+			return new Asn1SequenceOf<T>(decoder.DecodeListTlv<T>(Asn1PredefTag.Sequence));
+		}
+
+		static bool IAsn1DerDecodableTlv<Asn1SequenceOf<T>>.TryDecodeTlvFrom(Asn1DerDecoder decoder, out Asn1SequenceOf<T>? value)
+		{
+			throw new NotImplementedException();
+		}
+
+		static Asn1SequenceOf<T> IAsn1DerDecodableValue<Asn1SequenceOf<T>>.DecodeValueFrom(Asn1DerDecoder decoder)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

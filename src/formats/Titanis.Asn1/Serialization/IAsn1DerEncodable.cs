@@ -4,9 +4,16 @@ using System.Text;
 
 namespace Titanis.Asn1.Serialization
 {
-	public interface IAsn1DerEncodable
+	/// <summary>
+	/// Exposes functionality to encode or decode a value using ASN.1 DER.
+	/// </summary>
+	public interface IAsn1DerEncodableValue
 	{
-		void DecodeValue(Asn1DerDecoder decoder);
 		void EncodeValue(Asn1DerEncoder encoder);
+	}
+
+	public interface IAsn1DerDecodableValue<TSelf>
+	{
+		static abstract TSelf DecodeValueFrom(Asn1DerDecoder decoder);
 	}
 }

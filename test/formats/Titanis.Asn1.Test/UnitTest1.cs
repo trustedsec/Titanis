@@ -12,7 +12,7 @@ namespace Titanis.Asn1.Test
 			T expected
 			)
 		{
-			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(data));
+			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(data), false);
 			var actual = decoderFunc(decoder);
 			Assert.AreEqual(expected, actual);
 		}
@@ -24,7 +24,7 @@ namespace Titanis.Asn1.Test
 			T expected
 			)
 		{
-			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(data));
+			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(data), false);
 			var frame = decoder.DecodeTlvStart(tag);
 			var actual = decoderFunc(decoder);
 			decoder.CloseTlv(frame);
@@ -108,7 +108,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x01,0x01, 0x00
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Boolean, r => r.DecodeBool(), false);
+			TestDecodeTuple(data, Asn1PredefTag.Boolean, r => r.DecodeBoolTlv(), false);
 		}
 
 		[TestMethod]
@@ -118,7 +118,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x01,0x01, 0xFF
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Boolean, r => r.DecodeBool(), true);
+			TestDecodeTuple(data, Asn1PredefTag.Boolean, r => r.DecodeBoolTlv(), true);
 		}
 
 		[TestMethod]
@@ -128,7 +128,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x02, 0x01, 0x01
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeByte(), 1);
+			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsByte(), 1);
 		}
 
 		[TestMethod]
@@ -138,7 +138,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x02, 0x02, 0x00, 0x82
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeByte(), 0x82);
+			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsByte(), 0x82);
 		}
 
 		[TestMethod]
@@ -149,7 +149,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x02, 0x02, 0x01, 0x02
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeByte(), 0x00);
+			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsByte(), 0x00);
 		}
 
 		[TestMethod]
@@ -159,7 +159,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x02, 0x01, 0xFF
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeSByte(), -1);
+			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsSByte(), -1);
 		}
 
 		[TestMethod]
@@ -169,7 +169,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x02, 0x01, 0x01
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeInt16(), 1);
+			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsInt16(), 1);
 		}
 
 		[TestMethod]
@@ -179,7 +179,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x02, 0x02, 0x12, 0x34
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeInt16(), 0x1234);
+			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsInt16(), 0x1234);
 		}
 
 		[TestMethod]
@@ -189,7 +189,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x02, 0x01, 0xFF
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeInt16(), -1);
+			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsInt16(), -1);
 		}
 
 		[TestMethod]
@@ -199,7 +199,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x02, 0x04, 0x12, 0x34, 0x56, 0x78
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeInt32(), 0x12345678);
+			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsInt32(), 0x12345678);
 		}
 
 		[TestMethod]
@@ -209,7 +209,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x02, 0x08, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0
 			};
-			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeInt64(), 0x123456789ABCDEF0);
+			TestDecodeTuple(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsInt64(), 0x123456789ABCDEF0);
 		}
 
 		[TestMethod]
@@ -219,7 +219,7 @@ namespace Titanis.Asn1.Test
 			{
 				0x03, 0x02, 0x02, 0x12
 			};
-			TestDecodeTuple(data, Asn1PredefTag.BitString, r => r.DecodeBitString(), new Asn1BitString(new byte[] { 0x12 }, 0x02));
+			TestDecodeTuple(data, Asn1PredefTag.BitString, r => r.DecodeBitStringTlv(), new Asn1BitString(new byte[] { 0x12 }, 0x02));
 		}
 
 		[TestMethod]
@@ -231,7 +231,7 @@ namespace Titanis.Asn1.Test
 					0x03, 0x02, 0x02, 0x12,
 				0x00, 0x00
 			};
-			TestDecodeTuple(data, Asn1PredefTag.BitString, r => r.DecodeBitString(), new Asn1BitString(new byte[] { 0x12 }, 0x02));
+			TestDecodeTuple(data, Asn1PredefTag.BitString, r => r.DecodeBitStringTlv(), new Asn1BitString(new byte[] { 0x12 }, 0x02));
 		}
 
 		[TestMethod]
@@ -244,7 +244,7 @@ namespace Titanis.Asn1.Test
 					0x03, 0x02, 0x02, 0x56,
 				0x00, 0x00
 			};
-			TestDecodeTuple(data, Asn1PredefTag.BitString, r => r.DecodeBitString(), new Asn1BitString(new byte[] { 0x12, 0x34, 0x56 }, 0x02));
+			TestDecodeTuple(data, Asn1PredefTag.BitString, r => r.DecodeBitStringTlv(), new Asn1BitString(new byte[] { 0x12, 0x34, 0x56 }, 0x02));
 		}
 
 		[TestMethod]
@@ -260,7 +260,7 @@ namespace Titanis.Asn1.Test
 					0x03, 0x02, 0x02, 0x56,
 					0x00, 0x00
 			};
-			TestDecodeTuple(data, Asn1PredefTag.BitString, r => r.DecodeBitString(), new Asn1BitString(new byte[] { 0x12, 0x34, 0x56 }, 0x02));
+			TestDecodeTuple(data, Asn1PredefTag.BitString, r => r.DecodeBitStringTlv(), new Asn1BitString(new byte[] { 0x12, 0x34, 0x56 }, 0x02));
 		}
 	}
 }

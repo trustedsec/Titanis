@@ -4,44 +4,42 @@ using System.Text;
 
 namespace Titanis.Asn1.Metadata
 {
-
-	public class Asn1ConstrainedType : Asn1DerivedType
+	/// <summary>
+	/// Represents a type with one or more constraints.
+	/// </summary>
+	public sealed class Asn1ConstrainedType : Asn1DerivedType
 	{
-		//internal Asn1ConstrainedType()
-		//{
-
-		//}
-
 		public Asn1ConstrainedType(
 			Asn1Type baseType,
-			Asn1Constraint[] constraints
+			Asn1Constraint constraint
 			)
 			: base(baseType)
 		{
 			if (baseType is null)
 				throw new ArgumentNullException(nameof(baseType));
-			if (constraints.IsNullOrEmpty())
-				throw new ArgumentNullException(nameof(constraints));
+			if (constraint is null)
+				throw new ArgumentNullException(nameof(constraint));
 
-			this.Constraints = constraints;
+			this.Constraint = constraint;
 		}
 
-		public Asn1Constraint[] Constraints { get; internal set; }
-		public override bool HasStaticTag => this.BaseType.HasStaticTag;
-		public override Asn1Tag Tag => this.BaseType.Tag;
+		/// <inheritdoc/>
+		public sealed override string DefinitionString => $"{this.BaseType} ({this.Constraint})";
 
-		public override Asn1TypeKind Kind => Asn1TypeKind.Constrained;
+		/// <summary>
+		/// Gets the constraints applied to this type.
+		/// </summary>
+		public Asn1Constraint Constraint { get; }
+		/// <inheritdoc/>
+		public sealed override Asn1TypeKind Kind => Asn1TypeKind.Constrained;
 
-		public override object Visit(ITypeVisitor visitor)
-		{
-			return visitor.VisitConstrained(this);
-		}
+		/// <inheritdoc/>
+		public sealed override T Accept<T>(ITypeVisitor<T> visitor) => visitor.Visit(this);
 
 		protected override void OnAttachedOverride()
 		{
 			base.OnAttachedOverride();
-			this.BaseType.OnAttaching(this.Module, null);
-			this.BaseType.OnAttached(this.EnclosingType, null);
+			this.BaseType.OnAttached(this.DeclaringModule, this.EnclosingType, null);
 		}
 	}
 }
