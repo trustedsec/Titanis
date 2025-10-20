@@ -68,6 +68,8 @@ namespace WmiRegistry
 
 			// Set a value
 			await dynRegistry.SetStringValue(hklm, @"Software\WmiRegistryTest", "TestValue", "Test value data");
+			await dynRegistry.SetDwordValue(hklm, @"Software\WmiRegistryTest", "", 0x12345678u);
+			await dynRegistry.GetStringValue(hklm, @"SYSTEM\CurrentControlSet\Services\WlanSvc\Parameters\OneXAuthenticator", "");
 
 			return 0;
 		}

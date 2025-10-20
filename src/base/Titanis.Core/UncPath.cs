@@ -190,7 +190,7 @@ namespace Titanis
 		/// </summary>
 		/// <param name="text">UNC path to parse, beginning with a double backslash</param>
 		/// <param name="uncPath">The parsed path</param>
-		/// <returns><see langword="true"/> if <paramref name="text"/> was successfully parsef; otherwise, <see langword="false"/>.</returns>
+		/// <returns><see langword="true"/> if <paramref name="text"/> was successfully parsed; otherwise, <see langword="false"/>.</returns>
 		public static bool TryParse(string? text, out UncPath? uncPath)
 		{
 			if (string.IsNullOrEmpty(text))
