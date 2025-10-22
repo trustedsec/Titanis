@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,6 +62,8 @@ namespace Titanis.Cli
 				var ret = await this.InvokeAsync(command, args, startIndex, cancellationToken);
 				if (this._resultsPending)
 					this.FlushOutput();
+				if (this._style is OutputStyle.Json)
+					context.WriteOutput("]");
 
 				if (this._recordsExpected)
 				{
@@ -434,7 +437,7 @@ namespace Titanis.Cli
 
 			this.FlushOutput();
 
-			if ((style is OutputStyle.Table or OutputStyle.List) && fields.IsNullOrEmpty())
+			if ((style is OutputStyle.Table or OutputStyle.List or OutputStyle.Csv or OutputStyle.Tsv or OutputStyle.Json) && fields.IsNullOrEmpty())
 			{
 				var recordType = this.GetType().GetCustomAttribute<OutputRecordTypeAttribute>()?.RecordType;
 				if (recordType != null)
@@ -501,6 +504,31 @@ namespace Titanis.Cli
 
 				this._resultTable = tbl;
 			}
+			else if (style is OutputStyle.Csv or OutputStyle.Tsv)
+			{
+				var sep = style switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
+				string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.Name)));
+				this.VerifyContext().WriteOutputLine(line);
+			}
+			else if (style is OutputStyle.Json)
+			{
+				this.VerifyContext().WriteOutputLine("[");
+			}
+		}
+
+		static string FormatValue(string sep, string? text)
+		{
+			if (string.IsNullOrEmpty(text))
+				return text;
+
+			var qual = '"';
+			if (text.Contains(sep))
+			{
+				if (text.Contains(qual))
+					text = text.Replace("\"", "\"\"");
+				text = qual + text + qual;
+			}
+			return text;
 		}
 
 		protected Stream OpenRawOutputStream()
@@ -528,7 +556,6 @@ namespace Titanis.Cli
 		protected void WriteRecord(object? record)
 		{
 			this._recordsExpected = true;
-			this._recordsWritten++;
 			var context = this.VerifyContext();
 
 			switch (this._style)
@@ -574,18 +601,49 @@ namespace Titanis.Cli
 					}
 					context.WriteOutputLine(string.Empty);
 					break;
+				case OutputStyle.Csv or OutputStyle.Tsv:
+					if (this._outputFields != null && record is not null)
+					{
+						var sep = this._style switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
+						string line = string.Join(sep, this._outputFields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._style))));
+						this.VerifyContext().WriteOutputLine(line);
+					}
+					break;
+				case OutputStyle.Json:
+					if (this._outputFields != null && record is not null)
+					{
+						Dictionary<string, object?> values = new Dictionary<string, object?>();
+						foreach (var field in this._outputFields)
+						{
+							var fieldValue = field.GetValue(record);
+							if (fieldValue != null)
+							{
+								string formatted = field.FormatValue(fieldValue, OutputStyle.Json);
+								values.Add(field.Name, fieldValue);
+							}
+						}
+						if (this._recordsWritten > 0)
+							context.WriteOutput(",");
+						var jsonLine = JsonSerializer.Serialize(values);
+						context.WriteOutputLine(jsonLine);
+					}
+					break;
 				default:
 					break;
 			}
+			this._recordsWritten++;
 		}
 
 		private void FlushOutput()
 		{
-			if (this._resultsPending && this._resultTable != null)
+			if (this._resultsPending)
 			{
-				this.VerifyContext().WriteOutputLine(this._resultTable.ToString());
-				this._resultsPending = false;
-				this._resultTable = null;
+				if (this._resultTable != null)
+				{
+					this.VerifyContext().WriteOutputLine(this._resultTable.ToString());
+					this._resultsPending = false;
+					this._resultTable = null;
+				}
 			}
 		}
 		#endregion

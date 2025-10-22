@@ -9,6 +9,9 @@ namespace Titanis.Cli
 		Freeform = 0,
 		Raw,
 		Table,
-		List
+		List,
+		Csv,
+		Tsv,
+		Json,
 	}
 }

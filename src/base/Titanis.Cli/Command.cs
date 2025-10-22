@@ -40,7 +40,7 @@ namespace Titanis.Cli
 		[Parameter(ParameterFlags.OutputOnly)]
 		[Description("Fields to display in output")]
 		[ValueListProvider(typeof(FieldListProvider))]
-		protected string[]? OutputFields { get; set; }
+		public string[]? OutputFields { get; set; }
 		#endregion
 
 		/// <inheritdoc/>
