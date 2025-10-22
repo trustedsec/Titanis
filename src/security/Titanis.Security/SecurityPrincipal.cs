@@ -67,7 +67,22 @@ namespace Titanis.Security
 		{
 			return other is not null &&
 				   NameType == other.NameType &&
-				   NamePartCount == other.NamePartCount;
+				   NamePartCount == other.NamePartCount &&
+				   NamesMatch(other);
+		}
+
+		private bool NamesMatch(SecurityPrincipalName other)
+		{
+			var count = other.NamePartCount;
+			if (count != this.NamePartCount)
+				return false;
+			for (int i = 0; i < count; i++)
+			{
+				if (!string.Equals(this.GetNamePart(i), other.GetNamePart(i)))
+					return false;
+			}
+
+			return true;
 		}
 
 		/// <inheritdoc/>
