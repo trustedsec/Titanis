@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>12.0</LangVersion>
 
 		<IsRoslynComponent>true</IsRoslynComponent>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
