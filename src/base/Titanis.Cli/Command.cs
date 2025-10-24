@@ -477,13 +477,16 @@ namespace Titanis.Cli
 					argText = tokenText;
 					paramByName = false;
 
-					isFinalPos = positionalIndex > metadata.PositionalParameters.Count;
-					if (positionalIndex >= metadata.PositionalParameters.Count)
-						throw new SyntaxException(Messages.Cli_TooManyArguments + ": " + argText);
-					else
-						parameter = metadata.PositionalParameters[positionalIndex];
+					do
+					{
+						isFinalPos = positionalIndex > metadata.PositionalParameters.Count;
+						if (positionalIndex >= metadata.PositionalParameters.Count)
+							throw new SyntaxException(Messages.Cli_TooManyArguments + ": " + argText);
+						else
+							parameter = metadata.PositionalParameters[positionalIndex];
 
-					positionalIndex++;
+						positionalIndex++;
+					} while (setParams.ContainsKey(parameter));
 				}
 
 				object? argValue;
