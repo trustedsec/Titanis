@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Titanis.Security.Kerberos
 {
@@ -30,22 +31,18 @@ namespace Titanis.Security.Kerberos
 
 		public TicketInfo? HomeTgt { get; private set; }
 		private List<TicketInfo> _tickets = new List<TicketInfo>();
-		private ConcurrentDictionary<SecurityPrincipalName, TicketInfo> _ticketsBySpn = new ConcurrentDictionary<SecurityPrincipalName, TicketInfo>();
 
 		public TicketInfo[] GetAllTickets() => this._tickets.ToArray();
 
+
+
 		/// <inheritdoc/>
-		public TicketInfo? GetTicketFromCache(SecurityPrincipalName spn)
+		public TicketInfo? GetTicketFromCache(SecurityPrincipalName spn, string? clientName)
 		{
 			ArgumentNullException.ThrowIfNull(spn);
 
-			if (this._ticketsBySpn.TryGetValue(spn, out var ticket))
-			{
-				if (ticket.IsCurrent)
-					return ticket;
-			}
-
-			return null;
+			var ticket = this._tickets.FirstOrDefault(r => r.IsCurrent && r.TargetSpn == spn && (clientName is null || clientName.Equals(r.UserName, StringComparison.OrdinalIgnoreCase)));
+			return ticket;
 		}
 
 		/// <summary>
@@ -58,8 +55,6 @@ namespace Titanis.Security.Kerberos
 		{
 			ArgumentNullException.ThrowIfNull(ticket);
 
-			if (ticket.IsCurrent)
-				this._ticketsBySpn[ticket.TargetSpn] = ticket;
 			this._tickets.Add(ticket);
 			if (
 				ticket.IsTgt

@@ -439,7 +439,7 @@ namespace KerberosV5Spec2
 		private EncryptedData(Asn1DerDecoder decoder)
 		{
 			this.etype = decoder.DecodeTaggedValue<int>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeIntegerTlvAsInt32());
-			this.kvno = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint? );
+			this.kvno = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint?);
 			this.cipher = decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeOctetStringTlv());
 		}
 	}
@@ -988,9 +988,9 @@ namespace KerberosV5Spec2
 			this.cname = decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000003), (encoder) => PrincipalName.DecodeTlvFrom(decoder));
 			this.transited = decoder.DecodeTaggedValue<TransitedEncoding>(new Asn1Tag(0xA0000004), (encoder) => TransitedEncoding.DecodeTlvFrom(decoder));
 			this.authtime = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000005), (encoder) => decoder.DecodeDateTimeTlv());
-			this.starttime = decoder.CheckTag(new Asn1Tag(0xA0000006)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000006), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
+			this.starttime = decoder.CheckTag(new Asn1Tag(0xA0000006)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000006), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
 			this.endtime = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000007), (encoder) => decoder.DecodeDateTimeTlv());
-			this.renew_till = decoder.CheckTag(new Asn1Tag(0xA0000008)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000008), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
+			this.renew_till = decoder.CheckTag(new Asn1Tag(0xA0000008)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000008), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
 			this.caddr = decoder.CheckTag(new Asn1Tag(0xA0000009)) ? decoder.DecodeTaggedValue<HostAddress[]>(new Asn1Tag(0xA0000009), (encoder) => decoder.DecodeListTlv<HostAddress>(new Asn1Tag(0x20000010), (encoder) => HostAddress.DecodeTlvFrom(decoder))) : default(HostAddress[]);
 			this.authorization_data = decoder.CheckTag(new Asn1Tag(0xA000000A)) ? decoder.DecodeTaggedValue<AuthorizationData_Element[]>(new Asn1Tag(0xA000000A), (encoder) => decoder.DecodeListTlv<AuthorizationData_Element>(new Asn1Tag(0x20000010), (encoder) => AuthorizationData_Element.DecodeTlvFrom(decoder))) : default(AuthorizationData_Element[]);
 		}
@@ -1164,9 +1164,9 @@ namespace KerberosV5Spec2
 			this.cname = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000001), (encoder) => PrincipalName.DecodeTlvFrom(decoder)) : default(PrincipalName);
 			this.realm = decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeStringTlv<GeneralString>());
 			this.sname = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000003), (encoder) => PrincipalName.DecodeTlvFrom(decoder)) : default(PrincipalName);
-			this.from = decoder.CheckTag(new Asn1Tag(0xA0000004)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
+			this.from = decoder.CheckTag(new Asn1Tag(0xA0000004)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
 			this.till = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000005), (encoder) => decoder.DecodeDateTimeTlv());
-			this.rtime = decoder.CheckTag(new Asn1Tag(0xA0000006)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000006), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
+			this.rtime = decoder.CheckTag(new Asn1Tag(0xA0000006)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000006), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
 			this.nonce = decoder.DecodeTaggedValue<int>(new Asn1Tag(0xA0000007), (encoder) => decoder.DecodeIntegerTlvAsInt32());
 			this.etype = decoder.DecodeTaggedValue<int[]>(new Asn1Tag(0xA0000008), (encoder) => decoder.DecodeListTlv<int>(new Asn1Tag(0x20000010), (encoder) => decoder.DecodeIntegerTlvAsInt32()));
 			this.addresses = decoder.CheckTag(new Asn1Tag(0xA0000009)) ? decoder.DecodeTaggedValue<HostAddress[]>(new Asn1Tag(0xA0000009), (encoder) => decoder.DecodeListTlv<HostAddress>(new Asn1Tag(0x20000010), (encoder) => HostAddress.DecodeTlvFrom(decoder))) : default(HostAddress[]);
@@ -1748,12 +1748,12 @@ namespace KerberosV5Spec2
 			this.key = decoder.DecodeTaggedValue<EncryptionKey>(new Asn1Tag(0xA0000000), (encoder) => EncryptionKey.DecodeTlvFrom(decoder));
 			this.last_req = decoder.DecodeTaggedValue<LastReq_Element[]>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeListTlv<LastReq_Element>(new Asn1Tag(0x20000010), (encoder) => LastReq_Element.DecodeTlvFrom(decoder)));
 			this.nonce = decoder.DecodeTaggedValue<int>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeIntegerTlvAsInt32());
-			this.key_expiration = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
+			this.key_expiration = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
 			this.flags = decoder.DecodeTaggedValue<Asn1BitString>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeBitStringTlv());
 			this.authtime = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000005), (encoder) => decoder.DecodeDateTimeTlv());
-			this.starttime = decoder.CheckTag(new Asn1Tag(0xA0000006)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000006), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
+			this.starttime = decoder.CheckTag(new Asn1Tag(0xA0000006)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000006), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
 			this.endtime = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000007), (encoder) => decoder.DecodeDateTimeTlv());
-			this.renew_till = decoder.CheckTag(new Asn1Tag(0xA0000008)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000008), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
+			this.renew_till = decoder.CheckTag(new Asn1Tag(0xA0000008)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000008), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
 			this.srealm = decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000009), (encoder) => decoder.DecodeStringTlv<GeneralString>());
 			this.sname = decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA000000A), (encoder) => PrincipalName.DecodeTlvFrom(decoder));
 			this.caddr = decoder.CheckTag(new Asn1Tag(0xA000000B)) ? decoder.DecodeTaggedValue<HostAddress[]>(new Asn1Tag(0xA000000B), (encoder) => decoder.DecodeListTlv<HostAddress>(new Asn1Tag(0x20000010), (encoder) => HostAddress.DecodeTlvFrom(decoder))) : default(HostAddress[]);
@@ -2113,7 +2113,7 @@ namespace KerberosV5Spec2
 			this.cusec = decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeIntegerTlvAsUInt32());
 			this.ctime = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000005), (encoder) => decoder.DecodeDateTimeTlv());
 			this.subkey = decoder.CheckTag(new Asn1Tag(0xA0000006)) ? decoder.DecodeTaggedValue<EncryptionKey>(new Asn1Tag(0xA0000006), (encoder) => EncryptionKey.DecodeTlvFrom(decoder)) : default(EncryptionKey);
-			this.seq_number = decoder.CheckTag(new Asn1Tag(0xA0000007)) ? decoder.DecodeTaggedValue<int>(new Asn1Tag(0xA0000007), (encoder) => decoder.DecodeIntegerTlvAsInt32()) : default(int? );
+			this.seq_number = decoder.CheckTag(new Asn1Tag(0xA0000007)) ? decoder.DecodeTaggedValue<int>(new Asn1Tag(0xA0000007), (encoder) => decoder.DecodeIntegerTlvAsInt32()) : default(int?);
 			this.authorization_data = decoder.CheckTag(new Asn1Tag(0xA0000008)) ? decoder.DecodeTaggedValue<AuthorizationData_Element[]>(new Asn1Tag(0xA0000008), (encoder) => decoder.DecodeListTlv<AuthorizationData_Element>(new Asn1Tag(0x20000010), (encoder) => AuthorizationData_Element.DecodeTlvFrom(decoder))) : default(AuthorizationData_Element[]);
 		}
 	}
@@ -2354,7 +2354,7 @@ namespace KerberosV5Spec2
 			this.ctime = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeDateTimeTlv());
 			this.cusec = decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsUInt32());
 			this.subkey = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<EncryptionKey>(new Asn1Tag(0xA0000002), (encoder) => EncryptionKey.DecodeTlvFrom(decoder)) : default(EncryptionKey);
-			this.seq_number = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint? );
+			this.seq_number = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint?);
 		}
 	}
 
@@ -2466,9 +2466,9 @@ namespace KerberosV5Spec2
 		private KRB_SAFE_BODY(Asn1DerDecoder decoder)
 		{
 			this.user_data = decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeOctetStringTlv());
-			this.timestamp = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
-			this.usec = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint? );
-			this.seq_number = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint? );
+			this.timestamp = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
+			this.usec = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint?);
+			this.seq_number = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint?);
 			this.s_address = decoder.DecodeTaggedValue<HostAddress>(new Asn1Tag(0xA0000004), (encoder) => HostAddress.DecodeTlvFrom(decoder));
 			this.r_address = decoder.CheckTag(new Asn1Tag(0xA0000005)) ? decoder.DecodeTaggedValue<HostAddress>(new Asn1Tag(0xA0000005), (encoder) => HostAddress.DecodeTlvFrom(decoder)) : default(HostAddress);
 		}
@@ -2847,9 +2847,9 @@ namespace KerberosV5Spec2
 		private EncKrbPrivPart_Tagged28(Asn1DerDecoder decoder)
 		{
 			this.user_data = decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeOctetStringTlv());
-			this.timestamp = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
-			this.usec = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint? );
-			this.seq_number = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint? );
+			this.timestamp = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
+			this.usec = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint?);
+			this.seq_number = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint?);
 			this.s_address = decoder.DecodeTaggedValue<HostAddress>(new Asn1Tag(0xA0000004), (encoder) => HostAddress.DecodeTlvFrom(decoder));
 			this.r_address = decoder.CheckTag(new Asn1Tag(0xA0000005)) ? decoder.DecodeTaggedValue<HostAddress>(new Asn1Tag(0xA0000005), (encoder) => HostAddress.DecodeTlvFrom(decoder)) : default(HostAddress);
 		}
@@ -3136,14 +3136,14 @@ namespace KerberosV5Spec2
 		private KrbCredInfo(Asn1DerDecoder decoder)
 		{
 			this.key = decoder.DecodeTaggedValue<EncryptionKey>(new Asn1Tag(0xA0000000), (encoder) => EncryptionKey.DecodeTlvFrom(decoder));
-			this.prealm = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString? );
+			this.prealm = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString?);
 			this.pname = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000002), (encoder) => PrincipalName.DecodeTlvFrom(decoder)) : default(PrincipalName);
-			this.flags = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<Asn1BitString>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeBitStringTlv()) : default(Asn1BitString? );
-			this.authtime = decoder.CheckTag(new Asn1Tag(0xA0000004)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
-			this.starttime = decoder.CheckTag(new Asn1Tag(0xA0000005)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000005), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
-			this.endtime = decoder.CheckTag(new Asn1Tag(0xA0000006)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000006), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
-			this.renew_till = decoder.CheckTag(new Asn1Tag(0xA0000007)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000007), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
-			this.srealm = decoder.CheckTag(new Asn1Tag(0xA0000008)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000008), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString? );
+			this.flags = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<Asn1BitString>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeBitStringTlv()) : default(Asn1BitString?);
+			this.authtime = decoder.CheckTag(new Asn1Tag(0xA0000004)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
+			this.starttime = decoder.CheckTag(new Asn1Tag(0xA0000005)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000005), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
+			this.endtime = decoder.CheckTag(new Asn1Tag(0xA0000006)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000006), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
+			this.renew_till = decoder.CheckTag(new Asn1Tag(0xA0000007)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000007), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
+			this.srealm = decoder.CheckTag(new Asn1Tag(0xA0000008)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000008), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString?);
 			this.sname = decoder.CheckTag(new Asn1Tag(0xA0000009)) ? decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000009), (encoder) => PrincipalName.DecodeTlvFrom(decoder)) : default(PrincipalName);
 			this.caddr = decoder.CheckTag(new Asn1Tag(0xA000000A)) ? decoder.DecodeTaggedValue<HostAddress[]>(new Asn1Tag(0xA000000A), (encoder) => decoder.DecodeListTlv<HostAddress>(new Asn1Tag(0x20000010), (encoder) => HostAddress.DecodeTlvFrom(decoder))) : default(HostAddress[]);
 		}
@@ -3288,9 +3288,9 @@ namespace KerberosV5Spec2
 		private EncKrbCredPart_Tagged29(Asn1DerDecoder decoder)
 		{
 			this.ticket_info = decoder.DecodeTaggedValue<KrbCredInfo[]>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeListTlv<KrbCredInfo>(new Asn1Tag(0x20000010), (encoder) => KrbCredInfo.DecodeTlvFrom(decoder)));
-			this.nonce = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint? );
-			this.timestamp = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
-			this.usec = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint? );
+			this.nonce = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint?);
+			this.timestamp = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
+			this.usec = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint?);
 			this.s_address = decoder.CheckTag(new Asn1Tag(0xA0000004)) ? decoder.DecodeTaggedValue<HostAddress>(new Asn1Tag(0xA0000004), (encoder) => HostAddress.DecodeTlvFrom(decoder)) : default(HostAddress);
 			this.r_address = decoder.CheckTag(new Asn1Tag(0xA0000005)) ? decoder.DecodeTaggedValue<HostAddress>(new Asn1Tag(0xA0000005), (encoder) => HostAddress.DecodeTlvFrom(decoder)) : default(HostAddress);
 		}
@@ -3483,16 +3483,16 @@ namespace KerberosV5Spec2
 		{
 			this.pvno = decoder.DecodeTaggedValue<byte>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeIntegerTlvAsByte());
 			this.msg_type = decoder.DecodeTaggedValue<byte>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsByte());
-			this.ctime = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
-			this.cusec = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint? );
+			this.ctime = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
+			this.cusec = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint?);
 			this.stime = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeDateTimeTlv());
 			this.susec = decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000005), (encoder) => decoder.DecodeIntegerTlvAsUInt32());
 			this.error_code = decoder.DecodeTaggedValue<int>(new Asn1Tag(0xA0000006), (encoder) => decoder.DecodeIntegerTlvAsInt32());
-			this.crealm = decoder.CheckTag(new Asn1Tag(0xA0000007)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000007), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString? );
+			this.crealm = decoder.CheckTag(new Asn1Tag(0xA0000007)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000007), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString?);
 			this.cname = decoder.CheckTag(new Asn1Tag(0xA0000008)) ? decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000008), (encoder) => PrincipalName.DecodeTlvFrom(decoder)) : default(PrincipalName);
 			this.realm = decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000009), (encoder) => decoder.DecodeStringTlv<GeneralString>());
 			this.sname = decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA000000A), (encoder) => PrincipalName.DecodeTlvFrom(decoder));
-			this.e_text = decoder.CheckTag(new Asn1Tag(0xA000000B)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA000000B), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString? );
+			this.e_text = decoder.CheckTag(new Asn1Tag(0xA000000B)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA000000B), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString?);
 			this.e_data = decoder.CheckTag(new Asn1Tag(0xA000000C)) ? decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA000000C), (encoder) => decoder.DecodeOctetStringTlv()) : default(Byte[]);
 		}
 	}
@@ -3655,7 +3655,7 @@ namespace KerberosV5Spec2
 		private PA_ENC_TS_ENC(Asn1DerDecoder decoder)
 		{
 			this.patimestamp = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeDateTimeTlv());
-			this.pausec = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint? );
+			this.pausec = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsUInt32()) : default(uint?);
 		}
 	}
 
@@ -3825,7 +3825,7 @@ namespace KerberosV5Spec2
 		private ETYPE_INFO2_ENTRY(Asn1DerDecoder decoder)
 		{
 			this.etype = decoder.DecodeTaggedValue<int>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeIntegerTlvAsInt32());
-			this.salt = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString? );
+			this.salt = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString?);
 			this.s2kparams = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeOctetStringTlv()) : default(Byte[]);
 		}
 	}
@@ -3925,7 +3925,7 @@ namespace KerberosV5Spec2
 		private AD_KDCIssued(Asn1DerDecoder decoder)
 		{
 			this.ad_checksum = decoder.DecodeTaggedValue<Checksum>(new Asn1Tag(0xA0000000), (encoder) => Checksum.DecodeTlvFrom(decoder));
-			this.i_realm = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString? );
+			this.i_realm = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString?);
 			this.i_sname = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000002), (encoder) => PrincipalName.DecodeTlvFrom(decoder)) : default(PrincipalName);
 			this.elements = decoder.DecodeTaggedValue<AuthorizationData_Element[]>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeListTlv<AuthorizationData_Element>(new Asn1Tag(0x20000010), (encoder) => AuthorizationData_Element.DecodeTlvFrom(decoder)));
 		}
@@ -4602,7 +4602,7 @@ namespace KerberosV5Spec2
 	partial class S4UUserID : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<S4UUserID>, IAsn1DerDecodableValue<S4UUserID>
 	{
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		internal uint nonce;
+		internal int nonce;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		internal PrincipalName? cname;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
@@ -4612,7 +4612,7 @@ namespace KerberosV5Spec2
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		internal Asn1BitString? options;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public S4UUserID(uint nonce, GeneralString crealm, PrincipalName? cname = default, Byte[]? subject_certificate = default, Asn1BitString? options = default)
+		public S4UUserID(int nonce, GeneralString crealm, PrincipalName? cname = default, Byte[]? subject_certificate = default, Asn1BitString? options = default)
 		{
 			this.nonce = nonce;
 			this.cname = cname;
@@ -4649,9 +4649,9 @@ namespace KerberosV5Spec2
 				{
 					encoder.EncodeValueTlv(this.cname);
 				});
-			encoder.EncodeExplicitTlv<uint>(new Asn1Tag(0xA0000000), this.nonce, (encoder, r) =>
+			encoder.EncodeExplicitTlv<int>(new Asn1Tag(0xA0000000), this.nonce, (encoder, r) =>
 			{
-				encoder.EncodeUInt32Tlv(this.nonce);
+				encoder.EncodeInt32Tlv(this.nonce);
 			});
 		}
 
@@ -4697,11 +4697,11 @@ namespace KerberosV5Spec2
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		private S4UUserID(Asn1DerDecoder decoder)
 		{
-			this.nonce = decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeIntegerTlvAsUInt32());
+			this.nonce = decoder.DecodeTaggedValue<int>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeIntegerTlvAsInt32());
 			this.cname = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000001), (encoder) => PrincipalName.DecodeTlvFrom(decoder)) : default(PrincipalName);
 			this.crealm = decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeStringTlv<GeneralString>());
 			this.subject_certificate = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeOctetStringTlv()) : default(Byte[]);
-			this.options = decoder.CheckTag(new Asn1Tag(0xA0000004)) ? decoder.DecodeTaggedValue<Asn1BitString>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeBitStringTlv()) : default(Asn1BitString? );
+			this.options = decoder.CheckTag(new Asn1Tag(0xA0000004)) ? decoder.DecodeTaggedValue<Asn1BitString>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeBitStringTlv()) : default(Asn1BitString?);
 		}
 	}
 
@@ -5024,5 +5024,95 @@ namespace KerberosV5Spec2
 		private ChoiceIndex _choiceTag;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		internal ChoiceIndex SelectedChoice => this._choiceTag;
+	}
+
+	[Asn1Sequence()]
+	partial class ChangePasswdData : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<ChangePasswdData>, IAsn1DerDecodableValue<ChangePasswdData>
+	{
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal Byte[] newpasswd;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal PrincipalName? targname;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal GeneralString? targrealm;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public ChangePasswdData(Byte[] newpasswd, PrincipalName? targname = default, GeneralString? targrealm = null)
+		{
+			this.newpasswd = newpasswd;
+			this.targname = targname;
+			this.targrealm = targrealm;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public Asn1Tag Tag => new Asn1Tag(0x20000010);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Asn1Tag StaticTag => new Asn1Tag(0x20000010);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeValue(Asn1DerEncoder encoder)
+		{
+			if (this.targrealm is not null)
+				encoder.EncodeExplicitTlv<GeneralString>(new Asn1Tag(0xA0000002), this.targrealm.Value, (encoder, r) =>
+				{
+					encoder.EncodeStringTlv(this.targrealm.Value);
+				});
+			if (this.targname is not null)
+				encoder.EncodeExplicitTlv<PrincipalName>(new Asn1Tag(0xA0000001), this.targname, (encoder, r) =>
+				{
+					encoder.EncodeValueTlv(this.targname);
+				});
+			encoder.EncodeExplicitTlv<Byte[]>(new Asn1Tag(0xA0000000), this.newpasswd, (encoder, r) =>
+			{
+				encoder.EncodeOctetStringTlv(this.newpasswd);
+			});
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeTlv(Asn1DerEncoder encoder)
+		{
+			encoder.EncodeValueTlv(this, this.Tag);
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static ChangePasswdData DecodeValueFrom(Asn1DerDecoder decoder)
+		{
+			var instance = new ChangePasswdData(decoder);
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static ChangePasswdData DecodeTlvFrom(Asn1DerDecoder decoder)
+		{
+			var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+			var instance = ChangePasswdData.DecodeValueFrom(decoder);
+			decoder.CloseTlv(tlvFrame);
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out ChangePasswdData? instance)
+		{
+			if (decoder.CheckTag(new Asn1Tag(0x20000010)))
+			{
+				var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+				instance = ChangePasswdData.DecodeValueFrom(decoder);
+				decoder.CloseTlv(tlvFrame);
+				return true;
+			}
+			else
+			{
+				instance = default;
+				return false;
+			}
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		private ChangePasswdData(Asn1DerDecoder decoder)
+		{
+			this.newpasswd = decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeOctetStringTlv());
+			this.targname = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000001), (encoder) => PrincipalName.DecodeTlvFrom(decoder)) : default(PrincipalName);
+			this.targrealm = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeStringTlv<GeneralString>()) : default(GeneralString?);
+		}
 	}
 }

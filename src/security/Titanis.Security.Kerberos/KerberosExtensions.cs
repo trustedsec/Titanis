@@ -1,7 +1,10 @@
 ﻿
 using System;
+using System.Buffers.Binary;
+using Titanis.Asn1.Serialization;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
+using Titanis.Winterop;
 
 namespace KerberosV5Spec2
 {
@@ -9,6 +12,16 @@ namespace KerberosV5Spec2
 	{
 		internal Exception GetException()
 		{
+			if (this.e_data != null)
+			{
+				// [MS-KILE] § 2.2.2
+				var errorInfo = Asn1DerDecoder.DecodeTlv<KERB_ERROR_DATA>(this.e_data);
+				if (errorInfo?.data_type == 3 && errorInfo.data_value?.Length == 12)
+				{
+					Ntstatus ntstatus = (Ntstatus)BinaryPrimitives.ReadUInt32LittleEndian(errorInfo.data_value);
+					ntstatus.CheckAndThrow();
+				}
+			}
 			// TODO: Provite e-text, although it's usually empty
 			return new KerberosException((KerberosErrorCode)this.error_code);
 		}

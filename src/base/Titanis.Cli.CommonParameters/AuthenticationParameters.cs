@@ -31,7 +31,7 @@ namespace Titanis.Cli
 		[Alias("u")]
 		[Description("User name to authenticate with, not including the domain")]
 		[Category(ParameterCategories.Authentication)]
-		public string? UserName { get; set; }
+		public UserPrincipalName? UserName { get; set; }
 
 		[Parameter]
 		[Alias("ud")]
@@ -90,6 +90,21 @@ namespace Titanis.Cli
 		[TypeConverter(typeof(EndPointConverter))]
 		public EndPoint? Kdc { get; set; }
 
+		[Parameter]
+		[Description("Name of user to impersonate with S4U")]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		public UserPrincipalName? S4UserName { get; set; }
+
+		[Parameter]
+		[Description("Name of file containing a certificate of a user to impersonate with S4U")]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		public string? S4UserCert { get; set; }
+
+		[Parameter]
+		[Description("Name of service to proxy through")]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		public SecurityPrincipalName? S4ProxyService { get; set; }
+
 		/// <summary>
 		/// Gets a value indicating whether the user provided Kerberos parameters.
 		/// </summary>
@@ -108,38 +123,14 @@ namespace Titanis.Cli
 		/// </summary>
 		/// <param name="isRequired"><see langword="true"/> if authentication is required</param>
 		/// <param name="context">Validation context</param>
-		public void Validate(bool isRequired, ParameterValidationContext context)
+		public void Validate(bool isRequired, ParameterValidationContext context, bool requiresKerberos = false)
 		{
 			var log = this.Services?.GetService<ILog>();
 
-			if (string.IsNullOrEmpty(this.UserDomain) && !string.IsNullOrEmpty(this.UserName))
+			if (string.IsNullOrEmpty(this.UserDomain) && this.UserName != null)
 			{
-				int isep = this.UserName.IndexOfAny(new char[] { '\\', '@' });
-				if (isep >= 0)
-				{
-					var sep = this.UserName[isep];
-					if (isep == 0)
-					{
-						if (sep == '@')
-							context.LogError(nameof(UserName), "The user name component before the @ is missing.");
-						else if (sep == '\\')
-							context.LogError(nameof(UserName), "The domain component before the \\ is missing.");
-					}
-
-					var part1 = this.UserName.Substring(0, isep);
-					var part2 = this.UserName.Substring(isep + 1);
-					switch (sep)
-					{
-						case '@':
-							this.UserName = part1;
-							this.UserDomain = part2;
-							break;
-						case '\\':
-							this.UserDomain = part1;
-							this.UserName = part2;
-							break;
-					}
-				}
+				if (!string.IsNullOrEmpty(this.UserName.Realm))
+					this.UserDomain = this.UserName.Realm;
 			}
 
 			// Check for Kerberos credentials
@@ -153,21 +144,27 @@ namespace Titanis.Cli
 					)
 				|| (
 					// Username and credential
-					!string.IsNullOrEmpty(this.UserName)
+					(this.UserName is not null)
 					&& !string.IsNullOrEmpty(this.UserDomain)
 					&& (
-						(this.Password != null))
+						(this.Password != null)
 						|| (this.NtlmHash != null)
 						|| (this.AesKey != null)
+						)
 				);
 			this.HasKerberosInfo = hasKerbCred;
 			if (!hasKerbCred && this.Kdc is not null)
 				log?.WriteWarning($"-Kdc option specified but not enough options specified for Kerberos; Kerberos will not be used.");
 
+			if (this.S4UserName is not null)
+			{
+				if (this.Kdc is null)
+					context.LogError(new ParameterValidationError(nameof(S4UserName), $"-{nameof(S4UserName)} requires -{nameof(Kdc)}"));
+			}
 
 			// Check for NTLM
 			bool hasNtlm = false;
-			if (!string.IsNullOrEmpty(this.UserName))
+			if (this.UserName is not null)
 			{
 				hasNtlm = (this.Password is not null) || (this.NtlmHash is not null);
 
@@ -185,11 +182,16 @@ namespace Titanis.Cli
 			{
 				context.LogError(nameof(Anonymous), "No authentication specified.  Either provide a user name with -UserName, or specify -Anonymous to authenticate as anonymous.");
 			}
+
+			if (!hasKerbCred && requiresKerberos)
+			{
+				context.LogError("The command requires a Kerberos security context, but not enough information is available to build a Kerberos context.");
+			}
 		}
 
 		public NtlmClientContext? TryCreateNtlmContext(ServicePrincipalName? targetSpn)
 		{
-			if (string.IsNullOrEmpty(this.UserName) && !this.Anonymous.IsSet)
+			if ((this.UserName is null) && !this.Anonymous.IsSet)
 				return null;
 
 			var domain = this.UserDomain;
@@ -197,11 +199,11 @@ namespace Titanis.Cli
 			NtlmCredential? ntlmCred;
 			if (this.Password != null)
 			{
-				ntlmCred = new NtlmPasswordCredential(this.UserName, domain, this.Password);
+				ntlmCred = new NtlmPasswordCredential(this.UserName.UserName, this.UserDomain, this.Password);
 			}
 			else if (this.NtlmHash != null)
 			{
-				ntlmCred = new NtlmHashCredential(this.UserName, domain, new Buffer128(), new Buffer128(this.NtlmHash.Bytes));
+				ntlmCred = new NtlmHashCredential(this.UserName.UserName, this.UserDomain, new Buffer128(), new Buffer128(this.NtlmHash.Bytes));
 			}
 			else if (this.Anonymous.IsSet)
 				ntlmCred = NtlmCredential.Anonymous;
@@ -293,7 +295,6 @@ namespace Titanis.Cli
 			ArgumentNullException.ThrowIfNull(targetSpn);
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
 
-			KerberosClientContext? krbContext = null;
 			var log = this.Services.GetService<ILog>();
 
 			// Configure the Kerberos client
@@ -310,7 +311,8 @@ namespace Titanis.Cli
 				}
 
 				krb = this.Services.CreateKerberosClient(kdcLocator);
-				krb.Workstation = this.Workstation;
+				if (!string.IsNullOrEmpty(this.Workstation))
+					krb.Workstation = HostAddress.FromNetbiosName(this.Workstation);
 				this._kerberosClient = krb;
 
 				if (!string.IsNullOrEmpty(this.TicketCache))
@@ -326,41 +328,45 @@ namespace Titanis.Cli
 			}
 
 			// Now start processing credentials
+			TicketInfo? serviceTicket = null;
 
-			bool foundMatchingTicket = false;
+			// Name and realm of the user authenticating
+			var authUser = this.UserName?.UserName;
+			var authRealm = this.UserDomain;
 
-			// Start with cache
-			{
-				var ticket = this._kerberosClient.TicketCache.GetTicketFromCache(targetSpn);
-				foundMatchingTicket = ticket != null;
-			}
+			// Client name on service ticket (reflects impersonation/delegation)
+			var effectiveUserName = this.S4UserName?.UserName ?? authUser;
+			var effectiveUserRealm = this.S4UserName?.Realm ?? this.UserDomain;
 
-			// Check tickets
-			if (!foundMatchingTicket && this.Tickets != null)
+			// Search the cache for a service ticket
+			serviceTicket = krb.TicketCache.GetTicketFromCache(targetSpn, effectiveUserName);
+
+			// Check for a matching ticket matching the target SPN and user name (if specified)
+			if ((serviceTicket is null) && this.Tickets != null)
 			{
 				foreach (var ticketFileName in this.Tickets)
 				{
 					// TODO: Resolve file name
 					log?.WriteVerbose($"Loading tickets from {ticketFileName}");
 					var fileCache = new TicketCacheFile(ticketFileName, krb);
-					log?.WriteVerbose($"Loaded {fileCache.TicketCount} from {ticketFileName}");
+					log?.WriteVerbose($"Loaded {fileCache.TicketCount} tickets from {ticketFileName}");
 
-					string? userName = this.UserName;
 					string? userDomain = this.UserDomain;
 					var fileTickets = fileCache.GetAllTickets();
 					foreach (var ticket in fileTickets)
 					{
-						if (!foundMatchingTicket)
+						if (serviceTicket is null)
 						{
-							foundMatchingTicket = FindMatchingTicket(targetSpn, log, ticket, ref userName, ref userDomain);
+							if (CheckMatchingTicket(targetSpn, log, ticket, ref effectiveUserName, ref userDomain))
+								serviceTicket = ticket;
 						}
 
 						// TODO: This will effectively import the ticket into the KRB5CCNAME file, which is not desirable
-						this._kerberosClient.ImportTicket(ticket);
+						krb.ImportTicket(ticket);
 					}
 
 					// No primary match, check alternate service classes
-					if (!foundMatchingTicket)
+					if (serviceTicket is null)
 					{
 						ServicePrincipalName? matchingSpn = null;
 						var altNames = new string[] { ServiceClassNames.RestrictedKrbHost, ServiceClassNames.HostU };
@@ -369,11 +375,12 @@ namespace Titanis.Cli
 							var altSpn = targetSpn.WithServiceClass(altClass);
 							foreach (var ticket in fileTickets)
 							{
-								foundMatchingTicket = FindMatchingTicket(altSpn, log, ticket, ref userName, ref userDomain);
-								if (foundMatchingTicket)
+								if (CheckMatchingTicket(altSpn, log, ticket, ref effectiveUserName, ref userDomain))
+									serviceTicket = ticket;
+
+								if (serviceTicket is not null)
 								{
 									matchingSpn = altSpn;
-									// TODO: Nothing was done with the found ticket
 									break;
 								}
 							}
@@ -385,23 +392,30 @@ namespace Titanis.Cli
 						if (matchingSpn != null)
 							targetSpn = matchingSpn;
 					}
+				}
 
-					this.UserName = userName;
-					this.UserDomain = userDomain;
+				if (serviceTicket is not null)
+				{
+					effectiveUserName ??= serviceTicket.UserName;
+					effectiveUserName ??= serviceTicket.UserRealm;
 				}
 			}
 
+			// Note that effectiveUser is set iff a matching service ticket is found
 
 			// Now process TGTs
 			var tgtFileName = this.Tgt;
-			bool foundTgt = false;
+			TicketInfo? tgt = null;
+
+			// TODO: This should really only be used if no auth user is specified
 			if (krb.TicketCache.HomeTgt is not null)
 			{
-				foundTgt = true;
-				this.UserName ??= krb.TicketCache.HomeTgt.UserName;
-				this.UserDomain ??= krb.TicketCache.HomeTgt.ServiceRealm;
+				tgt = krb.TicketCache.HomeTgt;
+				authUser ??= krb.TicketCache.HomeTgt.UserName;
+				authRealm ??= krb.TicketCache.HomeTgt.UserRealm;
 			}
-			if (!foundMatchingTicket && !foundTgt && !string.IsNullOrEmpty(tgtFileName))
+			// Check the -Tgt file
+			if ((serviceTicket is null) && (tgt is null) && !string.IsNullOrEmpty(tgtFileName))
 			{
 				log?.WriteVerbose($"Loading ticket(s) from {tgtFileName}");
 				var tgtCache = new TicketCacheFile(tgtFileName, krb);
@@ -419,18 +433,18 @@ namespace Titanis.Cli
 						}
 
 						if (
-							(this.UserName == null || string.Equals(this.UserName, ticket.UserName, StringComparison.OrdinalIgnoreCase))
-							&& (this.UserDomain == null || string.Equals(this.UserDomain, ticket.UserRealm, StringComparison.OrdinalIgnoreCase))
+							(authUser == null || string.Equals(authUser, ticket.UserName, StringComparison.OrdinalIgnoreCase))
+							&& (authRealm == null || string.Equals(authRealm, ticket.UserRealm, StringComparison.OrdinalIgnoreCase))
 							)
 						{
-							if (this.UserName == null || this.UserDomain == null)
+							if (authUser == null || authRealm == null)
 							{
 								// Adopt user info from ticket
-								log?.WriteVerbose($"Using UPN from TGT: {ticket.UserName}@{ticket.UserRealm}");
-								this.UserName ??= ticket.UserName;
-								this.UserDomain ??= ticket.UserRealm;
+								log?.WriteVerbose($"Using client name from TGT: {ticket.UserName}@{ticket.UserRealm}");
+								authUser ??= ticket.UserName;
+								authRealm ??= ticket.UserRealm;
 							}
-							foundTgt = true;
+							tgt = ticket;
 							krb.ImportTicket(ticket);
 						}
 					}
@@ -443,70 +457,93 @@ namespace Titanis.Cli
 			}
 
 			KerberosCredential? cred = null;
-			if (!string.IsNullOrEmpty(this.UserDomain))
+			if (!string.IsNullOrEmpty(authRealm) && !string.IsNullOrEmpty(authUser))
 			{
 				if (this.Password != null)
-					cred = new KerberosPasswordCredential(this.UserName, this.UserDomain, this.Password);
+					cred = new KerberosPasswordCredential(authUser, authRealm, this.Password);
 				else if (this.NtlmHash != null)
-					cred = new KerberosKeyCredential(this.UserName, this.UserDomain, EType.Rc4Hmac, this.NtlmHash.Bytes);
+					cred = new KerberosKeyCredential(authUser, authRealm, EType.Rc4Hmac, this.NtlmHash.Bytes);
 				else if (this.AesKey != null)
-					cred = new KerberosKeyCredential(this.UserName, this.UserDomain, this.AesKey.Bytes.Length switch
+					cred = new KerberosKeyCredential(authUser, authRealm, this.AesKey.Bytes.Length switch
 					{
 						(128 / 8) => EType.Aes128CtsHmacSha1_96,
 						(256 / 8) => EType.Aes256CtsHmacSha1_96,
 						_ => throw new ArgumentException("The AES key is not the correct size for AES 128 or AES 256.")
 					}, this.AesKey.Bytes);
 			}
+
+			// A credential is required regardless of whether it is used for authentication
 			if (cred == null)
 			{
-				if (foundMatchingTicket || (foundTgt && !string.IsNullOrEmpty(this.UserDomain)))
-					cred = new KerberosNullCredential(this.UserName, this.UserDomain);
+				if ((serviceTicket is not null) || ((tgt is not null) && !string.IsNullOrEmpty(authRealm)))
+					// Create a placeholder credential for the context
+					cred = new KerberosNullCredential(authUser, authRealm ?? serviceTicket.ServiceRealm);
 				else
 					cred = null;
 			}
 
+			// A credential now exists iff the context has enough information to create a context
 
-			if (cred != null && ((this.Kdc is not null) || foundMatchingTicket))
+			if (serviceTicket is null)
+			{
+				// Get a ticket
+				if (cred != null && (this.Kdc is not null))
+				{
+
+					// TODO: This should be truly asynchronous.
+					try
+					{
+						var ticketParams = krb.GetDefaultTicketOptions(null);
+						if (this.S4UserName != null)
+						{
+							ticketParams.S4UserName = this.S4UserName;
+							ticketParams.S4ProxyService = this.S4ProxyService;
+						}
+
+						serviceTicket = Task.Factory.StartNew(() => krb.GetTicketAsync(
+							targetSpn,
+							cred.Realm,
+							cred,
+							ticketParams,
+							CancellationToken.None), TaskCreationOptions.LongRunning).Unwrap().Result;
+					}
+					catch (Exception ex)
+					{
+						log?.WriteWarning($"Unable to get Kerberos ticket for {targetSpn}: {ex.Message}");
+					}
+				}
+				else
+				{
+					//if (!string.IsNullOrEmpty(this.Kdc))
+					//	throw new InvalidOperationException("KDC option specified, but no suitable credentials were provided.");
+				}
+			}
+
+			if (serviceTicket is not null)
 			{
 				var logger = this.Services.GetService<IKerberosCallback>();
-
-				// TODO: This should be truly asynchronous.
-				try
+				var krbContext = new KerberosClientContext(
+					cred,
+					this._kerberosClient,
+					targetSpn,
+					serviceTicket,
+					callback: logger
+					)
 				{
-					var ticket = Task.Factory.StartNew(() => this._kerberosClient.GetTicketAsync(
-						targetSpn,
-						this.UserDomain,
-						cred,
-						null,
-						CancellationToken.None), TaskCreationOptions.LongRunning).Unwrap().Result;
-
-					krbContext = new KerberosClientContext(
-						cred,
-						this._kerberosClient,
-						targetSpn,
-						ticket,
-						callback: logger
-						)
-					{
-						RequiredCapabilities = 0
-							| SecurityCapabilities.MutualAuthentication | SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality | SecurityCapabilities.SequenceDetection | SecurityCapabilities.ReplayDetection
-					};
-				}
-				catch (Exception ex)
-				{
-					log?.WriteWarning($"Unable to get Kerberos ticket for {targetSpn}: {ex.Message}");
-				}
-			}
-			else
-			{
-				//if (!string.IsNullOrEmpty(this.Kdc))
-				//	throw new InvalidOperationException("KDC option specified, but no suitable credentials were provided.");
+					RequiredCapabilities = 0
+						| SecurityCapabilities.MutualAuthentication
+						| SecurityCapabilities.Integrity
+						| SecurityCapabilities.Confidentiality
+						| SecurityCapabilities.SequenceDetection
+						| SecurityCapabilities.ReplayDetection
+				};
+				return krbContext;
 			}
 
-			return krbContext;
+			return null;
 		}
 
-		private static bool FindMatchingTicket(ServicePrincipalName targetSpn, ILog? log, TicketInfo ticket,
+		private static bool CheckMatchingTicket(ServicePrincipalName targetSpn, ILog? log, TicketInfo ticket,
 			ref string? userName,
 			ref string? userRealm)
 		{

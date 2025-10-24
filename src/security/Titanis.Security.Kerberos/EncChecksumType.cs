@@ -6,6 +6,7 @@ namespace Titanis.Security.Kerberos
 {
 	enum EncChecksumType
 	{
+		// [RFC 3961] § 8
 		Crc32 = 1,
 		RsaMd4 = 2,
 		rsaMd4Des = 3,
@@ -15,8 +16,11 @@ namespace Titanis.Security.Kerberos
 		RsaMd5 = 7,
 		RsaMd5Des = 8,
 		Sha1 = -131,
+
+		// [RFC 3962] § 7
 		HmacSha1_96_Aes128 = 15,
 		HmacSha1_96_Aes256 = 16,
+
 		// [RFC 4757] 4.
 		HmacMd5String = -138,
 	}

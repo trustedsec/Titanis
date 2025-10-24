@@ -21,3 +21,13 @@ https://datatracker.ietf.org/doc/html/rfc4757
 [RFC 6806] - Kerberos Principal Name Canonicalization and Cross-Realm Referrals
 
 RFC 6113 - A Generalized Framework for Kerberos Pre-Authentication
+
+[MS-SFU] S4U2self, S4U2proxy
+
+[RFC 1964] Kerberos over GSS API
+
+[ChangePW] - Kerberos Change Password Protocol
+https://datatracker.ietf.org/doc/html/draft-ietf-cat-kerb-chg-password-02
+
+
+[RFC 3244] - Microsoft Windows 2000 Kerberos Change & Set

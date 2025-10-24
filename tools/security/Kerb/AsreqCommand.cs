@@ -34,38 +34,12 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 	internal class AsreqCommand : TicketRequestCommand
 	{
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-		[Parameter]
-		[Mandatory]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("Name of user (no domain)")]
-		public string UserName { get; set; }
 
-		[Parameter]
-		[Mandatory]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("Name of realm (domain)")]
-		public string Realm { get; set; }
+		[ParameterGroup(ParameterGroupOptions.Required)]
+		public InitialAuthParameterGroup InitialAuth { get; set; }
+
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-		[Parameter]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("Password")]
-		public string? Password { get; set; }
-
-		[Parameter]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("NTLM hash (hex-encoded, no colons)")]
-		public HexString? NtlmHash { get; set; }
-
-		[Parameter]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("AES 128 key")]
-		public HexString? Aes128Key { get; set; }
-
-		[Parameter]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("AES 256 key")]
-		public HexString? Aes256Key { get; set; }
 
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
@@ -85,36 +59,28 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 		{
 			base.ValidateParameters(context);
 
-			int credCount = 0;
-			if (this.Password != null) credCount++;
-			if (this.NtlmHash != null) credCount++;
-			if (this.Aes128Key != null) credCount++;
-			if (this.Aes256Key != null) credCount++;
+			this.InitialAuth.Validate(context);
 
-			if (this.EncTypes != null && this.Password == null)
+			if (this.EncTypes != null && this.InitialAuth.Password == null)
 				context.LogError(nameof(EncTypes), "EncTypes may only be specified along with -Password");
-
-			if (credCount != 1)
-				context.LogError(new ParameterValidationError(null, "The command line must specify exactly one (1) credential."));
 		}
 
 		protected sealed override async Task<IList<TicketInfo>> RequestTickets(KerberosClient krb, CancellationToken cancellationToken)
 		{
+			var ticket = await this.InitialAuth.RequestInitialTicket(
+				krb,
+				this.Spn,
+				this.EncTypes,
+				this.TicketParamGroup?.GetTicketParameters(this.Log),
+				cancellationToken,
+				this.Log);
 
-			KerberosCredential cred =
-				(this.Password != null) ? new KerberosPasswordCredential(this.UserName, this.Realm, this.Password)
-				: (this.NtlmHash != null) ? new KerberosKeyCredential(this.UserName, this.Realm, EType.Rc4Hmac, this.NtlmHash.Bytes)
-				: (this.Aes128Key != null) ? new KerberosKeyCredential(this.UserName, this.Realm, EType.Aes128CtsHmacSha1_96, this.Aes128Key.Bytes)
-				: (this.Aes256Key != null) ? new KerberosKeyCredential(this.UserName, this.Realm, EType.Aes256CtsHmacSha1_96, this.Aes256Key.Bytes)
-				: throw new SyntaxException("No credential provided");
+			var realm = this.InitialAuth.EffectiveRealm;
+			this.WriteRecord(ticket);
+			if (!string.Equals(ticket.TicketRealm, realm, StringComparison.OrdinalIgnoreCase))
+				this.WriteWarning($"The ticket realm '{ticket.TicketRealm}' does not match the requested realm '{realm}'.  This may be the result of canonicalization.");
 
-			TicketParameters ticketParameters = this.TicketParamGroup?.GetTicketParameters(this.Log) ?? krb.GetDefaultTgtOptions();
-
-			var tgt = await krb.RequestTgt(this.Realm, cred, this.Spn, ticketParameters, this.EncTypes, cancellationToken).ConfigureAwait(false);
-			if (!string.Equals(tgt.TicketRealm, this.Realm, StringComparison.OrdinalIgnoreCase))
-				this.WriteWarning($"The ticket realm '{tgt.TicketRealm}' does not match the requested realm '{this.Realm}'.  This may be the result of canonicalization.");
-			this.WriteRecord(tgt);
-			return [tgt];
+			return [ticket];
 		}
 	}
 }

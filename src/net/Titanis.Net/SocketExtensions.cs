@@ -83,5 +83,69 @@ namespace Titanis.Net
 				family = defaultValue;
 			return family;
 		}
+
+		/// <summary>
+		/// Receives bytes from a socket into a buffer, and does not return until
+		/// all bytes are read.
+		/// </summary>
+		/// <param name="socket">Stream <see cref="Socket"/> to read from.</param>
+		/// <param name="buffer">Buffer to receive bytes into</param>
+		/// <param name="cancellationToken">Cancellation token</param>
+		/// <exception cref="EndOfStreamException"><paramref name="socket"/> is closed before <paramref name="buffer"/> is filled.</exception>
+		public static async Task ReceiveAllAsync(
+			this ISocket socket,
+			Memory<byte> buffer,
+			CancellationToken cancellationToken
+			)
+		{
+			int cbTotalRecv = 0;
+			while (cbTotalRecv < buffer.Length)
+			{
+				int cbRecv = await socket.ReceiveAsync(
+					buffer.Slice(cbTotalRecv),
+					SocketFlags.None,
+					cancellationToken
+					).ConfigureAwait(false);
+				if (cbRecv == 0)
+					throw new EndOfStreamException();
+
+				cbTotalRecv += cbRecv;
+			}
+		}
+
+		/// <summary>
+		/// Receives bytes from a socket into a buffer, and does not return until
+		/// a minimum number of bytes is read.
+		/// </summary>
+		/// <param name="socket">Stream <see cref="Socket"/> to read from.</param>
+		/// <param name="buffer">Buffer to receive bytes into</param>
+		/// <param name="cancellationToken">Cancellation token</param>
+		/// <exception cref="EndOfStreamException"><paramref name="socket"/> is closed before <paramref name="minCount"/> is read.</exception>
+		public static async Task<int> ReceiveAtLeastAsync(
+			this ISocket socket,
+			Memory<byte> buffer,
+			int minCount,
+			CancellationToken cancellationToken
+			)
+		{
+			if (buffer.Length < minCount)
+				throw new ArgumentException("The buffer is smaller than the minimum byte count.", nameof(buffer));
+
+			int cbTotalRecv = 0;
+			while (cbTotalRecv < minCount)
+			{
+				int cbRecv = await socket.ReceiveAsync(
+					buffer.Slice(cbTotalRecv),
+					SocketFlags.None,
+					cancellationToken
+					).ConfigureAwait(false);
+				if (cbRecv == 0)
+					throw new EndOfStreamException();
+
+				cbTotalRecv += cbRecv;
+			}
+
+			return cbTotalRecv;
+		}
 	}
 }

@@ -208,6 +208,7 @@ namespace Titanis.Security.Kerberos
 				// 15.
 				KeyUsage.Safe or KeyUsage.InitiatorSign or KeyUsage.AcceptorSign => 15,
 				KeyUsage.NonKerbChecksumSalt => 17,
+				KeyUsage.X509Checksum => (int)KeyUsage.X509Checksum,
 				_ => throw new ArgumentOutOfRangeException(nameof(usage))
 			};
 
@@ -237,16 +238,26 @@ namespace Titanis.Security.Kerberos
 		// [RFC 4757] § 4. Checksum Types
 		public static byte[] Hash(byte[] keyBytes, int messageType, byte[] data)
 		{
+			Md5Context md5 = new Md5Context();
+			md5.Initialize();
+
+			// T
+			{
+				Span<byte> t = stackalloc byte[4];
+				BinaryPrimitives.WriteInt32LittleEndian(t, messageType);
+				md5.HashData(t);
+			}
+			md5.HashData(data);
+
 			HMACMD5 hmac = new HMACMD5(keyBytes);
 			var signKey = hmac.ComputeHash(Encoding.UTF8.GetBytes("signaturekey\0"));
 
-			byte[] tmp = new byte[4 + data.Length];
-			BinaryPrimitives.WriteInt32LittleEndian(tmp.Slice(0, 4), messageType);
-			data.CopyTo(tmp, 4);
+			byte[] hash = new byte[16];
+			md5.HashFinal(hash);
 
 			hmac = new HMACMD5(signKey);
-			var hash = hmac.ComputeHash(tmp);
-			return hash;
+			var cksum = hmac.ComputeHash(hash);
+			return cksum;
 		}
 
 		/// <summary>
@@ -382,6 +393,10 @@ namespace Titanis.Security.Kerberos
 				keyBuffer.k2[i] = keyBuffer.k1[i];
 			}
 		}
+
+		// [MS-SFU] § 2.2.2
+		/// <inheritdoc/>
+		internal sealed override EncChecksumType ChecksumType => EncChecksumType.RsaMd4;
 	}
 
 	// [RFC 4757]
@@ -417,5 +432,9 @@ namespace Titanis.Security.Kerberos
 				K1[i] = 0xAB;
 			}
 		}
+
+		// [MS-SFU] § 2.2.2
+		/// <inheritdoc/>
+		internal sealed override EncChecksumType ChecksumType => EncChecksumType.RsaMd4;
 	}
 }

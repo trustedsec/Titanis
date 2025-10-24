@@ -199,9 +199,9 @@ namespace Titanis.Security.Kerberos
 			var encProfile = encInfo.encProfile;
 			var protoKey = this._credential.DeriveProtocolKeyFor(encProfile, salt);
 			this._callback?.OnEncryptingTS(protoKey, salt);
-			tsencBytes = protoKey.Encrypt(KeyUsage.AsreqPaEncTimestamp, tsencBytes).ToArray();
+			var tsencData = protoKey.EncryptAndWrap(KeyUsage.AsreqPaEncTimestamp, tsencBytes);
 
-			var padataBytes = Asn1DerEncoder.EncodeTlv(Structs.EncryptedData(encProfile.EType, tsencBytes));
+			var padataBytes = Asn1DerEncoder.EncodeTlv(tsencData);
 
 			return padataBytes;
 		}

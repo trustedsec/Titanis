@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +39,11 @@ namespace Titanis.Security.Kerberos
 		public DateTime? EndTime { get; set; }
 		public static DateTime DefaultEndTime => new DateTime(1970, 1, 1, 0, 0, 0);
 		public DateTime? RenewTill { get; set; }
+		public UserPrincipalName? S4UserName { get; set; }
+		public X509Certificate? S4UserCertificate { get; set; }
+		public bool IndicatesS4User => this.S4UserName is not null || this.S4UserCertificate is not null;
+		public SecurityPrincipalName? S4ProxyService { get; set; }
+		public TicketInfo? AdditionalTicket { get; set; }
 	}
 	/// <summary>
 	/// Implements a Kerberos client.
@@ -45,6 +51,8 @@ namespace Titanis.Security.Kerberos
 	public partial class KerberosClient : IDisposable
 	{
 		public const string Krb5CacheVariableName = "KRB5CCNAME";
+
+		public static readonly ServicePrincipalName ChangePwSpn = new ServicePrincipalName("kadmin", "changepw");
 
 		/// <summary>
 		/// Initializes a new <see cref="KerberosClient"/>.
@@ -97,7 +105,7 @@ namespace Titanis.Security.Kerberos
 		/// <remarks>
 		/// If provided, this is included with <c>ASREQ</c> messages.
 		/// </remarks>
-		public string? Workstation { get; set; }
+		public HostAddress? Workstation { get; set; }
 
 		#region Network I/O
 		// TODO: What is the max buffer size?
@@ -235,7 +243,7 @@ namespace Titanis.Security.Kerberos
 			string targetRealm,
 			KerberosCredential credential,
 			CancellationToken cancellationToken)
-			=> this.RequestTgt(targetRealm, credential, null, GetDefaultTgtOptions(), null, cancellationToken);
+			=> this.RequestInitialTicket(targetRealm, credential, null, GetDefaultTgtOptions(), null, cancellationToken);
 		/// <summary>
 		/// Requests a ticket-granting ticket for the specified realm.
 		/// </summary>
@@ -252,7 +260,7 @@ namespace Titanis.Security.Kerberos
 		/// This method bypasses the cache.  This means that this call will always result in a request
 		/// sent to the KDC.  Any returned ticket is not stored in the cache.
 		/// </remarks>
-		public async Task<TicketInfo> RequestTgt(
+		public async Task<TicketInfo> RequestInitialTicket(
 			string targetRealm,
 			KerberosCredential credential,
 			SecurityPrincipalName? targetSpn,
@@ -280,7 +288,7 @@ namespace Titanis.Security.Kerberos
 			{
 				_requestPac = true
 			};
-			TicketRequestContext context = new TicketRequestContext(credential)
+			TicketRequestContext context = new TicketRequestContext(credential, null, false)
 			{
 				preauth = paInfo
 			};
@@ -290,6 +298,7 @@ namespace Titanis.Security.Kerberos
 				paInfo,
 				Structs.KdcReqBody(
 					ticketParameters,
+					ticketParameters.Options,
 					Structs.PrincipalName(PrincipalNameType.Principal, credential.UserName),
 					credential.Realm,
 					Structs.PrincipalName(targetSpn),
@@ -351,7 +360,7 @@ namespace Titanis.Security.Kerberos
 			{
 				_requestPac = true
 			};
-			TicketRequestContext context = new TicketRequestContext(null)
+			TicketRequestContext context = new TicketRequestContext(null, null, false)
 			{
 				preauth = paInfo
 			};
@@ -361,6 +370,7 @@ namespace Titanis.Security.Kerberos
 				paInfo,
 				Structs.KdcReqBody(
 					GetDefaultTgtOptions(),
+					DefaultTgtOptions,
 					Structs.PrincipalName(PrincipalNameType.Principal, userName),
 					targetRealm,
 					Structs.PrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.Krbtgt, targetRealm),
@@ -502,12 +512,12 @@ namespace Titanis.Security.Kerberos
 			CancellationToken cancellationToken)
 		{
 			var spn = new ServicePrincipalName(ServiceClassNames.Krbtgt, realm);
-			var ticket = this.TicketCache.GetTicketFromCache(spn);
+			var ticket = this.TicketCache.GetTicketFromCache(spn, credential?.UserName);
 			if (ticket == null)
 			{
 				if (this._realmMapping.TryGetValue(realm, out string mapped))
 					realm = mapped;
-				ticket = this.TicketCache.GetTicketFromCache(spn);
+				ticket = this.TicketCache.GetTicketFromCache(spn, credential?.UserName);
 			}
 
 			if (ticket != null)
@@ -540,13 +550,17 @@ namespace Titanis.Security.Kerberos
 			ArgumentException.ThrowIfNullOrEmpty(realm);
 			ArgumentNullException.ThrowIfNull(credential);
 
-			var ticket = this.TicketCache.GetTicketFromCache(targetSpn);
+			var ticket = this.TicketCache.GetTicketFromCache(targetSpn, credential.UserName);
 			if (ticket != null)
 				return ticket;
 
 
 			var tgt = await this.GetTgt(realm, credential, cancellationToken).ConfigureAwait(false);
-			ticketParameters ??= GetDefaultTicketOptions(tgt);
+			if (ticketParameters != null)
+				ticketParameters.EndTime = tgt.EndTime;
+			else
+				ticketParameters ??= GetDefaultTicketOptions(tgt);
+
 			ticket = await this.RequestTicket(
 				tgt,
 				targetSpn,
@@ -566,7 +580,25 @@ namespace Titanis.Security.Kerberos
 			TicketParameters? ticketParameters,
 			CancellationToken cancellationToken)
 		{
-			var ticket = await RequestTicketCore(tgt, spn, realm, encTypes, ticketParameters, cancellationToken).ConfigureAwait(false);
+			var options = ticketParameters.Options;
+			if (ticketParameters != null && ticketParameters.S4ProxyService != null && ticketParameters.S4ProxyService != spn)
+			{
+				if (ticketParameters.AdditionalTicket == null)
+				{
+					var proxyTicket = await RequestTicket(
+						tgt,
+						ticketParameters.S4ProxyService,
+						realm,
+						encTypes,
+						ticketParameters,
+						cancellationToken
+						).ConfigureAwait(false);
+					ticketParameters.AdditionalTicket = proxyTicket;
+				}
+				options |= KdcOptions.CNameInAddlTicket;
+			}
+
+			var ticket = await RequestTicketCore(tgt, spn, realm, encTypes, ticketParameters, options, cancellationToken).ConfigureAwait(false);
 			if (ticket.IsTgt)
 			{
 				HashSet<string> referralNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -576,7 +608,7 @@ namespace Titanis.Security.Kerberos
 					this._callback?.OnReferralReceived(spn, ticket);
 					this.TicketCache?.AddTicket(ticket);
 
-					var nextTicket = await RequestTicketCore(ticket, spn, ticket.ServiceInstance, encTypes, ticketParameters, cancellationToken).ConfigureAwait(false);
+					var nextTicket = await RequestTicketCore(ticket, spn, ticket.ServiceInstance, encTypes, ticketParameters, options, cancellationToken).ConfigureAwait(false);
 					ticket = nextTicket;
 				}
 			}
@@ -589,6 +621,7 @@ namespace Titanis.Security.Kerberos
 			string realm,
 			EType[]? encTypes,
 			TicketParameters? ticketParameters,
+			KdcOptions options,
 			CancellationToken cancellationToken)
 		{
 			ArgumentNullException.ThrowIfNull(tgt);
@@ -601,9 +634,13 @@ namespace Titanis.Security.Kerberos
 			if (!ticketParameters.EndTime.HasValue)
 				ticketParameters.EndTime = tgt.EndTime ?? TicketParameters.DefaultEndTime;
 
-			TicketRequestContext context = new TicketRequestContext(null);
+			// TODO: Using the subkey breaks RC4 HMAC with S4U
+			bool usingSubkey = false;
+			//bool usingSubkey = true;
+			var sessionKey = usingSubkey ? tgt.GenerateSessionKey() : tgt.SessionKey;
+			TicketRequestContext context = new TicketRequestContext(null, sessionKey, usingSubkey);
 
-			var tgsreq = this.CreateTgsReq(spn, tgt, encTypes, ticketParameters, context);
+			var tgsreq = this.CreateTgsReq(spn, tgt, encTypes, ticketParameters, options, context);
 
 			this._callback?.OnRequestingTicket(spn, tgt, (KdcOptions)tgsreq.Tgsreq.req_body.kdc_options.ToUInt32());
 
@@ -611,7 +648,7 @@ namespace Titanis.Security.Kerberos
 			var rep = await this.TransceiveKdcAsync(realm, string.Equals(realm, tgt.UserRealm) ? LocateKdcOptions.Home : LocateKdcOptions.None, pduBytes, cancellationToken).ConfigureAwait(false);
 
 			if (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Tgsrep)
-				return ProcessTgsRep(rep.Tgsrep, tgt.SessionKey, context);
+				return ProcessTgsRep(rep.Tgsrep, context);
 			else if (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Error)
 				throw rep.Error.GetException();
 			else
@@ -620,10 +657,10 @@ namespace Titanis.Security.Kerberos
 
 		internal TicketInfo ProcessTgsRep(
 			KDC_REP rep,
-			SessionKey tgtSessionKey,
 			TicketRequestContext context)
 		{
-			var encPart = this.ExtractTgsEncPart(rep, tgtSessionKey).Value;
+			Debug.Assert(context.sessionKey != null);
+			var encPart = this.ExtractTgsEncPart(rep, context.sessionKey, context.usingSubkey).Value;
 			if (encPart.nonce != context.nonce)
 				throw new SecurityException("The nonce in the TGS-REP does not match the nonce sent in the TGS-REQ.");
 
@@ -636,10 +673,10 @@ namespace Titanis.Security.Kerberos
 
 		private Asn1Explicit<EncKDCRepPart> ExtractTgsEncPart(
 			KDC_REP rep,
-			SessionKey tgtSessionKey
-			)
+			SessionKey tgtSessionKey,
+			bool usingSubkey)
 		{
-			var encPart = Asn1DerDecoder.DecodeTlv<EncTGSRepPart>(tgtSessionKey.Decrypt(KeyUsage.TgsrepEncPart_SessionKey, rep.enc_part));
+			var encPart = Asn1DerDecoder.DecodeTlv<EncTGSRepPart>(tgtSessionKey.Decrypt(usingSubkey ? KeyUsage.TgsrepEncPart_AuthSubkeyKey : KeyUsage.TgsrepEncPart_SessionKey, rep.enc_part));
 			var kdcOptions = (KdcOptions)encPart.Value.flags.ToUInt32();
 
 			return encPart;
@@ -674,17 +711,25 @@ namespace Titanis.Security.Kerberos
 		internal class TicketRequestContext
 		{
 			internal TicketRequestContext(
-				KerberosCredential? credential
+				KerberosCredential? credential,
+				SessionKey? sessionKey,
+				bool usingSubkey
 				)
 			{
 				this.nonce = GenerateNonce();
 				this.credential = credential;
+				this.sessionKey = sessionKey;
+				this.usingSubkey = usingSubkey;
+				this.now = KerberosTime.Now();
 			}
 
 			internal readonly KerberosCredential? credential;
+			internal readonly SessionKey? sessionKey;
+			internal readonly bool usingSubkey;
 
 			internal int nonce;
 			internal PreauthInfo preauth;
+			internal KerberosTime now;
 		}
 
 		public const KdcOptions DefaultTgtOptions = 0
@@ -716,11 +761,11 @@ namespace Titanis.Security.Kerberos
 			return DateTime.UtcNow + TimeSpan.FromHours(10);
 		}
 
-		public TicketParameters GetDefaultTicketOptions(TicketInfo tgt)
+		public TicketParameters GetDefaultTicketOptions(TicketInfo? tgt)
 		{
 			return new TicketParameters()
 			{
-				EndTime = tgt.EndTime,
+				EndTime = tgt?.EndTime,
 				Options = DefaultTicketOptions,
 			};
 		}
@@ -743,27 +788,7 @@ namespace Titanis.Security.Kerberos
 			return req;
 		}
 
-		private HostAddress[]? MakeHostAddress()
-		{
-			HostAddress[]? hostAddresses;
-			var netbiosName = this.Workstation;
-			if (netbiosName != null)
-			{
-				netbiosName = netbiosName.ToUpper().PadRight(15, ' ');
-				netbiosName += '\x20';
-
-				hostAddresses = new HostAddress[]
-				{
-					Structs.HostAddress(AddressType.Netbios, netbiosName)
-				};
-			}
-			else
-			{
-				hostAddresses = null;
-			}
-
-			return hostAddresses;
-		}
+		private KerberosV5Spec2.HostAddress[]? MakeHostAddress() => (this.Workstation != null) ? [this.Workstation.ToKrb5HostAddress()] : null;
 
 		private static Checksum ComputeChecksum(ReadOnlySpan<byte> message)
 		{
@@ -776,6 +801,7 @@ namespace Titanis.Security.Kerberos
 			TicketInfo tgt,
 			EType[]? etypes,
 			TicketParameters ticketParameters,
+			KdcOptions options,
 			TicketRequestContext context
 			)
 		{
@@ -789,13 +815,85 @@ namespace Titanis.Security.Kerberos
 
 			KDC_REQ_BODY reqBody = Structs.KdcReqBody(
 				ticketParameters,
-				cname,
+				options,
+				null, //(ticketParameters.S4UserName is null) ? null : Structs.PrincipalName(PrincipalNameType.Principal, ticketParameters.S4UserName.UserName),// null, //cname,
 				tgt.ServiceInstance,
 				Structs.PrincipalName(spn),
 				context.nonce,
 				(etypes == null) ? this.GetAllETypes() : Array.ConvertAll(etypes, r => (int)r),
 				null
 				);
+
+			var pacOptions = PacOptions.BranchAware;
+
+			List<PA_DATA> padatas = new(3);
+
+			if (ticketParameters.IndicatesS4User)
+			{
+				if (ticketParameters.AdditionalTicket == null)
+				{
+					string s4uRealm = ticketParameters.S4UserName?.Realm ?? tgt.UserRealm;
+
+					// [MS-SFU] § 2.2.1
+
+					pacOptions |= PacOptions.Claims;
+
+					const string KerberosPackageName = "Kerberos";
+
+					// Compose s4uByteArray
+					const PrincipalNameType nameType = PrincipalNameType.Principal;
+					string s4uString = ticketParameters.S4UserName + s4uRealm + KerberosPackageName;
+					var byteCount = 4 + Encoding.UTF8.GetByteCount(s4uString);
+					byte[] s4uByteArray = new byte[byteCount];
+					BinaryPrimitives.WriteInt32LittleEndian(s4uByteArray, (int)nameType);
+					Encoding.UTF8.GetBytes(s4uString, s4uByteArray.Slice(4));
+
+					// [MS-SFU] § 2.2.2 - PA_S4U_X509_USER
+					// [MS-SFU] <4> - According to the spec, the X509 structure is included even if no X509 certificate is provided
+					// TODO: Verify the above with a PCAP
+					// NOTE: Although the spec says the session key of the TGT is used, this is ONLY true if there is no subkey
+					S4UUserID userId = new(
+						context.nonce,
+						s4uRealm,
+						(ticketParameters.S4UserName is null) ? null : Structs.PrincipalName(PrincipalNameType.Principal, ticketParameters.S4UserName?.UserName),
+						ticketParameters.S4UserCertificate?.GetRawCertData(),
+						null);
+					var userIdBytes = Asn1DerEncoder.EncodeTlv(userId).ToArray();
+
+					Checksum cksum;
+					if (context.sessionKey.EType is EType.Rc4Hmac or EType.Rc4HmacExp)
+					{
+						Md4Context md4 = new Md4Context();
+						md4.Initialize();
+						md4.HashData(userIdBytes);
+
+						var hash = new byte[md4.DigestSizeBytes];
+						md4.HashFinal(hash);
+						cksum = new Checksum((int)EncChecksumType.RsaMd4, hash);
+					}
+					else
+					{
+						cksum = context.sessionKey.Checksum(KeyUsage.X509Checksum, userIdBytes);
+					}
+
+					var s4uCert = new PA_S4U_X509_USER(userId, cksum);
+					padatas.Add(Structs.PAData(PadataType.S4u2Self_X509User, Asn1DerEncoder.EncodeTlv(s4uCert).ToArray()));
+					if (ticketParameters.S4UserCertificate is null)
+					{
+						var cksumBytes = Rc4Hmac.Hash(context.sessionKey.KeyBytes, (int)KrbMessageType.PaForUser, s4uByteArray);
+						var s4u = new PA_FOR_USER(Structs.PrincipalName(nameType, ticketParameters.S4UserName.UserName), s4uRealm, Structs.Checksum(EncChecksumType.HmacMd5String, cksumBytes), "Kerberos");
+						padatas.Add(Structs.PAData(PadataType.S4u2Self_PaForUser, Asn1DerEncoder.EncodeTlv(s4u).ToArray()));
+					}
+
+					// [MS-SFU] § 2.2.5
+					pacOptions |= PacOptions.ResourceBasedConstrainedDelegation;
+				}
+				else
+				{
+				}
+			}
+
+			padatas.Add(Kerberos.Structs.PAData_PacOptions(pacOptions));
 
 			AP_REQ apreq = Structs.APReq(
 				0,
@@ -806,15 +904,15 @@ namespace Titanis.Security.Kerberos
 						cname,
 						tgt.UserRealm,
 						ComputeChecksum(Asn1DerEncoder.EncodeTlv(reqBody).Span),
+						context.now,
 						seqnbr,
-						null
+						context.usingSubkey ? context.sessionKey.key : null
 						)).Span)
 				);
-			List<PA_DATA> padatas = new()
-			{
-				Structs.PAData_APRep(apreq),
-				Kerberos.Structs.PAData_PacOptions(PacOptions.BranchAware)
-			};
+			padatas.Add(Structs.PAData_APReq(apreq));
+
+
+
 
 			KDC_REQ_CHOICE req = new KDC_REQ_CHOICE
 			{
@@ -827,6 +925,7 @@ namespace Titanis.Security.Kerberos
 		internal AP_REQ CreateAPReq(
 			TicketInfo ticket,
 			EncryptionKey subkey,
+			KerberosTime now,
 			int initialSeqNbr,
 			APOptions options,
 			SecurityCapabilities caps
@@ -849,6 +948,7 @@ namespace Titanis.Security.Kerberos
 						capabilities = caps
 					}.AsSpan().ToArray()
 				),
+				now,
 				initialSeqNbr,
 				subkey
 				);
@@ -864,6 +964,152 @@ namespace Titanis.Security.Kerberos
 
 			return apreq;
 		}
+
+		#region Changepw stuff
+#if DEBUG
+		internal void TestChangepw_dbg(
+			KerberosCredential cred,
+			byte[] asrepBytes,
+			byte[] msgBytes)
+		{
+			var asrep = Asn1DerDecoder.DecodeTlv<AS_REP>(asrepBytes);
+
+			var encProfile = this.GetEncProfile((EType)asrep.Value.enc_part.etype);
+			var ltk = cred.DeriveProtocolKeyFor(encProfile, Encoding.UTF8.GetBytes("LUMON.INDmilchick"));
+			var asrepEncPart = ltk.DecryptTlv<EncASRepPart>(KeyUsage.AsrepEncPart, asrep.Value.enc_part);
+
+			var sessionKey = encProfile.CreateSessionKey(asrepEncPart.Value.key);
+
+			var request = new ByteMemoryReader(msgBytes).ReadPduStruct<ChangepwMessage>();
+			var apreq = Asn1DerDecoder.DecodeTlv<AP_REQ>(request.Apreqdata).Value;
+			var auth = sessionKey.DecryptTlv<Authenticator>(KeyUsage.ApreqAuth_AppSessionKey_IncludesAuthSubkey, apreq.authenticator);
+			KRB_PRIV_Tagged21 priv = Asn1DerDecoder.DecodeTlv<KRB_PRIV>(request.PrivMessage).Value;
+			var subkey = encProfile.CreateSessionKey(auth.Value.subkey);
+			var privContents = subkey.DecryptTlv<EncKrbPrivPart>(KeyUsage.Priv, priv.enc_part);
+
+			Debug.Assert(privContents.Value.seq_number == auth.Value.seq_number);
+		}
+#endif
+
+		public async Task ChangePassword(
+			EndPoint kdcEP,
+			TicketInfo ticket,
+			KerberosCredential credential,
+			string newPassword,
+			HostAddress hostAddress,
+			CancellationToken cancellationToken
+			)
+		{
+			ArgumentNullException.ThrowIfNull(kdcEP);
+			ArgumentNullException.ThrowIfNull(ticket);
+			ArgumentNullException.ThrowIfNull(credential);
+			ArgumentNullException.ThrowIfNull(newPassword);
+			ArgumentNullException.ThrowIfNull(hostAddress);
+
+			byte[] privData = Encoding.UTF8.GetBytes(newPassword);
+
+			await SendChangepwRequest(
+				kdcEP,
+				ticket,
+				credential,
+				privData,
+				ChangepwMessage.ChangepwVersionNumber,
+				cancellationToken).ConfigureAwait(false);
+		}
+
+		public async Task SetPassword(
+			EndPoint kdcEP,
+			TicketInfo ticket,
+			KerberosCredential credential,
+			string newPassword,
+			// NOTE: [RFC 3244] declares targname and targrealm as optional, although in practice this fails
+			SecurityPrincipalName? targetAccount,
+			string? targetRealm,
+			HostAddress hostAddress,
+			CancellationToken cancellationToken
+			)
+		{
+			ArgumentNullException.ThrowIfNull(kdcEP);
+			ArgumentNullException.ThrowIfNull(ticket);
+			ArgumentNullException.ThrowIfNull(credential);
+			ArgumentNullException.ThrowIfNull(newPassword);
+			ArgumentNullException.ThrowIfNull(hostAddress);
+
+			byte[] privData = Asn1DerEncoder.EncodeTlv(new ChangePasswdData(Encoding.UTF8.GetBytes(newPassword), targetAccount?.PrincipalName(), (targetRealm is null) ? default(GeneralString?) : targetRealm)).ToArray();
+
+			await SendChangepwRequest(
+				kdcEP,
+				ticket,
+				credential,
+				privData,
+				ChangepwMessage.Win2kResetPasswordVersionNumber,
+				cancellationToken).ConfigureAwait(false);
+		}
+
+		private async Task SendChangepwRequest(EndPoint kdcEP, TicketInfo ticket, KerberosCredential credential, byte[] privData, ushort version, CancellationToken cancellationToken)
+		{
+			var socketService = this._socketService;
+			var socket = socketService.CreateTcpSocket(kdcEP.AddressFamily);
+			await using (socket.ConfigureAwait(false))
+			{
+				await socket.ConnectAsync(kdcEP, cancellationToken).ConfigureAwait(false);
+
+				KerberosClientContext authContext = new KerberosClientContext(credential, this, KerberosClient.ChangePwSpn, ticket, null);
+				authContext.RequiredCapabilities |= SecurityCapabilities.DceStyle;
+				var apreqBytes = authContext.Initialize().ToArray();
+
+				var privBytes = authContext.EncodeKrbPriv(privData);
+
+
+
+				var msg = new ChangepwMessage
+				{
+					MessageLength = checked((ushort)(6 + apreqBytes.Length + privBytes.Length)),
+					ProtocolVersionNumber = version,
+					ApreqLength = checked((ushort)apreqBytes.Length),
+					Apreqdata = apreqBytes,
+					PrivMessage = privBytes.ToArray()
+				};
+				var writer = new ByteWriter(4 + msg.MessageLength);
+				writer.WriteInt32BE(msg.MessageLength);
+				writer.WritePduStruct(msg);
+
+				var bytes = writer.GetData();
+
+				await socket.SendAsync(bytes, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+
+				var replyBuf = new byte[32 * 1024];
+
+				int cbRecv = await socket.ReceiveAtLeastAsync(
+					replyBuf,
+					4 + 6,
+					cancellationToken).ConfigureAwait(false);
+				var cbMessage = BinaryPrimitives.ReadInt32BigEndian(replyBuf) + 4;
+				if (cbRecv < cbMessage)
+					cbRecv += await socket.ReceiveAtLeastAsync(replyBuf.AsMemory(cbRecv), cbMessage - cbRecv, cancellationToken).ConfigureAwait(false);
+
+				var reader = new ByteMemoryReader(replyBuf.AsMemory(4, cbRecv - 4));
+				var reply = reader.ReadPduStruct<ChangepwMessage>();
+				authContext.Initialize(reply.Apreqdata);
+				var privReply = Asn1DerDecoder.DecodeTlv<KRB_PRIV>(reply.PrivMessage);
+
+				var privEncpart = authContext.InitiatorSubkey.DecryptTlv<EncKrbPrivPart>(KeyUsage.Priv, privReply.Value.enc_part).Value;
+				if (privEncpart.user_data.Length >= 2)
+				{
+					var status = (ChangepwStatus)BinaryPrimitives.ReadUInt16BigEndian(privEncpart.user_data);
+					if (status != ChangepwStatus.Success)
+					{
+						string? errorMessage = null;
+						if (privEncpart.user_data.Length > 2)
+							errorMessage = Encoding.UTF8.GetString(privEncpart.user_data.Slice(2));
+
+						throw new KrbChangePasswordException(status, errorMessage);
+					}
+				}
+			}
+		}
+
+		#endregion
 
 		/// <summary>
 		/// Generates a 32-bit nonce.
@@ -924,61 +1170,61 @@ namespace Titanis.Security.Kerberos
 		}
 		#endregion
 
-		//internal KerbTrace Trace(
-		//	KerberosCredential credential,
-		//	byte[] asreqBytes,
-		//	byte[] asrepBytes,
-		//	byte[] tgsreqBytes,
-		//	byte[] tgsrepBytes,
-		//	byte[] apreqBytes,
-		//	byte[] aprepBytes,
-		//	byte[] aprep2Bytes,
-		//	byte[] mechList,
-		//	byte[] initiatorMechListMic,
-		//	byte[] acceptorMechListMic,
-		//	byte[] req0,
-		//	byte[] rep0
-		//	)
-		//{
-		//	KerbTrace trace = new KerbTrace(this, credential, this._callback);
+		internal KerbTrace Trace(
+			KerberosCredential credential,
+			byte[] asreqBytes,
+			byte[] asrepBytes,
+			byte[] tgsreqBytes,
+			byte[] tgsrepBytes,
+			byte[] apreqBytes,
+			byte[] aprepBytes,
+			byte[] aprep2Bytes,
+			byte[] mechList,
+			byte[] initiatorMechListMic,
+			byte[] acceptorMechListMic,
+			byte[] req0,
+			byte[] rep0
+			)
+		{
+			KerbTrace trace = new KerbTrace(this, credential, this._callback);
 
-		//	trace.TraceAsreq(asreqBytes);
-		//	trace.TraceAsrep(asrepBytes);
-		//	trace.TraceTgsreq(tgsreqBytes);
-		//	trace.TraceTgsrep(tgsrepBytes);
-		//	trace.TraceApreq(apreqBytes);
-		//	trace.TraceAprep(aprepBytes, mechList, acceptorMechListMic);
-		//	trace.TraceAprep2(aprep2Bytes, mechList, initiatorMechListMic);
+			trace.TraceAsreq(asreqBytes);
+			trace.TraceAsrep(asrepBytes);
+			trace.TraceTgsreq(tgsreqBytes);
+			trace.TraceTgsrep(tgsrepBytes);
+			trace.TraceApreq(apreqBytes);
+			trace.TraceAprep(aprepBytes, mechList, acceptorMechListMic);
+			trace.TraceAprep2(aprep2Bytes, mechList, initiatorMechListMic);
 
-		//	trace.TraceReq(req0);
+			trace.TraceReq(req0);
 
-		//	return trace;
-		//}
+			return trace;
+		}
 
-		//internal KerbTrace Trace(
-		//	KerberosCredential credential,
-		//	SessionKey ticketSessionKey,
-		//	byte[] apreqBytes,
-		//	byte[] aprepBytes,
-		//	byte[] aprep2Bytes,
-		//	byte[] mechList,
-		//	byte[] initiatorMechListMic,
-		//	byte[] acceptorMechListMic,
-		//	byte[] req0,
-		//	byte[] rep0
-		//	)
-		//{
-		//	KerbTrace trace = new KerbTrace(this, credential, this._callback);
+		internal KerbTrace Trace(
+			KerberosCredential credential,
+			SessionKey ticketSessionKey,
+			byte[] apreqBytes,
+			byte[] aprepBytes,
+			byte[] aprep2Bytes,
+			byte[] mechList,
+			byte[] initiatorMechListMic,
+			byte[] acceptorMechListMic,
+			byte[] req0,
+			byte[] rep0
+			)
+		{
+			KerbTrace trace = new KerbTrace(this, credential, this._callback);
 
-		//	trace.TicketSessionKey = ticketSessionKey;
-		//	trace.TraceApreq(apreqBytes);
-		//	trace.TraceAprep(aprepBytes, mechList, acceptorMechListMic);
-		//	trace.TraceAprep2(aprep2Bytes, mechList, initiatorMechListMic);
+			trace.TicketSessionKey = ticketSessionKey;
+			trace.TraceApreq(apreqBytes);
+			trace.TraceAprep(aprepBytes, mechList, acceptorMechListMic);
+			trace.TraceAprep2(aprep2Bytes, mechList, initiatorMechListMic);
 
-		//	trace.TraceReq(req0);
+			trace.TraceReq(req0);
 
-		//	return trace;
-		//}
+			return trace;
+		}
 		public void ImportTickets(IEnumerable<TicketInfo> tickets)
 		{
 			ArgumentNullException.ThrowIfNull(tickets);
@@ -1181,236 +1427,236 @@ namespace Titanis.Security.Kerberos
 		}
 	}
 
-	//internal class KerbTrace
-	//{
-	//	private readonly KerberosClient kerb;
-	//	private readonly KerberosCredential credential;
-	//	private readonly IKerberosCallback? callback;
-	//	private KdcOptions tgsKdcOptions;
+	internal class KerbTrace
+	{
+		private readonly KerberosClient kerb;
+		private readonly KerberosCredential credential;
+		private readonly IKerberosCallback? callback;
+		private KdcOptions tgsKdcOptions;
 
-	//	internal KerbTrace(KerberosClient kerb, KerberosCredential credential, IKerberosCallback? callback = null)
-	//	{
-	//		this.kerb = kerb;
-	//		this.credential = credential;
-	//		this.callback = callback;
-	//	}
+		internal KerbTrace(KerberosClient kerb, KerberosCredential credential, IKerberosCallback? callback = null)
+		{
+			this.kerb = kerb;
+			this.credential = credential;
+			this.callback = callback;
+		}
 
-	//	#region AS-REQ
-	//	public KDC_REQ? Asreq { get; private set; }
-	//	public string? AuthService { get; private set; }
-	//	public string? AuthRealm { get; private set; }
-	//	public uint AuthNonce { get; private set; }
-	//	#endregion
-	//	#region AS-REP
-	//	public KDC_REP? Asrep { get; private set; }
-	//	public TicketInfo? Tgt { get; private set; }
-	//	public SessionKey? TgtSessionKey { get; private set; }
-	//	#endregion
-	//	#region TGS-REQ
-	//	public KDC_REQ Tgsreq { get; private set; }
-	//	public uint TgsNonce { get; private set; }
-	//	public SecurityPrincipalName TargetSpn { get; private set; }
-	//	#endregion
-	//	#region TGS-REP
-	//	public KDC_REP Tgsrep { get; private set; }
-	//	public AP_REQ Tgsreq_apreq { get; private set; }
-	//	public Authenticator Tgsreq_auth { get; private set; }
-	//	public TicketInfo Ticket { get; private set; }
-	//	public SessionKey TicketSessionKey { get; internal set; }
-	//	#endregion
-	//	#region AP-REQ
-	//	public AP_REQ_Unnamed_3 Apreq { get; private set; }
-	//	public Authenticator_Outer Apreq_auth { get; private set; }
-	//	#endregion
-	//	#region AP-REP
-	//	public AP_REP_Unnamed_5 Aprep { get; private set; }
-	//	public EncPart_APRep Aprep_auth { get; private set; }
-	//	public SessionKey AcceptorSubkey { get; private set; }
-	//	public uint RecvSeqNbr { get; private set; }
-	//	#endregion
-	//	#region AP-REP2
-	//	public AP_REP_Unnamed_5 Aprep2 { get; private set; }
-	//	public EncPart_APRep Aprep2_auth { get; private set; }
-	//	public uint SendSeqNbr { get; private set; }
-	//	#endregion
+		#region AS-REQ
+		public KDC_REQ? Asreq { get; private set; }
+		public string? AuthService { get; private set; }
+		public string? AuthRealm { get; private set; }
+		public int AuthNonce { get; private set; }
+		#endregion
+		#region AS-REP
+		public KDC_REP? Asrep { get; private set; }
+		public TicketInfo? Tgt { get; private set; }
+		public SessionKey? TgtSessionKey { get; private set; }
+		#endregion
+		#region TGS-REQ
+		public KDC_REQ Tgsreq { get; private set; }
+		public int TgsNonce { get; private set; }
+		public SecurityPrincipalName TargetSpn { get; private set; }
+		#endregion
+		#region TGS-REP
+		public KDC_REP Tgsrep { get; private set; }
+		public AP_REQ Tgsreq_apreq { get; private set; }
+		public Authenticator Tgsreq_auth { get; private set; }
+		public TicketInfo Ticket { get; private set; }
+		public SessionKey TicketSessionKey { get; internal set; }
+		#endregion
+		#region AP-REQ
+		public AP_REQ Apreq { get; private set; }
+		public Authenticator Apreq_auth { get; private set; }
+		#endregion
+		#region AP-REP
+		public AP_REP Aprep { get; private set; }
+		public EncAPRepPart Aprep_auth { get; private set; }
+		public SessionKey AcceptorSubkey { get; private set; }
+		public uint RecvSeqNbr { get; private set; }
+		#endregion
+		#region AP-REP2
+		public AP_REP Aprep2 { get; private set; }
+		public EncAPRepPart Aprep2_auth { get; private set; }
+		public int SendSeqNbr { get; private set; }
+		#endregion
 
-	//	internal void TraceAsreq(byte[] asreqBytes)
-	//	{
-	//		var asreq = Asn1DerDecoder.DecodeTlv<KDC_REQ>(asreqBytes);
-	//		this.Asreq = asreq;
-	//		var authTarget = asreq.req_body.sname.name_string;
-	//		this.AuthService = authTarget[0].Value;
-	//		this.AuthRealm = authTarget[1].Value;
-	//		this.AuthNonce = asreq.req_body.nonce;
+		internal void TraceAsreq(byte[] asreqBytes)
+		{
+			var asreq = Asn1DerDecoder.DecodeTlv<KDC_REQ>(asreqBytes);
+			this.Asreq = asreq;
+			var authTarget = asreq.req_body.sname.name_string;
+			this.AuthService = authTarget[0].Value;
+			this.AuthRealm = authTarget[1].Value;
+			this.AuthNonce = asreq.req_body.nonce;
 
-	//		this.callback?.OnRequestingTgt(this.AuthRealm, this.credential, this.AuthNonce);
-	//	}
-	//	internal void TraceAsrep(byte[] asrepBytes)
-	//		=> this.TraceAsrep(asrepBytes, this.AuthService, this.AuthRealm, this.AuthNonce);
-	//	internal void TraceAsrep(
-	//		byte[] asrepBytes,
-	//		string authService,
-	//		string authRealm,
-	//		uint authNonce)
-	//	{
-	//		var asrep = Asn1DerDecoder.DecodeTlv<KDC_REP>(asrepBytes);
-	//		this.Asrep = asrep;
-	//		var tgt = this.kerb.ProcessASRep(asrep, new TicketRequestContext(credential)
-	//		{ nonce = (uint)authNonce }, DateTime.Now);
-	//		this.Tgt = tgt;
-	//		this.TgtSessionKey = tgt.SessionKey;
-	//	}
+			this.callback?.OnRequestingTgt(this.AuthRealm, this.credential, this.AuthNonce);
+		}
+		internal void TraceAsrep(byte[] asrepBytes)
+			=> this.TraceAsrep(asrepBytes, this.AuthService, this.AuthRealm, this.AuthNonce);
+		internal void TraceAsrep(
+			byte[] asrepBytes,
+			string authService,
+			string authRealm,
+			int authNonce)
+		{
+			var asrep = Asn1DerDecoder.DecodeTlv<KDC_REP>(asrepBytes);
+			this.Asrep = asrep;
+			var tgt = this.kerb.ProcessASRep(asrep, new TicketRequestContext(credential, null, false)
+			{ nonce = authNonce }, DateTime.Now);
+			this.Tgt = tgt;
+			this.TgtSessionKey = tgt.SessionKey;
+		}
 
-	//	internal void TraceTgsreq(byte[] tgsreqBytes)
-	//		=> this.TraceTgsreq(tgsreqBytes, this.TgtSessionKey);
-	//	internal void TraceTgsreq(byte[] tgsreqBytes, SessionKey tgtSessionKey)
-	//	{
-	//		var tgsreq = Asn1DerDecoder.DecodeTlv<KDC_REQ>(tgsreqBytes);
-	//		this.Tgsreq = tgsreq;
-	//		this.TgsNonce = tgsreq.req_body.nonce;
+		internal void TraceTgsreq(byte[] tgsreqBytes)
+			=> this.TraceTgsreq(tgsreqBytes, this.TgtSessionKey);
+		internal void TraceTgsreq(byte[] tgsreqBytes, SessionKey tgtSessionKey)
+		{
+			var tgsreq = Asn1DerDecoder.DecodeTlv<KDC_REQ>(tgsreqBytes);
+			this.Tgsreq = tgsreq;
+			this.TgsNonce = tgsreq.req_body.nonce;
 
-	//		this.TargetSpn = tgsreq.req_body.sname.ToSecurityPrincipalName();
+			this.TargetSpn = tgsreq.req_body.sname.ToSecurityPrincipalName();
 
-	//		var tgsreq_options = (KdcOptions)tgsreq.req_body.kdc_options.ToUInt32();
-	//		AP_REQ? tgsreq_apreq = null;
-	//		Authenticator_Outer? tgsreq_auth = null;
-	//		foreach (var padata in tgsreq.padata)
-	//		{
-	//			switch ((PadataType)padata.padata_type)
-	//			{
-	//				case PadataType.TgsReq:
-	//					tgsreq_apreq = Asn1DerDecoder.Decode<AP_REQ>(padata.padata_value);
-	//					tgsreq_auth = tgtSessionKey.DecryptTlv<Authenticator_Outer>(
-	//						KeyUsage.TgsreqPatgsreqPadataApreqAuthChecksum_TgsSessionKey_IncludesAuthSubkey,
-	//						tgsreq_apreq.Value.authenticator);
-	//					break;
-	//			}
-	//		}
+			var tgsreq_options = (KdcOptions)tgsreq.req_body.kdc_options.ToUInt32();
+			AP_REQ? tgsreq_apreq = null;
+			Authenticator? tgsreq_auth = null;
+			foreach (var padata in tgsreq.padata)
+			{
+				switch ((PadataType)padata.padata_type)
+				{
+					case PadataType.TgsReq:
+						tgsreq_apreq = Asn1DerDecoder.DecodeTlv<AP_REQ>(padata.padata_value);
+						tgsreq_auth = tgtSessionKey.DecryptTlv<Authenticator>(
+							KeyUsage.TgsreqPatgsreqPadataApreqAuthChecksum_TgsSessionKey_IncludesAuthSubkey,
+							tgsreq_apreq.Value.authenticator);
+						break;
+				}
+			}
 
-	//		this.callback?.OnRequestingTicket(this.TargetSpn, this.Tgt, tgsreq_options);
-	//	}
+			this.callback?.OnRequestingTicket(this.TargetSpn, this.Tgt, tgsreq_options);
+		}
 
-	//	internal void TraceTgsrep(byte[] tgsrepBytes)
-	//		=> TraceTgsrep(tgsrepBytes, this.TargetSpn, this.TgsNonce, this.TgtSessionKey);
-	//	internal void TraceTgsrep(byte[] tgsrepBytes, SecurityPrincipalName spn, int tgsNonce, SessionKey tgtSessionKey)
-	//	{
-	//		var tgsrep = Asn1DerDecoder.Decode<Asn1.KerberosV5Spec2.KDC_REP>(tgsrepBytes);
-	//		var ticket = this.kerb.ProcessTgsRep(tgsrep, tgtSessionKey, new TicketRequestContext(credential)
-	//		{ nonce = (uint)TgsNonce });
-	//		this.Ticket = ticket;
-	//		this.TicketSessionKey = ticket.SessionKey;
-	//	}
+		internal void TraceTgsrep(byte[] tgsrepBytes)
+			=> TraceTgsrep(tgsrepBytes, this.TargetSpn, this.TgsNonce, this.TgtSessionKey);
+		internal void TraceTgsrep(byte[] tgsrepBytes, SecurityPrincipalName spn, int tgsNonce, SessionKey tgtSessionKey)
+		{
+			var tgsrep = Asn1DerDecoder.DecodeTlv<KDC_REP>(tgsrepBytes);
+			var ticket = this.kerb.ProcessTgsRep(tgsrep, new TicketRequestContext(credential, tgtSessionKey, false)
+			{ nonce = TgsNonce });
+			this.Ticket = ticket;
+			this.TicketSessionKey = ticket.SessionKey;
+		}
 
-	//	internal void TraceApreq(byte[] apreqBytes)
-	//		=> this.TraceApreq(apreqBytes, this.TicketSessionKey);
-	//	internal void TraceApreq(byte[] apreqBytes, SessionKey ticketSessionKey)
-	//	{
-	//		this.TicketSessionKey = ticketSessionKey;
-	//		var apreq_ = Asn1DerDecoder.Decode<Asn1.KerberosV5Spec2.AP_REQ_Unnamed_3>(apreqBytes);
-	//		var apreq_auth = Asn1DerDecoder.Decode<Asn1.KerberosV5Spec2.Authenticator_Outer>(ticketSessionKey.Decrypt(KeyUsage.ApreqAuth_AppSessionKey_IncludesAuthSubkey, apreq_.authenticator));
+		internal void TraceApreq(byte[] apreqBytes)
+			=> this.TraceApreq(apreqBytes, this.TicketSessionKey);
+		internal void TraceApreq(byte[] apreqBytes, SessionKey ticketSessionKey)
+		{
+			this.TicketSessionKey = ticketSessionKey;
+			var apreq_ = Asn1DerDecoder.DecodeTlv<AP_REQ>(apreqBytes);
+			var apreq_auth = Asn1DerDecoder.DecodeTlv<Authenticator>(ticketSessionKey.Decrypt(KeyUsage.ApreqAuth_AppSessionKey_IncludesAuthSubkey, apreq_.Value.authenticator));
 
-	//		this.SendSeqNbr = apreq_auth.Value.seq_number.Value;
-	//		if (apreq_auth.Value.authorization_data != null)
-	//		{
-	//			foreach (var authData in apreq_auth.Value.authorization_data)
-	//			{
-	//				switch (authData.ad_type)
-	//				{
-	//					case 1:
-	//						{
-	//							var subauth = Asn1DerDecoder.Decode<Asn1Explicit<Unnamed_0>>(authData.ad_data);
-	//						}
-	//						break;
-	//					default:
-	//						break;
-	//				}
-	//			}
-	//		}
+			this.SendSeqNbr = apreq_auth.Value.seq_number.Value;
+			if (apreq_auth.Value.authorization_data != null)
+			{
+				foreach (var authData in apreq_auth.Value.authorization_data)
+				{
+					switch (authData.ad_type)
+					{
+						case 1:
+							{
+								//var subauth = Asn1DerDecoder.DecodeTlv<Asn1Explicit<Unnamed_0>>(authData.ad_data);
+							}
+							break;
+						default:
+							break;
+					}
+				}
+			}
 
-	//		SecurityCapabilities gssFlags = SecurityCapabilities.None;
-	//		if (
-	//			apreq_auth.Value.cksum.cksumtype == AuthChecksumToken.ChecksumType
-	//			&& apreq_auth.Value.cksum.checksum.Length >= AuthChecksumToken.StructSize
-	//			)
-	//		{
-	//			ref var token = ref MemoryMarshal.AsRef<AuthChecksumToken>(apreq_auth.Value.cksum.checksum);
-	//			gssFlags = token.capabilities;
-	//		}
+			SecurityCapabilities gssFlags = SecurityCapabilities.None;
+			if (
+				apreq_auth.Value.cksum.cksumtype == AuthChecksumToken.ChecksumType
+				&& apreq_auth.Value.cksum.checksum.Length >= AuthChecksumToken.StructSize
+				)
+			{
+				ref var token = ref MemoryMarshal.AsRef<AuthChecksumToken>(apreq_auth.Value.cksum.checksum);
+				gssFlags = token.capabilities;
+			}
 
-	//		this.callback?.OnSendingApreq(null, this.TargetSpn, null, this.credential, gssFlags, ticketSessionKey, this.SendSeqNbr);
-	//	}
+			this.callback?.OnSendingApreq(null, this.TargetSpn, null, this.credential, gssFlags, ticketSessionKey, this.SendSeqNbr);
+		}
 
-	//	internal void TraceAprep(byte[] aprepBytes,
-	//		byte[]? mechList, byte[]? acceptorMechListMic
-	//		)
-	//		=> this.TraceAprep(aprepBytes, this.TicketSessionKey, mechList, acceptorMechListMic);
-	//	internal void TraceAprep(byte[] aprepBytes, SessionKey ticketSessionKey,
-	//		byte[]? mechList, byte[]? acceptorMechListMic
-	//		)
-	//	{
-	//		var aprep_ = Asn1DerDecoder.Decode<Asn1.KerberosV5Spec2.AP_REP_Unnamed_5>(aprepBytes);
-	//		var aprep_auth = Asn1DerDecoder.Decode<Asn1.KerberosV5Spec2.EncPart_APRep>(ticketSessionKey.Decrypt(KeyUsage.APRep_EncPart, aprep_.enc_part));
-	//		var acceptorSubkey = this.kerb.CreateSessionKeyFor(aprep_auth.Value.subkey);
-	//		this.AcceptorSubkey = acceptorSubkey;
-	//		this.RecvSeqNbr = aprep_auth.Value.seq_number ?? 0;
+		internal void TraceAprep(byte[] aprepBytes,
+			byte[]? mechList, byte[]? acceptorMechListMic
+			)
+			=> this.TraceAprep(aprepBytes, this.TicketSessionKey, mechList, acceptorMechListMic);
+		internal void TraceAprep(byte[] aprepBytes, SessionKey ticketSessionKey,
+			byte[]? mechList, byte[]? acceptorMechListMic
+			)
+		{
+			var aprep_ = Asn1DerDecoder.DecodeTlv<AP_REP>(aprepBytes);
+			var aprep_auth = Asn1DerDecoder.DecodeTlv<EncAPRepPart>(ticketSessionKey.Decrypt(KeyUsage.APRep_EncPart, aprep_.Value.enc_part));
+			var acceptorSubkey = this.kerb.CreateSessionKeyFor(aprep_auth.Value.subkey);
+			this.AcceptorSubkey = acceptorSubkey;
+			this.RecvSeqNbr = aprep_auth.Value.seq_number ?? 0;
 
-	//		this.callback?.OnReceivedAprep(null, this.RecvSeqNbr, acceptorSubkey);
+			this.callback?.OnReceivedAprep(null, this.RecvSeqNbr, acceptorSubkey);
 
-	//		if (mechList != null && acceptorMechListMic != null)
-	//		{
-	//			acceptorSubkey.VerifySignature(
-	//				KeyUsage.AcceptorSign,
-	//				aprep_auth.Value.seq_number.Value,
-	//				WrapFlags.AcceptorSubkey,
-	//				new MessageVerifyParams(acceptorMechListMic, SecBufferList.Create(SecBuffer.Integrity(mechList)))
-	//				);
-	//		}
-	//	}
+			if (mechList != null && acceptorMechListMic != null)
+			{
+				acceptorSubkey.VerifySignature(
+					KeyUsage.AcceptorSign,
+					aprep_auth.Value.seq_number.Value,
+					WrapFlags.AcceptorSubkey,
+					new MessageVerifyParams(acceptorMechListMic, SecBufferList.Create(SecBuffer.Integrity(mechList)))
+					);
+			}
+		}
 
-	//	internal void TraceAprep2(byte[] aprep2Bytes, byte[] mechList, byte[] initiatorMechListMic)
-	//		=> this.TraceAprep2(aprep2Bytes, this.TicketSessionKey, this.AcceptorSubkey, this.SendSeqNbr, mechList, initiatorMechListMic);
-	//	internal void TraceAprep2(byte[] aprep2Bytes, SessionKey ticketSessionKey, SessionKey acceptorSubkey, uint sendSeqNbr, byte[] mechList, byte[] initiatorMechListMic)
-	//	{
-	//		var aprep2_ = Asn1DerDecoder.Decode<Asn1.KerberosV5Spec2.AP_REP_Unnamed_5>(aprep2Bytes);
-	//		var aprep2_auth = Asn1DerDecoder.Decode<Asn1.KerberosV5Spec2.EncPart_APRep>(ticketSessionKey.Decrypt(KeyUsage.APRep_EncPart, aprep2_.enc_part));
-	//		acceptorSubkey.VerifySignature(
-	//			KeyUsage.InitiatorSign,
-	//			(uint)sendSeqNbr,
-	//			WrapFlags.AcceptorSubkey,
-	//			new MessageVerifyParams(initiatorMechListMic, SecBufferList.Create(SecBuffer.Integrity(mechList)))
-	//			);
-	//	}
+		internal void TraceAprep2(byte[] aprep2Bytes, byte[] mechList, byte[] initiatorMechListMic)
+			=> this.TraceAprep2(aprep2Bytes, this.TicketSessionKey, this.AcceptorSubkey, this.SendSeqNbr, mechList, initiatorMechListMic);
+		internal void TraceAprep2(byte[] aprep2Bytes, SessionKey ticketSessionKey, SessionKey acceptorSubkey, int sendSeqNbr, byte[] mechList, byte[] initiatorMechListMic)
+		{
+			var aprep2_ = Asn1DerDecoder.DecodeTlv<AP_REP>(aprep2Bytes);
+			var aprep2_auth = Asn1DerDecoder.DecodeTlv<EncAPRepPart>(ticketSessionKey.Decrypt(KeyUsage.APRep_EncPart, aprep2_.Value.enc_part));
+			acceptorSubkey.VerifySignature(
+				KeyUsage.InitiatorSign,
+				(uint)sendSeqNbr,
+				WrapFlags.AcceptorSubkey,
+				new MessageVerifyParams(initiatorMechListMic, SecBufferList.Create(SecBuffer.Integrity(mechList)))
+				);
+		}
 
-	//	internal void TraceReq(byte[] req0)
-	//		=> this.TraceReq(req0, this.AcceptorSubkey, this.SendSeqNbr);
-	//	internal void TraceReq(byte[] req0, SessionKey acceptorSubkey, uint sendSeqNbr)
-	//	{
-	//		var buffer = req0;
+		internal void TraceReq(byte[] req0)
+			=> this.TraceReq(req0, this.AcceptorSubkey, this.SendSeqNbr);
+		internal void TraceReq(byte[] req0, SessionKey acceptorSubkey, int sendSeqNbr)
+		{
+			var buffer = req0;
 
-	//		const int RpcHeaderSize = 0x18;
-	//		const int AuthHeaderSize = 8;
-	//		int cbFrag = BinaryPrimitives.ReadUInt16LittleEndian(req0.Slice(8, 2));
-	//		int authLength = BinaryPrimitives.ReadUInt16LittleEndian(req0.Slice(10, 2));
-	//		int cbBody = cbFrag - authLength - AuthHeaderSize - RpcHeaderSize;
-	//		Span<byte> rpcHeader = buffer.Slice(0, RpcHeaderSize);
-	//		Span<byte> stubData = buffer.Slice(RpcHeaderSize, cbBody);
-	//		Span<byte> authTrailer = buffer.Slice(RpcHeaderSize + cbBody, AuthHeaderSize);
-	//		Span<byte> sealTrailer = buffer.Slice(cbFrag - authLength, authLength);
-	//		acceptorSubkey.UnsealMessage(
-	//			KeyUsage.InitiatorSeal,
-	//			(uint)(sendSeqNbr + 1),
-	//			WrapFlags.AcceptorSubkey | WrapFlags.Sealed,
-	//			new MessageSealParams(
-	//				default,
-	//				SecBufferList.Create(
-	//					SecBuffer.Integrity(rpcHeader),
-	//					SecBuffer.PrivacyWithIntegrity(stubData),
-	//					SecBuffer.Integrity(authTrailer)
-	//				),
-	//				sealTrailer
-	//			));
-	//	}
-	//}
+			const int RpcHeaderSize = 0x18;
+			const int AuthHeaderSize = 8;
+			int cbFrag = BinaryPrimitives.ReadUInt16LittleEndian(req0.Slice(8, 2));
+			int authLength = BinaryPrimitives.ReadUInt16LittleEndian(req0.Slice(10, 2));
+			int cbBody = cbFrag - authLength - AuthHeaderSize - RpcHeaderSize;
+			Span<byte> rpcHeader = buffer.Slice(0, RpcHeaderSize);
+			Span<byte> stubData = buffer.Slice(RpcHeaderSize, cbBody);
+			Span<byte> authTrailer = buffer.Slice(RpcHeaderSize + cbBody, AuthHeaderSize);
+			Span<byte> sealTrailer = buffer.Slice(cbFrag - authLength, authLength);
+			acceptorSubkey.UnsealMessage(
+				KeyUsage.InitiatorSeal,
+				(uint)(sendSeqNbr + 1),
+				WrapFlags.AcceptorSubkey | WrapFlags.Sealed,
+				new MessageSealParams(
+					default,
+					SecBufferList.Create(
+						SecBuffer.Integrity(rpcHeader),
+						SecBuffer.PrivacyWithIntegrity(stubData),
+						SecBuffer.Integrity(authTrailer)
+					),
+					sealTrailer
+				));
+		}
+	}
 
 	public enum KerberosFileFormat
 	{

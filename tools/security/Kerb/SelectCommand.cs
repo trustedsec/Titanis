@@ -16,7 +16,10 @@ namespace Kerb
 	/// <task category="Kerberos">Convert between a .ccache file and a .kirbi file</task>
 	/// <task category="Kerberos">Query tickets within a .ccache file or .kirbi file</task>
 	[Command]
-	[OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = OutputStyle.List)]
+	[OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = OutputStyle.Table, DefaultFields = new string[]
+	{
+		nameof(TicketInfo.SeqNbr), nameof(TicketInfo.UserName), nameof(TicketInfo.UserRealm), nameof(TicketInfo.TargetSpn), nameof(TicketInfo.EndTime), nameof(TicketInfo.KdcOptions)
+	})]
 	[Description("Selects and displays tickets from a file.")]
 	[DetailedHelpText(@"This command reads tickets from one or more files (.kirbi or .ccache), optionally filters them, and optionally writes the results to another file (either .kirbi or .ccache).  It can be used to inspect files, convert files, combine files, or remove tickets from files.
 

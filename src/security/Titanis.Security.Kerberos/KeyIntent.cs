@@ -4,7 +4,7 @@
 
 namespace Titanis.Security.Kerberos
 {
-	public enum KeyIntent
+	public enum KeyIntent : byte
 	{
 		Checksum = 0x99,
 		Encryption = 0xAA,

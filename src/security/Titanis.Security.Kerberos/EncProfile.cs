@@ -121,6 +121,12 @@ namespace Titanis.Security.Kerberos
 		/// Gets the <see cref="EType"/> value for this encryption profile.
 		/// </summary>
 		internal abstract EType EType { get; }
+
+		/// <summary>
+		/// Gets the <see cref="EncChecksumType"/> value for this encryption profile.
+		/// </summary>
+		internal abstract EncChecksumType ChecksumType { get; }
+
 		/// <summary>
 		/// Converts a string to a key.
 		/// </summary>

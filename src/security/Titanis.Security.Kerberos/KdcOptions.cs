@@ -30,5 +30,8 @@ namespace Titanis.Security.Kerberos
 		EncTicketInSKey = (1 << (31 - 28)),
 		Renew = (1 << (31 - 30)),
 		Validate = (1 << (31 - 31)),
+
+		// [MS-SFU] § 2.2.3
+		CNameInAddlTicket = (1 << (31 - 14)),
 	}
 }

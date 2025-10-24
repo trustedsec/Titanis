@@ -37,5 +37,15 @@ namespace Titanis.Net
 
 			return true;
 		}
+
+		public static EndPoint WithPort(this EndPoint ep, int port)
+		{
+			if (ep is IPEndPoint ipep)
+				return new IPEndPoint(ipep.Address, port);
+			else if (ep is DnsEndPoint dns)
+				return new DnsEndPoint(dns.Host, port);
+			else
+				throw new ArgumentException($"ep must be a {nameof(IPEndPoint)} or {nameof(DnsEndPoint)}.", nameof(ep));
+		}
 	}
 }

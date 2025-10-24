@@ -4,6 +4,7 @@
 
 namespace Titanis.Security.Kerberos
 {
+	// [RFC 4120] § 5.10.  Application Tag Numbers
 	enum KrbMessageType
 	{
 		Asreq = 10,
@@ -12,6 +13,10 @@ namespace Titanis.Security.Kerberos
 		Tgsrep = 13,
 		Apreq = 14,
 		Aprep = 15,
+		Priv = 21,
 		Cred = 22,
+
+		// [MS-SFU] § 2.2.1
+		PaForUser = 17,
 	}
 }

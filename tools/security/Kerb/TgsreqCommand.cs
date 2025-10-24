@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using Titanis;
 using Titanis.Cli;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
@@ -21,7 +23,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 	internal class RequestTicketCommand : TicketRequestCommand
 	{
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-		[Parameter(0)]
+		[Parameter(KdcPosition + 1)]
 		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("SPNs to request tickets for")]
@@ -45,11 +47,41 @@ By default, all supported encryption types are sent in the request.  To limit th
 		[Description("Realm of the KDC")]
 		public string? Realm { get; set; }
 
+		[Parameter]
+		[Description("Name of user to impersonate with S4U")]
+		public UserPrincipalName? S4UserName { get; set; }
+
+		[Parameter]
+		[Description("Name of file containing a certificate of a user to impersonate with S4U")]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		public string? S4UserCert { get; set; }
+
+		[Parameter]
+		[Description("Name of service account with S4U2proxy")]
+		public SecurityPrincipalName? S4ProxyService { get; set; }
+
+		private X509Certificate2? _s4uCert;
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			base.ValidateParameters(context);
 			if (string.IsNullOrEmpty(this.Tgt) && string.IsNullOrEmpty(this.TicketCache))
 				context.LogError($"Either -{nameof(Tgt)} or -{nameof(TicketCache)} must be specified.");
+			if (!string.IsNullOrEmpty(this.S4UserCert))
+			{
+				try
+				{
+					this.Log?.WriteMessage(LogMessage.Verbose(null, $"Loading certificate file {this.S4UserCert}"));
+					var certBytes = File.ReadAllBytes(this.S4UserCert);
+					this._s4uCert = new X509Certificate2(certBytes);
+				}
+				catch (Exception ex)
+				{
+					this.Log?.WriteError($"Error occurred loading certificate file {this.S4UserCert}: {ex.Message}");
+					throw;
+				}
+
+
+			}
 		}
 
 		protected sealed override async Task<IList<TicketInfo>?> RequestTickets(KerberosClient krb, CancellationToken cancellationToken)
@@ -73,7 +105,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 				var tgtCandidates = tgtStore.Where(r => r.IsCurrent && r.IsTgt).ToList();
 				if (tgtCandidates.Count == 0)
 				{
-					this.WriteError($"The file {ticketStoreFile} does not contain any ticket-granting-tickets.");
+					this.WriteError($"The file {ticketStoreFile} does not contain any valid ticket-granting tickets.");
 					return null;
 				}
 
@@ -83,6 +115,9 @@ By default, all supported encryption types are sent in the request.  To limit th
 			this.WriteVerbose($"Using ticket for {sourceTicket.UserName}@{sourceTicket.UserRealm} => {sourceTicket.TargetSpn} expiring {sourceTicket.EndTime}");
 
 			TicketParameters ticketParameters = this.TicketParamGroup?.GetTicketParameters(this.Log) ?? krb.GetDefaultTicketOptions(sourceTicket);
+			ticketParameters.S4UserName = this.S4UserName;
+			ticketParameters.S4UserCertificate = this._s4uCert;
+			ticketParameters.S4ProxyService = this.S4ProxyService;
 
 			List<TicketInfo> newTickets = new List<TicketInfo>(this.Targets.Length);
 			foreach (var spn in this.Targets)

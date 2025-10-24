@@ -10,10 +10,10 @@ namespace Titanis.Security.Kerberos
 {
 	static class Structs
 	{
-		internal static HostAddress HostAddress(AddressType type, string netbiosName)
+		internal static KerberosV5Spec2.HostAddress HostAddress(AddressType type, string netbiosName)
 		{
 			Debug.Assert(!string.IsNullOrEmpty(netbiosName));
-			return new HostAddress(
+			return new KerberosV5Spec2.HostAddress(
 				(int)type,
 				Encoding.UTF8.GetBytes(netbiosName)
 			);
@@ -32,7 +32,7 @@ namespace Titanis.Security.Kerberos
 			where TPadata : IAsn1DerEncodableTlv
 			=> PAData(patype, Asn1DerEncoder.EncodeTlv(padata).ToArray());
 
-		internal static PA_DATA PAData_APRep(AP_REQ apreq)
+		internal static PA_DATA PAData_APReq(AP_REQ apreq)
 			=> PAData(PadataType.TgsReq, apreq);
 
 		internal static PA_DATA PAData_PacOptions(PacOptions options)
@@ -57,20 +57,21 @@ namespace Titanis.Security.Kerberos
 
 		internal static KerberosV5Spec2.PrincipalName PrincipalName(PrincipalNameType nameType, string[] nameParts) => new PrincipalName((int)nameType, Array.ConvertAll(nameParts, r => new GeneralString(r)));
 
-		internal static KerberosV5Spec2.PrincipalName PrincipalName(SecurityPrincipalName spn) => new PrincipalName((int)spn.NameType, Array.ConvertAll(spn.GetNameParts(), r => new GeneralString(r)));
+		internal static KerberosV5Spec2.PrincipalName PrincipalName(this SecurityPrincipalName spn) => new PrincipalName((int)spn.NameType, Array.ConvertAll(spn.GetNameParts(), r => new GeneralString(r)));
 
 
 		internal static KDC_REQ_BODY KdcReqBody(
 			TicketParameters ticketParameters,
-			KerberosV5Spec2.PrincipalName cname,
+			KdcOptions options,
+			KerberosV5Spec2.PrincipalName? cname,
 			string crealm,
-			KerberosV5Spec2.PrincipalName sname,
+			KerberosV5Spec2.PrincipalName? sname,
 			int nonce,
 			int[] etypes,
-			HostAddress[]? hostAddresses
+			KerberosV5Spec2.HostAddress[]? hostAddresses
 			)
 			=> new KDC_REQ_BODY(
-				new Asn1BitString((uint)ticketParameters.Options),
+				new Asn1BitString((uint)options),
 				crealm,
 				ticketParameters.EndTime ?? TicketParameters.DefaultEndTime,
 				nonce,
@@ -79,7 +80,8 @@ namespace Titanis.Security.Kerberos
 				sname,
 				ticketParameters.StartTime,
 				ticketParameters.RenewTill,
-				hostAddresses
+				hostAddresses,
+				additional_tickets: (ticketParameters.AdditionalTicket != null) ? [ticketParameters.AdditionalTicket.ticket] : null
 			);
 
 		internal static Checksum Checksum(EncChecksumType type, byte[] value)
@@ -89,11 +91,11 @@ namespace Titanis.Security.Kerberos
 			KerberosV5Spec2.PrincipalName cname,
 			string crealm,
 			Checksum cksum,
+			KerberosTime now,
 			int seqnbr,
-			EncryptionKey subkey
+			EncryptionKey? subkey
 			)
 		{
-			var now = KerberosTime.Now();
 			return new Authenticator(new Authenticator_Tagged2(
 				5,
 				crealm,
@@ -140,6 +142,5 @@ namespace Titanis.Security.Kerberos
 				ticket,
 				authenticator
 				));
-
 	}
 }

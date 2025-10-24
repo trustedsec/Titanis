@@ -18,4 +18,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("fef604b3-c442-496e-afe1-d687a054bebd")]
 
 [assembly: InternalsVisibleTo("Titanis.Security.Kerberos.Test")]
-[assembly: InternalsVisibleTo("KerbInspect")]
+[assembly: InternalsVisibleTo("Kerb")]

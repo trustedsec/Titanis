@@ -425,7 +425,7 @@ namespace Titanis.CodeGen
 		#region Literal expressions
 		public static LiteralExpressionSyntax Null => SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
 		public static LiteralExpressionSyntax BooleanLiteral(bool value)
-			=> SyntaxFactory.LiteralExpression(value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.TrueLiteralExpression);
+			=> SyntaxFactory.LiteralExpression(value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
 		public static ExpressionSyntax Primitive(object? value)
 		{
 			ExpressionSyntax expr = value switch

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Titanis
 {
-	public static class ServiceExtensions
+	public static class ServiceProviderExtensions
 	{
 		public static TService? GetService<TService>(this IServiceProvider services)
 			where TService : class

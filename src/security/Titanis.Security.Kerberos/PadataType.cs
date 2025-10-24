@@ -21,6 +21,11 @@ namespace Titanis.Security.Kerberos
 		ETypeInfo2 = 19,
 		PacRequest = 128,
 
+		// [MS-SFU] § 2.2.1
+		S4u2Self_PaForUser = 129,
+		// [MS-SFU] § 2.2.2
+		S4u2Self_X509User = 130,
+
 		// [RFC 6806] Appendix A
 		SvrReferralInfo = 20,
 

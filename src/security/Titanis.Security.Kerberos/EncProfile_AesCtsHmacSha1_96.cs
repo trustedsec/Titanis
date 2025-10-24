@@ -123,6 +123,8 @@ namespace Titanis.Security.Kerberos
 		internal sealed override EType EType => EType.Aes128CtsHmacSha1_96;
 		/// <inheritdoc/>
 		public sealed override int KeyBits => 128;
+		/// <inheritdoc/>
+		internal sealed override EncChecksumType ChecksumType => EncChecksumType.HmacSha1_96_Aes128;
 	}
 
 	public sealed class EncProfile_Aes256CtsHmacSha1_96 : EncProfile_AesCtsHmacSha1_96
@@ -130,5 +132,7 @@ namespace Titanis.Security.Kerberos
 		internal sealed override EType EType => EType.Aes256CtsHmacSha1_96;
 		/// <inheritdoc/>
 		public sealed override int KeyBits => 256;
+		/// <inheritdoc/>
+		internal sealed override EncChecksumType ChecksumType => EncChecksumType.HmacSha1_96_Aes256;
 	}
 }

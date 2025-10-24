@@ -8,6 +8,8 @@ namespace Kerb
 	[Subcommand("asreq", typeof(AsreqCommand))]
 	[Subcommand("tgsreq", typeof(RequestTicketCommand))]
 	[Subcommand("select", typeof(SelectCommand))]
+	[Subcommand("changepw", typeof(ChangePasswordCommand))]
+	[Subcommand("setpw", typeof(SetPasswordCommand))]
 	internal class Program : MultiCommand
 	{
 		static void Main(string[] args)

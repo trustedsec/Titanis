@@ -20,10 +20,11 @@ namespace Titanis.Security.Kerberos
 		/// Gets a ticket for the specified realm and service.
 		/// </summary>
 		/// <param name="spn">SPN on ticket</param>
+		/// <param name="clientName">Desired client name or <see langword="null"/> to match any</param>
 		/// <returns>A <see cref="TicketInfo"/> containing the requested ticket,
 		/// if found; otherwise, <see langword="null"/>.</returns>
-		TicketInfo? GetTicketFromCache(SecurityPrincipalName spn);
+		TicketInfo? GetTicketFromCache(SecurityPrincipalName spn, string? clientName);
 
-		
+
 	}
 }

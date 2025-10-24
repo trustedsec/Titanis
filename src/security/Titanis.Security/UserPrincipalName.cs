@@ -22,14 +22,18 @@ namespace Titanis.Security
 		/// </summary>
 		/// <param name="userName">Name of user</param>
 		/// <param name="realm">Name of realm</param>
-		public UserPrincipalName(string userName, string realm)
+		public UserPrincipalName(string userName, string? realm, string? originalText = null)
 		{
 			UserName = userName;
 			Realm = realm;
-			this.Text = $"{userName}@{realm}";
+
+			if (string.IsNullOrEmpty(originalText))
+				originalText = string.IsNullOrEmpty(realm) ? userName : $"{userName}@{realm}";
+
+			this.OriginalText = originalText;
 		}
 
-		public string Text { get; set; }
+		public string OriginalText { get; set; }
 
 		/// <summary>
 		/// Gets the name of the user.
@@ -38,18 +42,18 @@ namespace Titanis.Security
 		/// <summary>
 		/// Gets the name of the realm.
 		/// </summary>
-		public string Realm { get; }
+		public string? Realm { get; }
 
 		public sealed override PrincipalNameType NameType => PrincipalNameType.Enterprise;
-		public sealed override string[] GetNameParts() => new string[] { this.Text };
+		public sealed override string[] GetNameParts() => new string[] { this.OriginalText };
 		public sealed override int NamePartCount => 1;
 		public sealed override string GetNamePart(int index) => index switch
 		{
-			0 => this.Text,
+			0 => this.OriginalText,
 			_ => throw new ArgumentOutOfRangeException(nameof(index))
 		};
 
-		private static readonly Regex rgxUpn = new Regex(@"^(?<u>[^@]+)@(?<r>.*)$");
+		private static readonly Regex rgxUpn = new Regex(@"^((?<r>[^\\]+)\\)?((?<u>[^@]+)(@(?<r>.*))?)$");
 		public static UserPrincipalName Parse(string text)
 		{
 			if (string.IsNullOrEmpty(text)) throw new ArgumentException($"'{nameof(text)}' cannot be null or empty.", nameof(text));
@@ -60,14 +64,15 @@ namespace Titanis.Security
 
 			var u = m.Groups["u"].Value;
 			var r = m.Groups["r"].Value;
-			return new UserPrincipalName(u, r);
+			if (r == string.Empty)
+				r = null;
+			return new UserPrincipalName(u, r, text);
 		}
 
 		private string? _str;
 
 		/// <inheritdoc/>
-		public sealed override string ToString()
-			=> (this._str ??= $"{UserName}@{Realm}");
+		public sealed override string ToString() => this.OriginalText;
 
 		public sealed override bool Equals(object? obj)
 		{

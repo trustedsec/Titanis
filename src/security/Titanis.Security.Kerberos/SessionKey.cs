@@ -42,6 +42,13 @@ namespace Titanis.Security.Kerberos
 		internal readonly KerberosV5Spec2.EncryptionKey key;
 		internal byte[] KeyBytes => this.key.keyvalue;
 
+		internal Checksum Checksum(KeyUsage usage, Span<byte> data)
+		{
+			var cksumBytes = new byte[this.EncryptionProfile.ChecksumSizeBytes];
+			this.EncryptionProfile.ComputeChecksum(this.KeyBytes, KeyUsage.X509Checksum, KeyIntent.Checksum, [], SecBufferList.Create(SecBuffer.Integrity(data)), [], cksumBytes);
+			return new Checksum((int)this.EncryptionProfile.ChecksumType, cksumBytes);
+		}
+
 		public Memory<byte> Encrypt(KeyUsage usage, Span<byte> data)
 			=> this.EncryptionProfile.Encrypt(this.KeyBytes, usage, data);
 

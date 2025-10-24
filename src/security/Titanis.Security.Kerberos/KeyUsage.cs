@@ -32,5 +32,8 @@ namespace Titanis.Security.Kerberos
 		AcceptorSign = 23,
 		InitiatorSeal = 24,
 		InitiatorSign = 25,
+
+		// [MS-SFU] § 2.2.2 PA_S4U_X509_USER
+		X509Checksum = 26,
 	}
 }
