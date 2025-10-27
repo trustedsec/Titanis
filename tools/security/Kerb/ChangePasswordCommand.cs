@@ -12,7 +12,7 @@ using Titanis.Security.Kerberos;
 
 namespace Kerb;
 
-/// <task category="Expanding Access">Change a password</task>
+/// <task category="Expanding Access;Kerberos">Change a password</task>
 [Command]
 [Description("Changes an account password")]
 [DetailedHelpText(@"{0} uses the Kerberos Change Password protocol and can only be used to change the password of the authenticating user.  To set the password of another user, use the `setpw` command.

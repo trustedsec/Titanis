@@ -12,7 +12,7 @@ using Titanis.Security.Kerberos;
 
 namespace Kerb;
 
-/// <task category="Expanding Access">Set the password of another user account</task>
+/// <task category="Expanding Access;Kerberos">Set the password of another user account</task>
 [Command]
 [Description("Sets the password of (another) account")]
 [DetailedHelpText(@"{0} uses the Windows 2000 Kerberos Change Password protocol (RFC 3244) and can be used to change the password of a user account that may or may not be the same as the authenticating user.  This service does not require an initial ticket and is more flexible than `changepw`.")]

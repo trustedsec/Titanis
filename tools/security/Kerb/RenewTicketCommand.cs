@@ -10,6 +10,7 @@ using Titanis.Security.Kerberos;
 
 namespace Kerb;
 
+/// <task category="Kerberos">Renew a ticket</task>
 [Command]
 [Description("Renews a ticket")]
 [DetailedHelpText(@"This command sends a request to the TGS to renew the source ticket.  You may provide the source ticket to renew either with -Ticket or -TicketCache.  For -TicketCache, -TargetSpn is required; for -Ticket, -TargetSpn is optional.  If you specify both -Ticket and -TicketCache, {0} only loads source tickets from -Ticket and only uses -TicketCache for output.
