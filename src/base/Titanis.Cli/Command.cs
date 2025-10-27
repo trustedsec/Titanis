@@ -34,6 +34,7 @@ namespace Titanis.Cli
 	{
 		#region Common fields
 		[Parameter]
+		[Alias("OutputStyle")]
 		[Description("Determines the output style")]
 		public OutputStyle? ConsoleOutputStyle { get; set; }
 
