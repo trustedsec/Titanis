@@ -18,14 +18,24 @@ Titanis is a library of protocol implementations and command line utilities, wri
 * Security
 	* NTLM ([MS-NLMP](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-NLMP/%5bMS-NLMP%5d.pdf))
 	* Kerberos ([RFC4120](https://datatracker.ietf.org/doc/html/rfc4120) and [MS-KILE](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-KILE/%5bMS-KILE%5d.pdf))
-		* RC4-HMAC ([RFC4757](https://datatracker.ietf.org/doc/html/rfc4757))
-		* AES 128/256 ([RFC3962](https://datatracker.ietf.org/doc/html/rfc3962))
-		* Support for .kirbi and [ccache](https://web.mit.edu/kerberos/krb5-1.21/doc/formats/ccache_file_format.html) files
-		* Support for [keytab](https://web.mit.edu/kerberos/krb5-devel/doc/formats/keytab_file_format.html) files
+		* Inter-realm referrals
+		* S4U ([MS-SFU](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-WMI/%5bMS-WMI%5d.pdf))
+			* S4U2self
+			* S4U2proxy
+		* Encryption profiles
+			* RC4-HMAC ([RFC4757](https://datatracker.ietf.org/doc/html/rfc4757))
+			* AES 128/256 ([RFC3962](https://datatracker.ietf.org/doc/html/rfc3962))
+			* Support for .kirbi and [ccache](https://web.mit.edu/kerberos/krb5-1.21/doc/formats/ccache_file_format.html) files
+			* Support for [keytab](https://web.mit.edu/kerberos/krb5-devel/doc/formats/keytab_file_format.html) files
+		* Change / set password ([RFC3244](https://datatracker.ietf.org/doc/html/rfc3244))
 	* SP-NEGO ([MS-SPNG](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-SPNG/%5bMS-SPNG%5d.pdf))
 * Integrated SOCKS 5 support (`-Socks5` parameter) ([RFC1928](https://datatracker.ietf.org/doc/html/rfc1928))
 
+
 For recent changes, see the [change log](CHANGELOG.md)
+
+For an overview on supported authentication scenarios, see [Authentication](syntax-auth.md) - Describes how to control authentication with parameters
+
 
 The toolset implements callbacks and logging features to integrate into your operational environment.
 

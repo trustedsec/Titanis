@@ -1,4 +1,58 @@
-# Authentication Parameters
+# Authentication
+
+All commands within Titanis that authenticate over the network accept a
+uniform set of authentication parameters that supports a variety of
+authentication scenarios.  When building an authentication context, Titanis
+attempts to build a context for both NTLM and Kerberos.  If both contexts are
+available, Titanis wraps them in an SP-Nego context.  If only one context is
+available, Titanis does not wrap it in SP-Nego unless the application protocol
+requires it (such as SMB2).
+
+Other than the system clock, Titanis uses only the information in the command
+line and certain environment variables for authentication; it does not use any 
+information from your current session, such as the name of your user account
+or the name of your workstation.  Use `-Workstation` to specify the name to
+report as your workstation during authentication (NTLM and Kerberos).
+
+# Quick Reference
+## Notes
+1. Commands have built-in support for Kerberos; you do not need to request tickets prior to running a command.
+1. All commands accept tickets as either a .kirbi or .ccache file.  No conversion necessary is necessary.
+1. The `-TicketCache` parameter may be specified either explicitly on the command line or taken from the `KRB5CCNAME` environment variable.
+	1. Titanis commands work best if you maintain a ticket cache per user and set `KRB5CCNAME` to this file.
+	1. Tickets are requested as necessary and added to the ticket file and reused in subsequent commands.
+	1. If a ticket file contains tickets for multiple users, use `-UserName` to filter which tickets are used.
+	1. Titanis skips tickets that are outside their validity period.
+1. Ticket files specified with `-Tgt` or `-Ticket` are never modified.
+	1. If a file contains both a TGT and a service ticket, you may specify the same file for both parameters.
+1. If you specify a ticket file (`-Tgt`, `-Ticket`, or `-TicketCache`) without specifying a user name or realm, Titanis searches for the first usable ticket.
+	1. 
+1. Ticket files specified with `-TicketCache` are updated to include any tickets requested during authentication.
+	1. If the file doesn't exist, it is created.  If the extension is `.ccache` it is created as a ccache file; otherwise as a kirbi file.
+	1. If it does exist, Titanis detects and retains the format of the file regardless of the extension.
+	1. If the file is modified outside of the Titanis command (detected by last modified time) while the Titanis command is running, Titanis does NOT overwrite the file.
+1. If a command requires multiple tickets, it will use the tickets in the specified ticket files and request missing tickets from the KDC (if specified).
+1. Titanis automatically handles inter-realm referrals.
+	1. It determines the KDC of the next realm by resolving the realm name using DNS; it does not query for the SRV record.
+
+
+| If you have... | then use... | Supports | Notes |
+|-|-|-|
+| Nothing | `-Anonymous` | NTLM | Use with `-vv` to get the domain and computer name of a server.
+| User name with... | `-UserName` &lt;username&gt; ||The domain is inferred from the NTLM_CHALLENGE message.|
+| &nbsp; ...password | `-Password` &lt;password&gt; |NTLM|Be sure to escape special characters as required by your shell.|
+| &nbsp; ...NTLM hash | `-NtlmHash` &lt;hex-encoded hash&gt; |NTLM|Use just the NTLM hash; no colons|
+|User name and domain with...| `-UserName` &lt;domain&gt;\\&lt;username&gt; ||You may need to escape the backslash depending on your shell.  The domain name may be either the NetBIOS name or FQDN. |
+| | `-UserName` &lt;username&gt;@&lt;domain&gt; |||
+| | `-UserName` &lt;username&gt; -UserDomain &lt;domain&gt; |||
+| &nbsp; ...password | `-Password` &lt;password&gt; |NTLM, Kerberos|Be sure to escape special characters as required by your shell.|
+| &nbsp; ...NTLM hash | `-NtlmHash` &lt;hex-encoded hash&gt; |NTLM, Kerberos (RC4 HMAC only)|Use just the NTLM hash; no colons.|
+| &nbsp; ...AES 128 key | `-AesKey` &lt;hex-encoded hash&gt; |Kerberos (AES128)|AES 128 and AES 256 are distinguished by the size of the key.|
+| &nbsp; ...AES 256 key | `-AesKey` &lt;hex-encoded hash&gt; |Kerberos (AES256)||
+|Ticket-granting ticket and KDC| `-Tgt` &lt;TGT file name&gt; `-Kdc` &lt;endpoint&gt;|Kerberos|Titanis requests the necessary service tickets from the KDC.|
+|| `-TicketCache` &lt;TGT file name&gt; `-Kdc` &lt;endpoint&gt;|Kerberos|Titanis requests the necessary service tickets from the KDC.|
+|Service ticket| `-Ticket` &lt;ticket file name&gt;|Kerberos|The SPN of the ticket must match what the command requires.|
+|| `-TicketCache` &lt;ticket file name&gt;|Kerberos|The SPN of the ticket must match what the command requires.|
 
 The Authentication parameter group defines parameters that specify how the tool is to authenticate with the target.  Most protocols exchange security tokens to build a security context to authenticate the user and provide message security services, such as signing and sealing.  The parameters specify how to build this security context.  Titanis supports the following security protocols:
 
@@ -11,93 +65,57 @@ Some protocols require a specific security protocol.  For example, SMB2 requires
 In general, to use Kerberos, you must specify the KDC address with `-Kdc`.  Titanis will attempt to contact the KDC to request a ticket.
 
 
-## Common Parameters
+## Other Parameters
 
 |Parameter|Description|
 |-|-|
 |`-Workstation <name>`|Name of the workstation to send along with the authentication request.  Windows uses this to evaluate logon restrictions and usually includes it in the event log record for the authentication request.|
-|`-KdcPort <port>`|Port to connect to KDC, if different from 88|
 |`-NtlmVersion <m.n.b.r>`|Version number to send in NTLM|
 
-## Anonymous Authentication
+# Service for User (S4U)
 
-### Supports
-* NTLM
+Titanis commands integrate support for Service-for-user-to-self (S4U2self) and
+Service-for-user-to-proxy (S4U2proxy) scenarios.  S4U allows you to use a
+service account to obtain a service ticket for and impersonate a user account
+when you don't have credentials for that user account.
 
-### Syntax
-```
--Anonymous
-```
+| Parameter | Description | Note |
+|-|
+| `-S4UserName` &lt;user name&gt; | Name of user to impersonate | If the user name does not include the domain, then the domain of the service is assumed. |
+| `-S4UserCert` &lt;certificate file name&gt; | X.509 certificate identifying user to impersonate |
+| `-S4ProxyService` &lt;service account&gt; | Name of service account to proxy through | May be specified as &lt;class&gt;/&Lt;host&gt; or &lt;account name&gt;
 
-To use anonymous authentication, specify the `-Anonymous` switch.  Anonymous authentication is only supported by NTLM.
+## Notes
+1. Only one of `-S4UserName` or `-S4UserCert` are required for S4U.
+	1. If both are specified, they must agree.
+1. The presence of `-S4ProxyService` indicates S4U2proxy.
+	1. Otherwise, S4U2self is used.
+1. S4U may be combined with any Kerberos authentication scenario above.
+	1. The provided credentials must be for the service account, not the user to impersonate.
+	1. At each step in the sequence, Titanis checks the ticket files provided by `-Tgt`, `-Ticket`, and `-TicketCache` for the desired ticket.
+	1. If the desired ticket is found, it is used, and the KDC is not contacted for that step.
 
-## User Name and Password
+## S4U2self Sequence
 
-### Supports
-* NTLM
-* Kerberos (all encryption profiles)
+The full S4U2self sequence is as follows:
+1. Request TGT for `-UserName` using credential specified by `-Password`, `-NtlmHash`, or `-AesKey`.
+1. Use TGT to request a service ticket to the service required by the command.
+1. Use S4U2self to request a ticket for the user specified by `-S4User*` to the service required by the command.
 
-### Syntax
-```
--UserName <user name> -Password <password> [ -Kdc <kdc address> ]
-```
+## S4U2proxy Sequence
 
-To authenticate with a user name and password, specify the user name and password with `-UserName` and `-Password` respectively.  Note that it is generally good practice to enclose the password in quotes so that thet shell does not interpret any of the special characters and mangle the password.
+The full S4U2proxy sequence is as follows:
+1. Request TGT for `-UserName` using credential specified by `-Password`, `-NtlmHash`, or `-AesKey`.
+1. Use TGT to request a service ticket to the service specified by `-S4ProxyService`.
+1. Use S4U2self  to request a ticket for the user specified by `-S4User*` to the service specified by `-S4ProxyService`.
+1. Use S4U2proxy to request a ticket for the user specified by `-S4User*` to the service required by the command.
 
-To specify the domain of the user, here are your options:
-* Specify the domain with `-UserDomain`
-* Include the domain as part of the username: `-UserName LUMON\milchick`
-* Include the domain as part of the username: `-UserName milchick@lumon.ind`
+# Example
 
-To enable Kerberos, specify the address of the KDC with `-Kdc`.
+Let's say you have a TGT for COBEL-WKS$ and wish to impersonate user `milchick`.
 
-## User Name and NTLM Hash
+`Smb2Client ls //`
 
-### Supports
-* NTLM
-* Kerberos (Rc4Hmac only)
-
-### Syntax
-```
--UserName <user name> -NtlmHash <hex string> [ -Kdc <kdc address> ]
-```
-
-To authenticate with a user name and the NTLM hash, specify the user name and hash with `-UserName` and `-NtlmHash` respectively.  Enter the hash as a hexadecimal string without a prefix or colon.
-
-To enable Kerberos, specify the address of the KDC with `-Kdc`.  Titanis will attempt to authenticate using Rc4Hmac.  This may be blocked by domain policy.
-
-## User Name and AES Key
-
-### Supports
-* Kerberos (Aes128 or Aes256 only)
-
-### Syntax
-```
--UserName <user name> -AesKey <hex string> -Kdc <kdc address>
-```
-
-To authenticate with a user name and AES key, specify the user name and key with `-UserName` and `-AesKey` respectively.  Enter the key as a hexadecimal string without a prefix or colon.  Titanis determines whether to use AES 128 or AES 256 based on the length of the key provided.
-
-## Ticket-Granting Ticket
-
-### Supports
-* Kerberos (all encryption profiles)
-
-### Syntax
-```
--Tgt <ticket file> -Kdc <kdc address> [ -UserName <user name> ] [ -UserDomain <domain> ]
-```
-
-To authenticate with a TGT, specify the name of the file (either .kirbi or ccache) containing the TGT with `-Tgt` and the address of the KDC with `-Kdc`.  Titanis loads the tickets from `<ticket file>` and searches for a ticket with service class `krbtgt` and optionally filters the list of tickets that match `-UserName` and/or `-UserDomain`, if provided.  It then contacts the TGS to request a ticket for the target service.
-
-## Pass-the-Ticket
-
-### Supports
-* Kerberos (all encryption profiles)
-
-### Syntax
-```
--Ticket <ticket file> [ -UserName <user name> ] [ -UserDomain <domain> ]
-```
-
-To authenticate with a ticket, specify the name of the file (either .kirbi or ccache) containing the ticket with `-Ticket`.  Titanis loads the tickets from `<ticket file>` and searches for a ticket matching the service class and host of the target service and optionally filters the list of tickets that match `-UserName` and/or `-UserDomain`, if provided.
+## Notes
+1. You may specify one or both of the `-S4User*` parameters.  If you specify both `-S4UserName` and `-S4UserCert`, they must match; otherwise, the KDC will likely fail the request.
+1. 
