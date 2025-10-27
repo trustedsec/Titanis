@@ -581,21 +581,28 @@ namespace Titanis.Security.Kerberos
 			CancellationToken cancellationToken)
 		{
 			var options = ticketParameters.Options;
-			if (ticketParameters != null && ticketParameters.S4ProxyService != null && ticketParameters.S4ProxyService != spn)
+			if (ticketParameters != null && ticketParameters.S4ProxyService != null)
 			{
-				if (ticketParameters.AdditionalTicket == null)
+				if (ticketParameters.S4ProxyService != spn)
 				{
-					var proxyTicket = await RequestTicket(
-						tgt,
-						ticketParameters.S4ProxyService,
-						realm,
-						encTypes,
-						ticketParameters,
-						cancellationToken
-						).ConfigureAwait(false);
-					ticketParameters.AdditionalTicket = proxyTicket;
+					if (ticketParameters.AdditionalTicket == null)
+					{
+						var proxyTicket = await RequestTicket(
+							tgt,
+							ticketParameters.S4ProxyService,
+							realm,
+							encTypes,
+							ticketParameters,
+							cancellationToken
+							).ConfigureAwait(false);
+						ticketParameters.AdditionalTicket = proxyTicket;
+					}
+					options |= KdcOptions.CNameInAddlTicket;
 				}
-				options |= KdcOptions.CNameInAddlTicket;
+				else
+				{
+					// This is a request for the S4U2self ticket prior to the S4U2proxy request
+				}
 			}
 
 			var ticket = await RequestTicketCore(tgt, spn, realm, encTypes, ticketParameters, options, cancellationToken).ConfigureAwait(false);
@@ -1035,7 +1042,10 @@ namespace Titanis.Security.Kerberos
 			ArgumentNullException.ThrowIfNull(newPassword);
 			ArgumentNullException.ThrowIfNull(hostAddress);
 
-			byte[] privData = Asn1DerEncoder.EncodeTlv(new ChangePasswdData(Encoding.UTF8.GetBytes(newPassword), targetAccount?.PrincipalName(), (targetRealm is null) ? default(GeneralString?) : targetRealm)).ToArray();
+			byte[] privData = Asn1DerEncoder.EncodeTlv(new ChangePasswdData(
+				Encoding.UTF8.GetBytes(newPassword),
+				targetAccount?.PrincipalName(),
+				(targetRealm is null) ? default(GeneralString?) : targetRealm)).ToArray();
 
 			await SendChangepwRequest(
 				kdcEP,
