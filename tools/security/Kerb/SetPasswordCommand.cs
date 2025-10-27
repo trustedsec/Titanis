@@ -59,7 +59,7 @@ internal class SetPasswordCommand : Command
 			krbAuthContext.Credential,
 			this.NewPassword,
 			this.TargetAccount,
-			null,
+			this.TargetAccount.Realm ?? krbAuthContext.Ticket.TicketRealm,
 			HostAddress.FromIPAddress(System.Net.IPAddress.Any),
 			cancellationToken);
 
