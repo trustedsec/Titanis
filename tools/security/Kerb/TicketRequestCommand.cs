@@ -11,6 +11,10 @@ namespace Kerb;
 /// <summary>
 /// Base class for commands that request a ticket
 /// </summary>
+[OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = OutputStyle.Table, DefaultFields = new string[]
+{
+		nameof(TicketInfo.SeqNbr), nameof(TicketInfo.UserName), nameof(TicketInfo.UserRealm), nameof(TicketInfo.TargetSpn), nameof(TicketInfo.EndTime), nameof(TicketInfo.KdcOptions)
+})]
 abstract class TicketRequestCommand : KdcCommand
 {
 
@@ -79,6 +83,7 @@ abstract class TicketRequestCommand : KdcCommand
 		var newTickets = await this.RequestTickets(krb, cancellationToken);
 		if (newTickets is not null)
 		{
+			this.WriteRecords(newTickets);
 			if (newTickets.Count > 0 && !string.IsNullOrEmpty(outFileName))
 			{
 				tickets.AddRange(newTickets);

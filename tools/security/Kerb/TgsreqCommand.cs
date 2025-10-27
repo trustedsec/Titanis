@@ -12,7 +12,6 @@ namespace Kerb
 	/// <task category="Kerberos;Expanding Access">Get ticket hash for hash cracking</task>
 	[Command]
 	[Description("Requests a ticket from the KDC.")]
-	[OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = Titanis.Cli.OutputStyle.List)]
 	[DetailedHelpText(@"This command sends a TGS-REQ to the KDC to request a ticket.
 
 The command line must include either a password or a hex-encoded key that is used both for pre-authentication as well as to decrypt the response.  When specifying the NTLM hash, specify just the NTLM portion with no colon.
@@ -130,8 +129,6 @@ By default, all supported encryption types are sent in the request.  To limit th
 			{
 				var ticket = await krb.RequestTicket(sourceTicket, spn, this.Realm ?? sourceTicket.TicketRealm, this.EncTypes, ticketParams, cancellationToken).ConfigureAwait(false);
 				newTickets.Add(ticket);
-
-				this.WriteRecord(ticket);
 			}
 
 			return newTickets;

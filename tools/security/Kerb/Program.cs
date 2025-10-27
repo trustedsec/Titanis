@@ -7,6 +7,7 @@ namespace Kerb
 	[Subcommand("getasinfo", typeof(GetASInfoCommand))]
 	[Subcommand("asreq", typeof(AsreqCommand))]
 	[Subcommand("tgsreq", typeof(RequestTicketCommand))]
+	[Subcommand("renew", typeof(RenewTicketCommand))]
 	[Subcommand("select", typeof(SelectCommand))]
 	[Subcommand("changepw", typeof(ChangePasswordCommand))]
 	[Subcommand("setpw", typeof(SetPasswordCommand))]

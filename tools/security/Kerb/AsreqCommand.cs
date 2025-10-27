@@ -12,7 +12,6 @@ namespace Kerb
 	/// <task category="Enumeration">Check whether a user name is valid</task>
 	[Command]
 	[Description("Requests a TGT from the KDC.")]
-	[OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = OutputStyle.List)]
 	[DetailedHelpText(@"This command sends an AS-REQ to the KDC to request a ticket-granting ticket.
 
 The command line must include either a password or a hex-encoded key that is used both for preauthentication as well as to decrypt the response.  When specifying the NTLM hash, specify just the NTLM portion with no colon.
@@ -76,7 +75,6 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 				this.Log);
 
 			var realm = this.InitialAuth.EffectiveRealm;
-			this.WriteRecord(ticket);
 			if (!string.Equals(ticket.TicketRealm, realm, StringComparison.OrdinalIgnoreCase))
 				this.WriteWarning($"The ticket realm '{ticket.TicketRealm}' does not match the requested realm '{realm}'.  This may be the result of canonicalization.");
 

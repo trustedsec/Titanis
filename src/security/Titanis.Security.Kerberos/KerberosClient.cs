@@ -622,7 +622,7 @@ namespace Titanis.Security.Kerberos
 			this.TicketCache?.AddTicket(ticket);
 			return ticket;
 		}
-		public async Task<TicketInfo> RequestTicketCore(
+		private async Task<TicketInfo> RequestTicketCore(
 			TicketInfo tgt,
 			SecurityPrincipalName spn,
 			string realm,
@@ -647,7 +647,7 @@ namespace Titanis.Security.Kerberos
 			var sessionKey = usingSubkey ? tgt.GenerateSessionKey() : tgt.SessionKey;
 			TicketRequestContext context = new TicketRequestContext(null, sessionKey, usingSubkey);
 
-			var tgsreq = this.CreateTgsReq(spn, tgt, encTypes, ticketParameters, options, context);
+			var tgsreq = this.CreateTgsReq(spn, tgt, tgt.TicketRealm, encTypes, ticketParameters, options, context);
 
 			this._callback?.OnRequestingTicket(spn, tgt, (KdcOptions)tgsreq.Tgsreq.req_body.kdc_options.ToUInt32());
 
@@ -805,7 +805,8 @@ namespace Titanis.Security.Kerberos
 
 		private KDC_REQ_CHOICE CreateTgsReq(
 			SecurityPrincipalName spn,
-			TicketInfo tgt,
+			TicketInfo ticket,
+			string realm,
 			EType[]? etypes,
 			TicketParameters ticketParameters,
 			KdcOptions options,
@@ -814,9 +815,7 @@ namespace Titanis.Security.Kerberos
 		{
 			ArgumentNullException.ThrowIfNull(ticketParameters);
 
-			Debug.Assert(tgt.IsTgt);
-
-			var cname = Structs.PrincipalName(PrincipalNameType.Principal, tgt.UserName);
+			var cname = Structs.PrincipalName(PrincipalNameType.Principal, ticket.UserName);
 
 			int seqnbr = GenerateNonce();
 
@@ -824,7 +823,7 @@ namespace Titanis.Security.Kerberos
 				ticketParameters,
 				options,
 				null, //(ticketParameters.S4UserName is null) ? null : Structs.PrincipalName(PrincipalNameType.Principal, ticketParameters.S4UserName.UserName),// null, //cname,
-				tgt.ServiceInstance,
+				realm,
 				Structs.PrincipalName(spn),
 				context.nonce,
 				(etypes == null) ? this.GetAllETypes() : Array.ConvertAll(etypes, r => (int)r),
@@ -839,7 +838,7 @@ namespace Titanis.Security.Kerberos
 			{
 				if (ticketParameters.AdditionalTicket == null)
 				{
-					string s4uRealm = ticketParameters.S4UserName?.Realm ?? tgt.UserRealm;
+					string s4uRealm = ticketParameters.S4UserName?.Realm ?? ticket.UserRealm;
 
 					// [MS-SFU] § 2.2.1
 
@@ -904,12 +903,12 @@ namespace Titanis.Security.Kerberos
 
 			AP_REQ apreq = Structs.APReq(
 				0,
-				tgt.ticket,
-				tgt.SessionKey.EncryptAndWrap(
+				ticket.ticket,
+				ticket.SessionKey.EncryptAndWrap(
 					KeyUsage.TgsreqPatgsreqPadataApreqAuthChecksum_TgsSessionKey_IncludesAuthSubkey,
 					Asn1DerEncoder.EncodeTlv(Structs.Authenticator(
 						cname,
-						tgt.UserRealm,
+						ticket.UserRealm,
 						ComputeChecksum(Asn1DerEncoder.EncodeTlv(reqBody).Span),
 						context.now,
 						seqnbr,
