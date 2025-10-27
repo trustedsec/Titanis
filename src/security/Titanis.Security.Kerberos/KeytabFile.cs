@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -11,13 +12,13 @@ using Titanis.PduStruct;
 
 namespace Titanis.Security.Kerberos
 {
-	public class Keytab
+	public class KeytabFile
 	{
-		public Keytab()
+		public KeytabFile()
 		{
 		}
 
-		public static Keytab LoadFrom(string fileName)
+		public static KeytabFile LoadFrom(string fileName)
 		{
 			ArgumentException.ThrowIfNullOrEmpty(fileName);
 
@@ -64,11 +65,15 @@ namespace Titanis.Security.Kerberos
 	}
 
 	/// <summary>
-	/// Describes an entry within a <see cref="Keytab"/>.
+	/// Describes an entry within a <see cref="KeytabFile"/>.
 	/// </summary>
 	public class KeytabEntry
 	{
-		public KeytabEntry(SecurityPrincipal principal, EType encType, byte[] keyBytes)
+		public KeytabEntry(
+			SecurityPrincipal principal,
+			int kvno,
+			EType encType,
+			byte[] keyBytes)
 		{
 			ArgumentNullException.ThrowIfNull(principal);
 			ArgumentNullException.ThrowIfNull(keyBytes);
@@ -77,7 +82,16 @@ namespace Titanis.Security.Kerberos
 		}
 
 		public SecurityPrincipal Principal { get; }
+
+		[Browsable(false)]
 		public byte[] KeyBytes { get; }
+
+		public int Kvno { get; }
+
+		public EType EType { get; }
+
+		[DisplayName("Key")]
+		public string KeyText { get; }
 	}
 
 	[PduStruct]
