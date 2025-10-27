@@ -265,17 +265,18 @@ namespace Titanis.Cli
 			this.LogLevel = (LogMessageSeverity)Math.Min((int)level, (int)this.LogLevel);
 		}
 
-		private LogFormat _consoleLogFormat;
+		private LogFormat _logFormat;
 		[Parameter]
+		[Alias("LogFormat")]
 		[Category(ParameterCategories.Output)]
 		[Description("Sets the format of log messages written to the console")]
 		[DefaultValue(LogFormat.Text)]
 		public LogFormat ConsoleLogFormat
 		{
-			get => this._consoleLogFormat;
+			get => this._logFormat;
 			set
 			{
-				this._consoleLogFormat = value;
+				this._logFormat = value;
 				if (this.HasContext)
 					this.Log.Format = value;
 			}
