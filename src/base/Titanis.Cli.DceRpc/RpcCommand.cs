@@ -193,7 +193,6 @@ namespace Titanis.Cli
 			SmbParameters ??= new SmbParameters();
 			Authentication ??= new AuthenticationParameters();
 
-			Authentication.Validate(false, context);
 			SmbParameters.Validate(context, Authentication);
 		}
 
