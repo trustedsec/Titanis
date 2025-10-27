@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
@@ -156,10 +157,23 @@ namespace Titanis.Cli
 			if (!hasKerbCred && this.Kdc is not null)
 				log?.WriteWarning($"-Kdc option specified but not enough options specified for Kerberos; Kerberos will not be used.");
 
-			if (this.S4UserName is not null)
+			if (this.S4UserName is not null || this.S4UserCert is not null)
 			{
 				if (this.Kdc is null)
-					context.LogError(new ParameterValidationError(nameof(S4UserName), $"-{nameof(S4UserName)} requires -{nameof(Kdc)}"));
+				{
+					if (this.S4UserName is not null)
+						context.LogError(new ParameterValidationError(nameof(S4UserName), $"-{nameof(S4UserName)} requires -{nameof(Kdc)}"));
+					if (this.S4UserCert is not null)
+						context.LogError(new ParameterValidationError(nameof(S4UserCert), $"-{nameof(S4UserCert)} requires -{nameof(Kdc)}"));
+				}
+
+				if (!string.IsNullOrEmpty(this.S4UserCert))
+				{
+					log?.WriteDiagnostic($"Loading user certificate from {this.S4UserCert}...");
+					var certBytes = File.ReadAllBytes(this.S4UserCert);
+					_s4UserCert = new X509Certificate2(certBytes);
+					log?.WriteVerbose($"Loaded certificate for {_s4UserCert.Subject}");
+				}
 			}
 
 			// Check for NTLM
@@ -283,6 +297,7 @@ namespace Titanis.Cli
 		}
 
 		private KerberosClient? _kerberosClient;
+		private X509Certificate2 _s4UserCert;
 
 		/// <summary>
 		/// Creates a <see cref="KerberosClientContext"/>.
@@ -494,9 +509,10 @@ namespace Titanis.Cli
 					try
 					{
 						var ticketParams = krb.GetDefaultTicketOptions(null);
-						if (this.S4UserName != null)
+						if (this.S4UserName != null || this._s4UserCert != null)
 						{
 							ticketParams.S4UserName = this.S4UserName;
+							ticketParams.S4UserCertificate = this._s4UserCert;
 							ticketParams.S4ProxyService = this.S4ProxyService;
 						}
 

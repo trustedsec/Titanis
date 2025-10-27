@@ -12,7 +12,7 @@ namespace Kerb
 	/// <task category="Kerberos;Expanding Access">Get ticket hash for hash cracking</task>
 	[Command]
 	[Description("Requests a ticket from the KDC.")]
-	[OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = OutputStyle.List)]
+	[OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = Titanis.Cli.OutputStyle.List)]
 	[DetailedHelpText(@"This command sends a TGS-REQ to the KDC to request a ticket.
 
 The command line must include either a password or a hex-encoded key that is used both for pre-authentication as well as to decrypt the response.  When specifying the NTLM hash, specify just the NTLM portion with no colon.
@@ -42,6 +42,10 @@ By default, all supported encryption types are sent in the request.  To limit th
 
 		[ParameterGroup]
 		public TicketParameterGroup? TicketParamGroup { get; set; }
+
+		[Parameter]
+		[Description("Requests a forwarded ticket")]
+		public SwitchParam Forwarded { get; set; }
 
 		[Parameter]
 		[Description("Realm of the KDC")]
@@ -114,15 +118,17 @@ By default, all supported encryption types are sent in the request.  To limit th
 
 			this.WriteVerbose($"Using ticket for {sourceTicket.UserName}@{sourceTicket.UserRealm} => {sourceTicket.TargetSpn} expiring {sourceTicket.EndTime}");
 
-			TicketParameters ticketParameters = this.TicketParamGroup?.GetTicketParameters(this.Log) ?? krb.GetDefaultTicketOptions(sourceTicket);
-			ticketParameters.S4UserName = this.S4UserName;
-			ticketParameters.S4UserCertificate = this._s4uCert;
-			ticketParameters.S4ProxyService = this.S4ProxyService;
+			TicketParameters ticketParams = this.TicketParamGroup?.GetTicketParameters(this.Log) ?? krb.GetDefaultTicketOptions(sourceTicket);
+			if (this.Forwarded.IsSet)
+				ticketParams.Options |= KdcOptions.Forwarded;
+			ticketParams.S4UserName = this.S4UserName;
+			ticketParams.S4UserCertificate = this._s4uCert;
+			ticketParams.S4ProxyService = this.S4ProxyService;
 
 			List<TicketInfo> newTickets = new List<TicketInfo>(this.Targets.Length);
 			foreach (var spn in this.Targets)
 			{
-				var ticket = await krb.RequestTicket(sourceTicket, spn, this.Realm ?? sourceTicket.TicketRealm, this.EncTypes, ticketParameters, cancellationToken).ConfigureAwait(false);
+				var ticket = await krb.RequestTicket(sourceTicket, spn, this.Realm ?? sourceTicket.TicketRealm, this.EncTypes, ticketParams, cancellationToken).ConfigureAwait(false);
 				newTickets.Add(ticket);
 
 				this.WriteRecord(ticket);

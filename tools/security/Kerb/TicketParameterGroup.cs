@@ -30,7 +30,12 @@ namespace Kerb
 
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("Requests a ticket renewable until the specified time")]
+		[Description("Requests a renewable ticket")]
+		public SwitchParam Renewable { get; set; }
+
+		[Parameter]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		[Description("Requests a ticket renewable until the specified time (implies -Renewable)")]
 		public DateTime? RenewTill { get; set; }
 
 		[Parameter]
@@ -47,27 +52,40 @@ namespace Kerb
 		public TicketParameters GetTicketParameters(ILog? log)
 		{
 			TicketParameters ticketParameters = new();
-			KdcOptions options = 0;
-			if (this.Postdate.HasValue)
-			{
-				options |= KdcOptions.Postdated;
-				ticketParameters.StartTime = this.Postdate.Value.ToUniversalTime();
-			}
+
 			if (this.EndTime.HasValue)
 				ticketParameters.EndTime = this.EndTime.Value.ToUniversalTime();
 
-			if (this.RenewableOk.IsSet)
-				options |= KdcOptions.RenewableOK;
-			if (this.Forwardable.IsSet)
-				options |= KdcOptions.Forwardable;
-
-			if (this.RenewTill.HasValue)
+			bool optionsSpecified = false
+				| this.RenewableOk.IsSpecified
+				| this.Forwardable.IsSpecified
+				| this.Renewable.IsSpecified
+				| this.RenewableOk.IsSpecified
+				| this.Postdate.HasValue
+				| this.RenewTill.HasValue
+				;
+			KdcOptions options;
+			if (optionsSpecified)
 			{
-				options |= KdcOptions.Renewable;
-				ticketParameters.RenewTill = this.RenewTill.Value.ToUniversalTime();
-			}
+				options = KdcOptions.None;
+				if (this.Postdate.HasValue)
+				{
+					options |= KdcOptions.Postdated;
+					ticketParameters.StartTime = this.Postdate.Value.ToUniversalTime();
+				}
 
-			if (options == 0)
+				if (this.RenewableOk.IsSet)
+					options |= KdcOptions.RenewableOK;
+				if (this.Forwardable.IsSet)
+					options |= KdcOptions.Forwardable;
+
+				if (this.RenewTill.HasValue)
+				{
+					options |= KdcOptions.Renewable;
+					ticketParameters.RenewTill = this.RenewTill.Value.ToUniversalTime();
+				}
+			}
+			else
 				options = KerberosClient.DefaultTgtOptions;
 
 			ticketParameters.Options = options;
