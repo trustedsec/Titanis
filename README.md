@@ -23,6 +23,7 @@ Titanis is a library of protocol implementations and command line utilities, wri
 			* S4U2self
 			* S4U2proxy
 		* Encryption profiles
+			* DES CBC MD5 ([RFC3961](https://datatracker.ietf.org/doc/html/rfc3961)) (AS only)
 			* RC4-HMAC ([RFC4757](https://datatracker.ietf.org/doc/html/rfc4757))
 			* AES 128/256 ([RFC3962](https://datatracker.ietf.org/doc/html/rfc3962))
 			* Support for .kirbi and [ccache](https://web.mit.edu/kerberos/krb5-1.21/doc/formats/ccache_file_format.html) files

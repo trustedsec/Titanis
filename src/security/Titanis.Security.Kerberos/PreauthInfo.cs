@@ -131,10 +131,10 @@ namespace Titanis.Security.Kerberos
 			return this.paTypes != null && this.paTypes.Contains(patype);
 		}
 
+		internal byte[]? passwordSalt;
 		private void ProcessPasswordSalt(byte[] padata_value)
 		{
-			// TODO: Implement
-			throw new NotImplementedException();
+			this.passwordSalt = padata_value;
 		}
 
 		internal List<KdcEncryptionTypeInfo>? etypesFromKdc;

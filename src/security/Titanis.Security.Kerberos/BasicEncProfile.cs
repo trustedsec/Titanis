@@ -18,6 +18,9 @@ namespace Titanis.Security.Kerberos
 		/// </summary>
 		public abstract int CipherBlockSizeBytes { get; }
 
+		/// <inheritdoc/>
+		public sealed override int KeyGenerationSeedSizeBytes => this.KeySizeBytes;
+
 		/// <summary>
 		/// Gets the number of iterations to execute for key derivation.
 		/// </summary>
@@ -79,6 +82,7 @@ namespace Titanis.Security.Kerberos
 			NFold.DeriveKey(constant, keySeed);
 
 			var keySize = this.KeySizeBytes;
+			Debug.Assert(keySize == this.KeyGenerationSeedSizeBytes);
 
 			// protoKey and keyBuffer may be the same buffer, so don't overwrite
 			Span<byte> output = stackalloc byte[KeySizeBytes];
@@ -86,6 +90,7 @@ namespace Titanis.Security.Kerberos
 			{
 				this.EncryptBlock(protoKey, keySeed);
 				int cb = Math.Min(CipherBlockSize, keySize - i);
+
 				keySeed.Slice(0, cb).CopyTo(output.Slice(i, cb));
 			}
 

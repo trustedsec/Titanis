@@ -174,6 +174,7 @@ namespace Titanis.Security.Kerberos
 			Singleton.SingleInstance<EncProfile_Aes128CtsHmacSha1_96>(),
 			Singleton.SingleInstance<Rc4Hmac>(),
 			Singleton.SingleInstance<Rc4HmacExp>(),
+			Singleton.SingleInstance<EncProfile_DesCbcMd5>(),
 		};
 
 		/// <summary>
@@ -198,7 +199,7 @@ namespace Titanis.Security.Kerberos
 		}
 		private int[] GetAllETypes()
 		{
-			return this._encProfiles.ConvertAll(r => (int)r.EType).ToArray();
+			return Array.ConvertAll(this.DefaultETypes, r => (int)r);
 		}
 		/// <summary>
 		/// Attempts to get an <see cref="EncProfile"/> from the list of profiles.
@@ -320,6 +321,7 @@ namespace Titanis.Security.Kerberos
 				if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_PREAUTH_REQUIRED)
 				{
 					paInfo.Skew = new KerberosTime(err.stime, err.susec).AsDateTime() - sendTime;
+
 					var paList = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<PA_DATA>>(err.e_data).Values;
 					this._callback?.OnReceiveAsrepPadataList(paList);
 					bool supportedPreauth = paInfo.ProcessPadata(paList);
@@ -335,6 +337,12 @@ namespace Titanis.Security.Kerberos
 					}
 
 					throw new InvalidOperationException(Messages.Krb5_NoSupportedPreauths);
+				}
+				else if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_ETYPE_NOSUPP)
+				{
+					// TODO: Report the supported types
+					var supported = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<PA_DATA>>(err.e_data);
+					throw err.GetException();
 				}
 				else
 				{
@@ -491,8 +499,13 @@ namespace Titanis.Security.Kerberos
 				PreauthInfo paInfo = new PreauthInfo(this, credential, this._callback);
 				paInfo.ProcessPadata(asrep.padata);
 				var encType = paInfo.TryGetSupportedEncProfile();
-				encProfile = encType.encProfile;
-				salt = encType.Salt;
+				if (encType != null)
+				{
+					encProfile = encType.encProfile;
+					salt = encType.Salt;
+				}
+				else if (paInfo.passwordSalt != null)
+					salt = paInfo.passwordSalt;
 			}
 			if (encProfile == null)
 				encProfile = this.GetEncProfile((EType)asrep.enc_part.etype);
@@ -752,6 +765,17 @@ namespace Titanis.Security.Kerberos
 			| KdcOptions.Canonicalize
 			;
 
+		// Matches Windows 11
+		private static readonly EType[] defaultEtypes = new EType[]
+		{
+			EType.Aes256CtsHmacSha1_96,
+			EType.Aes128CtsHmacSha1_96,
+			EType.Rc4Hmac,
+			EType.DesCbcMd5
+		};
+
+		public EType[] DefaultETypes { get; set; } = defaultEtypes;
+
 		public TicketParameters GetDefaultTgtOptions()
 		{
 			DateTime till = GetDefaultEndTime();
@@ -763,9 +787,9 @@ namespace Titanis.Security.Kerberos
 			};
 		}
 
-		private static DateTime GetDefaultEndTime()
+		public static DateTime GetDefaultEndTime()
 		{
-			return DateTime.UtcNow + TimeSpan.FromHours(10);
+			return DateTime.UtcNow + TimeSpan.FromHours(12);
 		}
 
 		public TicketParameters GetDefaultTicketOptions(TicketInfo? tgt)

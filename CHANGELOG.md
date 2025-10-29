@@ -9,6 +9,7 @@ Change Log
 	* Set password [RFC 3244]
 	* Select ticket by sequence number
 	* Invert selection
+	* DES CBC MD5 [RFC 3961]
 * WMI
 	* Delete operation
 * New output formats

@@ -23,7 +23,9 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		public sealed override int KeyBits => Rc4HmacProtocolKeySizeBytes * 8;
 		/// <inheritdoc/>
-		public sealed override int MessageBlockSize => 1;
+		public sealed override int KeyGenerationSeedSizeBytes => this.KeySizeBytes;
+		/// <inheritdoc/>
+		public sealed override int MessageBlockSizeBytes => 1;
 		/// <inheritdoc/>
 		protected sealed override int SpecificKeySizeBytes => Rc4HmacSpecificKeySizeBytes;
 		public sealed override int SignTokenSize => WrapToken.StructSize;
@@ -42,7 +44,11 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		public sealed override void RandomToKey(ReadOnlySpan<byte> input, Span<byte> keyBuffer)
 		{
-			// TODO: Check buffers
+			if (input.Length < this.KeyGenerationSeedSizeBytes)
+				throw new ArgumentException("Random input data too short.", nameof(input));
+			if (keyBuffer.Length != this.KeySizeBytes)
+				throw new ArgumentException($"Key buffer is the wrong size.", nameof(keyBuffer));
+
 			input.CopyTo(keyBuffer);
 		}
 

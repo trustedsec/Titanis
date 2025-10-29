@@ -8,6 +8,13 @@ using Titanis.Winterop;
 
 namespace KerberosV5Spec2
 {
+	public enum ErrorDataType
+	{
+		// [MS-KILE] § 2.2.2
+		SkewRecovery = 2,
+		Extended = 3,
+	}
+
 	public partial class KRB_ERROR_Tagged30
 	{
 		internal Exception GetException()
@@ -15,14 +22,24 @@ namespace KerberosV5Spec2
 			if (this.e_data != null)
 			{
 				// [MS-KILE] § 2.2.2
-				var errorInfo = Asn1DerDecoder.DecodeTlv<KERB_ERROR_DATA>(this.e_data);
-				if (errorInfo?.data_type == 3 && errorInfo.data_value?.Length == 12)
+				KERB_ERROR_DATA? errorInfo;
+				try
+				{
+					Asn1DerDecoder.TryDecodeTlv<KERB_ERROR_DATA>(this.e_data, out errorInfo);
+				}
+				catch
+				{
+					// Ignore decoding error
+					errorInfo = null;
+				}
+
+				if (errorInfo?.data_type == (int)ErrorDataType.Extended && errorInfo.data_value?.Length == 12)
 				{
 					Ntstatus ntstatus = (Ntstatus)BinaryPrimitives.ReadUInt32LittleEndian(errorInfo.data_value);
 					ntstatus.CheckAndThrow();
 				}
 			}
-			// TODO: Provite e-text, although it's usually empty
+			// TODO: Provide e-text, although it's usually empty
 			return new KerberosException((KerberosErrorCode)this.error_code);
 		}
 	}

@@ -75,11 +75,15 @@ namespace Titanis.Security.Kerberos
 		/// <remarks>
 		/// A value of <c>1</c> indicates a stream cipher.
 		/// </remarks>
-		public abstract int MessageBlockSize { get; }
+		public abstract int MessageBlockSizeBytes { get; }
 		/// <summary>
 		/// Gets the key size, in bits.
 		/// </summary>
 		public abstract int KeyBits { get; }
+		/// <summary>
+		/// Gets the number of bytes of random data required to generate a key.
+		/// </summary>
+		public abstract int KeyGenerationSeedSizeBytes { get; }
 		/// <summary>
 		/// Gets the key size, in bytes.
 		/// </summary>
@@ -93,7 +97,7 @@ namespace Titanis.Security.Kerberos
 		/// Gets the size of the SignToken, in bytes.
 		/// </summary>
 		// [RFC 4121] § 4.2.6.1 - MIC Tokens
-		public abstract int SignTokenSize {get;}
+		public abstract int SignTokenSize { get; }
 
 		/// <summary>
 		/// Gets the size required for the sealing token header.
@@ -257,8 +261,10 @@ namespace Titanis.Security.Kerberos
 			CompareChecksums(checksum, computedChecksum);
 		}
 
-		protected static void CompareChecksums(ReadOnlySpan<byte> checksum, Span<byte> computedChecksum)
+		internal static void CompareChecksums(ReadOnlySpan<byte> checksum, ReadOnlySpan<byte> computedChecksum)
 		{
+			Debug.Assert(checksum.Length == computedChecksum.Length);
+
 			for (int i = 0; i < checksum.Length; i++)
 			{
 				if (computedChecksum[i] != checksum[i])
@@ -279,24 +285,26 @@ namespace Titanis.Security.Kerberos
 			ReadOnlySpan<byte> protocolKey, KeyUsage usage,
 			ReadOnlySpan<byte> plaintext)
 		{
-			if (0 != (plaintext.Length % this.MessageBlockSize))
-				throw new ArgumentException("The message size is not a multiple of MessageBlockSize.  It must be padded.", nameof(plaintext));
-
-			byte[] cipherBuf = new byte[this.CipherHeaderSizeBytes + plaintext.Length + this.CipherTrailerSizeBytes];
-			var plaintextBuf = cipherBuf.Slice(this.CipherHeaderSizeBytes, plaintext.Length);
+			int cbCipher = this.CipherHeaderSizeBytes + plaintext.Length;
+			int cbPadding = (this.MessageBlockSizeBytes > 1)
+				? ((this.MessageBlockSizeBytes - (cbCipher % this.MessageBlockSizeBytes)) % this.MessageBlockSizeBytes)
+				: 0;
+			cbCipher += cbPadding;
+			byte[] cipherBuf = new byte[cbCipher + this.CipherTrailerSizeBytes];
+			var plaintextBuf = cipherBuf.Slice(this.CipherHeaderSizeBytes, plaintext.Length + cbPadding);
 			plaintext.CopyTo(plaintextBuf);
 
 			this.Encrypt(
 				protocolKey, usage,
 				cipherBuf.Slice(0, this.CipherHeaderSizeBytes),
 				SecBufferList.Create(SecBuffer.PrivacyWithIntegrity(plaintextBuf)),
-				cipherBuf.Slice(this.CipherHeaderSizeBytes + plaintext.Length, this.CipherTrailerSizeBytes)
+				cipherBuf.Slice(cbCipher, this.CipherTrailerSizeBytes)
 				);
 
 #if DEBUG
 			byte[] copy = (byte[])cipherBuf.Clone();
 			var decrypted = this.Decrypt(protocolKey, usage, copy);
-			Debug.Assert(decrypted.ToArray().SequenceEqual(plaintext.ToArray()));
+			Debug.Assert(decrypted.Slice(0, plaintext.Length).ToArray().SequenceEqual(plaintext.ToArray()));
 #endif
 
 			return cipherBuf;

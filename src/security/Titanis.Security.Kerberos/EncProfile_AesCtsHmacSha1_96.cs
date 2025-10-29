@@ -18,7 +18,7 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		public sealed override int CipherBlockSizeBytes => AesBlockSize;
 		/// <inheritdoc/>
-		public sealed override int MessageBlockSize => 1;
+		public sealed override int MessageBlockSizeBytes => 1;
 
 
 		/// <inheritdoc/>
