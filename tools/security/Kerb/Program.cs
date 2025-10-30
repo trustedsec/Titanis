@@ -11,6 +11,7 @@ namespace Kerb
 	[Subcommand("select", typeof(SelectCommand))]
 	[Subcommand("changepw", typeof(ChangePasswordCommand))]
 	[Subcommand("setpw", typeof(SetPasswordCommand))]
+	[Subcommand("s2k", typeof(S2kCommand))]
 	internal class Program : MultiCommand
 	{
 		static void Main(string[] args)

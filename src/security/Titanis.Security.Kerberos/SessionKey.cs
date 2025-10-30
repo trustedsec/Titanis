@@ -1,6 +1,7 @@
 ﻿using KerberosV5Spec2;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -36,11 +37,17 @@ namespace Titanis.Security.Kerberos
 		/// <summary>
 		/// Gets the encryption profile used by the key.
 		/// </summary>
+		[Browsable(false)]
 		public EncProfile EncryptionProfile { get; }
 		public EType EType => this.EncryptionProfile.EType;
 
 		internal readonly KerberosV5Spec2.EncryptionKey key;
+		[Browsable(false)]
 		internal byte[] KeyBytes => this.key.keyvalue;
+
+		[DisplayName("Key")]
+		public string KeyText => this.KeyBytes.ToHexString();
+
 
 		internal Checksum Checksum(KeyUsage usage, Span<byte> data)
 		{

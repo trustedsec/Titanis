@@ -21,7 +21,9 @@ namespace Titanis.Security.Kerberos
 		[Browsable(false)]
 		public byte[]? Salt { get; }
 		[DisplayName("Salt (text)")]
-		public string? SaltText => this.Salt?.ToHexString();
+		public string? SaltText => (this.Salt is not null) ? Encoding.UTF8.GetString(this.Salt) : null;
+		[DisplayName("Salt (hex)")]
+		public string? SaltHex => this.Salt?.ToHexString();
 
 		internal KdcEncryptionTypeInfo(EType etype, EncProfile? encProfile, byte[]? salt)
 		{
