@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Net;
 using Titanis.Cli;
+using Titanis.Security;
 using Titanis.Security.Kerberos;
 
 namespace Kerb
@@ -16,22 +17,22 @@ namespace Kerb
 If the account does not exist or the realm name is wrong, the KDC returns an error indicating this and does not provide preauthentication info.
 
 If the user exists but does not require preauthentication, the KDC will instead reply with a TGT without providing encryption types.  In that case, use the requesttgt command to analyze the ticket.")]
+	[Example("Get AS info for milchick", "{0} milchick@LUMON 10.66.0.11")]
 	internal class GetASInfoCommand : Command
 	{
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-		[Parameter]
+		[Parameter(0)]
 		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Name of user (no domain)")]
-		public string UserName { get; set; }
+		public UserPrincipalName UserName { get; set; }
 
 		[Parameter]
-		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Name of realm (domain)")]
-		public string Realm { get; set; }
+		public string? Realm { get; set; }
 
-		[Parameter]
+		[Parameter(10)]
 		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Host name or address of KDC")]
@@ -41,14 +42,22 @@ If the user exists but does not require preauthentication, the KDC will instead 
 		public NetworkParameters NetParameters { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
+		protected override void ValidateParameters(ParameterValidationContext context)
+		{
+			base.ValidateParameters(context);
+
+			var realm = this.Realm ?? this.UserName.Realm;
+			if (realm is null)
+				context.LogError(new ParameterValidationError(nameof(Realm), $"Realm must be specified either as -{nameof(Realm)} or along with the user name."));
+		}
+
 		protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 		{
 			KerberosClient krb = this.CreateKerberosClient(new SimpleKdcLocator(new DnsEndPoint(this.Kdc, KerberosClient.KdcTcpPort)));
 
-			var asInfo = await krb.GetASInfo(Realm, this.UserName, cancellationToken).ConfigureAwait(false);
+			var asInfo = await krb.GetASInfo(Realm ?? this.UserName.Realm, this.UserName.UserName, cancellationToken).ConfigureAwait(false);
 
 			this.WriteMessage($"KDC time: {asInfo.KdcTime:O}");
-
 			this.WriteRecords(asInfo.SupportedEncryptionTypes);
 
 			return 0;
