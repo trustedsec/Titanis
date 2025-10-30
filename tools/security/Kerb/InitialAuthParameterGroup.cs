@@ -56,12 +56,12 @@ internal class InitialAuthParameterGroup : ParameterGroupBase
 	[Parameter]
 	[Category(ParameterCategories.AuthenticationKerberos)]
 	[Description("AES 128 key")]
-	public HexString? Aes128Key { get; set; }
+	public HexString? AesKey { get; set; }
 
 	[Parameter]
 	[Category(ParameterCategories.AuthenticationKerberos)]
-	[Description("AES 256 key")]
-	public HexString? Aes256Key { get; set; }
+	[Description("DES key")]
+	public HexString? DesKey { get; set; }
 
 
 	internal void Validate(ParameterValidationContext context)
@@ -73,8 +73,8 @@ internal class InitialAuthParameterGroup : ParameterGroupBase
 		int credCount = 0;
 		if (this.Password != null) credCount++;
 		if (this.NtlmHash != null) credCount++;
-		if (this.Aes128Key != null) credCount++;
-		if (this.Aes256Key != null) credCount++;
+		if (this.AesKey != null) credCount++;
+		if (this.DesKey != null) credCount++;
 		if (this.UserKey != null) credCount++;
 
 		if (credCount != 1)
@@ -142,8 +142,13 @@ internal class InitialAuthParameterGroup : ParameterGroupBase
 
 		return (this.Password != null) ? new KerberosPasswordCredential(userName, realm, this.Password)
 			: (this.NtlmHash != null) ? new KerberosKeyCredential(userName, realm, EType.Rc4Hmac, this.NtlmHash.Bytes)
-			: (this.Aes128Key != null) ? new KerberosKeyCredential(userName, realm, EType.Aes128CtsHmacSha1_96, this.Aes128Key.Bytes)
-			: (this.Aes256Key != null) ? new KerberosKeyCredential(userName, realm, EType.Aes256CtsHmacSha1_96, this.Aes256Key.Bytes)
+			: (this.AesKey != null) ? new KerberosKeyCredential(userName, realm, (this.AesKey.Bytes.Length switch
+			{
+				(128 / 8) => EType.Aes128CtsHmacSha1_96,
+				(256 / 8) => EType.Aes256CtsHmacSha1_96,
+				_ => throw new ArgumentException("The AES key is not the correct size for AES 128 or AES 256.")
+			}), this.AesKey.Bytes)
+			: (this.DesKey != null) ? new KerberosKeyCredential(userName, realm, EType.DesCbcMd5, this.DesKey.Bytes)
 			: throw new SyntaxException("No credential provided");
 	}
 }

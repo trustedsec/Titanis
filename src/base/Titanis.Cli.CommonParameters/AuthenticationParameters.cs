@@ -58,6 +58,11 @@ namespace Titanis.Cli
 		public HexString? AesKey { get; set; }
 
 		[Parameter]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		[Description("DES key")]
+		public HexString? DesKey { get; set; }
+
+		[Parameter]
 		[Description("Name of workstation to send with NTLM authentication")]
 		[Alias("w")]
 		[Category(ParameterCategories.AuthenticationNtlm)]
@@ -151,6 +156,7 @@ namespace Titanis.Cli
 						(this.Password != null)
 						|| (this.NtlmHash != null)
 						|| (this.AesKey != null)
+						|| (this.DesKey != null)
 						)
 				);
 			this.HasKerberosInfo = hasKerbCred;
@@ -485,6 +491,8 @@ namespace Titanis.Cli
 						(256 / 8) => EType.Aes256CtsHmacSha1_96,
 						_ => throw new ArgumentException("The AES key is not the correct size for AES 128 or AES 256.")
 					}, this.AesKey.Bytes);
+				else if (this.DesKey != null)
+					cred = new KerberosKeyCredential(authUser, authRealm, EType.DesCbcMd5, this.DesKey.Bytes);
 			}
 
 			// A credential is required regardless of whether it is used for authentication
