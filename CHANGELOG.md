@@ -1,14 +1,14 @@
 Change Log
 
-# 2025-10-27
+# 2025-10-30
 
 * Kerberos
 	* S4U2self and S4U2proxy ([MS-SFU])
 		* S4U with user certificate
-	* Change password
-	* Set password [RFC 3244]
+	* Renew a ticket
+	* Change password / Set password [RFC 3244]
 	* Select ticket by sequence number
-	* Invert selection
+	* Invert selection with `Kerb select`
 	* DES CBC MD5 [RFC 3961]
 * WMI
 	* Delete operation

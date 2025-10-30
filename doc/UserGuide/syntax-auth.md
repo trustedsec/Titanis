@@ -62,7 +62,7 @@ The Authentication parameter group defines parameters that specify how the tool 
 
 Some protocols require a specific security protocol.  For example, SMB2 requires SPNEGO, which itself may enclose both NTLM and Kerberos.  Some protocols, such as RPC, will accept a number of security protocols along with a field in the header that specifies how to interpret the tokens.  Titanis will use the provided parameters to build the appropriate type of security context.  If the parameters support multiple security protocols and the application protocol supports SPNEGO, Titanis prepares a security context for each supported security protocol and wraps them in an SPNEGO context.
 
-In general, to use Kerberos, you must specify the KDC address with `-Kdc`.  Titanis will attempt to contact the KDC to request a ticket.
+In general, to use Kerberos, you must specify the KDC address with `-Kdc`.  If no ticket is in the cache, Titanis will attempt to contact the KDC to request a ticket.
 
 
 ## Other Parameters
@@ -95,6 +95,10 @@ when you don't have credentials for that user account.
 	1. At each step in the sequence, Titanis checks the ticket files provided by `-Tgt`, `-Ticket`, and `-TicketCache` for the desired ticket.
 	1. If the desired ticket is found, it is used, and the KDC is not contacted for that step.
 
+To test S4U (or any authentication scenario), consider using `Lsa whoami`.  This
+command prints name of the user that authenticates to it.  It accepts the usual
+authentication parameters.
+
 ## S4U2self Sequence
 
 The full S4U2self sequence is as follows:
@@ -114,8 +118,14 @@ The full S4U2proxy sequence is as follows:
 
 Let's say you have a TGT for COBEL-WKS$ and wish to impersonate user `milchick`.
 
-`Smb2Client ls //`
+`Smb2Client ls \\LUMON-FS1\C$ -UserName allentown@LUMON -Password password -Kdc 10.66.0.11 -S4UserName milchick -S4ProxyService host/allentown`
+
+This command:
+1. Requests a TGT for user `allentown` (or retrieves one from the cache)
+1. Requests a service ticket for user `milchick` to the proxy service `host/allentown` using S4U2self.
+1. Using the S4U2self ticket from above, requests a service ticket for user `milchick` to `cifs/LUMON-FS1`.
 
 ## Notes
 1. You may specify one or both of the `-S4User*` parameters.  If you specify both `-S4UserName` and `-S4UserCert`, they must match; otherwise, the KDC will likely fail the request.
-1. 
+1. During testing, when specifying `-S4UserCert`, the DC takes considerably longer to respond (around 10 seconds).
+1. The name supplied to `-S4ProxyService` may be of the form `<class>/<instance>` or simply the service account name.
