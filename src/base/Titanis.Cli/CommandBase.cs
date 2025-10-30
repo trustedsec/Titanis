@@ -650,7 +650,7 @@ namespace Titanis.Cli
 		#endregion
 		protected string ResolveFsPath(string path)
 		{
-			return Path.GetFullPath(path);
+			return this.VerifyContext().ResolveFsPath(path);
 		}
 
 		internal const string Indent = "  ";

@@ -105,5 +105,10 @@ namespace Titanis.Cli
 		}
 
 		public object? GetVariable(string name) => Environment.GetEnvironmentVariable(name);
+
+		public string ResolveFsPath(string path)
+		{
+			return Path.GetFullPath(path);
+		}
 	}
 }

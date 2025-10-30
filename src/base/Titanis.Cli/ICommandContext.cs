@@ -28,5 +28,6 @@ namespace Titanis.Cli
 		ILog Log { get; }
 
 		Task ExecuteFrameAsync(Func<CancellationToken, Task> func);
+		string ResolveFsPath(string path);
 	}
 }
