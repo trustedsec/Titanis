@@ -14,10 +14,13 @@ namespace Kerb
 	[Description("Requests a ticket from the KDC.")]
 	[DetailedHelpText(@"This command sends a TGS-REQ to the KDC to request a ticket.
 
+The target may either be specified as a service principal name of the form <class>/<instance> or as the name of the account itself.  For machine accounts, the $ is optional.  For instance, instead of host/LUMON-FS1, you may simply use LUMON-FS1$ or LUMON-FS1
+
 The command line must include either a password or a hex-encoded key that is used both for pre-authentication as well as to decrypt the response.  When specifying the NTLM hash, specify just the NTLM portion with no colon.
 
 By default, all supported encryption types are sent in the request.  To limit this, use the -EncTypes parameter to specify which encryption types to request from the server.")]
 	[Example("Requesting a ticket for SMB", "{0} -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi cifs/LUMON-FS1 -OutputFile milchick-LUMON-FS1.kirbi")]
+	[Example("Requesting a ticket for LUMON-FS1", "{0} -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi LUMON-FS1 -OutputFile milchick-LUMON-FS1.kirbi")]
 	[Example("Requesting a ticket for SMB and Host", "{0} -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi cifs/LUMON-FS1, HOST/LUMON-FS1 -OutputFile milchick-LUMON-FS1.kirbi")]
 	internal class RequestTicketCommand : TicketRequestCommand
 	{

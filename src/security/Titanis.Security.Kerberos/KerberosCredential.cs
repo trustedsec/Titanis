@@ -26,6 +26,7 @@ namespace Titanis.Security.Kerberos
 			this.Realm = realm.ToUpper();
 		}
 
+		internal virtual PrincipalNameType UserNameType => PrincipalNameType.Principal;
 		/// <summary>
 		/// Gets the user name.
 		/// </summary>
@@ -43,6 +44,7 @@ namespace Titanis.Security.Kerberos
 		public byte[] GetSalt()
 			=> Encoding.UTF8.GetBytes(this.Realm.ToUpper() + this.UserName);
 
+		internal abstract bool SupportsPreauthType(PadataType preauthType);
 		/// <summary>
 		/// Checks whether this credential supports a specified profile.
 		/// </summary>

@@ -54,7 +54,7 @@ namespace Titanis.Security.Kerberos
 			for (int i = 0; i < blocks.Length; i++)
 			{
 				var newState = blocks[i];
-				blocks[i] = Des.Decrypt(key, newState) ^ initialState;
+				blocks[i] = DesPrimitives.DecryptBlock(key, newState) ^ initialState;
 				initialState = newState;
 			}
 			return initialState;
@@ -128,7 +128,7 @@ namespace Titanis.Security.Kerberos
 			// Am I missing something here?
 
 			var value = BitConverter.ToUInt64(input);
-			AddParityAndReverse(value);
+			DesPrimitives.AddParityAndReverse(value);
 			BinaryPrimitives.WriteUInt64LittleEndian(keyBuffer, value);
 		}
 
@@ -146,25 +146,6 @@ namespace Titanis.Security.Kerberos
 				bits >>= 1;
 			}
 			return rev;
-		}
-		internal static ulong AddParityAndReverse(ulong bits56)
-		{
-			ulong withParity = 0;
-			for (int i = 0; i < 8; i++)
-			{
-				byte b = (byte)(bits56 & 0x7F);
-				b <<= 1;
-				if ((BitOperations.PopCount(b) & 1) == 0)
-					b |= 1;
-
-				withParity <<= 8;
-				withParity |= b;
-
-				bits56 >>= 7;
-			}
-
-			Debug.Assert((BitOperations.PopCount(withParity) & 1) == 0);
-			return withParity;
 		}
 		internal static ulong SetParity(ulong bits64)
 		{
@@ -265,7 +246,7 @@ namespace Titanis.Security.Kerberos
 			Debug.Assert(temp < (1UL << 56));
 
 			// temp56 is reversed from what it should be, but AddParity reverses it back
-			temp = AddParityAndReverse(temp);
+			temp = DesPrimitives.AddParityAndReverse(temp);
 			temp = CorrectKeyIfWeak(temp);
 			temp = CorrectKeyIfWeak(SetParity(EncryptCbc(temp, temp, blocks)));
 

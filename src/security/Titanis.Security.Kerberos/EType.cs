@@ -16,5 +16,14 @@ namespace Titanis.Security.Kerberos
 		// [RFC 3962] § 7
 		Aes128CtsHmacSha1_96 = 17,
 		Aes256CtsHmacSha1_96 = 18,
+
+		// [RFC 4556] § 3.1
+		DsaWithSha1 = 9,
+		Md5WithRsa = 10,
+		Sha1WithRsa = 11,
+		Rc2Cbc = 12,
+		Rsa = 13,
+		RsaesOaep = 14,
+		DesEde3Cbc = 15,
 	}
 }

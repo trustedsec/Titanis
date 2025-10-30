@@ -120,7 +120,7 @@ namespace Titanis.Msrpc.Mssamr
 					fixed (byte* pCipher = encrypted)
 					{
 						ref ulong cipherVal = ref *(ulong*)pCipher;
-						cipherVal = (Des.Encrypt(
+						cipherVal = (DesPrimitives.EncryptBlock(
 							outputKeyVal,
 							*(ulong*)pBlock
 							));

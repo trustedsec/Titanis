@@ -16,10 +16,14 @@ namespace Titanis.Security.Kerberos
 		ETypeInfo = 11,
 		PkASreqOld = 14,
 		PkASrepOld = 15,
-		PkASReq = 16,
-		PkASRep = 17,
 		ETypeInfo2 = 19,
 		PacRequest = 128,
+
+		// [RFC 4556] § 3.1.3
+		PkASReq = 16,
+		PkASRep = 17,
+		
+
 
 		// [MS-SFU] § 2.2.1
 		S4u2Self_PaForUser = 129,

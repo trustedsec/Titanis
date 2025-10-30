@@ -45,7 +45,7 @@ class ChangePasswordCommand : KdcCommand
 			cancellationToken,
 			this.Log);
 
-		KerberosCredential cred = this.InitialAuth.GetCredential();
+		KerberosCredential cred = this.InitialAuth.GetCredential(this.Log);
 
 		await krb.ChangePassword(
 			this.Kdc.WithPort(464),

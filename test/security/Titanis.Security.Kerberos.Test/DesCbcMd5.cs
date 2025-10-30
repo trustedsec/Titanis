@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis.Crypto;
 
 namespace Titanis.Security.Kerberos.Test;
 [TestClass]
@@ -47,4 +48,39 @@ public class DesCbcMd5Test
 	}
 
 	private static byte[] milchickTimestamp = BinaryHelper.ParseHexString("b54e776d1ef994f9d4221672c6e6c01e8470baf139ffdc9bab641e2d5ce00a274911589b78005c8d4b57f9aefcc88029562f9f2301fa24e6");
+
+
+
+	[TestMethod]
+	public void PermuteSTables()
+	{
+		var S = DesPrimitives.S;
+		byte[] newS = new byte[64 * 8];
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < 8; i++)
+		{
+			sb.AppendLine($"// S{i + 1}");
+
+			var tableBase = i * 64;
+			for (int j = 0; j < 64; j++)
+			{
+				var c = j % 16;
+				var r = j / 16;
+
+				var newIndex = (c << 1) | (r & 1) | ((r & 2) << 4);
+
+				newS[tableBase + newIndex] = S[tableBase + j];
+			}
+
+			for (int j = 0; j < 4; j++)
+			{
+				sb.Append(string.Join(", ", newS.Slice(tableBase + j * 16, 16).ToArray().Select(r => r.ToString().PadLeft(2))));
+				sb.AppendLine(",");
+			}
+		}
+
+		var tables = sb.ToString();
+		//var rev = Array.ConvertAll(DesPrimitives.PC2, r => 56 - r);
+		//string s = string.Join(", ", rev);
+	}
 }

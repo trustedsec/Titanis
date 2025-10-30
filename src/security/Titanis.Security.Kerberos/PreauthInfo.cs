@@ -1,4 +1,5 @@
 ﻿using KerberosV5Spec2;
+using PKINIT;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -89,12 +90,7 @@ namespace Titanis.Security.Kerberos
 					return true;
 				case PadataType.PkASreqOld:
 					break;
-				case PadataType.PkASrepOld:
-					break;
-				case PadataType.PkASReq:
-					break;
-				case PadataType.PkASRep:
-					break;
+
 				case PadataType.ETypeInfo2:
 					this.ProcessETypeInfo2(padata.padata_value);
 					return true;
@@ -118,12 +114,44 @@ namespace Titanis.Security.Kerberos
 					break;
 				case PadataType.KerbKeyListRep:
 					break;
+
+				// [RFC 4556] § 3.1.3
+				case PadataType.PkASReq:
+					this.ProcessPkAsreq(padata.padata_value);
+					break;
+				case PadataType.PkASRep:
+					break;
+
+				// [MS-PKCA] 
+				case PadataType.PkASrepOld:
+					this.ProcessPkAsrepOld(padata.padata_value);
+					break;
+
 				default:
 					break;
 			}
 
 			return false;
 		}
+
+		#region PKINIT
+		private PadataType _pkinitType;
+		private void ProcessPkAsreq(byte[] data)
+		{
+			if (this._pkinitType is 0)
+			{
+				this._pkinitType = PadataType.PkASReq;
+			}
+		}
+
+		private void ProcessPkAsrepOld(byte[] data)
+		{
+			if (this._pkinitType is 0)
+			{
+				this._pkinitType = PadataType.PkASrepOld;
+			}
+		}
+		#endregion
 
 		private List<PadataType> paTypes = new List<PadataType>();
 		public bool SupportsPAType(PadataType patype)
@@ -212,7 +240,7 @@ namespace Titanis.Security.Kerberos
 
 		private void ProcessEncTimestamp(byte[] padata_value)
 		{
-			if (this._credential != null)
+			if (this._credential != null && this._credential.SupportsPreauthType(PadataType.EncTimestamp))
 			{
 				var tsenc = this.EncryptTS();
 				this._tsenc = Structs.PAData_TSEnc(tsenc.ToArray());

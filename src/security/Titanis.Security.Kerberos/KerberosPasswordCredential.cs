@@ -21,6 +21,9 @@ namespace Titanis.Security.Kerberos
 		public string Password { get; }
 
 		/// <inheritdoc/>
+		internal sealed override bool SupportsPreauthType(PadataType preauthType)
+			=> preauthType is PadataType.EncTimestamp;
+		/// <inheritdoc/>
 		public sealed override bool SupportsProfile(EncProfile profile) => (profile != null);
 		/// <inheritdoc/>
 		public sealed override SessionKey DeriveProtocolKeyFor(EncProfile profile, byte[]? salt)

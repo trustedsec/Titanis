@@ -86,7 +86,11 @@ namespace Kerb
 				}
 			}
 			else
+			{
 				options = KerberosClient.DefaultTgtOptions;
+				var end = KerberosClient.GetDefaultEndTime();
+				ticketParameters.RenewTill = ticketParameters.EndTime = end;
+			}
 
 			ticketParameters.Options = options;
 			return ticketParameters;

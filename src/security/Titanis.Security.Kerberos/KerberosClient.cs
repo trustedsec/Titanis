@@ -300,7 +300,7 @@ namespace Titanis.Security.Kerberos
 				Structs.KdcReqBody(
 					ticketParameters,
 					ticketParameters.Options,
-					Structs.PrincipalName(PrincipalNameType.Principal, credential.UserName),
+					Structs.PrincipalName(credential.UserNameType, credential.UserName),
 					credential.Realm,
 					Structs.PrincipalName(targetSpn),
 					context.nonce,

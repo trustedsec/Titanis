@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\base\Titanis.IO\Titanis.IO.csproj" />
     <ProjectReference Include="..\..\build\Titanis.SourceGen\Titanis.SourceGen.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\crypto\Titanis.Crypto.Des\Titanis.Crypto.Des.csproj" />
     <ProjectReference Include="..\..\crypto\Titanis.Crypto.Md4\Titanis.Crypto.Md4.csproj" />
     <ProjectReference Include="..\..\crypto\Titanis.Crypto.Md5\Titanis.Crypto.Md5.csproj" />
     <ProjectReference Include="..\..\crypto\Titanis.Crypto.Rc4\Titanis.Crypto.Rc4.csproj" />
@@ -32,6 +33,7 @@
     <ProjectReference Include="..\..\net\Titanis.DceRpc.Ndr\Titanis.DceRpc.Ndr.csproj" />
     <ProjectReference Include="..\..\net\Titanis.Msrpc.Core\Titanis.Msrpc.Core.csproj" />
     <ProjectReference Include="..\..\net\Titanis.Net\Titanis.Net.csproj" />
+    <ProjectReference Include="..\Titanis.Certificates\Titanis.Certificates.csproj" />
     <ProjectReference Include="..\Titanis.NFold\Titanis.NFold.csproj" />
     <ProjectReference Include="..\Titanis.Security\Titanis.Security.csproj" />
   </ItemGroup>

@@ -288,8 +288,8 @@ namespace Titanis.Security.Ntlm
 			const ulong Plaintext = 0x252423402153474B;
 			Buffer128 lmowf = new Buffer128
 			{
-				k1 = Des.Encrypt(key.k1, Plaintext),
-				k2 = Des.Encrypt(key.k2, Plaintext)
+				k1 = DesPrimitives.EncryptBlock(key.k1, Plaintext),
+				k2 = DesPrimitives.EncryptBlock(key.k2, Plaintext)
 			};
 			return lmowf;
 		}
@@ -308,8 +308,8 @@ namespace Titanis.Security.Ntlm
 			key.k2 |= (key.k1 >> 56);
 			key.k1 &= Mask56;
 
-			key.k1 = Des.ExpandKey(key.k1);
-			key.k2 = Des.ExpandKey(key.k2);
+			key.k1 = DesPrimitives.ExpandKey(key.k1);
+			key.k2 = DesPrimitives.ExpandKey(key.k2);
 
 			return key;
 		}
@@ -324,15 +324,15 @@ namespace Titanis.Security.Ntlm
 			);
 			 */
 
-			ulong k1 = Des.ExpandKey(key.k1);
-			ulong k2 = Des.ExpandKey((key.k2 << 8) | (key.k1 >> 56));
-			ulong k3 = Des.ExpandKey((key.k2 >> 48));
+			ulong k1 = DesPrimitives.ExpandKey(key.k1);
+			ulong k2 = DesPrimitives.ExpandKey((key.k2 << 8) | (key.k1 >> 56));
+			ulong k3 = DesPrimitives.ExpandKey((key.k2 >> 48));
 
 			return new Buffer192
 			{
-				k1 = Des.Encrypt(k1, data),
-				k2 = Des.Encrypt(k2, data),
-				k3 = Des.Encrypt(k3, data),
+				k1 = DesPrimitives.EncryptBlock(k1, data),
+				k2 = DesPrimitives.EncryptBlock(k2, data),
+				k3 = DesPrimitives.EncryptBlock(k3, data),
 			};
 		}
 
@@ -612,13 +612,13 @@ LmChallengeResponse [0..7]))
 			}
 			else if (0 != (negFlags & NegotiateFlags.G_NegotiateLMKey))
 			{
-				ulong k1 = Des.ExpandKey(response.keys.ResponseKeyLM.k1);
+				ulong k1 = DesPrimitives.ExpandKey(response.keys.ResponseKeyLM.k1);
 				ulong p1 = response.LmChallengeResponse.k1;
-				ulong k2 = Des.ExpandKey((response.keys.ResponseKeyLM.k1 >> 56) | (0xBDBDBDBDBDBD << 8));
+				ulong k2 = DesPrimitives.ExpandKey((response.keys.ResponseKeyLM.k1 >> 56) | (0xBDBDBDBDBDBD << 8));
 				Buffer128 kxkey = new Buffer128
 				{
-					k1 = Des.Encrypt(k1, p1),
-					k2 = Des.Encrypt(k2, p1)
+					k1 = DesPrimitives.EncryptBlock(k1, p1),
+					k2 = DesPrimitives.EncryptBlock(k2, p1)
 				};
 				return kxkey;
 			}
