@@ -1,6 +1,6 @@
 Change Log
 
-# 2025-10-30
+# 2025-11-03
 
 * Kerberos
 	* S4U2self and S4U2proxy ([MS-SFU])
@@ -10,6 +10,7 @@ Change Log
 	* Select ticket by sequence number
 	* Invert selection with `Kerb select`
 	* DES CBC MD5 [RFC 3961]
+	* Generate protocol keys (`Kerb s2k`)
 * WMI
 	* Delete operation
 * New output formats
@@ -21,6 +22,11 @@ Change Log
 * Other
 	* Commands support `-h` and `--help` (for zsh users)
 	* User name universally supports DOMAIN\user and user@DOMAIN syntaxes
+
+## Bugfixes
+
+* Canceling RPC operation on closed stream no longer throws exception (@moscowchill)
+* C# language version set to 12.0 on netstandard2.0 and netstandard2.1 projects (fixed build issue) (@moscowchill)
 
 # 2025-10-07
 
