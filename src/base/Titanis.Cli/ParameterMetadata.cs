@@ -97,7 +97,15 @@ namespace Titanis.Cli
 				if (elementType is not null)
 					flags |= ParameterFlags.IsList;
 				else
+				{
 					elementType = property.PropertyType;
+					var nullable = Nullable.GetUnderlyingType(elementType);
+					if (nullable is not null)
+						elementType = nullable;
+					// The above check fails when run from MSBuild in the .NET Framework
+					else if (elementType.IsGenericType && elementType.GetGenericTypeDefinition().FullName == "System.Nullable`1")
+						elementType = elementType.GenericTypeArguments[0];
+				}
 			}
 			this.ElementType = elementType;
 
