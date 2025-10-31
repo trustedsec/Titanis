@@ -108,27 +108,71 @@ namespace Titanis.Cli
 			this.writer.WriteLine();
 		}
 
+		protected sealed override void RenderCellText(TextTableCell cell, StringBuilder sb)
+		{
+			StringBuilder tempSB = (sb.Length == 0) ? sb : new StringBuilder();
+			base.RenderCellText(cell, tempSB);
+			tempSB.Replace("\\", "\\\\")
+				.Replace("|", "\\|")
+				;
+			if (tempSB != sb)
+				sb.Append(tempSB);
+		}
+
+
+		// TODO: What other characters must be escaped?
+		private static readonly char[] SpecialChars = new char[] { '<', '>', '&' };
+
+		private static bool RequiresEscaping(string text)
+		{
+			return text.IndexOfAny(SpecialChars) >= 0;
+		}
+
 		protected sealed override void RenderText(string? text, StringBuilder sb)
 		{
-			if (!this.InCodeBlock)
+			if (!this.InCodeBlock && text != null)
 			{
-				text = text
-					?.Replace("<", "&lt;")
-					?.Replace(">", "&gt;")
-					;
-				sb.Append(text);
+				if (RequiresEscaping(text))
+				{
+					// Let's do it the hard way
+					bool inCode = false;
+					foreach (var c in text)
+					{
+						if (inCode)
+						{
+							sb.Append(c);
+							if (c == '`')
+								inCode = false;
+						}
+						else
+						{
+							sb = c switch
+							{
+								'<' => sb.Append("&lt;"),
+								'>' => sb.Append("&gt;"),
+								'&' => sb.Append("&amp;"),
+								_ => sb.Append(c)
+							};
+							if (c == '`')
+								inCode = true;
+						}
+					}
+				}
+				else
+					sb.Append(text);
 			}
 		}
+
 		protected sealed override void WriteTextImpl(string text)
 		{
-			if (!this.InCodeBlock)
+			if (!this.InCodeBlock && RequiresEscaping(text))
 			{
-				text = text
-					.Replace("<", "&lt;")
-					.Replace(">", "&gt;")
-					;
+				StringBuilder sb = new StringBuilder();
+				RenderText(text, sb);
+				this.writer.Write(sb);
 			}
-			this.writer.Write(text);
+			else
+				this.writer.Write(text);
 		}
 
 		protected sealed override void BeginCodeBlockImpl()
