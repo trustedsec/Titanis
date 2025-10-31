@@ -71,7 +71,23 @@ namespace Titanis.Socks
 			ProtocolType protocolType
 			)
 		{
-			return new SocksSocket(this, new SocketInfo(addressFamily, socketType, protocolType));
+			return new SocksSocket(this, new SocketInfo(this.ServerEP.AddressFamily, socketType, protocolType));
+		}
+
+		public async Task<ISocket> ConnectTcp(EndPoint remoteEP, CancellationToken cancellationToken)
+		{
+			var socket = this.CreateSocket(remoteEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+			try
+			{
+				await socket.ConnectAsync(remoteEP, cancellationToken).ConfigureAwait(false);
+				var socket_ = socket;
+				socket = null;
+				return socket_;
+			}
+			finally
+			{
+				socket?.Dispose();
+			}
 		}
 
 		/// <summary>
@@ -82,8 +98,7 @@ namespace Titanis.Socks
 			this._callback?.OnConnecting(this.ServerEP, remoteEP);
 
 			var serverEP = this.ServerEP;
-			var socket = this._socketService.CreateSocket(this._serverAddrFamily, SocketType.Stream, ProtocolType.Tcp);
-			await socket.ConnectAsync(serverEP, cancellationToken).ConfigureAwait(false);
+			var socket = await _socketService.ConnectTcp(serverEP, cancellationToken).ConfigureAwait(false);
 
 			ByteWriter writer = new ByteWriter();
 			byte[] recvBuf = new byte[1024];

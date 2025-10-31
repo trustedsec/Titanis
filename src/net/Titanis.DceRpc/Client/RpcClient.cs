@@ -201,9 +201,6 @@ namespace Titanis.DceRpc.Client
 			)
 		{
 			ArgumentNullException.ThrowIfNull(serviceEP);
-			var af = serviceEP.AddressFamily;
-			if (af is AddressFamily.Unspecified)
-				af = AddressFamily.InterNetwork;
 
 			if (spn is null && serviceEP.TryGetHostAndPort(out var host, out var port))
 			{
@@ -214,14 +211,12 @@ namespace Titanis.DceRpc.Client
 			ISocket? socket = null;
 			try
 			{
-				socket = this._socketService.CreateTcpSocket(serviceEP.AddressFamilyOrDefault(af));
-
 				CancellationTokenSource connectCancel = new CancellationTokenSource(this.ConnectTimeout);
 				var cancelReg = cancellationToken.Register(() => connectCancel.Cancel());
 				try
 				{
 					this._callback?.OnConnectingProxy(socket, serviceEP, proxy);
-					await socket.ConnectAsync(serviceEP, connectCancel.Token).ConfigureAwait(false);
+					socket = await _socketService.ConnectTcp(serviceEP, cancellationToken).ConfigureAwait(false);
 				}
 				catch (OperationCanceledException ex)
 				{

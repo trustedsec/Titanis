@@ -33,6 +33,8 @@ namespace Titanis.Net
 			Log = log;
 		}
 
+		public static PlatformNameResolverService Shared { get; } = new PlatformNameResolverService();
+
 		public NameResolverOptions Options { get; }
 		public ILog? Log { get; }
 

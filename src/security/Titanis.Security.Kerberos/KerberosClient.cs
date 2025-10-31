@@ -131,10 +131,8 @@ namespace Titanis.Security.Kerberos
 			if (kdcEP == null)
 				throw new NotSupportedException(string.Format(Messages.Krb5_NoKdc, realm));
 
-			using (var s = this._socketService!.CreateTcpSocket(kdcEP.AddressFamilyOrDefault(AddressFamily.InterNetwork)))
+			using (var s = await _socketService!.ConnectTcp(kdcEP, cancellationToken).ConfigureAwait(false))
 			{
-				await s.ConnectAsync(kdcEP, cancellationToken).ConfigureAwait(false);
-
 				var stream = s.GetStream(false);
 				await stream.WriteAsync(memory, cancellationToken).ConfigureAwait(false);
 
@@ -1082,11 +1080,9 @@ namespace Titanis.Security.Kerberos
 		private async Task SendChangepwRequest(EndPoint kdcEP, TicketInfo ticket, KerberosCredential credential, byte[] privData, ushort version, CancellationToken cancellationToken)
 		{
 			var socketService = this._socketService;
-			var socket = socketService.CreateTcpSocket(kdcEP.AddressFamily);
-			await using (socket.ConfigureAwait(false))
+			var socket = await socketService.ConnectTcp(kdcEP, cancellationToken).ConfigureAwait(false);
+			await using (socket)
 			{
-				await socket.ConnectAsync(kdcEP, cancellationToken).ConfigureAwait(false);
-
 				KerberosClientContext authContext = new KerberosClientContext(credential, this, KerberosClient.ChangePwSpn, ticket, null);
 				authContext.RequiredCapabilities |= SecurityCapabilities.DceStyle;
 				var apreqBytes = authContext.Initialize().ToArray();

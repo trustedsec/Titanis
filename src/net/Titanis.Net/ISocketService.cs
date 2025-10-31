@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Titanis.Net;
 
 namespace Titanis.Net
@@ -20,41 +23,51 @@ namespace Titanis.Net
 		/// <param name="protocolType"></param>
 		/// <returns>An object implementing <see cref="ISocket"/> with the requested values.</returns>
 		ISocket CreateSocket(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType);
+
+		/// <summary>
+		/// Creates a socket and connects to a TCP endpoint.
+		/// </summary>
+		/// <param name="remoteEP">Remote endpoint</param>
+		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
+		/// <returns>The connected <see cref="ISocket"/></returns>
+		Task<ISocket> ConnectTcp(EndPoint remoteEP, CancellationToken cancellationToken);
+
 	}
 }
 
 public static class SocketServiceExtensions
 {
-	/// <summary>
-	/// Creates a TCP socket.
-	/// </summary>
-	/// <param name="sockets"><see cref="ISocketService"/> instance</param>
-	/// <param name="addressFamily">Address family (either <see cref="AddressFamily.InterNetwork"/> or <see cref="AddressFamily.InterNetworkV6"/>)</param>
-	/// <returns>An object implementing <see cref="ISocket"/> with the requested values.</returns>
-	/// <remarks>
-	/// <paramref name="addressFamily"/> is not validated, so the caller is free to choose
-	/// other <see cref="AddressFamily"/> values.
-	/// </remarks>
-	public static ISocket CreateTcpSocket(this ISocketService sockets, AddressFamily addressFamily)
-	{
-		return sockets.CreateSocket(addressFamily, SocketType.Stream, ProtocolType.Tcp);
-	}
-	/// <summary>
-	/// Creates a TCP socket.
-	/// </summary>
-	/// <param name="sockets"><see cref="ISocketService"/> instance</param>
-	/// <returns>An object implementing <see cref="ISocket"/> over TCP over IPv4.</returns>
-	public static ISocket CreateTcp4Socket(this ISocketService sockets)
-	{
-		return sockets.CreateSocket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-	}
-	/// <summary>
-	/// Creates a TCP socket.
-	/// </summary>
-	/// <param name="sockets"><see cref="ISocketService"/> instance</param>
-	/// <returns>An object implementing <see cref="ISocket"/> over TCP over IPv6.</returns>
-	public static ISocket CreateTcp6Socket(this ISocketService sockets)
-	{
-		return sockets.CreateSocket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
-	}
+	///// <summary>
+	///// Creates a TCP socket.
+	///// </summary>
+	///// <param name="sockets"><see cref="ISocketService"/> instance</param>
+	///// <param name="addressFamily">Address family (either <see cref="AddressFamily.InterNetwork"/> or <see cref="AddressFamily.InterNetworkV6"/>)</param>
+	///// <returns>An object implementing <see cref="ISocket"/> with the requested values.</returns>
+	///// <remarks>
+	///// <paramref name="addressFamily"/> is not validated, so the caller is free to choose
+	///// other <see cref="AddressFamily"/> values.
+	///// </remarks>
+	//public static ISocket CreateTcpSocket(this ISocketService sockets, AddressFamily addressFamily)
+	//{
+	//	return sockets.CreateSocket(addressFamily, SocketType.Stream, ProtocolType.Tcp);
+	//}
+
+	///// <summary>
+	///// Creates a TCP socket.
+	///// </summary>
+	///// <param name="sockets"><see cref="ISocketService"/> instance</param>
+	///// <returns>An object implementing <see cref="ISocket"/> over TCP over IPv4.</returns>
+	//public static ISocket CreateTcp4Socket(this ISocketService sockets)
+	//{
+	//	return sockets.CreateSocket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+	//}
+	///// <summary>
+	///// Creates a TCP socket.
+	///// </summary>
+	///// <param name="sockets"><see cref="ISocketService"/> instance</param>
+	///// <returns>An object implementing <see cref="ISocket"/> over TCP over IPv6.</returns>
+	//public static ISocket CreateTcp6Socket(this ISocketService sockets)
+	//{
+	//	return sockets.CreateSocket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
+	//}
 }

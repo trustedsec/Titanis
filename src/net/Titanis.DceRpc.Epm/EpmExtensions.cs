@@ -61,8 +61,7 @@ namespace Titanis.DceRpc.Client
 			ISocket? s = null;
 			try
 			{
-				s = socketService.CreateTcpSocket(addr.AddressFamily);
-				await s.ConnectAsync(epmEP, cancellationToken).ConfigureAwait(false);
+				s = await socketService.ConnectTcp(epmEP, cancellationToken).ConfigureAwait(false);
 				Stream? ns = null;
 				try
 				{

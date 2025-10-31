@@ -92,9 +92,8 @@ namespace Titanis.Smb2
 			ISocket? clientSocket = null;
 			try
 			{
-				clientSocket = this.socketService.CreateTcpSocket(serverEP.AddressFamilyOrDefault(AddressFamily.InterNetwork));
 				this.traceCallback?.OnConnecting(serverEP, serverName, options);
-				await clientSocket.ConnectAsync(serverEP, cancellationToken).ConfigureAwait(false);
+				clientSocket = await socketService.ConnectTcp(serverEP, cancellationToken).ConfigureAwait(false);
 
 				Stream? stream = null;
 				try

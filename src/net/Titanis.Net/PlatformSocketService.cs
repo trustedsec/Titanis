@@ -29,6 +29,8 @@ namespace Titanis.Net
 		internal readonly INameResolverService? _resolver;
 		private readonly ILog? _log;
 
+		public static PlatformSocketService Shared { get; } = new PlatformSocketService(PlatformNameResolverService.Shared, null);
+
 		public PlatformSocket CreateSocket(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
 		{
 			var socket = new Socket(addressFamily, socketType, protocolType);
@@ -36,6 +38,32 @@ namespace Titanis.Net
 		}
 		ISocket ISocketService.CreateSocket(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
 			=> this.CreateSocket(addressFamily, socketType, protocolType);
+
+		public async Task<ISocket> ConnectTcp(EndPoint remoteEP, CancellationToken cancellationToken)
+		{
+			if (remoteEP is DnsEndPoint dnsep && this._resolver is not null)
+			{
+				var hostEntry = await _resolver.ResolveAsync(dnsep.Host, cancellationToken).ConfigureAwait(false);
+				var addr = hostEntry.FirstOrDefault();
+				if (addr is null)
+					throw new ArgumentException($"Unable to resolve {dnsep.Host}");
+
+				remoteEP = new IPEndPoint(addr, dnsep.Port);
+			}
+
+			var socket = this.CreateSocket(remoteEP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+			try
+			{
+				await socket.ConnectAsync(remoteEP, cancellationToken).ConfigureAwait(false);
+				var socket_ = socket;
+				socket = null;
+				return socket_;
+			}
+			finally
+			{
+				socket?.Dispose();
+			}
+		}
 	}
 	/// <summary>
 	/// Implements <see cref="ISocket"/> on a <see cref="Socket"/>.
