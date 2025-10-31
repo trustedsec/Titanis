@@ -1,10 +1,10 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Titanis.Asn1.Serialization;
-using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
 
 namespace Titanis.Security.Kerberos
 {
@@ -27,7 +27,7 @@ namespace Titanis.Security.Kerberos
 			this.key = Structs.EncryptionKey(encryptionProfile.EType, keyData);
 		}
 
-		internal SessionKey(EncProfile encryptionProfile, Asn1.KerberosV5Spec2.EncryptionKey key)
+		internal SessionKey(EncProfile encryptionProfile, KerberosV5Spec2.EncryptionKey key)
 		{
 			this.EncryptionProfile = encryptionProfile;
 			this.key = key;
@@ -39,13 +39,13 @@ namespace Titanis.Security.Kerberos
 		public EncProfile EncryptionProfile { get; }
 		public EType EType => this.EncryptionProfile.EType;
 
-		internal readonly Asn1.KerberosV5Spec2.EncryptionKey key;
+		internal readonly KerberosV5Spec2.EncryptionKey key;
 		internal byte[] KeyBytes => this.key.keyvalue;
 
 		public Memory<byte> Encrypt(KeyUsage usage, Span<byte> data)
 			=> this.EncryptionProfile.Encrypt(this.KeyBytes, usage, data);
 
-		internal Titanis.Security.Kerberos.Asn1.KerberosV5Spec2.EncryptedData EncryptAndWrap(
+		internal KerberosV5Spec2.EncryptedData EncryptAndWrap(
 			KeyUsage usage,
 			Span<byte> data)
 			=> Structs.EncryptedData(this.EType, this.Encrypt(usage, data).ToArray());
@@ -92,7 +92,7 @@ namespace Titanis.Security.Kerberos
 			KeyUsage usage,
 			EncryptedData edata
 			)
-			where T : IAsn1DerEncodableTlv, new()
+			where T : IAsn1DerDecodableTlv<T>
 		{
 			if (this.EType != (EType)edata.etype)
 				throw new ArgumentException("The data cannot be decrypted with this key because the encryption profile does not match.");
@@ -102,7 +102,7 @@ namespace Titanis.Security.Kerberos
 			var message = encProfile.Decrypt(this.KeyBytes, usage, data);
 
 			// TODO: Once ASN.1 components can use spans, remove ToArray
-			T obj = Asn1DerDecoder.Decode<T>(message.ToArray());
+			T obj = Asn1DerDecoder.DecodeTlv<T>(message.ToArray());
 			return obj;
 		}
 

@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
+using SPNEGOASNOneSpec;
+using GSS_API;
 
 namespace Titanis.Security.Spnego
 {
@@ -63,7 +65,7 @@ namespace Titanis.Security.Spnego
 			(this._selectedContext != null) && (this._selectedContext.IsComplete);
 		private bool _mutualAuthed;
 
-		private byte[] _token;
+		private byte[]? _token;
 		/// <inheritdoc/>
 		public sealed override ReadOnlySpan<byte> Token => this._token;
 
@@ -102,9 +104,10 @@ namespace Titanis.Security.Spnego
 		/// <inheritdoc/>
 		public sealed override int SealTrailerSize => this.GetCompletedContext().SealTrailerSize;
 
-		private Asn1.SPNEGOASNOneSpec.MechTypeList _mechTypeList;
+		// Used for compute MIC
+		private Asn1Oid[]? _mechTypeList;
 
-		private AuthClientContext _selectedContext;
+		private AuthClientContext? _selectedContext;
 
 		enum SpnegoInitiator
 		{
@@ -140,32 +143,25 @@ namespace Titanis.Security.Spnego
 
 				mechList[i] = new Asn1Oid(mechOid);
 			}
-			this._mechTypeList = new Asn1.SPNEGOASNOneSpec.MechTypeList
-			{
-				mechTypes = mechList
-			};
+			this._mechTypeList = mechList;
 
 			// TODO: Include optimistic token
 			var optContext = this.Contexts[0];
 			var optToken = optContext.Initialize();
 
-			Asn1.SPNEGOASNOneSpec.NegotiationToken spnegoToken = new Asn1.SPNEGOASNOneSpec.NegotiationToken
+			var spnegoToken = new NegotiationToken()
 			{
-				negTokenInit = new Asn1.SPNEGOASNOneSpec.NegTokenInit
-				{
-					mechTypes = this._mechTypeList.mechTypes,
-					mechToken = optToken.ToArray()
-				}
+				NegTokenInit = new NegTokenInit(
+					mechTypes: this._mechTypeList,
+					mechToken: optToken.ToArray()
+					)
 			};
 
-			Asn1.GSS_API.InitialContextToken gssToken = new Asn1.GSS_API.InitialContextToken
-			{
-				Value = new Asn1.GSS_API.InitialContextToken_Unnamed_0
-				{
-					thisMech = new Asn1Oid(SpnegoOid),
-					innerContextToken = Asn1Any.CreateFrom(spnegoToken)
-				}
-			};
+			var gssToken = new InitialContextToken(
+				new InitialContextToken_Tagged0(
+					new Asn1Oid(SpnegoOid),
+					Asn1Any.CreateFromObject(spnegoToken)
+					));
 
 			return this._token = Asn1DerEncoder.EncodeTlv(gssToken).ToArray();
 		}
@@ -175,24 +171,27 @@ namespace Titanis.Security.Spnego
 		{
 			this._token = null;
 
-			ReadOnlySpan<byte> innerToken;
-			Asn1.SPNEGOASNOneSpec.NegotiationToken spnegoToken;
-			Asn1.GSS_API.InitialContextToken gssRespToken;
+			byte[]? tokenBytes;
+
+			ReadOnlySpan<byte> innerTokenBytes;
+			NegotiationToken spnegoToken;
+			InitialContextToken gssRespToken;
 			if (this._initiator == SpnegoInitiator.None)
 			{
-				Asn1.GSS_API.InitialContextToken gssToken;
+				InitialContextToken gssToken;
 				try
 				{
-					gssToken = Asn1DerDecoder.Decode<Asn1.GSS_API.InitialContextToken>(token.ToArray());
+					gssToken = Asn1DerDecoder.DecodeTlv<InitialContextToken>(token.ToArray());
 				}
 				catch (Exception ex)
 				{
 					throw new FormatException(Messages.Spnego_InvalidRespToken, ex);
 				}
 
-				Asn1.SPNEGOASNOneSpec.NegTokenInit2 initToken = gssToken.Value.innerContextToken.DecodeAs<Asn1.SPNEGOASNOneSpec.NegotiationToken2>().negTokenInit2;
-				if (initToken == null)
+				if (gssToken.Value.innerContextToken.Tag != new Asn1Tag(0, Asn1TagFlags.Context | Asn1TagFlags.Constructed))
 					throw new FormatException(Messages.Spnego_InvalidRespToken);
+
+				var initToken = Asn1DerDecoder.DecodeTlv<NegotiationToken2>(gssToken.Value.innerContextToken.TlvBytes).Value;
 
 				this._initiator = SpnegoInitiator.Server;
 
@@ -206,50 +205,44 @@ namespace Titanis.Security.Spnego
 				if (ctx == null)
 					throw new SecurityException(Messages.Spnego_NoSupportedMechs);
 
-				innerToken = preferred
+				innerTokenBytes = preferred
 					? this._selectedContext.Initialize(initToken.mechToken)
 					: this._selectedContext.Initialize();
 
 				mechList = new Asn1Oid[] { new Asn1Oid(this._selectedContext.MechOid) };
-				this._mechTypeList = new Asn1.SPNEGOASNOneSpec.MechTypeList
+				this._mechTypeList = mechList;
+				spnegoToken = new NegotiationToken
 				{
-					mechTypes = mechList
-				};
-				spnegoToken = new Asn1.SPNEGOASNOneSpec.NegotiationToken
-				{
-					negTokenInit = new Asn1.SPNEGOASNOneSpec.NegTokenInit
-					{
-						mechTypes = mechList,
-						mechToken = innerToken.ToArray(),
-					}
+					NegTokenInit = new NegTokenInit(
+						mechList,
+						mechToken: innerTokenBytes.ToArray()
+					)
 				};
 
-				gssRespToken = new Asn1.GSS_API.InitialContextToken
-				{
-					Value = new Asn1.GSS_API.InitialContextToken_Unnamed_0
-					{
-						thisMech = new Asn1Oid(SpnegoOid),
-						innerContextToken = Asn1Any.CreateFrom(spnegoToken)
-					}
-				};
-				this._token = Asn1DerEncoder.EncodeTlv(gssRespToken).ToArray();
+				gssRespToken = new InitialContextToken(
+					new InitialContextToken_Tagged0(
+						new Asn1Oid(SpnegoOid),
+						Asn1Any.CreateFromObject(spnegoToken)
+					));
+				tokenBytes = Asn1DerEncoder.EncodeTlv(gssRespToken).ToArray();
 
 			}
 			else
 			{
-				Asn1.SPNEGOASNOneSpec.NegotiationToken negToken;
+				NegotiationToken negToken;
 				try
 				{
-					negToken = Asn1DerDecoder.Decode<Asn1.SPNEGOASNOneSpec.NegotiationToken>(token.ToArray());
+					negToken = Asn1DerDecoder.DecodeTlv<NegotiationToken>(token.ToArray());
 				}
 				catch (Exception ex)
 				{
 					throw new FormatException(Messages.Spnego_InvalidRespToken, ex);
 				}
 
-				Asn1.SPNEGOASNOneSpec.NegTokenResp respToken = negToken.negTokenResp;
-				if (respToken == null)
+				if (negToken.SelectedChoice != NegotiationToken.ChoiceIndex.NegTokenResp)
 					throw new FormatException(Messages.Spnego_InvalidRespToken);
+
+				NegTokenResp respToken = negToken.NegTokenResp;
 
 				if (this._selectedContext == null)
 				{
@@ -264,30 +257,32 @@ namespace Titanis.Security.Spnego
 				}
 
 
-				if (respToken.negState == Asn1.SPNEGOASNOneSpec.NegTokenResp_NegState_NegState.accept_completed)
+				if (respToken.negState is NegTokenResp_NegState_Tagged0.Accept_completed)
 				{
 					var mic = respToken.mechListMIC;
 					if (respToken.responseToken != null)
-						innerToken = this._selectedContext.Initialize(respToken.responseToken);
+						innerTokenBytes = this._selectedContext.Initialize(respToken.responseToken);
 
 					if (!mic.IsNullOrEmpty())
 					{
-						byte[] mechListBytes = Asn1DerEncoder.EncodeTlv(this._mechTypeList).ToArray();
-						this._selectedContext.VerifyMessage(mechListBytes, mic, MessageSignOptions.SpnegoMechList);
+						var mechListBytes = Asn1DerEncoder.EncodeTlv(Asn1SequenceOf.Create(this._mechTypeList));
+						this._selectedContext.VerifyMessage(mechListBytes.Span, mic, MessageSignOptions.SpnegoMechList);
 					}
+
+					tokenBytes = null;
 				}
 				else
 				{
 
 					// TODO: Check mech ID of response
 					// TODO: Check MIC
-					innerToken = this._selectedContext.Initialize(respToken.responseToken);
+					innerTokenBytes = this._selectedContext.Initialize(respToken.responseToken);
 
 
-					byte[] mic;
-					if (this._selectedContext.IsComplete && innerToken.Length > 0)
+					byte[]? mic;
+					if (this._selectedContext.IsComplete && innerTokenBytes.Length > 0)
 					{
-						byte[] mechListBytes = Asn1DerEncoder.EncodeTlv(this._mechTypeList).ToArray();
+						var mechListBytes = Asn1DerEncoder.EncodeTlv(Asn1SequenceOf.Create(this._mechTypeList)).ToArray();
 						mic = new byte[this._selectedContext.SignTokenSize];
 						this._selectedContext.SignMessage(mechListBytes, mic, MessageSignOptions.SpnegoMechList);
 					}
@@ -296,22 +291,22 @@ namespace Titanis.Security.Spnego
 						mic = null;
 					}
 
-					spnegoToken = new Asn1.SPNEGOASNOneSpec.NegotiationToken
+					spnegoToken = new NegotiationToken
 					{
-						negTokenResp = new Asn1.SPNEGOASNOneSpec.NegTokenResp
+						NegTokenResp = new NegTokenResp
 						{
-							negState = Asn1.SPNEGOASNOneSpec.NegTokenResp_NegState_NegState.accept_incomplete,
+							negState = NegTokenResp_NegState_Tagged0.Accept_incomplete,
 							//supportedMech = new Asn1Oid(this._selectedContext.MechOid),
-							responseToken = innerToken.ToArray(),
+							responseToken = innerTokenBytes.ToArray(),
 							mechListMIC = mic
 						}
 					};
 
-					this._token = Asn1DerEncoder.EncodeTlv(spnegoToken).ToArray();
+					tokenBytes = Asn1DerEncoder.EncodeTlv(spnegoToken).ToArray();
 				}
 			}
 
-			return this._token;
+			return this._token = tokenBytes;
 		}
 
 		private AuthClientContext FindMatchingContext(params Asn1Oid[] mechList)

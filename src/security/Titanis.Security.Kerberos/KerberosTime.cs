@@ -17,7 +17,7 @@ namespace Titanis.Security.Kerberos
 		}
 		public KerberosTime(GeneralizedTime gt, uint usec)
 		{
-			this.dt = gt.value;
+			this.dt = gt.Value;
 			this.usec = usec;
 		}
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -95,7 +96,7 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		public sealed override ServicePrincipalName? TargetSpn { get; set; }
 
-		private byte[] _token;
+		private byte[]? _token;
 		/// <inheritdoc/>
 		public sealed override ReadOnlySpan<byte> Token => this._token;
 
@@ -114,7 +115,7 @@ namespace Titanis.Security.Kerberos
 		private SessionKey? _sessionKey;
 		private bool _isAcceptorSubkey = true;
 
-		private uint _sendSeqNbr;
+		private int _sendSeqNbr;
 		private uint _recvSeqNbr;
 
 		private uint GetSeqNbrForSend()
@@ -133,7 +134,7 @@ namespace Titanis.Security.Kerberos
 			var ticket = this.Ticket;
 
 			var sessionKey = this._sessionKey = this._initiatorSessionKey = ticket.GenerateSessionKey();
-			uint sendSeqNbr = KerberosClient.GenerateNonce();
+			int sendSeqNbr = KerberosClient.GenerateNonce();
 			this._sendSeqNbr = sendSeqNbr;
 			APOptions options = this.IsMutualAuthRequired
 				? APOptions.MutualRequired
@@ -149,14 +150,14 @@ namespace Titanis.Security.Kerberos
 				);
 
 			var encoder = Asn1DerEncoding.CreateDerEncoder();
-			encoder.EncodeObjTlv(apreq);
+			encoder.EncodeValueTlv(apreq);
 
 			this._callback?.OnSendingApreq(this, this.TargetSpn, ticket, this.Credential, gssFlags, sessionKey, sendSeqNbr);
 
 			if (!this.IsDceRpcStyle)
 			{
 				encoder.GetWriter().WriteUInt16BE((ushort)GssapiTokenId.APRep);
-				encoder.EncodeOid(new Asn1Oid(KerberosOid));
+				encoder.EncodeOidValue(new Asn1Oid(KerberosOid));
 				encoder.EncodeCloseTlvHeader(new Asn1Tag(0x60), 0);
 				Asn1.Krb5Token tokenStruc = new Asn1.Krb5Token
 				{
@@ -176,26 +177,30 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		protected sealed override ReadOnlySpan<byte> InitializeWithToken(ReadOnlySpan<byte> token)
 		{
-			Asn1.KerberosV5Spec2.AP_REP_Unnamed_5 aprep;
+			AP_REP_Tagged15 aprep;
+			byte[]? tokenBytes;
 			if (!this.IsDceRpcStyle)
 			{
-				Asn1.Krb5Token tokenStruc = Asn1DerDecoder.Decode<Asn1.Krb5Token>(token.ToArray());
+				Asn1.Krb5Token tokenStruc = Asn1DerDecoder.DecodeTlv<Asn1.Krb5Token>(token.ToArray());
 				if (tokenStruc.tokenId == GssapiTokenId.APRep)
 				{
 					aprep = tokenStruc.aprep.Value;
 				}
+				else if (tokenStruc.tokenId == GssapiTokenId.Error)
+				{
+					throw tokenStruc.error.GetException();
+				}
 				else
 				{
-					// TODO: More informative error
-					throw new FormatException();
+					throw new FormatException($"The server sent a token with an unrecognized or unsupported ID: {tokenStruc.tokenId} (0x{(uint)tokenStruc.tokenId:X4})");
 				}
 			}
 			else
 			{
-				aprep = Asn1DerDecoder.Decode<Asn1.KerberosV5Spec2.AP_REP>(token.ToArray()).Value;
+				aprep = Asn1DerDecoder.DecodeTlv<AP_REP>(token.ToArray()).Value;
 			}
 
-			var aprep_encPart = this.Ticket.SessionKey.DecryptTlv<Asn1.KerberosV5Spec2.EncPart_APRep>(
+			var aprep_encPart = this.Ticket.SessionKey.DecryptTlv<EncAPRepPart>(
 				KeyUsage.APRep_EncPart,
 				aprep.enc_part
 				).Value;
@@ -220,36 +225,32 @@ namespace Titanis.Security.Kerberos
 				aprep_encPart.subkey = null;
 				aprep_encPart.ctime = now.dt;
 				aprep_encPart.cusec = now.usec;
-				Asn1.KerberosV5Spec2.AP_REP aprep2 = new()
-				{
-					Value = new Asn1.KerberosV5Spec2.AP_REP_Unnamed_5
-					{
-						pvno = 5,
-						msg_type = (byte)KrbMessageType.Aprep,
-						enc_part = this.Ticket.SessionKey.EncryptTlv(
+				AP_REP aprep2 = new AP_REP(
+					new AP_REP_Tagged15(
+						5,
+						(byte)KrbMessageType.Aprep,
+						this.Ticket.SessionKey.EncryptTlv(
 							KeyUsage.APRep_EncPart,
-							new Asn1.KerberosV5Spec2.EncPart_APRep
-							{
-								Value = aprep_encPart
-								//Value = new Asn1.KerberosV5Spec2.EncAPRepPart_Unnamed_6
-								//{
-								//	ctime = KerberosClient.GetKerbNow(),
-								//	cusec = (uint)DateTime.UtcNow.Millisecond,
-								//	seq_number = (uint)this._sendSeqNbr,
-								//}
-							})
-					}
-				};
+							new EncAPRepPart(
+								aprep_encPart
+					//Value = new Asn1.KerberosV5Spec2.EncAPRepPart_Unnamed_6
+					//{
+					//	ctime = KerberosClient.GetKerbNow(),
+					//	cusec = (uint)DateTime.UtcNow.Millisecond,
+					//	seq_number = (uint)this._sendSeqNbr,
+					//}
+
+					))));
 				var respToken = Asn1DerEncoder.EncodeTlv(aprep2);
-				this._token = respToken.ToArray();
+				tokenBytes = respToken.ToArray();
 			}
 			else
 			{
-				this._token = null;
+				tokenBytes = null;
 			}
 
 			this._isComplete = true;
-			return this._token;
+			return this._token = tokenBytes;
 		}
 
 		/// <inheritdoc/>

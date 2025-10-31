@@ -1,5 +1,7 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
@@ -7,48 +9,67 @@ using Titanis.IO;
 
 namespace Titanis.Security.Kerberos.Asn1
 {
-	class Krb5Token : IAsn1DerEncodableTlv
+	class Krb5Token : IAsn1DerEncodableTlv, IAsn1DerDecodableTlv<Krb5Token>
 	{
-		public Asn1Tag Tag => new Asn1Tag(0x60);
-
 		public Asn1Oid mechId;
 		public GssapiTokenId tokenId;
-		public KerberosV5Spec2.AP_REQ apreq;
-		public KerberosV5Spec2.AP_REP aprep;
-		public KerberosV5Spec2.KRB_ERROR_Unnamed_12 error;
+		public AP_REQ apreq;
+		public AP_REP aprep;
+		public KRB_ERROR_Tagged30 error;
 
-		public void DecodeTlv(Asn1DerDecoder decoder)
+		static Krb5Token IAsn1DerDecodableTlv<Krb5Token>.DecodeTlvFrom(Asn1DerDecoder decoder)
 		{
-			var end = decoder.DecodeTlvStart(new Asn1Tag(0x60));
-			this.DecodeValue(decoder);
-			decoder.CloseTlv(end);
-		}
+			var frame = decoder.DecodeTlvStart(new Asn1Tag(0x40000000));
 
-		public void DecodeValue(Asn1DerDecoder decoder)
-		{
-			var end_mechId = decoder.DecodeTlvStart(Asn1PredefTag.ObjectIdentifier);
-			this.mechId = decoder.DecodeOid();
-			decoder.CloseTlv(end_mechId);
-
+			Krb5Token token = new Krb5Token
+			{
+				mechId = decoder.DecodeOidTlv()
+			};
 			var reader = decoder.GetReader();
-			this.tokenId = (GssapiTokenId)reader.ReadUInt16BE();
-			switch (this.tokenId)
+			token.tokenId = (GssapiTokenId)reader.ReadUInt16BE();
+			switch (token.tokenId)
 			{
 				case GssapiTokenId.APReq:
-					this.apreq = new KerberosV5Spec2.AP_REQ();
-					this.apreq.DecodeTlv(decoder);
+					token.apreq = decoder.DecodeTlv<AP_REQ>();
 					break;
 				case GssapiTokenId.APRep:
-					this.aprep = new KerberosV5Spec2.AP_REP();
-					this.aprep.DecodeTlv(decoder);
+					token.aprep = decoder.DecodeTlv<AP_REP>();
 					break;
 				case GssapiTokenId.Error:
-					this.error = new KerberosV5Spec2.KRB_ERROR_Unnamed_12();
-					this.error.DecodeTlv(decoder);
+					token.error = decoder.DecodeTlv<KRB_ERROR>().Value;
 					break;
 				default:
-					throw new FormatException(string.Format(Messages.Krb5_GssapiTokenIdUnknown, (byte)this.tokenId));
+					throw new FormatException(string.Format(Messages.Krb5_GssapiTokenIdUnknown, (ushort)token.tokenId));
 			}
+
+			decoder.CloseTlv(frame);
+
+			return token;
+		}
+
+		static bool IAsn1DerDecodableTlv<Krb5Token>.TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out Krb5Token? value)
+		{
+			if (decoder.CheckTag(new Asn1Tag(0x40000000)))
+			{
+				value = decoder.DecodeTlv<Krb5Token>();
+				return true;
+			}
+			else
+			{
+				value = default;
+				return false;
+			}
+		}
+
+		public Asn1Tag Tag => new Asn1Tag(0x60000000);
+
+		public void EncodeTlv(Asn1DerEncoder encoder)
+		{
+			var pos = encoder.Position;
+
+			EncodeValue(encoder);
+
+			encoder.EncodeCloseTlvHeader(this.Tag, pos);
 		}
 
 		public void EncodeValue(Asn1DerEncoder encoder)
@@ -56,35 +77,20 @@ namespace Titanis.Security.Kerberos.Asn1
 			switch (this.tokenId)
 			{
 				case GssapiTokenId.APReq:
-					encoder.EncodeObjTlv(this.apreq);
+					encoder.EncodeValueTlv(this.apreq);
 					break;
 				case GssapiTokenId.APRep:
-					encoder.EncodeObjTlv(this.aprep);
+					encoder.EncodeValueTlv(this.aprep);
 					break;
 				case GssapiTokenId.Error:
-					encoder.EncodeObjTlv(this.error);
+					encoder.EncodeValueTlv(this.error);
 					break;
 				default:
 					throw new FormatException(string.Format(Messages.Krb5_GssapiTokenIdUnknown, (byte)this.tokenId));
 			}
 			encoder.GetWriter().WriteUInt16BE((ushort)this.tokenId);
 
-			int end_mechId = encoder.Position;
-			encoder.EncodeOid(this.mechId);
-			encoder.EncodeCloseTlvHeader(Asn1PredefTag.ObjectIdentifier, end_mechId);
-		}
-
-		public bool TryDecodeTlv(Asn1DerDecoder decoder)
-		{
-			if (decoder.CheckTag(new Asn1Tag(0x60)))
-			{
-				this.DecodeTlv(decoder);
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			encoder.EncodeOidTlv(this.mechId);
 		}
 	}
 }

@@ -8,7 +8,6 @@ using System.Runtime.Intrinsics;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
-using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
 
 namespace Titanis.Security.Kerberos
 {

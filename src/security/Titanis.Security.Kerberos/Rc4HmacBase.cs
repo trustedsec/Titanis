@@ -4,9 +4,9 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using Titanis.Crypto;
-using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
 
 namespace Titanis.Security.Kerberos
 {
@@ -161,7 +161,7 @@ namespace Titanis.Security.Kerberos
 			KeyIntent intent,
 			Span<byte> specificKeyBuffer)
 		{
-			Keys keys = MemoryMarshal.AsRef<Keys>(specificKeyBuffer);
+			ref Keys keys = ref MemoryMarshal.AsRef<Keys>(specificKeyBuffer);
 			this.DeriveKey(protocolKey, usage, ref keys);
 		}
 
@@ -207,6 +207,7 @@ namespace Titanis.Security.Kerberos
 				KeyUsage.Cred => 14,
 				// 15.
 				KeyUsage.Safe or KeyUsage.InitiatorSign or KeyUsage.AcceptorSign => 15,
+				KeyUsage.NonKerbChecksumSalt => 17,
 				_ => throw new ArgumentOutOfRangeException(nameof(usage))
 			};
 
@@ -231,6 +232,21 @@ namespace Titanis.Security.Kerberos
 			ctx.HashData(micTokenHeader);
 
 			ctx.HashFinal(checksum);
+		}
+
+		// [RFC 4757] § 4. Checksum Types
+		public static byte[] Hash(byte[] keyBytes, int messageType, byte[] data)
+		{
+			HMACMD5 hmac = new HMACMD5(keyBytes);
+			var signKey = hmac.ComputeHash(Encoding.UTF8.GetBytes("signaturekey\0"));
+
+			byte[] tmp = new byte[4 + data.Length];
+			BinaryPrimitives.WriteInt32LittleEndian(tmp.Slice(0, 4), messageType);
+			data.CopyTo(tmp, 4);
+
+			hmac = new HMACMD5(signKey);
+			var hash = hmac.ComputeHash(tmp);
+			return hash;
 		}
 
 		/// <summary>

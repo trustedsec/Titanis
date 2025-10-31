@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Titanis.Security.Kerberos
 {
-	public class AuthzData
+	class AuthzData
 	{
-		public void Process(Asn1.KerberosV5Spec2.Unnamed_0[] addata)
+		public void Process(KerberosV5Spec2.AuthorizationData_Element[] addata)
 		{
 			if (addata != null)
 			{
@@ -17,7 +17,7 @@ namespace Titanis.Security.Kerberos
 			}
 		}
 
-		private void Process(Asn1.KerberosV5Spec2.Unnamed_0 aditem)
+		private void Process(KerberosV5Spec2.AuthorizationData_Element aditem)
 		{
 			if (aditem is null)
 				throw new ArgumentNullException(nameof(aditem));

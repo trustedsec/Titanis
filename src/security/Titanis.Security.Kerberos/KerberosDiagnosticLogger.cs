@@ -1,11 +1,11 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
-using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
 
 namespace Titanis.Security.Kerberos
 {
@@ -68,7 +68,7 @@ namespace Titanis.Security.Kerberos
 		{
 			foreach (var item in etypeInfos)
 			{
-				WriteMessage($"KDC supports EType {(EType)item.etype} salt={((item.salt.HasValue) ? item.salt.Value.value : "<none>")}");
+				WriteMessage($"KDC supports EType {(EType)item.etype} salt={((item.salt.HasValue) ? item.salt.Value.Value : "<none>")}");
 			}
 
 			this._chainedCallback?.OnProcessETypes(etypeInfos);
@@ -97,7 +97,7 @@ namespace Titanis.Security.Kerberos
 			this._chainedCallback?.OnReceivedTicket(ticketInfo);
 		}
 
-		void IKerberosCallback.OnSendingApreq(KerberosClientContext? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, uint sendSeqNbr)
+		void IKerberosCallback.OnSendingApreq(KerberosClientContext? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, int sendSeqNbr)
 		{
 			this.WriteMessage($"Sending AP-REQ to {targetSpn} for user {ticket.UserName}@{ticket.UserRealm} with session key {sessionKey.EType} {sessionKey.KeyBytes.ToHexString()} (sendSeqNbr={sendSeqNbr})(gssFlags={caps})");
 

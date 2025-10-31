@@ -1,11 +1,10 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Reflection;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
 using Titanis.Reflection;
 using Titanis.Security.Ntlm;
-using Titanis.Security.Spnego.Asn1.GSS_API;
-using Titanis.Security.Spnego.Asn1.SPNEGOASNOneSpec;
 
 namespace Titanis.Security.Spnego.Test
 {
@@ -27,16 +26,17 @@ namespace Titanis.Security.Spnego.Test
 
 			var decoder = Asn1DerEncoding.CreateDerDecoder(data);
 
-			InitialContextToken token = new InitialContextToken();
-			token.DecodeTlv(decoder);
+			throw new NotImplementedException();
+			//InitialContextToken token = new InitialContextToken();
+			//token.DecodeTlv(decoder);
 
-			var spnego = token.Value.innerContextToken.DecodeAs<NegotiationToken>();
-			//var token = decoder.DecodeObjTlv<NegTokenInit>();
+			//var spnego = token.Value.innerContextToken.DecodeAs<NegotiationToken>();
+			////var token = decoder.DecodeObjTlv<NegTokenInit>();
 
-			//Asn1Serializer ser = new Asn1Serializer(typeof(NegTokenInit), Asn1Encodings.Der);
-			//var token = ser.Read<NegTokenInit>(data);
-			//var actualData = ser.Write(token);
-			//CollectionAssert.AreEqual(data, actualData);
+			////Asn1Serializer ser = new Asn1Serializer(typeof(NegTokenInit), Asn1Encodings.Der);
+			////var token = ser.Read<NegTokenInit>(data);
+			////var actualData = ser.Write(token);
+			////CollectionAssert.AreEqual(data, actualData);
 		}
 
 		[TestMethod]
@@ -47,16 +47,17 @@ namespace Titanis.Security.Spnego.Test
 
 			var decoder = Asn1DerEncoding.CreateDerDecoder(data);
 
-			InitialContextToken token = new InitialContextToken();
-			token.DecodeTlv(decoder);
+			throw new NotImplementedException();
+			//InitialContextToken token = new InitialContextToken();
+			//token.DecodeTlv(decoder);
 
-			var spnego = token.Value.innerContextToken.DecodeAs<NegotiationToken2>();
-			//var token = decoder.DecodeObjTlv<NegTokenInit>();
+			//var spnego = token.Value.innerContextToken.DecodeAs<NegotiationToken2>();
+			////var token = decoder.DecodeObjTlv<NegTokenInit>();
 
-			//Asn1Serializer ser = new Asn1Serializer(typeof(NegTokenInit), Asn1Encodings.Der);
-			//var token = ser.Read<NegTokenInit>(data);
-			//var actualData = ser.Write(token);
-			//CollectionAssert.AreEqual(data, actualData);
+			////Asn1Serializer ser = new Asn1Serializer(typeof(NegTokenInit), Asn1Encodings.Der);
+			////var token = ser.Read<NegTokenInit>(data);
+			////var actualData = ser.Write(token);
+			////CollectionAssert.AreEqual(data, actualData);
 		}
 
 		[TestMethod]

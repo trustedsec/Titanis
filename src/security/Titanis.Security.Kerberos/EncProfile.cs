@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Buffers.Binary;
 using System.Collections;
 using System.Diagnostics;
@@ -10,7 +11,6 @@ using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using Titanis.Crypto;
-using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
 
 namespace Titanis.Security.Kerberos
 {

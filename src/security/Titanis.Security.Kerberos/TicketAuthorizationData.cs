@@ -1,4 +1,5 @@
-﻿using ms_dtyp;
+﻿using KerberosV5Spec2;
+using ms_dtyp;
 using ms_pac;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
 using Titanis.DceRpc;
 using Titanis.IO;
-using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
+using KerberosV5Spec2;
 using Titanis.Winterop.Security;
 
 namespace Titanis.Security.Kerberos
@@ -32,7 +33,7 @@ namespace Titanis.Security.Kerberos
 		private readonly KerberosClient _krb;
 		private readonly SessionKey _key;
 
-		internal void Process(Ticket_EncPart encPart)
+		internal void Process(EncTicketPart encPart)
 		{
 			var authData = encPart?.Value?.authorization_data;
 			if (authData == null)
@@ -41,7 +42,7 @@ namespace Titanis.Security.Kerberos
 			Process(authData, false);
 		}
 
-		private void Process(IList<Unnamed_0> authData, bool optional)
+		private void Process(IList<AuthorizationData_Element> authData, bool optional)
 		{
 			foreach (var adRec in authData)
 			{
@@ -49,13 +50,13 @@ namespace Titanis.Security.Kerberos
 			}
 		}
 
-		private void Process(Unnamed_0 adRec, bool optional)
+		private void Process(AuthorizationData_Element adRec, bool optional)
 		{
 			switch ((AdType)adRec.ad_type)
 			{
 				case AdType.IfRelevant:
 					{
-						var inner = Asn1DerDecoder.Decode<Asn1SequenceOf<Unnamed_0>>(adRec.ad_data);
+						var inner = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<AuthorizationData_Element>>(adRec.ad_data);
 						this.Process(inner.Values, true);
 					}
 					break;

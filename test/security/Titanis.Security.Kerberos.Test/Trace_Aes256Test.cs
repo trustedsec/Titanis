@@ -18,20 +18,21 @@ public class Trace_Aes256Test
 		var logger = new KerberosDiagnosticLogger(new TestLog(this.TestContext));
 		KerberosClient client = new KerberosClient(null, callback: logger);
 		KerberosPasswordCredential cred = new KerberosPasswordCredential("milchick", "LUMON.IND", "Br3@kr00m!");
-		client.Trace(cred,
-			Asreq,
-			Asrep,
-			TgsReq,
-			TgsRep,
-			ApReq,
-			ApRep,
-			ApRep2,
-			MechList,
-			InitiatorMechListMic,
-			AcceptorMechListMic,
-			Request0,
-			null
-			);
+		throw new NotImplementedException();
+		//client.Trace(cred,
+		//	Asreq,
+		//	Asrep,
+		//	TgsReq,
+		//	TgsRep,
+		//	ApReq,
+		//	ApRep,
+		//	ApRep2,
+		//	MechList,
+		//	InitiatorMechListMic,
+		//	AcceptorMechListMic,
+		//	Request0,
+		//	null
+		//	);
 	}
 
 	#region AS-REQ

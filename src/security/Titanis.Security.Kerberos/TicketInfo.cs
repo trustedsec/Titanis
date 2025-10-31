@@ -1,10 +1,10 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
-using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
 
 namespace Titanis.Security.Kerberos
 {
@@ -18,10 +18,12 @@ namespace Titanis.Security.Kerberos
 	public class TicketInfo
 	{
 		private TicketInfo(
-			Asn1.KerberosV5Spec2.Ticket_Ticket ticket,
+			int seqnbr,
+			Ticket_Tagged1 ticket,
 			SessionKey sessionKey
 			)
 		{
+			this.SeqNbr = seqnbr;
 			this.ticket = ticket;
 			this.SessionKey = sessionKey;
 
@@ -29,49 +31,52 @@ namespace Titanis.Security.Kerberos
 			this.TargetSpn = ticket.sname.ToSecurityPrincipalName();
 		}
 		internal TicketInfo(
-			Asn1.KerberosV5Spec2.Ticket_Ticket ticket,
+			int seqnbr,
+			Ticket_Tagged1 ticket,
 			SessionKey sessionKey,
 			KrbCredInfo credInfo
 			)
-			: this(ticket, sessionKey)
+			: this(seqnbr, ticket, sessionKey)
 		{
-			this.EndTime = credInfo.endtime?.value;
-			this.StartTime = credInfo.starttime?.value;
+			this.EndTime = credInfo.endtime?.Value;
+			this.StartTime = credInfo.starttime?.Value;
 			this.KdcOptions = (KdcOptions)(credInfo.flags?.ToUInt32() ?? 0);
 			if (credInfo.pname != null)
 			{
-				this.UserName = credInfo.pname.name_string[0].value;
+				this.UserName = credInfo.pname.name_string[0].Value;
 			}
-			this.UserRealm = credInfo.prealm?.value;
-			this.RenewTill = credInfo.renew_till?.value;
+			this.UserRealm = credInfo.prealm?.Value;
+			this.RenewTill = credInfo.renew_till?.Value;
 
 			this.TargetSpn = credInfo.sname.ToSecurityPrincipalName();
-			this.ServiceRealm = credInfo.srealm?.value;
+			this.ServiceRealm = credInfo.srealm?.Value;
 		}
 		internal TicketInfo(
-			Asn1.KerberosV5Spec2.Ticket_Ticket ticket,
+			int seqnbr,
+			Ticket_Tagged1 ticket,
 			SessionKey sessionKey,
 			EncKDCRepPart encPart,
 			string userName,
 			string userRealm)
-			: this(ticket, sessionKey)
+			: this(seqnbr, ticket, sessionKey)
 		{
-			this.EndTime = encPart.endtime.value;
-			this.StartTime = encPart.starttime?.value;
+			this.EndTime = encPart.endtime.Value;
+			this.StartTime = encPart.starttime?.Value;
 			this.KdcOptions = (KdcOptions)encPart.flags.ToUInt32();
 
 			this.UserName = userName;
 			this.UserRealm = userRealm;
-			this.RenewTill = encPart.renew_till?.value;
+			this.RenewTill = encPart.renew_till?.Value;
 
 			this.TargetSpn = encPart.sname.ToSecurityPrincipalName();
-			this.ServiceRealm = encPart.srealm.value;
+			this.ServiceRealm = encPart.srealm.Value;
 		}
 
-		internal TicketInfo(SessionKey key, CCacheCredential cred)
+		internal TicketInfo(int seqnbr, SessionKey key, CCacheCredential cred)
 		{
+			this.SeqNbr = seqnbr;
 			this.SessionKey = key;
-			this.ticket = Asn1DerDecoder.Decode<CCacheTicketWrapper>(cred.ticket.bytes).Value;
+			this.ticket = Asn1DerDecoder.DecodeTlv<Ticket>(cred.ticket.bytes).Value;
 
 			this.UserName = cred.client.components[0].str;
 			this.UserRealm = cred.client.realm.str;
@@ -84,8 +89,9 @@ namespace Titanis.Security.Kerberos
 			this.RenewTill = FromCcacheTime(cred.renewTill);
 		}
 
-		public TicketInfo(string? userName, string? userRealm, string? ticketRealm, SecurityPrincipalName spn, string? serviceRealm, KdcOptions kdcOptions, DateTime? endTime, DateTime? startTime, DateTime? renewTill, SessionKey sessionKey, byte[] encodedTicket)
+		public TicketInfo(int seqnbr, string? userName, string? userRealm, string? ticketRealm, SecurityPrincipalName spn, string? serviceRealm, KdcOptions kdcOptions, DateTime? endTime, DateTime? startTime, DateTime? renewTill, SessionKey sessionKey, byte[] encodedTicket)
 		{
+			this.SeqNbr = seqnbr;
 			this.UserName = userName;
 			this.UserRealm = userRealm;
 			this.TargetSpn = spn;
@@ -96,7 +102,7 @@ namespace Titanis.Security.Kerberos
 			this.RenewTill = renewTill;
 			this.SessionKey = sessionKey;
 
-			this.ticket = Asn1DerDecoder.Decode<TicketWrapper>(encodedTicket).Value;
+			this.ticket = Asn1DerDecoder.DecodeTlv<Ticket>(encodedTicket).Value;
 		}
 
 		private static DateTime FromCcacheTime(int time)
@@ -104,7 +110,8 @@ namespace Titanis.Security.Kerberos
 			return TicketParameters.DefaultEndTime + TimeSpan.FromSeconds(time);
 		}
 
-		internal readonly Asn1.KerberosV5Spec2.Ticket_Ticket ticket;
+		public int SeqNbr { get; }
+		internal readonly Ticket_Tagged1 ticket;
 
 		[DisplayName("User name")]
 		public string? UserName { get; }
@@ -115,7 +122,7 @@ namespace Titanis.Security.Kerberos
 		/// Gets the realm of the target the ticket is valid in.
 		/// </summary>
 		[DisplayName("Ticket realm")]
-		public string TicketRealm => this.ticket.realm.value;
+		public string TicketRealm => this.ticket.realm.Value;
 
 		/// <summary>
 		/// Gets the target service.
@@ -155,9 +162,9 @@ namespace Titanis.Security.Kerberos
 		[Browsable(false)]
 		public SessionKey SessionKey { get; }
 		[DisplayName("Enc. type")]
-		public EType EType => this.SessionKey.EType;
+		public EType EType => this.SessionKey?.EType ?? 0;
 		[DisplayName("Session key")]
-		public string SessionKeyText => this.SessionKey.KeyBytes.ToHexString();
+		public string SessionKeyText => this.SessionKey?.KeyBytes?.ToHexString() ?? string.Empty;
 		[DisplayName("Ticket enc. type")]
 		public EType TicketEncryptionType => (EType)this.ticket.enc_part.etype;
 

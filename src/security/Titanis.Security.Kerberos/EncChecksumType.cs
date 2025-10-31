@@ -17,6 +17,7 @@ namespace Titanis.Security.Kerberos
 		Sha1 = -131,
 		HmacSha1_96_Aes128 = 15,
 		HmacSha1_96_Aes256 = 16,
+		// [RFC 4757] 4.
 		HmacMd5String = -138,
 	}
 }

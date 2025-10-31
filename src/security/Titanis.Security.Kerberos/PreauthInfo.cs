@@ -1,11 +1,12 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
-using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
 
 [assembly: InternalsVisibleTo("Titanis.Security.Kerberos.Test")]
 
@@ -15,13 +16,13 @@ namespace Titanis.Security.Kerberos
 	public class KdcEncryptionTypeInfo
 	{
 		public EType EType { get; }
-		internal readonly EncProfile encProfile;
+		internal readonly EncProfile? encProfile;
 		[Browsable(false)]
 		public byte[]? Salt { get; }
 		[DisplayName("Salt (text)")]
 		public string? SaltText => this.Salt?.ToHexString();
 
-		internal KdcEncryptionTypeInfo(EType etype, EncProfile encProfile, byte[] salt)
+		internal KdcEncryptionTypeInfo(EType etype, EncProfile? encProfile, byte[]? salt)
 		{
 			this.EType = etype;
 			this.encProfile = encProfile;
@@ -155,14 +156,14 @@ namespace Titanis.Security.Kerberos
 		private void ProcessETypeInfo2(byte[] padata_value)
 		{
 			var etypes = (this.etypesFromKdc ??= new List<KdcEncryptionTypeInfo>());
-			var etypeInfos = Asn1DerDecoder.Decode<Asn1SequenceOf<ETYPE_INFO2_ENTRY>>(padata_value).Values;
+			var etypeInfos = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<ETYPE_INFO2_ENTRY>>(padata_value).Values;
 			this._callback?.OnProcessETypes(etypeInfos);
 			foreach (var elem in etypeInfos)
 			{
 				etypes.Add(new KdcEncryptionTypeInfo(
 					(EType)elem.etype,
 					this._client.TryGetEncProfile((EType)elem.etype),
-					elem.salt != null ? Encoding.UTF8.GetBytes(elem.salt) : null
+					elem.salt.HasValue ? Encoding.UTF8.GetBytes(elem.salt) : null
 				// TODO: Handle s2k parameters
 				));
 			}
@@ -171,7 +172,7 @@ namespace Titanis.Security.Kerberos
 		private void ProcessETypeInfo(byte[] padata_value)
 		{
 			var etypes = (this.etypesFromKdc ??= new List<KdcEncryptionTypeInfo>());
-			var etypeInfos = Asn1DerDecoder.Decode<Asn1SequenceOf<ETYPE_INFO_ENTRY>>(padata_value).Values;
+			var etypeInfos = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<ETYPE_INFO_ENTRY>>(padata_value).Values;
 			this._callback?.OnProcessETypes(etypeInfos);
 			foreach (var elem in etypeInfos)
 			{

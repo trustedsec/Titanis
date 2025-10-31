@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 using Titanis.Asn1;
 using Titanis.IO;
 using Titanis.PduStruct;
-using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
 
 namespace Titanis.Security.Kerberos
 {
@@ -107,7 +107,7 @@ namespace Titanis.Security.Kerberos
 			return new CCachePrincipal()
 			{
 				version = 4,
-				componentCount =parts.Length,
+				componentCount = parts.Length,
 				nameType = spn.NameType,
 				realm = new CCacheStringData(realm),
 				components = Array.ConvertAll(parts, r => new CCacheStringData(r))
@@ -230,19 +230,6 @@ namespace Titanis.Security.Kerberos
 		public static int ToCCacheDateTime(this DateTime dt)
 		{
 			return (int)(dt - TicketParameters.DefaultEndTime).TotalSeconds;
-		}
-	}
-
-	class CCacheTicketWrapper : Asn1Explicit<Ticket_Ticket>
-	{
-		public CCacheTicketWrapper()
-		{
-			this.Tag = new Asn1Tag(0x61);
-		}
-		public CCacheTicketWrapper(Ticket_Ticket ticket)
-			: this()
-		{
-			this.Value = ticket;
 		}
 	}
 }

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Titanis.Security.Kerberos.Asn1.KerberosV5Spec2;
 
 namespace Titanis.Security.Kerberos
 {
@@ -20,7 +20,7 @@ namespace Titanis.Security.Kerberos
 
 		void OnRequestingTicket(SecurityPrincipalName spn, TicketInfo tgt, KdcOptions kdcOptions);
 		void OnReceivedTicket(TicketInfo ticketInfo) { }
-		void OnSendingApreq(KerberosClientContext? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, uint sendSeqNbr);
+		void OnSendingApreq(KerberosClientContext? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, int sendSeqNbr);
 		void OnReceivedAprep(KerberosClientContext? authContext, uint recvSeqNbr, SessionKey? acceptorSubkey) { }
 
 		void OnReferralReceived(SecurityPrincipalName spn, TicketInfo ticket);
