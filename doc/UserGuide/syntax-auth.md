@@ -80,10 +80,10 @@ service account to obtain a service ticket for and impersonate a user account
 when you don't have credentials for that user account.
 
 | Parameter | Description | Note |
-|-|
+|-|-|-|
 | `-S4UserName` &lt;user name&gt; | Name of user to impersonate | If the user name does not include the domain, then the domain of the service is assumed. |
 | `-S4UserCert` &lt;certificate file name&gt; | X.509 certificate identifying user to impersonate |
-| `-S4ProxyService` &lt;service account&gt; | Name of service account to proxy through | May be specified as &lt;class&gt;/&Lt;host&gt; or &lt;account name&gt;
+| `-S4ProxyService` &lt;service account&gt; | Name of service account to proxy through | May be specified as &lt;class&gt;/&lt;host&gt; or &lt;account name&gt;
 
 ## Notes
 1. Only one of `-S4UserName` or `-S4UserCert` are required for S4U.
