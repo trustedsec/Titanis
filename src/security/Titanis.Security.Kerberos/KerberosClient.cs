@@ -658,7 +658,7 @@ namespace Titanis.Security.Kerberos
 			var sessionKey = usingSubkey ? tgt.GenerateSessionKey() : tgt.SessionKey;
 			TicketRequestContext context = new TicketRequestContext(null, sessionKey, usingSubkey);
 
-			var tgsreq = this.CreateTgsReq(spn, tgt, tgt.TicketRealm, encTypes, ticketParameters, options, context);
+			var tgsreq = this.CreateTgsReq(spn, tgt, realm, encTypes, ticketParameters, options, context);
 
 			this._callback?.OnRequestingTicket(spn, tgt, (KdcOptions)tgsreq.Tgsreq.req_body.kdc_options.ToUInt32());
 
@@ -844,7 +844,7 @@ namespace Titanis.Security.Kerberos
 			KDC_REQ_BODY reqBody = Structs.KdcReqBody(
 				ticketParameters,
 				options,
-				null, //(ticketParameters.S4UserName is null) ? null : Structs.PrincipalName(PrincipalNameType.Principal, ticketParameters.S4UserName.UserName),// null, //cname,
+				(ticketParameters.S4UserName is null) ? null : ticketParameters.S4UserName.PrincipalName(),// null, //cname,
 				realm,
 				Structs.PrincipalName(spn),
 				context.nonce,
