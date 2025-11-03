@@ -442,9 +442,7 @@ namespace Titanis.Cli
 			{
 				var recordType = this.GetType().GetCustomAttribute<OutputRecordTypeAttribute>()?.RecordType;
 				if (recordType != null)
-				{
-					fields = OutputField.GetFieldsFor(recordType);
-				}
+					fields = OutputField.GetFieldsFor(recordType, this.Context.MetadataContext);
 				else
 					throw new ArgumentNullException(nameof(fields));
 			}
