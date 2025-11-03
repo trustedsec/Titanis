@@ -19,7 +19,7 @@ Scm <subcommand>
 |[stop](#scm-stop)|Stops a service|
 
 
-  For help on a subcommand, use `Scm &lt;subcommand&gt; -?`
+  For help on a subcommand, use `Scm <subcommand> -h`
 # Scm create
   Creates and optionally starts a new service
 
@@ -80,7 +80,15 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -97,7 +105,7 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -113,7 +121,7 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -124,10 +132,14 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -198,7 +210,15 @@ Scm delete [options] <ServerName> <ServiceName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -206,7 +226,7 @@ Scm delete [options] <ServerName> <ServiceName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -215,7 +235,7 @@ Scm delete [options] <ServerName> <ServiceName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -231,7 +251,7 @@ Scm delete [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -242,10 +262,14 @@ Scm delete [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -316,8 +340,16 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  ServiceName|
 ||||  TriggerType|
@@ -331,7 +363,7 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -340,7 +372,7 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -356,7 +388,7 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -367,10 +399,14 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -446,8 +482,16 @@ Scm query [options] <ServerName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  ServiceName|
 ||||  DisplayName|
@@ -462,7 +506,7 @@ Scm query [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -471,7 +515,7 @@ Scm query [options] <ServerName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -487,7 +531,7 @@ Scm query [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -498,10 +542,14 @@ Scm query [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -565,7 +613,15 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -573,7 +629,7 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -582,7 +638,7 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -598,7 +654,7 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -609,10 +665,14 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -689,7 +749,15 @@ Scm stop [options] <ServerName> <ServiceName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -697,7 +765,7 @@ Scm stop [options] <ServerName> <ServiceName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -706,7 +774,7 @@ Scm stop [options] <ServerName> <ServiceName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -722,7 +790,7 @@ Scm stop [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -733,10 +801,14 @@ Scm stop [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)

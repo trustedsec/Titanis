@@ -24,7 +24,7 @@ Lsa <subcommand>
 |[rmpriv](#lsa-rmpriv)|Removes one or more privileges from an account|
 
 
-  For help on a subcommand, use `Lsa &lt;subcommand&gt; -?`
+  For help on a subcommand, use `Lsa <subcommand> -h`
 # Lsa addpriv
   Adds one or more privileges to an account
 
@@ -86,7 +86,15 @@ Lsa addpriv [options] <ServerName> <Privileges>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
@@ -96,7 +104,7 @@ Lsa addpriv [options] <ServerName> <Privileges>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -105,7 +113,7 @@ Lsa addpriv [options] <ServerName> <Privileges>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -121,7 +129,7 @@ Lsa addpriv [options] <ServerName> <Privileges>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -132,10 +140,14 @@ Lsa addpriv [options] <ServerName> <Privileges>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -224,7 +236,15 @@ Lsa createaccount [options] <ServerName> <Sid>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -232,7 +252,7 @@ Lsa createaccount [options] <ServerName> <Sid>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -241,7 +261,7 @@ Lsa createaccount [options] <ServerName> <Sid>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -257,7 +277,7 @@ Lsa createaccount [options] <ServerName> <Sid>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -268,10 +288,14 @@ Lsa createaccount [options] <ServerName> <Sid>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -341,8 +365,16 @@ Lsa enumaccounts [options] <ServerName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Sid|
 ||||  AccountName|
@@ -354,7 +386,7 @@ Lsa enumaccounts [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -363,7 +395,7 @@ Lsa enumaccounts [options] <ServerName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -379,7 +411,7 @@ Lsa enumaccounts [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -390,10 +422,14 @@ Lsa enumaccounts [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -523,8 +559,16 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Sid|
 ||||  AccountName|
@@ -536,7 +580,7 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -545,7 +589,7 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -561,7 +605,7 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -572,10 +616,14 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -645,8 +693,16 @@ Lsa getprivs [options] <ServerName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Privilege|
 ||||  Attributes|
@@ -660,7 +716,7 @@ Lsa getprivs [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -669,7 +725,7 @@ Lsa getprivs [options] <ServerName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -685,7 +741,7 @@ Lsa getprivs [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -696,10 +752,14 @@ Lsa getprivs [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -790,8 +850,16 @@ Lsa getrights [options] <ServerName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Name|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
@@ -803,7 +871,7 @@ Lsa getrights [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -812,7 +880,7 @@ Lsa getrights [options] <ServerName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -828,7 +896,7 @@ Lsa getrights [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -839,10 +907,14 @@ Lsa getrights [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -918,8 +990,16 @@ Lsa getsysaccess [options] <ServerName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Value|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
@@ -931,7 +1011,7 @@ Lsa getsysaccess [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -940,7 +1020,7 @@ Lsa getsysaccess [options] <ServerName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -956,7 +1036,7 @@ Lsa getsysaccess [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -967,10 +1047,14 @@ Lsa getsysaccess [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1047,8 +1131,16 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  AccountName|
 ||||  NameType|
@@ -1063,7 +1155,7 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1072,7 +1164,7 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1088,7 +1180,7 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1099,10 +1191,14 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1178,8 +1274,16 @@ Lsa lookupsid [options] <ServerName> <Sids>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  AccountName|
 ||||  NameType|
@@ -1194,7 +1298,7 @@ Lsa lookupsid [options] <ServerName> <Sids>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1203,7 +1307,7 @@ Lsa lookupsid [options] <ServerName> <Sids>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1219,7 +1323,7 @@ Lsa lookupsid [options] <ServerName> <Sids>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1230,10 +1334,14 @@ Lsa lookupsid [options] <ServerName> <Sids>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1344,7 +1452,15 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
 |    -ByName||&lt;String&gt;|Account name|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
@@ -1354,7 +1470,7 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1363,7 +1479,7 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1379,7 +1495,7 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1390,10 +1506,14 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1505,8 +1625,16 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Value|
 |    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
@@ -1518,7 +1646,7 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1527,7 +1655,7 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1543,7 +1671,7 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1554,10 +1682,14 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1641,10 +1773,18 @@ Lsa whoami [options] <ServerName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
-||||  Text|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
+||||**Possible values:**|
+||||  OriginalText|
 ||||  UserName|
 ||||  Realm|
 ||||  NameType|
@@ -1656,7 +1796,7 @@ Lsa whoami [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1665,7 +1805,7 @@ Lsa whoami [options] <ServerName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1681,7 +1821,7 @@ Lsa whoami [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1692,10 +1832,14 @@ Lsa whoami [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)

@@ -29,7 +29,7 @@ Smb2Client <subcommand>
 |[enumstreams](#smb2client-enumstreams)|Lists the data streams of a file or directory.|
 
 
-  For help on a subcommand, use `Smb2Client &lt;subcommand&gt; -?`
+  For help on a subcommand, use `Smb2Client <subcommand> -h`
 # Smb2Client enumnics
   Queries the server for a list of network interfaces.
 
@@ -79,8 +79,16 @@ Smb2Client enumnics [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  InterfaceIndex|
 ||||  Capabilities|
@@ -94,7 +102,7 @@ Smb2Client enumnics [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -103,7 +111,7 @@ Smb2Client enumnics [options] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -119,7 +127,7 @@ Smb2Client enumnics [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -130,10 +138,14 @@ Smb2Client enumnics [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -197,7 +209,15 @@ Smb2Client enumopenfiles [options] <ServerName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Id|
@@ -221,7 +241,7 @@ Smb2Client enumopenfiles [options] <ServerName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -237,7 +257,7 @@ Smb2Client enumopenfiles [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -248,10 +268,14 @@ Smb2Client enumopenfiles [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -339,8 +363,16 @@ Smb2Client enumsessions [options] <ServerName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  ClientName|
 ||||  UserName|
@@ -366,7 +398,7 @@ Smb2Client enumsessions [options] <ServerName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -382,7 +414,7 @@ Smb2Client enumsessions [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -393,10 +425,14 @@ Smb2Client enumsessions [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -476,8 +512,16 @@ Smb2Client enumshares [options] <ServerName>
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  ShareName|
 ||||  ServerName|
@@ -505,7 +549,7 @@ Smb2Client enumshares [options] <ServerName>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -521,7 +565,7 @@ Smb2Client enumshares [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -532,10 +576,14 @@ Smb2Client enumshares [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -621,8 +669,16 @@ Smb2Client enumsnapshots [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Token|
 ||||  Timestamp|
@@ -633,7 +689,7 @@ Smb2Client enumsnapshots [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -642,7 +698,7 @@ Smb2Client enumsnapshots [options] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -658,7 +714,7 @@ Smb2Client enumsnapshots [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -669,10 +725,14 @@ Smb2Client enumsnapshots [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -753,8 +813,16 @@ Smb2Client enumstreams [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Name|
 ||||  Size|
@@ -766,7 +834,7 @@ Smb2Client enumstreams [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -775,7 +843,7 @@ Smb2Client enumstreams [options] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -791,7 +859,7 @@ Smb2Client enumstreams [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -802,10 +870,14 @@ Smb2Client enumstreams [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -864,10 +936,18 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |    -Depth||&lt;Int32&gt;|Depth of directory tree to traverse (default = 0 [no recursion], -1 = no limit)|
 |-Q, -QueryBufferSize||&lt;Int32&gt;|Specifies the buffer size for querying the directory listing (for recursive operations).|
 |    -TreeOnly||&lt;SwitchParam&gt;|Only copies the directory structure, but not the files.|
-|-O, -Overwrite||&lt;SwitchParam&gt;|Overwrites existing local files|
+|    -Overwrite||&lt;SwitchParam&gt;|Overwrites existing local files|
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continues copying after an error occurs|
 |    -TimeWarpToken||&lt;TimeWarpToken&gt;|Snapshot version, either as a date/time or a @GMT token|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -904,7 +984,7 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -913,7 +993,7 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -929,7 +1009,7 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -940,10 +1020,14 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1055,8 +1139,16 @@ Smb2Client ls [options] <UncPath>
 |-Q, -QueryBufferSize||&lt;Int32&gt;|Specifies the buffer size for querying the directory listing.|
 |    -Depth||&lt;Int32&gt;|Sets the depth limit for a recursive listing (default = 0 [no recursion], -1 = no limit)|
 |    -TimeWarpToken||&lt;TimeWarpToken&gt;|Snapshot version, either as a date/time or a @GMT token|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  RelativePath|
 ||||  FileIndex|
@@ -1114,7 +1206,7 @@ Smb2Client ls [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1123,7 +1215,7 @@ Smb2Client ls [options] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1139,7 +1231,7 @@ Smb2Client ls [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1150,10 +1242,14 @@ Smb2Client ls [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1275,7 +1371,15 @@ Smb2Client mkdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Parents||&lt;SwitchParam&gt;|Create parent directories|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -1312,7 +1416,7 @@ Smb2Client mkdir [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1321,7 +1425,7 @@ Smb2Client mkdir [options] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1337,7 +1441,7 @@ Smb2Client mkdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1348,10 +1452,14 @@ Smb2Client mkdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1418,7 +1526,15 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |    -PrintPath||&lt;String&gt;|The path to display to the user in directory listings (defaults to &lt;TargetPath&gt;)|
 |    -Directory||&lt;SwitchParam&gt;|Creates the symlink as a directory|
 |    -Relative||&lt;SwitchParam&gt;|Create the link as a relative path|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -1455,7 +1571,7 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1464,7 +1580,7 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1480,7 +1596,7 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1491,10 +1607,14 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1591,7 +1711,15 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -PrintPath||&lt;String&gt;|The path to display to the user in directory listings (defaults to &lt;TargetPath&gt;)|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -1628,7 +1756,7 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1637,7 +1765,7 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1653,7 +1781,7 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1664,10 +1792,14 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1770,7 +1902,15 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |    -LastAccessTimestamp||&lt;DateTime&gt;|Last access time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -ChangeTimestamp||&lt;DateTime&gt;|Change time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -1816,7 +1956,7 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1832,7 +1972,7 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1843,10 +1983,14 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -1939,7 +2083,15 @@ Smb2Client rm [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -1947,7 +2099,7 @@ Smb2Client rm [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -1956,7 +2108,7 @@ Smb2Client rm [options] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -1972,7 +2124,7 @@ Smb2Client rm [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -1983,10 +2135,14 @@ Smb2Client rm [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -2067,7 +2223,15 @@ Smb2Client rmdir [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -2075,7 +2239,7 @@ Smb2Client rmdir [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -2084,7 +2248,7 @@ Smb2Client rmdir [options] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -2100,7 +2264,7 @@ Smb2Client rmdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -2111,10 +2275,14 @@ Smb2Client rmdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -2174,8 +2342,16 @@ Smb2Client touch [options] <UncPath>
 |    -UpdateAttributes||&lt;String&gt;|File attributes modifications|
 |    -TimestampsFrom||&lt;UncPath&gt;|UNC Path of remote file to copy timestamps from|
 |    -CopyFileAttributes||&lt;SwitchParam&gt;|If specified, also copy file attributes from TimestampsFrom|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  RelativePath|
 ||||  FileIndex|
@@ -2242,7 +2418,7 @@ Smb2Client touch [options] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -2258,7 +2434,7 @@ Smb2Client touch [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -2269,10 +2445,14 @@ Smb2Client touch [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -2406,7 +2586,15 @@ Smb2Client umount [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -RemoveDirectory||&lt;SwitchParam&gt;|Deletes the directory after unmounting|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -2443,7 +2631,7 @@ Smb2Client umount [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -2452,7 +2640,7 @@ Smb2Client umount [options] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -2468,7 +2656,7 @@ Smb2Client umount [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -2479,10 +2667,14 @@ Smb2Client umount [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)
@@ -2544,8 +2736,16 @@ Smb2Client watch [options] <UncPath>
 |    -Recursive||&lt;SwitchParam&gt;|Watches the entire subtree|
 |-B, -BufferSize||&lt;Int32&gt;|Buffer size (default = 2048)|
 |    -ContinueOnErrors||&lt;SwitchParam&gt;|Continue watching for changes if an error occurs|
-|    -ConsoleOutputStyle||&lt;OutputStyle&gt;|Determines the output style|
-|-O, -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Action|
 ||||  FileName|
@@ -2586,7 +2786,7 @@ Smb2Client watch [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-L, -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
 ||||  Diagnostic|
@@ -2595,7 +2795,7 @@ Smb2Client watch [options] <UncPath>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat||&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
 ||||  Text|
@@ -2611,7 +2811,7 @@ Smb2Client watch [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;String&gt;|User name to authenticate with, not including the domain|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 |    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
 |    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
@@ -2622,10 +2822,14 @@ Smb2Client watch [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 
 
 ### Authentication (NTLM)

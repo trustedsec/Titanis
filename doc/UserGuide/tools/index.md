@@ -14,8 +14,12 @@ This index lists the tools by command name as well as by task.
 |[Epm lsep](Epm.md#epm-lsep)|Lists the dynamic RPC endpoints registered with the endpoint mapper|
 |[Kerb](Kerb.md#kerb)|Commands for working with Kerberos authentication|
 |[Kerb asreq](Kerb.md#kerb-asreq)|Requests a TGT from the KDC.|
+|[Kerb changepw](Kerb.md#kerb-changepw)|Changes an account password|
 |[Kerb getasinfo](Kerb.md#kerb-getasinfo)|Gets server time and encryption types (with salts) for a user account.|
+|[Kerb renew](Kerb.md#kerb-renew)|Renews a ticket|
+|[Kerb s2k](Kerb.md#kerb-s2k)|Generates a protocol key from a string, such as a password|
 |[Kerb select](Kerb.md#kerb-select)|Selects and displays tickets from a file.|
+|[Kerb setpw](Kerb.md#kerb-setpw)|Sets the password of (another) account|
 |[Kerb tgsreq](Kerb.md#kerb-tgsreq)|Requests a ticket from the KDC.|
 |[Lsa](Lsa.md#lsa)|Commands for interacting with the LSA|
 |[Lsa addpriv](Lsa.md#lsa-addpriv)|Adds one or more privileges to an account|
@@ -59,6 +63,7 @@ This index lists the tools by command name as well as by task.
 |[Smb2Client watch](Smb2Client.md#smb2client-watch)|Watches for modifications to a directory or subtree.|
 |[Wmi](Wmi.md#wmi)|Commands for interacting with the Windows Management Instrumentation service|
 |[Wmi backup](Wmi.md#wmi-backup)|Backs up the WMI repository|
+|[Wmi delete](Wmi.md#wmi-delete)|Deletes a WMI object|
 |[Wmi exec](Wmi.md#wmi-exec)|Executes a command on a remote system via WMI|
 |[Wmi get](Wmi.md#wmi-get)|Gets an object with a WMI path|
 |[Wmi invoke](Wmi.md#wmi-invoke)|Invokes a method on a WMI class or object|
@@ -102,25 +107,31 @@ This index lists the tools by command name as well as by task.
 |Translate an a SID to its account name and domain|[Lsa lookupsid](Lsa.md#lsa-lookupsid)|
 |Translate an account name to its SID and domain name|[Lsa lookupname](Lsa.md#lsa-lookupname)|
 |**Expanding Access**|
+|Change a password|[Kerb changepw](Kerb.md#kerb-changepw)|
 |Create an LSA policy account|[Lsa createaccount](Lsa.md#lsa-createaccount)|
 |Get ticket hash for hash cracking|[Kerb tgsreq](Kerb.md#kerb-tgsreq)|
 |Grant a privilege to an account|[Lsa addpriv](Lsa.md#lsa-addpriv)|
 |Request a ticket for a service|[Kerb tgsreq](Kerb.md#kerb-tgsreq)|
 |Request a ticket-granting-ticket|[Kerb asreq](Kerb.md#kerb-asreq)|
+|Set the password of another user account|[Kerb setpw](Kerb.md#kerb-setpw)|
 |Set the system access rights for an account|[Lsa setsysaccess](Lsa.md#lsa-setsysaccess)|
 |**Kerberos**|
+|Change a password|[Kerb changepw](Kerb.md#kerb-changepw)|
 |Check the encryption types supported for a user account|[Kerb getasinfo](Kerb.md#kerb-getasinfo)|
 |Check the encryption types supported for a user account|[Kerb asreq](Kerb.md#kerb-asreq)|
 |Check whether a user account requires pre-authentication|[Kerb getasinfo](Kerb.md#kerb-getasinfo)|
 |Check whether a user account requires pre-authentication|[Kerb asreq](Kerb.md#kerb-asreq)|
 |Convert between a .ccache file and a .kirbi file|[Kerb select](Kerb.md#kerb-select)|
 |Describe a Kerberos ticket|[Kerb select](Kerb.md#kerb-select)|
+|Generate protocol key from password|[Kerb s2k](Kerb.md#kerb-s2k)|
 |Get ticket hash for hash cracking|[Kerb tgsreq](Kerb.md#kerb-tgsreq)|
 |Print the contents of a .ccache file|[Kerb select](Kerb.md#kerb-select)|
 |Print the contents of a .kirbi file|[Kerb select](Kerb.md#kerb-select)|
 |Query tickets within a .ccache file or .kirbi file|[Kerb select](Kerb.md#kerb-select)|
+|Renew a ticket|[Kerb renew](Kerb.md#kerb-renew)|
 |Request a ticket for a service|[Kerb tgsreq](Kerb.md#kerb-tgsreq)|
 |Request a ticket-granting-ticket|[Kerb asreq](Kerb.md#kerb-asreq)|
+|Set the password of another user account|[Kerb setpw](Kerb.md#kerb-setpw)|
 |**Lateral Movement**|
 |Create a service|[Scm create](Scm.md#scm-create)|
 |Execute a command line on a remote system|[Wmi exec](Wmi.md#wmi-exec)|
@@ -164,6 +175,7 @@ This index lists the tools by command name as well as by task.
 |Watch a file or directory on an SMB server for changes|[Smb2Client watch](Smb2Client.md#smb2client-watch)|
 |**WMI**|
 |Back up the WMI MOF repository|[Wmi backup](Wmi.md#wmi-backup)|
+|Delete a WMI object|[Wmi delete](Wmi.md#wmi-delete)|
 |Execute a command line on a remote system|[Wmi exec](Wmi.md#wmi-exec)|
 |Executes a WMI query|[Wmi query](Wmi.md#wmi-query)|
 |Get a WMI object|[Wmi get](Wmi.md#wmi-get)|
