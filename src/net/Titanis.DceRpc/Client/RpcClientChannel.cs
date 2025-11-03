@@ -316,18 +316,32 @@ namespace Titanis.DceRpc.Client
 
 			if (!pendingRequest._taskSource.Task.IsCompleted)
 			{
-				var writer = RpcPduWriter.Create();
-				int authLength = (pendingRequest.bindContext.authContext != null)
-					? pendingRequest.bindContext.authContext.MessageAuthTokenSize
-					: 0;
-				await this.SendPduAsync(
-					PduType.CoCancel, PfcFlags.None,
-					pendingRequest.callId,
-					writer,
-					authLength,
-					CancellationToken.None,
-					pendingRequest.bindContext.authContext
-					).ConfigureAwait(false);
+				try
+				{
+					var writer = RpcPduWriter.Create();
+					int authLength = (pendingRequest.bindContext.authContext != null)
+						? pendingRequest.bindContext.authContext.MessageAuthTokenSize
+						: 0;
+					await this.SendPduAsync(
+						PduType.CoCancel, PfcFlags.None,
+						pendingRequest.callId,
+						writer,
+						authLength,
+						CancellationToken.None,
+						pendingRequest.bindContext.authContext
+						).ConfigureAwait(false);
+				}
+				catch (ObjectDisposedException)
+				{
+					// NetworkStream/connection already disposed - ignore
+					// This can happen during normal cleanup when the connection closes
+					// before the cancellation callback fires
+				}
+				catch (Exception)
+				{
+					// Ignore other errors during cancellation - the request is already
+					// being cancelled, so failures in sending the cancel PDU are not critical
+				}
 
 				if (isTimeout)
 					pendingRequest._taskSource.TrySetException(new TimeoutException("The RPC call has timed out."));
