@@ -316,7 +316,7 @@ namespace Titanis.Security.Kerberos
 			while (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Error)
 			{
 				var err = rep.Error;
-				if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_PREAUTH_REQUIRED)
+				if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_PREAUTH_REQUIRED && !err.e_data.IsNullOrEmpty())
 				{
 					paInfo.Skew = new KerberosTime(err.stime, err.susec).AsDateTime() - sendTime;
 
@@ -336,7 +336,7 @@ namespace Titanis.Security.Kerberos
 
 					throw new InvalidOperationException(Messages.Krb5_NoSupportedPreauths);
 				}
-				else if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_ETYPE_NOSUPP)
+				else if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_ETYPE_NOSUPP && !err.e_data.IsNullOrEmpty())
 				{
 					// TODO: Report the supported types
 					var supported = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<PA_DATA>>(err.e_data);
