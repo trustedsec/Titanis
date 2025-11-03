@@ -37,7 +37,7 @@ report as your workstation during authentication (NTLM and Kerberos).
 
 
 | If you have... | then use... | Supports | Notes |
-|-|-|-|
+|-|-|-|-|
 | Nothing | `-Anonymous` | NTLM | Use with `-vv` to get the domain and computer name of a server.
 | User name with... | `-UserName` &lt;username&gt; ||The domain is inferred from the NTLM_CHALLENGE message.|
 | &nbsp; ...password | `-Password` &lt;password&gt; |NTLM|Be sure to escape special characters as required by your shell.|
