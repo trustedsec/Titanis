@@ -77,6 +77,8 @@ namespace Titanis.Msrpc.Mswmi
 			=> CheckValue(this.PropertyType, this.SubtypeCode, value);
 
 
+		public Type RuntimeType => GetRuntimeTypeFor(this.PropertyType, this.SubtypeCode);
+
 		public static Type GetRuntimeTypeFor(CimType propType, CimSubtype subtype)
 		{
 			return propType switch
