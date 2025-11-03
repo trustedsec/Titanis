@@ -214,6 +214,10 @@ namespace Titanis.Cli
 			if ((this.UserName is null) && !this.Anonymous.IsSet)
 				return null;
 
+			// Don't use NTLM in S4U scenarios
+			if (this.S4UserName != null || this.S4UserCert != null || this.S4ProxyService != null)
+				return null;
+
 			var domain = this.UserDomain;
 
 			NtlmCredential? ntlmCred;
@@ -634,10 +638,9 @@ namespace Titanis.Cli
 			public sealed override AuthClientContext? GetAuthContextForService(ServicePrincipalName spn, SecurityCapabilities requiredCaps, AuthOptions options)
 			{
 				ArgumentNullException.ThrowIfNull(spn);
-				var authContext = this.authParams.CreateAuthContext
-					(spn,
-					requiredCaps
-,
+				var authContext = this.authParams.CreateAuthContext(
+					spn,
+					requiredCaps,
 					options);
 				return authContext;
 			}
