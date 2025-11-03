@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
 
 namespace Titanis.Cli
 {
@@ -92,10 +89,22 @@ namespace Titanis.Cli
 			}
 
 			List<OutputField> fields = new List<OutputField>(props.Count);
-			foreach (PropertyDescriptor prop in props)
+			if (fieldNames != null)
 			{
-				if ((fieldNames == null && prop.IsBrowsable) || (fieldNames != null && fieldNames.Contains(prop.Name, StringComparer.OrdinalIgnoreCase)))
-					fields.Add(new PropertyOutputField(prop, context));
+				var propsByName = props.OfType<PropertyDescriptor>().ToDictionary(r => r.Name, StringComparer.OrdinalIgnoreCase);
+				foreach (var name in fieldNames)
+				{
+					if (propsByName.TryGetValue(name, out var prop))
+						fields.Add(new PropertyOutputField(prop, context));
+				}
+			}
+			else
+			{
+				foreach (PropertyDescriptor prop in props)
+				{
+					if (fieldNames == null && prop.IsBrowsable)
+						fields.Add(new PropertyOutputField(prop, context));
+				}
 			}
 
 			return fields.ToArray();
