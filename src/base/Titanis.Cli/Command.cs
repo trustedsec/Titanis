@@ -422,6 +422,7 @@ namespace Titanis.Cli
 				bool paramByName;
 
 				ParameterMetadata parameter;
+				bool isLastParam = false;
 				string? argText;
 				if ((tokenText.Length > 0) && (token.OriginalText.StartsWith("-")))
 				{
@@ -486,6 +487,8 @@ namespace Titanis.Cli
 						else
 							parameter = metadata.PositionalParameters[positionalIndex];
 
+						isLastParam = positionalIndex == metadata.PositionalParameters.Count - 1;
+
 						positionalIndex++;
 					} while (setParams.ContainsKey(parameter));
 				}
@@ -530,7 +533,7 @@ namespace Titanis.Cli
 							{
 								throw new ParameterSyntaxException(parameter.Name, string.Format(Messages.Cli_ArgFormatError, parameter.Name, tokenText, ex.Message), ex);
 							}
-						} while ((listCont || (!paramByName && parameter.IsList)) && ((++i) < tokens.Count));
+						} while ((listCont || (!paramByName && isLastParam && parameter.IsList)) && ((++i) < tokens.Count));
 
 						Array array = Array.CreateInstance(parameter.ElementType, listArgs.Count);
 						for (int j = 0; j < array.Length; j++)
@@ -674,7 +677,13 @@ namespace Titanis.Cli
 				}
 
 				if (missingParamNames is not null)
+				{
+					foreach (var par in setParams)
+					{
+						this.WriteDiagnostic($"Parsed parameter '{par.Key}': {par.Value}");
+					}
 					throw new MissingParametersException(missingParamNames.ToArray());
+				}
 			}
 
 			{
