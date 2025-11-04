@@ -78,10 +78,13 @@ namespace Titanis.Msrpc.Mswmi
 
 
 		public Type RuntimeType => GetRuntimeTypeFor(this.PropertyType, this.SubtypeCode);
+		public Type ElementType => GetRuntimeTypeFor(this.PropertyType & CimType.BaseTypeMask, this.SubtypeCode);
 
 		public static Type GetRuntimeTypeFor(CimType propType, CimSubtype subtype)
 		{
-			return propType switch
+			bool isArray = (propType & CimType.Array) != 0;
+			propType &= CimType.BaseTypeMask;
+			var elemType = propType switch
 			{
 				CimType.SInt8 => typeof(sbyte),
 				CimType.UInt8 => typeof(byte),
@@ -105,6 +108,10 @@ namespace Titanis.Msrpc.Mswmi
 				CimType.Object => typeof(WmiObject),
 				_ => throw new ArgumentException($"The CimType {propType}/{subtype} does not have a corresponding runtime type."),
 			};
+			if (isArray)
+				elemType = elemType.MakeArrayType();
+
+			return elemType;
 		}
 
 		public static bool CheckValue(CimType propType, CimSubtype subtype, object? value)
