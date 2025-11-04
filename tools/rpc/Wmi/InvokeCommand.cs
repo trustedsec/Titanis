@@ -41,6 +41,8 @@ internal class InvokeCommand : WmiObjectCommandBase
 	[Description("Arguments to pass to the method")]
 	public string[] Arguments { get; set; }
 
+	private string? _lastOrigin;
+
 	protected sealed override async Task ProcessObject(WmiObject obj, WmiScope scope, CancellationToken cancellationToken)
 	{
 		WmiClassObject klass;
@@ -75,13 +77,17 @@ internal class InvokeCommand : WmiObjectCommandBase
 				if (argPos < inputProps.Length)
 				{
 					var inProp = inputProps[argPos];
+					this.WriteDiagnostic($"Parsing WMI method parameter '{inProp.Name}': {arg}");
+
 					if (0 != (inProp.PropertyType & CimType.Array))
 					{
 						List<object?> elems = new List<object?>();
 						if (arg != "[")
 							this.WriteError($"Arg #{argPos} ({inProp.Name}) requires an array.  To specify an array, specify a [ by itself, each array element separated by a space, then a ] to mark the end of the array");
-						while (i < this.Arguments.Length && (arg = this.Arguments[argPos]) != "]")
+						while (++i < this.Arguments.Length && (arg = this.Arguments[i]) != "]")
 						{
+							this.WriteDiagnostic($"Parsing WMI method parameter '{inProp.Name}[{elems.Count}]': {arg}");
+
 							if (TryParseArg(arg, inProp, out var coerced))
 								elems.Add(coerced);
 							else
@@ -89,7 +95,7 @@ internal class InvokeCommand : WmiObjectCommandBase
 						}
 						if (!argFailed)
 						{
-							var elemType = inProp.RuntimeType;
+							var elemType = inProp.ElementType;
 							Array arr = Array.CreateInstance(elemType, elems.Count);
 							for (int j = 0; j < elems.Count; j++)
 							{
@@ -106,6 +112,8 @@ internal class InvokeCommand : WmiObjectCommandBase
 						else
 							argFailed = true;
 					}
+
+					argPos++;
 				}
 			}
 		}
@@ -114,12 +122,18 @@ internal class InvokeCommand : WmiObjectCommandBase
 		{
 			this.WriteError("One or more arguments could not be parsed.");
 		}
-
-		var res = await obj.InvokeMethodAsync(method.Name, args, cancellationToken);
-		if (res != null)
+		else
 		{
-			this.SetOutputFormat(this.ConsoleOutputStyle ?? OutputStyle.List, OutputField.GetFieldsFor(res, this.OutputFields));
-			this.WriteRecord(res);
+			var res = await obj.InvokeMethodAsync(method.Name, args, cancellationToken);
+			if (res != null)
+			{
+				if (method.ClassOfOrigin != this._lastOrigin)
+				{
+					this.SetOutputFormat(this.ConsoleOutputStyle ?? OutputStyle.List, OutputField.GetFieldsFor(res, this.OutputFields));
+					this._lastOrigin = res.WmiClass?.Name;
+				}
+				this.WriteRecord(res);
+			}
 		}
 	}
 
@@ -127,7 +141,7 @@ internal class InvokeCommand : WmiObjectCommandBase
 	{
 		try
 		{
-			coerced = CoerceValue(arg, inProp.PropertyType, inProp.SubtypeCode);
+			coerced = CoerceValue(arg, inProp.PropertyType & CimType.BaseTypeMask, inProp.SubtypeCode);
 			return true;
 		}
 		catch (Exception ex)
