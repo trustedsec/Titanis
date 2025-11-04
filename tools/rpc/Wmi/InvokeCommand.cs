@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -15,16 +17,21 @@ namespace Wmi;
 /// <task category="WMI;Enumeration;Lateral Movement">Invoke a method on a WMI class or object</task>
 [Command]
 [Description("Invokes a method on a WMI class or object")]
+[DetailedHelpText(@"For each object, {0} looks up the specified method and parses/coerces the command line arguments after the method name as arguments to the WMI method.
+
+To pass an array of values to a WMI method, enter each element as a separate command line argument (separated by spaces) with [ before the first element and ] after the last argument.  For example, to invoke this method:
+
+	void WmiMethod(string argFirst, int[] values, string argLast)
+
+you would enter:
+
+	Wmi invoke ... WmiMethod ""first arg"" [ 1 2 3 4 5 ] ""last arg""
+")]
 [Example("Start EXPLORER.EXE", "{0} -namespace root\\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-DC1 Win32_Process Create C:\\WINDOWS\\explorer.exe")]
 [Example("Terminate a process by PID", "{0} -namespace root\\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-DC1 Win32_Process.Handle=8008 Terminate")]
 [Example("Terminate a process by name", "{0} -namespace root\\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-DC1 \"SELECT * FROM Win32_Process WHERE Caption='REGEDIT.EXE'\" Terminate")]
-internal class InvokeCommand : WmiNamespaceCommandBase
+internal class InvokeCommand : WmiObjectCommandBase
 {
-	[Parameter(10)]
-	[Mandatory]
-	[Description("Path to object or WQL query of objects to invoke on")]
-	public string ObjectPathOrWqlQuery { get; set; }
-
 	[Parameter(20)]
 	[Mandatory]
 	[Description("Method to invoke")]
@@ -34,62 +41,7 @@ internal class InvokeCommand : WmiNamespaceCommandBase
 	[Description("Arguments to pass to the method")]
 	public string[] Arguments { get; set; }
 
-	protected sealed override async Task<int> RunAsync(WmiScope ns, CancellationToken cancellationToken)
-	{
-		int count = 0;
-
-		if (
-			this.ObjectPathOrWqlQuery.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase)
-			|| this.ObjectPathOrWqlQuery.StartsWith("ASSOCIATORS OF", StringComparison.OrdinalIgnoreCase)
-			)
-		{
-			var wql = this.ObjectPathOrWqlQuery;
-			var query = await ns.ExecuteWqlQueryAsync(wql, 1, cancellationToken);
-			bool hasObject = false;
-			while (await query.ReadAsync(cancellationToken))
-			{
-				hasObject = true;
-				try
-				{
-					this.WriteDiagnostic($"Invoking on object {query.Current.RelativePath}");
-					await InvokeOn(query.Current, cancellationToken);
-					count++;
-				}
-				catch (Exception ex)
-				{
-					this.WriteError($"Method invocation failed: {ex.Message}");
-				}
-			}
-
-			if (!hasObject)
-				this.WriteWarning("No invocations because the query did not yield any instances");
-		}
-		else
-		{
-			string objPath = this.ObjectPathOrWqlQuery;
-			var obj = await ns.GetObjectAsync(objPath, cancellationToken);
-			if (obj != null)
-			{
-				this.WriteDiagnostic($"Invoking on object {obj.RelativePath}");
-				await InvokeOn(obj, cancellationToken);
-				count++;
-			}
-			else
-			{
-				this.WriteError($"Object path `{objPath}' did not return an object.");
-			}
-		}
-
-		this.WriteVerbose($"Invoked on {count} instance(s)");
-		return 0;
-	}
-
-	private async Task InvokeOn(WmiObject obj, CancellationToken cancellationToken)
-	{
-		await InvokeMethodOnObject(obj, cancellationToken);
-	}
-
-	private async Task InvokeMethodOnObject(WmiObject obj, CancellationToken cancellationToken)
+	protected sealed override async Task ProcessObject(WmiObject obj, WmiScope scope, CancellationToken cancellationToken)
 	{
 		WmiClassObject klass;
 		WmiObject target;
@@ -104,7 +56,7 @@ internal class InvokeCommand : WmiNamespaceCommandBase
 			klass = (WmiClassObject)await obj.Scope.GetObjectAsync(inst.WmiClass.Name, cancellationToken);
 		}
 		else
-			throw new NotSupportedException("The returned WMI object type is not supported.");
+			throw new NotSupportedException($"The returned WMI object type ({obj.GetType().FullName}) is not supported.");
 
 		var method = klass.GetMethod(this.Method);
 		if (method == null)
@@ -116,21 +68,43 @@ internal class InvokeCommand : WmiNamespaceCommandBase
 		bool argFailed = false;
 		if (this.Arguments != null)
 		{
+			int argPos = 0;
 			for (int i = 0; i < this.Arguments.Length; i++)
 			{
 				var arg = this.Arguments[i];
-				if (i < inputProps.Length)
+				if (argPos < inputProps.Length)
 				{
-					var inProp = inputProps[i];
-					try
+					var inProp = inputProps[argPos];
+					if (0 != (inProp.PropertyType & CimType.Array))
 					{
-						var coerced = CoerceValue(arg, inProp.PropertyType, inProp.SubtypeCode);
-						args.Add(inProp.Name, coerced);
+						List<object?> elems = new List<object?>();
+						if (arg != "[")
+							this.WriteError($"Arg #{argPos} ({inProp.Name}) requires an array.  To specify an array, specify a [ by itself, each array element separated by a space, then a ] to mark the end of the array");
+						while (i < this.Arguments.Length && (arg = this.Arguments[argPos]) != "]")
+						{
+							if (TryParseArg(arg, inProp, out var coerced))
+								elems.Add(coerced);
+							else
+								argFailed = true;
+						}
+						if (!argFailed)
+						{
+							var elemType = inProp.RuntimeType;
+							Array arr = Array.CreateInstance(elemType, elems.Count);
+							for (int j = 0; j < elems.Count; j++)
+							{
+								var elem = elems[j];
+								arr.SetValue(elem, j);
+							}
+							args.Add(inProp.Name, arr);
+						}
 					}
-					catch (Exception ex)
+					else
 					{
-						this.WriteError($"Error parsing argument '{arg}' for parameter '{inProp.Name}': {ex.Message}");
-						argFailed = true;
+						if (TryParseArg(arg, inProp, out var coerced))
+							args.Add(inProp.Name, coerced);
+						else
+							argFailed = true;
 					}
 				}
 			}
@@ -142,8 +116,26 @@ internal class InvokeCommand : WmiNamespaceCommandBase
 		}
 
 		var res = await obj.InvokeMethodAsync(method.Name, args, cancellationToken);
-		this.SetOutputFormat(this.ConsoleOutputStyle ?? OutputStyle.List, OutputField.GetFieldsFor(res, this.OutputFields));
-		this.WriteRecord(res);
+		if (res != null)
+		{
+			this.SetOutputFormat(this.ConsoleOutputStyle ?? OutputStyle.List, OutputField.GetFieldsFor(res, this.OutputFields));
+			this.WriteRecord(res);
+		}
+	}
+
+	private bool TryParseArg(string arg, WmiProperty inProp, out object? coerced)
+	{
+		try
+		{
+			coerced = CoerceValue(arg, inProp.PropertyType, inProp.SubtypeCode);
+			return true;
+		}
+		catch (Exception ex)
+		{
+			this.WriteError($"Error parsing argument '{arg}' for parameter '{inProp.Name}': {ex.Message}");
+			coerced = null;
+			return false;
+		}
 	}
 
 	public static object? CoerceValue(string text, CimType propType, CimSubtype subtype)
@@ -153,18 +145,6 @@ internal class InvokeCommand : WmiNamespaceCommandBase
 		bool isArray = 0 != (propType & CimType.Array);
 		if (isArray)
 		{
-			//if (value is Array arr)
-			//{
-			//	var coerced = Array.CreateInstance(elemType, arr.Length);
-			//	for (int i = 0; i < coerced.Length; i++)
-			//	{
-			//		var elem = arr.GetValue(i);
-			//		var coercedElem = CoerceElement(elem, elemType);
-			//		coerced.SetValue(coercedElem, elem);
-			//	}
-			//	return coerced;
-			//}
-			//else
 			throw new ArgumentException("An array type requires an array value but an array was not provided.");
 		}
 		else

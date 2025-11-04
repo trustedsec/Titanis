@@ -8,6 +8,10 @@ using Titanis.Cli;
 using Titanis.Msrpc.Mswmi;
 
 namespace Wmi;
+
+/// <summary>
+/// Base class for commands that execute a WMI query.
+/// </summary>
 [OutputRecordType(typeof(WmiObject))]
 internal abstract class QueryCommandBase : WmiNamespaceCommandBase
 {
@@ -40,6 +44,8 @@ internal abstract class QueryCommandBase : WmiNamespaceCommandBase
 		while (await results.ReadAsync(cancellationToken))
 		{
 			var record = results.Current;
+			if (record is null)
+				continue;
 
 			if (first)
 			{

@@ -22,57 +22,34 @@ Use -WithQualifiers to filter by one or more qualifiers.  Each entry may either 
 [Example("List the methods of the Win32_Process class", "{0} -namespace root\\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 Win32_Process")]
 [Example("List only the static methods of the Win32_Process class", "{0} -namespace root\\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 -WithQualifiers static Win32_Process")]
 [Example("List the methods of the Win32_Process class that require the SeDebugPrivilege", "{0} -namespace root\\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 -WithQualifiers Privileges=SeDebugPrivilege Win32_Process")]
-internal class LsmethodCommand : WmiNamespaceCommandBase
+internal class LsmethodCommand : WmiObjectCommandBase
 {
-	[Parameter(10)]
-	[Mandatory]
-	[Description("Path of class or object to inspect")]
-	public string[] ObjectPath { get; set; }
-
-	protected sealed override async Task<int> RunAsync(WmiScope ns, CancellationToken cancellationToken)
+	protected sealed override async Task ProcessObject(WmiObject obj, WmiScope scope, CancellationToken cancellationToken)
 	{
-		foreach (var objPath in this.ObjectPath)
+		if (obj is WmiClassObject cls)
 		{
-			try
+			var methods = cls.Methods;
+			if (methods != null)
 			{
-				var obj = await ns.GetObjectAsync(objPath, cancellationToken);
-
-				if (obj is WmiClassObject cls)
+				foreach (var method in methods)
 				{
-					var methods = cls.Methods;
-					if (methods != null)
-					{
-						foreach (var method in methods)
-						{
-							if (FilterQualifiers(method.Qualifiers))
-								this.WriteRecord(method);
-						}
-					}
+					if (FilterQualifiers(method.Qualifiers))
+						this.WriteRecord(method);
 				}
-				else if (obj is WmiInstanceObject inst)
-				{
-					var methods = inst.WmiClass.Methods;
-
-					if (methods != null)
-					{
-						foreach (var method in methods)
-						{
-							if (FilterQualifiers(method.Qualifiers))
-								this.WriteRecord(method);
-						}
-					}
-				}
-				else
-				{
-					this.WriteError($"Object path `{objPath}' did not return a class object.");
-				}
-			}
-			catch (Exception ex)
-			{
-				this.WriteMessage(LogMessage.Error(null, ex));
 			}
 		}
+		else if (obj is WmiInstanceObject inst)
+		{
+			var methods = inst.WmiClass.Methods;
 
-		return 0;
+			if (methods != null)
+			{
+				foreach (var method in methods)
+				{
+					if (FilterQualifiers(method.Qualifiers))
+						this.WriteRecord(method);
+				}
+			}
+		}
 	}
 }

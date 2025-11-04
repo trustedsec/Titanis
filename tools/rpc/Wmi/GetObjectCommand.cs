@@ -34,8 +34,11 @@ internal class GetObjectCommand : WmiNamespaceCommandBase
 			try
 			{
 				var obj = await ns.GetObjectAsync(path, cancellationToken);
-				this.SetOutputFormat(this.ConsoleOutputStyle ?? OutputStyle.List, OutputField.GetFieldsFor(obj, this.OutputFields));
-				this.WriteRecord(obj);
+				if ((obj != null))
+				{
+					this.SetOutputFormat(this.ConsoleOutputStyle ?? OutputStyle.List, OutputField.GetFieldsFor(obj, this.OutputFields));
+					this.WriteRecord(obj);
+				}
 			}
 			catch (Exception ex)
 			{
