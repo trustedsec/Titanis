@@ -42,6 +42,20 @@ namespace Titanis.Cli
 		[Description("Fields to display in output")]
 		[ValueListProvider(typeof(FieldListProvider))]
 		public string[]? OutputFields { get; set; }
+
+		[Parameter]
+		[Description("Print headers for table/list/CSV/TSV styles")]
+		[DefaultValue(true)]
+		public SwitchParam OutputHeaders { get; set; }
+
+		protected void SetOutputFormat(OutputStyle style)
+		{
+			base.SetOutputFormat(style, null, this.OutputHeaders.IsSet);
+		}
+		protected void SetOutputFormat(OutputStyle style, OutputField[] outputFields)
+		{
+			base.SetOutputFormat(style, outputFields, this.OutputHeaders.IsSet);
+		}
 		#endregion
 
 		/// <inheritdoc/>

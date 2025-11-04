@@ -431,10 +431,12 @@ namespace Titanis.Cli
 		protected bool IsFieldInOutput(string fieldName)
 			=> this._outputFieldNames?.Contains(fieldName) ?? false;
 
-		protected void SetOutputFormat(OutputStyle style, OutputField[]? fields)
+		private bool _includeHeaders;
+		protected void SetOutputFormat(OutputStyle style, OutputField[]? fields, bool includeHeaders)
 		{
 			if (style is not OutputStyle.Raw)
 				this._recordsExpected = true;
+			this._includeHeaders = includeHeaders;
 
 			this.FlushOutput();
 
@@ -491,6 +493,7 @@ namespace Titanis.Cli
 				Debug.Assert(fields != null);
 
 				TextTable tbl = new TextTable();
+				if (includeHeaders)
 				{
 					var trHeader = tbl.AddRow();
 					var trLine = tbl.AddRow();
@@ -595,7 +598,10 @@ namespace Titanis.Cli
 							var value = field.GetValue(record);
 							var formatted = field.FormatValue(value, this._style);
 
-							context.WriteOutputLine($"{field.Caption}: {formatted}");
+							if (this._includeHeaders)
+								context.WriteOutputLine(formatted);
+							else
+								context.WriteOutputLine($"{field.Caption}: {formatted}");
 						}
 					}
 					context.WriteOutputLine(string.Empty);
@@ -603,9 +609,12 @@ namespace Titanis.Cli
 				case OutputStyle.Csv or OutputStyle.Tsv:
 					if (this._outputFields != null && record is not null)
 					{
-						var sep = this._style switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
-						string line = string.Join(sep, this._outputFields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._style))));
-						this.VerifyContext().WriteOutputLine(line);
+						if (_includeHeaders)
+						{
+							var sep = this._style switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
+							string line = string.Join(sep, this._outputFields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._style))));
+							this.VerifyContext().WriteOutputLine(line);
+						}
 					}
 					break;
 				case OutputStyle.Json:
