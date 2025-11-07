@@ -5,6 +5,7 @@ namespace Titanis.Cli.SamTool;
 [Command]
 [Description("Commands for interacting with a remote Security Accounts Manager")]
 [Subcommand("enumusers", typeof(EnumUsersCommand))]
+[Subcommand("enumgroups", typeof(EnumGroupsCommand))]
 internal class Program : MultiCommand
 {
 	static void Main(string[] args)
