@@ -2,14 +2,19 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Titanis.DceRpc;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Mssamr
 {
 	public sealed class SamGroup : SamObject
 	{
-		internal SamGroup(SamClient samClient, RpcContextHandle handle) : base(samClient, handle)
+		internal SamGroup(SamClient samClient, RpcContextHandle handle, SecurityIdentifier sid)
+			: base(samClient, handle)
 		{
+			Sid = sid;
 		}
+
+		public SecurityIdentifier Sid { get; }
 
 		public Task<List<SamMemberInfo>> EnumMembersAsync(CancellationToken cancellationToken)
 			=> this._samClient.EnumGroupMembers(this._handle, cancellationToken);

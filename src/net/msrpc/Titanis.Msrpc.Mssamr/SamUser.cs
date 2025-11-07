@@ -5,10 +5,10 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Mssamr
 {
-	public sealed class SamUser : SamObject
+	public sealed class SamUser : SamAccount
 	{
-		public SamUser(SamClient samClient, RpcContextHandle handle)
-			: base(samClient, handle)
+		public SamUser(SamClient samClient, RpcContextHandle handle, SecurityIdentifier sid)
+			: base(samClient, handle, sid)
 		{
 		}
 

@@ -2,15 +2,19 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Titanis.DceRpc;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Mssamr
 {
 	public sealed class SamAlias : SamObject
 	{
-		public SamAlias(SamClient samClient, RpcContextHandle handle)
+		public SamAlias(SamClient samClient, RpcContextHandle handle, SecurityIdentifier sid)
 			: base(samClient, handle)
 		{
+			Sid = sid;
 		}
+
+		public SecurityIdentifier Sid { get; }
 
 		public Task<List<SamSid>> EnumMembersAsync(CancellationToken cancellationToken)
 			=> this._samClient.EnumAliasMembers(this._handle, cancellationToken);

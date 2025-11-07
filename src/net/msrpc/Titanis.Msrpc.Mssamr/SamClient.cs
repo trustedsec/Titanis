@@ -261,13 +261,14 @@ namespace Titanis.Msrpc.Mssamr
 				cancellationToken
 				).ConfigureAwait(false));
 
-			return new SamDomain(this, phDomain.value);
+			return new SamDomain(this, phDomain.value, pDomainSid.ToSid());
 		}
 
 		internal async Task<SamGroup> OpenGroup(
 			RpcContextHandle phDomain,
 			uint groupId,
 			SamGroupAccess access,
+			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken
 			)
 		{
@@ -280,13 +281,15 @@ namespace Titanis.Msrpc.Mssamr
 				cancellationToken
 				).ConfigureAwait(false));
 
-			return new SamGroup(this, phGroup.value);
+			var groupSid = domainSid.Concat(groupId);
+			return new SamGroup(this, phGroup.value, groupSid);
 		}
 
 		internal async Task<SamAlias> OpenAlias(
 			RpcContextHandle phDomain,
 			uint aliasId,
 			SamAliasAccess access,
+			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken
 			)
 		{
@@ -299,13 +302,15 @@ namespace Titanis.Msrpc.Mssamr
 				cancellationToken
 				).ConfigureAwait(false));
 
-			return new SamAlias(this, phAlias.value);
+			var aliasSid = domainSid.Concat(aliasId);
+			return new SamAlias(this, phAlias.value, aliasSid);
 		}
 
 		internal async Task<SamUser> OpenUser(
 			RpcContextHandle phDomain,
-			uint aliasId,
+			uint userId,
 			SamUserAccess access,
+			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken
 			)
 		{
@@ -313,12 +318,13 @@ namespace Titanis.Msrpc.Mssamr
 			NtstatusException.CheckAndThrow((Ntstatus)await this._proxy.SamrOpenUser(
 				phDomain,
 				(uint)access,
-				aliasId,
+				userId,
 				phUser,
 				cancellationToken
 				).ConfigureAwait(false));
 
-			return new SamUser(this, phUser.value);
+			var userSid = domainSid.Concat(userId);
+			return new SamUser(this, phUser.value, userSid);
 		}
 
 		private delegate Task<int> EnumFunc(
@@ -364,6 +370,7 @@ namespace Titanis.Msrpc.Mssamr
 					cancellationToken).ConfigureAwait(false));
 				if (
 					(status == Ntstatus.STATUS_NO_MORE_ENTRIES)
+					|| (status == Ntstatus.STATUS_MORE_ENTRIES)
 					|| (status == Ntstatus.STATUS_SUCCESS)
 					)
 				{
@@ -588,6 +595,7 @@ namespace Titanis.Msrpc.Mssamr
 			RpcContextHandle phDomain,
 			string name,
 			SamGroupAccess access,
+			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken)
 		{
 			var pRelativeId = new RpcPointer<uint>();
@@ -601,13 +609,15 @@ namespace Titanis.Msrpc.Mssamr
 				cancellationToken
 				).ConfigureAwait(false));
 
-			return new SamGroup(this, phGroup.value);
+			var groupSid = domainSid.Concat(pRelativeId.value);
+			return new SamGroup(this, phGroup.value, groupSid);
 		}
 
 		internal async Task<SamAlias> CreateAlias(
 			RpcContextHandle phDomain,
 			string name,
 			SamAliasAccess access,
+			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken)
 		{
 			var pRelativeId = new RpcPointer<uint>();
@@ -620,7 +630,8 @@ namespace Titanis.Msrpc.Mssamr
 				pRelativeId,
 				cancellationToken).ConfigureAwait(false));
 
-			return new SamAlias(this, phAlias.value);
+			var aliasSid = domainSid.Concat(pRelativeId.value);
+			return new SamAlias(this, phAlias.value, aliasSid);
 		}
 
 		internal async Task<SamUser> CreateUser(
@@ -628,6 +639,7 @@ namespace Titanis.Msrpc.Mssamr
 			string name,
 			SamUserAccountFlags accountType,
 			SamUserAccess access,
+			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken)
 		{
 			var pRelativeId = new RpcPointer<uint>();
@@ -643,7 +655,8 @@ namespace Titanis.Msrpc.Mssamr
 				pRelativeId,
 				cancellationToken).ConfigureAwait(false));
 
-			return new SamUser(this, phUser.value);
+			var userSid = domainSid.Concat(pRelativeId.value);
+			return new SamUser(this, phUser.value, userSid);
 		}
 
 		#region Query domain info
