@@ -56,6 +56,8 @@ namespace Titanis.Msrpc.Mssamr
 		Read = 0x20010,
 		Write = 0x2000E,
 		Execute = 0x20001,
+
+		MaxAllowed = 0x02000000
 	}
 
 	[Flags]
@@ -71,6 +73,8 @@ namespace Titanis.Msrpc.Mssamr
 		Read = 0x20004,
 		Write = 0x20013,
 		Execute = 0x20008,
+
+		MaxAllowed = 0x02000000
 	}
 
 	[Flags]
