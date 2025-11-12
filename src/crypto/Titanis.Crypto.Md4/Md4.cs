@@ -1,30 +1,45 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Titanis.Crypto
 {
-	public unsafe struct Md4Context : IHashContext, IHashBuffer
+	public struct Md4Context : IHashContext, IHashBuffer
 	{
 		public long InputSize { get; set; }
 		public int WriteIndex { get; set; }
 
 		internal Md4State _state;
-		internal fixed uint _block[Md4.BlockSize / sizeof(uint)];
-		Span<byte> IHashBuffer.InputBuffer
+
+		[InlineArray(Md4.BlockSize)]
+		struct BlockAsBytes
 		{
-			get
-			{
-				fixed (uint* pBlock = this._block)
-				{
-					return new Span<byte>((byte*)pBlock, InputBlockSizeBytes);
-				}
-			}
+			internal byte b;
+		}
+		[InlineArray(Md4.BlockSize / 4)]
+		struct BlockAsWords
+		{
+			internal uint w;
+		}
+		[StructLayout(LayoutKind.Explicit)]
+		struct Block
+		{
+			[FieldOffset(0)]
+			internal BlockAsBytes bytes;
+			[FieldOffset(0)]
+			internal BlockAsWords words;
 		}
 
+		private Block _block;
+		public Span<byte> InputBuffer => MemoryMarshal.CreateSpan(ref this._block.bytes.b, Md4.BlockSize);
+
 		public int DigestSizeBytes => Md4State.StructSize;
+		public static int StaticDigestSizeBytes => Md4State.StructSize;
 		public int InputBlockSizeBytes => Md4.BlockSize;
 
 		public void Initialize()
@@ -111,33 +126,21 @@ namespace Titanis.Crypto
 			this.WriteIndex = 0;
 		}
 
-		internal unsafe void SetLength(long cbPlaintext)
+		internal void SetLength(long cbPlaintext)
 		{
-			fixed (uint* pBuf = &this._block[Md4.BlockSize / 4 - 2])
-			{
-				*(long*)pBuf = (this.InputSize * 8);
-			}
+			BinaryPrimitives.WriteInt64LittleEndian(this.InputBuffer[^8..], cbPlaintext * 8);
 		}
 
-		internal unsafe void MarkEnd()
+		internal void MarkEnd()
 		{
-			fixed (uint* pBuf = this._block)
-			{
-				byte* pBytes = (byte*)pBuf;
-				pBytes[this.WriteIndex++] = 0x80;
-			}
+			this._block.bytes[this.WriteIndex++] = 0x80;
 		}
 
-		internal unsafe void ZeroBufferBytes(int startIndex, int count)
+		internal void ZeroBufferBytes(int startIndex, int count)
 		{
-			fixed (uint* pBuf = this._block)
+			for (int i = 0; i < count; i++)
 			{
-				byte* pBytes = (byte*)pBuf;
-				pBytes += startIndex;
-				for (int i = 0; i < count; i++)
-				{
-					pBytes[i] = 0;
-				}
+				this._block.bytes[i + startIndex] = 0;
 			}
 		}
 
@@ -152,7 +155,7 @@ namespace Titanis.Crypto
 			if (this.WriteIndex >= Md4.BlockSize)
 				this.HashBuffer();
 
-			if (this.WriteIndex < (Md4.BlockSize - 8))
+			if (this.WriteIndex <= (Md4.BlockSize - 8))
 			{
 				this.ZeroBufferBytes(this.WriteIndex, (Md4.BlockSize - 8) - this.WriteIndex);
 			}
@@ -170,13 +173,9 @@ namespace Titanis.Crypto
 			GetDigest(digestBuffer);
 		}
 
-		private unsafe void GetDigest(Span<byte> digestBuffer)
+		private void GetDigest(Span<byte> digestBuffer)
 		{
-			Debug.Assert(digestBuffer.Length >= this.DigestSizeBytes);
-			fixed (byte* pDigest = digestBuffer)
-			{
-				*(Md4State*)pDigest = this._state;
-			}
+			MemoryMarshal.Cast<byte, Md4State>(digestBuffer)[0] = this._state;
 		}
 
 		/*
@@ -200,17 +199,17 @@ namespace Titanis.Crypto
 
 		private uint Round1(uint a, uint b, uint c, uint d, int k, int s)
 		{
-			return BitHelper.RotateLeft((a + F(b, c, d) + this._block[k]), s);
+			return BitHelper.RotateLeft((a + F(b, c, d) + this._block.words[k]), s);
 		}
 
 		private uint Round2(uint a, uint b, uint c, uint d, int k, int s)
 		{
-			return BitHelper.RotateLeft((a + G(b, c, d) + this._block[k] + 0x5A827999), s);
+			return BitHelper.RotateLeft((a + G(b, c, d) + this._block.words[k] + 0x5A827999), s);
 		}
 
 		private uint Round3(uint a, uint b, uint c, uint d, int k, int s)
 		{
-			return BitHelper.RotateLeft((a + H(b, c, d) + this._block[k] + 0x6ED9EBA1), s);
+			return BitHelper.RotateLeft((a + H(b, c, d) + this._block.words[k] + 0x6ED9EBA1), s);
 		}
 	}
 
@@ -223,7 +222,7 @@ namespace Titanis.Crypto
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	struct Md4State
 	{
-		public static unsafe int StructSize => sizeof(Md4State);
+		public const int StructSize = 4 * 4;
 
 		internal uint a;
 		internal uint b;

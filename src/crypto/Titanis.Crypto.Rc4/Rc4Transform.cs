@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Threading;
 
 namespace Titanis.Crypto
 {
-	unsafe struct SBox
+	[InlineArray(Rc4.SBoxSize)]
+	struct SBox
 	{
-		const int SBoxSize = 256;
-		private fixed byte _s[SBoxSize];
-		internal unsafe Span<byte> S
-		{
-			get
-			{
-				fixed (byte* pSBox = this._s)
-				{
-					return new Span<byte>(pSBox, SBoxSize);
-				}
-			}
-		}
+		internal byte b;
 	}
 
 	internal class Rc4Transform : ICryptoTransform

@@ -7,6 +7,7 @@ namespace Titanis.Crypto
 		internal Sha2LargeContext<Sha384Policy> ctx;
 
 		public int DigestSizeBytes => 384 / 8;
+		public static int StaticDigestSizeBytes => 384 / 8;
 
 		public int InputBlockSizeBytes => this.ctx.InputBlockSizeBytes;
 
@@ -20,9 +21,9 @@ namespace Titanis.Crypto
 			this.ctx.HashBuffer();
 		}
 
-		public void HashData(ReadOnlySpan<byte> block)
+		public void HashData(ReadOnlySpan<byte> input)
 		{
-			this.ctx.HashData(block);
+			this.ctx.HashData(input);
 		}
 
 		public void HashFinal(Span<byte> digestBuffer)

@@ -2,6 +2,7 @@
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -34,6 +35,8 @@ namespace Titanis.Crypto
 			0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817
 		};
 
+		internal const int BufferWordCount = 80;
+
 		internal static ulong ch(ulong x, ulong y, ulong z)
 			=> (x & y) ^ (~x & z);
 		internal static ulong maj(ulong x, ulong y, ulong z)
@@ -53,7 +56,13 @@ namespace Titanis.Crypto
 		void InitializeState(ref Sha2LargeState state);
 		int DigestSize { get; }
 	}
-	internal unsafe struct Sha2LargeContext<TPolicy> : IHashContext, IHashBuffer
+
+	[InlineArray(Sha384_512.BufferWordCount)]
+	struct Sha2LargeBlock
+	{
+		internal ulong w;
+	}
+	internal struct Sha2LargeContext<TPolicy> : IHashContext, IHashBuffer
 		where TPolicy : struct, ISha2LargePolicy
 	{
 		public long InputSize { get; set; }
@@ -61,32 +70,14 @@ namespace Titanis.Crypto
 
 		internal Sha2LargeState _state;
 
-		private const int BufferWordCount = 80;
-		internal fixed ulong _buffer[BufferWordCount];
-		private Span<ulong> W
-		{
-			get
-			{
-				fixed (ulong* pBlock = this._buffer)
-				{
-					return new Span<ulong>(pBlock, BufferWordCount);
-				}
-			}
-		}
+		internal Sha2LargeBlock _buffer;
+		private Span<ulong> W => MemoryMarshal.CreateSpan<ulong>(ref this._buffer.w, Sha384_512.BufferWordCount);
 
-		public Span<byte> InputBuffer
-		{
-			get
-			{
-				fixed (ulong* pBlock = this._buffer)
-				{
-					return new Span<byte>((byte*)pBlock, InputBlockSizeBytes);
-				}
-			}
-		}
+		public Span<byte> InputBuffer => MemoryMarshal.AsBytes(this.W);
 
 
 		public int DigestSizeBytes => new TPolicy().DigestSize;
+		public static int StaticDigestSizeBytes => new TPolicy().DigestSize;
 		public int InputBlockSizeBytes => Sha512.BlockSize;
 
 		public void Initialize()
@@ -111,7 +102,7 @@ namespace Titanis.Crypto
 				w[i] = BinaryPrimitives.ReverseEndianness(w[i]);
 			}
 
-			for (int i = 16; i < BufferWordCount; i++)
+			for (int i = 16; i < Sha384_512.BufferWordCount; i++)
 			{
 				w[i] =
 					Sha384_512.ssig1(w[i - 2])
@@ -129,7 +120,7 @@ namespace Titanis.Crypto
 			var g = this._state.h6;
 			var h = this._state.h7;
 
-			for (int i = 0; i < BufferWordCount; i++)
+			for (int i = 0; i < Sha384_512.BufferWordCount; i++)
 			{
 				var t1 = h
 					+ Sha384_512.bsig1(e)
@@ -160,37 +151,25 @@ namespace Titanis.Crypto
 			this.WriteIndex = 0;
 		}
 
-		internal unsafe void SetLength(long cbPlaintext)
+		internal void SetLength(long cbPlaintext)
 		{
 			cbPlaintext *= 8;
-			cbPlaintext = BinaryPrimitives.ReverseEndianness(cbPlaintext);
-			//cbPlaintext = (cbPlaintext >> 32) | (cbPlaintext << 32);
-			fixed (ulong* pBuf = &this._buffer[Sha512.BlockSize / 8 - 2])
-			{
-				*(long*)pBuf = 0;
-				*(long*)(pBuf + 1) = ((cbPlaintext));
-			}
+
+			BinaryPrimitives.WriteInt64BigEndian(this.InputBuffer.Slice(Sha512.BlockSize - 16, 8), 0);
+			BinaryPrimitives.WriteInt64BigEndian(this.InputBuffer.Slice(Sha512.BlockSize - 8, 8), cbPlaintext);
 		}
 
-		internal unsafe void MarkEnd()
+		internal void MarkEnd()
 		{
-			fixed (ulong* pBuf = this._buffer)
-			{
-				byte* pBytes = (byte*)pBuf;
-				pBytes[this.WriteIndex++] = 0x80;
-			}
+			this.InputBuffer[this.WriteIndex++] = 0x80;
 		}
 
-		internal unsafe void ZeroBufferBytes(int startIndex, int count)
+		internal void ZeroBufferBytes(int startIndex, int count)
 		{
-			fixed (ulong* pBuf = this._buffer)
+			var pBytes = this.InputBuffer.Slice(startIndex);
+			for (int i = 0; i < count; i++)
 			{
-				byte* pBytes = (byte*)pBuf;
-				pBytes += startIndex;
-				for (int i = 0; i < count; i++)
-				{
-					pBytes[i] = 0;
-				}
+				pBytes[i] = 0;
 			}
 		}
 
@@ -203,7 +182,7 @@ namespace Titanis.Crypto
 
 			this.MarkEnd();
 
-			if (this.WriteIndex < (Sha512.BlockSize - 16))
+			if (this.WriteIndex <= (Sha512.BlockSize - 16))
 			{
 				this.ZeroBufferBytes(this.WriteIndex, (Sha512.BlockSize - 16) - this.WriteIndex);
 			}
@@ -220,22 +199,22 @@ namespace Titanis.Crypto
 			GetDigest(digestBuffer);
 		}
 
-		private unsafe void GetDigest(Span<byte> digestBuffer)
+		private void GetDigest(Span<byte> digestBuffer)
 		{
 			Debug.Assert(digestBuffer.Length >= this.DigestSizeBytes);
-			fixed (byte* pDigest = digestBuffer)
+			BinaryPrimitives.WriteUInt64BigEndian(digestBuffer.Slice(0x00, 8), this._state.h0);
+			BinaryPrimitives.WriteUInt64BigEndian(digestBuffer.Slice(0x08, 8), this._state.h1);
+			BinaryPrimitives.WriteUInt64BigEndian(digestBuffer.Slice(0x10, 8), this._state.h2);
+			BinaryPrimitives.WriteUInt64BigEndian(digestBuffer.Slice(0x18, 8), this._state.h3);
+			BinaryPrimitives.WriteUInt64BigEndian(digestBuffer.Slice(0x20, 8), this._state.h4);
+			BinaryPrimitives.WriteUInt64BigEndian(digestBuffer.Slice(0x28, 8), this._state.h5);
+			if (digestBuffer.Length >= 0x40)
 			{
-				ref Sha2LargeState digest = ref *(Sha2LargeState*)pDigest;
-				digest.h0 = BinaryPrimitives.ReverseEndianness(this._state.h0);
-				digest.h1 = BinaryPrimitives.ReverseEndianness(this._state.h1);
-				digest.h2 = BinaryPrimitives.ReverseEndianness(this._state.h2);
-				digest.h3 = BinaryPrimitives.ReverseEndianness(this._state.h3);
-				digest.h4 = BinaryPrimitives.ReverseEndianness(this._state.h4);
-				digest.h5 = BinaryPrimitives.ReverseEndianness(this._state.h5);
-				digest.h6 = BinaryPrimitives.ReverseEndianness(this._state.h6);
-				digest.h7 = BinaryPrimitives.ReverseEndianness(this._state.h7);
+				BinaryPrimitives.WriteUInt64BigEndian(digestBuffer.Slice(0x30, 8), this._state.h6);
+				BinaryPrimitives.WriteUInt64BigEndian(digestBuffer.Slice(0x38, 8), this._state.h7);
 			}
 		}
+
 	}
 
 	public class Sha384 : SlimHashAlgorithm<Sha224Context>
@@ -253,7 +232,7 @@ namespace Titanis.Crypto
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	struct Sha2LargeState
 	{
-		public static unsafe int StructSize => sizeof(Sha2LargeState);
+		public const int StructSize = 8 * 8;
 
 		internal ulong h0;
 		internal ulong h1;

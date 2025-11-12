@@ -44,8 +44,10 @@ namespace Titanis.Crypto
 
 		public static ulong ExpandKey(ulong key56)
 		{
-			if (key56 >= (1UL << 56))
-				throw new ArgumentNullException("Key must only be 56 bits.", nameof(key56));
+			// UNDONE: This was meant as a sanity check
+			// However, NTLM passes 64 bits with the expectation that this implementation will ignore them
+			//if (key56 >= (1UL << 56))
+			//	throw new ArgumentNullException("Key must only be 56 bits.", nameof(key56));
 
 			var key64 = AddParityAndReverse(BinaryPrimitives.ReverseEndianness(key56) >> 8);
 			return key64;

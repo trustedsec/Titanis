@@ -43,6 +43,8 @@ namespace Titanis.Crypto
 			this.BlockSize = 1;
 		}
 
+		internal const int SBoxSize = 256;
+
 		private static readonly KeySizes[] _legalBlockSizes = new KeySizes[] { new KeySizes(1, 1, 1) };
 		public override KeySizes[] LegalBlockSizes => _legalBlockSizes;
 
@@ -75,7 +77,7 @@ namespace Titanis.Crypto
 
 		internal static Rc4State Transform(ref SBox sbox, ReadOnlySpan<byte> inputBuffer, Span<byte> outputBuffer, Rc4State state)
 		{
-			var s = sbox.S;
+			ref var s = ref sbox;
 			for (int index = 0; index < inputBuffer.Length; index++)
 			{
 				state.i++;
@@ -136,10 +138,10 @@ namespace Titanis.Crypto
 		internal static void BuildS(ReadOnlySpan<byte> key, out SBox sbox)
 		{
 			sbox = new SBox();
-			Span<byte> s = sbox.S;
+			ref var s = ref sbox;
 
 			int keylength = key.Length;
-			for (int i = 0; i < 256; i++)
+			for (int i = 0; i < Rc4.SBoxSize; i++)
 			{
 				s[i] = (byte)i;
 			}

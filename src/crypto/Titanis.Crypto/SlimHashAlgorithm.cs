@@ -1,18 +1,19 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Security.Cryptography;
 
 namespace Titanis.Crypto
 {
-	public abstract class SlimHashAlgorithm : HashAlgorithm
+	/// <summary>
+	/// Represents an implementation of a hash algorithm.
+	/// </summary>
+	public abstract class SlimHashAlgorithm
 	{
-		//public sealed override bool CanReuseTransform => true;
-		//public sealed override bool CanTransformMultipleBlocks => true;
-
 		public static byte[] ComputeHmac<T>(ReadOnlySpan<byte> key, ReadOnlySpan<byte> input)
 			where T : struct, IHashContext
 		{
-			int digestSize = (new T()).DigestSizeBytes;
+			int digestSize = T.StaticDigestSizeBytes;
 			byte[] digestBuffer = new byte[digestSize];
 			ComputeHmac<T>(key, input, digestBuffer);
 			return digestBuffer;
@@ -38,7 +39,7 @@ namespace Titanis.Crypto
 		public static byte[] ComputeHash<T>(ReadOnlySpan<byte> input)
 			where T : struct, IHashContext
 		{
-			int digestSize = (new T()).DigestSizeBytes;
+			int digestSize = T.StaticDigestSizeBytes;
 			byte[] digestBuffer = new byte[digestSize];
 			ComputeHash<T>(input, digestBuffer);
 			return digestBuffer;
@@ -53,7 +54,7 @@ namespace Titanis.Crypto
 			ctx.HashFinal(digestBuffer);
 		}
 
-		public static unsafe void HashData<T>(ReadOnlySpan<byte> input, ref T context)
+		public static void HashData<T>(ReadOnlySpan<byte> input, ref T context)
 			where T : IHashBuffer
 		{
 			int cbSize = input.Length;
@@ -83,6 +84,8 @@ namespace Titanis.Crypto
 				}
 			}
 		}
+
+		public abstract void Initialize();
 	}
 
 	public class SlimHashAlgorithm<T> : SlimHashAlgorithm
@@ -93,21 +96,12 @@ namespace Titanis.Crypto
 
 		protected SlimHashAlgorithm()
 		{
-			//this.HashSizeValue = this._context.DigestSizeBytes * 8;
 		}
-
-		//public override int InputBlockSize => this._context.InputBlockSizeBytes * 8;
-		//public override int OutputBlockSize => this.HashSize;
 
 		public override void Initialize()
 		{
 			this._context.Initialize();
 			this._isInit = true;
-		}
-
-		protected override void HashCore(byte[] array, int ibStart, int cbSize)
-		{
-			this.HashCore(new ReadOnlySpan<byte>(array, ibStart, cbSize));
 		}
 
 		protected void HashCore(ReadOnlySpan<byte> input)
@@ -116,15 +110,6 @@ namespace Titanis.Crypto
 				this.Initialize();
 
 			this._context.HashData(input);
-		}
-
-		protected override byte[] HashFinal()
-		{
-			byte[] digest = new byte[this._context.DigestSizeBytes];
-			this._context.HashFinal(digest);
-
-			this._isInit = false;
-			return digest;
 		}
 	}
 

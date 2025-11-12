@@ -9,19 +9,6 @@ namespace Titanis.Crypto
 {
 	public static class Sp800_108
 	{
-		private static unsafe void SetInt32(byte[] buf, int offset, int n)
-		{
-			Debug.Assert((offset + 4) <= buf.Length);
-
-			if (BitConverter.IsLittleEndian)
-				n = BinaryPrimitives.ReverseEndianness(n);
-
-			fixed (byte* pBuf = buf)
-			{
-				*(int*)(pBuf + offset) = n;
-			}
-		}
-
 		public static byte[] KdfCtr(
 			byte[] label,
 			byte[] context,
@@ -53,11 +40,11 @@ namespace Titanis.Crypto
 			offInput += label.Length + 1;
 			Buffer.BlockCopy(context, 0, input, offInput, context.Length);
 			offInput += context.Length;
-			SetInt32(input, offInput, outputBitLength);
+			BinaryPrimitives.WriteInt32BigEndian(input.AsSpan(offInput, 4), outputBitLength);
 
 			for (int i = 0; i < n; i++)
 			{
-				SetInt32(input, 0, i + 1);
+				BinaryPrimitives.WriteInt32BigEndian(input.AsSpan(0, 4), i + 1);
 
 				byte[] outChunk = hashalg.ComputeHash(input);
 				Buffer.BlockCopy(outChunk, 0, output, i * cbHash, outChunk.Length);

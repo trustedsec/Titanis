@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -22,6 +24,8 @@ namespace Titanis.Crypto
 			0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 		};
 
+		internal const int BufferWordCount = 64;
+
 		internal static uint ch(uint x, uint y, uint z)
 			=> (x & y) ^ (~x & z);
 		internal static uint maj(uint x, uint y, uint z)
@@ -41,7 +45,13 @@ namespace Titanis.Crypto
 		void InitializeState(ref Sha2SmallState state);
 		int DigestSize { get; }
 	}
-	internal unsafe struct Sha2SmallContext<TPolicy> : IHashContext, IHashBuffer
+
+	[InlineArray(Sha224_256.BufferWordCount)]
+	struct Sha2SmallBlock
+	{
+		internal uint w;
+	}
+	internal struct Sha2SmallContext<TPolicy> : IHashContext, IHashBuffer
 		where TPolicy : struct, ISha2SmallPolicy
 	{
 		public long InputSize { get; set; }
@@ -49,32 +59,14 @@ namespace Titanis.Crypto
 
 		internal Sha2SmallState _state;
 
-		private const int BufferWordCount = 64;
-		internal fixed uint _buffer[BufferWordCount];
-		private Span<uint> W
-		{
-			get
-			{
-				fixed (uint* pBlock = this._buffer)
-				{
-					return new Span<uint>(pBlock, BufferWordCount);
-				}
-			}
-		}
+		internal Sha2SmallBlock _buffer;
+		private Span<uint> W => MemoryMarshal.CreateSpan<uint>(ref this._buffer.w, Sha224_256.BufferWordCount);
 
-		public Span<byte> InputBuffer
-		{
-			get
-			{
-				fixed (uint* pBlock = this._buffer)
-				{
-					return new Span<byte>((byte*)pBlock, InputBlockSizeBytes);
-				}
-			}
-		}
+		public Span<byte> InputBuffer => MemoryMarshal.AsBytes(W);
 
 
 		public int DigestSizeBytes => new TPolicy().DigestSize;
+		public static int StaticDigestSizeBytes => new TPolicy().DigestSize;
 		public int InputBlockSizeBytes => Sha2_Small.BlockSize;
 
 		public void Initialize()
@@ -99,7 +91,7 @@ namespace Titanis.Crypto
 				w[i] = BinaryPrimitives.ReverseEndianness(w[i]);
 			}
 
-			for (int i = 16; i < BufferWordCount; i++)
+			for (int i = 16; i < Sha224_256.BufferWordCount; i++)
 			{
 				w[i] =
 					Sha224_256.ssig1(w[i - 2])
@@ -148,36 +140,23 @@ namespace Titanis.Crypto
 			this.WriteIndex = 0;
 		}
 
-		internal unsafe void SetLength(long cbPlaintext)
+		internal void SetLength(long cbPlaintext)
 		{
 			cbPlaintext *= 8;
-			cbPlaintext = BinaryPrimitives.ReverseEndianness(cbPlaintext);
-			//cbPlaintext = (cbPlaintext >> 32) | (cbPlaintext << 32);
-			fixed (uint* pBuf = &this._buffer[Sha2_Small.BlockSize / 4 - 2])
-			{
-				*(long*)pBuf = ((cbPlaintext));
-			}
+			BinaryPrimitives.WriteInt64BigEndian(this.InputBuffer.Slice(Sha2_Small.BlockSize - 8, 8), cbPlaintext);
 		}
 
-		internal unsafe void MarkEnd()
+		internal void MarkEnd()
 		{
-			fixed (uint* pBuf = this._buffer)
-			{
-				byte* pBytes = (byte*)pBuf;
-				pBytes[this.WriteIndex++] = 0x80;
-			}
+			this.InputBuffer[this.WriteIndex++] = 0x80;
 		}
 
-		internal unsafe void ZeroBufferBytes(int startIndex, int count)
+		internal void ZeroBufferBytes(int startIndex, int count)
 		{
-			fixed (uint* pBuf = this._buffer)
+			var pBytes = this.InputBuffer.Slice(startIndex);
+			for (int i = 0; i < count; i++)
 			{
-				byte* pBytes = (byte*)pBuf;
-				pBytes += startIndex;
-				for (int i = 0; i < count; i++)
-				{
-					pBytes[i] = 0;
-				}
+				pBytes[i] = 0;
 			}
 		}
 
@@ -190,7 +169,7 @@ namespace Titanis.Crypto
 
 			this.MarkEnd();
 
-			if (this.WriteIndex < (Sha2_Small.BlockSize - 8))
+			if (this.WriteIndex <= (Sha2_Small.BlockSize - 8))
 			{
 				this.ZeroBufferBytes(this.WriteIndex, (Sha2_Small.BlockSize - 8) - this.WriteIndex);
 			}
@@ -207,20 +186,19 @@ namespace Titanis.Crypto
 			GetDigest(digestBuffer);
 		}
 
-		private unsafe void GetDigest(Span<byte> digestBuffer)
+		private void GetDigest(Span<byte> digestBuffer)
 		{
 			Debug.Assert(digestBuffer.Length >= this.DigestSizeBytes);
-			fixed (byte* pDigest = digestBuffer)
+			BinaryPrimitives.WriteUInt32BigEndian(digestBuffer.Slice(0x00, 4), this._state.h0);
+			BinaryPrimitives.WriteUInt32BigEndian(digestBuffer.Slice(0x04, 4), this._state.h1);
+			BinaryPrimitives.WriteUInt32BigEndian(digestBuffer.Slice(0x08, 4), this._state.h2);
+			BinaryPrimitives.WriteUInt32BigEndian(digestBuffer.Slice(0x0C, 4), this._state.h3);
+			BinaryPrimitives.WriteUInt32BigEndian(digestBuffer.Slice(0x10, 4), this._state.h4);
+			BinaryPrimitives.WriteUInt32BigEndian(digestBuffer.Slice(0x14, 4), this._state.h5);
+			BinaryPrimitives.WriteUInt32BigEndian(digestBuffer.Slice(0x18, 4), this._state.h6);
+			if (digestBuffer.Length >= 0x20)
 			{
-				ref Sha2SmallState digest = ref *(Sha2SmallState*)pDigest;
-				digest.h0 = BinaryPrimitives.ReverseEndianness(this._state.h0);
-				digest.h1 = BinaryPrimitives.ReverseEndianness(this._state.h1);
-				digest.h2 = BinaryPrimitives.ReverseEndianness(this._state.h2);
-				digest.h3 = BinaryPrimitives.ReverseEndianness(this._state.h3);
-				digest.h4 = BinaryPrimitives.ReverseEndianness(this._state.h4);
-				digest.h5 = BinaryPrimitives.ReverseEndianness(this._state.h5);
-				digest.h6 = BinaryPrimitives.ReverseEndianness(this._state.h6);
-				digest.h7 = BinaryPrimitives.ReverseEndianness(this._state.h7);
+				BinaryPrimitives.WriteUInt32BigEndian(digestBuffer.Slice(0x1C, 4), this._state.h7);
 			}
 		}
 	}
@@ -240,7 +218,7 @@ namespace Titanis.Crypto
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	struct Sha2SmallState
 	{
-		public static unsafe int StructSize => sizeof(Sha2SmallState);
+		public const int StructSize = 8 * 4;
 
 		internal uint h0;
 		internal uint h1;
