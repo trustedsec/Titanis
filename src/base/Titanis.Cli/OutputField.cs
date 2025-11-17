@@ -88,6 +88,11 @@ namespace Titanis.Cli
 				props = context.GetProperties(recordType);
 			}
 
+			return GetFieldList(context, fieldNames, props);
+		}
+
+		private static OutputField[] GetFieldList(CommandMetadataContext context, string[]? fieldNames, PropertyDescriptorCollection props)
+		{
 			List<OutputField> fields = new List<OutputField>(props.Count);
 			if (fieldNames != null)
 			{
@@ -115,14 +120,9 @@ namespace Titanis.Cli
 			if (record is null) throw new ArgumentNullException(nameof(record));
 
 			var props = TypeDescriptor.GetProperties(record);
-			List<OutputField> fields = new List<OutputField>(props.Count);
-			foreach (PropertyDescriptor prop in props)
-			{
-				if (prop.IsBrowsable && (fieldNames == null || fieldNames.Contains(prop.Name, StringComparer.OrdinalIgnoreCase)))
-					fields.Add(new PropertyOutputField(prop, new CommandMetadataContext(MetadataResolver.Default)));
-			}
+			var context = new CommandMetadataContext(MetadataResolver.Default);
 
-			return fields.ToArray();
+			return GetFieldList(context, fieldNames, props);
 		}
 	}
 

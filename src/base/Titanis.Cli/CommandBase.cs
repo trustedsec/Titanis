@@ -440,15 +440,6 @@ namespace Titanis.Cli
 
 			this.FlushOutput();
 
-			if ((style is OutputStyle.Table or OutputStyle.List or OutputStyle.Csv or OutputStyle.Tsv or OutputStyle.Json) && fields.IsNullOrEmpty())
-			{
-				var recordType = this.GetType().GetCustomAttribute<OutputRecordTypeAttribute>()?.RecordType;
-				if (recordType != null)
-					fields = OutputField.GetFieldsFor(recordType, this.Context.MetadataContext);
-				else
-					throw new ArgumentNullException(nameof(fields));
-			}
-
 			this._style = style;
 			this._outputFields = fields;
 
@@ -490,23 +481,13 @@ namespace Titanis.Cli
 
 			if (style is OutputStyle.Table)
 			{
-				Debug.Assert(fields != null);
-
-				TextTable tbl = new TextTable();
-				if (includeHeaders)
+				if (!fields.IsNullOrEmpty())
 				{
-					var trHeader = tbl.AddRow();
-					var trLine = tbl.AddRow();
-					foreach (var field in fields!)
-					{
-						trHeader.AddCell(field.Caption);
-						trLine.AddCell(new TextTableCell() { Padding = '-' });
-					}
+					// If the fields are known, build the table so that even if no records are written, the headers are there
+					this._resultTable = BuildResultTable(fields, includeHeaders);
 				}
-
-				this._resultTable = tbl;
 			}
-			else if (style is OutputStyle.Csv or OutputStyle.Tsv)
+			if (style is OutputStyle.Csv or OutputStyle.Tsv)
 			{
 				var sep = style switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
 				string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.Name)));
@@ -516,6 +497,23 @@ namespace Titanis.Cli
 			{
 				this.VerifyContext().WriteOutputLine("[");
 			}
+		}
+
+		private static TextTable BuildResultTable(OutputField[]? fields, bool includeHeaders)
+		{
+			TextTable tbl = new TextTable();
+			if (includeHeaders)
+			{
+				var trHeader = tbl.AddRow();
+				var trLine = tbl.AddRow();
+				foreach (var field in fields!)
+				{
+					trHeader.AddCell(field.Caption);
+					trLine.AddCell(new TextTableCell() { Padding = '-' });
+				}
+			}
+
+			return tbl;
 		}
 
 		static string FormatValue(string sep, string? text)
@@ -560,68 +558,126 @@ namespace Titanis.Cli
 			this._recordsExpected = true;
 			var context = this.VerifyContext();
 
+			var fields = this._outputFields;
+			if ((this._style is OutputStyle.Table or OutputStyle.List or OutputStyle.Csv or OutputStyle.Tsv or OutputStyle.Json) && fields.IsNullOrEmpty())
+			{
+				if (record != null)
+					fields = OutputField.GetFieldsFor(record);
+				else
+					throw new ArgumentNullException(nameof(fields));
+
+				// These formats require consistent fields across records
+				if (this._style is OutputStyle.Table or OutputStyle.Csv or OutputStyle.Tsv)
+				{
+					this._outputFields = fields;
+				}
+			}
+
 			switch (this._style)
 			{
 				case OutputStyle.Freeform:
 					context.WriteOutputLine(record?.ToString());
 					break;
 				case OutputStyle.Table:
+					if (this._resultTable is null)
+					{
+						Debug.Assert(fields != null);
+
+						TextTable tbl = BuildResultTable(fields, this._includeHeaders);
+						this._resultTable = tbl;
+					}
+
 					{
 						var tbl = this._resultTable;
 						if (tbl != null)
 						{
-							Debug.Assert(this._outputFields != null);
+							Debug.Assert(fields != null);
 
 							this._resultsPending = true;
 
-							var tr = tbl.AddRow();
 							if (record is not null)
 							{
-								foreach (var field in this._outputFields!)
+								int maxArrayLength = 1;
+								for (int arrayIndex = 0; arrayIndex < maxArrayLength; arrayIndex++)
 								{
-									var value = field.GetValue(record);
-									var formatted = field.FormatValue(value, this._style);
+									var tr = tbl.AddRow();
+									for (int fieldIndex = 0; fieldIndex < fields!.Length; fieldIndex++)
+									{
+										OutputField? field = fields![fieldIndex];
+										var value = field.GetValue(record);
+										string? formatted;
+										if (value is Array arr)
+										{
+											maxArrayLength = Math.Max(maxArrayLength, arr.Length);
+											if (arrayIndex < arr.Length)
+											{
+												value = arr.GetValue(arrayIndex);
+												formatted = field.FormatValue(value, this._style);
+											}
+											else
+												formatted = null;
+										}
+										else if (arrayIndex == 0 || fieldIndex == 0)
+										{
+											formatted = field.FormatValue(value, this._style);
+										}
+										else
+											formatted = null;
 
-									tr.AddCell(formatted, field.Alignment);
+										tr.AddCell(formatted, field.Alignment);
+									}
 								}
+							}
+							else
+							{
+								var tr = tbl.AddRow();
 							}
 						}
 					}
 					break;
 				case OutputStyle.List:
-					Debug.Assert(this._outputFields != null);
+					Debug.Assert(fields != null);
 
 					if (record is not null)
 					{
-						foreach (var field in this._outputFields!)
+						foreach (var field in fields!)
 						{
 							var value = field.GetValue(record);
-							var formatted = field.FormatValue(value, this._style);
+							if (value is not null)
+							{
+								if (!(value is Array array))
+									array = new object[] { value };
 
-							if (this._includeHeaders)
-								context.WriteOutputLine(formatted);
-							else
-								context.WriteOutputLine($"{field.Caption}: {formatted}");
+								foreach (var elem in array)
+								{
+									var formatted = field.FormatValue(elem, this._style);
+
+									if (this._includeHeaders)
+										context.WriteOutputLine($"{field.Caption}: {formatted}");
+									else
+										context.WriteOutputLine(formatted);
+								}
+							}
 						}
 					}
 					context.WriteOutputLine(string.Empty);
 					break;
 				case OutputStyle.Csv or OutputStyle.Tsv:
-					if (this._outputFields != null && record is not null)
+					if (fields != null && record is not null)
 					{
 						if (_includeHeaders)
 						{
 							var sep = this._style switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
-							string line = string.Join(sep, this._outputFields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._style))));
+							string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._style))));
 							this.VerifyContext().WriteOutputLine(line);
 						}
 					}
 					break;
 				case OutputStyle.Json:
-					if (this._outputFields != null && record is not null)
+					if (fields != null && record is not null)
 					{
 						Dictionary<string, object?> values = new Dictionary<string, object?>();
-						foreach (var field in this._outputFields)
+						foreach (var field in fields)
 						{
 							var fieldValue = field.GetValue(record);
 							if (fieldValue != null)

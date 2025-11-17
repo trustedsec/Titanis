@@ -38,6 +38,8 @@ namespace Titanis.Cli
 		[Description("Determines the output style")]
 		public OutputStyle? ConsoleOutputStyle { get; set; }
 
+		public OutputStyle DefaultOutputStyle { get; private set; } = OutputStyle.List;
+
 		[Parameter(ParameterFlags.OutputOnly)]
 		[Description("Fields to display in output")]
 		[ValueListProvider(typeof(FieldListProvider))]
@@ -98,6 +100,7 @@ namespace Titanis.Cli
 				}
 
 				CommandMetadata metadata = GetCommandMetadata(this.GetType(), context.MetadataContext);
+				this.DefaultOutputStyle = metadata.DefaultOutputStyle;
 
 				var validation = this.Parse(args, startIndex, metadata, true);
 				if (validation.Errors.Count > 0)
@@ -107,8 +110,7 @@ namespace Titanis.Cli
 				{
 					if (metadata.OutputRecordType is not null)
 					{
-						var fields = OutputField.GetFieldsFor(metadata.OutputRecordType, context.MetadataContext, this.OutputFields ?? metadata.DefaultOutputFields);
-						this.SetOutputFormat(this.ConsoleOutputStyle ?? metadata.DefaultOutputStyle, fields);
+						this.SetOutputFormat(this.ConsoleOutputStyle ?? metadata.DefaultOutputStyle, null);
 					}
 				}
 				catch { }
