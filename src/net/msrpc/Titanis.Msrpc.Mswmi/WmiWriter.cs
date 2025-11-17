@@ -101,12 +101,13 @@ namespace Titanis.Msrpc.Mswmi
 			if (str == null)
 				return HeapStringRef.Null;
 
-			int presetIndex = Array.IndexOf(Heap.implicitStrings, str);
-			if (presetIndex >= 0)
-			{
-				return new HeapStringRef((uint)(presetIndex | 0x8000_0000));
-			}
-			else
+			// UNDONE: #630 encoding implicit strings doesn't appear to work
+			//int presetIndex = Array.IndexOf(Heap.implicitStrings, str);
+			//if (presetIndex >= 0 && presetIndex != 2)
+			//{
+			//	return new HeapStringRef((uint)(presetIndex | 0x8000_0000));
+			//}
+			//else
 			{
 				var offHeap = heapWriter.Position;
 				heapWriter.WriteEncodedString(str);
