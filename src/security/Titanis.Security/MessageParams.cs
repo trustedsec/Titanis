@@ -11,6 +11,7 @@ namespace Titanis.Security
 	/// <summary>
 	/// Specifies message security options.
 	/// </summary>
+	[Flags]
 	public enum MessageSecBufferOptions
 	{
 		/// <summary>

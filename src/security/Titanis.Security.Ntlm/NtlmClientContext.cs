@@ -168,14 +168,10 @@ namespace Titanis.Security.Ntlm
 		/// </summary>
 		public const NegotiateFlags DefaultClientConfigFlags =
 			NegotiateFlags.W_Negotiate56
-			| NegotiateFlags.V_NegotiateKeyExchange
 			| NegotiateFlags.U_Negotiate128
 			| NegotiateFlags.T_NegotiateVersion
-			| NegotiateFlags.P_NegotiateExtendedSessionSecurity
 			| NegotiateFlags.M_NegotiateAlwaysSign
 			| NegotiateFlags.H_NegotiateNtlm
-			| NegotiateFlags.G_NegotiateLMKey
-			| NegotiateFlags.D_NegotiateSign
 			| NegotiateFlags.C_RequestTarget
 			;
 
