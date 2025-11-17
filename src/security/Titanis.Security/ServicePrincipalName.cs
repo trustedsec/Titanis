@@ -24,8 +24,12 @@ namespace Titanis.Security
 		/// <param name="serviceInstance">Service instance name (usually the host name)</param>
 		public ServicePrincipalName(string serviceClass, string serviceInstance)
 		{
+			if (serviceClass is null) throw new ArgumentNullException(nameof(serviceClass));
+			if (string.IsNullOrEmpty(serviceInstance)) throw new ArgumentException($"'{nameof(serviceInstance)}' cannot be null or empty.", nameof(serviceInstance));
+
 			ServiceClass = serviceClass;
-			_instance = serviceInstance;
+			this._instance = serviceInstance;
+			this._instanceParts = serviceInstance.Split('/');
 		}
 		/// <summary>
 		/// Initializes a new <see cref="ServicePrincipalName"/>.
@@ -34,6 +38,7 @@ namespace Titanis.Security
 		/// <param name="serviceInstanceParts">Parts of the service instance name (usually the host name)</param>
 		public ServicePrincipalName(string serviceClass, string[] serviceInstanceParts)
 		{
+			if (serviceClass is null) throw new ArgumentNullException(nameof(serviceClass));
 			if (serviceInstanceParts is null || serviceInstanceParts.Length == 0)
 				throw new ArgumentNullException(nameof(serviceInstanceParts));
 
@@ -53,7 +58,7 @@ namespace Titanis.Security
 		public string ServiceClass { get; }
 
 		private string? _instance;
-		private string[]? _instanceParts;
+		private string[] _instanceParts;
 
 		/// <summary>
 		/// Gets the service instance name (usually the host).
@@ -70,9 +75,9 @@ namespace Titanis.Security
 		/// <inheritdoc/>
 		public sealed override PrincipalNameType NameType => PrincipalNameType.ServiceInstance;
 		/// <inheritdoc/>
-		public sealed override string[] GetNameParts() => new string[] { this.ServiceClass, this.ServiceInstance };
+		public sealed override string[] GetNameParts() => [this.ServiceClass, .. this._instanceParts];
 		/// <inheritdoc/>
-		public sealed override int NamePartCount => 2;
+		public sealed override int NamePartCount => 1 + this._instanceParts.Length;
 		/// <inheritdoc/>
 		public sealed override string GetNamePart(int index) => index switch
 		{
