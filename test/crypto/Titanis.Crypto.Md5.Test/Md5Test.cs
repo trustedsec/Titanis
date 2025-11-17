@@ -18,27 +18,22 @@ namespace Titanis.Crypto.Test
 			Assert.AreEqual(Md5State.InitialWord3, buf.d);
 		}
 
-		private static void TestHash(string sourcer, string expectedHash)
+		[TestMethod]
+		[DataRow("", "d41d8cd98f00b204e9800998ecf8427e")]
+		[DataRow("a", "0cc175b9c0f1b6a831c399e269772661")]
+		[DataRow("abc", "900150983cd24fb0d6963f7d28e17f72")]
+		[DataRow("message digest", "f96b697d7cb7938d525a2f31aaf161d0")]
+		[DataRow("abcdefghijklmnopqrstuvwxyz", "c3fcd3d76192e4007dfb496cca67e13b")]
+		[DataRow("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "d174ab98d277d9f5a5611c2c9f419d9f")]
+		[DataRow("12345678901234567890123456789012345678901234567890123456789012345678901234567890", "57edf4a22be3c955ac49da2e2107b67a")]
+		public void TestMd5Hashes(string input, string expectedHash)
 		{
-			byte[] plaintext = Encoding.UTF8.GetBytes(sourcer);
+			byte[] plaintext = Encoding.UTF8.GetBytes(input);
 			byte[] hash = SlimHashAlgorithm.ComputeHash<Md5Context>(plaintext);
 			string hashstr = hash.ToHexString();
 
 			Assert.AreEqual(expectedHash, hashstr);
 		}
-
-		[TestMethod]
-		public void TestMd4_Empty()
-		{
-			TestHash("", "d41d8cd98f00b204e9800998ecf8427e");
-			TestHash("a", "0cc175b9c0f1b6a831c399e269772661");
-			TestHash("abc", "900150983cd24fb0d6963f7d28e17f72");
-			TestHash("message digest", "f96b697d7cb7938d525a2f31aaf161d0");
-			TestHash("abcdefghijklmnopqrstuvwxyz", "c3fcd3d76192e4007dfb496cca67e13b");
-			TestHash("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "d174ab98d277d9f5a5611c2c9f419d9f");
-			TestHash("12345678901234567890123456789012345678901234567890123456789012345678901234567890", "57edf4a22be3c955ac49da2e2107b67a");
-		}
-
 
 		private static void TestHmac(string keystr, string input, string expected)
 		{
@@ -78,6 +73,8 @@ namespace Titanis.Crypto.Test
 			TestHmac(MakeArray(0xaa, 80), "Test Using Larger Than Block-Size Key - Hash Key First", "6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd");
 			TestHmac(MakeArray(0xaa, 80), "Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data", "6f630fad67cda0ee1fb1f562db3aa53e");
 		}
+
+
 
 		private static byte[] MakeArray(byte n, int length)
 		{
