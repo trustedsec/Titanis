@@ -19,9 +19,17 @@ namespace Titanis
 		/// <exception cref="TimeoutException"><paramref name="task"/> did not complete within <paramref name="task"/>.</exception>
 		public static async Task AwaitWithTimeout(this Task task, TimeSpan timeout)
 		{
-			bool completed = await Task.WhenAny(task, Task.Delay(timeout)) == task;
-			if (!completed)
-				throw new TimeoutException();
+			if (timeout == TimeSpan.MaxValue)
+			{
+				// Interpret as a normal await
+				await task;
+			}
+			else
+			{
+				bool completed = await Task.WhenAny(task, Task.Delay(timeout)) == task;
+				if (!completed)
+					throw new TimeoutException();
+			}
 		}
 		/// <summary>
 		/// Awaits a task for a specified timeout.
