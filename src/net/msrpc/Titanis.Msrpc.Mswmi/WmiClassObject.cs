@@ -260,7 +260,7 @@ namespace Titanis.Msrpc.Mswmi
 			var wmiMethod = this.WmiObject.GetMethod(binder.Name);
 			if (wmiMethod != null)
 			{
-				ElementInit[] elems = new ElementInit[args.Length];
+				List<ElementInit> elems = new List<ElementInit>(args.Length);
 
 				var inputClass = wmiMethod.InputSignature;
 				var inputProps = inputClass?.Properties ?? Array.Empty<WmiProperty>();
@@ -291,7 +291,7 @@ namespace Titanis.Msrpc.Mswmi
 
 					// TODO: Check for duplicate arg names
 
-					elems[i] = Expression.ElementInit(addMethod, Expression.Constant(argName), Expression.Convert(arg.Expression, typeof(object)));
+					elems.Add(Expression.ElementInit(addMethod, Expression.Constant(argName), Expression.Convert(arg.Expression, typeof(object))));
 				}
 
 				if (!failed)
