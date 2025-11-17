@@ -63,6 +63,15 @@ namespace Titanis.Msrpc.Mswmi
 									this.ShortDescription = this.FullDescription;
 							}
 							break;
+						case "ID":
+							this.Id = qual.Value as int?;
+							break;
+						case "IN":
+							{
+								if (qual.Value is bool b)
+									this.IsInputParameter = b;
+							}
+							break;
 					}
 				}
 			}
@@ -110,6 +119,8 @@ namespace Titanis.Msrpc.Mswmi
 		public string ShortDescription { get; }
 		public string FullDescription { get; }
 		public bool IsStatic { get; }
+		public int? Id { get; }
+		public bool IsInputParameter { get; }
 		#endregion
 	}
 }
