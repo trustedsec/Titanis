@@ -73,7 +73,7 @@ namespace Titanis.Cli
 			public override bool ShouldSerializeValue(object component) => false;
 		}
 
-		public static OutputField[] GetFieldsFor(Type recordType, CommandMetadataContext context, string[]? fieldNames = null)
+		public static OutputField[] GetFieldsFor(Type recordType, CommandMetadataContext context, string[]? fieldNames = null, bool includeDummyFields = false)
 		{
 			if (recordType is null) throw new ArgumentNullException(nameof(recordType));
 
@@ -88,10 +88,10 @@ namespace Titanis.Cli
 				props = context.GetProperties(recordType);
 			}
 
-			return GetFieldList(context, fieldNames, props);
+			return GetFieldList(context, fieldNames, props, includeDummyFields);
 		}
 
-		private static OutputField[] GetFieldList(CommandMetadataContext context, string[]? fieldNames, PropertyDescriptorCollection props)
+		private static OutputField[] GetFieldList(CommandMetadataContext context, string[]? fieldNames, PropertyDescriptorCollection props, bool includeDummyFields)
 		{
 			List<OutputField> fields = new List<OutputField>(props.Count);
 			if (fieldNames != null)
@@ -101,6 +101,8 @@ namespace Titanis.Cli
 				{
 					if (propsByName.TryGetValue(name, out var prop))
 						fields.Add(new PropertyOutputField(prop, context));
+					else if (includeDummyFields)
+						fields.Add(new DummyOutputField(name, name, null, DisplayAlignment.Left));
 				}
 			}
 			else
@@ -115,14 +117,14 @@ namespace Titanis.Cli
 			return fields.ToArray();
 		}
 
-		public static OutputField[] GetFieldsFor(object record, string[]? fieldNames = null)
+		public static OutputField[] GetFieldsFor(object record, string[]? fieldNames = null, bool includeDummyFields = false)
 		{
 			if (record is null) throw new ArgumentNullException(nameof(record));
 
 			var props = TypeDescriptor.GetProperties(record);
 			var context = new CommandMetadataContext(MetadataResolver.Default);
 
-			return GetFieldList(context, fieldNames, props);
+			return GetFieldList(context, fieldNames, props, includeDummyFields);
 		}
 	}
 
@@ -133,6 +135,8 @@ namespace Titanis.Cli
 			CommandMetadataContext context
 			)
 		{
+			if (property is null) throw new ArgumentNullException(nameof(property));
+
 			this.Property = property;
 			this.Caption = this.Name;
 
@@ -180,6 +184,48 @@ namespace Titanis.Cli
 			else
 			{
 				return null;
+			}
+		}
+	}
+
+	public sealed class DummyOutputField : OutputField
+	{
+		public DummyOutputField(
+			string name,
+			string caption,
+			string? format,
+			DisplayAlignment alignment = DisplayAlignment.Left
+			)
+		{
+			this.Name = name;
+			this.Caption = caption;
+			this.FormatString = format;
+			this.Alignment = alignment;
+		}
+
+		public sealed override string Name { get; }
+		public sealed override string Caption { get; }
+		public sealed override string? FormatString { get; }
+		public sealed override DisplayAlignment Alignment { get; }
+
+		private string? _properName;
+
+		public sealed override object? GetValue(object rec)
+		{
+			if (rec is null)
+				return null;
+
+			var props = TypeDescriptor.GetProperties(rec);
+			var prop = props[this.Name];
+			if (prop is null)
+				prop = props.Find(this.Name, true);
+
+			if (prop is null)
+				return null;
+			else
+			{
+				object value = prop.GetValue(rec);
+				return value;
 			}
 		}
 	}

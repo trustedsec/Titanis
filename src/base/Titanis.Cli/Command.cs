@@ -30,7 +30,7 @@ namespace Titanis.Cli
 	/// To implement custom parameter validation, implement <see cref="ValidateParameters(ParameterValidationContext)"/>.
 	/// </para>
 	/// </remarks>
-	public abstract class Command : CommandBase, IValidateParameters
+	public abstract class Command : CommandBase, IValidateParameters, IOutputFieldProvider
 	{
 		#region Common fields
 		[Parameter]
@@ -52,11 +52,64 @@ namespace Titanis.Cli
 
 		protected void SetOutputFormat(OutputStyle style)
 		{
-			base.SetOutputFormat(style, null, this.OutputHeaders.IsSet);
+			base.SetOutputFormat(style, this, this.OutputHeaders.IsSet);
 		}
-		protected void SetOutputFormat(OutputStyle style, OutputField[] outputFields)
+
+
+
+		OutputField[] IOutputFieldProvider.GetFieldsForType(Type recordType)
 		{
-			base.SetOutputFormat(style, outputFields, this.OutputHeaders.IsSet);
+			var fields = this.OutputFields;
+			if (fields != null && fields.Length == 1 && fields[0] == "*")
+				fields = null;
+
+			return this.ApplyFormatting(OutputField.GetFieldsFor(recordType, this.Context.MetadataContext, fields, typeof(ICustomTypeDescriptor).IsAssignableFrom(recordType)));
+		}
+		OutputField[] IOutputFieldProvider.GetFieldsForRecord(object record)
+		{
+			var fields = this.OutputFields;
+			if (fields != null && fields.Length == 1 && fields[0] == "*")
+				fields = null;
+
+			return this.ApplyFormatting(OutputField.GetFieldsFor(record, fields, record is ICustomTypeDescriptor));
+		}
+
+		bool IOutputFieldProvider.IncludesField(string fieldName)
+		{
+			return this.OutputFields is null || this.OutputFields.Any(r => fieldName?.Equals(r, StringComparison.OrdinalIgnoreCase) ?? false);
+		}
+
+		private OutputField[] ApplyFormatting(OutputField[] fields)
+		{
+			var formatAttrs = this.GetType().GetCustomAttributes<OutputFieldFormatAttribute>(true);
+			var byName = formatAttrs.GroupBy(a => a.FieldName).ToDictionary(g => g.Key);
+			foreach (var field in fields)
+			{
+				if (byName.TryGetValue(field.Name, out var group))
+				{
+					var attr = group.First();
+					field.FormatStringOverride = attr.FormatString;
+					if (attr.FormatterType is not null && typeof(IOutputFormatter).IsAssignableFrom(attr.FormatterType))
+					{
+						try
+						{
+							field.formatter = (IOutputFormatter)Activator.CreateInstance(attr.FormatterType);
+						}
+						catch
+						{
+							// Silently fail
+						}
+					}
+				}
+
+				if (this.HumanReadable.IsSet && field.IsFileSize && field.formatter == null)
+				{
+					field.FormatStringOverride = "H2";
+					field.formatter = FileSizeFormatter.Instance;
+				}
+			}
+
+			return fields;
 		}
 		#endregion
 
@@ -110,7 +163,7 @@ namespace Titanis.Cli
 				{
 					if (metadata.OutputRecordType is not null)
 					{
-						this.SetOutputFormat(this.ConsoleOutputStyle ?? metadata.DefaultOutputStyle, null);
+						this.SetOutputFormat(this.ConsoleOutputStyle ?? metadata.DefaultOutputStyle);
 					}
 				}
 				catch { }

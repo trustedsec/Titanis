@@ -62,7 +62,7 @@ namespace Titanis.Cli
 				var ret = await this.InvokeAsync(command, args, startIndex, cancellationToken);
 				if (this._resultsPending)
 					this.FlushOutput();
-				if (this._style is OutputStyle.Json)
+				if (this._outputStyle is OutputStyle.Json)
 					context.WriteOutput("]");
 
 				if (this._recordsExpected)
@@ -411,8 +411,9 @@ namespace Titanis.Cli
 		#endregion
 
 		#region Output formatting
-		private OutputStyle _style;
-		private OutputField[]? _outputFields;
+		private OutputStyle _outputStyle;
+		private IOutputFieldProvider? _outputFieldProvider;
+		private OutputField[]? _outputFieldList;
 		private TextTable? _resultTable;
 
 		/// <summary>
@@ -426,13 +427,16 @@ namespace Titanis.Cli
 		private bool _recordsExpected;
 		private int _recordsWritten;
 
-		private HashSet<string>? _outputFieldNames;
-
+		/// <summary>
+		/// Indicates whether a field is selected to be printed in the output.
+		/// </summary>
+		/// <param name="fieldName">Name of field</param>
+		/// <returns><see langword="true"/> if the field will be in the output; otherwise, <see langword="false"/>.</returns>
 		protected bool IsFieldInOutput(string fieldName)
-			=> this._outputFieldNames?.Contains(fieldName) ?? false;
+			=> this._outputFieldProvider?.IncludesField(fieldName) ?? true;
 
 		private bool _includeHeaders;
-		protected void SetOutputFormat(OutputStyle style, OutputField[]? fields, bool includeHeaders)
+		protected void SetOutputFormat(OutputStyle style, IOutputFieldProvider? fields, bool includeHeaders)
 		{
 			if (style is not OutputStyle.Raw)
 				this._recordsExpected = true;
@@ -440,60 +444,10 @@ namespace Titanis.Cli
 
 			this.FlushOutput();
 
-			this._style = style;
-			this._outputFields = fields;
+			this._outputStyle = style;
+			this._outputFieldProvider = fields ?? new OutputFieldProvider(this.VerifyContext().MetadataContext);
 
-			HashSet<string>? fieldNames = null;
-			if (fields != null)
-			{
-				var formatAttrs = this.GetType().GetCustomAttributes<OutputFieldFormatAttribute>(true);
-				var byName = formatAttrs.GroupBy(a => a.FieldName).ToDictionary(g => g.Key);
-				fieldNames = new HashSet<string>(fields.Select(r => r.Name), StringComparer.OrdinalIgnoreCase);
-				foreach (var field in fields)
-				{
-					if (byName.TryGetValue(field.Name, out var group))
-					{
-						fieldNames.Add(field.Name);
-
-						var attr = group.First();
-						field.FormatStringOverride = attr.FormatString;
-						if (attr.FormatterType is not null && typeof(IOutputFormatter).IsAssignableFrom(attr.FormatterType))
-						{
-							try
-							{
-								field.formatter = (IOutputFormatter)Activator.CreateInstance(attr.FormatterType);
-							}
-							catch
-							{
-								// Silently fail
-							}
-						}
-					}
-
-					if (this.HumanReadable.IsSet && field.IsFileSize && field.formatter == null)
-					{
-						field.FormatStringOverride = "H2";
-						field.formatter = FileSizeFormatter.Instance;
-					}
-				}
-			}
-			this._outputFieldNames = fieldNames;
-
-			if (style is OutputStyle.Table)
-			{
-				if (!fields.IsNullOrEmpty())
-				{
-					// If the fields are known, build the table so that even if no records are written, the headers are there
-					this._resultTable = BuildResultTable(fields, includeHeaders);
-				}
-			}
-			if (style is OutputStyle.Csv or OutputStyle.Tsv)
-			{
-				var sep = style switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
-				string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.Name)));
-				this.VerifyContext().WriteOutputLine(line);
-			}
-			else if (style is OutputStyle.Json)
+			if (style is OutputStyle.Json)
 			{
 				this.VerifyContext().WriteOutputLine("[");
 			}
@@ -558,22 +512,31 @@ namespace Titanis.Cli
 			this._recordsExpected = true;
 			var context = this.VerifyContext();
 
-			var fields = this._outputFields;
-			if ((this._style is OutputStyle.Table or OutputStyle.List or OutputStyle.Csv or OutputStyle.Tsv or OutputStyle.Json) && fields.IsNullOrEmpty())
+			var fields = this._outputFieldList;
+			if ((this._outputStyle is OutputStyle.Table or OutputStyle.List or OutputStyle.Csv or OutputStyle.Tsv or OutputStyle.Json) && fields is null)
 			{
 				if (record != null)
-					fields = OutputField.GetFieldsFor(record);
+				{
+					fields = (this._outputFieldProvider ??= CreateDefaultFieldProvider()).GetFieldsForRecord(record);
+				}
 				else
 					throw new ArgumentNullException(nameof(fields));
 
 				// These formats require consistent fields across records
-				if (this._style is OutputStyle.Table or OutputStyle.Csv or OutputStyle.Tsv)
+				if (this._outputStyle is OutputStyle.Table or OutputStyle.Csv or OutputStyle.Tsv)
 				{
-					this._outputFields = fields;
+					this._outputFieldList = fields;
+
+					if (this._outputStyle is OutputStyle.Csv or OutputStyle.Tsv)
+					{
+						var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
+						string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.Name)));
+						this.VerifyContext().WriteOutputLine(line);
+					}
 				}
 			}
 
-			switch (this._style)
+			switch (this._outputStyle)
 			{
 				case OutputStyle.Freeform:
 					context.WriteOutputLine(record?.ToString());
@@ -606,20 +569,21 @@ namespace Titanis.Cli
 										OutputField? field = fields![fieldIndex];
 										var value = field.GetValue(record);
 										string? formatted;
+
 										if (value is Array arr)
 										{
 											maxArrayLength = Math.Max(maxArrayLength, arr.Length);
 											if (arrayIndex < arr.Length)
 											{
 												value = arr.GetValue(arrayIndex);
-												formatted = field.FormatValue(value, this._style);
+												formatted = field.FormatValue(value, this._outputStyle);
 											}
 											else
 												formatted = null;
 										}
 										else if (arrayIndex == 0 || fieldIndex == 0)
 										{
-											formatted = field.FormatValue(value, this._style);
+											formatted = field.FormatValue(value, this._outputStyle);
 										}
 										else
 											formatted = null;
@@ -650,7 +614,7 @@ namespace Titanis.Cli
 
 								foreach (var elem in array)
 								{
-									var formatted = field.FormatValue(elem, this._style);
+									var formatted = field.FormatValue(elem, this._outputStyle);
 
 									if (this._includeHeaders)
 										context.WriteOutputLine($"{field.Caption}: {formatted}");
@@ -667,8 +631,8 @@ namespace Titanis.Cli
 					{
 						if (_includeHeaders)
 						{
-							var sep = this._style switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
-							string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._style))));
+							var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
+							string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._outputStyle))));
 							this.VerifyContext().WriteOutputLine(line);
 						}
 					}
@@ -696,6 +660,11 @@ namespace Titanis.Cli
 					break;
 			}
 			this._recordsWritten++;
+		}
+
+		private OutputFieldProvider CreateDefaultFieldProvider()
+		{
+			return new(this.VerifyContext().MetadataContext);
 		}
 
 		private void FlushOutput()
