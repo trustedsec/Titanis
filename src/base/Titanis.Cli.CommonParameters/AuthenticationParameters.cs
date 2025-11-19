@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -124,6 +125,8 @@ namespace Titanis.Cli
 		/// </summary>
 		public bool HasAuthInfo => this.HasKerberosInfo | this.HasNtlmInfo;
 
+		private bool _validated;
+
 		/// <summary>
 		/// Validates authentication parameters.
 		/// </summary>
@@ -207,10 +210,14 @@ namespace Titanis.Cli
 			{
 				context.LogError("The command requires a Kerberos security context, but not enough information is available to build a Kerberos context.");
 			}
+
+			this._validated = true;
 		}
 
 		public NtlmClientContext? TryCreateNtlmContext(ServicePrincipalName? targetSpn)
 		{
+			Debug.Assert(this._validated);
+
 			if ((this.UserName is null) && !this.Anonymous.IsSet)
 				return null;
 
