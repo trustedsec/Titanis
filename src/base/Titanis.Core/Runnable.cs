@@ -101,7 +101,7 @@ namespace Titanis
 		/// This method can only be called while the <see cref="Runnable"/> is in the <see cref="RunnableState.Stopped"/> state.
 		/// </para>
 		/// </remarks>
-		public void Start()
+		public Task Start()
 		{
 			var oldState = (RunnableState)Interlocked.CompareExchange(ref this._state, (int)RunnableState.Starting, (int)RunnableState.Stopped);
 			if (oldState != RunnableState.Stopped)
@@ -113,6 +113,8 @@ namespace Titanis
 			var cancelSource = this._stopTokenSource = new CancellationTokenSource();
 
 			this._runTask = Task.Factory.StartNew(() => this.RunWrapper(cancelSource.Token), TaskCreationOptions.LongRunning).Unwrap();
+
+			return this._startedSource.Task;
 		}
 
 		private async Task RunWrapper(CancellationToken cancellationToken)
