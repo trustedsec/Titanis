@@ -56,7 +56,8 @@ namespace Titanis.Msrpc
 				try
 				{
 					var spn = service.GetSpnFor(pipeUncPath.ServerName);
-					await rpcClient.BindProxyToStream(proxy, spn, RpcAuthLevel.ConfiguredDefault, stream, cancellationToken).ConfigureAwait(false);
+					var authLevel = service.SupportsReauthOverNamedPipes ? RpcAuthLevel.ConfiguredDefault : RpcAuthLevel.None;
+					await rpcClient.BindProxyToStream(proxy, spn, authLevel, stream, cancellationToken).ConfigureAwait(false);
 					stream = null;
 				}
 				finally
