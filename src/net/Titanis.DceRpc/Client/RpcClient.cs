@@ -303,7 +303,7 @@ namespace Titanis.DceRpc.Client
 
 					if (spn is not null)
 					{
-						authContext = this._credentialService?.GetAuthContextForService(spn, caps, AuthOptions.PreferSpnego);
+						authContext = this._credentialService?.GetAuthContextForService(spn, caps, AuthOptions.None);
 						if (authContext is null)
 							authContext = this._credentialService?.GetAuthContextForService(spn.WithServiceClass(ServiceClassNames.HostU), caps, AuthOptions.PreferSpnego);
 					}
