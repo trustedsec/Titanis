@@ -23,7 +23,7 @@ namespace Titanis.Asn1
 			this.TlvBytes = tlvBytes;
 
 #if DEBUG
-			Asn1DerDecoder testDecoder = new Asn1DerDecoder(new ByteMemoryReader(tlvBytes), true);
+			Asn1DerDecoder testDecoder = new Asn1DerDecoder(new ByteMemoryReader(tlvBytes), Asn1DerDecoderOptions.AllowBer);
 			var actualTag = testDecoder.PeekTag();
 			Debug.Assert(actualTag == tag);
 #endif

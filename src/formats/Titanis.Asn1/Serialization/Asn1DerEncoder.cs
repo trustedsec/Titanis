@@ -9,6 +9,13 @@ using Titanis.IO;
 
 namespace Titanis.Asn1.Serialization
 {
+	[Flags]
+	public enum Asn1DerEncoderOptions
+	{
+		None = 0,
+		Ber = 1,
+	}
+
 	/// <summary>
 	/// Encodes a value according to ASN.1 Distinguished Encoding Rules.
 	/// </summary>
@@ -22,7 +29,8 @@ namespace Titanis.Asn1.Serialization
 		internal Asn1DerEncoder(
 			Asn1Encoding encoding,
 			ByteWriter writer,
-			IAsn1EncoderCallback? callback = null
+			IAsn1EncoderCallback? callback = null,
+			Asn1DerEncoderOptions options = Asn1DerEncoderOptions.None
 			)
 			: base(encoding)
 		{
@@ -31,22 +39,35 @@ namespace Titanis.Asn1.Serialization
 
 			this._writer = writer;
 			this._callback = callback;
+			this._options = options;
 		}
 
 		private ByteWriter _writer;
 		private readonly IAsn1EncoderCallback? _callback;
+		private readonly Asn1DerEncoderOptions _options;
+		private bool IsBer => (this._options & Asn1DerEncoderOptions.Ber) != 0;
+
 
 		public ByteWriter GetWriter() => this._writer;
 		public override Memory<byte> GetBytes() => this._writer.GetData();
 
 		public int Position => this._writer.Position;
 
-		public static Memory<byte> EncodeTlv<T>(T obj, IAsn1EncoderCallback? callback = null)
+		public static Memory<byte> EncodeTlv<T>(T obj, IAsn1EncoderCallback? callback = null, Asn1DerEncoderOptions options = Asn1DerEncoderOptions.None)
 			where T : IAsn1DerEncodableTlv
 		{
 			ByteWriter writer = new ByteWriter(0x10, ByteWriterOptions.Reverse);
-			Asn1DerEncoder encoder = new Asn1DerEncoder(Asn1DerEncoding.Instance, writer, callback);
+			Asn1DerEncoder encoder = new Asn1DerEncoder(Asn1DerEncoding.Instance, writer, callback, options);
 			obj.EncodeTlv(encoder);
+			return writer.GetData();
+		}
+
+		public static Memory<byte> EncodeValue<T>(T obj, IAsn1EncoderCallback? callback = null, Asn1DerEncoderOptions options = Asn1DerEncoderOptions.None)
+			where T : IAsn1DerEncodableValue
+		{
+			ByteWriter writer = new ByteWriter(0x10, ByteWriterOptions.Reverse);
+			Asn1DerEncoder encoder = new Asn1DerEncoder(Asn1DerEncoding.Instance, writer, callback, options);
+			obj.EncodeValue(encoder);
 			return writer.GetData();
 		}
 
@@ -191,6 +212,11 @@ namespace Titanis.Asn1.Serialization
 		{
 			if (length < 0x80)
 				this._WriteByte((byte)length);
+			else if (this.IsBer)
+			{
+				this._writer.WriteUInt32BE(length);
+				this._writer.WriteByte(0x84);
+			}
 			else
 			{
 				int endPos = this._writer.Position;

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -11,6 +12,12 @@ using Titanis.IO;
 
 namespace Titanis.Asn1.Serialization
 {
+	public enum Asn1DerDecoderOptions
+	{
+		None = 0,
+		AllowBer = 1
+	}
+
 	/// <summary>
 	/// Implements a decoder to read messages encoded with
 	/// ASN.1 Distinguished Encoding Rules (DER)
@@ -22,13 +29,13 @@ namespace Titanis.Asn1.Serialization
 	/// <seealso cref="Asn1DerEncoding"/>
 	public class Asn1DerDecoder : Asn1Decoder
 	{
-		internal Asn1DerDecoder(IByteSource reader, bool allowBer)
+		internal Asn1DerDecoder(IByteSource reader, Asn1DerDecoderOptions options)
 		{
 			if (reader is null)
 				throw new ArgumentNullException(nameof(reader));
 
 			this._reader = reader;
-			this._allowBer = allowBer;
+			this._options = options;
 			if (reader is IByteSource seekable && seekable.CanSeek)
 				this._sourceLength = seekable.Length - seekable.Position;
 			else
@@ -38,9 +45,9 @@ namespace Titanis.Asn1.Serialization
 		}
 
 		private IByteSource _reader;
+		private readonly Asn1DerDecoderOptions _options;
 		private long _sourceLength;
-		private bool _allowBer;
-		private bool AllowBer => this._allowBer;
+		private bool AllowBer => 0 != (this._options & Asn1DerDecoderOptions.AllowBer);
 
 		/// <summary>
 		/// The value indicating an unbounded length.  Used for BER.
@@ -134,7 +141,7 @@ namespace Titanis.Asn1.Serialization
 			where T : IAsn1DerDecodableTlv<T>
 		{
 			Debug.Assert(bytes.Span[0] != 0);
-			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(bytes), true);
+			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(bytes), Asn1DerDecoderOptions.AllowBer);
 			var value = decoder.DecodeTlv<T>();
 			return value;
 		}
@@ -148,7 +155,7 @@ namespace Titanis.Asn1.Serialization
 		public static bool TryDecodeTlv<T>(ReadOnlyMemory<byte> bytes, out T? value)
 			where T : IAsn1DerDecodableTlv<T>
 		{
-			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(bytes), true);
+			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(bytes), Asn1DerDecoderOptions.AllowBer);
 			return T.TryDecodeTlvFrom(decoder, out value);
 		}
 
@@ -390,7 +397,7 @@ namespace Titanis.Asn1.Serialization
 		public static T DecodeValue<T>(ReadOnlyMemory<byte> bytes)
 			where T : IAsn1DerDecodableValue<T>
 		{
-			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(bytes), true);
+			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(bytes), Asn1DerDecoderOptions.AllowBer);
 			var value = decoder.DecodeValue<T>();
 			return value;
 		}
