@@ -1,0 +1,105 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Titanis.Certificates;
+using Titanis.Cli;
+using Titanis.Ldap;
+
+namespace Ldap;
+internal class AddComputerCommand : AddCommandBase
+{
+	protected override string RdnName => "CN";
+	protected override string ObjectClass => "computer";
+
+	[Parameter]
+	[Description("Password of new account")]
+	public string? NewPassword { get; set; }
+
+	[Parameter]
+	[Description("User name for auth requests")]
+	public string? LogonName { get; set; }
+
+	[Parameter]
+	[Description("Display name for user")]
+	public string? DisplayName { get; set; }
+
+	[Parameter]
+	[Description("Names of files containing certificates to associate with the user")]
+	public string[]? UserCerts { get; set; }
+
+	[Parameter]
+	[Description("Name of installed operating system")]
+	public string? Os { get; set; }
+
+	[Parameter]
+	[Description("Version of installed operating system")]
+	public string? OsVersion { get; set; }
+
+	[Parameter]
+	[Description("Groups to make the user a member of")]
+	public string[]? MemberOf { get; set; }
+
+	protected override async Task GetAttributesFor(LdapDistinguishedName dn, Dictionary<string, object> attributes, LdapClient ldap, CancellationToken cancellationToken)
+	{
+		if (this.NewPassword != null)
+		{
+			attributes.Add("unicodePwd", Encoding.Unicode.GetBytes($"\"{this.NewPassword}\""));
+		}
+
+		var logonName = this.LogonName ?? dn.Rdns[0].Values[0];
+		attributes.Add("sAMAccountName", logonName);
+
+		if (this.DisplayName != null)
+			attributes.Add("displayName", this.DisplayName);
+		if (this.Os != null)
+			attributes.Add("operatingSystem", this.Os);
+		if (this.OsVersion != null)
+			attributes.Add("operatingSystemVersion", this.OsVersion);
+
+		attributes.Add("userAccountControl", (int)UserAccountControlFlags.WorkstationTrustAccount);
+
+		if (this.UserCerts != null)
+		{
+			List<BinaryString> certValues = new List<BinaryString>();
+			foreach (var userCertFile in this.UserCerts)
+			{
+				this.WriteDiagnostic($"Loading certificate from '{userCertFile}'");
+				var certs = CertificateHelper.LoadFrom(userCertFile);
+				foreach (var cert in certs)
+				{
+					if (cert.HasEku(ExtendedKeyUsages.ClientAuthentication))
+					{
+						certValues.Add(new BinaryString(cert.RawData));
+					}
+				}
+
+				if (certValues.Count > 0)
+				{
+					attributes.Add("userCertificate", certValues.ToArray());
+				}
+			}
+		}
+
+		if (this.MemberOf != null)
+		{
+			List<LdapDistinguishedName> groups = new List<LdapDistinguishedName>(this.MemberOf.Length);
+			foreach (var groupName in this.MemberOf)
+			{
+				var groupResults = await ldap.SimpleSearch(groupName, cancellationToken);
+				if (groupResults.EntryCount == 1)
+				{
+					groups.Add(groupResults.Entries[0].EntryName);
+				}
+				else
+				{
+					;
+				}
+			}
+
+			attributes.Add("memberOf", groups.ToArray());
+		}
+	}
+}

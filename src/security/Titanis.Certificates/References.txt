@@ -1,0 +1,1 @@
+﻿[MS-GPNAP] - Group Policy NAP (list of hash algorithms)

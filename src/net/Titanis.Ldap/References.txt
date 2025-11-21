@@ -1,0 +1,10 @@
+﻿[RFC 4510] - LDAP - Roadmap
+[RFC 4511] - LDAP - The Protocol
+[RFC 4512] - LDAP - Directory Information Models
+[RFC 4514] - LDAP - DNs
+[RFC 4515] - LDAP - Filter syntax
+
+[RFC 2252] - LDAP
+[RFC 2253] - LDAP DNs
+
+[RFC 2696] - LDAP Paging
