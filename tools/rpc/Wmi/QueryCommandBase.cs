@@ -40,19 +40,11 @@ internal abstract class QueryCommandBase : WmiNamespaceCommandBase
 	{
 		var results = await ns.ExecuteWqlQueryAsync(this.GetQueryText(), this.PageSize, cancellationToken);
 
-		bool first = true;
 		while (await results.ReadAsync(cancellationToken))
 		{
 			var record = results.Current;
 			if (record is null)
 				continue;
-
-			if (first)
-			{
-				first = false;
-				this.SetOutputFormat(this.ConsoleOutputStyle ?? OutputStyle.Table, OutputField.GetFieldsFor(record, this.OutputFields));
-			}
-
 
 			this.WriteRecord(record);
 		}

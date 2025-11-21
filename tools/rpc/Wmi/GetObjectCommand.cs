@@ -13,7 +13,7 @@ namespace Wmi;
 /// <task category="WMI;Enumeration">Get a WMI object</task>
 [Command]
 [Description("Gets an object with a WMI path")]
-[OutputRecordType(typeof(WmiObject))]
+[OutputRecordType(typeof(WmiObject), DefaultOutputStyle = OutputStyle.List)]
 [DetailedHelpText(@"The object path is specified relative to the namespace.
 
 Since the command line parser strips double quotes, use single quotes to delimit strings.  Single quotes are converted to double quotes before sending the request to WMI.")]
@@ -34,11 +34,7 @@ internal class GetObjectCommand : WmiNamespaceCommandBase
 			try
 			{
 				var obj = await ns.GetObjectAsync(path, cancellationToken);
-				if ((obj != null))
-				{
-					this.SetOutputFormat(this.ConsoleOutputStyle ?? OutputStyle.List, OutputField.GetFieldsFor(obj, this.OutputFields));
-					this.WriteRecord(obj);
-				}
+				this.WriteRecord(obj);
 			}
 			catch (Exception ex)
 			{
