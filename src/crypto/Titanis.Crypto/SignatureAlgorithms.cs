@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Titanis.Certificates
+namespace Titanis.Crypto
 {
 	public enum HashType
 	{
