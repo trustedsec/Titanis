@@ -275,6 +275,12 @@ namespace Titanis.Security.Kerberos
 		public sealed override int SealTrailerSize => this.GetSessionKeyStruct().EncryptionProfile.SealTrailerSize;
 
 		/// <inheritdoc/>
+		public sealed override void IncrementRecvSeqNbr()
+		{
+			var seqNbr = this.GetSeqNbrForReceive();
+		}
+
+		/// <inheritdoc/>
 		public sealed override void SignMessage(
 			in MessageSignParams signParams,
 			MessageSignOptions options
@@ -309,13 +315,18 @@ namespace Titanis.Security.Kerberos
 				? (WrapFlags.AcceptorSubkey)
 				: WrapFlags.None);
 
-			uint seqNbr = (uint)(this.RecvSeqNbr++);
+			uint seqNbr = GetSeqNbrForReceive();
 			sessionKey.VerifySignature(
 				KeyUsage.AcceptorSign,
 				seqNbr,
 				flags,
 				verifyParams
 				);
+		}
+
+		private uint GetSeqNbrForReceive()
+		{
+			return (uint)(this.RecvSeqNbr++);
 		}
 
 		/// <inheritdoc/>

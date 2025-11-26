@@ -336,6 +336,11 @@ namespace Titanis.Security.Spnego
 			return null;
 		}
 
+		public sealed override void IncrementRecvSeqNbr()
+		{
+			this.GetCompletedContext().IncrementRecvSeqNbr();
+		}
+
 		/// <inheritdoc/>
 		public sealed override void SealMessage(in MessageSealParams sealParams)
 			=> this.GetCompletedContext().SealMessage(sealParams);

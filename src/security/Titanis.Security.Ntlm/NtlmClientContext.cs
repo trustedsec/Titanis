@@ -805,6 +805,13 @@ namespace Titanis.Security.Ntlm
 
 		#region Message security
 		/// <inheritdoc/>
+		public sealed override void IncrementRecvSeqNbr()
+		{
+			// Burn a number
+			this._cryptoContext.GetNextSeqNbrS2C();
+		}
+
+		/// <inheritdoc/>
 		public sealed override int SignTokenSize => NtlmMessageSignatureV1.StructSize;
 
 		public sealed override void SignMessage(

@@ -66,6 +66,11 @@ namespace Titanis.Security
 		/// <returns></returns>
 		protected abstract ReadOnlySpan<byte> GetSessionKeyImpl();
 
+		/// <summary>
+		/// Increments the sequence number expected on the next message received.
+		/// </summary>
+		public abstract void IncrementRecvSeqNbr();
+
 		#region Signing
 		/// <summary>
 		/// Gets the size of a signing token.

@@ -307,6 +307,12 @@ namespace Titanis.Security.Ntlm
 		public override int SignTokenSize => NtlmMessageSignatureV1.StructSize;
 		public override int SealTrailerSize => NtlmMessageSignatureV1.StructSize;
 
+		/// <inheritdoc/>
+		public sealed override void IncrementRecvSeqNbr()
+		{
+			this._cryptoContext.GetNextSeqNbrC2S();
+		}
+
 		public sealed override void SignMessage(
 			in MessageSignParams signParams,
 			MessageSignOptions options
