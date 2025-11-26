@@ -143,6 +143,8 @@ namespace Titanis.Ldap
 		{
 			return value ? TrueBytes : FalseBytes;
 		}
+
+		public override object Parse(string text) => bool.Parse(text);
 	}
 
 	// [RFC 2252] § 6.16
@@ -176,6 +178,8 @@ namespace Titanis.Ldap
 		{
 			return Encoding.UTF8.GetBytes(value.ToString());
 		}
+
+		public override object Parse(string text) => int.Parse(text);
 	}
 
 	// [RFC 2252] § 6.16
@@ -209,6 +213,8 @@ namespace Titanis.Ldap
 		{
 			return Encoding.UTF8.GetBytes(value.ToString());
 		}
+
+		public override object Parse(string text) => int.Parse(text);
 	}
 
 	// [RFC 4517] § 3.3.16
@@ -242,6 +248,8 @@ namespace Titanis.Ldap
 		{
 			return Encoding.UTF8.GetBytes(value.ToString());
 		}
+
+		public override object Parse(string text) => long.Parse(text);
 	}
 
 	public class AccessPointRef
@@ -286,9 +294,14 @@ namespace Titanis.Ldap
 		protected sealed override AccessPointRef DecodeImpl(byte[] bytes)
 		{
 			string str = Encoding.UTF8.GetString(bytes);
-			Match m = rgxAP.Match(str);
+			return Parse(str);
+		}
+
+		public override AccessPointRef Parse(string text)
+		{
+			Match m = rgxAP.Match(text);
 			if (!m.Success)
-				throw new ArgumentException($"The value '{str}' is not a valid access point reference.");
+				throw new ArgumentException($"The value '{text}' is not a valid access point reference.");
 
 			return new AccessPointRef(new PresentationAddress(m.Groups["pa"].Value), new LdapDistinguishedName(m.Groups["dn"].Value));
 		}
@@ -352,6 +365,12 @@ namespace Titanis.Ldap
 			var byteCount_value = Encoding.UTF8.GetByteCount(valuePart);
 			string str = $"S:{byteCount_value}:{valuePart}:{value.Dn.Text}";
 			return Encoding.UTF8.GetBytes(str);
+		}
+
+		public override object Parse(string text)
+		{
+			// TODO: How should this be handled?  Should there be a friendlier syntax for the user?
+			throw new NotImplementedException();
 		}
 
 		internal static (string, LdapDistinguishedName) DecodeDN(byte[] bytes, char expectedPrefix)
@@ -418,8 +437,14 @@ namespace Titanis.Ldap
 
 		protected sealed override LdapDistinguishedName DecodeImpl(byte[] bytes)
 		{
-			return new LdapDistinguishedName(Encoding.UTF8.GetString(bytes));
+			return Parse(Encoding.UTF8.GetString(bytes));
 		}
+
+		public override LdapDistinguishedName Parse(string text)
+		{
+			return new LdapDistinguishedName(text);
+		}
+
 		protected sealed override byte[] EncodeImpl(LdapDistinguishedName value)
 		{
 			return Encoding.UTF8.GetBytes(value.Text);
@@ -479,6 +504,12 @@ namespace Titanis.Ldap
 			string str = $"B:{namePart.Length}:{namePart}:{value.Dn.Text}";
 			return Encoding.UTF8.GetBytes(str);
 		}
+
+		public override object Parse(string text)
+		{
+			// TODO: How to handle?
+			throw new NotImplementedException();
+		}
 	}
 
 	// [RFC 2252] § 6.9
@@ -507,8 +538,14 @@ namespace Titanis.Ldap
 		protected sealed override LdapDistinguishedName DecodeImpl(byte[] bytes)
 		{
 			string text = Encoding.UTF8.GetString(bytes);
+			return Parse(text);
+		}
+
+		public override LdapDistinguishedName Parse(string text)
+		{
 			return new LdapDistinguishedName(text);
 		}
+
 		/// <inheritdoc/>
 		protected sealed override byte[] EncodeImpl(LdapDistinguishedName value)
 		{
@@ -556,8 +593,14 @@ namespace Titanis.Ldap
 
 		protected sealed override PresentationAddress DecodeImpl(byte[] bytes)
 		{
-			return new PresentationAddress(Encoding.UTF8.GetString(bytes));
+			return Parse(Encoding.UTF8.GetString(bytes));
 		}
+
+		public override PresentationAddress Parse(string text)
+		{
+			return new PresentationAddress(text);
+		}
+
 		protected sealed override byte[] EncodeImpl(PresentationAddress value)
 		{
 			return Encoding.UTF8.GetBytes(value.Text);
@@ -625,6 +668,11 @@ namespace Titanis.Ldap
 		{
 			return value.Bytes;
 		}
+
+		public override object Parse(string text)
+		{
+			return new BinaryString(BinaryHelper.ParseHexString(text));
+		}
 	}
 
 
@@ -657,6 +705,11 @@ namespace Titanis.Ldap
 		{
 			return Asn1DerEncoder.EncodeValue(value).ToArray();
 		}
+
+		public override object Parse(string text)
+		{
+			return new Asn1Oid(text);
+		}
 	}
 
 
@@ -677,6 +730,8 @@ namespace Titanis.Ldap
 		{
 			return this.Encoding.GetBytes(value);
 		}
+
+		public override object Parse(string text) => text;
 	}
 
 	// [MS-ADTS] § 3.1.1.2.2.2.5
@@ -737,6 +792,12 @@ namespace Titanis.Ldap
 		protected sealed override byte[] EncodeOctets(SecurityDescriptor value)
 		{
 			return value.ToByteArray();
+		}
+
+		public override object Parse(string text)
+		{
+			// TODO: Parse SecurityDescriptor
+			throw new NotImplementedException();
 		}
 	}
 
@@ -802,6 +863,11 @@ namespace Titanis.Ldap
 		{
 			return value.Bytes;
 		}
+
+		public override object Parse(string text)
+		{
+			return BinaryHelper.ParseHexString(text);
+		}
 	}
 
 	public sealed class StringOctetGuidSyntax : Asn1EncodedSyntax<Guid>
@@ -828,6 +894,11 @@ namespace Titanis.Ldap
 		protected sealed override byte[] EncodeOctets(Guid value)
 		{
 			return value.ToByteArray();
+		}
+
+		public override object Parse(string text)
+		{
+			return Guid.Parse(text);
 		}
 	}
 
@@ -874,6 +945,11 @@ namespace Titanis.Ldap
 		protected sealed override byte[] EncodeOctets(SecurityIdentifier value)
 		{
 			return value.GetBytes();
+		}
+
+		public override object Parse(string text)
+		{
+			return SecurityIdentifier.Parse(text);
 		}
 	}
 
