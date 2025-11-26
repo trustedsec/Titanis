@@ -19,7 +19,7 @@ namespace Ldap
 	[Subcommand("adduser", typeof(AddUserCommand))]
 	[Subcommand("addcomputer", typeof(AddComputerCommand))]
 	[Subcommand("moduser", typeof(ModUserCommand))]
-	internal class Program : MultiCommand
+	internal partial class Program : MultiCommand
 	{
 		static void Main(string[] args)
 			=> RunProgramAsync<Program>(args);

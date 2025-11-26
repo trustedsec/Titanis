@@ -78,6 +78,40 @@ namespace Titanis.Ldap
 		/// <param name="value">Value to encode</param>
 		/// <returns>Encoded bytes representing <paramref name="value"/>.</returns>
 		public abstract byte[] Encode(object value);
+
+		public abstract bool IsCorrectType(object value);
+
+		public abstract object Parse(string text);
+
+		public virtual byte[] ParseAndEncode(string text)
+		{
+			var value = this.Parse(text);
+			var encoded = this.Encode(value);
+			return encoded;
+		}
+
+		/// <summary>
+		/// Encodes an attribute value, either in its native type or textual representation.
+		/// </summary>
+		/// <param name="valueOrText">Value or text</param>
+		/// <returns>A <see cref="byte"/> array of the encoded value</returns>
+		/// <exception cref="ArgumentException"><paramref name="valueOrText"/> is not a valid value or textual representation.</exception>
+		public virtual byte[] ParseOrEncode(object valueOrText)
+		{
+			if (IsCorrectType(valueOrText))
+			{
+				return this.Encode(valueOrText);
+			}
+			else if (valueOrText is string str)
+			{
+				return this.ParseAndEncode(str);
+			}
+			else
+			{
+				throw new ArgumentException($"The value '{valueOrText}' is not the correct type and cannot be parsed as text with syntax {this.GetType().Name}.");
+			}
+		}
+
 	}
 	/// <summary>
 	/// Implements <see cref="LdapSyntax"/> to handle typed values.
@@ -123,6 +157,9 @@ namespace Titanis.Ldap
 		/// <param name="value">Value to encode</param>
 		/// <returns>Encoded bytes representing <paramref name="value"/>.</returns>
 		protected abstract byte[] EncodeImpl(T value);
+
+		/// <inheritdoc/>
+		public override bool IsCorrectType(object value) => value is T;
 	}
 
 	// [RFC 4517] § 3.3.1
@@ -154,7 +191,16 @@ namespace Titanis.Ldap
 		/// <inheritdoc/>
 		protected sealed override byte[] EncodeImpl(AttributeTypeDescription value)
 		{
-			return Encoding.UTF8.GetBytes(value.ToString());
+			return ParseAndEncode(value.ToString());
+		}
+
+		public override object Parse(string text)
+		{
+			return AttributeTypeDescription.Parse(text);
+		}
+		public override byte[] ParseAndEncode(string text)
+		{
+			return Encoding.UTF8.GetBytes(text);
 		}
 	}
 
@@ -207,6 +253,11 @@ namespace Titanis.Ldap
 			encoded[^1] = (byte)'B';
 			return encoded;
 		}
+
+		public override object Parse(string text)
+		{
+			return DecodeImpl(Encoding.UTF8.GetBytes(text));
+		}
 	}
 
 	// [RFC 4517] § 3.3.4
@@ -241,6 +292,8 @@ namespace Titanis.Ldap
 			if (value.Length != 2) throw new ArgumentException($"Not a valid country string: {value}");
 			return new byte[] { (byte)value[0], (byte)value[1] };
 		}
+
+		public override object Parse(string text) => text;
 	}
 
 	// [RFC 4517] § 3.3.5
@@ -300,7 +353,12 @@ namespace Titanis.Ldap
 			ArgumentNullException.ThrowIfNull(bytes);
 
 			string str = Encoding.UTF8.GetString(bytes);
-			var tokens = str.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			return Parse(str);
+		}
+
+		public override DeliveryMethod[] Parse(string text)
+		{
+			var tokens = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
 			List<DeliveryMethod> methods = new List<DeliveryMethod>((tokens.Length + 1) / 2);
 			methods.Add(Enum.Parse<DeliveryMethod>(tokens[0], true));
@@ -309,7 +367,7 @@ namespace Titanis.Ldap
 				var token1 = tokens[i - 1];
 				var token2 = tokens[i - 1];
 				if (token1 != "$")
-					throw new ArgumentException($"Token {i} was '{token1}' when '$' was expected.", nameof(bytes));
+					throw new ArgumentException($"Token {i} was '{token1}' when '$' was expected.", nameof(text));
 
 				methods.Add(Enum.Parse<DeliveryMethod>(token2, true));
 			}
@@ -365,7 +423,17 @@ namespace Titanis.Ldap
 		/// <inheritdoc/>
 		protected sealed override byte[] EncodeImpl(ContentRule value)
 		{
-			return Encoding.UTF8.GetBytes(value.ToString());
+			return ParseAndEncode(value.ToString());
+		}
+
+		public override object Parse(string text)
+		{
+			return new ContentRule(text);
+		}
+
+		public override byte[] ParseAndEncode(string text)
+		{
+			return Encoding.UTF8.GetBytes(text);
 		}
 	}
 
@@ -408,6 +476,11 @@ namespace Titanis.Ldap
 		{
 			return Encoding.UTF8.GetBytes(value.Description);
 		}
+
+		public override object Parse(string text)
+		{
+			return new StructureRule(text);
+		}
 	}
 
 	// [RFC 4517] § 3.3.9
@@ -437,6 +510,11 @@ namespace Titanis.Ldap
 		protected sealed override byte[] EncodeImpl(LdapDistinguishedName value)
 		{
 			return Encoding.UTF8.GetBytes(value.Text);
+		}
+
+		public override object Parse(string text)
+		{
+			return new LdapDistinguishedName(text);
 		}
 	}
 

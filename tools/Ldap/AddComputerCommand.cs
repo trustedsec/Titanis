@@ -9,10 +9,14 @@ using Titanis.Cli;
 using Titanis.Ldap;
 
 namespace Ldap;
+
+[Command]
+[Description("Adds a computer account to the directory")]
 internal class AddComputerCommand : AddCommandBase
 {
 	protected override string RdnName => "CN";
 	protected override string ObjectClass => "computer";
+	protected override string? DefaultContainer => "CN=Computers";
 
 	[Parameter]
 	[Description("Password of new account")]
@@ -46,7 +50,7 @@ internal class AddComputerCommand : AddCommandBase
 	{
 		if (this.NewPassword != null)
 		{
-			attributes.Add("unicodePwd", Encoding.Unicode.GetBytes($"\"{this.NewPassword}\""));
+			attributes.Add("unicodePwd", new BinaryString(Encoding.Unicode.GetBytes($"\"{this.NewPassword}\"")));
 		}
 
 		var logonName = this.LogonName ?? dn.Rdns[0].Values[0];

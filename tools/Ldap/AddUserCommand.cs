@@ -14,6 +14,8 @@ internal class AddUserCommand : AddCommandBase
 	protected override string RdnName => "CN";
 	protected override string ObjectClass => "user";
 
+	protected override string? DefaultContainer => "CN=Users";
+
 	[Parameter]
 	[Description("Password of new account")]
 	public string? NewPassword { get; set; }

@@ -51,7 +51,7 @@ namespace Titanis.Ldap
 	}
 
 	[Serializable]
-	public class LdapException : Exception
+	public class LdapException : Exception, IHaveErrorCode
 	{
 		public LdapException(LdapResultCode resultCode, string message) : base(message ?? GetMessageFor(resultCode))
 		{
@@ -66,6 +66,8 @@ namespace Titanis.Ldap
 		}
 
 		public LdapResultCode ResultCode { get; }
+
+		public int ErrorCode => (int)this.ResultCode;
 
 		private static string GetMessageFor(LdapResultCode resultCode)
 			=> $"An LDAP error has occurred: {resultCode}";

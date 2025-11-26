@@ -15,22 +15,26 @@ internal abstract class LdapObjectCommandBase : LdapCommandBase
 	[Description("Names or DNs of OUs to create")]
 	public string[] Name { get; set; }
 
-	protected abstract string RdnName { get; }
+	protected abstract Task<LdapDistinguishedName> ResolveObjectName(string simpleName, LdapClient ldap, CancellationToken cancellationToken);
+
 	protected sealed override async Task<int> RunAsync(LdapClient ldap, CancellationToken cancellationToken)
 	{
 		foreach (var name in this.Name)
 		{
-			var dn = name;
-			if (!dn.Contains('='))
+			LdapDistinguishedName dn;
+			if (!name.Contains('='))
 				// This is a simple namee
-				dn = this.RdnName + "=" + LdapRelativeDistinguishedName.Escape(dn);
-
-			if (!dn.Contains(",DC="))
+				dn = await this.ResolveObjectName(name, ldap, cancellationToken);
+			else
+			{
+				var fullName = name;
 				// This is relative to the domain root
-				dn += "," + ldap.DomainRoot;
+				if (!name.Contains(",DC="))
+					fullName += "," + ldap.DomainRoot;
+				dn = new LdapDistinguishedName(fullName);
+			}
 
-			var objName = new LdapDistinguishedName(dn);
-			await RunAsync(ldap, objName, cancellationToken);
+			await RunAsync(ldap, dn, cancellationToken);
 		}
 
 		return 0;

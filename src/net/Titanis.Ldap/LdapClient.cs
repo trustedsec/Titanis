@@ -567,34 +567,45 @@ namespace Titanis.Ldap
 		}
 
 		public async Task Modify(
-			LdapDistinguishedName dn,
-			Dictionary<string, object> attributes,
+			LdapModifyRequest request,
 			CancellationToken cancellationToken)
 		{
-			ArgumentNullException.ThrowIfNull(dn);
-			ArgumentNullException.ThrowIfNull(attributes);
+			ArgumentNullException.ThrowIfNull(request);
 
-			List<ModifyRequest_Tagged6_Changes_Element> attrs = new List<ModifyRequest_Tagged6_Changes_Element>(attributes.Count);
-			foreach (var attrEntry in attributes)
+			List<ModifyRequest_Tagged6_Changes_Element> attrs = new List<ModifyRequest_Tagged6_Changes_Element>(request._changes.Count);
+			foreach (var change in request._changes)
 			{
-				if (attrEntry.Value is null)
-					throw new ArgumentException($"The attribute list contains an attribute '{attrEntry.Key}' with no value.");
+				if (change.Values is null)
+					throw new ArgumentException($"The attribute list contains an attribute '{change.Name}' with no value.");
 
-				var attrSchema = await GetAttribute(attrEntry.Key, cancellationToken).ConfigureAwait(false);
-				if (attrSchema is null)
-					throw new ArgumentException($"The attributes list contains attribute '{attrEntry.Key}' that cannot be found.", nameof(attributes));
-
-				try
+				if (change.Values is byte[][] byteses)
 				{
-					var encoded = attrSchema.Syntax.Encode(attrEntry.Value);
-					attrs.Add(new ModifyRequest_Tagged6_Changes_Element(ModifyRequest_Tagged6_Changes_Element_Operation.Replace, new PartialAttribute(attrSchema.EncodedName, [encoded])));
+					attrs.Add(new ModifyRequest_Tagged6_Changes_Element((ModifyRequest_Tagged6_Changes_Element_Operation)change.ChangeType, new PartialAttribute(Encoding.UTF8.GetBytes(change.Name), byteses)));
 				}
-				catch (Exception ex)
+				else if (change.Values is [byte[] bytes])
 				{
-					throw new ArgumentException($"Error while encoding attribute '{attrEntry.Key}': {ex.Message}", nameof(attributes), ex);
+					attrs.Add(new ModifyRequest_Tagged6_Changes_Element((ModifyRequest_Tagged6_Changes_Element_Operation)change.ChangeType, new PartialAttribute(Encoding.UTF8.GetBytes(change.Name), [bytes])));
+				}
+				else
+				{
+					var attrSchema = await GetAttribute(change.Name, cancellationToken).ConfigureAwait(false);
+					if (attrSchema is null)
+						throw new ArgumentException($"The attributes list contains attribute '{change.Name}' that cannot be found.", nameof(request));
+
+					try
+					{
+						var values = change.Values;
+						byte[][] encoded = Array.ConvertAll(values, attrSchema.Syntax.ParseOrEncode);
+						attrs.Add(new ModifyRequest_Tagged6_Changes_Element((ModifyRequest_Tagged6_Changes_Element_Operation)change.ChangeType, new PartialAttribute(attrSchema.EncodedName, encoded)));
+					}
+					catch (Exception ex)
+					{
+						throw new ArgumentException($"Error while encoding attribute '{change.Name}': {ex.Message}", nameof(request), ex);
+					}
 				}
 			}
 
+			var dn = request.DistinguishedName;
 			var resp = await _channel.SendMessage(new LDAPMessage_ProtocolOp()
 			{
 				ModifyRequest = new ModifyRequest_Tagged6(Encoding.UTF8.GetBytes(dn.Text), attrs.ToArray())
