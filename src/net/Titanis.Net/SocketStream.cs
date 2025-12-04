@@ -21,10 +21,14 @@ namespace Titanis.Net
 		public SocketStream(ISocket socket, FileAccess access, bool ownsSocket)
 		{
 			if (socket is null) throw new ArgumentNullException(nameof(socket));
+
 			this.Socket = socket;
 			this._access = access;
 			this._ownsSocket = ownsSocket;
+			this._readFlags = SocketFlags.None;
 		}
+
+		private SocketFlags _readFlags;
 
 		/// <summary>
 		/// Gets the underlying <see cref="ISocket"/>.
@@ -111,19 +115,19 @@ namespace Titanis.Net
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			this.VerifyNotDisposed();
-			return this.Socket.Receive(buffer.AsSpan(offset, count), SocketFlags.None);
+			return this.Socket.Receive(buffer.AsSpan(offset, count), this._readFlags);
 		}
 		/// <inheritdoc/>
 		public override int Read(Span<byte> buffer)
 		{
 			this.VerifyNotDisposed();
-			return this.Socket.Receive(buffer, SocketFlags.None);
+			return this.Socket.Receive(buffer, this._readFlags);
 		}
 		/// <inheritdoc/>
 		public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
 		{
 			this.VerifyNotDisposed();
-			return this.Socket.ReceiveAsync(buffer, SocketFlags.None, cancellationToken);
+			return this.Socket.ReceiveAsync(buffer, this._readFlags, cancellationToken);
 		}
 		/// <inheritdoc/>
 		public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
@@ -134,7 +138,7 @@ namespace Titanis.Net
 
 		private async Task<int> ReadAsyncInner(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
 		{
-			return await this.Socket.ReceiveAsync(buffer.AsMemory().Slice(offset, count), SocketFlags.None, cancellationToken).ConfigureAwait(false);
+			return await this.Socket.ReceiveAsync(buffer.AsMemory().Slice(offset, count), this._readFlags, cancellationToken).ConfigureAwait(false);
 		}
 		#endregion
 		#region Write

@@ -176,9 +176,9 @@ namespace Titanis.Net
 		public Stream GetStream(bool transferOwnership)
 		{
 			if (transferOwnership)
-				return this._stream ??= new NetworkStream(this._socket, true);
+				return this._stream ??= new SocketStream(this, FileAccess.ReadWrite, true);
 			else
-				return new NetworkStream(this._socket, false);
+				return new SocketStream(this, FileAccess.ReadWrite, false);
 		}
 	}
 }
