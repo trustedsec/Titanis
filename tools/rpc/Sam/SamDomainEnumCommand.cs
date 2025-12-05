@@ -12,6 +12,7 @@ internal abstract class SamDomainEnumCommand : SamCommand
 {
 	[Parameter]
 	[DefaultValue(true)]
+	[Description("Continue even if errors occur")]
 	public SwitchParam ContinueOnError { get; set; }
 
 	protected sealed override SamServerAccess RequiredSamAccess => SamServerAccess.EnumerateDomains | SamServerAccess.LookupDomain;
