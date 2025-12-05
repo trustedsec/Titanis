@@ -12,7 +12,7 @@ namespace Titanis.Asn1.Test
 			T expected
 			)
 		{
-			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(data), false);
+			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(data), Asn1DerDecoderOptions.None);
 			var actual = decoderFunc(decoder);
 			Assert.AreEqual(expected, actual);
 		}
@@ -24,7 +24,7 @@ namespace Titanis.Asn1.Test
 			T expected
 			)
 		{
-			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(data), false);
+			Asn1DerDecoder decoder = new Asn1DerDecoder(new ByteMemoryReader(data), Asn1DerDecoderOptions.None);
 			var frame = decoder.DecodeTlvStart(tag);
 			var actual = decoderFunc(decoder);
 			decoder.CloseTlv(frame);
