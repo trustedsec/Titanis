@@ -9,6 +9,9 @@ using Titanis.Cli;
 using Titanis.Ldap;
 
 namespace Ldap;
+
+[Command]
+[Description("Adds a new user")]
 internal class AddUserCommand : AddCommandBase
 {
 	protected override string RdnName => "CN";

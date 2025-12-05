@@ -8,6 +8,9 @@ using Titanis.Cli;
 using Titanis.Ldap;
 
 namespace Ldap;
+
+[Command]
+[Description("Adds a new organizational unit")]
 internal class AddOuCommand : AddCommandBase
 {
 	protected override string RdnName => "OU";
