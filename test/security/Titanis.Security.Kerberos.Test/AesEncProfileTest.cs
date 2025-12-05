@@ -196,9 +196,10 @@ namespace Titanis.Security.Kerberos.Test
 			const int SeqNbr = 42;
 
 			var message = new byte[42];
-			var trailer = new byte[encProf.SealHeaderSize + encProf.SealTrailerSize];
+			encProf.GetWrapBufferSizes(WrapOptions.Confidentiality, out var headerSize, out var trailerSize);
+			var token = new byte[headerSize + trailerSize];
 
-			MessageSealParams sealParams = new(default, SecBufferList.Create(SecBuffer.PrivacyWithIntegrity(message)), trailer);
+			MessageSealParams sealParams = new(token, SecBufferList.Create(SecBuffer.PrivacyWithIntegrity(message)), default);
 			encProf.SealMessage(key, KeyUsage.InitiatorSeal, SeqNbr, WrapFlags.Sealed, sealParams);
 
 			encProf.UnsealMessage(key, KeyUsage.InitiatorSeal, SeqNbr, WrapFlags.Sealed, sealParams);
@@ -227,13 +228,14 @@ namespace Titanis.Security.Kerberos.Test
 			FillArray(message2);
 			FillArray(message3);
 
-			var trailer = new byte[encProf.SealHeaderSize + encProf.SealTrailerSize];
+			encProf.GetWrapBufferSizes(WrapOptions.Confidentiality, out var headerSize, out var trailerSize);
+			var token = new byte[headerSize + trailerSize];
 
-			MessageSealParams sealParams = new(default, SecBufferList.Create(
+			MessageSealParams sealParams = new(token, SecBufferList.Create(
 				SecBuffer.Integrity(message1),
 				SecBuffer.PrivacyWithIntegrity(message2),
 				SecBuffer.Integrity(message3)
-				), trailer);
+				), default);
 			encProf.SealMessage(key, KeyUsage.InitiatorSeal, SeqNbr, WrapFlags.Sealed | WrapFlags.AcceptorSubkey, sealParams);
 
 			encProf.UnsealMessage(key, KeyUsage.InitiatorSeal, SeqNbr, WrapFlags.Sealed | WrapFlags.AcceptorSubkey, sealParams);

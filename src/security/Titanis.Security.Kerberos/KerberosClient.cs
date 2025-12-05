@@ -843,7 +843,7 @@ namespace Titanis.Security.Kerberos
 			KDC_REQ_BODY reqBody = Structs.KdcReqBody(
 				ticketParameters,
 				options,
-				(ticketParameters.S4UserName is null) ? null : ticketParameters.S4UserName.PrincipalName(),// null, //cname,
+				null, //(ticketParameters.S4UserName is null) ? null : ticketParameters.S4UserName.PrincipalName(),// null, //cname,
 				realm,
 				Structs.PrincipalName(spn),
 				context.nonce,

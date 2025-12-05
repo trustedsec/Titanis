@@ -92,7 +92,7 @@ namespace Titanis.Security.Kerberos
 
 		void IKerberosCallback.OnReceivedTicket(TicketInfo ticketInfo)
 		{
-			this.WriteMessage($"Received ticket for {ticketInfo.TargetSpn} within {ticketInfo.TicketRealm} for user {ticketInfo.UserName}@{ticketInfo.UserRealm}: {ticketInfo.SessionKey.EType} session key {ticketInfo.SessionKey.KeyBytes.ToHexString()}");
+			this.WriteMessage($"Received ticket for {ticketInfo.TargetSpn} within {ticketInfo.TicketRealm} for user {ticketInfo.UserName}@{ticketInfo.UserRealm}: {ticketInfo.SessionKey.EType} session key {ticketInfo.SessionKey.KeyBytes.ToHexString()} with options {ticketInfo.KdcOptions}");
 
 			this._chainedCallback?.OnReceivedTicket(ticketInfo);
 		}
