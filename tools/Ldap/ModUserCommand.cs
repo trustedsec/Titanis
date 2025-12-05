@@ -51,7 +51,7 @@ internal class ModUserCommand : ModCommand
 			if (this.OldPassword != null)
 			{
 				modifyRequest.DeleteValue("unicodePwd", EncodePassword(this.OldPassword));
-				//modifyRequest.AddValue("unicodePwd", EncodePassword(this.NewPassword));
+				modifyRequest.AddValue("unicodePwd", EncodePassword(this.NewPassword));
 			}
 			else
 			{

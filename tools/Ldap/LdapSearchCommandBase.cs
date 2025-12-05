@@ -126,7 +126,7 @@ internal abstract class LdapSearchCommandBase : LdapCommandBase, ILdapClientSear
 
 	private async Task BuildAndRunQuery(LdapClient ldap, LdapDistinguishedName? searchBase, CancellationToken cancellationToken)
 	{
-		var isRootDse = ((searchBase != null) && (searchBase.Rdns.Length == 0));
+		var isRootDse = ((searchBase != null) && (searchBase.Rdns.Count == 0));
 
 		LdapQuery query = CreateQuery(searchBase);
 		if (this.PageSize.HasValue)
