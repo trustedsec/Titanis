@@ -59,9 +59,7 @@ namespace WeakServices
 				var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential(UserName, Domain, Password), true);
 				ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
 				ntlmContext.Workstation = myWorkstationName;
-				ntlmContext.ClientChannelBindingsUnhashed = new byte[16];
 				ntlmContext.TargetSpn = spn;
-				ntlmContext.ClientChannelBindingsUnhashed = new byte[16];
 				return ntlmContext;
 			};
 			this.Services.AddService(typeof(IClientCredentialService), creds);
