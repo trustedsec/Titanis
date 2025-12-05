@@ -41,6 +41,10 @@ internal class InvokeCommand : WmiObjectCommandBase
 	[Description("Arguments to pass to the method")]
 	public string[] Arguments { get; set; }
 
+	[Parameter]
+	[Description("List of parameters to skip")]
+	public string[] SkipParams { get; set; }
+
 	private string? _lastOrigin;
 
 	protected sealed override async Task ProcessObject(WmiObject obj, WmiScope scope, CancellationToken cancellationToken)
@@ -66,6 +70,12 @@ internal class InvokeCommand : WmiObjectCommandBase
 
 		Dictionary<string, object?> args = new Dictionary<string, object?>();
 		var inputProps = method.InputSignature?.Properties ?? Array.Empty<WmiProperty>();
+		Array.Sort(inputProps, (x, y) => (x.Id ?? x.DeclarationOrder).CompareTo(y.Id ?? y.DeclarationOrder));
+
+		bool ShouldSkip(WmiProperty prop)
+		{
+			return (this.SkipParams != null && this.SkipParams.Contains(prop.Name, StringComparer.OrdinalIgnoreCase));
+		}
 
 		bool argFailed = false;
 		if (this.Arguments != null)
@@ -77,6 +87,9 @@ internal class InvokeCommand : WmiObjectCommandBase
 				if (argPos < inputProps.Length)
 				{
 					var inProp = inputProps[argPos];
+					while (ShouldSkip(inProp))
+						inProp = inputProps[++argPos];
+
 					this.WriteDiagnostic($"Parsing WMI method parameter '{inProp.Name}': {arg}");
 
 					if (0 != (inProp.PropertyType & CimType.Array))
@@ -127,11 +140,6 @@ internal class InvokeCommand : WmiObjectCommandBase
 			var res = await obj.InvokeMethodAsync(method.Name, args, cancellationToken);
 			if (res != null)
 			{
-				if (method.ClassOfOrigin != this._lastOrigin)
-				{
-					this.SetOutputFormat(this.ConsoleOutputStyle ?? OutputStyle.List, OutputField.GetFieldsFor(res, this.OutputFields));
-					this._lastOrigin = res.WmiClass?.Name;
-				}
 				this.WriteRecord(res);
 			}
 		}
