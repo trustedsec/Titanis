@@ -18,6 +18,7 @@ internal abstract class LdapSearchCommandBase : LdapCommandBase, ILdapClientSear
 	public LdapDistinguishedName[]? SearchBase { get; set; }
 
 	[Parameter]
+	[Description("Scope of search")]
 	public LdapSearchScope? Scope { get; set; }
 
 	[Parameter]
