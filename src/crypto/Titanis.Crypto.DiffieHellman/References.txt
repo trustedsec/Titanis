@@ -1,0 +1,5 @@
+﻿[RFC 2631] Diffie-Hellman Key Agreement
+
+[RFC 3526] More Modular Exponential (MODP) Diffie-Hellman groups for Internet Key Exchange (IKE)
+
+[RFC 2409] The Internet Key Exchange (IKE) - Groups
