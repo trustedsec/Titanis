@@ -77,7 +77,6 @@
     <ProjectReference Include="..\..\..\src\base\Titanis.Reflection\Titanis.Reflection.csproj" />
     <ProjectReference Include="..\..\..\src\security\Titanis.Security.Kerberos\Titanis.Security.Kerberos.csproj" />
     <ProjectReference Include="..\..\..\src\security\Titanis.Security\Titanis.Security.csproj" />
-    <ProjectReference Include="..\..\..\Titanis.Crypto.Cms\Titanis.Crypto.Cms.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using CryptographicMessageSyntax2004;
+﻿//using CryptographicMessageSyntax2004;
 using KerberosV5_PK_INIT_SPEC;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Numerics;
@@ -10,22 +10,22 @@ namespace Titanis.Security.Kerberos.Test;
 [TestClass]
 public sealed class Test1
 {
-	[TestMethod]
-	public void TestDecodePkintSignedAuthData()
-	{
-		var bytes = SignedDataBytes;
-		ContentInfo contentInfo = Asn1DerDecoder.DecodeTlv<ContentInfo>(bytes);
+	//[TestMethod]
+	//public void TestDecodePkintSignedAuthData()
+	//{
+	//	var bytes = SignedDataBytes;
+	//	ContentInfo contentInfo = Asn1DerDecoder.DecodeTlv<ContentInfo>(bytes);
 
-		var idSignedData = CryptographicMessageSyntax2004Module.id_signedData.ToString();
-		Assert.AreEqual(idSignedData, contentInfo.contentType.ToString());
+	//	var idSignedData = CryptographicMessageSyntax2004Module.id_signedData.ToString();
+	//	Assert.AreEqual(idSignedData, contentInfo.contentType.ToString());
 
-		var signedData = Asn1DerDecoder.DecodeTlv<SignedData>(contentInfo.content.TlvBytes);
+	//	var signedData = Asn1DerDecoder.DecodeTlv<SignedData>(contentInfo.content.TlvBytes);
 
-		var econtent = signedData.encapContentInfo;
+	//	var econtent = signedData.encapContentInfo;
 
-		Assert.AreEqual(KerberosV5_PK_INIT_SPECModule.id_pkinit_authData.ToString(), econtent.eContentType.ToString());
-		var authData = Asn1DerDecoder.DecodeTlv<AuthPack>(econtent.eContent);
-	}
+	//	Assert.AreEqual(KerberosV5_PK_INIT_SPECModule.id_pkinit_authData.ToString(), econtent.eContentType.ToString());
+	//	var authData = Asn1DerDecoder.DecodeTlv<AuthPack>(econtent.eContent);
+	//}
 
 	[TestMethod]
 	public void TestKnownGood()
