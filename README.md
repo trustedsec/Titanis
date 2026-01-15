@@ -15,10 +15,12 @@ Titanis is a library of protocol implementations and command line utilities, wri
 	* Service Control Manager ([MS-SCMR](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-SCMR/%5bMS-SCMR%5d.pdf))
 	* Server service ([MS-SRVS](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-SRVS/%5bMS-SRVS%5d.pdf))
 	* WMI ([MS-WMI](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-WMI/%5bMS-WMI%5d.pdf) and [MS-WMIO](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-WMIO/%5bMS-WMIO%5d.pdf))
+* LDAP ([RFC 4511](https://datatracker.ietf.org/doc/html/rfc4511) and parts of [MS-ADTS](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-ADTS/%5bMS-ADTS%5d.pdf))
 * Security
 	* NTLM ([MS-NLMP](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-NLMP/%5bMS-NLMP%5d.pdf))
 	* Kerberos ([RFC4120](https://datatracker.ietf.org/doc/html/rfc4120) and [MS-KILE](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-KILE/%5bMS-KILE%5d.pdf))
 		* Inter-realm referrals
+		* PKINIT ([MS-PKCA](https://winprotocoldoc.z19.web.core.windows.net/MS-PKCA/%5bMS-PKCA%5d.pdf) and [RFC 4556](https://datatracker.ietf.org/doc/html/rfc4556))
 		* S4U ([MS-SFU](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-WMI/%5bMS-WMI%5d.pdf))
 			* S4U2self
 			* S4U2proxy
@@ -35,7 +37,7 @@ Titanis is a library of protocol implementations and command line utilities, wri
 
 For recent changes, see the [change log](CHANGELOG.md)
 
-For an overview on supported authentication scenarios, see [Authentication](syntax-auth.md) - Describes how to control authentication with parameters
+For an overview on supported authentication scenarios, see [Authentication](doc/UserGuide/syntax-auth.md) - Describes how to control authentication with parameters
 
 
 The toolset implements callbacks and logging features to integrate into your operational environment.

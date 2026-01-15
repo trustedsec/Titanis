@@ -34,6 +34,7 @@ report as your workstation during authentication (NTLM and Kerberos).
 1. If a command requires multiple tickets, it will use the tickets in the specified ticket files and request missing tickets from the KDC (if specified).
 1. Titanis automatically handles inter-realm referrals.
 	1. It determines the KDC of the next realm by resolving the realm name using DNS; it does not query for the SRV record.
+1. When a certificate is specified, the certificate may be in either `.pfx` or `.pem` format.  If the `.pem` file does not contain the key, there is a corresponding -XxKey argument (e.g. `-UserCert` and `-UserKey`).
 
 
 | If you have... | then use... | Supports | Notes |
@@ -53,6 +54,11 @@ report as your workstation during authentication (NTLM and Kerberos).
 || `-TicketCache` &lt;TGT file name&gt; `-Kdc` &lt;endpoint&gt;|Kerberos|Titanis requests the necessary service tickets from the KDC.|
 |Service ticket| `-Ticket` &lt;ticket file name&gt;|Kerberos|The SPN of the ticket must match what the command requires.|
 || `-TicketCache` &lt;ticket file name&gt;|Kerberos|The SPN of the ticket must match what the command requires.|
+|Certificate file as a ...| | | |
+| &nbsp; ... .pfx with certificate and key | `-UserCert` &lt;.pfx file&gt; `-UserKeyPassword` &lt;passphrase&gt;| Kerberos | `-UserKeyPassword` is used to decrypt the file and is only required if the file is encrypted. |
+| &nbsp; ... .pem with certificate and key | `-UserCert` &lt;.pem file&gt; `-UserKeyPassword` &lt;passphrase&gt;| Kerberos | `-UserKeyPassword` is used to decrypt the file and is only required if the file is encrypted. |
+| &nbsp; ... .pem with certificate and separate .key | `-UserCert` &lt;.pem file&gt; `-UserKey` &lt;.key file&gt; `-UserKeyPassword` &lt;passphrase&gt;| Kerberos | `-UserKeyPassword` is used to decrypt the file and is only required if the file is encrypted. |
+
 
 The Authentication parameter group defines parameters that specify how the tool is to authenticate with the target.  Most protocols exchange security tokens to build a security context to authenticate the user and provide message security services, such as signing and sealing.  The parameters specify how to build this security context.  Titanis supports the following security protocols:
 
