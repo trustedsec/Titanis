@@ -168,6 +168,29 @@ namespace Titanis
 		}
 
 		/// <summary>
+		/// Attempts to parse a character as a hexadecimal digit.
+		/// </summary>
+		/// <param name="digit">Digit to parse</param>
+		/// <returns>Numeric value of <paramref name="digit"/> if it is a valid hexadecimal digit; otherwise, <c>-1</c></returns>
+		/// <exception cref="ArgumentException"><paramref name="digit"/> is not a valid hexadecimal digit</exception>
+		public static int TryParseHexChar(char digit)
+		{
+			uint n = (uint)(digit - '0');
+			if (n < 10)
+			{
+				return unchecked((int)n);
+			}
+			else
+			{
+				n = (uint)((digit & ~0x20) - 'A');
+				if (n < 6)
+					return unchecked((int)(n + 10));
+				else
+					return -1;
+			}
+		}
+
+		/// <summary>
 		/// Parses a hexadecimal digit character.
 		/// </summary>
 		/// <param name="digit">Digit to parse</param>
