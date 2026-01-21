@@ -1,5 +1,6 @@
 ﻿using ms_samr;
 using System;
+using Titanis.DceRpc;
 using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Mssamr

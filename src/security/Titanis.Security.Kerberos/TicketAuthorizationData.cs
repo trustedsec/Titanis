@@ -174,37 +174,37 @@ namespace Titanis.Security.Kerberos
 		public string? EffectiveName
 		{
 			get => (this._effectiveName ??= info.EffectiveName.AsString());
-			set => info.EffectiveName = (this._effectiveName = value).ToRpcUniString();
+			set => info.EffectiveName = (this._effectiveName = value).ToRpcUnicodeString();
 		}
 		private string? _FullName;
 		public string? FullName
 		{
 			get => (this._FullName ??= info.FullName.AsString());
-			set => info.FullName = (this._FullName = value).ToRpcUniString();
+			set => info.FullName = (this._FullName = value).ToRpcUnicodeString();
 		}
 		private string? _LogonScript;
 		public string? LogonScript
 		{
 			get => (this._LogonScript ??= info.LogonScript.AsString());
-			set => info.LogonScript = (this._LogonScript = value).ToRpcUniString();
+			set => info.LogonScript = (this._LogonScript = value).ToRpcUnicodeString();
 		}
 		private string? _ProfilePath;
 		public string? ProfilePath
 		{
 			get => (this._ProfilePath ??= info.ProfilePath.AsString());
-			set => info.ProfilePath = (this._ProfilePath = value).ToRpcUniString();
+			set => info.ProfilePath = (this._ProfilePath = value).ToRpcUnicodeString();
 		}
 		private string? _HomeDirectory;
 		public string? HomeDirectory
 		{
 			get => (this._HomeDirectory ??= info.HomeDirectory.AsString());
-			set => info.HomeDirectory = (this._HomeDirectory = value).ToRpcUniString();
+			set => info.HomeDirectory = (this._HomeDirectory = value).ToRpcUnicodeString();
 		}
 		private string? _HomeDirectoryDrive;
 		public string? HomeDirectoryDrive
 		{
 			get => (this._HomeDirectoryDrive ??= info.HomeDirectoryDrive.AsString());
-			set => info.HomeDirectoryDrive = (this._HomeDirectoryDrive = value).ToRpcUniString();
+			set => info.HomeDirectoryDrive = (this._HomeDirectoryDrive = value).ToRpcUnicodeString();
 		}
 		public int LogonCount => info.LogonCount;
 		public int BadPasswordCount => info.BadPasswordCount;
@@ -218,13 +218,13 @@ namespace Titanis.Security.Kerberos
 		public string? LogonServer
 		{
 			get => (this._LogonServer ??= info.LogonServer.AsString());
-			set => info.LogonServer = (this._LogonServer = value).ToRpcUniString();
+			set => info.LogonServer = (this._LogonServer = value).ToRpcUnicodeString();
 		}
 		private string? _LogonDomainName;
 		public string? LogonDomainName
 		{
 			get => (this._LogonDomainName ??= info.LogonDomainName.AsString());
-			set => info.LogonDomainName = (this._LogonDomainName = value).ToRpcUniString();
+			set => info.LogonDomainName = (this._LogonDomainName = value).ToRpcUnicodeString();
 		}
 
 		public SecurityIdentifier? LogonDomainId => info.LogonDomainId.ToSid();
@@ -340,39 +340,6 @@ namespace Titanis.Security.Kerberos
 			=> dt.HasValue ? ToFileTime(dt.Value)
 			: (options == FileTimeOptions.NullAsNever) ? Never
 			: Forever;
-
-		public static DateTime? ToDateTimeOrNull(this FILETIME ft)
-			=> (
-				((ft.dwLowDateTime == uint.MaxValue) && (ft.dwHighDateTime == int.MaxValue))
-				|| ((ft.dwLowDateTime == 0) && (ft.dwHighDateTime == 0))
-			) ? null
-			: DateTime.FromFileTimeUtc((((long)ft.dwHighDateTime) << 32) | ft.dwLowDateTime);
-
-		public static DateTime ToDateTime(this FILETIME ft)
-			=> DateTime.FromFileTimeUtc((((long)ft.dwHighDateTime) << 32) | ft.dwLowDateTime);
-
-		public static string? AsString(this RPC_UNICODE_STRING rpcUniString)
-			=> (rpcUniString.Buffer == null) ? null : new string(rpcUniString.Buffer.value.AsSpan());
-
-		public static RPC_UNICODE_STRING ToRpcUniString(this string? str)
-		{
-			if (str == null)
-			{
-				return new RPC_UNICODE_STRING
-				{
-					Buffer = new RpcPointer<ArraySegment<char>>(Array.Empty<char>())
-				};
-			}
-			else
-			{
-				return new RPC_UNICODE_STRING
-				{
-					Length = (ushort)(str.Length * 2),
-					MaximumLength = (ushort)(str.Length * 2),
-					Buffer = new RpcPointer<ArraySegment<char>>(str.ToCharArray()),
-				};
-			}
-		}
 
 		public static NtlmSessionKey ToNtlmSessionKey(this USER_SESSION_KEY key)
 			=> new NtlmSessionKey(key.data[0].data, key.data[1].data);

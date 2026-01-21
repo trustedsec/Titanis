@@ -95,6 +95,29 @@ namespace Titanis
 		}
 
 		/// <summary>
+		/// Attempts to parse a character as a hexadecimal digit.
+		/// </summary>
+		/// <param name="digit">Digit to parse</param>
+		/// <returns>Numeric value of <paramref name="digit"/> if it is a valid hexadecimal digit; otherwise, <c>-1</c></returns>
+		/// <exception cref="ArgumentException"><paramref name="digit"/> is not a valid hexadecimal digit</exception>
+		public static int TryParseHexChar(char digit)
+		{
+			uint n = (uint)(digit - '0');
+			if (n < 10)
+			{
+				return unchecked((int)n);
+			}
+			else
+			{
+				n = (uint)((digit & ~0x20) - 'A');
+				if (n < 6)
+					return unchecked((int)(n + 10));
+				else
+					return -1;
+			}
+		}
+
+		/// <summary>
 		/// Parses a hexadecimal digit character.
 		/// </summary>
 		/// <param name="digit">Digit to parse</param>
@@ -109,17 +132,11 @@ namespace Titanis
 			}
 			else
 			{
-				n = (uint)(digit - 'A');
+				n = (uint)((digit & ~0x20) - 'A');
 				if (n < 6)
 					return unchecked((int)(n + 10));
 				else
-				{
-					n = (uint)(digit - 'a');
-					if (n < 6)
-						return unchecked((int)(n + 10));
-					else
-						throw new ArgumentException(Messages.HexParse_InvalidHexDigit);
-				}
+					throw new ArgumentException(Messages.HexParse_InvalidHexDigit);
 			}
 		}
 		/// <summary>
@@ -173,8 +190,7 @@ namespace Titanis
 					continue;
 				else if (
 					((uint)(c - '0') <= (uint)('9' - '0'))
-					|| ((uint)(c - 'a') <= (uint)('z' - 'a'))
-					|| ((uint)(c - 'A') <= (uint)('Z' - 'A'))
+					|| ((uint)((c & ~0x20) - 'A') <= (uint)('Z' - 'A'))
 					|| (c is '/' or '+' or '-' or '_')
 					)
 				{
