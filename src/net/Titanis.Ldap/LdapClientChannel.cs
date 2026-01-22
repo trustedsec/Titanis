@@ -29,7 +29,7 @@ namespace Titanis.Ldap
 			}, cancellationToken).ConfigureAwait(false);
 			var saslResult = resp.message.protocolOp.BindResponse.resultCode;
 
-			while (saslResult == LDAPResult_ResultCode.SaslBindInProgress || (saslResult == LDAPResult_ResultCode.Success && !authContext.IsComplete))
+			while (saslResult == LDAPResult_ResultCode.SaslBindInProgress)
 			{
 				var token = authContext.Initialize(resp.message.protocolOp.BindResponse.serverSaslCreds).ToArray();
 				if (token.Length > 0)
@@ -45,6 +45,9 @@ namespace Titanis.Ldap
 
 				saslResult = resp.message.protocolOp.BindResponse.resultCode;
 			}
+
+			if (saslResult == LDAPResult_ResultCode.Success && !authContext.IsComplete)
+				authContext.Initialize(resp.message.protocolOp.BindResponse.serverSaslCreds).ToArray();
 
 			if (saslResult != LDAPResult_ResultCode.Success)
 				throw new LdapException((LdapResultCode)saslResult, Encoding.UTF8.GetString(resp.message.protocolOp.BindResponse.diagnosticMessage));

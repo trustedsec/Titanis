@@ -63,7 +63,9 @@ namespace Titanis.Ldap
 		/// Port for the Global Catalog service
 		/// </summary>
 		public const int GcLdapPort = 3268;
-		// Port for the Global Catalog service over SSL
+		/// <summary>
+		/// Port for the Global Catalog service over SSL
+		/// </summary>
 		public const int GcLdapsPort = 3269;
 
 		/// <summary>
@@ -160,7 +162,7 @@ namespace Titanis.Ldap
 
 				var flags = (sslOptions != null)
 					? SecurityCapabilities.None
-					: SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
+					: SecurityCapabilities.Integrity | SecurityCapabilities.SequenceDetection | SecurityCapabilities.ReplayDetection | SecurityCapabilities.Confidentiality;
 				var authContext = credentials.GetAuthContextForService(spn, flags, AuthOptions.PreferSpnego);
 				if (authContext != null)
 				{
@@ -478,7 +480,7 @@ namespace Titanis.Ldap
 
 			var syntax = AdSyntaxes.TryGetSyntax(attrSyntaxId, omSyntax, omObjectClass);
 
-			var attr = new LdapAttributeSchema( ldapName, syntax);
+			var attr = new LdapAttributeSchema(ldapName, syntax);
 			return attr;
 		}
 
@@ -547,7 +549,7 @@ namespace Titanis.Ldap
 
 					try
 					{
-						var encoded = attrSchema.Syntax.Encode(multiValue);
+						var encoded = (multiValue is byte[] bytes) ? bytes : attrSchema.Syntax.ParseOrEncode(multiValue);
 						encodedValues[iValue] = encoded;
 					}
 					catch (Exception ex)

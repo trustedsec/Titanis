@@ -13,6 +13,9 @@
 			Referrals = referrals;
 		}
 
+		/// <summary>
+		/// Gets the number of entries returned.
+		/// </summary>
 		public int EntryCount { get; }
 
 		/// <summary>
@@ -27,6 +30,10 @@
 		/// Gets the bookmark returned by the server when paging is used.
 		/// </summary>
 		public byte[]? Bookmark { get; internal set; }
+		/// <summary>
+		/// Gets the dirsync cookie returned by the server.
+		/// </summary>
+		/// <seealso cref="LdapQuery.DirSyncCookie"/>
 		public byte[]? DirsyncCookie { get; internal set; }
 	}
 }

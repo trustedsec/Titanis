@@ -54,5 +54,32 @@ namespace Titanis.Ldap
 		/// </remarks>
 		public sealed override string ToString()
 			=> $"{this.AttributeTypeDescription}: {string.Join(";", this.Value)}";
+
+
+		public static string ParseSpecialValue(string attrDesc, string assertionValue)
+		{
+			if (assertionValue.StartsWith("0x") && ulong.TryParse(assertionValue.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out var ul))
+				return ul.ToString();
+			else if (NamedBitGroups.GroupsByName.TryGetValue(attrDesc, out var group))
+			{
+				string[] parts = assertionValue.Split(',', options: StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+				ulong value = 0;
+				foreach (var part in parts)
+				{
+					if (
+						ulong.TryParse(part, out ul)
+						|| group.NamedBits.TryGetValue(part, out ul)
+						)
+						value |= ul;
+					else
+						return assertionValue;
+				}
+
+				assertionValue = value.ToString();
+			}
+
+			return assertionValue;
+		}
 	}
 }

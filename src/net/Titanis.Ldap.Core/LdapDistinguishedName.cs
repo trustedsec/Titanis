@@ -298,6 +298,9 @@ namespace Titanis.Ldap
 
 		private string BuildText()
 		{
+			if (this._rdns.IsNullOrEmpty())
+				return string.Empty;
+
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < this._rdns.Length; i++)
 			{
@@ -378,6 +381,8 @@ namespace Titanis.Ldap
 					return SchemaRoot;
 				else if (str.Equals("ConfigRoot", StringComparison.OrdinalIgnoreCase))
 					return ConfigRoot;
+				else if (str.Equals("RootDse", StringComparison.OrdinalIgnoreCase))
+					return RootDse;
 
 				return new LdapDistinguishedName(str);
 			}

@@ -47,6 +47,9 @@ namespace Titanis.Ldap
 		public static readonly NamedBitGroup InstanceType = new NamedBitGroup("instanceType", typeof(InstanceTypeFlags), typeof(InstanceTypeShortFlags));
 		public static readonly NamedBitGroup NtdsaOptions = new NamedBitGroup("options", typeof(NtdsaOptionsFlags), typeof(NtdsaOptionsShortFlags));
 
+		public static readonly NamedBitGroup SupportedEncryptionTypes = new NamedBitGroup("msDS-SupportedEncryptionTypes", typeof(SupportedEncryptionTypes), null);
+		public static readonly NamedBitGroup SamAccountType = new NamedBitGroup("samAccountType", typeof(SamAccountType), null);
+
 		public static readonly NamedBitGroup[] AllGroups = new NamedBitGroup[]
 		{
 			UserAccountControl,
@@ -55,7 +58,9 @@ namespace Titanis.Ldap
 			SchemaFlagsEx,
 			GroupType,
 			InstanceType,
-			NtdsaOptions
+			NtdsaOptions,
+			SupportedEncryptionTypes,
+			SamAccountType,
 		};
 
 		internal static readonly Dictionary<string, NamedBitGroup> GroupsByName = AllGroups.ToDictionary(r => r.AttributeName, StringComparer.OrdinalIgnoreCase);

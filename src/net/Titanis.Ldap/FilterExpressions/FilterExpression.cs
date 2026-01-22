@@ -1,35 +1,83 @@
-﻿using Lightweight_Directory_Access_Protocol_V3;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Immutable;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Titanis.Ldap.FilterExpressions
 {
-	public abstract partial class FilterExpression
+	public abstract class FilterExpressionContext
 	{
+		public abstract string ResolveParameter(string parameterName);
+	}
+
+	public struct FilterParameterUsage
+	{
+		public FilterParameterUsage(string name, string attribute)
+		{
+			Name = name;
+			Attribute = attribute;
+		}
+
+		public string Name { get; }
+		public string Attribute { get; }
+	}
+
+	public sealed partial class FilterExpression
+	{
+		internal FilterExpression(FilterClause rootClause, ImmutableArray<FilterParameterUsage> paramUsages)
+		{
+			ArgumentNullException.ThrowIfNull(rootClause);
+			RootClause = rootClause;
+			ParameterUsages = paramUsages;
+		}
+
+		public FilterClause RootClause { get; }
+		public ImmutableArray<FilterParameterUsage> ParameterUsages { get; }
+
 		public LdapFilter ToFilter()
-			=> new LdapFilter(this.ToFilterAsn1());
-		internal abstract Filter ToFilterAsn1();
+		{
+			return new LdapFilter(this.RootClause.ToFilterAsn1(NullFilterContext.Instance));
+		}
+
+		class NullFilterContext : FilterExpressionContext
+		{
+			internal static readonly NullFilterContext Instance = new NullFilterContext();
+
+			public override string ResolveParameter(string parameterName)
+			{
+				throw new InvalidOperationException($"The filter references parameter '{parameterName}', but no parameters are defined.");
+			}
+		}
+
+		public LdapFilter ToFilter(FilterExpressionContext context)
+		{
+			return new LdapFilter(this.RootClause.ToFilterAsn1(context));
+		}
 
 		// [RFC 4515]
 		public static FilterExpression Parse(string text)
 		{
 			ArgumentException.ThrowIfNullOrEmpty(text);
 
-			var ctx = new ParseContext
+			List<FilterParameterUsage> paramUsages = new();
+			var ctx = new ParseContext(paramUsages)
 			{
 				text = text,
 			};
 
-			var expr = ctx.ReadFilter();
-			return expr;
+			var clause = ctx.ReadFilter();
+			return new FilterExpression(clause, ImmutableArray.CreateRange(paramUsages));
 		}
 
-		partial
-
-				// [RFC 4515]
-				struct ParseContext
+		// [RFC 4515]
+		partial struct ParseContext
 		{
+			internal ParseContext(List<FilterParameterUsage> paramUsages)
+			{
+				this.paramUsages = paramUsages;
+			}
+
+			internal readonly List<FilterParameterUsage> paramUsages;
+
 			internal string text;
 			internal int readIndex;
 
@@ -63,17 +111,17 @@ namespace Titanis.Ldap.FilterExpressions
 				return new FormatException($"The LDAP filter is not in the expected format.  Expected '{expected}' at position {position} but found '{actual}'.");
 			}
 
-			private FilterExpression? TryReadFilter()
+			private FilterClause? TryReadFilter()
 			{
 				return this.PeekNextChar() == '(' ? this.ReadFilter() : null;
 			}
 
-			internal FilterExpression ReadFilter()
+			internal FilterClause ReadFilter()
 			{
 				var startPos = this.readIndex;
 				this.ReadExpected('(');
 
-				FilterExpression filter;
+				FilterClause filter;
 
 				var c = this.PeekNextChar();
 				switch (c)
@@ -83,9 +131,9 @@ namespace Titanis.Ldap.FilterExpressions
 						{
 							this.ReadExpected((char)c);
 
-							List<FilterExpression> clauses = new List<FilterExpression>();
+							List<FilterClause> clauses = new List<FilterClause>();
 							{
-								FilterExpression? clause;
+								FilterClause? clause;
 								while ((clause = this.TryReadFilter()) != null)
 								{
 									clauses.Add(clause);
@@ -128,18 +176,40 @@ namespace Titanis.Ldap.FilterExpressions
 
 							var attrDesc = sb.ToString();
 
+							bool isParam = false;
+							{
+								c = this.PeekNextChar();
+								if (c == '@')
+								{
+									isParam = true;
+									this.ReadNextChar();
+								}
+							}
 							var filterType = this.ReadFilterType();
-							var assertionValue = this.ReadAssertionValue();
-							assertionValue = ParseSpecialValue(attrDesc, assertionValue);
+
+							AssertionValue assertionValue;
+							var assertionValueStr = this.ReadAssertionValue();
+							{
+								if (isParam)
+								{
+									this.paramUsages.Add(new FilterParameterUsage(assertionValueStr, attrDesc));
+
+									assertionValue = new ParameterizedAssertionValue(assertionValueStr, attrDesc);
+								}
+								else
+								{
+									assertionValue = new LiteralAssertionValue(LdapAttribute.ParseSpecialValue(attrDesc, assertionValueStr));
+								}
+							}
 
 							switch (filterType)
 							{
 								case FilterType.Equal:
 									{
 										Match mSubstr;
-										if (assertionValue == "*")
+										if (assertionValueStr == "*")
 											filter = HasAttribute(attrDesc);
-										else if ((mSubstr = rgxSubstring.Match(assertionValue)).Success)
+										else if ((mSubstr = rgxSubstring.Match(assertionValueStr)).Success)
 										{
 											var initial = mSubstr.Groups["initial"];
 											var anyGroup = mSubstr.Groups["any"].Captures;
@@ -190,32 +260,6 @@ namespace Titanis.Ldap.FilterExpressions
 			}
 
 			private static Regex rgxSubstring = SubstringRegex();
-
-			private string ParseSpecialValue(string attrDesc, string assertionValue)
-			{
-				if (assertionValue.StartsWith("0x") && ulong.TryParse(assertionValue.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out var ul))
-					return ul.ToString();
-				else if (NamedBitGroups.GroupsByName.TryGetValue(attrDesc, out var group))
-				{
-					string[] parts = assertionValue.Split(',', options: StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-					ulong value = 0;
-					foreach (var part in parts)
-					{
-						if (
-							ulong.TryParse(part, out ul)
-							|| group.NamedBits.TryGetValue(part, out ul)
-							)
-							value |= ul;
-						else
-							return assertionValue;
-					}
-
-					assertionValue = value.ToString();
-				}
-
-				return assertionValue;
-			}
 
 			private static bool IsAttrChar(int c)
 			{
@@ -287,14 +331,13 @@ namespace Titanis.Ldap.FilterExpressions
 		}
 
 		#region Operators
-		public virtual FilterExpression Not() => new NotExpression(this);
-		public static AndExpression All(FilterExpression[] clauses)
+		public static AndExpression All(FilterClause[] clauses)
 		{
 			ArgumentNullException.ThrowIfNull(clauses);
 			if (clauses.Contains(null)) throw new ArgumentNullException(nameof(clauses));
 			return new AndExpression(clauses);
 		}
-		public static OrExpression Any(FilterExpression[] clauses)
+		public static OrExpression Any(FilterClause[] clauses)
 		{
 			ArgumentNullException.ThrowIfNull(clauses);
 			if (clauses.Contains(null)) throw new ArgumentNullException(nameof(clauses));
@@ -307,7 +350,7 @@ namespace Titanis.Ldap.FilterExpressions
 			return new PresentExpression(attributeDesc);
 		}
 
-		public static EqualsExpression Equal(string attributeDesc, string assertionValue)
+		public static EqualsExpression Equal(string attributeDesc, AssertionValue assertionValue)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(attributeDesc);
 			ArgumentNullException.ThrowIfNull(assertionValue);
@@ -315,7 +358,7 @@ namespace Titanis.Ldap.FilterExpressions
 			return new EqualsExpression(attributeDesc, assertionValue);
 		}
 
-		public static GreaterOrEqualExpression GreaterOrEqual(string attributeDesc, string assertionValue)
+		public static GreaterOrEqualExpression GreaterOrEqual(string attributeDesc, AssertionValue assertionValue)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(attributeDesc);
 			ArgumentNullException.ThrowIfNull(assertionValue);
@@ -323,7 +366,7 @@ namespace Titanis.Ldap.FilterExpressions
 			return new GreaterOrEqualExpression(attributeDesc, assertionValue);
 		}
 
-		public static LessOrEqualExpression LessOrEqual(string attributeDesc, string assertionValue)
+		public static LessOrEqualExpression LessOrEqual(string attributeDesc, AssertionValue assertionValue)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(attributeDesc);
 			ArgumentNullException.ThrowIfNull(assertionValue);
@@ -331,7 +374,7 @@ namespace Titanis.Ldap.FilterExpressions
 			return new LessOrEqualExpression(attributeDesc, assertionValue);
 		}
 
-		public static ApproxEqualExpression ApproxEqual(string attributeDesc, string assertionValue)
+		public static ApproxEqualExpression ApproxEqual(string attributeDesc, AssertionValue assertionValue)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(attributeDesc);
 			ArgumentNullException.ThrowIfNull(assertionValue);
@@ -339,7 +382,7 @@ namespace Titanis.Ldap.FilterExpressions
 			return new ApproxEqualExpression(attributeDesc, assertionValue);
 		}
 
-		public static ExtensibleMatchExpression ExtensibleMatch(string attributeDesc, string extension, string assertionValue)
+		public static ExtensibleMatchExpression ExtensibleMatch(string attributeDesc, string extension, AssertionValue assertionValue)
 		{
 			ArgumentException.ThrowIfNullOrWhiteSpace(attributeDesc);
 			ArgumentNullException.ThrowIfNull(assertionValue);
@@ -349,148 +392,42 @@ namespace Titanis.Ldap.FilterExpressions
 		#endregion
 	}
 
-	public sealed class NotExpression : FilterExpression
+	public abstract class AssertionValue
 	{
-		internal NotExpression(FilterExpression operand)
-		{
-			Operand = operand;
-		}
-
-		public FilterExpression Operand { get; }
-
-		internal override Filter ToFilterAsn1() => new Filter { Not = this.Operand.ToFilterAsn1() };
+		internal abstract string Resolve(FilterExpressionContext context);
 	}
 
-	public sealed class AndExpression : FilterExpression
+	public class LiteralAssertionValue : AssertionValue
 	{
-		internal AndExpression(FilterExpression[] clauses)
+		public LiteralAssertionValue(string value)
 		{
-			Clauses = clauses;
+			ArgumentNullException.ThrowIfNull(value);
+			LiteralValue = value;
 		}
-		public FilterExpression[] Clauses { get; }
 
-		internal override Filter ToFilterAsn1() => new Filter { And = Array.ConvertAll(this.Clauses, r => r.ToFilterAsn1()) };
+		public string LiteralValue { get; }
+
+		internal override string Resolve(FilterExpressionContext context) => this.LiteralValue;
 	}
 
-	public sealed class OrExpression : FilterExpression
+	public class ParameterizedAssertionValue : AssertionValue
 	{
-		internal OrExpression(FilterExpression[] clauses)
-		{
-			Clauses = clauses;
-		}
-		public FilterExpression[] Clauses { get; }
+		private readonly string attrDesc;
 
-		internal override Filter ToFilterAsn1() => new Filter { Or = Array.ConvertAll(this.Clauses, r => r.ToFilterAsn1()) };
-	}
-
-	public sealed class PresentExpression : FilterExpression
-	{
-		internal PresentExpression(string attributeDescription)
+		public ParameterizedAssertionValue(string parameterName, string attrDesc)
 		{
-			AttributeDescription = attributeDescription;
+			ArgumentException.ThrowIfNullOrEmpty(parameterName);
+			ParameterName = parameterName;
+			this.attrDesc = attrDesc;
 		}
 
-		public string AttributeDescription { get; }
+		public string ParameterName { get; }
 
-		internal override Filter ToFilterAsn1() => new Filter() { Present = Encoding.UTF8.GetBytes(this.AttributeDescription) };
-	}
-
-	public abstract class AssertionExpression : FilterExpression
-	{
-		internal AssertionExpression(string attributeDescription, string assertionValue)
+		internal override string Resolve(FilterExpressionContext context)
 		{
-			AttributeDescription = attributeDescription;
-			AssertionValue = assertionValue;
+			var text = context.ResolveParameter(this.ParameterName);
+			text = LdapAttribute.ParseSpecialValue(attrDesc, text);
+			return text;
 		}
-
-		public string AttributeDescription { get; }
-		public string AssertionValue { get; }
-
-		private protected AttributeValueAssertion ToAssertion() => new AttributeValueAssertion(Encoding.UTF8.GetBytes(this.AttributeDescription), Encoding.UTF8.GetBytes(this.AssertionValue));
-	}
-	public sealed class EqualsExpression : AssertionExpression
-	{
-		internal EqualsExpression(string attributeDescription, string assertionValue)
-			: base(attributeDescription, assertionValue)
-		{
-		}
-
-		internal override Filter ToFilterAsn1() => new Filter() { EqualityMatch = this.ToAssertion() };
-	}
-	public sealed class SubstringMatchExpression : FilterExpression
-	{
-		private readonly string attributeDescription;
-		private readonly string? initial;
-		private readonly string[]? any;
-		private readonly string? final;
-
-		internal SubstringMatchExpression(string attributeDescription, string? initial, string[]? any, string? final)
-		{
-			this.attributeDescription = attributeDescription;
-			this.initial = initial;
-			this.any = any;
-			this.final = final;
-		}
-
-		internal override Filter ToFilterAsn1()
-		{
-			List<SubstringFilter_Substrings_Element> elems = new List<SubstringFilter_Substrings_Element>();
-			if (!string.IsNullOrEmpty(this.initial))
-				elems.Add(new SubstringFilter_Substrings_Element() { Initial = Encoding.UTF8.GetBytes(this.initial) });
-			if (!any.IsNullOrEmpty())
-			{
-				foreach (var any in this.any)
-				{
-					elems.Add(new SubstringFilter_Substrings_Element() { Any = Encoding.UTF8.GetBytes(any) });
-				}
-			}
-
-			if (!string.IsNullOrEmpty(this.final))
-				elems.Add(new SubstringFilter_Substrings_Element() { Final = Encoding.UTF8.GetBytes(this.final) });
-
-			return new Filter()
-			{
-				Substrings = new SubstringFilter(Encoding.UTF8.GetBytes(this.attributeDescription), elems.ToArray())
-			};
-		}
-	}
-	public sealed class GreaterOrEqualExpression : AssertionExpression
-	{
-		internal GreaterOrEqualExpression(string attributeDescription, string assertionValue)
-			: base(attributeDescription, assertionValue)
-		{
-		}
-
-		internal override Filter ToFilterAsn1() => new Filter() { GreaterOrEqual = this.ToAssertion() };
-	}
-	public sealed class LessOrEqualExpression : AssertionExpression
-	{
-		internal LessOrEqualExpression(string attributeDescription, string assertionValue)
-			: base(attributeDescription, assertionValue)
-		{
-		}
-
-		internal override Filter ToFilterAsn1() => new Filter() { LessOrEqual = this.ToAssertion() };
-	}
-	public sealed class ApproxEqualExpression : AssertionExpression
-	{
-		internal ApproxEqualExpression(string attributeDescription, string assertionValue)
-			: base(attributeDescription, assertionValue)
-		{
-		}
-
-		internal override Filter ToFilterAsn1() => new Filter() { ApproxMatch = this.ToAssertion() };
-	}
-	public sealed class ExtensibleMatchExpression : AssertionExpression
-	{
-		internal ExtensibleMatchExpression(string attributeDescription, string extension, string assertionValue)
-			: base(attributeDescription, assertionValue)
-		{
-			Extension = extension;
-		}
-
-		public string Extension { get; }
-
-		internal override Filter ToFilterAsn1() => new Filter() { ExtensibleMatch = new MatchingRuleAssertion(Encoding.UTF8.GetBytes(this.AssertionValue), Encoding.UTF8.GetBytes(this.Extension), Encoding.UTF8.GetBytes(this.AttributeDescription)) };
 	}
 }

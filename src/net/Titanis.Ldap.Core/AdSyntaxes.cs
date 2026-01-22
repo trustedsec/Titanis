@@ -214,7 +214,10 @@ namespace Titanis.Ldap
 			return Encoding.UTF8.GetBytes(value.ToString());
 		}
 
-		public override object Parse(string text) => int.Parse(text);
+		public override object Parse(string text)
+		{
+			return int.Parse(text);
+		}
 	}
 
 	// [RFC 4517] § 3.3.16
@@ -866,7 +869,7 @@ namespace Titanis.Ldap
 
 		public override object Parse(string text)
 		{
-			return BinaryHelper.ParseHexString(text);
+			return new BinaryString(BinaryHelper.ParseHexString(text));
 		}
 	}
 

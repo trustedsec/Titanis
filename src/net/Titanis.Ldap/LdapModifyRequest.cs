@@ -66,10 +66,16 @@ namespace Titanis.Ldap
 		/// </summary>
 		public LdapChangeType ChangeType { get; }
 	}
+
+	public interface ILdapModifyRequest
+	{
+		void AddChange(string attributeName, object[] values, LdapChangeType changeType);
+	}
+
 	/// <summary>
 	/// Describes a modification to a directory entry.
 	/// </summary>
-	public class LdapModifyRequest
+	public class LdapModifyRequest : ILdapModifyRequest
 	{
 		public LdapModifyRequest(LdapDistinguishedName dn)
 		{
@@ -79,6 +85,9 @@ namespace Titanis.Ldap
 		public LdapDistinguishedName DistinguishedName { get; }
 
 		internal readonly List<LdapAttributeChange> _changes = new List<LdapAttributeChange>();
+
+		public void AddChange(string attributeName, object[] values, LdapChangeType changeType)
+			=> this.AddChange(new LdapAttributeChange(attributeName,values, changeType));
 
 		public LdapModifyRequest AddChange(LdapAttributeChange change)
 		{

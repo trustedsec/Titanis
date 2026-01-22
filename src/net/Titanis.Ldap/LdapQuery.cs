@@ -30,7 +30,7 @@ namespace Titanis.Ldap
 			LdapDistinguishedName? searchBase,
 			LdapSearchScope scope,
 			LdapFilter? filter,
-			AttributeSpec[] attributes
+			AttributeSpec[]? attributes
 			)
 		{
 			this.SearchBase = searchBase;
@@ -69,12 +69,47 @@ namespace Titanis.Ldap
 		/// If none specified, all attributes are returned.
 		/// </remarks>
 		public AttributeSpec[]? Attributes { get; set; }
+		/// <summary>
+		/// Gets or sets the page size.
+		/// </summary>
+		/// <remarks>
+		/// If set, limits the amount of results returned with a bookmark returned in <see cref="LdapSearchResult.Bookmark"/>.
+		/// </remarks>
 		public int? PageSize { get; set; }
+		/// <summary>
+		/// Gets or sets the paging bookmark.
+		/// </summary>
+		/// <remarks>
+		/// When set, returns the next page of results.
+		/// </remarks>
 		public byte[]? PagingBookmark { get; set; }
+		/// <summary>
+		/// Gets or sets a value determining whether to remain connected and monitor changes.
+		/// </summary>
+		/// <remarks>
+		/// When set, after issuing the query, the LDAP connection stays open and any changes to the
+		/// directory that match the query are returned.
+		/// </remarks>
 		public bool WatchForChanges { get; set; }
+		/// <summary>
+		/// Gets or sets a value determining whether to include deleted items in the results.
+		/// </summary>
+		/// <remarks>
+		/// Setting this property to <see langword="true"/> does not return recycled items; for this, set <see cref="IncludeRecycled"/>.
+		/// </remarks>
 		public bool IncludeDeleted { get; set; }
+		/// <summary>
+		/// Gets or sets a value determining whether to include deleted and recycled items in the results.
+		/// </summary>
 		public bool IncludeRecycled { get; set; }
 		public bool IncludeDeletedLinks { get; set; }
+		/// <summary>
+		/// Gets or sets the dirsync cookie to retrieve changes after a certain point.
+		/// </summary>
+		/// <remarks>
+		/// To get a dirsync cookie, set <see cref="DirSyncCookie"/> to an empty byte array (not <see langword="null"/>).
+		/// The dirsync cookie is returned in <see cref="LdapSearchResult.DirsyncCookie"/>.
+		/// </remarks>
 		public byte[]? DirSyncCookie { get; set; }
 	}
 }

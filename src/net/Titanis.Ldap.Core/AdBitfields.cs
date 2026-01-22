@@ -199,7 +199,7 @@ namespace Titanis.Ldap
 	public enum InstanceTypeFlags
 	{
 		None = 0,
-		Head = 1,
+		NcHead = 1,
 		Uninstantiated = 2,
 		Writable = 4,
 		Above = 8,
