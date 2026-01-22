@@ -4,13 +4,18 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis;
 using Titanis.Cli;
 using Titanis.Ldap;
+using Titanis.Ldap.FilterExpressions;
 
 namespace Ldap;
+
+[Command]
+[Description("Modifies an object in the directory")]
 internal class ModCommand : LdapObjectCommandBase
 {
-	[Parameter(30)]
+	[Parameter(After = nameof(ObjectName))]
 	[Description("Changes to make as name?=value")]
 	public AttributeChangeSpec[]? Changes { get; set; }
 
@@ -36,56 +41,70 @@ internal class ModCommand : LdapObjectCommandBase
 
 	}
 
-	struct ChangeContext
-	{
-		internal ChangeContext(LdapModifyRequest request)
-		{
-			this.request = request;
-			this.values = new List<object>();
-		}
-
-		internal readonly LdapModifyRequest request;
-		internal readonly List<object> values;
-		internal string? lastName;
-		internal LdapChangeType changeType;
-
-		internal void ProcessChange(AttributeChangeSpec change)
-		{
-			if (lastName != null && (
-				(lastName != change.Name)
-				|| (changeType != change.ChangeType)
-				))
-			{
-				CommitChange();
-			}
-
-			lastName = change.Name;
-			changeType = change.ChangeType;
-			values.Add(change.Value);
-		}
-
-		internal readonly void CommitChange()
-		{
-			request.AddChange(new LdapAttributeChange(lastName, values.ToArray(), changeType));
-			values.Clear();
-		}
-	}
-
 	protected sealed override async Task RunAsync(LdapClient ldap, LdapDistinguishedName objName, CancellationToken cancellationToken)
 	{
 		LdapModifyRequest request = new LdapModifyRequest(objName);
 		if (this.Changes != null)
 		{
-			ChangeContext ctx = new ChangeContext(request);
-			foreach (var change in this.Changes)
-			{
-				ctx.ProcessChange(change);
-			}
-			ctx.CommitChange();
+			ChangeContext ctx = new ChangeContext(this.Context);
+			ctx.ProcessArgs(this.Changes, request);
 		}
 
 		this.GetChanges(request);
 
 		await ldap.Modify(request, cancellationToken);
+	}
+}
+
+struct ChangeContext
+{
+	internal ChangeContext(ICommandContext command)
+	{
+		this.command = command;
+		this.values = new List<object>();
+	}
+
+	private readonly ICommandContext command;
+	internal readonly List<object> values;
+	internal string? lastAttrName;
+	internal LdapChangeType changeType;
+
+	internal void ProcessChange(AttributeChangeSpec change, ILdapModifyRequest request)
+	{
+		if (lastAttrName != null && (
+			(lastAttrName != change.Name)
+			|| (changeType != change.ChangeType)
+			))
+		{
+			CommitChange(request);
+		}
+
+		lastAttrName = change.Name;
+		changeType = change.ChangeType;
+
+		object? value = change.Encoding switch
+		{
+			AttributeEncoding.Unspecified => LdapAttribute.ParseSpecialValue(change.Name, change.Value),
+			AttributeEncoding.File => File.ReadAllBytes(this.command.ResolveFsPath(change.Value)),
+			AttributeEncoding.Hex => BinaryHelper.ParseHexString(change.Value),
+			AttributeEncoding.Base64 => Convert.FromBase64String(change.Value),
+			_ => throw new FormatException($"Unsupported encoding {change.Encoding}.")
+		};
+		values.Add(value);
+	}
+
+	internal readonly void CommitChange(ILdapModifyRequest request)
+	{
+		request.AddChange(lastAttrName, values.ToArray(), changeType);
+		values.Clear();
+	}
+
+	internal void ProcessArgs(AttributeChangeSpec[] attrs, ILdapModifyRequest request)
+	{
+		foreach (var change in attrs)
+		{
+			this.ProcessChange(change, request);
+		}
+		this.CommitChange(request);
 	}
 }

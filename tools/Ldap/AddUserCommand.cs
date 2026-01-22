@@ -15,7 +15,7 @@ namespace Ldap;
 internal class AddUserCommand : AddCommandBase
 {
 	protected override string RdnName => "CN";
-	protected override string ObjectClass => "user";
+	protected override string NewObjectClass => "user";
 
 	protected override string? DefaultContainer => "CN=Users";
 

@@ -10,11 +10,17 @@ using Titanis.Ldap;
 namespace Ldap;
 
 [Command]
-[Description("Adds a new organizational unit")]
-internal class AddOuCommand : AddCommandBase
+[Description("Adds an object to the directory")]
+internal class AddCommand : AddCommandBase
 {
-	protected override string RdnName => "OU";
-	protected override string NewObjectClass => "organizationalUnit";
+	[Parameter(After = nameof(ObjectName))]
+	[Mandatory]
+	[Description("Object class of object to add")]
+	public string ObjectClass { get; set; }
+
+	protected override string RdnName => "CN";
+
+	protected override string NewObjectClass => this.ObjectClass;
 
 	protected override Task GetAttributesFor(LdapDistinguishedName dn, Dictionary<string, object> attributes, LdapClient ldap, CancellationToken cancellationToken)
 	{

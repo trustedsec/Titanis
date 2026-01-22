@@ -15,7 +15,7 @@ namespace Ldap;
 internal class AddComputerCommand : AddCommandBase
 {
 	protected override string RdnName => "CN";
-	protected override string ObjectClass => "computer";
+	protected override string NewObjectClass => "computer";
 	protected override string? DefaultContainer => "CN=Computers";
 
 	[Parameter]

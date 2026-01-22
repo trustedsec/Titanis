@@ -22,7 +22,7 @@ Note that these rules are observed and enforced by Active Directory; {0} merely 
 [Example(@"Search for accounts matching `milchick` exactly", "{0} =milchick")]
 internal class SearchCommand : QueryCommandBase
 {
-	[Parameter(20)]
+	[Parameter(After = nameof(ServerName))]
 	[Mandatory]
 	[Description("Name to search for")]
 	public string[] SearchName { get; set; }

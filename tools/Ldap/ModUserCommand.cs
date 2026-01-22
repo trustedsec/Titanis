@@ -11,7 +11,7 @@ namespace Ldap;
 
 [Command]
 [Description("Modifies a directory entry")]
-[DetailedHelpText(@"Specify the changes as a series of name?=value pairs where ?= is:
+[DetailedHelpText(@"Specify attribute changes as a series of name?=value pairs where ?= is:
 
   +=   Add a value
   -=   Remove a value
@@ -27,6 +27,14 @@ To add or remove multiple values, specify each value as a separate name?=value p
 
 	# Adds 3 SPNs
 	servicePrincipleName+=HOST/ALLENTOWN servicePrincipleName+=cifs/ALLENTOWN servicePrincipleName+=RestrictedKrbHost/ALLENTOWN
+
+By default, the attribute values are parsed according to their syntax.  For numeric attributes with bitflags, you may use the named bits, separating multiple bit names with a comma.  For example, to set the encryption types for an account:
+
+	msDS-SupportedEncryptionTypes=Aes128CtsHmacSha1_96,Aes256CtsHmacSha1_96
+
+Use the `namedbits` command to view a list of supported attributes with bitflags.
+
+
 
 You may specify multiple operations for the same attribute within a single command line.  Each operation is sent to the LDAP server as part of the modification request, in the order specified on the command line.  Note that consecutive changes to the same attribute with the same operation are combined.  IN the above example, all 3 SPNs are added in a single operation.
 

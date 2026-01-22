@@ -12,7 +12,7 @@ namespace Ldap;
 [Command]
 [Description("Watches for changes to an object or subtree")]
 [OutputRecordType(typeof(LdapEntry), DefaultOutputStyle = OutputStyle.List)]
-internal sealed class WatchCommand : LdapSearchCommandBase
+internal sealed class WatchCommand : QueryCommandBase
 {
 	protected override void ValidateParameters(ParameterValidationContext context)
 	{

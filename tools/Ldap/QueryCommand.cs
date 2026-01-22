@@ -16,6 +16,14 @@ namespace Ldap;
 
 If no search base is provided, {0} uses the root of the domain.
 
+-SearchBase supports these special names:
+
+* DomainRoot - the default domain naming context of the server
+* ForestRoot - the forest root naming context
+* ConfigRoot - the configuration naming context
+* SchemaRoot - the schema naming context
+* RootDse - The root entry
+
 -Filter accepts an LDAP query.  An LDAP query consists of one or more assertions of the form
 
 	(<attr> <op> <value>)
@@ -42,15 +50,19 @@ To combine multiple assertions, specify a `&` (all must match) or `|` (at least 
 
   (&(attr1=value)(attr2=value)(attr3=value))
 
-A few of the fields support named bits.
+A few of the fields support named bits.  Use the `namedbits` command for a list of supported attributes and bit names.
 
 
 NOTE: Although not strictly required, it is a good idea to surround the filter with quotes to avoid having to escape special characters.")]
 [Example("Find User with Logon Name 'milchick'", "{0} LUMON-DC1 '(samAccountName=milchick)' -OutputFields distinguishedName, objectSid")]
 [Example("Find Objects with SPNs", "{0} LUMON-DC1 '(servicePrincipalName=*)' -OutputFields distinguishedName, objectSid, servicePrincipalName")]
+[Example("Query rootDse with no authentication", "{0} LUMON-DC1 -OutputFields * -OutputStyle List")]
+[Example("Query for accounts trusted for unconstrained delegation", "{0} LUMON-DC1 -OutputFields * \"(userAccountControl|=TrustedForDelegation)\"")]
+[Example("Query for accounts trusted for S4U2self", "{0} LUMON-DC1 -OutputFields * \"(userAccountControl|=TrustedForS4U2self)\"")]
+[Example("Query for accounts trusted for constrained delegation", "{0} LUMON-DC1 -OutputFields * \"(msDS-AllowedToDelegateTo=*)\"")]
 internal class QueryCommand : QueryCommandBase
 {
-	[Parameter(20)]
+	[Parameter(After = nameof(ServerName))]
 	[Description("LDAP query")]
 	public string? Filter { get; set; }
 

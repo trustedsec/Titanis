@@ -10,16 +10,16 @@ using Titanis.Ldap;
 namespace Ldap;
 internal abstract class LdapObjectCommandBase : LdapCommandBase
 {
-	[Parameter(20)]
+	[Parameter(After = nameof(ServerName))]
 	[Mandatory]
-	[Description("Names or DNs of OUs to create")]
-	public string[] Name { get; set; }
+	[Description("Names or DNs of objects to create")]
+	public string[] ObjectName { get; set; }
 
 	protected abstract Task<LdapDistinguishedName> ResolveObjectName(string simpleName, LdapClient ldap, CancellationToken cancellationToken);
 
 	protected sealed override async Task<int> RunAsync(LdapClient ldap, CancellationToken cancellationToken)
 	{
-		foreach (var name in this.Name)
+		foreach (var name in this.ObjectName)
 		{
 			LdapDistinguishedName dn;
 			if (!name.Contains('='))

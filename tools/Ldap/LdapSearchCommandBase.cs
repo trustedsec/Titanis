@@ -79,57 +79,25 @@ internal abstract class LdapSearchCommandBase : LdapCommandBase, ILdapClientSear
 		}
 	}
 
-	protected sealed override async Task<int> RunAsync(LdapClient ldap, CancellationToken cancellationToken)
+	private bool _pageHasResult;
+	public void OnEntry(LdapEntry entry)
 	{
-		if (this.OutputFields is null)
-			this.OutputFields = [nameof(LdapEntry.EntryName)];
-
-		if (this.SearchBase.IsNullOrEmpty())
-			this.SearchBase = [ldap.DomainRoot];
-
-		foreach (var searchBase in this.SearchBase)
-		{
-			await BuildAndRunQuery(ldap, searchBase, cancellationToken).ConfigureAwait(false);
-		}
-
-		if (this.FollowReferrals.IsSet)
-		{
-			while (this._referralQueue.TryDequeue(out var referral))
-			{
-				this.WriteMessage($"Following referral {referral}");
-				Uri refuri;
-				try
-				{
-					refuri = new Uri(referral);
-				}
-				catch (Exception ex)
-				{
-					this.WriteError($"Referral '{referral}' is not valid: {ex.Message}");
-					continue;
-				}
-
-				try
-				{
-					var refClient = await base.ConnectLdap(refuri.Host, cancellationToken);
-					var searchBase = new LdapDistinguishedName(refuri.PathAndQuery.Substring(1));
-					await BuildAndRunQuery(refClient, searchBase, cancellationToken).ConfigureAwait(false);
-				}
-				catch (Exception ex)
-				{
-					this.WriteError($"Search on referral '{referral}' failed: {ex.Message}");
-					continue;
-				}
-			}
-		}
-
-		return 0;
+		this._pageHasResult = true;
+		this.WriteRecord(entry);
 	}
 
-	private async Task BuildAndRunQuery(LdapClient ldap, LdapDistinguishedName? searchBase, CancellationToken cancellationToken)
+	protected readonly ConcurrentQueue<string> referralQueue = new ConcurrentQueue<string>();
+	public void OnReference(string reference)
 	{
+		this.WriteMessage($"Received reference to " + reference);
+		this.referralQueue.Enqueue(reference);
+	}
+
+	protected async Task BuildAndRunQuery(LdapClient ldap, LdapQuery query, CancellationToken cancellationToken)
+	{
+		var searchBase = query.SearchBase;
 		var isRootDse = ((searchBase != null) && (searchBase.Rdns.Count == 0));
 
-		LdapQuery query = CreateQuery(searchBase);
 		if (this.PageSize.HasValue)
 			query.PageSize = this.PageSize.Value;
 		query.IncludeDeleted = this.IncludeDeleted.IsSet;
@@ -162,21 +130,5 @@ internal abstract class LdapSearchCommandBase : LdapCommandBase, ILdapClientSear
 			if (!results.DirsyncCookie.IsNullOrEmpty())
 				this.WriteMessage($"Received dirsync cookie: {results.DirsyncCookie.ToHexString()}");
 		} while ((!query.PagingBookmark.IsNullOrEmpty() || !query.DirSyncCookie.IsNullOrEmpty()) && this._pageHasResult && !cancellationToken.IsCancellationRequested);
-	}
-
-	protected abstract LdapQuery CreateQuery(LdapDistinguishedName searchBase);
-
-	private bool _pageHasResult;
-	public void OnEntry(LdapEntry entry)
-	{
-		this._pageHasResult = true;
-		this.WriteRecord(entry);
-	}
-
-	private ConcurrentQueue<string> _referralQueue = new ConcurrentQueue<string>();
-	public void OnReference(string reference)
-	{
-		this.WriteMessage($"Received reference to " + reference);
-		this._referralQueue.Enqueue(reference);
 	}
 }
