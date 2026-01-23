@@ -26,9 +26,7 @@ namespace Wmi.Registry
 		[Description("Overwrites existing output file")]
 		public SwitchParam Overwrite { get; set; }
 
-		TextWriter? writer;
-		private bool dataWritten;
-
+		private RegistryExporter? _exporter;
 
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
@@ -64,6 +62,7 @@ namespace Wmi.Registry
 		{
 			base.OnBeforeQuery();
 
+			TextWriter writer;
 			if (string.IsNullOrEmpty(OutputFile))
 			{
 				writer = new StreamWriter(this.Context.OpenRawOutputStream());
@@ -83,54 +82,39 @@ namespace Wmi.Registry
 				filestream.Write(Encoding.Unicode.GetPreamble());
 				writer = new StreamWriter(filestream, Encoding.Unicode);
 			}
-			writer.WriteLine("Windows Registry Editor Version 5.00");
+
+			this._exporter = new RegistryExporter(writer);
 		}
 
-		private RegistryPath? _lastPath;
 		protected override void OnKeyMatch(RegistryPath keyPath)
 		{
-			this._lastPath = keyPath;
-			this.dataWritten = true;
+			Debug.Assert(this._exporter != null);
+
+			this._exporter.WriteKey(keyPath);
 		}
 
 		protected override void OnValueMatch(RegistryPath keyPath, string valueName, RegistryValueKind valueKind, RegistryData? valueData)
 		{
-			dataWritten = true;
-			Debug.Assert(writer != null);
+			Debug.Assert(this._exporter != null);
 
-			if (this._lastPath != keyPath)
-			{
-				this._lastPath = keyPath;
-				WriteKeySectionHeader(keyPath);
-			}
-
-			var entry = new RegistryEntry(keyPath, valueName, valueData);
-			entry.ExportTo(writer);
-		}
-
-		private void WriteKeySectionHeader(RegistryPath keyPath)
-		{
-			writer.WriteLine();
-			writer.WriteLine($"[{keyPath.Root}\\{keyPath.KeyPath}]");
+			this._exporter.WriteValue(keyPath, valueName, valueKind, valueData);
 		}
 
 		protected override void OnQueryComplete()
 		{
-			if (writer is not null)
+			if (this._exporter is not null)
 			{
-				if (dataWritten)
-				{
-					//reg.exe always seems to have an extra newline at the end
-					writer.WriteLine();
-				}
-				writer.Flush();
-				writer.Close();
-				writer.Dispose();
+				this._exporter.Close();
+
+				var dataWritten = this._exporter.KeyCount > 0 || this._exporter.ValueCount > 0;
 				if (!dataWritten)
 				{
 					// Delete the file if nothing was written
-					File.Delete(OutputFile);
-					this.WriteWarning($"No data found to export.");
+					if (this.OutputFile != null)
+					{
+						File.Delete(OutputFile);
+						this.WriteWarning($"No data found to export.");
+					}
 				}
 			}
 		}

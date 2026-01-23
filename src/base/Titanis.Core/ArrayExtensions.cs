@@ -244,6 +244,26 @@ namespace Titanis
 			return true;
 		}
 
+		public static T[]? OfType<T>(this Array? array)
+		{
+			if (array is null)
+				return null;
+
+			T[] converted = new T[array.Length];
+			int writeIndex = 0;
+			for (int i = 0; i < array.Length; i++)
+			{
+				var elem = array.GetValue(i);
+				if (elem is T t)
+					converted[writeIndex++] = t;
+			}
+
+			if (converted.Length != writeIndex)
+				Array.Resize(ref converted, writeIndex);
+
+			return converted;
+		}
+
 		#region Span stuff
 		/// <summary>
 		/// Creates a span containing a range of elements within an array.

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.IO;
+using Titanis;
 using Titanis.Msrpc.Mswmi;
 using Titanis.Security.Kerberos;
 using Titanis.Winterop;
@@ -89,7 +90,7 @@ namespace Wmi.Registry
 
 			var regKeys = (await this.stdregprov.EnumKey(rootKey, keyPath).ConfigureAwait(false));
 			((Win32ErrorCode)regKeys.ReturnValue).CheckAndThrow();
-			var subkeyNames = ((System.Array)regKeys.sNames)?.OfType<string>();
+			var subkeyNames = ((object[])regKeys.sNames)?.OfType<string>();
 			return subkeyNames;
 		}
 
@@ -148,8 +149,7 @@ namespace Wmi.Registry
 		public async Task<IRegistryKey> OpenSubkey(string subkeyName, CancellationToken cancellationToken)
 		{
 			var keyPath = this.KeyPath;
-
-			var subkeyPath = new RegistryPath(keyPath.ServerName, keyPath.Root, $"{keyPath.KeyPath}\\{subkeyName}");
+			var subkeyPath = keyPath.Append(subkeyName);
 			return new WmiRegistryKey(this.stdregprov, subkeyPath);
 		}
 

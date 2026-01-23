@@ -74,6 +74,13 @@ namespace Titanis.Winterop.Registry
 			}
 		}
 
+		public RegistryPath Append(string subkeyName)
+		{
+			ArgumentException.ThrowIfNullOrEmpty(subkeyName);
+
+			var subkeyPath = new RegistryPath(this.ServerName, this.Root, $"{this.KeyPath}\\{subkeyName}");
+			return subkeyPath;
+		}
 
 		#region Predefined roots
 		private static readonly string[] predefinedRootNames = new string[]

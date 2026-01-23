@@ -58,27 +58,5 @@ namespace Wmi.Registry
 		//reg.exe export does "valuename"=hex(optional type number if not REG_BINARY):BB,
 		//splits are made just before 80 characters.  First line with valuename can be longer and will include first byte + , prior to \\\n
 		// Subsequent lines are indented with 2 spaces.
-
-		/// <summary>
-		/// Gets the string to represent this value in a <c>.reg</c> file.
-		/// </summary>
-		/// <returns></returns>
-		/// <exception cref="NotSupportedException"></exception>
-		internal string GetExportString()
-		{
-			StringWriter writer = new StringWriter();
-			ExportTo(writer);
-			return writer.ToString();
-		}
-		internal void ExportTo(TextWriter writer)
-		{
-			if (this.Data is null)
-				return;
-
-			string valueNameEscaped = this.ValueName == null || this.ValueName == "" ? "@=" : $"\"{this.ValueName.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"=";
-			writer.Write(valueNameEscaped);
-
-			this.Data.ExportTo(writer, valueNameEscaped.Length);
-		}
 	}
 }
