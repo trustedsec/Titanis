@@ -1,10 +1,9 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using Titanis.Cli;
-using Titanis.Winterop.Registry;
+using Titanis;
 
-namespace Wmi.Registry
+namespace Titanis.Winterop.Registry
 {
 	[Flags]
 	public enum RegistrySearchOptions
@@ -31,13 +30,13 @@ namespace Wmi.Registry
 			RegistrySearchOptions options
 			)
 		{
-			this.ValueNames = valueNameFilters;
-			this.Options = options;
-			this.TypeFilters = typeFilter;
+			ValueNames = valueNameFilters;
+			Options = options;
+			TypeFilters = typeFilter;
 
 			if (!searchTexts.IsDefaultOrEmpty)
 			{
-				this.SearchTexts = searchTexts;
+				SearchTexts = searchTexts;
 
 				if (0 != (options & RegistrySearchOptions.MatchPattern))
 				{
@@ -57,7 +56,7 @@ namespace Wmi.Registry
 						else
 						{
 							if (ulong.TryParse(searchText, out var ui64)
-								|| (searchText.StartsWith("0x") && ulong.TryParse(searchText.Substring(2), out ui64)))
+								|| searchText.StartsWith("0x") && ulong.TryParse(searchText.Substring(2), out ui64))
 							{
 								(intFilters ??= new List<ulong>()).Add(ui64);
 							}
@@ -66,59 +65,57 @@ namespace Wmi.Registry
 						patterns.Add(new WildcardPattern(searchText));
 					}
 
-					this._patterns = patterns.ToImmutable();
-					this._integerValues = intFilters?.ToArray();
+					_patterns = patterns.ToImmutable();
+					_integerValues = intFilters?.ToArray();
 				}
 			}
 		}
 
 		#region Value name filter
 		public ImmutableArray<string> ValueNames { get; }
-		public bool HasValueNameFilter => !this.ValueNames.IsDefaultOrEmpty;
+		public bool HasValueNameFilter => !ValueNames.IsDefaultOrEmpty;
 		public bool MatchesName(string name)
 		{
-			return !this.HasValueNameFilter || this.ValueNames.Any(r => r.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+			return !HasValueNameFilter || ValueNames.Any(r => r.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 		}
 		#endregion
 
 		#region Type filter
 		public ImmutableArray<RegistryValueKind> TypeFilters { get; set; }
-		public bool HasTypeFilter => !this.TypeFilters.IsDefaultOrEmpty;
+		public bool HasTypeFilter => !TypeFilters.IsDefaultOrEmpty;
 		public bool MatchesType(RegistryValueKind kind)
 		{
-			return !this.HasTypeFilter || this.TypeFilters.Contains(kind);
+			return !HasTypeFilter || TypeFilters.Contains(kind);
 		}
 		#endregion
 
 		public ImmutableArray<string> SearchTexts { get; set; }
-		public bool HasSearchFilter => !this.SearchTexts.IsDefaultOrEmpty;
+		public bool HasSearchFilter => !SearchTexts.IsDefaultOrEmpty;
 
 		private ImmutableArray<WildcardPattern> _patterns;
 		private ulong[]? _integerValues;
 
 
 		public RegistrySearchOptions Options { get; set; }
-		public bool SearchKeyNames => 0 != (this.Options & RegistrySearchOptions.SearchKeyNames);
-		public bool SearchValueNames => 0 != (this.Options & RegistrySearchOptions.SearchValueNames);
-		public bool SearchData => 0 != (this.Options & RegistrySearchOptions.SearchData);
-		public bool IsRecursive => 0 != (this.Options & RegistrySearchOptions.IsRecursive);
-		public bool IgnoreCase => 0 != (this.Options & RegistrySearchOptions.IgnoreCase);
-		public bool MatchWholeName => 0 != (this.Options & RegistrySearchOptions.MatchWholeName);
-		public bool MatchPattern => 0 != (this.Options & RegistrySearchOptions.MatchPattern);
+		public bool SearchKeyNames => 0 != (Options & RegistrySearchOptions.SearchKeyNames);
+		public bool SearchValueNames => 0 != (Options & RegistrySearchOptions.SearchValueNames);
+		public bool SearchData => 0 != (Options & RegistrySearchOptions.SearchData);
+		public bool IsRecursive => 0 != (Options & RegistrySearchOptions.IsRecursive);
+		public bool IgnoreCase => 0 != (Options & RegistrySearchOptions.IgnoreCase);
+		public bool MatchWholeName => 0 != (Options & RegistrySearchOptions.MatchWholeName);
+		public bool MatchPattern => 0 != (Options & RegistrySearchOptions.MatchPattern);
 
 		public bool Matches(string str)
 		{
-			if (!this._patterns.IsDefaultOrEmpty)
+			if (!_patterns.IsDefaultOrEmpty)
+				return _patterns.Any(r => r.Matches(str, IgnoreCase));
+			else if (!SearchTexts.IsDefaultOrEmpty)
 			{
-				return this._patterns.Any(r => r.Matches(str, this.IgnoreCase));
-			}
-			else if (!this.SearchTexts.IsDefaultOrEmpty)
-			{
-				var comp = this.IgnoreCase ? StringComparison.InvariantCultureIgnoreCase
+				var comp = IgnoreCase ? StringComparison.InvariantCultureIgnoreCase
 					: StringComparison.InvariantCulture;
 
-				return this.SearchTexts.Any(
-					this.MatchWholeName ? r => str.Equals(r, comp)
+				return SearchTexts.Any(
+					MatchWholeName ? r => str.Equals(r, comp)
 					: r => str.Contains(r, comp)
 					);
 			}
@@ -128,11 +125,11 @@ namespace Wmi.Registry
 
 		public bool Matches(ulong n)
 		{
-			return (this._integerValues != null && this._integerValues.Contains(n)) || this.Matches(n.ToString());
+			return _integerValues != null && _integerValues.Contains(n) || Matches(n.ToString());
 		}
 		public bool Matches(uint n)
 		{
-			return (this._integerValues != null && this._integerValues.Contains(n)) || this.Matches(n.ToString());
+			return _integerValues != null && _integerValues.Contains(n) || Matches(n.ToString());
 		}
 
 		public bool Matches(byte[] n)
@@ -140,7 +137,7 @@ namespace Wmi.Registry
 			try
 			{
 				var str = Encoding.Unicode.GetString(n);
-				if (this.Matches(str))
+				if (Matches(str))
 					return true;
 			}
 			catch { }
@@ -148,7 +145,7 @@ namespace Wmi.Registry
 			try
 			{
 				var str = Encoding.ASCII.GetString(n);
-				if (this.Matches(str))
+				if (Matches(str))
 					return true;
 			}
 			catch { }
@@ -158,12 +155,12 @@ namespace Wmi.Registry
 
 		public bool Matches(ImmutableArray<string> strings)
 		{
-			return !strings.IsDefaultOrEmpty && strings.Any(this.Matches);
+			return !strings.IsDefaultOrEmpty && strings.Any(Matches);
 		}
 
 		public bool DataSearchMatches(RegistryData data)
 		{
-			return this.SearchData && data.Matches(this);
+			return SearchData && data.Matches(this);
 		}
 	}
 }

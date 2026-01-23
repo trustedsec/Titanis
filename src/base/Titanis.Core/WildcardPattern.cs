@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Titanis.Cli
+namespace Titanis
 {
 	/// <summary>
 	/// Represents a wildcard pattern for matching file names.

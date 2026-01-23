@@ -12,27 +12,28 @@ namespace Wmi.Registry
 
 	class WmiRegistryKey : IRegistryKey
 	{
-		internal readonly dynamic stdregprov;
-		internal readonly RegistryPath keyPath;
-		internal uint RootKeyHandle => (uint)this.keyPath.Root;
-
-		public string KeyName => this.keyPath.KeyName;
-
 		internal WmiRegistryKey(dynamic stdregprov, RegistryPath keyPath)
 		{
 			this.stdregprov = stdregprov;
-			this.keyPath = keyPath;
+			this.KeyPath = keyPath;
 		}
+
+		internal readonly dynamic stdregprov;
+		public RegistryPath KeyPath { get; }
+
+		internal uint RootKeyHandle => (uint)this.KeyPath.Root;
+
+		public string KeyName => this.KeyPath.KeyName;
 
 		public async Task EnumerateValues(
 			Func<string, RegistryValueKind, bool> includeDataPredicate,
-			Func<string, RegistryValueKind, object?, Task> iterator,
+			Action<string, RegistryValueKind, object?> iterator,
 			RegistryKeyEnumerateOptions options,
 			CancellationToken cancellationToken
 			)
 		{
 			var rootKey = this.RootKeyHandle;
-			var keyPath = this.keyPath.KeyPath;
+			var keyPath = this.KeyPath.KeyPath;
 
 			dynamic regEntries = await ((Task<WmiInstanceObject>)this.stdregprov.EnumValues(rootKey, keyPath, cancellationToken)).ConfigureAwait(false);
 			((Win32ErrorCode)regEntries.ReturnValue).CheckAndThrow();
@@ -63,7 +64,7 @@ namespace Wmi.Registry
 						data = null;
 				}
 
-				await iterator(string.Empty, RegistryValueKind.REG_SZ, data);
+				iterator(string.Empty, RegistryValueKind.REG_SZ, data);
 			}
 
 			var types = ((object[])regEntries.Types);
@@ -77,14 +78,14 @@ namespace Wmi.Registry
 					(includeDataPredicate is null || includeDataPredicate(name, kind)) ? await this.GetValue(name, kind, options, cancellationToken)
 					: null;
 
-				await iterator(name, kind, data);
+				iterator(name, kind, data);
 			}
 		}
 
 		public async Task<string[]> GetSubkeyNames(CancellationToken cancellationToken)
 		{
 			var rootKey = this.RootKeyHandle;
-			var keyPath = this.keyPath.KeyPath;
+			var keyPath = this.KeyPath.KeyPath;
 
 			var regKeys = (await this.stdregprov.EnumKey(rootKey, keyPath).ConfigureAwait(false));
 			((Win32ErrorCode)regKeys.ReturnValue).CheckAndThrow();
@@ -101,7 +102,7 @@ namespace Wmi.Registry
 		{
 			var registry = this.stdregprov;
 			var rootKeyHandle = this.RootKeyHandle;
-			var keyPath = this.keyPath.KeyPath;
+			var keyPath = this.KeyPath.KeyPath;
 
 			try
 			{
@@ -144,9 +145,9 @@ namespace Wmi.Registry
 			}
 		}
 
-		internal async Task<WmiRegistryKey> OpenSubkey(string subkeyName, CancellationToken cancellationToken)
+		public async Task<IRegistryKey> OpenSubkey(string subkeyName, CancellationToken cancellationToken)
 		{
-			var keyPath = this.keyPath;
+			var keyPath = this.KeyPath;
 
 			var subkeyPath = new RegistryPath(keyPath.ServerName, keyPath.Root, $"{keyPath.KeyPath}\\{subkeyName}");
 			return new WmiRegistryKey(this.stdregprov, subkeyPath);

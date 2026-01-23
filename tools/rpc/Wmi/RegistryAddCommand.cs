@@ -10,6 +10,7 @@ using Titanis.Cli;
 using Titanis.Msrpc.Mswmi;
 using Titanis.Security.Kerberos;
 using Titanis.Winterop;
+using Titanis.Winterop.Registry;
 using Titanis.Winterop.Security;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Titanis.Winterop.Registry;
 using Wmi.Registry;
 
 namespace Wmi.Test

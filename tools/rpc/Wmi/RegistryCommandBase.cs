@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
 using Titanis.Msrpc.Mswmi;
+using Titanis.Winterop.Registry;
 
 namespace Wmi.Registry
 {

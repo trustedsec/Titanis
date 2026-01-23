@@ -4,9 +4,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using Titanis.Cli;
 
-namespace Wmi.Registry
+namespace Titanis.Winterop.Registry
 {
 	/// <summary>
 	/// Specifies a predefined root key in the Windows registry.
@@ -36,9 +35,9 @@ namespace Wmi.Registry
 		/// <param name="keyPath">The path to the registry key within the specified hive. If null, an empty string is used.</param>
 		public RegistryPath(string? server, PredefinedKey root, string? keyPath)
 		{
-			this.ServerName = server;
-			this.Root = root;
-			this.KeyPath = keyPath ?? string.Empty;
+			ServerName = server;
+			Root = root;
+			KeyPath = keyPath ?? string.Empty;
 		}
 
 		/// <summary>
@@ -59,7 +58,7 @@ namespace Wmi.Registry
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return $"\\\\{this.ServerName}\\{this.Root}\\{this.KeyPath}";
+			return $"\\\\{ServerName}\\{Root}\\{KeyPath}";
 		}
 
 		/// <summary>
@@ -69,9 +68,9 @@ namespace Wmi.Registry
 		{
 			get
 			{
-				int isep = this.KeyPath.LastIndexOf('\\');
-				return (isep > 0) ? this.KeyPath.Substring(isep + 1)
-					: this.KeyPath;
+				int isep = KeyPath.LastIndexOf('\\');
+				return isep > 0 ? KeyPath.Substring(isep + 1)
+					: KeyPath;
 			}
 		}
 
@@ -104,7 +103,7 @@ namespace Wmi.Registry
 		{
 			if (rootName != null)
 			{
-				if ((rootName.StartsWith("0x") && uint.TryParse(rootName.AsSpan(2), System.Globalization.NumberStyles.HexNumber, null, out var ul))
+				if (rootName.StartsWith("0x") && uint.TryParse(rootName.AsSpan(2), System.Globalization.NumberStyles.HexNumber, null, out var ul)
 					|| uint.TryParse(rootName, out ul)
 					)
 				{
@@ -175,13 +174,13 @@ namespace Wmi.Registry
 	/// <summary>
 	/// Provides type conversion between <see cref="RegistryPath"/> and <see cref="string"/>.
 	/// </summary>
-	public class RegistryPathConverter : System.ComponentModel.TypeConverter
+	public class RegistryPathConverter : TypeConverter
 	{
 		/// <inheritdoc/>
 		/// <remarks>
 		/// This implementation only supports conversion from <see cref="string"/>.
 		/// </remarks>
-		public override bool CanConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, Type sourceType)
+		public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
 		{
 			if (sourceType == typeof(string))
 				return true;
@@ -192,12 +191,10 @@ namespace Wmi.Registry
 		/// <remarks>
 		/// This implementation only supports conversion from <see cref="string"/>.
 		/// </remarks>
-		public override object? ConvertFrom(System.ComponentModel.ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
+		public override object? ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
 		{
 			if (value is string s)
-			{
 				return RegistryPath.Parse(s);
-			}
 			return base.ConvertFrom(context, culture, value);
 		}
 	}

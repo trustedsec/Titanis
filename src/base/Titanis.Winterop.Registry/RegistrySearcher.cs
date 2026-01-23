@@ -1,23 +1,24 @@
 ﻿using System.ComponentModel;
 using Titanis;
 using Titanis.Winterop;
-using Titanis.Winterop.Registry;
 
-namespace Wmi.Registry
+namespace Titanis.Winterop.Registry
 {
-	interface IRegistrySearchCallback
+	public interface IRegistrySearchCallback
 	{
 		void OnKeyMatch(RegistryPath keyPath);
 		void OnValueMatch(RegistryPath keyPath, string valueName, RegistryValueKind valueKind, RegistryData? valueData);
 	}
 
-	class RegistrySearcher
+	public class RegistrySearcher
 	{
-		internal RegistrySearcher(
+		public RegistrySearcher(
 			IRegistrySearchCallback searchCallback,
 			RegistrySearchFilter filter,
 			ILog? log)
 		{
+			ArgumentNullException.ThrowIfNull(searchCallback);
+			ArgumentNullException.ThrowIfNull(filter);
 			this.searchCallback = searchCallback;
 			this.filter = filter;
 			this.log = log;
@@ -27,12 +28,12 @@ namespace Wmi.Registry
 		private readonly RegistrySearchFilter filter;
 		private readonly ILog? log;
 
-		internal async Task DoSearch(WmiRegistryKey registryKey, CancellationToken cancellationToken)
+		public async Task DoSearch(IRegistryKey registryKey, CancellationToken cancellationToken)
 		{
 			var filter = this.filter;
-			var subtreeRootKeyPath = registryKey.keyPath;
+			var subtreeRootKeyPath = registryKey.KeyPath;
 
-			Queue<WmiRegistryKey> keysToProcess = new Queue<WmiRegistryKey>();
+			Queue<IRegistryKey> keysToProcess = new Queue<IRegistryKey>();
 			keysToProcess.Enqueue(registryKey);
 			bool includeValues = (filter.Options & RegistrySearchOptions.SearchTargetMask & ~RegistrySearchOptions.SearchKeyNames) != 0;
 			while (keysToProcess.TryDequeue(out var key) && !cancellationToken.IsCancellationRequested)
@@ -42,19 +43,19 @@ namespace Wmi.Registry
 				{
 					try
 					{
-						this.log?.WriteDiagnostic($"Enumerating values under {key}.");
+						log?.WriteDiagnostic($"Enumerating values under {key}.");
 						await key.EnumerateValues(
 							(n, t) => ShouldRetrieveData(filter, n, t),
-							async (name, kind, data) =>
+							(name, kind, data) =>
 							{
 								if (data != null)
 								{
-									await this.ProcessRegistryValue(
-										key.keyPath,
+									ProcessRegistryValue(
+										key.KeyPath,
 										name,
 										kind,
 										data
-										).ConfigureAwait(false);
+										);
 								}
 							},
 							RegistryKeyEnumerateOptions.ContinueOnException | RegistryKeyEnumerateOptions.PassExceptionToIterator,
@@ -62,7 +63,7 @@ namespace Wmi.Registry
 					}
 					catch (Win32Exception ex)
 					{
-						this.log.WriteWarning($"Failed to enumerate values under {key}: {ex.Message}");
+						log.WriteWarning($"Failed to enumerate values under {key}: {ex.Message}");
 						continue;
 					}
 				}
@@ -70,15 +71,15 @@ namespace Wmi.Registry
 				// Subkeys
 				if (filter.IsRecursive || filter.SearchKeyNames)
 				{
-					this.log?.WriteDiagnostic($"Enumerating keys under {key}.");
+					log?.WriteDiagnostic($"Enumerating keys under {key}.");
 					string[]? subkeyNames;
 					try
 					{
-						subkeyNames = (await key.GetSubkeyNames(cancellationToken).ConfigureAwait(false));
+						subkeyNames = await key.GetSubkeyNames(cancellationToken).ConfigureAwait(false);
 					}
 					catch (Win32Exception ex)
 					{
-						this.log?.WriteWarning($"Failed to enumerate keys under {key}: {ex}");
+						log?.WriteWarning($"Failed to enumerate keys under {key}: {ex}");
 						subkeyNames = null;
 					}
 
@@ -90,7 +91,7 @@ namespace Wmi.Registry
 							{
 								bool keyMatches = filter.SearchKeyNames && filter.Matches(key.KeyName);
 								if (filter.SearchKeyNames)
-									this.searchCallback.OnKeyMatch(key.keyPath);
+									searchCallback.OnKeyMatch(key.KeyPath);
 							}
 						}
 
@@ -100,12 +101,12 @@ namespace Wmi.Registry
 							{
 								try
 								{
-									var subkey = await key.OpenSubkey(subkeyName, cancellationToken);
+									var subkey = await key.OpenSubkey(subkeyName, cancellationToken).ConfigureAwait(false);
 									keysToProcess.Enqueue(subkey);
 								}
 								catch (Exception ex)
 								{
-									this.log?.WriteError($"Error opening {key.keyPath}\\subkeyName: {ex.Message}");
+									log?.WriteError($"Error opening {key.KeyPath}\\subkeyName: {ex.Message}");
 								}
 							}
 						}
@@ -118,7 +119,7 @@ namespace Wmi.Registry
 			=> filter.MatchesName(name) && filter.MatchesType(kind);
 
 
-		internal async Task ProcessRegistryValue(
+		internal void ProcessRegistryValue(
 			RegistryPath keyPath,
 			string valueName,
 			RegistryValueKind valueKind,
@@ -136,9 +137,7 @@ namespace Wmi.Registry
 				return;
 
 			if (data is Exception ex)
-			{
 				log.WriteWarning($"Failed to get value '{valueName}' under {keyPath}: {ex.Message}");
-			}
 			else
 			{
 				var valueData = (valueKind, data) switch
@@ -165,7 +164,6 @@ namespace Wmi.Registry
 					matches = filter.DataSearchMatches(valueData);
 
 				if (matches)
-				{
 					//TODO: WMI StdRegProv GetSecurityDescriptor does not currently work as expected.
 
 					#region GetSecurity stuff
@@ -194,8 +192,7 @@ namespace Wmi.Registry
 					//}
 					#endregion
 
-					this.searchCallback.OnValueMatch(keyPath, valueName, valueKind, valueData);
-				}
+					searchCallback.OnValueMatch(keyPath, valueName, valueKind, valueData);
 			}
 		}
 	}
