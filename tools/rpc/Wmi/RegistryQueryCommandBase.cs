@@ -1,6 +1,6 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -8,12 +8,15 @@ using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Titanis;
 using Titanis.Asn1.Metadata;
 using Titanis.Cli;
 using Titanis.Msrpc.Mswmi;
 using Titanis.Winterop;
+using Titanis.Winterop.Registry;
 using Titanis.Winterop.Security;
 
 namespace Wmi.Registry
@@ -23,11 +26,12 @@ namespace Wmi.Registry
 	/// </summary>
 	[DetailedHelpResource(typeof(Messages), nameof(Messages.wmi_base_query_Detailed))]
 	[OutputFieldFormat(nameof(RegistryEntry.ValueName), null, typeof(ValueNameFormatter))]
-	internal abstract class RegistryQueryCommandBase : WmiRegistryCommandBase
+	internal abstract partial class RegistryQueryCommandBase : WmiRegistryCommandBase, IRegistrySearchCallback
 	{
 		[Parameter]
 		[Description($"Value name to query")]
-		public string? ValueName { get; set; }
+		[Alias("vn")]
+		public string[]? ValueName { get; set; }
 
 		[Parameter]
 		[Description("Query default value")]
@@ -52,7 +56,7 @@ namespace Wmi.Registry
 		[Parameter]
 		[Description("Data or pattern to search for")]
 		[Alias("f")]
-		public string? SearchPattern { get; set; }
+		public string[]? SearchPattern { get; set; }
 
 		[Parameter]
 		[Description("Search key names")]
@@ -81,208 +85,94 @@ namespace Wmi.Registry
 		[Parameter]
 		[Description("Filter value data type")]
 		[Alias("t")]
-		public RegistryValueKind? Type { get; set; }
+		public RegistryValueKind[]? Type { get; set; }
 
-        //TODO: WMI StdRegProv GetSecurityDescriptor does not currently work as expected.
-        //[Parameter]
-        //[Description("Queries key security descriptors")]
-        //[Alias("sec")]
-        //public SwitchParam GetSecurity { get; set; }
+		//TODO: WMI StdRegProv GetSecurityDescriptor does not currently work as expected.
+		//[Parameter]
+		//[Description("Queries key security descriptors")]
+		//[Alias("sec")]
+		//public SwitchParam GetSecurity { get; set; }
 
-        private bool searchValues;
-		private bool searchKeys;
-		private bool searchData;
-		private bool useExact;
-		private string? printValueName;
-		private ulong? integerSearchValue;
-		Regex? searchPatternRegex;
-		private (RegistryPath, SecurityDescriptor)? cachedSecurityDescriptor;
-
-
-		protected abstract void WriteRegistryRecord(RegistryEntry entry);
-
-		protected virtual void OnCommandComplete()
+		/// <summary>
+		/// Called before the query begins.
+		/// </summary>
+		protected virtual void OnBeforeQuery()
+		{
+		}
+		/// <summary>
+		/// Called after the query has completed.
+		/// </summary>
+		protected virtual void OnQueryComplete()
 		{
 			//No-op
 		}
+
+		private (RegistryPath, SecurityDescriptor)? cachedSecurityDescriptor;
+
+		private RegistrySearchFilter? _filter;
 
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			base.ValidateParameters(context);
 
-			if (Exact.IsSet && string.IsNullOrEmpty(SearchPattern))
-			{
-				context.LogError($"-{nameof(Exact)} options require -{nameof(SearchPattern)} to be specified.");
-			}
-
-			if (ValueEmpty.IsSet && !string.IsNullOrEmpty(ValueName))
-			{
-				context.LogError($"The -{nameof(ValueEmpty)} option is mutually exclusive with -{nameof(ValueName)}.");
-			}
-			else
+			// Value name filter
+			string[]? valueNameFilter;
+			if (this.ValueName != null)
 			{
 				if (ValueEmpty.IsSet)
-				{
-					ValueName = string.Empty;
-					printValueName = DefaultValueName;
-				}
+					context.LogError($"The -{nameof(ValueEmpty)} option is mutually exclusive with -{nameof(ValueName)}.");
+
+				valueNameFilter = ValueName;
+			}
+			else if (ValueEmpty.IsSet)
+				valueNameFilter = [string.Empty];
+			else
+				valueNameFilter = null;
+
+
+			RegistrySearchOptions searchTargets = RegistrySearchOptions.None;
+			var searchOptions = RegistrySearchOptions.None;
+
+			if (this.Recursive.IsSet)
+				searchOptions |= RegistrySearchOptions.IsRecursive;
+
+			// Process search filter and options
+			if (!SearchPattern.IsNullOrEmpty())
+			{
+				if (Exact.IsSet)
+					searchOptions |= RegistrySearchOptions.MatchWholeName;
 				else
-				{
-					printValueName = ValueName;
-				}
-			}
+					searchOptions |= RegistrySearchOptions.MatchPattern;
 
-			//While reg.exe allows both a search pattern and a value name to be specified, the search pattern is ignored in that case, so we will error out here
-			if (!string.IsNullOrEmpty(SearchPattern) && (!string.IsNullOrEmpty(ValueName)))
-			{
-				context.LogError($"The -{nameof(SearchPattern)} option cannot be used together with -{nameof(ValueEmpty)} or -{nameof(ValueName)}.");
-			}
+				if (!CaseSensitive.IsSet) searchOptions |= RegistrySearchOptions.IgnoreCase;
 
-			//ValueName or ValueEmpty was specified.  This is the same as a SearchPattern of the valuename with Exact and SearchValues set
-			if (ValueName != null)
-			{
-				if (DataSearch.IsSet || KeySearch.IsSet || ValueSearch.IsSet)
+				if (this.DataSearch.IsSet)
+					searchTargets |= RegistrySearchOptions.SearchData;
+				if (this.KeySearch.IsSet)
+					searchTargets |= RegistrySearchOptions.SearchKeyNames;
+				if (valueNameFilter?.FirstOrDefault() == "*")
 				{
-					context.LogError($"The -{nameof(SearchPattern)}, -{nameof(DataSearch)}, -{nameof(KeySearch)} and -{nameof(ValueSearch)} options can not be used with -{nameof(ValueName)} or -{nameof(ValueEmpty)}");
+					searchTargets |= RegistrySearchOptions.SearchValueNames;
+					valueNameFilter = null;
 				}
-				useExact = true;
-				SearchPattern = ValueName;
-				searchValues = true;
-				searchKeys = false;
-				searchData = false;
+
+				if (searchTargets == RegistrySearchOptions.None)
+					searchTargets = RegistrySearchOptions.SearchTargetMask;
 			}
 			else
 			{
-				useExact = Exact.IsSet;
-				//We can't search without a search pattern
-				if ((DataSearch.IsSet || KeySearch.IsSet || ValueSearch.IsSet) && string.IsNullOrEmpty(SearchPattern))
-				{
-					context.LogError($"The -{nameof(SearchPattern)} option must be specified when using -{nameof(DataSearch)}, -{nameof(KeySearch)} or -{nameof(ValueSearch)}.");
-				}
-
-				//if searching and value / key / data is not specified reg.exe defaults to key search so we do that here
-				if (!(DataSearch.IsSet || KeySearch.IsSet || ValueSearch.IsSet) && !string.IsNullOrEmpty(SearchPattern))
-				{
-					searchKeys = true;
-					searchData = false;
-					searchValues = false;
-					this.WriteDiagnostic("Defaulting to key search.");
-				}
-				else
-				{
-					searchValues = ValueSearch.IsSet;
-					searchKeys = KeySearch.IsSet;
-					searchData = DataSearch.IsSet;
-				}
-
-				if (!string.IsNullOrEmpty(SearchPattern))
-				{
-					if (ulong.TryParse(SearchPattern, NumberStyles.Integer, CultureInfo.InvariantCulture, out var val))
-					{
-						integerSearchValue = val;
-					}
-					else
-					{
-						integerSearchValue = null;
-					}
-					if (!useExact)
-					{
-						string regexPattern = ".*" + Regex.Escape(SearchPattern).Replace(@"\*", ".*").Replace(@"\?", ".") + ".*";
-						searchPatternRegex = new Regex(regexPattern, CaseSensitive.IsSet ? RegexOptions.None : RegexOptions.IgnoreCase);
-					}
-				}
-			}
-		}
-
-		private bool StringSearchMatches(string str)
-		{
-			if (useExact)
-			{
-				return str.Equals(SearchPattern, CaseSensitive.IsSet ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase);
-			}
-			else
-			{
-				return searchPatternRegex!.IsMatch(str);
-			}
-		}
-
-		private bool DataSearchMatches(RegistryData data)
-		{
-			if (!searchData) return true;
-
-			if (integerSearchValue is not null && data is IHaveUInt64Value uint64Value)
-			{
-				return uint64Value.UInt64Value == integerSearchValue.Value;
+				if (Exact.IsSet || CaseSensitive.IsSet || DataSearch.IsSet || KeySearch.IsSet)
+					context.LogError($"-{nameof(Exact)}, -{nameof(CaseSensitive)}, -{nameof(DataSearch)}, and -{nameof(KeySearch)} options require -{nameof(SearchPattern)} to be specified.");
 			}
 
-			return StringSearchMatches(data.UntypedValue?.ToString());
-		}
 
-		private async Task<RegistryEntry?> GetRegistryValue(dynamic objreg, RegistryPath path, string valueName, RegistryValueKind regType, bool SearchData)
-		{
-			dynamic registry = objreg;
-			var hive = (uint)KeyPath.Root;
-			dynamic registryValue;
-			try
-			{
-				registryValue = await ((Task<WmiInstanceObject>)(regType switch
-				{
-					RegistryValueKind.REG_SZ => registry.GetStringValue(hive, path.KeyPath, valueName),
-					RegistryValueKind.REG_EXPAND_SZ => registry.GetExpandedStringValue(hive, path.KeyPath, valueName),
-					RegistryValueKind.REG_DWORD => registry.GetDWORDValue(hive, path.KeyPath, valueName),
-					RegistryValueKind.REG_MULTI_SZ => registry.GetMultiStringValue(hive, path.KeyPath, valueName),
-					RegistryValueKind.REG_QWORD => registry.GetQWORDValue(hive, path.KeyPath, valueName),
-					RegistryValueKind.REG_BINARY => registry.GetBinaryValue(hive, path.KeyPath, valueName),
-					_ => throw new Win32Exception((int)Win32ErrorCode.ERROR_INVALID_PARAMETER, $"Unsupported registry value type '{regType}' for value '{valueName}'"),
-				})).ConfigureAwait(false);
 
-				((Hresult)(registryValue).ReturnValue).CheckAndThrow();
-			}
-			catch (Win32Exception ex)
-			{
-				this.WriteWarning($"Failed to get value {ValueDisplayName(valueName)} under {path}: {ex.Message}");
-				return null;
-			}
-			var data = regType switch
-			{
-				RegistryValueKind.REG_SZ => RegistryData.CreateString((string)registryValue.sValue),
-				RegistryValueKind.REG_EXPAND_SZ => RegistryData.CreateExpandableString((string)registryValue.sValue),
-				RegistryValueKind.REG_BINARY => RegistryData.CreateBinary(Array.ConvertAll((object[])registryValue.uValue, r => (byte)r)),
-				RegistryValueKind.REG_DWORD => RegistryData.CreateDword((uint)registryValue.uValue),
-				RegistryValueKind.REG_MULTI_SZ => RegistryData.CreateRegMultiString(Array.ConvertAll((object[])registryValue.sValue, r => (string)r)),
-				RegistryValueKind.REG_QWORD => RegistryData.CreateDword((ulong)registryValue.uValue),
-				_ => throw new Win32Exception((int)Win32ErrorCode.ERROR_INVALID_PARAMETER, $"Unsupported registry value type '{regType}' for value '{valueName}'")
-			};
-			if (SearchData && !DataSearchMatches(data))
-			{
-				return null;
-			}
-
-			//TODO: WMI StdRegProv GetSecurityDescriptor does not currently work as expected.
-			//if(this.GetSecurity.IsSet)
-			//{
-			//	if (cachedSecurityDescriptor is null || cachedSecurityDescriptor.Value.Item1 != path)
-			//	{
-			//		try
-			//		{
-			//			//why does these calls return 0x8004101D
-			//			this.WriteDiagnostic($"Getting security descriptor for {RegistryPath}.");
-			//			var result = (await registry.GetSecurityDescriptor(hive, RegistryPath.KeyPath)).ConfigureAwait(false);
-			//			var sdResult = result.Descriptor;
-			//			entry.SecurityDescriptor = sdResult;
-			//			cachedSecurityDescriptor = (path, sdResult);
-			//		}
-			//		catch (Win32Exception ex)
-			//		{
-			//			this.WriteVerbose($"Failed to get Security Descriptor for {RegistryPath}: {ex.Message}");
-			//		}
-			//	}
-			//	else
-			//	{
-			//		entry.SecurityDescriptor = cachedSecurityDescriptor.Value.Item2;
-			//	}
-			//}
-			return new RegistryEntry(path, valueName, data);
+			var filter = new RegistrySearchFilter(
+				ImmutableArray.Create(valueNameFilter),
+				ImmutableArray.Create(this.Type),
+				ImmutableArray.Create(this.SearchPattern),
+				searchOptions | searchTargets);
+			this._filter = filter;
 		}
 
 
@@ -297,86 +187,29 @@ namespace Wmi.Registry
 				this.WriteError($"{KeyPath} either does not exist, or access is denied.");
 				return 0;
 			}
-			Queue<RegistryPath> keysToProcess = new Queue<RegistryPath>();
-			keysToProcess.Enqueue(KeyPath);
-			bool topLevel = true;
-			while (keysToProcess.TryDequeue(out var key) && !cancellationToken.IsCancellationRequested)
-			{
-				if (this.Recursive.IsSet || topLevel)
-				{
-					topLevel = false;
-					//Only enumerate values / data if needed
-					if (SearchPattern == null || searchValues || searchData)
-					{
-						string[]? sNames;
-						int[]? Types;
-						try
-						{
-							var regEntries = await registry.EnumValues((uint)key.Root, key.KeyPath).ConfigureAwait(false);
-							((Win32ErrorCode)regEntries.ReturnValue).CheckAndThrow();
-							sNames = ((object[]?)regEntries.sNames).OfType<string>();
-							Types = ((Array)regEntries.Types).OfType<int>();
-						}
-						catch (Win32Exception ex)
-						{
-							this.WriteWarning($"Failed to enumerate values under {key}: {ex.Message}");
-							continue;
-						}
-						if (sNames is not null)
-						{
-							this.WriteDiagnostic($"Enumerating {sNames.Length} values under {key}.");
-							for (int i = 0; i < sNames.Length && !cancellationToken.IsCancellationRequested; i++)
-							{
 
-								if ((this.Type == null || this.Type == (RegistryValueKind)Types[i]))
-								{
-									bool hasValueMatch = (searchValues && StringSearchMatches(sNames[i]));
-									if (SearchPattern == null || hasValueMatch || searchData)
-									{
-										var regEntry = await GetRegistryValue(objreg, key, sNames[i], (RegistryValueKind)Types[i], !hasValueMatch).ConfigureAwait(false);
-										if (regEntry != null)
-										{
-											this.WriteRegistryRecord(regEntry);
-										}
-									}
-								}
-							}
-						}
+			this.OnBeforeQuery();
 
-					}
-					this.WriteDiagnostic($"Enumerating keys under {key}.");
-					string[]? subkeyNames;
-					try
-					{
-						var regKeys = (await registry.EnumKey((uint)key.Root, key.KeyPath).ConfigureAwait(false));
-						((Win32ErrorCode)regKeys.ReturnValue).CheckAndThrow();
-						subkeyNames = ((System.Array)regKeys.sNames)?.OfType<string>();
-					}
-					catch (Win32Exception ex)
-					{
-						this.WriteWarning($"Failed to enumerate keys under {key}: {ex}");
-						subkeyNames = null;
-					}
-					if (subkeyNames is not null)
-					{
-						foreach (string subkey in subkeyNames)
-						{
-							keysToProcess.Enqueue(new RegistryPath(KeyPath.ServerName, key.Root, $"{key.KeyPath}\\{subkey}"));
-						}
-					}
-
-				}
-				//We only want to print empty keys when we're not searching, or if our search is explicitly for keys
-				if (SearchPattern == null || (searchKeys == true && StringSearchMatches(key.KeyName)))
-				{
-					this.WriteRegistryRecord(new RegistryEntry(key));
-				}
-			}
-			OnCommandComplete();
+			await DoSearch(new WmiRegistryKey(registry, this.KeyPath), cancellationToken).ConfigureAwait(false);
+			OnQueryComplete();
 			return 0;
 
 
 		}
+
+		private Task DoSearch(WmiRegistryKey registryKey, CancellationToken cancellationToken)
+		{
+			var searcher = new RegistrySearcher(this, this._filter, this.Log);
+			return searcher.DoSearch(registryKey, cancellationToken);
+		}
+
+
+		protected abstract void OnKeyMatch(RegistryPath keyPath);
+
+		void IRegistrySearchCallback.OnKeyMatch(RegistryPath keyPath) => this.OnKeyMatch(keyPath);
+
+		protected abstract void OnValueMatch(RegistryPath keyPath, string valueName, RegistryValueKind valueKind, RegistryData? valueData);
+		void IRegistrySearchCallback.OnValueMatch(RegistryPath keyPath, string valueName, RegistryValueKind valueKind, RegistryData? valueData) => this.OnValueMatch(keyPath, valueName, valueKind, valueData);
 	}
 
 	static class ArrayExtensions

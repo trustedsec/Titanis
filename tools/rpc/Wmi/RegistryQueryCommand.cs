@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
+using Titanis.Winterop.Registry;
 
 namespace Wmi.Registry
 {
@@ -23,7 +24,17 @@ namespace Wmi.Registry
 	[Example(@"Search for any value name or data item containing the string 'password' under HKLM\Software", @"{0} -UserName milchick -Password Br3@kr00m! -ValueSearch -DataSearch -SearchPattern password -Recursive \\LUMON-FS1\HKLM\Software")]
 	internal class RegistryQueryCommand : RegistryQueryCommandBase
 	{
-		protected override void WriteRegistryRecord(RegistryEntry entry) => this.WriteRecord(entry);
+		private void WriteRegistryRecord(RegistryEntry entry) => this.WriteRecord(entry);
 
+		protected override void OnKeyMatch(RegistryPath keyPath)
+		{
+			this.WriteRegistryRecord(new RegistryEntry(keyPath));
+		}
+
+		protected override void OnValueMatch(RegistryPath keyPath, string valueName, RegistryValueKind valueKind, RegistryData? valueData)
+		{
+			var regEntry = new RegistryEntry(keyPath, valueName, valueData);
+			this.WriteRegistryRecord(regEntry);
+		}
 	}
 }

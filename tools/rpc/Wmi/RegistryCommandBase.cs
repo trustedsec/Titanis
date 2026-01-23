@@ -49,6 +49,6 @@ namespace Wmi.Registry
 		protected abstract Task<int> RunAsync(dynamic registry, CancellationToken cancellationToken);
 
 		public const string DefaultValueName = "(default)";
-		protected string ValueDisplayName(string name) => string.IsNullOrEmpty(name) ? DefaultValueName : name;
+		protected static string ValueDisplayName(string name) => string.IsNullOrEmpty(name) ? DefaultValueName : name;
 	}
 }

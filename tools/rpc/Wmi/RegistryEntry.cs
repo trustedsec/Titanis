@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
@@ -11,27 +10,13 @@ using System.Threading.Tasks;
 using Titanis;
 using Titanis.Cli;
 using Titanis.Security.Kerberos;
+using Titanis.Winterop.Registry;
 using Titanis.Winterop.Security;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Wmi.Registry
 {
-	/// <summary>
-	/// Specifies the data types used in the Windows registry.
-	/// </summary>
-	public enum RegistryValueKind : uint
-	{
-		REG_NONE = 0,
-		REG_SZ = 1,
-		REG_EXPAND_SZ = 2,
-		REG_BINARY = 3,
-		REG_DWORD = 4,
-		REG_MULTI_SZ = 7,
-		REG_QWORD = 11
-	}
-
-
-	public interface IHaveUInt64Value
+	interface IHaveUInt64Value
 	{
 		ulong UInt64Value { get; }
 	}
@@ -53,6 +38,14 @@ namespace Wmi.Registry
 		/// </summary>
 		public abstract object UntypedValue { get; }
 
+		/// <summary>
+		/// Determines whether the data matches a filter.
+		/// </summary>
+		/// <param name="filter">Filter</param>
+		/// <returns><see langword="true"/> if the data matches <paramref name="filter"/>; otherwise, <see langword="false"/></returns>
+		public abstract bool Matches(RegistrySearchFilter filter);
+
+		#region Factory methods
 		/// <summary>
 		/// Creates a <see cref="RegistryData"/> instance representing a REG_MULTI_SZ registry value.
 		/// </summary>
@@ -80,7 +73,9 @@ namespace Wmi.Registry
 		/// Creates a new <see cref="RegistryData"/> instance representing a REG_QWORD registry value.
 		/// </summary>
 		public static RegistryData CreateDword(ulong data) => new RegistryQword(data);
+		#endregion
 
+		#region Export
 		const int WrapThreshold = 77;
 		const string Indent = "  ";
 
@@ -144,6 +139,8 @@ namespace Wmi.Registry
 		/// <param name="writer">Target writer</param>
 		/// <param name="lineOffset">Line offset of <paramref name="writer"/></param>
 		public abstract void ExportTo(TextWriter writer, int lineOffset);
+		#endregion
+
 		/// <inheritdoc/>
 		public sealed override string ToString() => this.ToString(null, null);
 		/// <inheritdoc/>
@@ -175,11 +172,14 @@ namespace Wmi.Registry
 		/// <inheritdoc/>
 		public override object UntypedValue => this.Value;
 
-        /// <inheritdoc/>
+		/// <inheritdoc/>
 		ulong IHaveUInt64Value.UInt64Value => this.Value;
 
-        /// <inheritdoc/>
-        public override string ToString(string? format, IFormatProvider? formatProvider) => this.Value.ToString(format, formatProvider);
+		/// <inheritdoc/>
+		public sealed override bool Matches(RegistrySearchFilter filter) => filter.Matches(this._value);
+
+		/// <inheritdoc/>
+		public override string ToString(string? format, IFormatProvider? formatProvider) => this.Value.ToString(format, formatProvider);
 
 		/// <inheritdoc/>
 		public sealed override void ExportTo(TextWriter writer, int lineOffset)
@@ -213,6 +213,10 @@ namespace Wmi.Registry
 		ulong IHaveUInt64Value.UInt64Value => this.Value;
 		/// <inheritdoc/>
 		public override object UntypedValue => this.Value;
+
+		/// <inheritdoc/>
+		public sealed override bool Matches(RegistrySearchFilter filter) => filter.Matches(this.Value);
+
 		/// <inheritdoc/>
 		public override string ToString(string? format, IFormatProvider? formatProvider) => this.Value.ToString(format, formatProvider);
 		/// <inheritdoc/>
@@ -244,6 +248,10 @@ namespace Wmi.Registry
 		public string Value { get; }
 		/// <inheritdoc/>
 		public override object UntypedValue => this.Value;
+
+		/// <inheritdoc/>
+		public sealed override bool Matches(RegistrySearchFilter filter) => filter.Matches(this.Value);
+
 		/// <inheritdoc/>
 		public override string ToString(string? format, IFormatProvider? formatProvider) => this.Value;
 
@@ -276,6 +284,10 @@ namespace Wmi.Registry
 		public string Value { get; }
 		/// <inheritdoc/>
 		public override object UntypedValue => this.Value;
+
+		/// <inheritdoc/>
+		public sealed override bool Matches(RegistrySearchFilter filter) => filter.Matches(this.Value);
+
 		/// <inheritdoc/>
 		public override string ToString(string? format, IFormatProvider? formatProvider) => this.Value;
 
@@ -308,6 +320,10 @@ namespace Wmi.Registry
 		/// Gets the value as a <see langword="ulong"/>.
 		/// </summary>
 		public ImmutableArray<string> Strings { get; }
+
+		/// <inheritdoc/>
+		public sealed override bool Matches(RegistrySearchFilter filter) => filter.Matches(this.Strings);
+
 		/// <inheritdoc/>
 		public override object UntypedValue => this.Strings;
 		/// <inheritdoc/>
@@ -317,7 +333,8 @@ namespace Wmi.Registry
 		public override void ExportTo(TextWriter writer, int lineOffset)
 		{
 			var stringval = string.Join("\0", this.Strings) + "\0\0";
-			writer.WriteLine(Encoding.Unicode.GetBytes(stringval));
+			byte[] bytes = Encoding.Unicode.GetBytes(stringval);
+			ExportAsHexTo(writer, this.Kind, bytes, lineOffset);
 		}
 	}
 	/// <summary>
@@ -348,6 +365,10 @@ namespace Wmi.Registry
 		public byte[] Bytes { get; }
 		/// <inheritdoc/>
 		public override object UntypedValue => this.Bytes;
+
+		/// <inheritdoc/>
+		public sealed override bool Matches(RegistrySearchFilter filter) => filter.Matches(this.Bytes);
+
 		/// <inheritdoc/>
 		public override string ToString(string? format, IFormatProvider? formatProvider) => BinaryHelper.ToHexString(this.Bytes);
 
@@ -430,7 +451,7 @@ namespace Wmi.Registry
 			if (this.Data is null)
 				return;
 
-			string valueNameEscaped = this.ValueName == null || this.ValueName == "" ? "@" : $"\"{this.ValueName.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"=";
+			string valueNameEscaped = this.ValueName == null || this.ValueName == "" ? "@=" : $"\"{this.ValueName.Replace("\\", "\\\\").Replace("\"", "\\\"")}\"=";
 			writer.Write(valueNameEscaped);
 
 			this.Data.ExportTo(writer, valueNameEscaped.Length);

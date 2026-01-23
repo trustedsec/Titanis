@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
+using Titanis.Winterop.Registry;
 
 namespace Wmi.Registry
 {
@@ -25,10 +26,8 @@ namespace Wmi.Registry
 		[Description("Overwrites existing output file")]
 		public SwitchParam Overwrite { get; set; }
 
-		HashSet<string> seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 		TextWriter? writer;
-
-		bool dataWritten = false;
+		private bool dataWritten;
 
 
 		protected override void ValidateParameters(ParameterValidationContext context)
@@ -36,24 +35,45 @@ namespace Wmi.Registry
 			base.ValidateParameters(context);
 			if (string.IsNullOrEmpty(OutputFile))
 			{
+				// Nothing to check
+			}
+			else
+			{
+				var outputFilePath = this.ResolveFsPath(this.OutputFile);
+				if (File.Exists(outputFilePath))
+				{
+					if (this.Overwrite.IsSet)
+					{
+						var attrs = File.GetAttributes(outputFilePath);
+						if (0 != (attrs & (FileAttributes.System | FileAttributes.ReadOnly | FileAttributes.Hidden)))
+						{
+							this.WriteWarning($"{outputFilePath} marked as read-only, hidden, or system; clearing attributes and overwriting.");
+							// Clear the read-only bit
+							File.SetAttributes(outputFilePath, FileAttributes.Normal);
+						}
+					}
+					else
+					{
+						context.LogError(nameof(OutputFile), $"Output file '{outputFilePath}' already exists.  Use -{nameof(Overwrite)} to overwrite.");
+					}
+				}
+			}
+		}
+
+		protected override void OnBeforeQuery()
+		{
+			base.OnBeforeQuery();
+
+			if (string.IsNullOrEmpty(OutputFile))
+			{
 				writer = new StreamWriter(this.Context.OpenRawOutputStream());
 			}
 			else
 			{
-				if (File.Exists(OutputFile))
-				{
-					if (this.Overwrite.IsSet)
-					{
-						var attrs = File.GetAttributes(OutputFile);
-						if (0 != (attrs & (FileAttributes.System | FileAttributes.ReadOnly | FileAttributes.Hidden)))
-						{
-							this.WriteWarning($"{OutputFile} marked as read-only, hidden, or system; clearing attributes and overwriting.");
-							// Clear the read-only bit
-							File.SetAttributes(OutputFile, FileAttributes.Normal);
-						}
-					}
-				}
-				var filestream = new FileStream(OutputFile, new FileStreamOptions
+				var outputFileName = this.ResolveFsPath(this.OutputFile);
+
+				this.WriteDiagnostic($"Creating output file '{outputFileName}'");
+				var filestream = new FileStream(outputFileName, new FileStreamOptions
 				{
 					Mode = FileMode.Create,
 					Access = FileAccess.Write,
@@ -66,19 +86,35 @@ namespace Wmi.Registry
 			writer.WriteLine("Windows Registry Editor Version 5.00");
 		}
 
-		protected override void WriteRegistryRecord(RegistryEntry entry)
+		private RegistryPath? _lastPath;
+		protected override void OnKeyMatch(RegistryPath keyPath)
+		{
+			this._lastPath = keyPath;
+			this.dataWritten = true;
+		}
+
+		protected override void OnValueMatch(RegistryPath keyPath, string valueName, RegistryValueKind valueKind, RegistryData? valueData)
 		{
 			dataWritten = true;
 			Debug.Assert(writer != null);
-			if (seenKeys.Add(entry.SubKey))
+
+			if (this._lastPath != keyPath)
 			{
-				writer.WriteLine();
-				writer.WriteLine($"[{entry.Root}\\{entry.SubKey}]");
+				this._lastPath = keyPath;
+				WriteKeySectionHeader(keyPath);
 			}
+
+			var entry = new RegistryEntry(keyPath, valueName, valueData);
 			entry.ExportTo(writer);
 		}
 
-		protected override void OnCommandComplete()
+		private void WriteKeySectionHeader(RegistryPath keyPath)
+		{
+			writer.WriteLine();
+			writer.WriteLine($"[{keyPath.Root}\\{keyPath.KeyPath}]");
+		}
+
+		protected override void OnQueryComplete()
 		{
 			if (writer is not null)
 			{
