@@ -190,6 +190,29 @@ namespace Titanis.Ldap
 		[GeneratedRegex(@"^(?<forest>[^:]*):(?<computer>[^@]*)@(?<domain>.*)$")]
 		private static partial Regex LdapServiceRegex();
 
+		// [RFC 4532] § 2
+		private const string WhoamiOid = "1.3.6.1.4.1.4203.1.11.3";
+		// [RFC 4532] § 2.1
+		private static readonly byte[] WhoamiBytes = new byte[]
+		{
+			0x31, 0x2e, 0x33, 0x2e, 0x36, 0x2e, 0x31,
+			0x2e, 0x34, 0x2e, 0x31, 0x2e, 0x34, 0x32, 0x30,  0x33, 0x2e, 0x31, 0x2e, 0x31, 0x31, 0x2e, 0x33,
+		};
+		public async Task<SaslIdentity> Whoami(CancellationToken cancellationToken)
+		{
+			var resp = await _channel.SendRequest(new LDAPMessage_ProtocolOp()
+			{
+				ExtendedReq = new ExtendedRequest_Tagged23(WhoamiBytes)
+			}, cancellationToken).ConfigureAwait(false);
+
+			var ext = resp.message.protocolOp.ExtendedResp;
+			if (ext.resultCode != LDAPResult_ResultCode.Success)
+				throw new LdapException((LdapResultCode)ext.resultCode, Encoding.UTF8.GetString(ext.diagnosticMessage));
+			// [RFC 4513] § 5.2.1.8.  SASL Authorization Identities
+			var authzId = Encoding.UTF8.GetString(ext.responseValue);
+			return new SaslIdentity(authzId);
+		}
+
 		#region Searching
 		class SearchResultBuilder : ILdapChannelSearchCallback
 		{

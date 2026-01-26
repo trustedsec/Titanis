@@ -19,6 +19,7 @@ namespace Ldap
 	[Subcommand("adduser", typeof(AddUserCommand))]
 	[Subcommand("addcomputer", typeof(AddComputerCommand))]
 	[Subcommand("moduser", typeof(ModUserCommand))]
+	[Subcommand("whoami", typeof(WhoamiCommand))]
 	internal partial class Program : MultiCommand
 	{
 		static void Main(string[] args)
