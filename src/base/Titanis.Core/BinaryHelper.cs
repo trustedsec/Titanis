@@ -94,6 +94,14 @@ namespace Titanis
 			return sb.ToString();
 		}
 
+		public static bool IsHexChar(char c)
+		{
+			return (
+				((uint)(c - '0') < 10)
+				|| (((uint)(c & ~0x20) - 'A') < 6)
+				);
+		}
+
 		/// <summary>
 		/// Attempts to parse a character as a hexadecimal digit.
 		/// </summary>
