@@ -224,5 +224,14 @@ namespace Titanis.Security.Kerberos
 			var encProfile = this.SessionKey.EncryptionProfile;
 			return encProfile.GenerateSubkey();
 		}
+
+		public void DecryptAuthorizationData(SessionKey authzKey)
+		{
+			ArgumentNullException.ThrowIfNull(authzKey);
+
+			var encTicketPart = Asn1DerDecoder.DecodeTlv<EncTicketPart>(authzKey.Decrypt(KeyUsage.Asrep_Tgsrep_Ticket, this.ticket.enc_part));
+			var authz = new TicketAuthorizationData(null, authzKey);
+			authz.Process(encTicketPart);
+		}
 	}
 }

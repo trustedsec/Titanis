@@ -22,6 +22,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 	[Example("Requesting a ticket for SMB", "{0} -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi cifs/LUMON-FS1 -OutputFile milchick-LUMON-FS1.kirbi")]
 	[Example("Requesting a ticket for LUMON-FS1", "{0} -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi LUMON-FS1 -OutputFile milchick-LUMON-FS1.kirbi")]
 	[Example("Requesting a ticket for SMB and Host", "{0} -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi cifs/LUMON-FS1, HOST/LUMON-FS1 -OutputFile milchick-LUMON-FS1.kirbi")]
+	[Example("Requesting a U2U ticket", "{0} -Kdc 10.66.0.11 -v -Tgt allentown-tgt.kirbi -Overwrite -U2u allentown-tgt.kirbi -OutputFileName allentown-u2u.kirbi host/allentown")]
 	internal class RequestTicketCommand : TicketRequestCommand
 	{
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -66,6 +67,10 @@ By default, all supported encryption types are sent in the request.  To limit th
 		[Description("Name of service account with S4U2proxy")]
 		public SecurityPrincipalName? S4ProxyService { get; set; }
 
+		[Parameter]
+		[Description("Name of file containing U2U ticket")]
+		public string? U2uTicket { get; set; }
+
 		private X509Certificate2? _s4uCert;
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
@@ -97,25 +102,21 @@ By default, all supported encryption types are sent in the request.  To limit th
 			else if (!string.IsNullOrEmpty(this.TicketCache)) ticketStoreFile = this.ResolveFsPath(this.TicketCache);
 			else throw new InvalidOperationException($"The command is not configured with -{nameof(Tgt)} -{nameof(TicketCache)}.");
 
-			this.WriteVerbose($"Reading TGT from {ticketStoreFile}");
-			var tgtStore = krb.LoadTicketsFromFile(File.ReadAllBytes(ticketStoreFile), out _);
+			TicketInfo? sourceTicket = LoadTgtFromStore(krb, ticketStoreFile);
+			if (sourceTicket is null)
+				return null;
 
-			TicketInfo sourceTicket;
+
+			TicketInfo? u2uTicket;
+			if (!string.IsNullOrEmpty(this.U2uTicket))
 			{
-				if (ticketStoreFile.Length == 0)
-				{
-					this.WriteError($"The file {ticketStoreFile} does not contain any tickets.");
+				u2uTicket = LoadTgtFromStore(krb, this.U2uTicket);
+				if (u2uTicket is null)
 					return null;
-				}
-
-				var tgtCandidates = tgtStore.Where(r => r.IsCurrent && r.IsTgt).ToList();
-				if (tgtCandidates.Count == 0)
-				{
-					this.WriteError($"The file {ticketStoreFile} does not contain any valid ticket-granting tickets.");
-					return null;
-				}
-
-				sourceTicket = tgtCandidates[0];
+			}
+			else
+			{
+				u2uTicket = null;
 			}
 
 			this.WriteVerbose($"Using ticket for {sourceTicket.UserName}@{sourceTicket.UserRealm} => {sourceTicket.TargetSpn} expiring {sourceTicket.EndTime}");
@@ -127,14 +128,52 @@ By default, all supported encryption types are sent in the request.  To limit th
 			ticketParams.S4UserCertificate = this._s4uCert;
 			ticketParams.S4ProxyService = this.S4ProxyService;
 
+			if (u2uTicket != null)
+			{
+				ticketParams.AdditionalTicket = u2uTicket;
+				ticketParams.Options |= KdcOptions.EncTicketInSKey;
+			}
+
 			List<TicketInfo> newTickets = new List<TicketInfo>(this.Targets.Length);
 			foreach (var spn in this.Targets)
 			{
 				var ticket = await krb.RequestTicket(sourceTicket, spn, this.Realm ?? sourceTicket.TicketRealm, this.EncTypes, ticketParams, cancellationToken).ConfigureAwait(false);
+
+				if (u2uTicket != null)
+					ticket.DecryptAuthorizationData(u2uTicket.SessionKey);
+
 				newTickets.Add(ticket);
 			}
 
 			return newTickets;
+		}
+
+		private TicketInfo? LoadTgtFromStore(KerberosClient krb, string ticketStoreFile)
+		{
+			this.WriteVerbose($"Reading TGT from {ticketStoreFile}");
+			var tgtStore = krb.LoadTicketsFromFile(File.ReadAllBytes(ticketStoreFile), out _);
+
+			TicketInfo? sourceTicket;
+			if (ticketStoreFile.Length == 0)
+			{
+				this.WriteError($"The file {ticketStoreFile} does not contain any tickets.");
+				sourceTicket = null;
+			}
+			else
+			{
+				var tgtCandidates = tgtStore.Where(r => r.IsCurrent && r.IsTgt).ToList();
+				if (tgtCandidates.Count == 0)
+				{
+					this.WriteError($"The file {ticketStoreFile} does not contain any valid ticket-granting tickets.");
+					sourceTicket = null;
+				}
+				else
+				{
+					sourceTicket = tgtCandidates[0];
+				}
+			}
+
+			return sourceTicket;
 		}
 	}
 }

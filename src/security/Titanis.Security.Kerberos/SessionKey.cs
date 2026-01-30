@@ -69,8 +69,12 @@ namespace Titanis.Security.Kerberos
 			if ((EType)edata.etype != this.EncryptionProfile.EType)
 				throw new ArgumentException("The EType of the encrypted data does not match the EType of this key.", nameof(edata));
 
+			return Decrypt(usage, edata.cipher);
+		}
+
+		internal ReadOnlyMemory<byte> Decrypt(KeyUsage usage, byte[] cipher)
+		{
 			var encProfile = this.EncryptionProfile;
-			var cipher = edata.cipher;
 			var cbBody = cipher.Length - encProfile.CipherHeaderSizeBytes - encProfile.CipherTrailerSizeBytes;
 			Memory<byte> message = cipher.AsMemory().Slice(encProfile.CipherHeaderSizeBytes, cbBody);
 			this.EncryptionProfile.Decrypt(

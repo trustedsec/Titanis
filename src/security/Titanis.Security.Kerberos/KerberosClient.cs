@@ -910,7 +910,7 @@ namespace Titanis.Security.Kerberos
 			padatas.Add(Kerberos.Structs.PAData_PacOptions(pacOptions));
 
 			AP_REQ apreq = Structs.APReq(
-				0,
+				(0 != (ticketParameters.Options & KdcOptions.EncTicketInSKey)) ? APOptions.UseSessionKey : APOptions.None,
 				ticket.ticket,
 				ticket.SessionKey.EncryptAndWrap(
 					KeyUsage.TgsreqPatgsreqPadataApreqAuthChecksum_TgsSessionKey_IncludesAuthSubkey,

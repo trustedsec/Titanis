@@ -12,6 +12,7 @@ using Titanis.DceRpc;
 using Titanis.IO;
 using KerberosV5Spec2;
 using Titanis.Winterop.Security;
+using Microsoft.Win32.SafeHandles;
 
 namespace Titanis.Security.Kerberos
 {
@@ -101,12 +102,17 @@ namespace Titanis.Security.Kerberos
 									ProcessLogonInfo(bufferDecoder);
 									break;
 								case PacBufferType.ClientNameInfo:
+									ProcessClientNameInfo(bufferDecoder);
 									break;
 								case PacBufferType.UserPrincipalName:
+									ProcessUpn(bufferDecoder);
 									break;
 								case PacBufferType.PacAttributes:
 									break;
 								case PacBufferType.PacRequestorSid:
+									break;
+								case PacBufferType.CredentialInfo:
+									ProcessCredentialInfo(bufferDecoder);
 									break;
 								default:
 									break;
@@ -115,6 +121,65 @@ namespace Titanis.Security.Kerberos
 						break;
 				}
 			}
+		}
+
+		// [MS-PAC] § 2.10 - UPN_DNS_INFO
+		private void ProcessUpn(RpcDecoder bufferDecoder)
+		{
+			ByteMemoryReader buf = bufferDecoder.GetStubData();
+
+			var upnInfo = new UPN_DNS_INFO();
+			upnInfo.Decode(bufferDecoder);
+
+			string? upn = null;
+			if (upnInfo.UpnLength > 0)
+			{
+				upn = Encoding.Unicode.GetString(buf.GetBytesReadOnly(upnInfo.UpnOffset, upnInfo.UpnLength));
+			}
+			string? dnsName = null;
+			if (upnInfo.DnsDomainNameLength > 0)
+			{
+				dnsName = Encoding.Unicode.GetString(buf.GetBytesReadOnly(upnInfo.DnsDomainNameOffset, upnInfo.DnsDomainNameLength));
+			}
+
+			string? samName = null;
+			if (0 != ((UpnDnsInfoFlags)upnInfo.Flags & UpnDnsInfoFlags.HasSidInfo))
+			{
+				var samNameLength = bufferDecoder.ReadUInt16();
+				var samNameOffset = bufferDecoder.ReadUInt16();
+				if (samNameLength > 0)
+				{
+					upn = Encoding.Unicode.GetString(buf.GetBytesReadOnly(samNameOffset, samNameLength));
+				}
+
+
+
+				var sidLength = bufferDecoder.ReadUInt16();
+				var sidOffset = bufferDecoder.ReadUInt16();
+				if (samNameLength > 0)
+				{
+					ReadOnlySpan<byte> sidBytes = buf.GetBytesReadOnly(samNameOffset, samNameLength);
+					upn = Encoding.Unicode.GetString(sidBytes);
+				}
+			}
+		}
+
+		private void ProcessClientNameInfo(RpcDecoder bufferDecoder)
+		{
+			var clientNameInfo = new PAC_CLIENT_INFO();
+			clientNameInfo.Decode(bufferDecoder);
+			//this._clientNameInfo = clientNameInfo;
+		}
+
+		private void ProcessCredentialInfo(RpcDecoder bufferDecoder)
+		{
+			PAC_CREDENTIAL_INFO credInfo = new PAC_CREDENTIAL_INFO();
+			credInfo.Decode(bufferDecoder);
+
+			var etype = (EType)credInfo.EncryptionType;
+			var encProf = this._krb.GetEncProfile(etype);
+			var encCredData = bufferDecoder.GetStubData().Remaining.ToArray();
+			var credData = this._key.Decrypt(KeyUsage.NonKerbSalt, encCredData);
 		}
 
 		private int _offServerCheckvsum;
@@ -238,19 +303,6 @@ namespace Titanis.Security.Kerberos
 
 		private List<RidWithAttributes>? _resGroupIds;
 		public IList<RidWithAttributes> ResourceGroupIds => (this._resGroupIds ??= this.info.ResourceGroupIds.ToList(r => new RidWithAttributes(r.RelativeId, (SidAttributes)r.Attributes)));
-	}
-
-	// [MS-PAC] § 2.2.1 - KERB_SID_AND_ATTRIBUTES
-	[Flags]
-	public enum SidAttributes
-	{
-		None = 0,
-
-		Mandatory = 1,
-		EnabledByDefault = 2,
-		Enabled = 4,
-		Owner = 8,
-		Resource = (1 << 29),
 	}
 
 	public class SidWithAttributes
