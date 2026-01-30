@@ -86,7 +86,12 @@ namespace Titanis
 		public string SharePath => $@"\\{ServerName}\{ShareName}";
 
 		/// <summary>
-		/// Gets the path to the share..
+		/// Gets the path to the server.
+		/// </summary>
+		public UncPath ServerUncPath => new UncPath(ServerName, Port, null, null);
+
+		/// <summary>
+		/// Gets the path to the share.
 		/// </summary>
 		public UncPath ShareUncPath => new UncPath(ServerName, Port, ShareName, null);
 
