@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\base\Titanis.Core\Titanis.Core.csproj" />
     <ProjectReference Include="..\..\..\src\base\Titanis.Winterop.ErrorCodes\Titanis.Winterop.ErrorCodes.csproj" />
+    <ProjectReference Include="..\..\..\src\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
   </ItemGroup>
 
   <ItemGroup>
