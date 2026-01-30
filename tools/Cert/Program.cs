@@ -6,6 +6,7 @@ using Titanis.Cli;
 
 namespace Cert;
 
+[Description("Work with X.509 certificates")]
 [Subcommand("selfcert", typeof(SelfCertCommand))]
 internal class Program : MultiCommand
 {
