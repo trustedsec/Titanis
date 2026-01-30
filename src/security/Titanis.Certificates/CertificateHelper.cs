@@ -98,7 +98,8 @@ namespace Titanis.Certificates
 											if (OperatingSystem.IsWindows())
 											{
 												// NOTE: Windows does not support ephemeral keys loaded from a PEM file, so the workaround is to export to a PFX (in memory) and reimport
-												withPrivateKey = new X509Certificate2(withPrivateKey.Export(X509ContentType.Pfx));
+												byte[] rawData = withPrivateKey.Export(X509ContentType.Pfx);
+												//withPrivateKey = new X509Certificate2(rawData);
 											}
 											cert = withPrivateKey;
 											break;

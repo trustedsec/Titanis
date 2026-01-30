@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis.Asn1;
+using Titanis.Asn1.Serialization;
 
 namespace Titanis.Certificates
 {
@@ -39,6 +41,24 @@ namespace Titanis.Certificates
 			}
 
 			return null;
+		}
+
+		public static string? Decode(this X509SubjectAlternativeNameExtension altName)
+		{
+			var decoded = SubjectAltName.TryReadFrom(altName.RawData);
+			return decoded;
+		}
+
+		public static X509SubjectAlternativeNameExtension ToSubjectAltName(this string subjectAltName)
+		{
+			GeneralName genName = new GeneralName()
+			{
+				OtherName = new AnotherName(new Asn1Oid(SubjectAltName.SubjectAltNameOid), Asn1Any.CreateFromObject(new UTF8String(subjectAltName)))
+			};
+
+			var bytes = Asn1DerEncoder.EncodeTlv(new Asn1SequenceOf<GeneralName>([genName])).ToArray();
+
+			return new X509SubjectAlternativeNameExtension(bytes, false);
 		}
 	}
 }
