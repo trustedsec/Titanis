@@ -23,10 +23,14 @@ namespace Titanis.Msrpc.Mswkst
 		CompressData = 0x00100000,
 	}
 
+	/// <summary>
+	/// Describes an SMB2 share.
+	/// </summary>
 	public class ShareInfo
 	{
 		[DisplayName("Name")]
-		public string? ShareName { get; set; }
+		public string ShareName { get; }
+
 		[DisplayName("Server")]
 		public string? ServerName { get; set; }
 		[DisplayName("Type")]
@@ -45,11 +49,6 @@ namespace Titanis.Msrpc.Mswkst
 		[DisplayName("Sec. Desc.")]
 		public string? SecurityDescriptorSddl { get; }
 		public ShareFlags Flags { get; set; }
-
-		public ShareInfo()
-		{
-
-		}
 
 		internal ShareInfo(ref readonly SHARE_INFO_1 info)
 		{

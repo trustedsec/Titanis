@@ -436,7 +436,7 @@ namespace Titanis.Msrpc.Mswkst
 			CancellationToken cancellationToken);
 
 		public Task<IList<ShareInfo>> GetShares(CancellationToken cancellationToken)
-			=> this.GetShares(LocalName, ShareInfoLevel.Level2, DefaultReturnBufferSize, cancellationToken);
+			=> this.GetShares(LocalName, ShareInfoLevel.Level1, DefaultReturnBufferSize, cancellationToken);
 		public Task<IList<ShareInfo>> GetShares(string serverName, ShareInfoLevel level, int bufferSize, CancellationToken cancellationToken)
 			=> EnumShares(serverName, level, bufferSize, this._proxy.NetrShareEnum, cancellationToken);
 
