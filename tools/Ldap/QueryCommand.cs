@@ -86,7 +86,13 @@ internal class QueryCommand : QueryCommandBase
 
 	protected override LdapQuery CreateQuery(LdapDistinguishedName searchBase)
 	{
-		var query = new LdapQuery(searchBase, LdapSearchScope.WholeSubtree, this._filter, []);
+		var fieldNames = new List<string>();
+		if (this.OutputFields != null)
+			fieldNames.AddRange(this.OutputFields);
+
+		fieldNames.RemoveAll(r => nameof(LdapEntry.EntryName).Equals(r, StringComparison.OrdinalIgnoreCase));
+
+		var query = new LdapQuery(searchBase, LdapSearchScope.WholeSubtree, this._filter, fieldNames.ConvertAll(r => new AttributeSpec(r)).ToArray());
 		return query;
 	}
 }

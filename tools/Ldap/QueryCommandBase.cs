@@ -12,7 +12,7 @@ internal abstract class QueryCommandBase : LdapSearchCommandBase
 
 	protected sealed override async Task<int> RunAsync(LdapClient ldap, CancellationToken cancellationToken)
 	{
-		if (this.OutputFields is null)
+		if (!this.OutputFieldsSpecified)
 			this.OutputFields = [nameof(LdapEntry.EntryName)];
 
 		if (this.SearchBase.IsNullOrEmpty())

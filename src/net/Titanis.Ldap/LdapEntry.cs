@@ -150,13 +150,18 @@ namespace Titanis.Ldap
 			var entry = (LdapEntry)component;
 			var attr = entry[this.attr];
 
-			if (this._enumType != null)
+			if (attr != null)
 			{
-				var value = Enum.ToObject(this._enumType, attr.Value);
-				return value;
+				if (this._enumType != null)
+				{
+					var value = Enum.ToObject(this._enumType, attr.Value);
+					return value;
+				}
+
+				return this.attr.IsSingleValued ? attr.Value : attr.Values;
 			}
 
-			return (attr is null) ? null : this.attr.IsSingleValued ? attr.Value : attr.Values;
+			return null;
 		}
 		public override void ResetValue(object component) => throw new NotSupportedException();
 		public override void SetValue(object? component, object? value) => throw new NotSupportedException();

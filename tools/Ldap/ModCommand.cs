@@ -13,6 +13,8 @@ namespace Ldap;
 
 [Command]
 [Description("Modifies an object in the directory")]
+[Example("Add a certificate to an account", "{0} LUMON-DC1 -UserName milchick@LUMON -Password Br3@kr00m! ALLENTOWN$  userCertificate:file+=allentown.cer", "This command authenticates as milchick, loads the certificate from the file allentown.cer, and associates it with the ALLENTOWN$ account.")]
+[Example("Adding resource-based constrained delegate to a computer account", "{0} LUMON-DC1 -UserName milchick@LUMON -Password Br3@kr00m!  Stealth$ msDS-AllowedToDelegateTo+=HOST/ALLENTOWN, msDS-AllowedToDelegateTo+=cifs/ALLENTOWN", "This command authenticates as milchick and allows the STEALTH$ account to delegate to ALLENTOWN for the `cifs` and `host` SPNs.")]
 internal class ModCommand : LdapObjectCommandBase
 {
 	[Parameter(After = nameof(ObjectName))]
@@ -36,7 +38,7 @@ internal class ModCommand : LdapObjectCommandBase
 		}
 	}
 
-	protected virtual void GetChanges(LdapModifyRequest modifyRequest)
+	protected virtual void GetAdditionalChanges(LdapModifyRequest modifyRequest)
 	{
 
 	}
@@ -50,7 +52,7 @@ internal class ModCommand : LdapObjectCommandBase
 			ctx.ProcessArgs(this.Changes, request);
 		}
 
-		this.GetChanges(request);
+		this.GetAdditionalChanges(request);
 
 		await ldap.Modify(request, cancellationToken);
 	}

@@ -1,8 +1,10 @@
 ﻿[RFC 4510] - LDAP - Roadmap
 [RFC 4511] - LDAP - The Protocol
 [RFC 4512] - LDAP - Directory Information Models
+[RFC 4513] - LDAP - Authentication
 [RFC 4514] - LDAP - DNs
 [RFC 4515] - LDAP - Filter syntax
+[RFC 4532] - LDAP - Who am I? extension
 
 [RFC 2252] - LDAP
 [RFC 2253] - LDAP DNs

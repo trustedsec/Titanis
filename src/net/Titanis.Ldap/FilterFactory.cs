@@ -136,6 +136,8 @@ namespace Titanis.Ldap
 
 		internal byte[] rep;
 
+		public override string ToString() => Encoding.UTF8.GetString(this.rep);
+
 		public static implicit operator AttributeSpec(string name) => new AttributeSpec(name);
 		public static implicit operator AttributeSpec(AttributeTypeDescription attribute) => new AttributeSpec(attribute);
 	}
