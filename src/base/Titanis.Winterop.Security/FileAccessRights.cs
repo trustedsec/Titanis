@@ -4,10 +4,12 @@ using System.Text;
 
 namespace Titanis.Winterop.Security
 {
+	// [MS-DTYP]
 	[Flags]
-	public enum Smb2FileAccessRights : uint
+	public enum FileAccessRights : uint
 	{
 		None = 0,
+
 		ReadData = 1,
 		WriteData = 2,
 		AppendData = 4,
@@ -25,15 +27,42 @@ namespace Titanis.Winterop.Security
 		AccessSystemSecurity = 0x01000000,
 		MaxAllowed = 0x02000000,
 
+		FileAll = // 0x001F01FF
+			0
+			// 0x0000000F
+			| ReadData
+			| WriteData
+			| AppendData
+			| ReadEa
+			// 0x000000F0
+			| WriteEa
+			| Execute
+			| DeleteChild
+			| ReadAttributes
+			// 0x00000100
+			| WriteAttributes
+			// 0x000F0000
+			| StandardRightsRequired
+			// 0x00100000
+			| Synchronize,
+
+		FileExecute = // 0x001200A
+			0
+			// 0x000000A0
+			| Execute
+			| ReadAttributes
+			// 0x00020000
+			| ReadControl
+			// 0x00100000
+			| Synchronize,
+
+		FileWrite = 0x00120116,
+		FileRead = 0x00120089,
+
 		StandardRightsRead = ReadControl,
 		StandardRightsWrite = ReadControl,
 		StandardRightsExecute = ReadControl,
 		StandardRightsRequired = 0x000F0000,
-
-		FileGenericExecute = Execute | ReadAttributes | Execute | StandardRightsExecute | Synchronize,
-		FileGenericRead = ReadAttributes | ReadData | ReadEa | StandardRightsRead | Synchronize,
-		FileGenericWrite = AppendData | WriteAttributes | WriteData | WriteEa | StandardRightsWrite | Synchronize,
-		FullAccess = StandardRightsRequired | Synchronize | 0x1FF,
 
 		GenericAll = 0x10000000,
 		GenericExecute = 0x20000000,

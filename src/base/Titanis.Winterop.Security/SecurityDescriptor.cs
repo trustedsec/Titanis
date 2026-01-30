@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml;
 
 namespace Titanis.Winterop.Security
 {
@@ -67,6 +69,16 @@ namespace Titanis.Winterop.Security
 	{
 		private SecurityDescriptorControl _control;
 
+		public SecurityDescriptor(
+			SecurityDescriptorControl control,
+			SecurityIdentifier? owner
+			)
+		{
+			this._control = control;
+
+			this.Owner = owner;
+		}
+
 		public SecurityDescriptor(ReadOnlySpan<byte> bytes)
 		{
 			if (bytes.Length < 20)
@@ -89,10 +101,10 @@ namespace Titanis.Winterop.Security
 				this.Owner = new SecurityIdentifier(bytes.Slice(offOwner));
 			if (offGroup != 0 && 0 == (control & SecurityDescriptorControl.GroupDefaulted))
 				this.Group = new SecurityIdentifier(bytes.Slice(offGroup));
-			//if (offDacl != 0 && 0 != (control & SecurityDescriptorControl.DaclPresent))
-			//	this.Dacl = new AccessControlList(bytes.Slice(offDacl));
-			//if (offSacl != 0 && 0 != (control & SecurityDescriptorControl.SaclPresent))
-			//	this.Sacl = new AccessControlList(bytes.Slice(offDacl));
+			if (offDacl != 0 && 0 != (control & SecurityDescriptorControl.DaclPresent))
+				this.Dacl = new AccessControlList(bytes.Slice(offDacl));
+			if (offSacl != 0 && 0 != (control & SecurityDescriptorControl.SaclPresent))
+				this.Sacl = new AccessControlList(bytes.Slice(offSacl));
 		}
 		public SecurityDescriptor(
 			SecurityDescriptorControl control,
@@ -185,19 +197,19 @@ namespace Titanis.Winterop.Security
 			}
 			if (this.Group != null)
 			{
-				off = Align8(off);
+				off = Align4(off);
 				offGroup = off;
 				off += this.Group.BinaryLength;
 			}
 			if (this.Sacl != null)
 			{
-				off = Align8(off);
+				off = Align4(off);
 				offSacl = off;
 				off += this.Sacl.BinaryLength;
 			}
 			if (this.Dacl != null)
 			{
-				off = Align8(off);
+				off = Align4(off);
 				offDacl = off;
 				off += this.Dacl.BinaryLength;
 			}
@@ -218,11 +230,204 @@ namespace Titanis.Winterop.Security
 			return buf;
 		}
 
-		private static int Align8(int off)
+		internal static int Align8(int off)
 		{
 			if ((off & 7) != 0)
-				off = off + 7 & 8 - 1;
+				off = (off + 7) & ~(8 - 1);
 			return off;
+		}
+		internal static int Align4(int off)
+		{
+			if ((off & 3) != 0)
+				off = (off + 3) & ~(4 - 1);
+			return off;
+		}
+
+		public static SecurityDescriptor ParseSddl(ReadOnlySpan<char> chars, SecurityIdentifier? domainSid)
+		{
+			if (chars.Length == 0)
+				return new SecurityDescriptor(SecurityDescriptorControl.None, null);
+
+			var ctx = new SddlParseContext(chars);
+			var sd = ParseSddl(ref ctx, domainSid);
+
+			if (ctx.LengthRemaining > 0)
+				throw ctx.MakeException("The SDDL contains extra characters after the security descriptor.");
+
+			return sd;
+		}
+
+		internal static SecurityDescriptor ParseSddl(ref SddlParseContext ctx, SecurityIdentifier? domainSid)
+		{
+			SecurityDescriptorControl control = SecurityDescriptorControl.None;
+
+			SecurityIdentifier? owner = null;
+			SecurityIdentifier? group = null;
+			AccessControlList? dacl = null;
+			AccessControlList? sacl = null;
+
+			while (ctx.LengthRemaining > 0)
+			{
+				if (ctx.LengthRemaining < 2)
+					throw ctx.MakeException("The string is too short to be a valid SDDL string.");
+
+				var c = ctx[0];
+				var c2 = ctx[1];
+				if (c2 == ':')
+				{
+					ctx.Advance(2);
+
+					if (c == 'O')
+					{
+						if (owner != null)
+							throw ctx.MakeException("The SDDL specifies multiple owners, which is not allowed.");
+
+						owner = SecurityIdentifier.Parse(ref ctx, domainSid);
+						continue;
+					}
+					else if (c == 'G')
+					{
+						if (group != null)
+							throw ctx.MakeException("The SDDL specifies multiple groups, which is not allowed.");
+
+						group = SecurityIdentifier.Parse(ref ctx, domainSid);
+						continue;
+					}
+					else if (c is 'D' or 'S')
+					{
+						var isSacl = c is 'S';
+						if (isSacl)
+						{
+							if (sacl != null)
+								throw ctx.MakeException("The SDDL specifies multiple SACLs, which is not allowed.");
+						}
+						else
+						{
+							if (dacl != null)
+								throw ctx.MakeException("The SDDL specifies multiple DACLs, which is not allowed.");
+						}
+
+						var acl = ParseAclSddl(ref ctx, isSacl, domainSid, out var aclFlags);
+
+						((isSacl ? ref sacl : ref dacl)) = acl;
+
+						control |= aclFlags;
+						continue;
+					}
+				}
+
+				throw ctx.MakeUnexpectedCharException(c.ToString(), "Expected O:, G:, D:, or S:");
+			}
+
+			var sd = new SecurityDescriptor(control, owner, group, dacl, sacl);
+			return sd;
+		}
+		private static AccessControlList? ParseAclSddl(ref SddlParseContext ctx, bool isDacl, SecurityIdentifier? domainSid, out SecurityDescriptorControl controlFlags)
+		{
+			var aclFlags = AccessControlList.ParseAclFlags(ref ctx);
+			if (aclFlags == AclFlags.NoAcl)
+			{
+				controlFlags = SecurityDescriptorControl.None;
+				return null;
+			}
+
+			SecurityDescriptorControl flags = SecurityDescriptorControl.None;
+			if (!isDacl)
+			{
+				if (0 != (aclFlags & AclFlags.ReqAutoInherit))
+					flags |= SecurityDescriptorControl.SaclRequiredAutoInherit;
+				if (0 != (aclFlags & AclFlags.AutoInherited))
+					flags |= SecurityDescriptorControl.SaclAutoInherited;
+				if (0 != (aclFlags & AclFlags.Protected))
+					flags |= SecurityDescriptorControl.SaclProtected;
+			}
+			else
+			{
+				if (0 != (aclFlags & AclFlags.ReqAutoInherit))
+					flags |= SecurityDescriptorControl.DaclRequiredAutoInherit;
+				if (0 != (aclFlags & AclFlags.AutoInherited))
+					flags |= SecurityDescriptorControl.DaclAutoInherited;
+				if (0 != (aclFlags & AclFlags.Protected))
+					flags |= SecurityDescriptorControl.DaclProtected;
+			}
+
+			controlFlags = flags;
+
+			List<AccessControlEntry> aces = new List<AccessControlEntry>();
+			while (ctx.AdvanceIf('('))
+			{
+				var ace = AccessControlEntry.ParseSddl(ref ctx, domainSid);
+				aces.Add(ace);
+				ctx.Expect(')');
+			}
+
+			var acl = new AccessControlList(aces, true);
+			return acl;
+		}
+	}
+
+	ref struct SddlParseContext
+	{
+		internal SddlParseContext(ReadOnlySpan<char> chars)
+		{
+			this.chars = chars;
+		}
+
+		private ReadOnlySpan<char> chars;
+		private int offset;
+
+		internal int LengthRemaining => this.chars.Length;
+
+		internal char this[int index] => this.chars[index];
+
+		internal void Advance(int count)
+		{
+			this.chars = this.chars.Slice(count);
+		}
+		internal bool AdvanceIf(char c)
+		{
+			if (this.LengthRemaining > 0 && this[0] == c)
+			{
+				this.Advance(1);
+				return true;
+			}
+			else
+				return false;
+		}
+		internal void Expect(char c)
+		{
+			if (this.LengthRemaining > 0 && this[0] == c)
+			{
+				this.Advance(1);
+			}
+			else
+				throw MakeUnexpectedCharException($"Expected '{c}'.");
+		}
+
+		internal ReadOnlySpan<char> Remaining(int length)
+		{
+			return this.chars.Slice(0, length);
+		}
+
+		internal Exception MakeUnexpectedCharException(string reason)
+		{
+			return this.MakeUnexpectedCharException(this.UnexpectedToken(), reason);
+		}
+		internal Exception MakeUnexpectedCharException(string token, string reason)
+		{
+			string message = $"Unexpected character	'{token}' @ {this.offset}";
+			return new FormatException(message);
+		}
+
+		private string UnexpectedToken()
+		{
+			return (this.LengthRemaining > 0 ? this[0].ToString() : "<end>");
+		}
+
+		internal Exception MakeException(string reason)
+		{
+			string message = $"Error at character	'{UnexpectedToken()}' @ {this.offset}: {reason}";
+			return new FormatException(message);
 		}
 	}
 }

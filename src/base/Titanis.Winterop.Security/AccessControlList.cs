@@ -1,10 +1,24 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Titanis.Winterop.Security
 {
+
+	[Flags]
+	internal enum AclFlags
+	{
+		None = 0,
+
+		NoAcl = 1,
+		Protected = 2,
+		ReqAutoInherit = 4,
+		AutoInherited = 8,
+	}
+
 	// [MS-DTYP] § 2.4.5 ACL
 	public class AccessControlList
 	{
@@ -39,6 +53,15 @@ namespace Titanis.Winterop.Security
 			}
 
 			this.Entries = new List<AccessControlEntry>(aces);
+		}
+		public AccessControlList(IList<AccessControlEntry> entries, bool ownsList)
+		{
+			if (entries is null) throw new ArgumentNullException(nameof(entries));
+
+			if (ownsList && entries is List<AccessControlEntry> list)
+				this.Entries = list;
+			else
+				this.Entries = [.. entries];
 		}
 
 		public List<AccessControlEntry> Entries { get; }
@@ -83,9 +106,66 @@ namespace Titanis.Winterop.Security
 				int size = entry.GetBytes(bytes.Slice(off));
 				off += size;
 
-				if (0 != (off & 0x3))
-					off = off + 3 & ~3;
+				off = SecurityDescriptor.Align4(off);
 			}
+		}
+
+		[Flags]
+		public enum DaclOptions
+		{
+			None = 0,
+			AutoInheritRequired = 0x0100,
+			AutoInherited = 0x0400,
+			Defaulted = 0x8,
+		};
+
+		private const string NoAccessControlFlag = "NO_ACCESS_CONTROL";
+
+		internal static AclFlags ParseAclFlags(ref SddlParseContext ctx)
+		{
+			AclFlags aclFlags = AclFlags.None;
+			char lc = '\0';
+			char c = '\0';
+
+			while (ctx.LengthRemaining > 0)
+			{
+				c = ctx[0];
+
+				// TODO: Stricter checking on duplicate options and such
+
+				if (c is 'P')
+					aclFlags |= AclFlags.Protected;
+				else if (lc is 'A' && c is 'R' or 'I')
+				{
+					if (c is 'R')
+						aclFlags |= AclFlags.ReqAutoInherit;
+					else if (c is 'I')
+						aclFlags |= AclFlags.AutoInherited;
+
+					lc = '\0';
+				}
+				else if (c is 'A')
+				{
+					// Wait for next char
+					lc = 'A';
+				}
+				else if (c is 'N' && ctx.LengthRemaining >= NoAccessControlFlag.Length && NoAccessControlFlag.AsSpan().Equals(ctx.Remaining(NoAccessControlFlag.Length), StringComparison.OrdinalIgnoreCase))
+				{
+					aclFlags = AclFlags.NoAcl;
+					ctx.Advance(NoAccessControlFlag.Length);
+					break;
+				}
+				else if (c is '(')
+				{
+					break;
+				}
+				else
+					throw ctx.MakeUnexpectedCharException("Expected P, AR, AI, or NO_ACCESS_CONTROL.");
+
+				ctx.Advance(1);
+			}
+
+			return aclFlags;
 		}
 	}
 }

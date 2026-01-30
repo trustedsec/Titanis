@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Data;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Titanis.Winterop.Security
 {
+	// [MS-DTYP] § 2.4.4.1 ACE_HEADER
 	/// <summary>
 	/// Specifies a type af <see cref="AccessControlEntry"/>.
 	/// </summary>
-	// [MS-DTYP] § 2.4.4.1 ACE_HEADER
 	public enum AccessControlEntryType
 	{
+		InvalidType = -1,
+
 		AccessAllowed = 0,
 		AccessDenied = 1,
 		Audit = 2,
@@ -24,7 +28,7 @@ namespace Titanis.Winterop.Security
 		SystemAlarmObject = 8,
 		AccessAllowedCallback = 9,
 		AccessDeniedCallback = 0x0A,
-		AcecssAllowedCallbackObject = 0x0B,
+		AccessAllowedCallbackObject = 0x0B,
 		AccessDeniedCallbackObject = 0x0C,
 		SystemAuditCallback = 0x0D,
 		SystemAlarmCallback = 0x0E,
@@ -35,10 +39,10 @@ namespace Titanis.Winterop.Security
 		ScopedPolicyId = 0x13,
 	}
 
+	// [MS-DTYP] § 2.4.4.1 ACE_HEADER
 	/// <summary>
 	/// Specifies flags that affect the behavior of an <see cref="AccessControlEntry"/>.
 	/// </summary>
-	// [MS-DTYP] § 2.4.4.1 ACE_HEADER
 	[Flags]
 	public enum AccessControlEntryFlags
 	{
@@ -52,12 +56,17 @@ namespace Titanis.Winterop.Security
 		Critical = 0x20,
 		SuccessfulAccessAudit = 0x40,
 		FailedAccessAudit = 0x80,
+
+		// Only on trust filter ACE
+		TrustProtectedFilter = 0x40,
+		// Only on access allowed ACE
+		CriticalAce = 0x20,
 	}
 
+	// [MS-DTYP] § 2.4.4.1 ACE_HEADER
 	/// <summary>
 	/// Describes an entry within an <see cref="AccessControlList"/>.
 	/// </summary>
-	// [MS-DTYP] § 2.4.4.1 ACE_HEADER
 	public abstract class AccessControlEntry
 	{
 		/// <summary>
@@ -138,20 +147,20 @@ namespace Titanis.Winterop.Security
 		internal static readonly Dictionary<uint, string> fileAccessRightCodes = new Dictionary<uint, string>()
 		{
 			// Generic
-			{ (uint)Smb2FileAccessRights.GenericAll, "GA" },
-			{ (uint)Smb2FileAccessRights.GenericRead, "GR" },
-			{ (uint)Smb2FileAccessRights.GenericWrite, "GW" },
-			{ (uint)Smb2FileAccessRights.GenericExecute, "GX" },
+			{ (uint)FileAccessRights.GenericAll, "GA" },
+			{ (uint)FileAccessRights.GenericRead, "GR" },
+			{ (uint)FileAccessRights.GenericWrite, "GW" },
+			{ (uint)FileAccessRights.GenericExecute, "GX" },
 			// Standard
-			{ (uint)Smb2FileAccessRights.ReadControl, "RC" },
-			{ (uint)Smb2FileAccessRights.Delete, "SD" },
-			{ (uint)Smb2FileAccessRights.WriteDac, "WD" },
-			{ (uint)Smb2FileAccessRights.WriteOwner, "WO" },
+			{ (uint)FileAccessRights.ReadControl, "RC" },
+			{ (uint)FileAccessRights.Delete, "SD" },
+			{ (uint)FileAccessRights.WriteDac, "WD" },
+			{ (uint)FileAccessRights.WriteOwner, "WO" },
 			// File
-			{ (uint)Smb2FileAccessRights.FullAccess, "FA" },
-			{ (uint)Smb2FileAccessRights.FileGenericRead, "FR" },
-			{ (uint)Smb2FileAccessRights.FileGenericWrite, "FW" },
-			{ (uint)Smb2FileAccessRights.FileGenericExecute, "FX" },
+			{ (uint)FileAccessRights.FileAll, "FA" },
+			{ (uint)FileAccessRights.FileRead, "FR" },
+			{ (uint)FileAccessRights.FileWrite, "FW" },
+			{ (uint)FileAccessRights.FileExecute, "FX" },
 		};
 
 		private protected void BuildSddlFromComponents(
@@ -195,7 +204,7 @@ namespace Titanis.Winterop.Security
 			{ AccessControlEntryType.SystemAlarmObject, "OL" },
 			{ AccessControlEntryType.AccessAllowedCallback, "XA" },
 			{ AccessControlEntryType.AccessDeniedCallback, "XD" },
-			{ AccessControlEntryType.AcecssAllowedCallbackObject, "ZA" },
+			{ AccessControlEntryType.AccessAllowedCallbackObject, "ZA" },
 			{ AccessControlEntryType.SystemAuditCallback, "XU" },
 			{ AccessControlEntryType.MandatoryLabel, "ML" },
 			{ AccessControlEntryType.ResourceAttribute, "RA" },
@@ -215,46 +224,246 @@ namespace Titanis.Winterop.Security
 			return s;
 		}
 
-		private static uint ParseFlagCodes(ReadOnlySpan<char> text, Dictionary<uint, string> flagCodes, out int charactersConsumed)
+		internal static AccessControlEntry? ParseSddl(ref SddlParseContext ctx, SecurityIdentifier? domainSid)
 		{
-			uint flags = 0;
-			int cchEaten = 0;
-			foreach (var entry in flagCodes)
+			AccessControlEntryType aceType = ParseAceType(ref ctx);
+			ctx.Expect(';');
+			AccessControlEntryFlags flags = ParseAceFlags(ref ctx);
+			ctx.Expect(';');
+			uint rights = AccessControlEntry.ParseRights(ref ctx);
+
+			// Object type
+			Guid? objType = null;
+			ctx.Expect(';');
+			objType = ParseGuid(ref ctx);
+
+			Guid? inheritType = null;
+			ctx.Expect(';');
+			inheritType = ParseGuid(ref ctx);
+
+			ctx.Expect(';');
+
+			var trustee = SecurityIdentifier.Parse(ref ctx, domainSid);
+
+			byte[] callbackData = Array.Empty<byte>();
+
+			var ace = aceType switch
 			{
-				if (text.Length > cchEaten && text.Equals(entry.Value, StringComparison.Ordinal))
+				AccessControlEntryType.AccessAllowed or
+				AccessControlEntryType.AccessDenied or
+				AccessControlEntryType.Audit or
+				AccessControlEntryType.ScopedPolicyId => (AccessControlEntry)new SimpleAce(aceType, flags, rights, trustee),
+
+				AccessControlEntryType.AccessAllowedObject or
+				AccessControlEntryType.AccessDeniedObject or
+				AccessControlEntryType.SystemAuditObject => new ObjectAce(aceType, flags, rights, objType, inheritType, trustee),
+
+				AccessControlEntryType.AccessAllowedCallback or
+				AccessControlEntryType.AccessDeniedCallback or
+				AccessControlEntryType.SystemAuditCallback => new CallbackAce(aceType, flags, rights, trustee, callbackData),
+
+				AccessControlEntryType.AccessAllowedCallbackObject or
+				AccessControlEntryType.AccessDeniedCallbackObject or
+				AccessControlEntryType.SystemAuditCallbackObject => new CallbackObjectAce(aceType, flags, rights, objType, inheritType, trustee, callbackData),
+
+				AccessControlEntryType.MandatoryLabel => new MandatoryLabelAce(aceType, flags, (MandatoryLabelPolicy)rights, trustee),
+
+				AccessControlEntryType.ResourceAttribute => new ResourceAttributeAce(aceType, flags, rights, trustee, callbackData),
+
+
+
+				AccessControlEntryType.Alarm or _ => throw new NotSupportedException("Future use"),
+				//AccessControlEntryType.AccessAllowedCompound => throw new NotImplementedException(),
+				//AccessControlEntryType.SystemAlarmObject => throw new NotImplementedException(),
+				//AccessControlEntryType.SystemAlarmCallback => throw new NotImplementedException(),
+				//AccessControlEntryType.SystemAlarmCallbackObject => throw new NotImplementedException(),
+			};
+
+			return ace;
+		}
+
+		internal static AccessControlEntryFlags ParseAceFlags(ref SddlParseContext ctx)
+		{
+			AccessControlEntryFlags flags = AccessControlEntryFlags.None;
+			char c = '\0';
+			while (ctx.LengthRemaining >= 2 && (c = ctx[0]) != ';')
+			{
+				var c1 = ctx[0];
+				var c2 = ctx[1];
+
+				AccessControlEntryFlags flag = (c1, c2) switch
 				{
-					flags |= entry.Key;
-					cchEaten += entry.Value.Length;
-					text = text.Slice(entry.Value.Length);
-				}
+					('C', 'I') => AccessControlEntryFlags.ContainerInherit,
+					('O', 'I') => AccessControlEntryFlags.ObjectInherit,
+					('N', 'P') => AccessControlEntryFlags.NoPropagateInherit,
+					('I', 'O') => AccessControlEntryFlags.InheritOnly,
+					('I', 'D') => AccessControlEntryFlags.Inherited,
+					('S', 'A') => AccessControlEntryFlags.SuccessfulAccessAudit,
+					('F', 'A') => AccessControlEntryFlags.FailedAccessAudit,
+					// Extra
+					('T', 'P') => AccessControlEntryFlags.TrustProtectedFilter,
+					('C', 'R') => AccessControlEntryFlags.CriticalAce,
+					_ => throw ctx.MakeUnexpectedCharException($"Unknown ACE flag '{c1}{c2}'.")
+				};
+
+				// TODO: Check for duplicate flag
+				flags |= flag;
+
+				ctx.Advance(2);
 			}
 
-			charactersConsumed = cchEaten;
 			return flags;
 		}
-		public static AccessControlEntry ParseSddl(ReadOnlySpan<char> text)
+
+		internal static AccessControlEntryType ParseAceType(ref SddlParseContext ctx)
 		{
-			AccessControlEntryType aceType = (AccessControlEntryType)(-1);
-			int cchEaten = 0;
-			foreach (var entry in aceTypeCodes)
+			char c = '\0';
+			int offset = 0;
+			for (; (offset < ctx.LengthRemaining) && ((c = ctx[offset]) != ';'); offset++)
+				;
+
+			if (c != ';')
+				throw ctx.MakeUnexpectedCharException("Expected ACE type.");
+
+			AccessControlEntryType aceType;
+			if (offset == 1)
 			{
-				if (text.Length >= entry.Value.Length && entry.Value.AsSpan().Equals(text, StringComparison.Ordinal))
+				c = ctx[0];
+				aceType = c switch
 				{
-					aceType = entry.Key;
-					cchEaten = entry.Value.Length;
-					break;
-				}
+					'A' => AccessControlEntryType.AccessAllowed,
+					'D' => AccessControlEntryType.AccessDenied,
+					_ => throw ctx.MakeUnexpectedCharException($"Unknown ACE type '{c}'.")
+				};
+				ctx.Advance(1);
+			}
+			else if (offset == 2)
+			{
+				var c1 = ctx[0];
+				var c2 = ctx[1];
+				aceType = (c1, c2) switch
+				{
+					('O', 'A') => AccessControlEntryType.AccessAllowedObject,
+					('O', 'D') => AccessControlEntryType.AccessDeniedObject,
+					('A', 'U') => AccessControlEntryType.Audit,
+					('A', 'L') => AccessControlEntryType.Alarm,
+					('O', 'U') => AccessControlEntryType.SystemAuditObject,
+					('O', 'L') => AccessControlEntryType.SystemAlarmObject,
+					('M', 'L') => AccessControlEntryType.MandatoryLabel,
+					('X', 'A') => AccessControlEntryType.AccessAllowedCallback,
+					('X', 'D') => AccessControlEntryType.AccessDeniedCallback,
+					('R', 'A') => AccessControlEntryType.ResourceAttribute,
+					('S', 'P') => AccessControlEntryType.ScopedPolicyId,
+					('X', 'U') => AccessControlEntryType.SystemAuditCallback,
+					('Z', 'A') => AccessControlEntryType.AccessAllowedCallbackObject,
+					//('T', 'L') => AccessControlEntryType.ProcessTrustLevel,
+					//('F', 'L') => AccessControlEntryType.AccessFilter,
+					_ => throw ctx.MakeUnexpectedCharException($"Unknown ACE type '{c1}{c2}'.")
+				};
+				ctx.Advance(2);
+			}
+			else
+			{
+				throw ctx.MakeUnexpectedCharException($"Unknown ACE type.");
 			}
 
-			if (cchEaten == 0)
-				throw new ArgumentException("Invalid ACE type", nameof(text));
+			return aceType;
+		}
 
-			if (text.Length > cchEaten && text[cchEaten] == ';')
-				text = text.Slice(cchEaten + 1);
-			else
-				throw new ArgumentException("Invalid ACE", nameof(text));
+		const int GuidTextLength = 32 + 4;
+		private static Guid? ParseGuid(ref SddlParseContext ctx)
+		{
+			if (ctx.LengthRemaining >= GuidTextLength)
+			{
+				if (Guid.TryParse(ctx.Remaining(GuidTextLength), out var guid))
+				{
+					ctx.Advance(GuidTextLength);
+					return guid;
+				}
+				else
+					throw ctx.MakeUnexpectedCharException("Expected GUID or ;");
+			}
 
-			throw new NotImplementedException();
+			return null;
+		}
+
+		internal static uint ParseRights(ref SddlParseContext ctx)
+		{
+			uint rights = 0;
+			char c = '\0';
+			while (ctx.LengthRemaining >= 2 && (c = ctx[0]) is not (';' or ')'))
+			{
+				var c1 = ctx[0];
+				var c2 = ctx[1];
+
+				ctx.Advance(2);
+
+				if (
+					(rights == 0)
+					&& (c1 == '0')
+					&& (c2 == 'x')
+					)
+				{
+					while (ctx.LengthRemaining > 0 && BinaryHelper.IsHexChar(c = ctx[0]))
+					{
+						rights *= 16;
+						rights += (uint)BinaryHelper.ParseHexChar(c);
+
+						ctx.Advance(1);
+					}
+
+					break;
+				}
+				else
+				{
+					uint right = (c1, c2) switch
+					{
+						// Generic
+						('G', 'R') => (uint)GenericAccessRights.GenericRead,
+						('G', 'W') => (uint)GenericAccessRights.GenericWrite,
+						('G', 'X') => (uint)GenericAccessRights.GenericExecute,
+						('G', 'A') => (uint)GenericAccessRights.GenericAll,
+						// Standard
+						('W', 'O') => (uint)StandardAccessRights.WriteOwner,
+						('W', 'D') => (uint)StandardAccessRights.WriteDac,
+						('R', 'C') => (uint)StandardAccessRights.ReadControl,
+						('S', 'D') => (uint)StandardAccessRights.Delete,
+						// File
+						('F', 'A') => (uint)FileAccessRights.FileAll,
+						('F', 'X') => (uint)FileAccessRights.FileExecute,
+						('F', 'W') => (uint)FileAccessRights.FileWrite,
+						('F', 'R') => (uint)FileAccessRights.FileRead,
+						// Registry
+						('K', 'A') => (uint)RegistryAccessRights.KeyAll,
+						('K', 'X') => (uint)RegistryAccessRights.KeyExecute,
+						('K', 'W') => (uint)RegistryAccessRights.KeyWrite,
+						('K', 'R') => (uint)RegistryAccessRights.KeyRead,
+						// Directory
+						('C', 'R') => (uint)DirectoryObjectAccessRights.ControlAccess,
+						('L', 'O') => (uint)DirectoryObjectAccessRights.ListObject,
+						('D', 'T') => (uint)DirectoryObjectAccessRights.DeleteTree,
+						('W', 'P') => (uint)DirectoryObjectAccessRights.WriteProperty,
+						('R', 'P') => (uint)DirectoryObjectAccessRights.ReadProperty,
+						('S', 'W') => (uint)DirectoryObjectAccessRights.SelfWrite,
+						('L', 'C') => (uint)DirectoryObjectAccessRights.ListChildren,
+						('D', 'C') => (uint)DirectoryObjectAccessRights.DeleteChild,
+						('C', 'C') => (uint)DirectoryObjectAccessRights.CreateChild,
+						// Mandatory label
+						('N', 'R') => (uint)MandatoryLabelPolicy.NoReadUp,
+						('N', 'W') => (uint)MandatoryLabelPolicy.NoWriteUp,
+						('N', 'X') => (uint)MandatoryLabelPolicy.NoExecuteUp,
+
+
+						_ => throw new FormatException($"Unknown ACE right '{c1}{c2}'.")
+					};
+
+					rights |= right;
+				}
+			}
+			if (ctx.LengthRemaining > 0 && ctx[0] is not (';' or ')'))
+				throw new FormatException("The ACE string is not valid.");
+
+			return rights;
 		}
 
 
@@ -300,7 +509,7 @@ namespace Titanis.Winterop.Security
 				case AccessControlEntryType.SystemAuditCallback:
 					return ParseCallbackAce(bytes, type, flags);
 
-				case AccessControlEntryType.AcecssAllowedCallbackObject:
+				case AccessControlEntryType.AccessAllowedCallbackObject:
 				case AccessControlEntryType.AccessDeniedCallbackObject:
 				case AccessControlEntryType.SystemAuditCallbackObject:
 					return ParseCallbackObjectAce(bytes, type, flags);
@@ -326,17 +535,28 @@ namespace Titanis.Winterop.Security
 			var accessMask = BinaryPrimitives.ReadUInt32LittleEndian(bytes);
 			var objFlags = (ObjectAceFlags)BinaryPrimitives.ReadUInt32LittleEndian(bytes.Slice(4));
 
-			Guid? objectType =
-				0 != (objFlags & ObjectAceFlags.HasObjectType) ? MemoryMarshal.Read<Guid>(bytes.Slice(8, 16))
-				: null;
-			Guid? inheritedType =
-				0 != (objFlags & ObjectAceFlags.HasInheritedType) ? MemoryMarshal.Read<Guid>(bytes.Slice(8 + 16, 16))
-				: null;
+			int off = 8;
+			Guid? objectType = ReadGuidIf(0 != (objFlags & ObjectAceFlags.HasObjectType), bytes, ref off);
+			Guid? inheritedType = ReadGuidIf(0 != (objFlags & ObjectAceFlags.HasInheritedType), bytes, ref off);
 
-			var sid = new SecurityIdentifier(bytes.Slice(8 + 16 + 16));
+			var sid = new SecurityIdentifier(bytes.Slice(off));
 			var ace = new ObjectAce(type, flags, accessMask, objectType, inheritedType, sid);
 			return ace;
 		}
+
+		private static Guid? ReadGuidIf(bool hasGuid, ReadOnlySpan<byte> bytes, ref int off)
+		{
+			Guid? inheritedType;
+			if (hasGuid)
+			{
+				inheritedType = MemoryMarshal.Read<Guid>(bytes.Slice(off, 16));
+				off += 16;
+			}
+			else
+				inheritedType = null;
+			return inheritedType;
+		}
+
 		private static AccessControlEntry ParseCallbackAce(ReadOnlySpan<byte> bytes, AccessControlEntryType type, AccessControlEntryFlags flags)
 		{
 			var accessMask = BinaryPrimitives.ReadUInt32LittleEndian(bytes);
@@ -379,6 +599,8 @@ namespace Titanis.Winterop.Security
 		}
 
 		internal abstract int BinaryLength { get; }
+		public abstract uint AccessMask { get; }
+
 		internal abstract int GetBytes(Span<byte> span);
 	}
 
@@ -398,7 +620,7 @@ namespace Titanis.Winterop.Security
 			this.Trustee = sid;
 		}
 
-		public uint AccessMask { get; }
+		public sealed override uint AccessMask { get; }
 
 		public SecurityIdentifier Trustee { get; }
 
@@ -455,6 +677,8 @@ namespace Titanis.Winterop.Security
 		}
 
 		public MandatoryLabelPolicy Policy { get; }
+		public override uint AccessMask => (uint)this.Policy;
+
 		public SecurityIdentifier Trustee { get; }
 
 		private static readonly Dictionary<uint, string> accessRightCodes = new Dictionary<uint, string>()
@@ -509,7 +733,7 @@ namespace Titanis.Winterop.Security
 			this.ApplicationData = applicationData;
 		}
 
-		public uint AccessMask { get; }
+		public sealed override uint AccessMask { get; }
 		public SecurityIdentifier Trustee { get; }
 		public byte[] ApplicationData { get; }
 
@@ -525,7 +749,7 @@ namespace Titanis.Winterop.Security
 				this.Trustee);
 		}
 
-		internal override int BinaryLength => 8 + this.Trustee.BinaryLength + this.ApplicationData.Length;
+		internal override int BinaryLength => 8 + this.Trustee.BinaryLength + SecurityDescriptor.Align4(this.ApplicationData.Length);
 		internal override int GetBytes(Span<byte> bytes)
 		{
 			var cb = this.BinaryLength;
@@ -562,7 +786,7 @@ namespace Titanis.Winterop.Security
 
 		public Guid? ObjectType { get; }
 		public Guid? InheritedObjectType { get; }
-		public uint AccessMask { get; }
+		public sealed override uint AccessMask { get; }
 		public SecurityIdentifier Trustee { get; }
 
 		public override void BuildSddl(StringBuilder sb)
@@ -629,7 +853,7 @@ namespace Titanis.Winterop.Security
 
 		public Guid? ObjectType { get; }
 		public Guid? InheritedObjectType { get; }
-		public uint AccessMask { get; }
+		public sealed override uint AccessMask { get; }
 		public SecurityIdentifier Trustee { get; }
 		public byte[] ApplicationData { get; }
 
@@ -694,7 +918,7 @@ namespace Titanis.Winterop.Security
 			this.AttributeData = attributeData;
 		}
 
-		public uint AccessMask { get; }
+		public sealed override uint AccessMask { get; }
 		public SecurityIdentifier Trustee { get; }
 		public byte[] AttributeData { get; }
 

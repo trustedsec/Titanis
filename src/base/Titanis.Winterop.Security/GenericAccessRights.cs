@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Titanis.Msrpc
+namespace Titanis.Winterop.Security
 {
+	// [MS-DTYP] § 
 	[Flags]
 	public enum GenericAccessRights : uint
 	{
