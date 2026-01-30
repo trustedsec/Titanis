@@ -44,7 +44,7 @@ namespace WeakServices
 			{
 				WellKnownSid.BuiltinAdministrators,
 				WellKnownSid.LocalSystem,
-				WellKnownSid.LocalAdministrator,
+				WellKnownSid.Administrator,
 			};
 			string[] uninterestingAccountNames = new string[]
 			{
