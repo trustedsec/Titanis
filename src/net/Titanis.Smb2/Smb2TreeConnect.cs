@@ -288,7 +288,7 @@ namespace Titanis.Smb2
 			const int MaxSymlinkDepth = 32;
 			int symlinkDepth = MaxSymlinkDepth;
 
-			if(createInfo.OplockLevel == Smb2OplockLevel.Lease)
+			if (createInfo.OplockLevel == Smb2OplockLevel.Lease)
 			{
 				if (!this.Session.Connection.SupportsDirectoryLeasing)
 					createInfo.OplockLevel = Smb2OplockLevel.Level2;
@@ -504,7 +504,7 @@ namespace Titanis.Smb2
 				var infos = resp.GetInfos();
 				return new DfsReferral(resp.Flags, resp.PathConsumed, infos);
 			}
-			catch (NtstatusException ex) when (ex.StatusCode == Ntstatus.STATUS_NOT_FOUND)
+			catch (NtstatusException ex) when (ex.StatusCode is Ntstatus.STATUS_NOT_FOUND or Ntstatus.STATUS_NO_SUCH_DEVICE)
 			{
 				return null;
 			}
