@@ -26,7 +26,7 @@ The domain name used for the salt must be the FQDN of the domain, not the shorte
 [Example("Generate keys for milchick in domain LUMON.IND", "{0} LUMON.INDmilchick Br3@kr00m!")]
 [Example("Generate AES keys for milchick in domain LUMON.IND", "{0} LUMON.INDmilchick Br3@kr00m! -EncTypes Aes128CtsHmacSha1_96, Aes256CtsHmacSha1_96")]
 [Example("Generate keys for computer ALLENTOWN$ in domain LUMON.IND", "{0} LUMON.INDhostallentown.lumon.ind password")]
-[OutputRecordType(typeof(SessionKey), DefaultFields = new string[] { nameof(SessionKey.EType), nameof(SessionKey.KeyBytes) })]
+[OutputRecordType(typeof(SessionKey), DefaultFields = new string[] { nameof(SessionKey.EType), nameof(SessionKey.KeyText) })]
 internal class S2kCommand : Command
 {
 	[Parameter(0)]
@@ -41,7 +41,7 @@ internal class S2kCommand : Command
 
 	[Parameter]
 	[Description("Encryption types to generate for")]
-	public EType[]? EncTypes { get; set; }
+	public EType[]? EncType { get; set; }
 
 	[Parameter]
 	[Description("Continue even if errors occur")]
@@ -50,7 +50,7 @@ internal class S2kCommand : Command
 	protected override Task<int> RunAsync(CancellationToken cancellationToken)
 	{
 		KerberosClient krb = new KerberosClient(null);
-		var etypes = this.EncTypes ?? krb.DefaultETypes;
+		var etypes = this.EncType ?? krb.DefaultETypes;
 
 		foreach (var etype in etypes)
 		{

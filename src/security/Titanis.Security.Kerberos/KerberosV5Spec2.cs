@@ -1617,8 +1617,9 @@ namespace KerberosV5Spec2
 		internal PrincipalName sname;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		internal HostAddress[]? caddr;
+		internal PA_DATA[]? padata;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public EncKDCRepPart(EncryptionKey key, LastReq_Element[] last_req, int nonce, Asn1BitString flags, GeneralizedTime authtime, GeneralizedTime endtime, GeneralString srealm, PrincipalName sname, GeneralizedTime? key_expiration = default, GeneralizedTime? starttime = default, GeneralizedTime? renew_till = default, HostAddress[]? caddr = default)
+		public EncKDCRepPart(EncryptionKey key, LastReq_Element[] last_req, int nonce, Asn1BitString flags, GeneralizedTime authtime, GeneralizedTime endtime, GeneralString srealm, PrincipalName sname, GeneralizedTime? key_expiration = default, GeneralizedTime? starttime = default, GeneralizedTime? renew_till = default, HostAddress[]? caddr = default, PA_DATA[]? padata = default)
 		{
 			this.key = key;
 			this.last_req = last_req;
@@ -1632,6 +1633,7 @@ namespace KerberosV5Spec2
 			this.srealm = srealm;
 			this.sname = sname;
 			this.caddr = caddr;
+			this.padata = padata;
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
@@ -1643,6 +1645,14 @@ namespace KerberosV5Spec2
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
+			if (this.padata is not null)
+				encoder.EncodeExplicitTlv<PA_DATA[]>(new Asn1Tag(0xA000000C), this.padata, (encoder, r) =>
+				{
+					encoder.EncodeListTlv(new Asn1Tag(0x20000010), this.padata, (encoder, r) =>
+					{
+						encoder.EncodeValueTlv(r);
+					});
+				});
 			if (this.caddr is not null)
 				encoder.EncodeExplicitTlv<HostAddress[]>(new Asn1Tag(0xA000000B), this.caddr, (encoder, r) =>
 				{
@@ -1757,6 +1767,7 @@ namespace KerberosV5Spec2
 			this.srealm = decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000009), (encoder) => decoder.DecodeStringTlv<GeneralString>());
 			this.sname = decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA000000A), (encoder) => PrincipalName.DecodeTlvFrom(decoder));
 			this.caddr = decoder.CheckTag(new Asn1Tag(0xA000000B)) ? decoder.DecodeTaggedValue<HostAddress[]>(new Asn1Tag(0xA000000B), (encoder) => decoder.DecodeListTlv<HostAddress>(new Asn1Tag(0x20000010), (encoder) => HostAddress.DecodeTlvFrom(decoder))) : default(HostAddress[]);
+			this.padata = decoder.CheckTag(new Asn1Tag(0xA000000C)) ? decoder.DecodeTaggedValue<PA_DATA[]>(new Asn1Tag(0xA000000C), (encoder) => decoder.DecodeListTlv<PA_DATA>(new Asn1Tag(0x20000010), (encoder) => PA_DATA.DecodeTlvFrom(decoder))) : default(PA_DATA[]);
 		}
 	}
 

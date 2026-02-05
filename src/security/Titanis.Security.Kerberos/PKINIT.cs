@@ -253,13 +253,17 @@ namespace KerberosV5_PK_INIT_SPEC
 		internal uint nonce;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		internal Byte[]? paChecksum;
+
+		internal byte[]? freshnessToken;
+
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public PKAuthenticator(uint cusec, GeneralizedTime ctime, uint nonce, Byte[]? paChecksum = default)
+		public PKAuthenticator(uint cusec, GeneralizedTime ctime, uint nonce, Byte[]? paChecksum = default, byte[]? freshnessToken=null)
 		{
 			this.cusec = cusec;
 			this.ctime = ctime;
 			this.nonce = nonce;
 			this.paChecksum = paChecksum;
+			this.freshnessToken = freshnessToken;
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
@@ -271,6 +275,11 @@ namespace KerberosV5_PK_INIT_SPEC
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
+			if (this.freshnessToken is not null)
+				encoder.EncodeExplicitTlv<Byte[]>(new Asn1Tag(0xA0000004), this.freshnessToken, (encoder, r) =>
+				{
+					encoder.EncodeOctetStringTlv(this.freshnessToken);
+				});
 			if (this.paChecksum is not null)
 				encoder.EncodeExplicitTlv<Byte[]>(new Asn1Tag(0xA0000003), this.paChecksum, (encoder, r) =>
 				{
@@ -336,6 +345,7 @@ namespace KerberosV5_PK_INIT_SPEC
 			this.ctime = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeDateTimeTlv());
 			this.nonce = decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeIntegerTlvAsUInt32());
 			this.paChecksum = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeOctetStringTlv()) : default(Byte[]);
+			this.freshnessToken = decoder.CheckTag(new Asn1Tag(0xA0000004)) ? decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeOctetStringTlv()) : default(Byte[]);
 		}
 	}
 
@@ -788,7 +798,7 @@ namespace KerberosV5_PK_INIT_SPEC
 		{
 			this.subjectPublicKey = decoder.DecodeTaggedValue<Asn1BitString>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeBitStringTlv());
 			this.nonce = decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsUInt32());
-			this.dhKeyExpiration = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
+			this.dhKeyExpiration = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime?);
 		}
 	}
 

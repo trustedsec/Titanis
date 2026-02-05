@@ -44,13 +44,13 @@ namespace Titanis.Cli
 			}
 			else
 			{
-				var propValue = this.GroupProperty.GetValue(command);
+				var propValue = this.GroupProperty.GetValue(owner);
 				if (propValue == null && create)
 				{
 					propValue = this.Constructor.Invoke(null);
 					if (propValue is IParameterGroup parmGroup)
 						parmGroup.Initialize(command, command.Services);
-					this.GroupProperty.SetValue(command, propValue);
+					this.GroupProperty.SetValue(owner, propValue);
 				}
 				return propValue;
 			}

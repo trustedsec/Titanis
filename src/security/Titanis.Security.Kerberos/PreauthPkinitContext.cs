@@ -30,8 +30,6 @@ namespace Titanis.Security.Kerberos
 			this._clientDhNonce = clientDhNonce;
 		}
 
-		private const int Freshness = 150;
-
 		private byte[] _clientDhNonce;
 
 		protected override KerberosPkinitCredential Credential { get; }
@@ -55,6 +53,11 @@ namespace Titanis.Security.Kerberos
 				case PadataType.PkASRep:
 					this.ProcessPkAsrep(padata.padata_value);
 					return true;
+
+				// [RFC 8070]
+				case PadataType.AsFreshness:
+					this.ProcessFreshnell(padata.padata_value);
+					break;
 
 					// [MS-PKCA] 
 					//case PadataType.PkASreqOld:
@@ -101,6 +104,12 @@ namespace Titanis.Security.Kerberos
 			this._serverNonce = serverNonce;
 		}
 
+		private byte[]? _freshnessToken;
+		private void ProcessFreshnell(byte[] token)
+		{
+			this._freshnessToken = token;
+		}
+
 		internal static void DeriveKey(ReadOnlySpan<byte> zz, ReadOnlySpan<byte> clientNonce, ReadOnlySpan<byte> serverNonce, Span<byte> seed)
 		{
 			var cbDigest = Sha1Context.StaticDigestSizeBytes;
@@ -139,6 +148,7 @@ namespace Titanis.Security.Kerberos
 		}
 
 		private PA_DATA? _pkinitResponse;
+
 		public PA_DATA DoPkinit(KDC_REQ_BODY kdcReqBody, X509Certificate2 cert)
 		{
 			Debug.Assert(kdcReqBody != null);
@@ -153,10 +163,11 @@ namespace Titanis.Security.Kerberos
 			// [RFC 4556] § 3.2.1 - Generation of Client Request
 
 			AuthPack authPack = new AuthPack(new PKAuthenticator(
-				kerbTime.usec,
-				kerbTime.dt,
-				(uint)nonce,
-				paChecksum
+					kerbTime.usec,
+					kerbTime.dt,
+					(uint)nonce,
+					paChecksum,
+					this._freshnessToken
 				),
 				new PKIX1Explicit88.SubjectPublicKeyInfo(
 					new PKIX1Explicit88.AlgorithmIdentifier(new Asn1Oid(DhPublicNumber), this._dhkey.EncodeDomainParameters()),
@@ -185,13 +196,14 @@ namespace Titanis.Security.Kerberos
 		{
 			if (this._pkinitType == 0)
 			{
-				padataList.Add(new PA_DATA(Freshness, Array.Empty<byte>()));
-				base.BuildPadataList(reqBody, padataList);
+				padataList.Add(new PA_DATA((int)PadataType.AsFreshness, Array.Empty<byte>()));
 			}
 			else if (this._pkinitType == PadataType.PkASReq)
 			{
 				var pkreq = (this._pkinitResponse ??= this.DoPkinit(reqBody, this.Credential.Certificate));
 				padataList.Add(pkreq);
+
+				padataList.Add(new PA_DATA((int)PadataType.AsFreshness, Array.Empty<byte>()));
 			}
 
 			base.BuildPadataList(reqBody, padataList);

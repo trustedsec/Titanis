@@ -30,6 +30,34 @@ namespace Titanis.Security.Kerberos
 		}
 
 		/// <summary>
+		/// Initializes a new <see cref="KerberosException"/>
+		/// </summary>
+		/// <param name="errorCode">Kerberos error that caused the current exception</param>
+		public KerberosException(KerberosErrorCode errorCode, Exception? innerException)
+			: base(BuildMessage(errorCode, innerException), innerException)
+		{
+			this.ErrorCode = errorCode;
+		}
+
+		private static string BuildMessage(KerberosErrorCode errorCode, Exception? innerException)
+		{
+			var message = KerberosErrorMessages.TryGetErrorMessage(errorCode);
+			if (innerException != null)
+				message += "  Details: " + innerException.Message;
+			return message;
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="KerberosException"/>
+		/// </summary>
+		/// <param name="errorCode">Kerberos error that caused the current exception</param>
+		public KerberosException(KerberosErrorCode errorCode, string details)
+			: base(KerberosErrorMessages.TryGetErrorMessage(errorCode) + "  Details: " + details)
+		{
+			this.ErrorCode = errorCode;
+		}
+
+		/// <summary>
 		/// Initializes a new <see cref="KerberosException"/> with serialized data.
 		/// </summary>
 		/// <param name="info">The <see cref="SerializationInfo"/> that holds the serialized object data</param>

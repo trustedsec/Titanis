@@ -102,11 +102,12 @@ namespace Titanis.Cli
 		[Description("Uses anonymous login")]
 		public SwitchParam Anonymous { get; set; }
 
+		private UserPrincipalName? _userName;
 		[Parameter]
 		[Alias("u")]
 		[Description("User name to authenticate with, not including the domain")]
 		[Category(ParameterCategories.Authentication)]
-		public UserPrincipalName? UserName { get; set; }
+		public UserPrincipalName? UserName { get => _userName; set => _userName = value; }
 
 		[Parameter]
 		[Alias("ud")]
@@ -162,20 +163,8 @@ namespace Titanis.Cli
 		[Category(ParameterCategories.AuthenticationNtlm)]
 		public Version? NtlmVersion { get; set; }
 
-		[Parameter]
-		[Description("Name of file containing user's certificate (for PKINIT)")]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		public string? UserCert { get; set; }
-
-		[Parameter]
-		[Description("Name of file containing user's key (for PKINIT)")]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		public string? UserKey { get; set; }
-
-		[Parameter]
-		[Description("Password to decrypt file containing user's key (for PKINIT)")]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		public string? UserKeyPassword { get; set; }
+		[ParameterGroup]
+		public UserCertificateParameterGroup? CertificateParameters { get; set; }
 
 		[Parameter]
 		[Description("KDC endpoint")]
@@ -226,9 +215,6 @@ namespace Titanis.Cli
 
 		private bool _validated;
 
-		private X509Certificate2? _userCert;
-		private X509Certificate2Collection? _userCertCollection;
-
 		/// <summary>
 		/// Validates authentication parameters.
 		/// </summary>
@@ -238,38 +224,7 @@ namespace Titanis.Cli
 		{
 			var log = this.Services?.GetService<ILog>();
 
-			// Try loading the certificate
-			// This will populate or validate UserName and UserDomain
-
-			if (!string.IsNullOrEmpty(this.UserCert))
-			{
-				AuthenticationParameters.LoadCertificateAndKey(
-					this.Owner.Context,
-					UserCert,
-					UserKey,
-					UserKeyPassword,
-					this.Owner.Context.Log,
-					context,
-					out this._userCert,
-					out this._userCertCollection,
-					out var upn
-					);
-
-				if (this.UserName == null)
-				{
-					if (upn is null)
-						context.LogError($"The certificate does not specify a user name.  Specify one with -{nameof(UserName)}.");
-					this.UserName = upn;
-				}
-				else
-				{
-					if (upn is not null)
-					{
-						if (!this.UserName.Equals(upn))
-							log?.WriteWarning($"The certificate specifies a user name '{upn}' that differs from the user name provided on the command line.  Using the user name from the command line.");
-					}
-				}
-			}
+			this._userCert = this.CertificateParameters?.Validate(context, log, ref this._userName);
 
 			if (string.IsNullOrEmpty(this.UserDomain) && this.UserName != null)
 			{
@@ -295,20 +250,16 @@ namespace Titanis.Cli
 						|| (this.NtlmHash != null)
 						|| (this.AesKey != null)
 						|| (this.DesKey != null)
-						|| (!string.IsNullOrEmpty(this.UserCert))
+						|| (this._userCert != null)
 						)
 				);
 			this.HasKerberosInfo = hasKerbCred;
 			if (!hasKerbCred && this.Kdc is not null)
 				log?.WriteWarning($"-Kdc option specified but not enough options specified for Kerberos; Kerberos will not be used.");
 
-			if (!string.IsNullOrEmpty(this.UserKey) && string.IsNullOrEmpty(this.UserCert))
-				context.LogError(new ParameterValidationError(nameof(UserKeyPassword), $"-{nameof(UserKey)} is only valid with -{nameof(UserCert)}"));
-			if (!string.IsNullOrEmpty(this.UserKeyPassword) && string.IsNullOrEmpty(this.UserCert))
-				context.LogError(new ParameterValidationError(nameof(UserKeyPassword), $"-{nameof(UserKeyPassword)} is only valid with -{nameof(UserCert)}"));
 
 			// For methods that require Kerberos, ensure  -Kdc is present
-			if (this.S4UserName is not null || this.S4UserCert is not null || !string.IsNullOrEmpty(this.UserKey))
+			if (this.S4UserName is not null || this.S4UserCert is not null || (this._userCert != null))
 			{
 				if (this.Kdc is null)
 				{
@@ -316,8 +267,8 @@ namespace Titanis.Cli
 						context.LogError(new ParameterValidationError(nameof(S4UserName), $"-{nameof(S4UserName)} requires -{nameof(Kdc)}"));
 					if (this.S4UserCert is not null)
 						context.LogError(new ParameterValidationError(nameof(S4UserCert), $"-{nameof(S4UserCert)} requires -{nameof(Kdc)}"));
-					if (!string.IsNullOrEmpty(this.UserKey))
-						context.LogError(new ParameterValidationError(nameof(UserKey), $"-{nameof(UserKey)} requires -{nameof(Kdc)}"));
+					if (this._userCert != null)
+						context.LogError(new ParameterValidationError(nameof(UserCertificateParameterGroup.UserCert), $"-{nameof(UserCertificateParameterGroup.UserCert)} requires -{nameof(Kdc)}"));
 				}
 
 				if (!string.IsNullOrEmpty(this.S4UserCert))
@@ -436,8 +387,8 @@ namespace Titanis.Cli
 			if ((this.UserName is null) && !this.Anonymous.IsSet)
 				return null;
 
-			// Don't use NTLM in S4U scenarios
-			if (this.S4UserName != null || this.S4UserCert != null || this.S4ProxyService != null || !string.IsNullOrEmpty(this.UserKey))
+			// Don't use NTLM in S4U or PKINIT scenarios
+			if (this.S4UserName != null || this.S4UserCert != null || this.S4ProxyService != null || (this._userCert != null))
 				return null;
 
 			var domain = this.UserDomain;
@@ -576,6 +527,7 @@ namespace Titanis.Cli
 
 		private KerberosClient? _kerberosClient;
 		private X509Certificate2 _s4UserCert;
+		private X509Certificate2? _userCert;
 
 		/// <summary>
 		/// Creates a <see cref="KerberosClientContextBase"/>.

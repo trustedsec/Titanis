@@ -22,8 +22,10 @@ namespace Titanis.Security.Kerberos
 		// [RFC 4556] § 3.1.3
 		PkASReq = 16,
 		PkASRep = 17,
-		
 
+
+		// [RFC 8070]
+		AsFreshness = 150,
 
 		// [MS-SFU] § 2.2.1
 		S4u2Self_PaForUser = 129,

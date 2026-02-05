@@ -48,10 +48,10 @@ namespace Titanis.Security.Kerberos
 		/// <summary>
 		/// Checks whether this credential supports a specified profile.
 		/// </summary>
-		/// <param name="profile">Encryption profile</param>
-		/// <returns><see langword="true"/> if this credential supports <paramref name="profile"/>; otherwise, <see langword="false"/>.</returns>
+		/// <param name="etype">Encryption type</param>
+		/// <returns><see langword="true"/> if this credential supports <paramref name="etype"/>; otherwise, <see langword="false"/>.</returns>
 		/// 
-		public abstract bool SupportsProfile(EncProfile profile);
+		public abstract bool SupportsProfile(EType etype);
 		/// <summary>
 		/// Derives a protocol key from the credential.
 		/// </summary>

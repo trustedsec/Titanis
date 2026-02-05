@@ -27,10 +27,7 @@ namespace Titanis.Security.Kerberos
 		internal sealed override bool SupportsPreauthType(PadataType preauthType)
 			=> preauthType is PadataType.PkASReq or PadataType.PkASrepOld;
 
-		public override bool SupportsProfile(EncProfile profile)
-		{
-			return true;
-		}
+		public override bool SupportsProfile(EType etype) => true;
 
 		internal override PreauthContext CreatePreauthContext(KerberosClient client, IKerberosCallback? callback)
 			=> new PreauthPkinitContext(client, this, callback);

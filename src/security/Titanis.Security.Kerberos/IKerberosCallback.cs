@@ -12,6 +12,7 @@ namespace Titanis.Security.Kerberos
 	{
 
 		void OnReceiveAsrepPadataList(IList<PA_DATA> padataList) { }
+		void OnReceivedAsrepEncPart(AsrepInfo asrep);
 		void OnRequestingTgt(string targetRealm, KerberosCredential credential, int nonce) { }
 		void OnEncryptingTS(SessionKey protocolKey, byte[]? salt) { }
 		void OnProcessETypes(IList<ETYPE_INFO_ENTRY> etypeInfos) { }

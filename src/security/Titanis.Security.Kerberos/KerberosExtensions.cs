@@ -1,6 +1,9 @@
 ﻿
+using ms_adtsclaims;
 using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
+using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
@@ -21,24 +24,32 @@ namespace KerberosV5Spec2
 		{
 			if (this.e_data != null)
 			{
-				// [MS-KILE] § 2.2.2
-				KERB_ERROR_DATA? errorInfo;
-				try
+				// Try to determine error data type
+				Asn1DerDecoder decoder = Asn1DerEncoding.CreateDerDecoder(this.e_data);
+				if (decoder.CheckTag(new Asn1Tag(0x20000010)))
 				{
-					Asn1DerDecoder.TryDecodeTlv<KERB_ERROR_DATA>(this.e_data, out errorInfo);
-				}
-				catch
-				{
-					// Ignore decoding error
-					errorInfo = null;
-				}
+					decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
 
-				if (errorInfo?.data_type == (int)ErrorDataType.Extended && errorInfo.data_value?.Length == 12)
-				{
-					Ntstatus ntstatus = (Ntstatus)BinaryPrimitives.ReadUInt32LittleEndian(errorInfo.data_value);
-					ntstatus.CheckAndThrow();
+					if (decoder.CheckTag(new Asn1Tag(0x20000010)))
+					{
+						var padataList = decoder.DecodeValue<Asn1SequenceOf<PA_DATA>>().Values;
+
+						throw new KerberosPadataException((KerberosErrorCode)this.error_code, padataList);
+					}
+					else if (decoder.CheckTag(new Asn1Tag(0xA0000001)))
+					{
+						// [MS-KILE] § 2.2.2
+						var errorData = decoder.DecodeValue<KERB_ERROR_DATA>();
+
+						if (errorData?.data_type == (int)ErrorDataType.Extended && errorData.data_value?.Length == 12)
+						{
+							Ntstatus ntstatus = (Ntstatus)BinaryPrimitives.ReadUInt32LittleEndian(errorData.data_value);
+							return new KerberosException((KerberosErrorCode)this.error_code, ntstatus.GetException());
+						}
+					}
 				}
 			}
+
 			// TODO: Provide e-text, although it's usually empty
 			return new KerberosException((KerberosErrorCode)this.error_code);
 		}

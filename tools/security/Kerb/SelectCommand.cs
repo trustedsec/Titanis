@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using KerberosV5Spec2;
+using System.ComponentModel;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
@@ -159,7 +160,8 @@ Specify the source files using -From.  You may specify multiple files and multip
 						{
 							foreach (var ticket in selected)
 							{
-								var authzData = krb.GetTicketAuthorizationData(ticket, keyBytes);
+								var ticketKey = krb.CreateSessionKeyFor(ticket.TicketEncryptionType, keyBytes);
+								var authzData = krb.GetTicketAuthorizationData(ticket, ticketKey, null);
 							}
 						}
 						allTickets.AddRange(selected);

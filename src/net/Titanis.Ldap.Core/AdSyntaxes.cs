@@ -952,6 +952,7 @@ namespace Titanis.Ldap
 
 		public override object Parse(string text)
 		{
+			// TODO: Parse domain-specific SIDs
 			return SecurityIdentifier.Parse(text);
 		}
 	}

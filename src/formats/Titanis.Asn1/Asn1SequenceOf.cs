@@ -62,12 +62,21 @@ namespace Titanis.Asn1
 
 		static bool IAsn1DerDecodableTlv<Asn1SequenceOf<T>>.TryDecodeTlvFrom(Asn1DerDecoder decoder, out Asn1SequenceOf<T>? value)
 		{
-			throw new NotImplementedException();
+			if (decoder.CheckTag(new Asn1Tag(Asn1PredefTag.Sequence, Asn1TagFlags.Constructed)))
+			{
+				value = new Asn1SequenceOf<T>(decoder.DecodeListTlv<T>(new Asn1Tag(Asn1PredefTag.Sequence, Asn1TagFlags.Constructed)));
+				return true;
+			}
+			else
+			{
+				value = default;
+				return false;
+			}
 		}
 
 		static Asn1SequenceOf<T> IAsn1DerDecodableValue<Asn1SequenceOf<T>>.DecodeValueFrom(Asn1DerDecoder decoder)
 		{
-			throw new NotImplementedException();
+			return new Asn1SequenceOf<T>(decoder.DecodeValueList<T>());
 		}
 	}
 }

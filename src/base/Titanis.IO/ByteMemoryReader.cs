@@ -88,7 +88,6 @@ namespace Titanis.IO
 			return this._ctx.Consume(count);
 		}
 
-
 		#region Nested
 		public bool SupportsNested => true;
 

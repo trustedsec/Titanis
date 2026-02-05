@@ -137,6 +137,17 @@ namespace Titanis.Security.Kerberos
 	{
 		internal PadataType authType;
 		internal CCacheData authData;
+
+		internal CCacheAuthData(PadataType type, CCacheData authData)
+		{
+			this.authType = type;
+			this.authData = authData;
+		}
+		internal CCacheAuthData(PadataType type, byte[] authData)
+		{
+			this.authType = type;
+			this.authData = new CCacheData(authData);
+		}
 	}
 
 	[PduStruct]
@@ -165,6 +176,11 @@ namespace Titanis.Security.Kerberos
 		internal int authDataCount;
 		[PduArraySize(nameof(authDataCount))]
 		internal CCacheAuthData[] authData;
+		partial void OnBeforeWritePdu(Titanis.IO.ByteWriter writer)
+		{
+			this.authDataCount = this.authData?.Length ?? 0;
+		}
+
 
 		internal CCacheData ticket;
 		internal CCacheData ticket2;

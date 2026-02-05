@@ -21,11 +21,12 @@ namespace Kerb;
 internal class InitialAuthParameterGroup : ParameterGroupBase
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+	private UserPrincipalName _userName;
 	[Parameter(KdcCommand.KdcPosition - 1)]
 	[Mandatory]
 	[Category(ParameterCategories.AuthenticationKerberos)]
 	[Description("Name of user (no domain)")]
-	public UserPrincipalName UserName { get; set; }
+	public UserPrincipalName UserName { get => _userName; set => _userName = value; }
 
 	[Parameter]
 	[Category(ParameterCategories.AuthenticationKerberos)]
@@ -33,13 +34,8 @@ internal class InitialAuthParameterGroup : ParameterGroupBase
 	public string? Realm { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-	[Parameter]
-	[Description("Name of file containing user's key")]
-	public string? UserKey { get; set; }
-
-	[Parameter]
-	[Description("Password to decrypt file containing user's key")]
-	public string? UserKeyPassword { get; set; }
+	[ParameterGroup]
+	public UserCertificateParameterGroup? CertificateParameters { get; set; }
 
 	internal string? EffectiveRealm => this.Realm ?? this.UserName.Realm;
 
@@ -63,6 +59,7 @@ internal class InitialAuthParameterGroup : ParameterGroupBase
 	[Description("DES key")]
 	public HexString? DesKey { get; set; }
 
+	private X509Certificate2? _userCert;
 
 	internal void Validate(ParameterValidationContext context)
 	{
@@ -70,12 +67,14 @@ internal class InitialAuthParameterGroup : ParameterGroupBase
 		if (string.IsNullOrEmpty(realm))
 			context.LogError(new ParameterValidationError(nameof(Realm), $"Realm must be specified either with -{nameof(Realm)} or as part of -{nameof(UserName)}"));
 
+		this._userCert = this.CertificateParameters?.Validate(context, this.Owner.Context.Log, ref this._userName);
+
 		int credCount = 0;
 		if (this.Password != null) credCount++;
 		if (this.NtlmHash != null) credCount++;
 		if (this.AesKey != null) credCount++;
 		if (this.DesKey != null) credCount++;
-		if (this.UserKey != null) credCount++;
+		if (this._userCert != null) credCount++;
 
 		if (credCount != 1)
 			context.LogError(new ParameterValidationError(null, "The command line must specify exactly one (1) credential."));
@@ -100,42 +99,9 @@ internal class InitialAuthParameterGroup : ParameterGroupBase
 	{
 		var realm = this.EffectiveRealm;
 
-		if (this.UserKey != null)
+		if (this._userCert != null)
 		{
-			var keyFileName = this.Owner.Context.ResolveFsPath(this.UserKey);
-			log?.WriteDiagnostic($"Loading user key from '{keyFileName}'");
-			var bytes = File.ReadAllBytes(keyFileName);
-
-			X509Certificate2Collection certs = new X509Certificate2Collection();
-			certs.Import(bytes, this.UserKeyPassword, X509KeyStorageFlags.EphemeralKeySet);
-
-			byte[]? subjectKeyId = null;
-			UserPrincipalName? upn = null;
-			var cert = certs.LastOrDefault();
-			foreach (var ext in cert.Extensions)
-			{
-				if (ext is X509SubjectKeyIdentifierExtension keyIdExt)
-					subjectKeyId = keyIdExt.SubjectKeyIdentifierBytes.ToArray();
-				else if (ext is X509SubjectAlternativeNameExtension altName)
-				{
-					var decoded = SubjectAltName.TryReadFrom(altName.RawData);
-					if (decoded != null)
-					{
-						upn = UserPrincipalName.Parse(decoded);
-						this.Realm = upn.Realm;
-						break;
-					}
-				}
-			}
-
-			if (upn == null)
-			{
-				upn = this.UserName;
-				if (upn is null)
-					throw new SyntaxException("The certificate did not contain a user name; you must specify one with -UserName.");
-			}
-
-			return new KerberosPkinitCredential(upn, upn.Realm ?? realm, cert);
+			return new KerberosPkinitCredential(this.UserName, this.UserName.Realm ?? realm, this._userCert);
 		}
 
 		var userName = this.UserName.UserName;

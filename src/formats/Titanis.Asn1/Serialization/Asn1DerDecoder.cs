@@ -348,14 +348,24 @@ namespace Titanis.Asn1.Serialization
 			where T : IAsn1DerDecodableTlv<T>
 		{
 			var frame = this.DecodeTlvStart(listTag);
+			var elems = DecodeValueList<T>();
+
+			this.CloseTlv(frame);
+
+			return elems;
+		}
+
+		public T[] DecodeValueList<T>() where T : IAsn1DerDecodableTlv<T>
+		{
+			if (this.IsEndOfDefTuple)
+				return Array.Empty<T>();
+
 			List<T> elems = new List<T>();
-			while (!this.IsEndOfTuple)
+			do
 			{
 				var elem = T.DecodeTlvFrom(this);
 				elems.Add(elem);
-			}
-
-			this.CloseTlv(frame);
+			} while (!this.IsEndOfTuple);
 
 			return elems.ToArray();
 		}

@@ -1,6 +1,6 @@
 ﻿using KerberosV5Spec2;
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using Titanis.Asn1;
@@ -37,6 +37,11 @@ namespace Titanis.Security.Kerberos
 
 		internal static PA_DATA PAData_PacOptions(PacOptions options)
 			=> PAData(PadataType.PacOptions, new PA_PAC_OPTIONS(new Asn1BitString((uint)options)));
+
+		internal static PA_DATA PAData_KerbKeyListReq(EType[] etypes)
+		{
+			return PAData(PadataType.KerbKeyListReq, new KerbKeyListRequest(etypes));
+		}
 
 		internal static PA_DATA PAData_TSEnc(byte[] encts)
 			=> PAData(PadataType.EncTimestamp, encts);

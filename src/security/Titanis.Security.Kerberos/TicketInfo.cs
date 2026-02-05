@@ -1,10 +1,13 @@
 ﻿using KerberosV5Spec2;
 using System;
+using System.Buffers.Binary;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
+using Titanis.Ldap;
 
 namespace Titanis.Security.Kerberos
 {
@@ -30,6 +33,9 @@ namespace Titanis.Security.Kerberos
 			var names = ticket.sname.name_string;
 			this.TargetSpn = ticket.sname.ToSecurityPrincipalName();
 		}
+		/// <remarks>
+		/// Called from <see cref="KerberosClient.LoadTicketsFromKirbiFile(byte[])"/>.
+		/// </remarks>
 		internal TicketInfo(
 			int seqnbr,
 			Ticket_Tagged1 ticket,
@@ -51,6 +57,9 @@ namespace Titanis.Security.Kerberos
 			this.TargetSpn = credInfo.sname.ToSecurityPrincipalName();
 			this.ServiceRealm = credInfo.srealm?.Value;
 		}
+		/// <remarks>
+		/// Called from <see cref="KerberosClient.ProcessASRep(KDC_REP, KerberosClient.TicketRequestContext, DateTime)"/> and <see cref="KerberosClient.ProcessTgsRep(KDC_REP, KerberosClient.TicketRequestContext)"/>.
+		/// </remarks>
 		internal TicketInfo(
 			int seqnbr,
 			Ticket_Tagged1 ticket,
@@ -70,8 +79,12 @@ namespace Titanis.Security.Kerberos
 
 			this.TargetSpn = encPart.sname.ToSecurityPrincipalName();
 			this.ServiceRealm = encPart.srealm.Value;
-		}
 
+			this.Padata = encPart.padata;
+		}
+		/// <remarks>
+		/// Called from <see cref="KerberosClient.LoadTicketsFromCcacheFile(byte[])"/>.
+		/// </remarks>
 		internal TicketInfo(int seqnbr, SessionKey key, CCacheCredential cred)
 		{
 			this.SeqNbr = seqnbr;
@@ -87,6 +100,8 @@ namespace Titanis.Security.Kerberos
 			this.StartTime = FromCcacheTime(cred.startTime);
 			this.EndTime = FromCcacheTime(cred.endTime);
 			this.RenewTill = FromCcacheTime(cred.renewTill);
+
+			this.Padata = cred.authData?.Select(r => new PA_DATA((int)r.authType, r.authData.bytes))?.ToArray();
 		}
 
 		public TicketInfo(int seqnbr, string? userName, string? userRealm, string? ticketRealm, SecurityPrincipalName spn, string? serviceRealm, KdcOptions kdcOptions, DateTime? endTime, DateTime? startTime, DateTime? renewTill, SessionKey sessionKey, byte[] encodedTicket)
@@ -144,7 +159,6 @@ namespace Titanis.Security.Kerberos
 
 		[DisplayName("Service realm")]
 		public string? ServiceRealm { get; }
-
 		[DisplayName("Options")]
 		public KdcOptions KdcOptions { get; }
 
@@ -155,6 +169,23 @@ namespace Titanis.Security.Kerberos
 		public DateTime? StartTime { get; }
 		[DisplayName("Renew till")]
 		public DateTime? RenewTill { get; }
+
+		[Browsable(false)]
+		public PA_DATA[]? Padata { get; }
+		internal PA_DATA? TryGetPadata(PadataType type)
+		{
+			return this.Padata?.FirstOrDefault(r => (PadataType)r.padata_type == type);
+		}
+
+		public SupportedEncryptionTypes? SupportedEncryptionTypes
+		{
+			get
+			{
+				ReadOnlySpan<byte> data = this.TryGetPadata(PadataType.SupportedEncTypes)?.padata_value;
+				return PreauthContext.ExtractSupportedEncTypes(data);
+			}
+		}
+
 
 		/// <summary>
 		/// Gets the session key.
@@ -225,13 +256,14 @@ namespace Titanis.Security.Kerberos
 			return encProfile.GenerateSubkey();
 		}
 
-		public void DecryptAuthorizationData(SessionKey authzKey)
+		public TicketAuthorizationData DecryptAuthorizationData(SessionKey authzKey, byte[]? asrepKey, KerberosClient krb)
 		{
 			ArgumentNullException.ThrowIfNull(authzKey);
 
 			var encTicketPart = Asn1DerDecoder.DecodeTlv<EncTicketPart>(authzKey.Decrypt(KeyUsage.Asrep_Tgsrep_Ticket, this.ticket.enc_part));
-			var authz = new TicketAuthorizationData(null, authzKey);
-			authz.Process(encTicketPart);
+			var authz = new TicketAuthorizationData();
+			authz.Process(encTicketPart, asrepKey, krb);
+			return authz;
 		}
 	}
 }

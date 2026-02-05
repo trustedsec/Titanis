@@ -70,7 +70,9 @@ namespace Titanis.Winterop
 				var key = errorCode.ToString();
 				message = resources.GetString(key);
 				if (message == null)
-					message = $"No message found for {typeof(TEnum).Name}.{errorCode} (code=0x{uval:X8})";
+					message = $"No message found for {typeof(TEnum).Name}.";
+
+				message = $"{key} (0x{uval:X8}): {message}";
 			}
 			else
 			{

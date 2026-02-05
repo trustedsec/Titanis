@@ -20,7 +20,7 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		internal sealed override bool SupportsPreauthType(PadataType preauthType) => false;
 		/// <inheritdoc/>
-		public sealed override bool SupportsProfile(EncProfile profile) => false;
+		public sealed override bool SupportsProfile(EType etype) => false;
 		/// <inheritdoc/>
 		public sealed override SessionKey DeriveProtocolKeyFor(EncProfile profile, byte[]? salt)
 		{

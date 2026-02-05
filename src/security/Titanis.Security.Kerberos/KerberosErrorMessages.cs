@@ -67,13 +67,14 @@ namespace Titanis.Security.Kerberos
 		public const string KRB_AP_ERR_NO_TGT_Message = @"No TGT available to validate USER-TO-USER";
 		public const string KDC_ERR_WRONG_REALM_Message = @"Cannot provide a ticket for the target realm";
 		public const string KRB_AP_ERR_USER_TO_USER_REQUIRED_Message = @"Ticket must be for USER-TO-USER";
-		public const string KDC_ERR_CANT_VERIFY_CERTIFICATE_Message = @"Reserved for PKINIT";
-		public const string KDC_ERR_INVALID_CERTIFICATE_Message = @"Reserved for PKINIT";
-		public const string KDC_ERR_REVOKED_CERTIFICATE_Message = @"Reserved for PKINIT";
-		public const string KDC_ERR_REVOCATION_STATUS_UNKNOWN_Message = @"Reserved for PKINIT";
-		public const string KDC_ERR_REVOCATION_STATUS_UNAVAILABLE_Message = @"Reserved for PKINIT";
-		public const string KDC_ERR_CLIENT_NAME_MISMATCH_Message = @"Reserved for PKINIT";
-		public const string KDC_ERR_KDC_NAME_MISMATCH_Message = @"Reserved for PKINIT";
+
+		public const string KDC_ERR_CANT_VERIFY_CERTIFICATE_Message = @"The KDC cannot verify the certificate.";
+		public const string KDC_ERR_INVALID_CERTIFICATE_Message = @"The certificate is invalid.";
+		public const string KDC_ERR_REVOKED_CERTIFICATE_Message = @"The certificate has been revoked.";
+		public const string KDC_ERR_REVOCATION_STATUS_UNKNOWN_Message = @"Revocation status is unknown.";
+		public const string KDC_ERR_REVOCATION_STATUS_UNAVAILABLE_Message = @"Revocation status is unavailable.";
+		public const string KDC_ERR_CLIENT_NAME_MISMATCH_Message = @"The client name in the request does not match the name bound to the certificate.";
+		public const string KDC_ERR_KDC_NAME_MISMATCH_Message = @"KDC_ERR_KDC_NAME_MISMATCH";
 
 		public static string GetErrorMessage(KerberosErrorCode errorCode)
 		{
@@ -85,7 +86,7 @@ namespace Titanis.Security.Kerberos
 		public static string TryGetErrorMessage(KerberosErrorCode errorCode)
 		{
 			_messageTable.TryGetValue(errorCode, out string message);
-			return message;
+			return $"{errorCode} ({(int)errorCode}): {message}";
 		}
 
 		private static readonly Dictionary<KerberosErrorCode, string> _messageTable = new Dictionary<KerberosErrorCode, string>()

@@ -74,6 +74,11 @@ namespace Titanis.Security.Kerberos
 			this._chainedCallback?.OnProcessETypes(etypeInfos);
 		}
 
+		void IKerberosCallback.OnReceivedAsrepEncPart(AsrepInfo asrep)
+		{
+			this.log.WriteVerbose($"ASREP key: etype={asrep.AsrepKey.EType} bytes={asrep.AsrepKey.KeyText}");
+		}
+
 		void IKerberosCallback.OnReceivedTgt(TicketInfo tgtInfo)
 		{
 			this.WriteMessage($"Received TGT for realm {tgtInfo.TicketRealm}: {tgtInfo.SessionKey.EType} session key {tgtInfo.SessionKey.KeyBytes.ToHexString()}");

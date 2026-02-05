@@ -190,8 +190,8 @@ namespace Titanis.Security.Kerberos
 			for (int i = 0; i < _encProfiles.Count; i++)
 			{
 				var prof = _encProfiles[i];
-				if (credential.SupportsProfile(prof))
-					etypes.Add((int)_encProfiles[i].EType);
+				if (credential.SupportsProfile(prof.EType))
+					etypes.Add((int)prof.EType);
 			}
 			return etypes.ToArray();
 		}
@@ -285,10 +285,7 @@ namespace Titanis.Security.Kerberos
 
 			PreauthContext paContext = credential.CreatePreauthContext(this, this._callback);
 			paContext._requestPac = true;
-			TicketRequestContext context = new TicketRequestContext(credential, null, false)
-			{
-				preauth = paContext
-			};
+			TicketRequestContext context = new TicketRequestContext(credential, paContext, null, false);
 
 			var asreq = this.CreateASReq(
 				context,
@@ -334,12 +331,6 @@ namespace Titanis.Security.Kerberos
 
 					throw new InvalidOperationException(Messages.Krb5_NoSupportedPreauths);
 				}
-				else if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_ETYPE_NOSUPP && !err.e_data.IsNullOrEmpty())
-				{
-					// TODO: Report the supported types
-					var supported = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<PA_DATA>>(err.e_data);
-					throw err.GetException();
-				}
 				else
 				{
 					throw err.GetException();
@@ -347,7 +338,7 @@ namespace Titanis.Security.Kerberos
 			}
 
 			if (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Asrep)
-				return ProcessASRep(rep.Asrep, paContext, context, Midpoint(sendTime, recvTime));
+				return ProcessASRep(rep.Asrep, context, Midpoint(sendTime, recvTime));
 			else
 				throw new SecurityException(Messages.Krb5_NoASRep);
 		}
@@ -360,18 +351,15 @@ namespace Titanis.Security.Kerberos
 			ArgumentException.ThrowIfNullOrEmpty(targetRealm);
 			ArgumentException.ThrowIfNullOrEmpty(userName);
 
-			PreauthContext paInfo = new PreauthKeyContext(this, null, this._callback)
+			PreauthContext preauth = new PreauthKeyContext(this, null, this._callback)
 			{
 				_requestPac = true
 			};
-			TicketRequestContext context = new TicketRequestContext(null, null, false)
-			{
-				preauth = paInfo
-			};
+			TicketRequestContext context = new TicketRequestContext(null, preauth, null, false);
 
 			var asreq = this.CreateASReq(
 				context,
-				paInfo,
+				preauth,
 				Structs.KdcReqBody(
 					GetDefaultTgtOptions(),
 					DefaultTgtOptions,
@@ -392,10 +380,10 @@ namespace Titanis.Security.Kerberos
 				if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_PREAUTH_REQUIRED)
 				{
 					var paList = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<PA_DATA>>(err.e_data).Values;
-					paInfo.TryProcessPadata(paList);
+					preauth.TryProcessPadata(paList);
 					return new KdcInfo(
 						new KerberosTime(err.stime, err.susec).AsDateTime(),
-						(IList<KdcEncryptionTypeInfo>?)paInfo.etypesFromKdc ?? Array.Empty<KdcEncryptionTypeInfo>()
+						(IList<KdcEncryptionTypeInfo>?)preauth.etypesFromKdc ?? Array.Empty<KdcEncryptionTypeInfo>()
 					);
 				}
 				else
@@ -440,14 +428,13 @@ namespace Titanis.Security.Kerberos
 			return encProfile.CreateSessionKey(keyBytes.ToArray());
 		}
 
-		public TicketAuthorizationData GetTicketAuthorizationData(TicketInfo ticket, byte[] keyBytes)
+		public TicketAuthorizationData GetTicketAuthorizationData(TicketInfo ticket, SessionKey sessionKey, byte[]? asrepKey)
 		{
-			var key = this.CreateSessionKeyFor(Structs.EncryptionKey(ticket.TicketEncryptionType, keyBytes));
-			var decrypted = key.Decrypt(KeyUsage.Asrep_Tgsrep_Ticket, ticket.ticket.enc_part);
+			var decrypted = sessionKey.Decrypt(KeyUsage.Asrep_Tgsrep_Ticket, ticket.ticket.enc_part);
 			var encPart = Asn1DerDecoder.DecodeTlv<EncTicketPart>(decrypted);
 
-			TicketAuthorizationData ad = new TicketAuthorizationData(this, key);
-			ad.Process(encPart);
+			TicketAuthorizationData ad = new TicketAuthorizationData();
+			ad.Process(encPart, asrepKey, this);
 			throw new NotImplementedException();
 		}
 
@@ -459,15 +446,18 @@ namespace Titanis.Security.Kerberos
 
 		internal TicketInfo ProcessASRep(
 			KDC_REP asrep,
-			PreauthContext paContext,
 			TicketRequestContext context,
 			DateTime midpoint)
 		{
-			paContext.TryProcessPadata(asrep.padata);
+			context.preauth.TryProcessPadata(asrep.padata);
 
-			var encPart = this.ExtractASRepEncPart(asrep, paContext);
+			var encPart = this.ExtractASRepEncPart(asrep, context.preauth);
 			if (encPart.nonce != context.nonce)
 				throw new SecurityException("The nonce in the AS-REP does not match the nonce sent in the AS-REQ.");
+
+			if (encPart.padata != null)
+				context.preauth.TryProcessPadata(encPart.padata);
+
 
 			// UNDONE: This situation can occur if the user supplies the NetBIOS name instead of the FQDN
 			// See #405
@@ -500,6 +490,7 @@ namespace Titanis.Security.Kerberos
 			var encPart = Asn1DerDecoder.DecodeTlv<EncASRepPart>(
 				protoKey.Decrypt(KeyUsage.AsrepEncPart, asrep.enc_part)
 				).Value;
+			this._callback?.OnReceivedAsrepEncPart(new AsrepInfo(encPart, protoKey));
 			return encPart;
 		}
 
@@ -609,6 +600,10 @@ namespace Titanis.Security.Kerberos
 			{
 				HashSet<string> referralNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 				referralNames.Add(realm);
+				// If the request is itself for a TGT, add the target domain
+				if (spn.NamePartCount == 2 && ServiceClassNames.Krbtgt.Equals(spn.GetNamePart(0), StringComparison.OrdinalIgnoreCase))
+					referralNames.Add(spn.GetNamePart(1));
+
 				while (referralNames.Add(ticket.ServiceInstance) && ticket.IsTgt)
 				{
 					this._callback?.OnReferralReceived(spn, ticket);
@@ -642,7 +637,8 @@ namespace Titanis.Security.Kerberos
 
 			bool usingSubkey = tgt.SessionKey.EType != EType.Rc4Hmac;
 			var sessionKey = usingSubkey ? tgt.GenerateSessionKey() : tgt.SessionKey;
-			TicketRequestContext context = new TicketRequestContext(null, sessionKey, usingSubkey);
+			KerberosNullCredential cred = new KerberosNullCredential(tgt.UserName, tgt.TicketRealm);
+			TicketRequestContext context = new TicketRequestContext(null, cred.CreatePreauthContext(this, this._callback), sessionKey, usingSubkey);
 
 			var tgsreq = this.CreateTgsReq(spn, tgt, realm, encTypes, ticketParameters, options, context);
 
@@ -663,10 +659,15 @@ namespace Titanis.Security.Kerberos
 			KDC_REP rep,
 			TicketRequestContext context)
 		{
+			context.preauth.TryProcessPadata(rep.padata);
+
 			Debug.Assert(context.sessionKey != null);
 			var encPart = this.ExtractTgsEncPart(rep, context.sessionKey, context.usingSubkey).Value;
 			if (encPart.nonce != context.nonce)
 				throw new SecurityException("The nonce in the TGS-REP does not match the nonce sent in the TGS-REQ.");
+
+			if (encPart.padata != null)
+				context.preauth.TryProcessPadata(encPart.padata);
 
 			TicketInfo ticketInfo = new TicketInfo(GetNextTicketSeqnbr(), rep.ticket, this.CreateSessionKeyFor(encPart.key), encPart, rep.cname.name_string[0].Value, rep.crealm.Value);
 
@@ -716,12 +717,14 @@ namespace Titanis.Security.Kerberos
 		{
 			internal TicketRequestContext(
 				KerberosCredential? credential,
+				PreauthContext preauth,
 				SessionKey? sessionKey,
 				bool usingSubkey
 				)
 			{
 				this.nonce = GenerateNonce();
 				this.credential = credential;
+				this.preauth = preauth;
 				this.sessionKey = sessionKey;
 				this.usingSubkey = usingSubkey;
 				this.now = KerberosTime.Now();
@@ -729,11 +732,11 @@ namespace Titanis.Security.Kerberos
 
 			internal readonly KerberosCredential? credential;
 			internal readonly SessionKey? sessionKey;
-			internal bool usingSubkey;
+			internal readonly bool usingSubkey;
 
 			internal int nonce;
-			internal PreauthContext preauth;
-			internal KerberosTime now;
+			internal readonly PreauthContext preauth;
+			internal readonly KerberosTime now;
 		}
 
 		public const KdcOptions DefaultTgtOptions = 0
@@ -924,6 +927,8 @@ namespace Titanis.Security.Kerberos
 						)).Span)
 				);
 			padatas.Add(Structs.PAData_APReq(apreq));
+
+			// padatas.Add(Structs.PAData_KerbKeyListReq([EType.Rc4Hmac]));
 
 
 
@@ -1363,7 +1368,7 @@ namespace Titanis.Security.Kerberos
 				addressCount = 0,
 				addresses = Array.Empty<CCacheAddress>(),
 				authDataCount = 0,
-				authData = Array.Empty<CCacheAuthData>(),
+				authData = ticket.Padata?.Select(r => new CCacheAuthData((PadataType)r.padata_type, r.padata_value))?.ToArray() ?? Array.Empty<CCacheAuthData>(),
 				ticket = new CCacheData(Asn1DerEncoder.EncodeTlv(new Ticket(ticket.ticket)).ToArray()),
 				ticket2 = new CCacheData(Array.Empty<byte>())
 			};
@@ -1454,14 +1459,14 @@ namespace Titanis.Security.Kerberos
 
 	internal class KerbTrace
 	{
-		private readonly KerberosClient kerb;
+		private readonly KerberosClient krb;
 		private readonly KerberosCredential credential;
 		private readonly IKerberosCallback? callback;
 		private KdcOptions tgsKdcOptions;
 
 		internal KerbTrace(KerberosClient kerb, KerberosCredential credential, IKerberosCallback? callback = null)
 		{
-			this.kerb = kerb;
+			this.krb = kerb;
 			this.credential = credential;
 			this.callback = callback;
 		}
@@ -1526,7 +1531,7 @@ namespace Titanis.Security.Kerberos
 		{
 			var asrep = Asn1DerDecoder.DecodeTlv<KDC_REP>(asrepBytes);
 			this.Asrep = asrep;
-			var tgt = this.kerb.ProcessASRep(asrep, null, new TicketRequestContext(credential, null, false)
+			var tgt = this.krb.ProcessASRep(asrep, new TicketRequestContext(credential, credential.CreatePreauthContext(this.krb, this.callback), null, false)
 			{ nonce = authNonce }, DateTime.Now);
 			this.Tgt = tgt;
 			this.TgtSessionKey = tgt.SessionKey;
@@ -1566,7 +1571,7 @@ namespace Titanis.Security.Kerberos
 		internal void TraceTgsrep(byte[] tgsrepBytes, SecurityPrincipalName spn, int tgsNonce, SessionKey tgtSessionKey)
 		{
 			var tgsrep = Asn1DerDecoder.DecodeTlv<KDC_REP>(tgsrepBytes);
-			var ticket = this.kerb.ProcessTgsRep(tgsrep, new TicketRequestContext(credential, tgtSessionKey, false)
+			var ticket = this.krb.ProcessTgsRep(tgsrep, new TicketRequestContext(credential, credential.CreatePreauthContext(this.krb, this.callback), tgtSessionKey, false)
 			{ nonce = TgsNonce });
 			this.Ticket = ticket;
 			this.TicketSessionKey = ticket.SessionKey;
@@ -1621,7 +1626,7 @@ namespace Titanis.Security.Kerberos
 		{
 			var aprep_ = Asn1DerDecoder.DecodeTlv<AP_REP>(aprepBytes);
 			var aprep_auth = Asn1DerDecoder.DecodeTlv<EncAPRepPart>(ticketSessionKey.Decrypt(KeyUsage.APRep_EncPart, aprep_.Value.enc_part));
-			var acceptorSubkey = this.kerb.CreateSessionKeyFor(aprep_auth.Value.subkey);
+			var acceptorSubkey = this.krb.CreateSessionKeyFor(aprep_auth.Value.subkey);
 			this.AcceptorSubkey = acceptorSubkey;
 			this.RecvSeqNbr = aprep_auth.Value.seq_number ?? 0;
 

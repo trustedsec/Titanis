@@ -1,5 +1,6 @@
 ﻿using KerberosV5Spec2;
 using System;
+using System.Buffers.Binary;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
+using Titanis.Ldap;
 
 [assembly: InternalsVisibleTo("Titanis.Security.Kerberos.Test")]
 
@@ -96,6 +98,10 @@ namespace Titanis.Security.Kerberos
 			return null;
 		}
 
+		public SupportedEncryptionTypes? SupportedEncryptionTypes { get; set; }
+		public PaSvrReferralInfo Referral { get; private set; }
+		public PacOptions PacOptions { get; private set; }
+
 		/// <summary>
 		/// Processes a <see cref="PA_DATA"/> from the AS.
 		/// </summary>
@@ -106,10 +112,11 @@ namespace Titanis.Security.Kerberos
 		/// </remarks>
 		protected virtual bool ProcessPadata(PA_DATA padata)
 		{
-			this.paTypes.Add((PadataType)padata.padata_type);
+			PadataType patype = (PadataType)padata.padata_type;
+			this.paTypes.Add(patype);
 
 			// TODO: Implement the rest of these types
-			switch ((PadataType)padata.padata_type)
+			switch (patype)
 			{
 				case PadataType.PasswordSalt:
 					this.ProcessPasswordSalt(padata.padata_value);
@@ -121,16 +128,24 @@ namespace Titanis.Security.Kerberos
 					this.ProcessETypeInfo2(padata.padata_value);
 					return true;
 
+				case PadataType.SupportedEncTypes:
+					this.ProcessSupportedEncTypes(padata.padata_value);
+					break;
+
+				case PadataType.SvrReferralInfo:
+					this.ProcessReferral(padata.padata_value);
+					break;
+
+				case PadataType.PacOptions:
+					this.ProcessPacOptions(padata.padata_value);
+					break;
 
 				case PadataType.TgsReq:
 				case PadataType.PacRequest:
-				case PadataType.SvrReferralInfo:
 				case PadataType.FxCookie:
 				case PadataType.FxFast:
 				case PadataType.FxError:
 				case PadataType.EncryptedChallenge:
-				case PadataType.SupportedEncTypes:
-				case PadataType.PacOptions:
 				case PadataType.KerbKeyListReq:
 				case PadataType.KerbKeyListRep:
 				default:
@@ -140,6 +155,31 @@ namespace Titanis.Security.Kerberos
 			return false;
 		}
 
+		private void ProcessPacOptions(byte[] padata_value)
+		{
+			this.PacOptions = (PacOptions)Asn1DerDecoder.DecodeTlv<PA_PAC_OPTIONS>(padata_value).flags.ToUInt32();
+		}
+
+		private void ProcessReferral(byte[] padata_value)
+		{
+			var referral = Asn1DerDecoder.DecodeTlv<PaSvrReferralInfo>(padata_value);
+			this.Referral = referral;
+		}
+
+		internal static SupportedEncryptionTypes? ExtractSupportedEncTypes(ReadOnlySpan<byte> data)
+		{
+			if (data.Length == 4)
+			{
+				var etypes = (SupportedEncryptionTypes)BinaryPrimitives.ReadInt32LittleEndian(data);
+				return etypes;
+			}
+			return default;
+
+		}
+		private void ProcessSupportedEncTypes(byte[] padata_value)
+		{
+			this.SupportedEncryptionTypes = ExtractSupportedEncTypes(padata_value);
+		}
 
 		private List<PadataType> paTypes = new List<PadataType>();
 		public bool SupportsPAType(PadataType patype)
