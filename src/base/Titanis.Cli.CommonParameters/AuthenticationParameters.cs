@@ -180,6 +180,11 @@ namespace Titanis.Cli
 		public UserPrincipalName? S4UserName { get; set; }
 
 		[Parameter]
+		[Description("User name to request TGT for U2U")]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		public SecurityPrincipalName? U2UserName { get; set; }
+
+		[Parameter]
 		[Description("Name of file containing a certificate of a user to impersonate with S4U")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		public string? S4UserCert { get; set; }
@@ -564,7 +569,7 @@ namespace Titanis.Cli
 				{
 					// TODO: ResolveFsPath
 
-					var cacheFileName = this.TicketCache;
+					var cacheFileName = this.Owner.Context.ResolveFsPath(this.TicketCache);
 					log?.WriteDiagnostic($"Loading ticket cache from {cacheFileName}.");
 					// TODO: This doesn't match the search below, which checks user name.  Document the semantics of the ticket cache
 					var ticketCache = new TicketCacheFile(cacheFileName, krb);
@@ -589,8 +594,9 @@ namespace Titanis.Cli
 			// Check for a matching ticket matching the target SPN and user name (if specified)
 			if ((serviceTicket is null) && this.Tickets != null)
 			{
-				foreach (var ticketFileName in this.Tickets)
+				foreach (var ticketFileName_ in this.Tickets)
 				{
+					string ticketFileName = this.Owner.Context.ResolveFsPath(ticketFileName_);
 					// TODO: Resolve file name
 					log?.WriteVerbose($"Loading tickets from {ticketFileName}");
 					var fileCache = new TicketCacheFile(ticketFileName, krb);
@@ -641,8 +647,8 @@ namespace Titanis.Cli
 
 				if (serviceTicket is not null)
 				{
-					effectiveUserName ??= serviceTicket.UserName;
-					effectiveUserName ??= serviceTicket.UserRealm;
+					effectiveUserName ??= serviceTicket.ClientName;
+					effectiveUserName ??= serviceTicket.ClientRealm;
 				}
 			}
 
@@ -656,18 +662,19 @@ namespace Titanis.Cli
 			if (krb.TicketCache.HomeTgt is not null)
 			{
 				tgt = krb.TicketCache.HomeTgt;
-				authUser ??= krb.TicketCache.HomeTgt.UserName;
-				authRealm ??= krb.TicketCache.HomeTgt.UserRealm;
+				authUser ??= krb.TicketCache.HomeTgt.ClientName;
+				authRealm ??= krb.TicketCache.HomeTgt.ClientRealm;
 			}
 			// Check the -Tgt file
 			if ((serviceTicket is null) && (tgt is null) && !string.IsNullOrEmpty(tgtFileName))
 			{
+				tgtFileName = this.Owner.Context.ResolveFsPath(tgtFileName);
 				log?.WriteVerbose($"Loading ticket(s) from {tgtFileName}");
 				var tgtCache = new TicketCacheFile(tgtFileName, krb);
 				var tickets = tgtCache.GetAllTickets();
 				foreach (var ticket in tickets)
 				{
-					log?.WriteVerbose($"Importing ticket for user {ticket.UserName}@{ticket.UserRealm} for {ticket.TargetSpn}");
+					log?.WriteVerbose($"Importing ticket for user {ticket.ClientName}@{ticket.ClientRealm} for {ticket.TargetSpn}");
 
 					if (ticket.IsTgt)
 					{
@@ -678,16 +685,16 @@ namespace Titanis.Cli
 						}
 
 						if (
-							(authUser == null || string.Equals(authUser, ticket.UserName, StringComparison.OrdinalIgnoreCase))
-							&& (authRealm == null || string.Equals(authRealm, ticket.UserRealm, StringComparison.OrdinalIgnoreCase))
+							(authUser == null || string.Equals(authUser, ticket.ClientName, StringComparison.OrdinalIgnoreCase))
+							&& (authRealm == null || string.Equals(authRealm, ticket.ClientRealm, StringComparison.OrdinalIgnoreCase))
 							)
 						{
 							if (authUser == null || authRealm == null)
 							{
 								// Adopt user info from ticket
-								log?.WriteVerbose($"Using client name from TGT: {ticket.UserName}@{ticket.UserRealm}");
-								authUser ??= ticket.UserName;
-								authRealm ??= ticket.UserRealm;
+								log?.WriteVerbose($"Using client name from TGT: {ticket.ClientName}@{ticket.ClientRealm}");
+								authUser ??= ticket.ClientName;
+								authRealm ??= ticket.ClientRealm;
 							}
 							tgt = ticket;
 							krb.ImportTicket(ticket);
@@ -736,7 +743,7 @@ namespace Titanis.Cli
 
 			// A credential now exists iff the context has enough information to create a context
 
-			if (serviceTicket is null)
+			if (serviceTicket is null && this.U2UserName is null)
 			{
 				// Get a ticket
 				if (cred != null && (this.Kdc is not null))
@@ -772,14 +779,22 @@ namespace Titanis.Cli
 				}
 			}
 
+			KerberosClientCred? clientCred;
 			if (serviceTicket is not null)
+				clientCred = serviceTicket;
+			else if (this.U2UserName is not null)
+				clientCred = this.U2UserName;
+			else
+				clientCred = null;
+
+			if (clientCred is not null)
 			{
 				var logger = this.Services.GetService<IKerberosCallback>();
 				var krbContext = new MskileClientContext(
 					cred,
 					this._kerberosClient,
 					targetSpn,
-					serviceTicket,
+					clientCred,
 					callback: logger
 					)
 				{
@@ -793,7 +808,7 @@ namespace Titanis.Cli
 					cred,
 					this._kerberosClient,
 					targetSpn,
-					serviceTicket,
+					clientCred,
 					callback: logger
 					)
 				{
@@ -818,23 +833,23 @@ namespace Titanis.Cli
 			if (matchesSpn)
 			{
 				if (
-					(userName == null || string.Equals(userName, ticket.UserName, StringComparison.OrdinalIgnoreCase))
-					&& (userRealm == null || string.Equals(userRealm, ticket.UserRealm, StringComparison.OrdinalIgnoreCase))
+					(userName == null || string.Equals(userName, ticket.ClientName, StringComparison.OrdinalIgnoreCase))
+					&& (userRealm == null || string.Equals(userRealm, ticket.ClientRealm, StringComparison.OrdinalIgnoreCase))
 					)
 				{
 					if (userName == null || userRealm == null)
 					{
 						// Adopt user info from ticket
-						log?.WriteVerbose($"Using UPN from ticket: {ticket.UserName}@{ticket.UserRealm}");
-						userName ??= ticket.UserName;
-						userRealm ??= ticket.UserRealm;
+						log?.WriteVerbose($"Using UPN from ticket: {ticket.ClientName}@{ticket.ClientRealm}");
+						userName ??= ticket.ClientName;
+						userRealm ??= ticket.ClientRealm;
 					}
-					log?.WriteDiagnostic($"Selected ticket with UPN '{ticket.UserName}@{ticket.UserRealm}' and SPN '{ticket.TargetSpn}'.");
+					log?.WriteDiagnostic($"Selected ticket with UPN '{ticket.ClientName}@{ticket.ClientRealm}' and SPN '{ticket.TargetSpn}'.");
 					return true;
 				}
 				else
 				{
-					log?.WriteDiagnostic($"Skipping ticket because UPN '{ticket.UserName}@{ticket.UserRealm}' doesn't match application-specified UPN of '{userName}@{userRealm}'.");
+					log?.WriteDiagnostic($"Skipping ticket because UPN '{ticket.ClientName}@{ticket.ClientRealm}' doesn't match application-specified UPN of '{userName}@{userRealm}'.");
 				}
 			}
 			else
