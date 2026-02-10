@@ -12,6 +12,7 @@ namespace Titanis.Cli
 		public const string Callback = "Callback";
 		public const string AuthenticationNtlm = "Authentication (NTLM)";
 		public const string AuthenticationKerberos = "Authentication (Kerberos)";
+		public const string TicketAuthorizationData = "Ticket Authorization Data (Kerberos)";
 		public const string ClientBehavior = "Client Behavior";
 		public const string Installation = "Installation";
 		public const string Removal = "Removal";
