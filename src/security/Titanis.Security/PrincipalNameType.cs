@@ -5,7 +5,7 @@
 namespace Titanis.Security
 {
 	// [RFC 4120] 6.2 § Principal Names
-	public enum PrincipalNameType : int	// Underlying type used by CCache serializer
+	public enum PrincipalNameType : int // Underlying type used by CCache serializer
 	{
 		Unknown = 0,
 		Principal = 1,
@@ -16,5 +16,6 @@ namespace Titanis.Security
 		X500Principal = 6,
 		SmtpName = 7,
 		Enterprise = 10,
+		MsPrincipal = -128
 	}
 }
