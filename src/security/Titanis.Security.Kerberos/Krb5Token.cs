@@ -15,6 +15,9 @@ namespace Titanis.Security.Kerberos.Asn1
 		public GssapiTokenId tokenId;
 		public AP_REQ apreq;
 		public AP_REP aprep;
+		public TGT_REQ tgtreq;
+		public TGT_REP tgtrep;
+
 		public KRB_ERROR_Tagged30 error;
 
 		static Krb5Token IAsn1DerDecodableTlv<Krb5Token>.DecodeTlvFrom(Asn1DerDecoder decoder)
@@ -34,6 +37,12 @@ namespace Titanis.Security.Kerberos.Asn1
 					break;
 				case GssapiTokenId.APRep:
 					token.aprep = decoder.DecodeTlv<AP_REP>();
+					break;
+				case GssapiTokenId.TgtReq:
+					token.tgtreq = decoder.DecodeTlv<TGT_REQ>();
+					break;
+				case GssapiTokenId.TgtRep:
+					token.tgtrep = decoder.DecodeTlv<TGT_REP>();
 					break;
 				case GssapiTokenId.Error:
 					token.error = decoder.DecodeTlv<KRB_ERROR>().Value;
@@ -82,6 +91,10 @@ namespace Titanis.Security.Kerberos.Asn1
 				case GssapiTokenId.APRep:
 					encoder.EncodeValueTlv(this.aprep);
 					break;
+				case GssapiTokenId.TgtReq:
+					encoder.EncodeValueTlv(this.tgtreq);
+					break;
+					// TODO: Encode TGT_REP
 				case GssapiTokenId.Error:
 					encoder.EncodeValueTlv(this.error);
 					break;

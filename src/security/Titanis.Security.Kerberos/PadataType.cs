@@ -35,8 +35,10 @@ namespace Titanis.Security.Kerberos
 		// [RFC 6806] Appendix A
 		SvrReferralInfo = 20,
 
-		// [RFC 6113]
+		// [RFC 6113] § 6.4
 		FxCookie = 133,
+		AuthenticationSet = 134,
+		AuthSetSelected = 135,
 		FxFast = 136,
 		FxError = 137,
 		EncryptedChallenge = 138,

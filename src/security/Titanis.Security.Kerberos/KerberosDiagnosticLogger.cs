@@ -90,21 +90,21 @@ namespace Titanis.Security.Kerberos
 		{
 			// Since this is a TGT, the TicketRealm indicates the issuing realm,
 			// but ServiceInstance indicates the target realm
-			this.WriteMessage($"Requesting ticket for {spn} within {tgt.ServiceInstance} for user {tgt.UserName}@{tgt.UserRealm} (KDC options = {kdcOptions})");
+			this.WriteMessage($"Requesting ticket for {spn} within {tgt.ServiceInstance} for user {tgt.ClientName}@{tgt.ClientRealm} (KDC options = {kdcOptions})");
 
 			this._chainedCallback?.OnRequestingTicket(spn, tgt, kdcOptions);
 		}
 
 		void IKerberosCallback.OnReceivedTicket(TicketInfo ticketInfo)
 		{
-			this.WriteMessage($"Received ticket for {ticketInfo.TargetSpn} within {ticketInfo.TicketRealm} for user {ticketInfo.UserName}@{ticketInfo.UserRealm}: {ticketInfo.SessionKey.EType} session key {ticketInfo.SessionKey.KeyBytes.ToHexString()} with options {ticketInfo.KdcOptions}");
+			this.WriteMessage($"Received ticket for {ticketInfo.TargetSpn} within {ticketInfo.TicketRealm} for user {ticketInfo.ClientName}@{ticketInfo.ClientRealm}: {ticketInfo.SessionKey.EType} session key {ticketInfo.SessionKey.KeyBytes.ToHexString()} with options {ticketInfo.KdcOptions}");
 
 			this._chainedCallback?.OnReceivedTicket(ticketInfo);
 		}
 
 		void IKerberosCallback.OnSendingApreq(KerberosClientContextBase? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, int sendSeqNbr)
 		{
-			this.WriteMessage($"Sending AP-REQ to {targetSpn} for user {ticket.UserName}@{ticket.UserRealm} with session key {sessionKey.EType} {sessionKey.KeyBytes.ToHexString()} (sendSeqNbr={sendSeqNbr})(gssFlags={caps})");
+			this.WriteMessage($"Sending AP-REQ to {targetSpn} for user {ticket.ClientName}@{ticket.ClientRealm} with session key {sessionKey.EType} {sessionKey.KeyBytes.ToHexString()} (sendSeqNbr={sendSeqNbr})(gssFlags={caps})");
 
 			this._chainedCallback?.OnSendingApreq(authContext, targetSpn, ticket, credential, caps, sessionKey, sendSeqNbr);
 		}

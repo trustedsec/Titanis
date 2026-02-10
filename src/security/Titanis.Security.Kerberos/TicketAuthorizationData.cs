@@ -14,9 +14,19 @@ using KerberosV5Spec2;
 using Titanis.Winterop.Security;
 using Microsoft.Win32.SafeHandles;
 using System.Buffers.Binary;
+using System.Linq;
+using Titanis.Ldap;
 
 namespace Titanis.Security.Kerberos
 {
+	// [MS-PAC] § 2.14 PAC_ATTRIBUTES_INFO
+	public enum PacAttributeFlags
+	{
+		None = 0,
+		WasRequested = 1,
+		WasGivenImplicitly = 2,
+	}
+
 	public class TicketAuthorizationData
 	{
 
@@ -30,42 +40,42 @@ namespace Titanis.Security.Kerberos
 		{
 		}
 
-		internal void Process(EncTicketPart encPart, byte[]? asrepKey, KerberosClient krb)
+		internal void Process(EncTicketPart encPart, SessionKey? asrepKey)
 		{
 			var authData = encPart?.Value?.authorization_data;
 			if (authData == null)
 				return;
 
-			Process(authData, false, asrepKey, krb);
+			Process(authData, false, asrepKey);
 		}
 
-		private void Process(IList<AuthorizationData_Element> authData, bool optional, byte[]? asrepKey, KerberosClient krb)
+		private void Process(IList<AuthorizationData_Element> authData, bool optional, SessionKey? asrepKey)
 		{
 			foreach (var adRec in authData)
 			{
-				this.Process(adRec, false, asrepKey, krb);
+				this.Process(adRec, false, asrepKey);
 			}
 		}
 
-		internal void Process(AuthorizationData_Element adRec, bool optional, byte[]? asrepKey, KerberosClient krb)
+		internal void Process(AuthorizationData_Element adRec, bool optional, SessionKey? asrepKey)
 		{
 			switch ((AdType)adRec.ad_type)
 			{
 				case AdType.IfRelevant:
 					{
 						var inner = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<AuthorizationData_Element>>(adRec.ad_data);
-						this.Process(inner.Values, true, asrepKey, krb);
+						this.Process(inner.Values, true, asrepKey);
 					}
 					break;
 				case AdType.Pac:
-					this.ProcessPac(adRec.ad_data, asrepKey, krb);
+					this.ProcessPac(adRec.ad_data, asrepKey);
 					break;
 				default:
 					break;
 			}
 		}
 
-		private void ProcessPac(byte[] authData, byte[]? asrepKey, KerberosClient krb)
+		private void ProcessPac(byte[] authData, SessionKey? asrepKey)
 		{
 			var decoder = RpcEncoding.MsrpcNdr.CreateDecoder(new ByteMemoryReader(authData), new RpcCallContext(null));
 			// PAC_TYPE
@@ -111,13 +121,22 @@ namespace Titanis.Security.Kerberos
 									ProcessUpn(bufferDecoder);
 									break;
 								case PacBufferType.PacAttributes:
+									if (bufferInfo.cbBufferSize == 8)
+									{
+										var cbFlags = bufferDecoder.ReadInt32();
+										this.PacAttributeFlags = (PacAttributeFlags)bufferDecoder.ReadInt32();
+									}
 									break;
 								case PacBufferType.PacRequestorSid:
+									this.RequestorSid = new SecurityIdentifier(buffer.Span);
 									break;
 								case PacBufferType.CredentialInfo:
 									// [MS-PAC] Š 2.6 PAC Credentials
 									if (asrepKey != null)
-										ProcessCredentialInfo(bufferDecoder, asrepKey, krb);
+										ProcessCredentialInfo(bufferDecoder, asrepKey);
+									break;
+								case PacBufferType.ConstrainedDelegationInfo:
+									ProcessConstrainedDelegationInfo(bufferDecoder);
 									break;
 								default:
 									break;
@@ -126,6 +145,26 @@ namespace Titanis.Security.Kerberos
 						break;
 				}
 			}
+		}
+
+		private void ProcessConstrainedDelegationInfo(RpcDecoder bufferDecoder)
+		{
+			var delgInfo = bufferDecoder.DeserializeType1(static d =>
+			{
+				var refid = d.ReadReferentId();
+				if (refid != 0)
+				{
+					var delgInfo = new S4U_DELEGATION_INFO();
+					delgInfo.Decode(d);
+					delgInfo.DecodeDeferrals(d);
+					return delgInfo;
+				}
+
+				return default;
+			});
+
+			this.S4uProxyTarget = delgInfo.S4U2proxyTarget.AsString();
+			this.S4uTransitedList = delgInfo.S4UTransitedServices?.ToList(r => r.AsString());
 		}
 
 		// [MS-PAC] § 2.10 - UPN_DNS_INFO
@@ -180,16 +219,14 @@ namespace Titanis.Security.Kerberos
 		}
 
 		// [MS-PAC] Š 2.6 PAC Credentials
-		private void ProcessCredentialInfo(RpcDecoder bufferDecoder, byte[] asrepKey, KerberosClient krb)
+		private void ProcessCredentialInfo(RpcDecoder bufferDecoder, SessionKey? asrepKey)
 		{
 			PAC_CREDENTIAL_INFO credInfo = new PAC_CREDENTIAL_INFO();
 			credInfo.Decode(bufferDecoder);
 
 			var etype = (EType)credInfo.EncryptionType;
-			var encProf = krb.GetEncProfile(etype);
-			var key = encProf.CreateSessionKey(asrepKey);
 			var encCredData = bufferDecoder.GetStubData().Remaining.ToArray();
-			var credDataBytes = key.Decrypt(KeyUsage.NonKerbSalt, encCredData);
+			var credDataBytes = asrepKey.Decrypt(KeyUsage.NonKerbSalt, encCredData);
 
 			bufferDecoder = RpcEncoding.MsrpcNdr.CreateDecoder(new ByteMemoryReader(credDataBytes), new RpcCallContext(null));
 			var credData = bufferDecoder.DeserializeType1(d =>
@@ -247,19 +284,26 @@ namespace Titanis.Security.Kerberos
 
 		public LogonInfo? LogonInfo { get; private set; }
 		public string ClientName { get; private set; }
+		public string? S4uProxyTarget { get; private set; }
+		public List<string?>? S4uTransitedList { get; private set; }
+		public PacAttributeFlags PacAttributeFlags { get; private set; }
+		public SecurityIdentifier? RequestorSid { get; private set; }
 
 		// [MS-PAC] Š 2.5 KERB_VALIDATION_INFO
 		private void ProcessLogonInfo(RpcDecoder decoder)
 		{
-			decoder.GetStubData().Consume(16);
-			var ptr = decoder.ReadReferentId();
-			if (ptr != 0)
+			this.LogonInfo = decoder.DeserializeType1(static d =>
 			{
-				var logonInfo = new LogonInfo();
-				logonInfo.info.Decode(decoder);
-				logonInfo.info.DecodeDeferrals(decoder);
-				this.LogonInfo = logonInfo;
-			}
+				var ptr = d.ReadReferentId();
+				if (ptr != 0)
+				{
+					var logonInfo = new LogonInfo();
+					logonInfo.info.Decode(d);
+					logonInfo.info.DecodeDeferrals(d);
+					return logonInfo;
+				}
+				return default;
+			});
 		}
 
 		public IReadOnlyList<SidWithAttributes> GetSecurityGroups()
@@ -432,7 +476,10 @@ namespace Titanis.Security.Kerberos
 		public SidAttributes Attributes { get; }
 
 		public override string ToString()
-			=> $"{this.Sid} : {this.Attributes}";
+		{
+			var wks = this.Sid.AsWellKnownSid();
+			return ($"{this.Sid} {((wks != WellKnownSid.Unknown) ? $"({wks}) " : null)}: {this.Attributes}");
+		}
 	}
 
 	public class RidWithAttributes

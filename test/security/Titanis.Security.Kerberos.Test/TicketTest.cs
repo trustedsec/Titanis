@@ -15,7 +15,7 @@ public class TicketTest
 	public void TestKirbi()
 	{
 		KerberosClient client = new KerberosClient(null);
-		var tickets = client.LoadTicketsFromFile(TgtBytes, out var format);
+		var tickets = client.LoadTicketsFromFile(TgtBytes, null, out var format);
 
 		var actual = client.ExportTickets(tickets, KerberosFileFormat.Kirbi);
 
@@ -30,7 +30,7 @@ public class TicketTest
 		var bytes = CcacheBytes;
 
 		KerberosClient client = new KerberosClient(null);
-		var tickets = client.LoadTicketsFromFile(bytes, out var format);
+		var tickets = client.LoadTicketsFromFile(bytes, null, out var format);
 
 		var actual = client.ExportTickets(tickets, KerberosFileFormat.Ccache);
 

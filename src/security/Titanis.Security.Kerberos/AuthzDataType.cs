@@ -10,5 +10,10 @@ namespace Titanis.Security.Kerberos
 		KdcIssued = 4,
 		AndOr = 5,
 		MandatoryForKdc = 8,
+
+		// [RFC 6113] § 6.3
+		AuthenticationStrength = 70,
+		FxFastArmor = 71,
+		FxFastUsed = 72,
 	}
 }

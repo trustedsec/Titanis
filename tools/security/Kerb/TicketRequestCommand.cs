@@ -4,8 +4,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis;
 using Titanis.Cli;
 using Titanis.Security.Kerberos;
+using Titanis.Winterop.Security;
 
 namespace Kerb;
 /// <summary>
@@ -13,7 +15,7 @@ namespace Kerb;
 /// </summary>
 [OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = OutputStyle.Table, DefaultFields = new string[]
 {
-		nameof(TicketInfo.SeqNbr), nameof(TicketInfo.UserName), nameof(TicketInfo.UserRealm), nameof(TicketInfo.TargetSpn), nameof(TicketInfo.EndTime), nameof(TicketInfo.KdcOptions)
+		nameof(TicketInfo.SeqNbr), nameof(TicketInfo.ClientName), nameof(TicketInfo.ClientRealm), nameof(TicketInfo.TargetSpn), nameof(TicketInfo.EndTime), nameof(TicketInfo.KdcOptions), nameof(TicketInfo.Comment)
 })]
 abstract class TicketRequestCommand : KdcCommand
 {
@@ -68,14 +70,15 @@ abstract class TicketRequestCommand : KdcCommand
 		KerberosClient krb = this.CreateKerberosClient();
 		if (!string.IsNullOrEmpty(this.TicketCache))
 		{
-			krb.TicketCache = new TicketCacheFile(this.TicketCache, krb);
+			string ticketCacheFile = this.ResolveFsPath(this.TicketCache);
+			krb.TicketCache = new TicketCacheFile(ticketCacheFile, krb);
 		}
 
 		// Load tickets from file, if it exists
 		List<TicketInfo> tickets = new List<TicketInfo>();
 		if ((outFileName is not null) && this.Append.IsSet && File.Exists(outFileName))
 		{
-			TicketInfo[] existingTickets = krb.LoadTicketsFromFile(File.ReadAllBytes(outFileName), out _);
+			TicketInfo[] existingTickets = krb.LoadTicketsFromFile(outFileName, out _);
 			this.WriteVerbose($"Loaded {existingTickets.Length} ticket(s) from {outFileName}.");
 			tickets.AddRange(existingTickets);
 		}

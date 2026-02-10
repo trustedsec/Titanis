@@ -91,6 +91,11 @@ namespace Titanis.Security
 			return System.HashCode.Combine(UserName.GetHashCode(StringComparison.OrdinalIgnoreCase), Realm.GetHashCode(StringComparison.OrdinalIgnoreCase));
 		}
 
+		public UserPrincipalName WithRealm(string? realm)
+		{
+			return new UserPrincipalName(this.UserName, realm, this.OriginalText);
+		}
+
 		public static bool operator ==(UserPrincipalName? left, UserPrincipalName? right)
 		{
 			return EqualityComparer<UserPrincipalName>.Default.Equals(left, right);

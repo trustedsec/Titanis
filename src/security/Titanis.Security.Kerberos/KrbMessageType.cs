@@ -16,6 +16,9 @@ namespace Titanis.Security.Kerberos
 		Priv = 21,
 		Cred = 22,
 
+		Tgtreq = 16,
+		Tgtrep = 17,
+
 		// [MS-SFU] § 2.2.1
 		PaForUser = 17,
 	}

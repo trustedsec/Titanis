@@ -44,7 +44,14 @@ namespace KerberosV5Spec2
 						if (errorData?.data_type == (int)ErrorDataType.Extended && errorData.data_value?.Length == 12)
 						{
 							Ntstatus ntstatus = (Ntstatus)BinaryPrimitives.ReadUInt32LittleEndian(errorData.data_value);
-							return new KerberosException((KerberosErrorCode)this.error_code, ntstatus.GetException());
+							// It may actually be HRESULT
+							Exception innerException;
+							if (Enum.IsDefined((Hresult)ntstatus))
+								innerException = ((Hresult)ntstatus).GetException();
+							else
+								innerException = ntstatus.GetException();
+
+							return new KerberosException((KerberosErrorCode)this.error_code, innerException);
 						}
 					}
 				}

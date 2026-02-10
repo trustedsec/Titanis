@@ -35,5 +35,13 @@ namespace Titanis.Security.Kerberos
 
 		// [MS-SFU] § 2.2.2 PA_S4U_X509_USER
 		X509Checksum = 26,
+
+		// [RFC 6113] § 6.2
+		FastReqChecksum = 50,
+		FastEnc = 51,
+		FastRep = 52,
+		FastFinished = 53,
+		EncChallengeClient = 54,
+		EncChallengeKdc = 55,
 	}
 }

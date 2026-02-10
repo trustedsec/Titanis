@@ -50,9 +50,8 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 		public TicketParameterGroup? TicketParamGroup { get; set; }
 
 		[Parameter]
-		[Category(ParameterCategories.Output)]
-		[Description("Service principal name to request ticket for")]
-		public SecurityPrincipalName? Spn { get; set; }
+		[Description("SPNs to request ticket(s) for")]
+		public SecurityPrincipalName[]? Target { get; set; }
 
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
@@ -62,23 +61,33 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 
 			if (this.EncTypes != null && this.InitialAuth.Password == null)
 				context.LogError(nameof(EncTypes), "EncTypes may only be specified along with -Password");
+
+			if (this.Target == null)
+				this.Target = [null];
 		}
 
 		protected sealed override async Task<IList<TicketInfo>> RequestTickets(KerberosClient krb, CancellationToken cancellationToken)
 		{
-			var ticket = await this.InitialAuth.RequestInitialTicket(
-				krb,
-				this.Spn,
-				this.EncTypes,
-				this.TicketParamGroup?.GetTicketParameters(this.Log),
-				cancellationToken,
-				this.Log);
+			List<TicketInfo> tickets = new List<TicketInfo>();
+			foreach (var target in this.Target)
+			{
+				this.WriteDiagnostic($"Requesting ticket for target={((target is null) ? "<null>" : target)}");
+				var ticket = await this.InitialAuth.RequestInitialTicket(
+					krb,
+					target,
+					this.EncTypes,
+					this.TicketParamGroup?.GetTicketParameters(this.Log),
+					cancellationToken,
+					this.Log);
 
-			var realm = this.InitialAuth.EffectiveRealm;
-			if (!string.Equals(ticket.TicketRealm, realm, StringComparison.OrdinalIgnoreCase))
-				this.WriteWarning($"The ticket realm '{ticket.TicketRealm}' does not match the requested realm '{realm}'.  This may be the result of canonicalization.");
+				var realm = this.InitialAuth.EffectiveRealm;
+				if (!string.Equals(ticket.TicketRealm, realm, StringComparison.OrdinalIgnoreCase))
+					this.WriteWarning($"The ticket realm '{ticket.TicketRealm}' does not match the requested realm '{realm}'.  This may be the result of canonicalization.");
 
-			return [ticket];
+				tickets.Add(ticket);
+			}
+
+			return tickets;
 		}
 	}
 }

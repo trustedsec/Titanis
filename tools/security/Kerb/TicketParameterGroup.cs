@@ -49,9 +49,15 @@ namespace Kerb
 		public SwitchParam RenewableOk { get; set; }
 		#endregion
 
+		[Parameter]
+		[Description("Comment to associate with ticket")]
+		public string? TicketComment { get; set; }
+
 		public TicketParameters GetTicketParameters(ILog? log)
 		{
 			TicketParameters ticketParameters = new();
+
+			ticketParameters.TicketComment = this.TicketComment;
 
 			if (this.EndTime.HasValue)
 				ticketParameters.EndTime = this.EndTime.Value.ToUniversalTime();

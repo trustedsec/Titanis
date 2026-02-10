@@ -1,9 +1,12 @@
 ﻿using KerberosV5Spec2;
 using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Principal;
 using System.Text;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
@@ -49,50 +52,59 @@ namespace Titanis.Security.Kerberos
 			this.KdcOptions = (KdcOptions)(credInfo.flags?.ToUInt32() ?? 0);
 			if (credInfo.pname != null)
 			{
-				this.UserName = credInfo.pname.name_string[0].Value;
+				this.ClientName = credInfo.pname.name_string[0].Value;
 			}
-			this.UserRealm = credInfo.prealm?.Value;
+			this.ClientRealm = credInfo.prealm?.Value;
 			this.RenewTill = credInfo.renew_till?.Value;
 
 			this.TargetSpn = credInfo.sname.ToSecurityPrincipalName();
 			this.ServiceRealm = credInfo.srealm?.Value;
+
+			// TODO: How should PADATA be encoded?
 		}
 		/// <remarks>
-		/// Called from <see cref="KerberosClient.ProcessASRep(KDC_REP, KerberosClient.TicketRequestContext, DateTime)"/> and <see cref="KerberosClient.ProcessTgsRep(KDC_REP, KerberosClient.TicketRequestContext)"/>.
+		/// Called from <see cref="KerberosClient.ProcessASRep(KDC_REP, KerberosClient.TicketRequestContext, DateTime)"/> and <see cref="KerberosClient.ProcessTgsRep(KDC_REP, TicketParameters, KerberosClient.TicketRequestContext)"/>.
 		/// </remarks>
 		internal TicketInfo(
 			int seqnbr,
 			Ticket_Tagged1 ticket,
 			SessionKey sessionKey,
 			EncKDCRepPart encPart,
-			string userName,
-			string userRealm)
+			string clientName,
+			string clientRealm,
+			SessionKey? asrepKey,
+			SessionKey? ticketKey
+			)
 			: this(seqnbr, ticket, sessionKey)
 		{
 			this.EndTime = encPart.endtime.Value;
 			this.StartTime = encPart.starttime?.Value;
 			this.KdcOptions = (KdcOptions)encPart.flags.ToUInt32();
 
-			this.UserName = userName;
-			this.UserRealm = userRealm;
+			this.ClientName = clientName;
+			this.ClientRealm = clientRealm;
 			this.RenewTill = encPart.renew_till?.Value;
 
 			this.TargetSpn = encPart.sname.ToSecurityPrincipalName();
 			this.ServiceRealm = encPart.srealm.Value;
 
 			this.Padata = encPart.padata;
+			this.AsrepKey = asrepKey;
+			this.TicketKey = ticketKey;
+
 		}
 		/// <remarks>
-		/// Called from <see cref="KerberosClient.LoadTicketsFromCcacheFile(byte[])"/>.
+		/// Called from <see cref="KerberosClient.LoadTicketsFromCcacheFile(byte[], string?)"/>.
 		/// </remarks>
-		internal TicketInfo(int seqnbr, SessionKey key, CCacheCredential cred)
+		internal TicketInfo(string sourceFileName, int seqnbr, SessionKey key, CCacheCredential cred, KerberosClient krb)
 		{
+			this.SourceFileName = sourceFileName;
 			this.SeqNbr = seqnbr;
 			this.SessionKey = key;
 			this.ticket = Asn1DerDecoder.DecodeTlv<Ticket>(cred.ticket.bytes).Value;
 
-			this.UserName = cred.client.components[0].str;
-			this.UserRealm = cred.client.realm.str;
+			this.ClientName = cred.client.components[0].str;
+			this.ClientRealm = cred.client.realm.str;
 			this.TargetSpn = SecurityPrincipalName.Create(cred.server.nameType, Array.ConvertAll(cred.server.components, r => r.str));
 			this.ServiceRealm = cred.server.realm.str;
 			this.KdcOptions = cred.ticketFlags;
@@ -101,14 +113,57 @@ namespace Titanis.Security.Kerberos
 			this.EndTime = FromCcacheTime(cred.endTime);
 			this.RenewTill = FromCcacheTime(cred.renewTill);
 
-			this.Padata = cred.authData?.Select(r => new PA_DATA((int)r.authType, r.authData.bytes))?.ToArray();
+			var padataList = cred.authData?.Select(r => new PA_DATA((int)r.authType, r.authData.bytes))?.ToList();
+			var padataExt = padataList?.FirstOrDefault(IsSuppPadata);
+
+			if (padataExt != null)
+			{
+				Debug.Assert(padataList != null);
+				padataList.Remove(padataExt);
+
+				try
+				{
+					var suppList = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<PA_DATA>>(padataExt.padata_value.AsMemory(4)).Values;
+					foreach (var suppItem in suppList)
+					{
+						switch ((SupplementalPadataType)suppItem.padata_type)
+						{
+							case SupplementalPadataType.AsrepKey:
+								this.AsrepKey = krb.CreateSessionKeyFor(Asn1DerDecoder.DecodeTlv<EncryptionKey>(suppItem.padata_value));
+								break;
+							case SupplementalPadataType.TicketKey:
+								this.TicketKey = krb.CreateSessionKeyFor(Asn1DerDecoder.DecodeTlv<EncryptionKey>(suppItem.padata_value));
+								break;
+							case SupplementalPadataType.TicketComment:
+								this.Comment = Encoding.UTF8.GetString(suppItem.padata_value);
+								break;
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					// TODO: Log?  
+				}
+			}
+
+			this.Padata = padataList?.ToArray();
+		}
+
+		private static bool IsSuppPadata(PA_DATA padata)
+		{
+			return
+				(padata != null)
+				&& ((PadataType)padata.padata_type == PadataType.PasswordSalt)
+				&& (padata.padata_value?.Length > 4)
+				&& (BinaryPrimitives.ReadUInt32LittleEndian(padata.padata_value) == SupplementalPadata.Signature)
+				;
 		}
 
 		public TicketInfo(int seqnbr, string? userName, string? userRealm, string? ticketRealm, SecurityPrincipalName spn, string? serviceRealm, KdcOptions kdcOptions, DateTime? endTime, DateTime? startTime, DateTime? renewTill, SessionKey sessionKey, byte[] encodedTicket)
 		{
 			this.SeqNbr = seqnbr;
-			this.UserName = userName;
-			this.UserRealm = userRealm;
+			this.ClientName = userName;
+			this.ClientRealm = userRealm;
 			this.TargetSpn = spn;
 			this.ServiceRealm = serviceRealm;
 			this.KdcOptions = kdcOptions;
@@ -125,13 +180,16 @@ namespace Titanis.Security.Kerberos
 			return TicketParameters.DefaultEndTime + TimeSpan.FromSeconds(time);
 		}
 
+		public string SourceFileName { get; }
 		public int SeqNbr { get; }
 		internal readonly Ticket_Tagged1 ticket;
 
-		[DisplayName("User name")]
-		public string? UserName { get; }
-		[DisplayName("User realm")]
-		public string? UserRealm { get; }
+		public string? Comment { get; set; }
+
+		[DisplayName("Client name")]
+		public string? ClientName { get; }
+		[DisplayName("Client realm")]
+		public string? ClientRealm { get; }
 
 		/// <summary>
 		/// Gets the realm of the target the ticket is valid in.
@@ -172,6 +230,15 @@ namespace Titanis.Security.Kerberos
 
 		[Browsable(false)]
 		public PA_DATA[]? Padata { get; }
+
+		[Browsable(false)]
+		public SessionKey? AsrepKey { get; }
+		public string? AsrepKeyText => this.AsrepKey?.KeyBytes?.ToHexString();
+
+		[Browsable(false)]
+		public SessionKey? TicketKey { get; set; }
+		public string? TicketKeyText => this.TicketKey?.KeyBytes?.ToHexString();
+
 		internal PA_DATA? TryGetPadata(PadataType type)
 		{
 			return this.Padata?.FirstOrDefault(r => (PadataType)r.padata_type == type);
@@ -192,14 +259,14 @@ namespace Titanis.Security.Kerberos
 		/// </summary>
 		[Browsable(false)]
 		public SessionKey SessionKey { get; }
-		[DisplayName("Enc. type")]
-		public EType EType => this.SessionKey?.EType ?? 0;
+		[DisplayName("Session etype")]
+		public EType SessionEType => this.SessionKey?.EType ?? 0;
 		[DisplayName("Session key")]
 		public string SessionKeyText => this.SessionKey?.KeyBytes?.ToHexString() ?? string.Empty;
-		[DisplayName("Ticket enc. type")]
-		public EType TicketEncryptionType => (EType)this.ticket.enc_part.etype;
+		[DisplayName("Ticket etype")]
+		public EType TicketEType => (EType)this.ticket.enc_part.etype;
 
-		public int? TgsrepHashcatMethod => this.TicketEncryptionType switch
+		public int? TgsrepHashcatMethod => this.TicketEType switch
 		{
 			EType.Rc4Hmac => 13100,
 			EType.Aes128CtsHmacSha1_96 => 19600,
@@ -219,7 +286,7 @@ namespace Titanis.Security.Kerberos
 			var bytes = this.ticket.enc_part.cipher;
 			StringBuilder sb = new StringBuilder();
 			var krb = new KerberosClient(null);
-			EType etype = this.TicketEncryptionType;
+			EType etype = this.TicketEType;
 			var encProf = krb.GetEncProfile(etype);
 
 			switch (etype)
@@ -230,7 +297,7 @@ namespace Titanis.Security.Kerberos
 				default:
 					{
 						var cbChecksum = encProf.ChecksumSizeBytes;
-						sb.Append($"$krb5tgs${(int)etype}${this.UserName}${this.TicketRealm}$*{this.TargetSpn.ToString().Replace(':', '~')}*${bytes.AsSpan(bytes.Length - cbChecksum).ToHexString()}${bytes.AsSpan(0, bytes.Length - cbChecksum).ToHexString()}");
+						sb.Append($"$krb5tgs${(int)etype}${this.ClientName}${this.TicketRealm}$*{this.TargetSpn.ToString().Replace(':', '~')}*${bytes.AsSpan(bytes.Length - cbChecksum).ToHexString()}${bytes.AsSpan(0, bytes.Length - cbChecksum).ToHexString()}");
 					}
 					break;
 			}
@@ -256,14 +323,43 @@ namespace Titanis.Security.Kerberos
 			return encProfile.GenerateSubkey();
 		}
 
-		public TicketAuthorizationData DecryptAuthorizationData(SessionKey authzKey, byte[]? asrepKey, KerberosClient krb)
-		{
-			ArgumentNullException.ThrowIfNull(authzKey);
+		#region Authorization data
+		private TicketAuthorizationData? _cachedAuthData;
+		private TicketAuthorizationData? CachedAuthData => (this._cachedAuthData ??= this.TryDecryptAuthData());
 
-			var encTicketPart = Asn1DerDecoder.DecodeTlv<EncTicketPart>(authzKey.Decrypt(KeyUsage.Asrep_Tgsrep_Ticket, this.ticket.enc_part));
+		private TicketAuthorizationData? TryDecryptAuthData()
+		{
+			return (this.TicketKey != null) ? this.DecryptAuthorizationData(null, null) : null;
+		}
+
+		public SidWithAttributes[]? SecurityGroups => this.CachedAuthData?.GetSecurityGroups()?.ToArray();
+
+		public string? NtlmHashText => this.CachedAuthData?.NtlmHash?.ToHexString();
+
+		public TicketAuthorizationData DecryptAuthorizationData(SessionKey? ticketKey, SessionKey? asrepKey)
+		{
+			if (this._cachedAuthData is null)
+			{
+				ticketKey ??= this.TicketKey;
+				asrepKey ??= this.AsrepKey;
+
+				ArgumentNullException.ThrowIfNull(ticketKey);
+
+				EncryptedData encPart = this.ticket.enc_part;
+
+				this._cachedAuthData = DecryptAuthorizationData(ticketKey, asrepKey, encPart);
+			}
+
+			return this._cachedAuthData;
+		}
+
+		internal static TicketAuthorizationData DecryptAuthorizationData(SessionKey ticketKey, SessionKey? asrepKey, EncryptedData encPart)
+		{
+			var encTicketPart = Asn1DerDecoder.DecodeTlv<EncTicketPart>(ticketKey.Decrypt(KeyUsage.Asrep_Tgsrep_Ticket, encPart.cipher.ToArray()));
 			var authz = new TicketAuthorizationData();
-			authz.Process(encTicketPart, asrepKey, krb);
+			authz.Process(encTicketPart, asrepKey);
 			return authz;
 		}
+		#endregion
 	}
 }

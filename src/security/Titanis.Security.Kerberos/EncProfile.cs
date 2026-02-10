@@ -138,7 +138,7 @@ namespace Titanis.Security.Kerberos
 		/// <param name="salt">Salt</param>
 		/// <returns>A <see cref="SessionKey"/> generated from the provided values</returns>
 		public virtual SessionKey StringToKey(string str, string salt)
-			=> new SessionKey(this, this.StringToKey(Encoding.UTF8.GetBytes(str), Encoding.UTF8.GetBytes(salt)));
+			=> new SessionKey(this, this.StringToKey(Encoding.UTF8.GetBytes(str), (salt != null) ? Encoding.UTF8.GetBytes(salt) : Array.Empty<byte>()));
 		/// <summary>
 		/// Converts a string to a key.
 		/// </summary>

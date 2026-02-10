@@ -41,7 +41,7 @@ namespace Titanis.Security.Kerberos
 		{
 			ArgumentNullException.ThrowIfNull(spn);
 
-			var ticket = this._tickets.FirstOrDefault(r => r.IsCurrent && r.TargetSpn == spn && (clientName is null || clientName.Equals(r.UserName, StringComparison.OrdinalIgnoreCase)));
+			var ticket = this._tickets.FirstOrDefault(r => r.IsCurrent && r.TargetSpn == spn && (clientName is null || clientName.Equals(r.ClientName, StringComparison.OrdinalIgnoreCase)));
 			return ticket;
 		}
 

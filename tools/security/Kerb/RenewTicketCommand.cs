@@ -54,9 +54,9 @@ internal class RenewTicketCommand : TicketRequestCommand
 		List<TicketInfo> sourceTickets = new List<TicketInfo>();
 		if (!string.IsNullOrEmpty(this.Ticket))
 		{
-			this.WriteDiagnostic($"Loading tickets from {this.Ticket}");
-			byte[] ticketBytes = File.ReadAllBytes(this.Ticket);
-			var tickets = krb.LoadTicketsFromFile(ticketBytes, out var format);
+			string ticketFile = this.ResolveFsPath(this.Ticket);
+			this.WriteDiagnostic($"Loading tickets from {ticketFile}");
+			var tickets = krb.LoadTicketsFromFile(ticketFile, out var format);
 
 			if (this.TargetSpn != null)
 			{

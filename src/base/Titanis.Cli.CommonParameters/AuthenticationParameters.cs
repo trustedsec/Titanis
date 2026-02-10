@@ -182,7 +182,7 @@ namespace Titanis.Cli
 		[Parameter]
 		[Description("User name to request TGT for U2U")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
-		public SecurityPrincipalName? U2UserName { get; set; }
+		public UserPrincipalName? U2UserName { get; set; }
 
 		[Parameter]
 		[Description("Name of file containing a certificate of a user to impersonate with S4U")]
@@ -783,7 +783,12 @@ namespace Titanis.Cli
 			if (serviceTicket is not null)
 				clientCred = serviceTicket;
 			else if (this.U2UserName is not null)
-				clientCred = this.U2UserName;
+			{
+				var u2UserName = this.U2UserName;
+				if (u2UserName.Realm == null)
+					u2UserName = u2UserName.WithRealm(this.UserDomain);
+				clientCred = u2UserName;
+			}
 			else
 				clientCred = null;
 

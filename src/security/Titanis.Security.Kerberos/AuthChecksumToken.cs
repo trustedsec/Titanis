@@ -10,6 +10,8 @@ namespace Titanis.Security.Kerberos
 		APReq = 0x0100,
 		APRep = 0x0200,
 		Error = 0x0300,
+		TgtReq= 0x0400,
+		TgtRep= 0x0401,
 	}
 
 	// [RFC 4121] § 4.1.1 - Authenticator Checksum

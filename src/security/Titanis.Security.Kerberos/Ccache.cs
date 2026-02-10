@@ -90,10 +90,10 @@ namespace Titanis.Security.Kerberos
 				version = 4,
 				componentCount = 1,
 				nameType = PrincipalNameType.Principal,
-				realm = new CCacheStringData(ticket.UserRealm),
+				realm = new CCacheStringData(ticket.ClientRealm),
 				components = new CCacheStringData[]
 				{
-					new CCacheStringData(ticket.UserName)
+					new CCacheStringData(ticket.ClientName)
 				},
 			};
 		}

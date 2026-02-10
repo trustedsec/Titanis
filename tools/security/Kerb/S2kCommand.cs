@@ -31,15 +31,14 @@ internal class S2kCommand : Command
 {
 	[Parameter(0)]
 	[Mandatory]
-	[Description("Salt as a string")]
-	public string Salt { get; set; }
-
-	[Parameter(10)]
-	[Mandatory]
 	[Description("String, such as the password")]
 	public string Password { get; set; }
 
-	[Parameter]
+	[Parameter(After = nameof(Password))]
+	[Description("Salt as a string")]
+	public string Salt { get; set; }
+
+	[Parameter(After = nameof(Salt))]
 	[Description("Encryption types to generate for")]
 	public EType[]? EncType { get; set; }
 
@@ -47,15 +46,27 @@ internal class S2kCommand : Command
 	[Description("Continue even if errors occur")]
 	public SwitchParam ContinueOnError { get; set; }
 
+	private KerberosClient _krb = new KerberosClient(null);
+	private EType[] _etypes;
+	protected override void ValidateParameters(ParameterValidationContext context)
+	{
+		base.ValidateParameters(context);
+
+		this._etypes = this.EncType ?? this._krb.DefaultETypes;
+		var hasNonRc4 = this._etypes.Any(r => r is not (EType.Rc4Hmac or EType.Rc4HmacExp));
+		if (hasNonRc4)
+		{
+			if (this.Salt == null)
+				context.LogError(nameof(Salt), $"-{nameof(Salt)} is required for encryption types other than Rc4Hmac");
+		}
+	}
+
 	protected override Task<int> RunAsync(CancellationToken cancellationToken)
 	{
-		KerberosClient krb = new KerberosClient(null);
-		var etypes = this.EncType ?? krb.DefaultETypes;
-
-		foreach (var etype in etypes)
+		foreach (var etype in this._etypes)
 		{
 			this.WriteDiagnostic($"Generating key for {etype}");
-			var encProfile = krb.TryGetEncProfile(etype);
+			var encProfile = _krb.TryGetEncProfile(etype);
 			if (encProfile is null)
 				this.WriteWarning($"Encryption profile {etype} not available.");
 

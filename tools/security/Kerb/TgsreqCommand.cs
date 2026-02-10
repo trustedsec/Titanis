@@ -32,7 +32,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 		[Parameter(KdcPosition + 1)]
 		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("SPNs to request tickets for")]
+		[Description("SPN(s) to request ticket(s) for")]
 		public SecurityPrincipalName[] Targets { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
@@ -75,15 +75,17 @@ By default, all supported encryption types are sent in the request.  To limit th
 		public string? U2uTicket { get; set; }
 
 		[Parameter]
-		[Description("Password for service account")]
+		[Description("Password for service account (for decrypting authorization data)")]
 		public string? ServicePassword { get; set; }
 
 		[Parameter]
-		[Description("Salt for service account")]
+		[Category(ParameterCategories.TicketAuthorizationData)]
+		[Description("Salt for service account (for decrypting authorization data)")]
 		public string? ServiceSalt { get; set; }
 
 		[Parameter]
-		[Description("Encryption key from AS-REP")]
+		[Category(ParameterCategories.TicketAuthorizationData)]
+		[Description("Encryption key from AS-REP (for decryption NTLM hash)")]
 		public HexString? AsrepKey { get; set; }
 
 		private X509Certificate2? _s4uCert;
@@ -131,8 +133,8 @@ By default, all supported encryption types are sent in the request.  To limit th
 		protected sealed override async Task<IList<TicketInfo>?> RequestTickets(KerberosClient krb, CancellationToken cancellationToken)
 		{
 			string ticketStoreFile;
-			if (!string.IsNullOrEmpty(this.Tgt)) ticketStoreFile = this.ResolveFsPath(this.Tgt);
-			else if (!string.IsNullOrEmpty(this.TicketCache)) ticketStoreFile = this.ResolveFsPath(this.TicketCache);
+			if (!string.IsNullOrEmpty(this.Tgt)) ticketStoreFile = this.Tgt;
+			else if (!string.IsNullOrEmpty(this.TicketCache)) ticketStoreFile = this.TicketCache;
 			else throw new InvalidOperationException($"The command is not configured with -{nameof(Tgt)} -{nameof(TicketCache)}.");
 
 			TicketInfo? sourceTicket = LoadTgtFromStore(krb, ticketStoreFile);
@@ -152,7 +154,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 				u2uTicket = null;
 			}
 
-			this.WriteVerbose($"Using ticket for {sourceTicket.UserName}@{sourceTicket.UserRealm} => {sourceTicket.TargetSpn} expiring {sourceTicket.EndTime}");
+			this.WriteVerbose($"Using ticket for {sourceTicket.ClientName}@{sourceTicket.ClientRealm} => {sourceTicket.TargetSpn} expiring {sourceTicket.EndTime}");
 
 			TicketParameters ticketParams = this.TicketParamGroup?.GetTicketParameters(this.Log) ?? krb.GetDefaultTicketOptions(sourceTicket);
 			if (this.Forwarded.IsSet)
@@ -180,13 +182,9 @@ By default, all supported encryption types are sent in the request.  To limit th
 				SessionKey? ticketKey;
 				if (serviceKey != null)
 					ticketKey = serviceKey;
-				//else if (ticketParams.AdditionalTicket != null)
-				//{
-				//	ticketKey = ticketParams.AdditionalTicket.SessionKey;
-				//}
-				else if (this._serviceCredential != null && this._serviceCredential.SupportsProfile(ticket.TicketEncryptionType))
+				else if (this._serviceCredential != null && this._serviceCredential.SupportsProfile(ticket.TicketEType))
 				{
-					var encProf = krb.TryGetEncProfile(ticket.TicketEncryptionType);
+					var encProf = krb.TryGetEncProfile(ticket.TicketEType);
 					if (encProf != null)
 						ticketKey = this._serviceCredential.DeriveProtocolKeyFor(encProf, this._serviceSalt);
 					else
@@ -199,46 +197,21 @@ By default, all supported encryption types are sent in the request.  To limit th
 
 				if (ticketKey != null)
 				{
+					// Verify the key
 					try
 					{
-						var authzData = ticket.DecryptAuthorizationData(ticketKey, this.AsrepKey?.Bytes, krb);
-
-						this.WriteMessage("Ticket authorization data:");
-
-						// Hashes (PKINIT only)
-						if (authzData.LmHash != null)
-							this.WriteMessage($"  LM hash: " + authzData.LmHash.ToHexString());
-						if (authzData.NtlmHash != null)
-							this.WriteMessage($"  NTLM hash: " + authzData.NtlmHash.ToHexString());
-
-						this.WriteMessage($"  Full name: " + authzData.LogonInfo?.FullName);
-						this.WriteMessage($"  Account flags: " + authzData.LogonInfo?.UserAccountControl);
-						this.WriteMessage($"  Logon count: " + authzData.LogonInfo?.LogonCount);
-						this.WriteMessage($"  Logon domain SID: " + authzData.LogonInfo?.LogonDomainSid);
-						this.WriteMessage($"  User ID: " + authzData.LogonInfo?.UserId);
-						this.WriteMessage($"  User SID: " + authzData.LogonInfo?.UserSid);
-						this.WriteMessage($"  Kickoff time: " + authzData.LogonInfo?.KickOffTime);
-						this.WriteMessage($"  Logoff time: " + authzData.LogonInfo?.LogoffTime);
-						this.WriteMessage($"  Last successful logon: " + authzData.LogonInfo?.LastSuccessfulLogon);
-						this.WriteMessage($"  Last failed logon: " + authzData.LogonInfo?.LastFailedLogon);
-						this.WriteMessage($"  Bad password count: " + authzData.LogonInfo?.BadPasswordCount);
-
-						this.WriteMessage($"  Password last set: " + authzData.LogonInfo?.PasswordLastSet);
-						this.WriteMessage($"  Password expires: " + authzData.LogonInfo?.PasswordMustChange);
-
-						// Groups
-						var groups = authzData.GetSecurityGroups();
-						this.WriteMessage($"  Security groups: ({groups.Count})");
-						foreach (var group in groups)
-						{
-							var wks = group.Sid.AsWellKnownSid();
-							this.WriteMessage($"    {group.Sid} {((wks != WellKnownSid.Unknown) ? $"({wks}) " : null)}: {group.Attributes}");
-						}
+						var asrepKey = ticket.AsrepKey;
+						//var asrepKey = krb.CreateSessionKeyFor(this.AsrepKey);
+						var authzData = ticket.DecryptAuthorizationData(ticketKey, asrepKey);
+						ticket.TicketKey = ticketKey;
 					}
 					catch (Exception ex)
 					{
 						this.WriteError($"Faild to extract authorization data: {ex.Message}");
 					}
+
+					if (ticket.TicketKey != null)
+						Program.TryPrintAuthorizationData(ticket, "Ticket authorization data:", this.Log);
 				}
 
 				newTickets.Add(ticket);
@@ -247,15 +220,16 @@ By default, all supported encryption types are sent in the request.  To limit th
 			return newTickets;
 		}
 
-		private TicketInfo? LoadTgtFromStore(KerberosClient krb, string ticketStoreFile)
+		private TicketInfo? LoadTgtFromStore(KerberosClient krb, string ticketStoreFileUnresolved)
 		{
-			this.WriteVerbose($"Reading TGT from {ticketStoreFile}");
-			var tgtStore = krb.LoadTicketsFromFile(File.ReadAllBytes(ticketStoreFile), out _);
+			ticketStoreFileUnresolved = this.ResolveFsPath(ticketStoreFileUnresolved);
+			this.WriteVerbose($"Reading TGT from {ticketStoreFileUnresolved}");
+			var tgtStore = krb.LoadTicketsFromFile(ticketStoreFileUnresolved, out _);
 
 			TicketInfo? sourceTicket;
-			if (ticketStoreFile.Length == 0)
+			if (ticketStoreFileUnresolved.Length == 0)
 			{
-				this.WriteError($"The file {ticketStoreFile} does not contain any tickets.");
+				this.WriteError($"The file {ticketStoreFileUnresolved} does not contain any tickets.");
 				sourceTicket = null;
 			}
 			else
@@ -263,7 +237,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 				var tgtCandidates = tgtStore.Where(r => r.IsCurrent && r.IsTgt).ToList();
 				if (tgtCandidates.Count == 0)
 				{
-					this.WriteError($"The file {ticketStoreFile} does not contain any valid ticket-granting tickets.");
+					this.WriteError($"The file {ticketStoreFileUnresolved} does not contain any valid ticket-granting tickets.");
 					sourceTicket = null;
 				}
 				else
