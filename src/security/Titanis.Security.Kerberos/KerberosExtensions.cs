@@ -32,9 +32,28 @@ namespace KerberosV5Spec2
 
 					if (decoder.CheckTag(new Asn1Tag(0x20000010)))
 					{
-						var padataList = decoder.DecodeValue<Asn1SequenceOf<PA_DATA>>().Values;
+						try
+						{
+							var padataList = decoder.DecodeValue<Asn1SequenceOf<PA_DATA>>().Values;
 
-						throw new KerberosPadataException((KerberosErrorCode)this.error_code, padataList);
+							return new KerberosPadataException((KerberosErrorCode)this.error_code, padataList);
+						}
+						catch (Asn1UnexpectedTagException ex) when (ex.ExpectedTag == new Asn1Tag(0xA0000001) && ex.ActualTag == new Asn1Tag(0xA0000000))
+						{
+							// This is probably a U2U
+							try
+							{
+								var code = decoder.DecodeTaggedValue(new Asn1Tag(0xA0000000), d => decoder.DecodeIntegerTlvAsInt32());
+								if (code is -128)
+								{
+									return CreateNtstatusKerberosException((KerberosErrorCode)this.error_code, Ntstatus.STATUS_USER2USER_REQUIRED);
+								}
+							}
+							catch
+							{
+								// Fall through to general case
+							}
+						}
 					}
 					else if (decoder.CheckTag(new Asn1Tag(0xA0000001)))
 					{
@@ -44,14 +63,7 @@ namespace KerberosV5Spec2
 						if (errorData?.data_type == (int)ErrorDataType.Extended && errorData.data_value?.Length == 12)
 						{
 							Ntstatus ntstatus = (Ntstatus)BinaryPrimitives.ReadUInt32LittleEndian(errorData.data_value);
-							// It may actually be HRESULT
-							Exception innerException;
-							if (Enum.IsDefined((Hresult)ntstatus))
-								innerException = ((Hresult)ntstatus).GetException();
-							else
-								innerException = ntstatus.GetException();
-
-							return new KerberosException((KerberosErrorCode)this.error_code, innerException);
+							return CreateNtstatusKerberosException((KerberosErrorCode)this.error_code, ntstatus);
 						}
 					}
 				}
@@ -59,6 +71,18 @@ namespace KerberosV5Spec2
 
 			// TODO: Provide e-text, although it's usually empty
 			return new KerberosException((KerberosErrorCode)this.error_code);
+		}
+
+		private static Exception CreateNtstatusKerberosException(KerberosErrorCode kerbErrorCode, Ntstatus ntstatus)
+		{
+			// It may actually be HRESULT
+			Exception innerException;
+			if (Enum.IsDefined((Hresult)ntstatus))
+				innerException = ((Hresult)ntstatus).GetException();
+			else
+				innerException = ntstatus.GetException();
+
+			return new KerberosException(kerbErrorCode, innerException);
 		}
 	}
 	public partial class EncryptionKey
