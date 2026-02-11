@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
+﻿using System.ComponentModel;
 using Titanis.Msrpc.Mswmi;
 
-namespace Wmi;
+namespace Titanis.Cli.WmiTool;
 
 /// <summary>
 /// Base class for commands that execute a WMI query.

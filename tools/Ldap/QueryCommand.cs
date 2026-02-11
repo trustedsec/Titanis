@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
 using Titanis.Ldap;
 using Titanis.Ldap.FilterExpressions;
 
-namespace Ldap;
+namespace Titanis.Cli.LdapTool;
 
 [Command]
 [Description("Queries the directory")]

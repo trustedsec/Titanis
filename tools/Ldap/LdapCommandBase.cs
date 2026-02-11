@@ -1,24 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Security;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis;
-using Titanis.Certificates;
-using Titanis.Cli;
 using Titanis.Ldap;
 using Titanis.Net;
 using Titanis.Security;
 
-namespace Ldap
+namespace Titanis.Cli.LdapTool
 {
 	/// <summary>
 	/// Base class for commands using <see cref="LdapClient"/>.

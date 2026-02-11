@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
-using Titanis.Cli;
 using Titanis.Msrpc.Mslsar;
 using Titanis.Winterop.Security;
 
-namespace Lsa;
+namespace Titanis.Cli.LsaTool;
 
 /// <task category="LSA;Expanding Access">Create an LSA policy account</task>
 [Description("Creates an account")]

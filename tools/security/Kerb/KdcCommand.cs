@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis;
-using Titanis.Cli;
 using Titanis.Security.Kerberos;
-using Titanis.Winterop.Security;
 
-namespace Kerb;
+namespace Titanis.Cli.Kerb;
 
 /// <summary>
 /// Base implementation for commands 

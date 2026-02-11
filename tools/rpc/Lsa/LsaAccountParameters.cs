@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
+﻿using System.ComponentModel;
 using Titanis.Msrpc.Mslsar;
 using Titanis.Winterop.Security;
 
-namespace Lsa;
+namespace Titanis.Cli.LsaTool;
 internal class LsaAccountParameters : ParameterGroupBase
 {
 	[Parameter]

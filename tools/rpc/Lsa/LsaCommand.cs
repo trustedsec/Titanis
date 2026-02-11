@@ -1,8 +1,7 @@
 ﻿using ms_lsar;
-using Titanis.Cli;
 using Titanis.Msrpc.Mslsar;
 
-namespace Lsa;
+namespace Titanis.Cli.LsaTool;
 
 /// <summary>
 /// Base class for LSA commands

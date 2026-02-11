@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
+﻿using System.ComponentModel;
 
-namespace Kerb;
+namespace Titanis.Cli.Kerb;
 
 [Command]
 [Description("Display and edit keytab files")]

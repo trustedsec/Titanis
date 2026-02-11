@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
-using Titanis.Cli;
 
-namespace Wmi;
+namespace Titanis.Cli.WmiTool;
 
 [Description("Commands for interacting with the Windows Management Instrumentation service")]
 [Subcommand("query", typeof(QueryCommand))]

@@ -4,7 +4,7 @@ using Titanis.Cli;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
 
-namespace Kerb
+namespace Titanis.Cli.Kerb
 {
 	/// <task category="Kerberos;Expanding Access">Request a ticket-granting-ticket</task>
 	/// <task category="Kerberos">Check whether a user account requires pre-authentication</task>

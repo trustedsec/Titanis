@@ -2,15 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Titanis;
-using Titanis.Cli;
 using Titanis.Msrpc.Mswmi;
 
-namespace Wmi;
+namespace Titanis.Cli.WmiTool;
 
 /// <task category="WMI;Enumeration">List the methods of a WMI class or object</task>
 [Command]

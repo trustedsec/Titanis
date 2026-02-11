@@ -1,7 +1,7 @@
 ﻿using Titanis.Msrpc.Mslsar;
 using Titanis.Winterop.Security;
 
-namespace Lsa;
+namespace Titanis.Cli.LsaTool;
 
 internal abstract class LsaPolicyCommand : LsaCommand
 {

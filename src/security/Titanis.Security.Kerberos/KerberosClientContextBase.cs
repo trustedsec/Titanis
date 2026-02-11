@@ -225,7 +225,8 @@ namespace Titanis.Security.Kerberos
 				Asn1.Krb5Token tokenStruc = Asn1DerDecoder.DecodeTlv<Asn1.Krb5Token>(token.ToArray());
 				if (tokenStruc.tokenId == GssapiTokenId.TgtRep)
 				{
-					aprep = tokenStruc.aprep.Value;
+					var tgtrep = tokenStruc.tgtrep;
+					throw new NotImplementedException();
 				}
 				else if (tokenStruc.tokenId == GssapiTokenId.Error)
 				{

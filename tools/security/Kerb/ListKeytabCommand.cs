@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
-using Titanis.Cli;
 using Titanis.Security.Kerberos;
 
-namespace Kerb;
+namespace Titanis.Cli.Kerb;
 
 [Command]
 [Description("Lists the entries in a keytab")]

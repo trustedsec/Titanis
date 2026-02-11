@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
 using Titanis.DceRpc;
-using Titanis.DceRpc.Client;
 using Titanis.DceRpc.Epm;
 
-namespace Titanis.DceRpc.Cli
+namespace Titanis.Cli.EpmTool
 {
 	/// <task category="RPC">Enumerate dynamic RPC endpoints</task>
 	[Command]

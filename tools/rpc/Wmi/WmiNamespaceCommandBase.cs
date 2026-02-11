@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis;
-using Titanis.Cli;
 using Titanis.Msrpc.Mswmi;
 
-namespace Wmi;
+namespace Titanis.Cli.WmiTool;
 internal abstract class WmiNamespaceCommandBase : WmiCommand
 {
 	[Parameter]

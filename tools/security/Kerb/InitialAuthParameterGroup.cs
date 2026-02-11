@@ -1,19 +1,9 @@
-﻿using PKIX1Implicit88;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis;
-using Titanis.Asn1;
-using Titanis.Asn1.Serialization;
-using Titanis.Cli;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
 
-namespace Kerb;
+namespace Titanis.Cli.Kerb;
 
 /// <summary>
 /// Defines parameters for initial authentication with a KDC.

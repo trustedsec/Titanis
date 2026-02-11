@@ -1,14 +1,10 @@
 ﻿using System.ComponentModel;
-using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using Titanis;
-using Titanis.Cli;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
-using Titanis.Winterop.Security;
 
-namespace Kerb
+namespace Titanis.Cli.Kerb
 {
 	/// <task category="Kerberos;Expanding Access">Request a ticket for a service</task>
 	/// <task category="Kerberos;Expanding Access">Get ticket hash for hash cracking</task>

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using Titanis.Ldap;
 
-namespace Ldap;
+namespace Titanis.Cli.LdapTool;
 
 public enum AttributeEncoding
 {

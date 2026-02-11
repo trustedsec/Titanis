@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis;
-using Titanis.Cli;
 using Titanis.Ldap;
-using Titanis.Ldap.FilterExpressions;
 
-namespace Ldap;
+namespace Titanis.Cli.LdapTool;
 
 [Command]
 [Description("Modifies an object in the directory")]

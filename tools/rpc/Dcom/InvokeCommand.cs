@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Net;
-using Titanis;
-using Titanis.Cli;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
 using Titanis.Msrpc.Msdcom;
 using Titanis.Net;
 using Titanis.Security;
 
-namespace Dcom;
+namespace Titanis.Cli.DcomTool;
+
 [Command]
 [Description("Invokes a method on an OLE automation object over DCOM")]
 internal class InvokeCommand : Command
@@ -58,33 +57,9 @@ internal class InvokeCommand : Command
 
 	protected override async Task<int> RunAsync(CancellationToken cancellationToken)
 	{
-		var remoteAddrs = await this.NetworkParameters.ResolveAsync(ServerName, cancellationToken).ConfigureAwait(false);
-
-		if (remoteAddrs.IsNullOrEmpty())
-		{
-			WriteError("No remote addresses to connect to.");
-			return -1;
-		}
-
-		var remoteAddr = remoteAddrs[0];
-
-		SecurityCapabilities rpcRequiredCaps = SecurityCapabilities.DceStyle | SecurityCapabilities.Integrity;
-		RpcAuthLevel authLevel;
-		if (EncryptRpc.IsSet)
-		{
-			rpcRequiredCaps |= SecurityCapabilities.Confidentiality;
-			authLevel = RpcAuthLevel.PacketPrivacy;
-		}
-		else
-			authLevel = RpcAuthLevel.PacketIntegrity;
-
-		var credService = this.RequireService<IClientCredentialService>();
 
 		var rpcClient = this.CreateRpcClient();
-		rpcClient.DefaultAuthLevel = authLevel;
-
-		// If the endpoint doesn't have a well-known port, use the EP mapper
-		IPEndPoint remoteEP = new IPEndPoint(remoteAddr, WellKnownTcpPort);
+		rpcClient.DefaultAuthLevel = EncryptRpc.IsSet ? RpcAuthLevel.PacketPrivacy : RpcAuthLevel.PacketIntegrity;
 
 		DcomClient dcom = await DcomClient.ConnectTo(this.ServerName, rpcClient, cancellationToken, callback: new DcomLogger(this.Log));
 

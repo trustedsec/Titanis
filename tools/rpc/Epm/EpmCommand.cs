@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
+﻿using System.ComponentModel;
 using Titanis.DceRpc.Epm;
 
-namespace Titanis.DceRpc.Cli;
+namespace Titanis.Cli.EpmTool;
 
 /// <summary>
 /// Base class for commands using the endpoint mapper.

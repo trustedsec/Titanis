@@ -1,14 +1,7 @@
 ﻿using ms_samr;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
 using Titanis.Msrpc.Mssamr;
 
-namespace Titanis.Smb2.Cli
+namespace Titanis.Cli.SamTool
 {
 	internal abstract class SamCommand : RpcCommand<SamClient>
 	{

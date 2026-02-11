@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
-using Titanis.Cli;
 
-namespace Dcom;
+namespace Titanis.Cli.DcomTool;
 
 [Description("Utility for working with DCOM")]
 [Subcommand("invoke", typeof(InvokeCommand))]

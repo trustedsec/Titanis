@@ -1,15 +1,10 @@
 ﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Runtime.Intrinsics.Arm;
 using System.Text;
-using Titanis;
-using Titanis.Cli;
 using Titanis.Msrpc.Mswmi;
-using Titanis.Security;
 using Titanis.Smb2;
 using Titanis.Winterop;
 
-namespace Wmi;
+namespace Titanis.Cli.WmiTool;
 
 /// <task category="WMI;Lateral Movement">Execute a command line on a remote system</task>
 [Command]

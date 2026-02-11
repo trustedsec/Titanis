@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
+﻿using System.ComponentModel;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
 
-namespace Kerb;
+namespace Titanis.Cli.Kerb;
 
 /// <task category="Kerberos">Renew a ticket</task>
 [Command]

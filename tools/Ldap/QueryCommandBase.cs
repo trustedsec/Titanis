@@ -1,11 +1,6 @@
-﻿using epm;
-using System.Collections.Generic;
-using System.ComponentModel;
-using Titanis;
-using Titanis.Cli;
 using Titanis.Ldap;
 
-namespace Ldap;
+namespace Titanis.Cli.LdapTool;
 
 internal abstract class QueryCommandBase : LdapSearchCommandBase
 {

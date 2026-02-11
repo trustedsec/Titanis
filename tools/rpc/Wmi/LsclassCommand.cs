@@ -1,14 +1,7 @@
-﻿using ms_wmi;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
+﻿using System.ComponentModel;
 using Titanis.Msrpc.Mswmi;
 
-namespace Wmi;
+namespace Titanis.Cli.WmiTool;
 
 /// <task category="WMI;Enumeration">List the classes within a WMI namespace</task>
 [Command]

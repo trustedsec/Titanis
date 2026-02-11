@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis;
-using Titanis.Cli;
+﻿using System.ComponentModel;
 using Titanis.Net;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
 
-namespace Kerb;
+namespace Titanis.Cli.Kerb;
 
 /// <task category="Expanding Access;Kerberos">Set the password of another user account</task>
 [Command]

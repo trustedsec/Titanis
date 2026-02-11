@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
-using Titanis.Cli;
 using Titanis.Msrpc.Mslsar;
 
-namespace Lsa;
+namespace Titanis.Cli.LsaTool;
 
 /// <task category="LSA;Enumeration">Translate an account name to its SID and domain name</task>
 [Command]

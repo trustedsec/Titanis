@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
-using Titanis.Cli;
 
-namespace Lsa;
+namespace Titanis.Cli.LsaTool;
 
 [Description("Commands for interacting with the LSA")]
 [Subcommand("lookupsid", typeof(LookupSidCommand))]

@@ -1,14 +1,6 @@
-﻿using ms_wmi;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
-using Titanis.Msrpc.Mswmi;
+﻿using System.ComponentModel;
 
-namespace Wmi;
+namespace Titanis.Cli.WmiTool;
 
 /// <task category="WMI;Enumeration">Executes a WMI query</task>
 [Command]

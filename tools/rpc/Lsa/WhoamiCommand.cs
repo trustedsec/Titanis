@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
-using Titanis.Cli;
 using Titanis.Msrpc.Mslsar;
 using Titanis.Security;
 
-namespace Lsa;
+namespace Titanis.Cli.LsaTool;
 
 [Command]
 [OutputRecordType(typeof(UserPrincipalName), DefaultOutputStyle = OutputStyle.Freeform)]

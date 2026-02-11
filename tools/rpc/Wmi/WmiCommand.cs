@@ -1,23 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis;
-using Titanis.Cli;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
-using Titanis.DceRpc.Epm;
 using Titanis.Msrpc.Msdcom;
 using Titanis.Msrpc.Mswmi;
 using Titanis.Net;
 using Titanis.Security;
-using Titanis.Smb2;
 
-namespace Wmi;
+namespace Titanis.Cli.WmiTool;
 internal abstract class WmiCommand : Command
 {
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]

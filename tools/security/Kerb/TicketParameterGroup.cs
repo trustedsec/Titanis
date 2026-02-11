@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis;
-using Titanis.Cli;
+﻿using System.ComponentModel;
 using Titanis.Security.Kerberos;
 
-namespace Kerb
+namespace Titanis.Cli.Kerb
 {
 	internal class TicketParameterGroup : ParameterGroupBase
 	{

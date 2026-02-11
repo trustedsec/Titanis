@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Net;
-using Titanis.Cli;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
 
-namespace Kerb
+namespace Titanis.Cli.Kerb
 {
 	/// <task category="Kerberos">Check whether a user account requires pre-authentication</task>
 	/// <task category="Kerberos">Check the encryption types supported for a user account</task>

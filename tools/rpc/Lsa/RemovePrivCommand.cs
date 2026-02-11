@@ -1,9 +1,7 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.Design;
-using Titanis.Cli;
 using Titanis.Msrpc.Mslsar;
 
-namespace Lsa;
+namespace Titanis.Cli.LsaTool;
 
 /// <task category="LSA">Revoke a privilege from an account</task>
 [Command]

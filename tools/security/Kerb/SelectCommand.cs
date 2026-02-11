@@ -1,16 +1,10 @@
-﻿using KerberosV5Spec2;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Globalization;
-using System.Net;
-using System.Net.Sockets;
-using System.Numerics;
 using System.Text.RegularExpressions;
-using Titanis;
-using Titanis.Cli;
 using Titanis.Security.Kerberos;
 
-namespace Kerb
+namespace Titanis.Cli.Kerb
 {
 	/// <task category="Kerberos">Describe a Kerberos ticket</task>
 	/// <task category="Kerberos">Print the contents of a .kirbi file</task>

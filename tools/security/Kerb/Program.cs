@@ -1,10 +1,7 @@
 ﻿using System.ComponentModel;
-using Titanis;
-using Titanis.Cli;
 using Titanis.Security.Kerberos;
-using Titanis.Winterop.Security;
 
-namespace Kerb
+namespace Titanis.Cli.Kerb
 {
 	[Description("Commands for working with Kerberos authentication")]
 	[Subcommand("getasinfo", typeof(GetASInfoCommand))]

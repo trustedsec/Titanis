@@ -1,12 +1,6 @@
 ﻿using System.ComponentModel;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using Titanis.Cli;
-using Titanis.Ldap;
-using Titanis.Net;
 
-namespace Ldap
+namespace Titanis.Cli.LdapTool
 {
 	[Description("Performs LDAP operations")]
 	[Subcommand("search", typeof(SearchCommand))]

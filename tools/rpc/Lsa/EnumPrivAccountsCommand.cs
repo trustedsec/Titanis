@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
-using Titanis.Cli;
 using Titanis.Msrpc.Mslsar;
 
-namespace Lsa;
+namespace Titanis.Cli.LsaTool;
 
 [Command]
 [OutputRecordType(typeof(LsaAccountInfo))]
