@@ -11,7 +11,7 @@ namespace Titanis.Security.Ntlm
 		internal string? workstationName;
 		internal string? workstationDomain;
 		internal ulong challengeFromClient;
-		internal ServicePrincipalName? targetSpn;
+		internal SecurityPrincipalName? targetSpn;
 		internal NtlmVersion clientVersion;
 		internal DateTime clientTime;
 

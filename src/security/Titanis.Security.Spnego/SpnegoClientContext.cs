@@ -45,9 +45,9 @@ namespace Titanis.Security.Spnego
 		/// <inheritdoc/>
 		public sealed override byte RpcAuthType => 0x09;
 
-		private ServicePrincipalName? _targetSpn;
+		private SecurityPrincipalName? _targetSpn;
 		/// <inheritdoc/>
-		public sealed override ServicePrincipalName? TargetSpn
+		public sealed override SecurityPrincipalName? TargetSpn
 		{
 			get => this._targetSpn;
 			set => this._targetSpn = value;
@@ -256,29 +256,26 @@ namespace Titanis.Security.Spnego
 						throw new SecurityException(Messages.Spnego_NoSelectedContext);
 				}
 
+				// Pass token to selected context
+				if (respToken.responseToken != null)
+					innerTokenBytes = this._selectedContext.Initialize(respToken.responseToken);
+				else
+					innerTokenBytes = default;
+
+				// If acceptor provided MIC
+				var acceptorMic = respToken.mechListMIC;
+				if (!acceptorMic.IsNullOrEmpty())
+				{
+					var mechListBytes = Asn1DerEncoder.EncodeTlv(Asn1SequenceOf.Create(this._mechTypeList));
+					this._selectedContext.VerifyMessage(mechListBytes.Span, acceptorMic, MessageSignOptions.SpnegoMechList);
+				}
 
 				if (respToken.negState is NegTokenResp_NegState_Tagged0.Accept_completed)
 				{
-					var mic = respToken.mechListMIC;
-					if (respToken.responseToken != null)
-						innerTokenBytes = this._selectedContext.Initialize(respToken.responseToken);
-
-					if (!mic.IsNullOrEmpty())
-					{
-						var mechListBytes = Asn1DerEncoder.EncodeTlv(Asn1SequenceOf.Create(this._mechTypeList));
-						this._selectedContext.VerifyMessage(mechListBytes.Span, mic, MessageSignOptions.SpnegoMechList);
-					}
-
 					tokenBytes = null;
 				}
 				else
 				{
-
-					// TODO: Check mech ID of response
-					// TODO: Check MIC
-					innerTokenBytes = this._selectedContext.Initialize(respToken.responseToken);
-
-
 					byte[]? mic;
 					if (this._selectedContext.IsComplete && innerTokenBytes.Length > 0)
 					{

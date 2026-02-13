@@ -12,8 +12,8 @@ namespace Titanis.Security.Kerberos
 	/// </remarks>
 	public sealed class KerberosNullCredential : KerberosCredential
 	{
-		public KerberosNullCredential(string userName, string realm)
-			: base(userName, realm)
+		public KerberosNullCredential(UserPrincipalName userName)
+			: base(userName)
 		{
 		}
 

@@ -78,7 +78,7 @@ namespace Titanis.Security
 				return false;
 			for (int i = 0; i < count; i++)
 			{
-				if (!string.Equals(this.GetNamePart(i), other.GetNamePart(i)))
+				if (!string.Equals(this.GetNamePart(i), other.GetNamePart(i), StringComparison.OrdinalIgnoreCase))
 					return false;
 			}
 

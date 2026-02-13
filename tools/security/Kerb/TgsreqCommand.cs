@@ -117,7 +117,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 				if (this.U2uTicket != null)
 					context.LogError(nameof(ServicePassword), $"-{nameof(ServicePassword)} cannot be used with -{nameof(U2uTicket)}");
 
-				this._serviceCredential = new KerberosPasswordCredential("<service>", "<realm>", this.ServicePassword);
+				this._serviceCredential = new KerberosPasswordCredential(new UserPrincipalName("<service>", "<realm>"), this.ServicePassword);
 			}
 			else
 			{

@@ -195,7 +195,7 @@ namespace Titanis.DceRpc.Client
 		public async Task ConnectTcp(
 			RpcClientProxy proxy,
 			EndPoint serviceEP,
-			ServicePrincipalName? spn,
+			SecurityPrincipalName? spn,
 			RpcAuthLevel authLevel,
 			CancellationToken cancellationToken
 			)
@@ -262,7 +262,7 @@ namespace Titanis.DceRpc.Client
 		/// </remarks>
 		public async Task BindProxyToStream(
 			RpcClientProxy proxy,
-			ServicePrincipalName? spn,
+			SecurityPrincipalName? spn,
 			RpcAuthLevel authLevel,
 			Stream? stream,
 			CancellationToken cancellationToken
@@ -304,8 +304,8 @@ namespace Titanis.DceRpc.Client
 					if (spn is not null)
 					{
 						authContext = this._credentialService?.GetAuthContextForService(spn, caps, AuthOptions.None);
-						if (authContext is null)
-							authContext = this._credentialService?.GetAuthContextForService(spn.WithServiceClass(ServiceClassNames.HostU), caps, AuthOptions.PreferSpnego);
+						if (authContext is null && spn is ServicePrincipalName svcpn)
+							authContext = this._credentialService?.GetAuthContextForService(svcpn.WithServiceClass(ServiceClassNames.HostU), caps, AuthOptions.PreferSpnego);
 					}
 					else
 						authContext = null;

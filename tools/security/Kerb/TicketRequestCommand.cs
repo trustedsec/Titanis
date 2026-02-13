@@ -7,7 +7,7 @@ namespace Titanis.Cli.Kerb;
 /// </summary>
 [OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = OutputStyle.Table, DefaultFields = new string[]
 {
-		nameof(TicketInfo.SeqNbr), nameof(TicketInfo.ClientName), nameof(TicketInfo.ClientRealm), nameof(TicketInfo.TargetSpn), nameof(TicketInfo.EndTime), nameof(TicketInfo.KdcOptions), nameof(TicketInfo.Comment)
+		nameof(TicketInfo.ClientName), nameof(TicketInfo.ClientRealm), nameof(TicketInfo.TargetSpn), nameof(TicketInfo.EndTime), nameof(TicketInfo.KdcOptions)
 })]
 abstract class TicketRequestCommand : KdcCommand
 {

@@ -152,7 +152,7 @@ namespace Titanis.Security.Ntlm
 		/// </remarks>
 		public bool UseNtlmV2 { get; }
 		/// <inheritdoc/>
-		public sealed override ServicePrincipalName? TargetSpn
+		public sealed override SecurityPrincipalName? TargetSpn
 		{
 			get => this._state.targetSpn;
 			set => this._state.targetSpn = value;
@@ -166,6 +166,7 @@ namespace Titanis.Security.Ntlm
 			| NegotiateFlags.U_Negotiate128
 			| NegotiateFlags.T_NegotiateVersion
 			| NegotiateFlags.M_NegotiateAlwaysSign
+			| NegotiateFlags.V_NegotiateKeyExchange
 			| NegotiateFlags.H_NegotiateNtlm
 			| NegotiateFlags.C_RequestTarget
 			;

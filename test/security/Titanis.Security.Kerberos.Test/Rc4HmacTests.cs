@@ -40,7 +40,7 @@ public class Rc4HmacTests
 			0xB4, 0x06, 0xA0, 0x17, 0x72, 0xD0, 0xAD, 0x22,
 			0x5D, 0x7B, 0x1C, 0x67, 0xDD, 0x81, 0x49, 0x6F,
 		};
-		KerberosKeyCredential cred = new KerberosKeyCredential("milchick", "LUMON.IND", EType.Rc4Hmac, ntlmHash);
+		KerberosKeyCredential cred = new KerberosKeyCredential(new UserPrincipalName("milchick", "LUMON.IND"), EType.Rc4Hmac, ntlmHash);
 
 		kerb.TestAsRep(repbuf, cred);
 	}

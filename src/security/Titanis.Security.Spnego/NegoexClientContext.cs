@@ -14,7 +14,7 @@ namespace Titanis.Security.Spnego
 
 		public override string UserName => throw new NotImplementedException();
 
-		public override ServicePrincipalName? TargetSpn { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+		public override SecurityPrincipalName? TargetSpn { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
 		public override bool IsComplete => throw new NotImplementedException();
 

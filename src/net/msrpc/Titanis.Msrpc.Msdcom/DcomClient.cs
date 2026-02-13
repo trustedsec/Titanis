@@ -327,7 +327,8 @@ namespace Titanis.Msrpc.Msdcom
 					(int)this._rpcClient.DefaultAuthLevel
 				));
 
-			ServicePrincipalName? exporterSpn = null;
+			SecurityPrincipalName? exporterSpn = null;
+			UserPrincipalName? u2upn = null;
 			bool isUntrustedSpn = false;
 			foreach (var secbinding in bindings.SecurityBindings)
 			{
@@ -338,6 +339,12 @@ namespace Titanis.Msrpc.Msdcom
 					if (ServicePrincipalName.TryParse(secbinding.PrincipalName, out var spn))
 					{
 						exporterSpn = spn;
+						break;
+					}
+					else if (UserPrincipalName.TryParse(secbinding.PrincipalName, out u2upn))
+					{
+						// HACK: Until there is better support for this
+						exporterSpn = new UserPrincipalName(u2upn.UserName, u2upn.Realm, u2upn.UserName, PrincipalNameType.MsPrincipal);
 						break;
 					}
 				}

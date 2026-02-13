@@ -225,7 +225,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 										try
 										{
 											var ticketKey = krb.CreateSessionKeyFor(ticket.TicketEType, ticketKeyBytes.Bytes);
-											var authzData = krb.GetTicketAuthorizationData(ticket, ticketKey, null);
+											var authzData = ticket.DecryptAuthorizationData(ticketKey, null);
 											ticket.TicketKey = ticketKey;
 											decrypted = true;
 											break;
@@ -274,7 +274,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 											{
 												this.WriteDiagnostic($"Attempting to decrypt with password '{servicePassword}' and salt '{salt}'.");
 												var ticketKey = encProfile.StringToKey(servicePassword, salt);
-												var authzData = krb.GetTicketAuthorizationData(ticket, ticketKey, null);
+												var authzData = ticket.DecryptAuthorizationData(ticketKey, null);
 												this.WriteVerbose($"Decrypted ticket #{ticket.SeqNbr} using password '{servicePassword}' and salt '{salt}'.");
 												ticket.TicketKey = ticketKey;
 												decrypted = true;

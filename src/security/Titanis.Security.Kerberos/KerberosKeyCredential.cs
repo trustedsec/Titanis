@@ -13,12 +13,11 @@ namespace Titanis.Security.Kerberos
 		/// Initializes a new <see cref="KerberosKeyCredential"/>.
 		/// </summary>
 		/// <param name="userName">User name</param>
-		/// <param name="realm">Realm</param>
 		/// <param name="etype">Encryption type of the key</param>
 		/// <param name="keyBytes">Bytes of the key</param>
 		/// <exception cref="ArgumentNullException"></exception>
-		public KerberosKeyCredential(string userName, string realm, EType etype, byte[] keyBytes)
-			: base(userName, realm)
+		public KerberosKeyCredential(UserPrincipalName userName, EType etype, byte[] keyBytes)
+			: base(userName)
 		{
 			if (keyBytes is null)
 				throw new ArgumentNullException(nameof(keyBytes));

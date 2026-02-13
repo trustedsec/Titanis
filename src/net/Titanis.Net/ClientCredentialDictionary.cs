@@ -17,7 +17,7 @@ namespace Titanis.Net
 		{
 			if (resourceType is ResourceTypes.Service)
 			{
-				if (resourceKey is ServicePrincipalName spn)
+				if (resourceKey is SecurityPrincipalName spn)
 					return this.GetAuthContextForService(spn, requiredCaps, options);
 				else
 					throw new ArgumentException($"resourceKey must be a {nameof(ServicePrincipalName)} for resource type '{ResourceTypes.Service}', but an argument of type '{resourceKey?.GetType()?.FullName ?? "<null>"}' was provided.", nameof(resourceKey));
@@ -35,11 +35,11 @@ namespace Titanis.Net
 		/// <summary>
 		/// Gets a credential for a service.
 		/// </summary>
-		/// <param name="spn"><see cref="ServicePrincipalName"/> of the service</param>
+		/// <param name="spn"><see cref="SecurityPrincipalName"/> of the service</param>
 		/// <param name="requiredCaps"><see cref="SecurityCapabilities"/> required by the caller</param>
 		/// <param name="options">Options affecting the creation of the authentication context</param>
 		/// <returns>An <see cref="AuthClientContext"/> for the credentials, if found; otherwise, <see langword="null"/></returns>
-		public virtual AuthClientContext? GetAuthContextForService(ServicePrincipalName spn, SecurityCapabilities requiredCaps, AuthOptions options)
+		public virtual AuthClientContext? GetAuthContextForService(SecurityPrincipalName spn, SecurityCapabilities requiredCaps, AuthOptions options)
 		{
 			ArgumentNullException.ThrowIfNull(spn);
 			return null;

@@ -17,7 +17,7 @@ public class Trace_Aes256Test
 	{
 		var logger = new KerberosDiagnosticLogger(new TestLog(this.TestContext));
 		KerberosClient client = new KerberosClient(null, callback: logger);
-		KerberosPasswordCredential cred = new KerberosPasswordCredential("milchick", "LUMON.IND", "Br3@kr00m!");
+		KerberosPasswordCredential cred = new KerberosPasswordCredential(new UserPrincipalName("milchick", "LUMON.IND"), "Br3@kr00m!");
 		throw new NotImplementedException();
 		//client.Trace(cred,
 		//	Asreq,

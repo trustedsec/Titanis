@@ -111,7 +111,7 @@ namespace Titanis.Asn1
 
 			if ((cb - i) <= 4)
 			{
-				uint n = this.Octets[i++];
+				uint n = 0;
 				while (i < cb)
 				{
 					n <<= 8;

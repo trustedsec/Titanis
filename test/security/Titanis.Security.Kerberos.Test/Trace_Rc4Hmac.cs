@@ -13,7 +13,7 @@ internal class Trace_Rc4Hmac
 	{
 		KerberosClient client = new KerberosClient(null);
 
-		KerberosPasswordCredential cred = new KerberosPasswordCredential("milchick", "LUMON.IND", "Br3@kr00m!");
+		KerberosPasswordCredential cred = new KerberosPasswordCredential(new UserPrincipalName("milchick", "LUMON.IND"), "Br3@kr00m!");
 		throw new NotImplementedException();
 		//client.Trace(cred,
 		//	Asreq,

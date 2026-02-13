@@ -256,7 +256,12 @@ namespace Titanis.Smb2
 				throw new InvalidOperationException($"No credential is available for server `{serverName}`.");
 			else if (authContext.RpcAuthType != SpnegoRpcType)
 			{
-				SpnegoClientContext spnego = new SpnegoClientContext();
+				SpnegoClientContext spnego = new SpnegoClientContext()
+				{
+					ChannelBinding = authContext.ChannelBinding,
+					TargetSpn = authContext.TargetSpn,
+					IsTargetSpnUntrusted = authContext.IsTargetSpnUntrusted,
+				};
 				spnego.Contexts.Add(authContext);
 				authContext = spnego;
 			}

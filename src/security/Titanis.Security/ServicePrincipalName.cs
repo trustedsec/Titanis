@@ -73,7 +73,7 @@ namespace Titanis.Security
 		public string[] ServiceInstanceParts => (this._instanceParts ??= this._instance!.Split('/'));
 
 		/// <inheritdoc/>
-		public sealed override PrincipalNameType NameType => PrincipalNameType.ServiceInstance;
+		public sealed override PrincipalNameType NameType { get; } = PrincipalNameType.ServiceInstance;
 		/// <inheritdoc/>
 		public sealed override string[] GetNameParts() => [this.ServiceClass, .. this._instanceParts];
 		/// <inheritdoc/>

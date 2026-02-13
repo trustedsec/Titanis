@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,28 +14,27 @@ namespace Titanis.Security.Kerberos
 		/// Initializes a new <see cref="KerberosCredential"/>.
 		/// </summary>
 		/// <param name="userName">User name</param>
-		/// <param name="realm">Realm</param>
-		/// <exception cref="ArgumentNullException"><paramref name="userName"/> or <paramref name="realm"/> is <see langword="null"/> or empty.</exception>
-		protected KerberosCredential(string userName, string realm)
+		/// <exception cref="ArgumentNullException"><paramref name="userName"/> is <see langword="null"/>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="userName"/> doesn't specify a <see cref="UserPrincipalName.Realm"/>.</exception>
+		protected KerberosCredential(UserPrincipalName userName)
 		{
-			if (string.IsNullOrEmpty(userName))
-				throw new ArgumentNullException(nameof(userName));
-			if (string.IsNullOrEmpty(realm))
-				throw new ArgumentNullException(nameof(realm));
+			ArgumentNullException.ThrowIfNull(userName);
 
 			this.UserName = userName;
-			this.Realm = realm.ToUpper();
+			if (string.IsNullOrEmpty(userName.Realm))
+				throw new ArgumentException($"The user name must specify a realm.", nameof(userName));
+
+			this.UserName = userName;
 		}
 
-		internal virtual PrincipalNameType UserNameType => PrincipalNameType.Principal;
 		/// <summary>
 		/// Gets the user name.
 		/// </summary>
-		public string UserName { get; }
+		public UserPrincipalName UserName { get; }
 		/// <summary>
-		/// Gets the realm.
+		/// Gets the name of the realm.
 		/// </summary>
-		public string Realm { get; }
+		public string Realm => this.UserName.Realm!;
 
 		/// <summary>
 		/// Gets the key salt.
@@ -42,7 +42,7 @@ namespace Titanis.Security.Kerberos
 		/// <returns>A byte array of key salt data</returns>
 		// [MS-KILE] § 3.1.1.2 Cryptographic Material
 		public byte[] GetSalt()
-			=> Encoding.UTF8.GetBytes(this.Realm.ToUpper() + this.UserName);
+			=> Encoding.UTF8.GetBytes(this.Realm.ToUpper() + this.UserName.UserName);
 
 		internal abstract bool SupportsPreauthType(PadataType preauthType);
 		/// <summary>

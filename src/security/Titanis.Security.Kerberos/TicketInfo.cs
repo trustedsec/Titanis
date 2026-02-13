@@ -149,6 +149,8 @@ namespace Titanis.Security.Kerberos
 			this.Padata = padataList?.ToArray();
 		}
 
+		public sealed override string ToString() => $"{this.ClientName}@{this.ClientRealm} => {this.TargetSpn}";
+
 		private static bool IsSuppPadata(PA_DATA padata)
 		{
 			return
@@ -200,7 +202,7 @@ namespace Titanis.Security.Kerberos
 		/// <summary>
 		/// Gets the target service.
 		/// </summary>
-		public SecurityPrincipalName TargetSpn { get; }
+		public SecurityPrincipalName TargetSpn { get; private set; }
 		/// <summary>
 		/// Gets the name of the target service.
 		/// </summary>
@@ -359,6 +361,12 @@ namespace Titanis.Security.Kerberos
 			var authz = new TicketAuthorizationData();
 			authz.Process(encTicketPart, asrepKey);
 			return authz;
+		}
+
+		internal void ChangeSpn(ServicePrincipalName targetSpn)
+		{
+			this.TargetSpn = targetSpn;
+			this.ticket.sname = Structs.PrincipalName(targetSpn);
 		}
 		#endregion
 	}

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Titanis.Security
 {
 	/// <summary>
-	/// Represents a user principal name.
+	/// Represents the security principal name of a user.
 	/// </summary>
 	[TypeConverter(typeof(UserPrincipalNameConverter))]
 	public sealed class UserPrincipalName : SecurityPrincipalName, IEquatable<UserPrincipalName?>
@@ -22,18 +22,33 @@ namespace Titanis.Security
 		/// </summary>
 		/// <param name="userName">Name of user</param>
 		/// <param name="realm">Name of realm</param>
-		public UserPrincipalName(string userName, string? realm, string? originalText = null)
+		/// <param name="wireName">Name sent over the wire</param>
+		/// <remarks>
+		/// If <paramref name="wireName"/> is <see langword="null"/>, it is formed based on <paramref name="nameType"/>: if <paramref name="nameType"/> is <see cref="PrincipalNameType.Enterprise"/>, it is set to <paramref name="userName"/>@<paramref name="realm"/>, else set to <paramref name="userName"/>.
+		/// </remarks>
+		public UserPrincipalName(string userName, string? realm, string? wireName = null, PrincipalNameType nameType = PrincipalNameType.Principal)
 		{
-			UserName = userName;
-			Realm = realm;
+			if (string.IsNullOrEmpty(userName)) throw new ArgumentException($"'{nameof(userName)}' cannot be null or empty.", nameof(userName));
 
-			if (string.IsNullOrEmpty(originalText))
-				originalText = string.IsNullOrEmpty(realm) ? userName : $"{userName}@{realm}";
+			this.UserName = userName;
+			this.Realm = realm;
 
-			this.OriginalText = originalText;
+			if (string.IsNullOrEmpty(wireName))
+			{
+				if (nameType is PrincipalNameType.Enterprise)
+					wireName = string.IsNullOrEmpty(realm) ? userName : $"{userName}@{realm}";
+				else
+					wireName = userName;
+			}
+
+			this.WireName = wireName!;
+			this.NameType = nameType;
 		}
 
-		public string OriginalText { get; set; }
+		/// <summary>
+		/// Gets the name as it is sent over the wire.
+		/// </summary>
+		public string WireName { get; set; }
 
 		/// <summary>
 		/// Gets the name of the user.
@@ -44,35 +59,71 @@ namespace Titanis.Security
 		/// </summary>
 		public string? Realm { get; }
 
-		public sealed override PrincipalNameType NameType => PrincipalNameType.Enterprise;
-		public sealed override string[] GetNameParts() => new string[] { this.OriginalText };
+		/// <summary>
+		/// Gets the original text specified by the user.
+		/// </summary>
+		public string? OriginalText { get; set; }
+
+		public sealed override PrincipalNameType NameType { get; }
+		public sealed override string[] GetNameParts() => new string[] { this.WireName };
 		public sealed override int NamePartCount => 1;
 		public sealed override string GetNamePart(int index) => index switch
 		{
-			0 => this.OriginalText,
+			0 => this.WireName,
 			_ => throw new ArgumentOutOfRangeException(nameof(index))
 		};
 
-		private static readonly Regex rgxUpn = new Regex(@"^((?<r>[^\\]+)\\)?((?<u>[^@]+)(@(?<r>.*))?)$");
+		private static readonly Regex rgxUpn = new Regex(@"^(((?<d>[^\\]+)\\(?<u>.*))|((?<u>[^@]+)(@(?<r>.*))?))$");
+		public static bool TryParse(string? text, out UserPrincipalName? upn)
+		{
+			if (!string.IsNullOrEmpty(text))
+			{
+				var m = rgxUpn.Match(text);
+				if (m.Success)
+				{
+					var d = m.Groups["d"];
+					var u = m.Groups["u"].Value;
+					if (d.Success)
+					{
+						upn = new UserPrincipalName(u, d.Value, u) { OriginalText = text };
+					}
+					else
+					{
+						var r = m.Groups["r"].Value;
+						if (r.Contains('.'))
+							upn = new UserPrincipalName(u, r, text, PrincipalNameType.Enterprise) { OriginalText = text };
+						else
+						{
+							if (r == string.Empty)
+								r = null;
+
+							upn = new UserPrincipalName(u, r, u) { OriginalText = text };
+						}
+					}
+					return true;
+				}
+			}
+
+			upn = null;
+			return false;
+		}
 		public static UserPrincipalName Parse(string text)
 		{
 			if (string.IsNullOrEmpty(text)) throw new ArgumentException($"'{nameof(text)}' cannot be null or empty.", nameof(text));
 
-			var m = rgxUpn.Match(text);
-			if (!m.Success)
+			if (TryParse(text, out var upn))
+				return upn;
+			else
 				throw new FormatException("The UPN must be specified as <user name>@<realm>");
-
-			var u = m.Groups["u"].Value;
-			var r = m.Groups["r"].Value;
-			if (r == string.Empty)
-				r = null;
-			return new UserPrincipalName(u, r, text);
 		}
 
 		private string? _str;
 
 		/// <inheritdoc/>
-		public sealed override string ToString() => this.OriginalText;
+		public sealed override string ToString() =>
+			(this.NameType is PrincipalNameType.Enterprise) ? this.WireName
+			: (!string.IsNullOrEmpty(this.Realm)) ? $"{this.Realm}\\{this.UserName}"
+			: this.UserName;
 
 		public sealed override bool Equals(object? obj)
 		{
@@ -93,7 +144,7 @@ namespace Titanis.Security
 
 		public UserPrincipalName WithRealm(string? realm)
 		{
-			return new UserPrincipalName(this.UserName, realm, this.OriginalText);
+			return new UserPrincipalName(this.UserName, realm, this.WireName, this.NameType);
 		}
 
 		public static bool operator ==(UserPrincipalName? left, UserPrincipalName? right)

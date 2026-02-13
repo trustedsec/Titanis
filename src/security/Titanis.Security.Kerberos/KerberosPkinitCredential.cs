@@ -10,13 +10,12 @@ namespace Titanis.Security.Kerberos
 {
 	public class KerberosPkinitCredential : KerberosCredential
 	{
-		public KerberosPkinitCredential(UserPrincipalName upn, string realm, X509Certificate2 certificate)
-			: base(upn.OriginalText, realm)
+		public KerberosPkinitCredential(UserPrincipalName upn, X509Certificate2 certificate)
+			: base(upn)
 		{
 			this.Certificate = certificate;
 		}
 
-		internal sealed override PrincipalNameType UserNameType => PrincipalNameType.Enterprise;
 		public X509Certificate2 Certificate { get; }
 
 		public override SessionKey DeriveProtocolKeyFor(EncProfile profile, byte[]? salt)

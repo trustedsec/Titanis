@@ -34,6 +34,8 @@ namespace Titanis.Cli.Kerb
 				log.PrintIf($"  LM hash: ", authzData.LmHash?.ToHexString());
 				log.PrintIf($"  NTLM hash: ", authzData.NtlmHash?.ToHexString());
 
+				log.PrintIf($"  Requestor SID: ", authzData.RequestorSid);
+
 				log.PrintIf($"  Full name: ", authzData.LogonInfo?.FullName);
 				log.PrintIf($"  Account flags: ", authzData.LogonInfo?.UserAccountControl);
 				log.PrintIf($"  Logon flags: ", authzData.LogonInfo?.UserFlags);
@@ -86,7 +88,7 @@ namespace Titanis.Cli.Kerb
 		}
 		public static void PrintIf<T>(this ILog log, string? label, T? message)
 		{
-			if (message == null)
+			if (message != null)
 				log.WriteInfo(label + message);
 		}
 		public static void PrintIf<T>(this ILog log, string? label, T? message)

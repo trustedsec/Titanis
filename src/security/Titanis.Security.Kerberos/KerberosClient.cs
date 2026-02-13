@@ -43,7 +43,20 @@ namespace Titanis.Security.Kerberos
 		public X509Certificate? S4UserCertificate { get; set; }
 		public bool IndicatesS4User => this.S4UserName is not null || this.S4UserCertificate is not null;
 		public SecurityPrincipalName? S4ProxyService { get; set; }
-		public TicketInfo? AdditionalTicket { get; set; }
+
+		private TicketInfo? _additionalTicket;
+		public TicketInfo? AdditionalTicket
+		{
+			get => _additionalTicket;
+			set
+			{
+				_additionalTicket = value;
+				this.addlTicketStruc = value?.ticket;
+			}
+		}
+
+		internal KerberosV5Spec2.Ticket_Tagged1? addlTicketStruc;
+
 		public string? TicketComment { get; internal set; }
 	}
 	/// <summary>
@@ -294,7 +307,7 @@ namespace Titanis.Security.Kerberos
 				Structs.KdcReqBody(
 					ticketParameters,
 					ticketParameters.Options,
-					Structs.PrincipalName(credential.UserNameType, credential.UserName),
+					Structs.PrincipalName(credential.UserName),
 					credential.Realm,
 					Structs.PrincipalName(targetSpn),
 					context.nonce,
@@ -429,16 +442,6 @@ namespace Titanis.Security.Kerberos
 			return encProfile.CreateSessionKey(keyBytes.ToArray());
 		}
 
-		public TicketAuthorizationData GetTicketAuthorizationData(TicketInfo ticket, SessionKey ticketKey, SessionKey? asrepKey)
-		{
-			var decrypted = ticketKey.Decrypt(KeyUsage.Asrep_Tgsrep_Ticket, ticket.ticket.enc_part.cipher.ToArray());
-			var encPart = Asn1DerDecoder.DecodeTlv<EncTicketPart>(decrypted);
-
-			TicketAuthorizationData ad = new TicketAuthorizationData();
-			ad.Process(encPart, asrepKey);
-			return ad;
-		}
-
 		private int _lastTicketSeqnbr;
 		private int GetNextTicketSeqnbr()
 		{
@@ -508,12 +511,14 @@ namespace Titanis.Security.Kerberos
 			CancellationToken cancellationToken)
 		{
 			var spn = new ServicePrincipalName(ServiceClassNames.Krbtgt, realm);
-			var ticket = this.TicketCache.GetTicketFromCache(spn, credential?.UserName);
+			var ticket = this.TicketCache.GetTicketFromCache(spn, credential?.UserName.UserName);
 			if (ticket == null)
 			{
-				if (this._realmMapping.TryGetValue(realm, out string mapped))
-					realm = mapped;
-				ticket = this.TicketCache.GetTicketFromCache(spn, credential?.UserName);
+				if (this._realmMapping.TryGetValue(realm, out string? mapped))
+				{
+					spn = new ServicePrincipalName(ServiceClassNames.Krbtgt, mapped);
+					ticket = this.TicketCache.GetTicketFromCache(spn, credential?.UserName.UserName);
+				}
 			}
 
 			if (ticket != null)
@@ -527,7 +532,7 @@ namespace Titanis.Security.Kerberos
 				ticket = await this.RequestTgt(realm, credential, cancellationToken).ConfigureAwait(false);
 				if (!string.Equals(ticket.TicketRealm, realm))
 				{
-					// Realm may have been normalized; set mapping
+					// Realm may have been canonicalized; set mapping
 					this._realmMapping[realm] = ticket.TicketRealm;
 				}
 				return ticket;
@@ -535,7 +540,7 @@ namespace Titanis.Security.Kerberos
 		}
 
 		public async Task<TicketInfo> GetTicketAsync(
-			ServicePrincipalName targetSpn,
+			SecurityPrincipalName targetSpn,
 			string realm,
 			KerberosCredential credential,
 			TicketParameters? ticketParameters,
@@ -546,7 +551,7 @@ namespace Titanis.Security.Kerberos
 			ArgumentException.ThrowIfNullOrEmpty(realm);
 			ArgumentNullException.ThrowIfNull(credential);
 
-			var ticket = this.TicketCache.GetTicketFromCache(targetSpn, credential.UserName);
+			var ticket = this.TicketCache.GetTicketFromCache(targetSpn, credential.UserName.UserName);
 			if (ticket != null)
 				return ticket;
 
@@ -581,7 +586,7 @@ namespace Titanis.Security.Kerberos
 			{
 				if (ticketParameters.S4ProxyService != spn)
 				{
-					if (ticketParameters.AdditionalTicket == null)
+					if (ticketParameters.addlTicketStruc == null)
 					{
 						var proxyTicket = await RequestTicket(
 							tgt,
@@ -643,7 +648,7 @@ namespace Titanis.Security.Kerberos
 
 			bool usingSubkey = tgt.SessionKey.EType != EType.Rc4Hmac;
 			var sessionKey = usingSubkey ? tgt.GenerateSessionKey() : tgt.SessionKey;
-			KerberosNullCredential cred = new KerberosNullCredential(tgt.ClientName, tgt.TicketRealm);
+			KerberosNullCredential cred = new KerberosNullCredential(new UserPrincipalName(tgt.ClientName, tgt.TicketRealm));
 			TicketRequestContext context = new TicketRequestContext(ticketParameters, null, cred.CreatePreauthContext(this, this._callback), sessionKey, usingSubkey)
 			{
 				Tgt = tgt
@@ -769,6 +774,13 @@ namespace Titanis.Security.Kerberos
 			| KdcOptions.Canonicalize
 			;
 
+		public const KdcOptions DefaultU2uTicketOptions = 0
+			| KdcOptions.Forwardable
+			| KdcOptions.Renewable
+			| KdcOptions.Canonicalize
+			| KdcOptions.EncTicketInSKey
+			;
+
 		// Matches Windows 11
 		private static readonly EType[] defaultEtypes = new EType[]
 		{
@@ -864,7 +876,7 @@ namespace Titanis.Security.Kerberos
 
 			if (ticketParameters.IndicatesS4User)
 			{
-				if (ticketParameters.AdditionalTicket == null)
+				if (ticketParameters.addlTicketStruc == null)
 				{
 					string s4uRealm = ticketParameters.S4UserName?.Realm ?? ticket.ClientRealm;
 

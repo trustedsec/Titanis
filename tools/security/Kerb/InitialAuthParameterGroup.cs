@@ -88,23 +88,22 @@ internal class InitialAuthParameterGroup : ParameterGroupBase
 	public KerberosCredential GetCredential(ILog? log)
 	{
 		var realm = this.EffectiveRealm;
+		var userName = this.UserName.WithRealm(realm);
 
 		if (this._userCert != null)
 		{
-			return new KerberosPkinitCredential(this.UserName, this.UserName.Realm ?? realm, this._userCert);
+			return new KerberosPkinitCredential(userName, this._userCert);
 		}
 
-		var userName = this.UserName.UserName;
-
-		return (this.Password != null) ? new KerberosPasswordCredential(userName, realm, this.Password)
-			: (this.NtlmHash != null) ? new KerberosKeyCredential(userName, realm, EType.Rc4Hmac, this.NtlmHash.Bytes)
-			: (this.AesKey != null) ? new KerberosKeyCredential(userName, realm, (this.AesKey.Bytes.Length switch
+		return (this.Password != null) ? new KerberosPasswordCredential(userName, this.Password)
+			: (this.NtlmHash != null) ? new KerberosKeyCredential(userName, EType.Rc4Hmac, this.NtlmHash.Bytes)
+			: (this.AesKey != null) ? new KerberosKeyCredential(userName, (this.AesKey.Bytes.Length switch
 			{
 				(128 / 8) => EType.Aes128CtsHmacSha1_96,
 				(256 / 8) => EType.Aes256CtsHmacSha1_96,
 				_ => throw new ArgumentException("The AES key is not the correct size for AES 128 or AES 256.")
 			}), this.AesKey.Bytes)
-			: (this.DesKey != null) ? new KerberosKeyCredential(userName, realm, EType.DesCbcMd5, this.DesKey.Bytes)
+			: (this.DesKey != null) ? new KerberosKeyCredential(userName, EType.DesCbcMd5, this.DesKey.Bytes)
 			: throw new SyntaxException("No credential provided");
 	}
 }

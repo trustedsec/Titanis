@@ -11,7 +11,7 @@ namespace Titanis.Security.Kerberos
 	/// </summary>
 	public abstract class KerberosKeyCredentialBase : KerberosCredential
 	{
-		protected KerberosKeyCredentialBase(string userName, string realm) : base(userName, realm)
+		protected KerberosKeyCredentialBase(UserPrincipalName userName) : base(userName)
 		{
 		}
 

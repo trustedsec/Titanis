@@ -56,7 +56,7 @@ internal class SetPasswordCommand : Command
 			HostAddress.FromIPAddress(System.Net.IPAddress.Any),
 			cancellationToken);
 
-		this.WriteMessage(new LogMessage(LogMessageSeverity.Info, null, $"Password changed for user '{this.TargetAccount?.UserName ?? cred.UserName}@{TargetAccount?.Realm ?? cred.Realm}'."));
+		this.WriteMessage(new LogMessage(LogMessageSeverity.Info, null, $"Password changed for user '{this.TargetAccount ?? cred.UserName}@{TargetAccount?.Realm ?? cred.Realm}'."));
 
 		return 0;
 	}

@@ -86,7 +86,7 @@ namespace Titanis.Security.Kerberos
 				ticketParameters.StartTime,
 				ticketParameters.RenewTill,
 				hostAddresses,
-				additional_tickets: (ticketParameters.AdditionalTicket != null) ? [ticketParameters.AdditionalTicket.ticket] : null
+				additional_tickets: (ticketParameters.addlTicketStruc != null) ? [ticketParameters.addlTicketStruc] : null
 			);
 
 		internal static Checksum Checksum(EncChecksumType type, byte[] value)

@@ -9,8 +9,8 @@ namespace Titanis.Security.Kerberos
 	/// </summary>
 	public class KerberosPasswordCredential : KerberosKeyCredentialBase
 	{
-		public KerberosPasswordCredential(string userName, string realm, string password)
-			: base(userName, realm)
+		public KerberosPasswordCredential(UserPrincipalName userName, string password)
+			: base(userName)
 		{
 			if (password is null)
 				throw new ArgumentNullException(nameof(password));

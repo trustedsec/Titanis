@@ -17,7 +17,7 @@ public class Lumon_Aes256
 	[TestMethod("Decrypt AS-REQ pa-data (AES 256)")]
 	public void TestDecryptAsreq_padata()
 	{
-		KerberosCredential cred = new KerberosPasswordCredential(UserName, DomainName, Password);
+		KerberosCredential cred = new KerberosPasswordCredential(new UserPrincipalName(UserName, DomainName), Password);
 		var encProfile = new EncProfile_Aes256CtsHmacSha1_96();
 		var key = cred.DeriveProtocolKeyFor(encProfile, null);
 		//var key = cred.DeriveProtocolKeyFor(encProfile, Array.Empty<byte>());
@@ -27,7 +27,7 @@ public class Lumon_Aes256
 	[TestMethod("Decrypt AS-REP enc-part (AES 256)")]
 	public void TestDecryptAsrep_encPart()
 	{
-		KerberosCredential cred = new KerberosPasswordCredential(UserName, DomainName, Password);
+		KerberosCredential cred = new KerberosPasswordCredential(new UserPrincipalName(UserName, DomainName), Password);
 		var encProfile = new EncProfile_Aes256CtsHmacSha1_96();
 		var key = cred.DeriveProtocolKeyFor(encProfile, null);
 		var decrypted = key.Decrypt(KeyUsage.AsrepEncPart, Structs.EncryptedData(EType.Aes256CtsHmacSha1_96, Asrep_encPart));

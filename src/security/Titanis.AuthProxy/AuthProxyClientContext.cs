@@ -38,7 +38,7 @@ namespace Titanis.AuthProxy
 
 		public override string UserName { get; }
 
-		public override ServicePrincipalName? TargetSpn { get; set; }
+		public override SecurityPrincipalName? TargetSpn { get; set; }
 
 		private bool _isComplete;
 		public override bool IsComplete => this._isComplete;
@@ -138,8 +138,6 @@ namespace Titanis.AuthProxy
 				string? principalName = this.UserName;
 				ReadOnlySpan<byte> authData = null;
 				string? targetSpn = this.TargetSpn?.ToString();
-				if (this.TargetSpn != null)
-					targetSpn = $"{this.TargetSpn.ServiceClass}/{this.TargetSpn.GetNamePart(1)}";
 
 				var channelBinding = this.ChannelBinding?.GetBytes();
 				string? packageName = null;

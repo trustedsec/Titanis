@@ -47,7 +47,7 @@ namespace Titanis.Net
 			=> credentialService.GetAuthContextForResource(ResourceTypes.SmbShare, sharePath, requiredCaps, options);
 		public static AuthClientContext? GetAuthContextForService(
 			this IClientCredentialService credentialService,
-			ServicePrincipalName service,
+			SecurityPrincipalName service,
 			SecurityCapabilities requiredCaps,
 			AuthOptions options = AuthOptions.None)
 			=> credentialService.GetAuthContextForResource(ResourceTypes.Service, service, requiredCaps, options);

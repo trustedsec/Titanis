@@ -207,22 +207,18 @@ namespace Titanis.Asn1.Serialization
 		{
 			if (expectedTag.IsEmpty) throw new ArgumentNullException(nameof(expectedTag));
 
-			Asn1Tag tag;
-			long length;
-			if (this.HasPeekTag)
-			{
-				tag = this._peekedTag;
-				length = this._peekedLength;
-				this.ConsumePeekState();
-			}
-			else
-			{
-				tag = this.DecodeTag();
-				length = this.DecodeLength();
-			}
-
+			var tag = this.PeekTag();
+			// Verify the tag but don't consume it yet
+			// This gives an exception handler a chance to handle the condition.
 			if (((tag._value | Asn1Tag.ConstructedFlag) != (expectedTag._value | Asn1Tag.ConstructedFlag)))
-				throw new InvalidDataException(string.Format(Messages.Asn1_UnexpectedTag, expectedTag.TagNumber, tag));
+				throw new Asn1UnexpectedTagException(this, expectedTag, tag, null);
+
+
+			Debug.Assert(this.HasPeekTag);
+			tag = this._peekedTag;
+			var length = this._peekedLength;
+			this.ConsumePeekState();
+
 
 			long innerEndIndex;
 			if (length < 0)

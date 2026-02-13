@@ -82,7 +82,7 @@ namespace Titanis.Security
 		/// <remarks>
 		/// This property must be initialized before calling <see cref="Initialize()"/>
 		/// </remarks>
-		public abstract ServicePrincipalName? TargetSpn { get; set; }
+		public abstract SecurityPrincipalName? TargetSpn { get; set; }
 		/// <summary>
 		/// Gets or sets a value indicating whether the SPN was supplied by an untrusted source.
 		/// </summary>
