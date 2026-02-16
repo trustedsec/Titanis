@@ -972,6 +972,7 @@ namespace Titanis.Security.Kerberos
 
 		internal static AP_REQ CreateAPReq(
 			TicketInfo ticket,
+			SecurityPrincipalName spn,
 			EncryptionKey subkey,
 			KerberosTime now,
 			int initialSeqNbr,
@@ -1014,9 +1015,13 @@ namespace Titanis.Security.Kerberos
 				KeyUsage.ApreqAuth_AppSessionKey_IncludesAuthSubkey,
 				authenticator);
 
+			var ticketStruc = ticket.ticket;
+			if (spn != null && spn != ticket.TargetSpn)
+				ticketStruc = new Ticket_Tagged1(ticketStruc.tkt_vno, ticketStruc.realm, Structs.PrincipalName(spn), ticketStruc.enc_part);
+
 			AP_REQ apreq = Structs.APReq(
 				options,
-				ticket.ticket,
+				ticketStruc,
 				enc_authenticator
 				);
 

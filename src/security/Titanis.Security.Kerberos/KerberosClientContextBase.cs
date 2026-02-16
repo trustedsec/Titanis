@@ -191,6 +191,7 @@ namespace Titanis.Security.Kerberos
 				var gssFlags = this.RequiredCapabilities;
 				var apreq = KerberosClient.CreateAPReq(
 					ticket,
+					this.TargetSpn,
 					initiatorSubkey.key,
 					this._now,
 					sendSeqNbr,
