@@ -11,6 +11,8 @@ namespace Titanis.Cli.Kerb
 	/// <task category="Kerberos">Print the contents of a .ccache file</task>
 	/// <task category="Kerberos">Convert between a .ccache file and a .kirbi file</task>
 	/// <task category="Kerberos">Query tickets within a .ccache file or .kirbi file</task>
+	/// <task category="Kerberos">Decrypt tickets</task>
+	/// <task category="Kerberos">Print ticket authorization data</task>
 	[Command]
 	[OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = OutputStyle.Table, DefaultFields = new string[]
 	{
@@ -114,6 +116,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 
 		[Parameter]
 		[Category(ParameterCategories.Output)]
+		[Description("Prints ticket authorization data (if decrypted)")]
 		public SwitchParam PrintAuthData { get; set; }
 
 		private Regex BuildRegexFor(string pattern)

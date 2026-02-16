@@ -3,8 +3,9 @@ using Titanis.Security.Kerberos;
 
 namespace Titanis.Cli.Kerb;
 
+/// <task category="Kerberos">List entries in a keytab file.</task>
 [Command]
-[Description("Lists the entries in a keytab")]
+[Description("Lists the entries in a keytab file")]
 [OutputRecordType(typeof(KeytabEntry))]
 internal class ListKeytabCommand : Command
 {

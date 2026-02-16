@@ -124,6 +124,30 @@ namespace Titanis.Security
 		{
 			return !(left == right);
 		}
+
+		public static bool TryParse(string str, out SecurityPrincipalName spn)
+		{
+			if (string.IsNullOrEmpty(str))
+			{
+				spn = null;
+				return false;
+			}
+			else if (ServicePrincipalName.TryParse(str, out var svcpn))
+			{
+				spn = svcpn;
+				return true;
+			}
+			else if (UserPrincipalName.TryParse(str, out var upn))
+			{
+				spn = upn;
+				return true;
+			}
+			else
+			{
+				spn = null;
+				return false;
+			}
+		}
 	}
 
 	/// <summary>
@@ -145,7 +169,7 @@ namespace Titanis.Security
 		{
 			if (value is string str)
 			{
-				if (ServicePrincipalName.TryParse(str, out var spn))
+				if (SecurityPrincipalName.TryParse(str, out var spn))
 					return spn;
 				else
 					return new SimplePrincipalName(str);

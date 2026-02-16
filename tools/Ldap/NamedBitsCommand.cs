@@ -10,6 +10,7 @@ namespace Titanis.Cli.LdapTool;
 internal class NamedBitsCommand : Command
 {
 	[Parameter(0)]
+	[Description("Attribute(s) to print (default is all)")]
 	public string[]? Attribute { get; set; }
 
 	protected override Task<int> RunAsync(CancellationToken cancellationToken)

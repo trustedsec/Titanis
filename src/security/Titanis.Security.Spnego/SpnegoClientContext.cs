@@ -251,16 +251,20 @@ namespace Titanis.Security.Spnego
 						var ctx = this._selectedContext = FindMatchingContext(respToken.supportedMech.Value);
 						if (ctx == null)
 							throw new SecurityException(Messages.Spnego_NoSupportedMechs);
+
+						innerTokenBytes = ctx.Initialize(respToken.responseToken);
 					}
 					else
 						throw new SecurityException(Messages.Spnego_NoSelectedContext);
 				}
-
-				// Pass token to selected context
-				if (respToken.responseToken != null)
-					innerTokenBytes = this._selectedContext.Initialize(respToken.responseToken);
 				else
-					innerTokenBytes = default;
+				{
+					// Pass token to selected context
+					if (respToken.responseToken != null)
+						innerTokenBytes = this._selectedContext.Initialize(respToken.responseToken);
+					else
+						innerTokenBytes = default;
+				}
 
 				// If acceptor provided MIC
 				var acceptorMic = respToken.mechListMIC;

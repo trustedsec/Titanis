@@ -27,45 +27,81 @@ using Titanis.Winterop;
 
 namespace Titanis.Cli
 {
+	[Flags]
+	public enum SpnMappingOptions
+	{
+		None = 0,
+		Revert = 1,
+	}
 	[TypeConverter(typeof(SpnMappingConverter))]
 	public class SpnMapping
 	{
-		public SpnMapping(string? matchServiceClass, string? matchServiceInstance, string? replaceServiceClass, string? replaceServiceInstance)
+		public SpnMapping(SecurityPrincipalName matchName, SecurityPrincipalName replaceName, SpnMappingOptions options)
 		{
-			MatchServiceClass = matchServiceClass;
-			MatchServiceInstance = matchServiceInstance;
-			ReplaceServiceClass = replaceServiceClass;
-			ReplaceServiceInstance = replaceServiceInstance;
+			ArgumentNullException.ThrowIfNull(matchName);
+			ArgumentNullException.ThrowIfNull(replaceName);
+			this.MatchName = matchName;
+			this.ReplaceName = replaceName;
+			this.Options = options;
 		}
 
-		public string? MatchServiceClass { get; }
-		public string? MatchServiceInstance { get; }
-		public string? ReplaceServiceClass { get; }
-		public string? ReplaceServiceInstance { get; }
+		public SecurityPrincipalName MatchName { get; }
+		public SecurityPrincipalName ReplaceName { get; }
+		public SpnMappingOptions Options { get; }
 
-		public override string ToString()
-		{
-			return $"{this.MatchServiceInstance ?? "*"}/{this.MatchServiceInstance ?? "*"} => {this.ReplaceServiceClass ?? "*"}/{this.ReplaceServiceInstance ?? "*"}";
-		}
+		public override string ToString() => $"{this.MatchName} => {this.ReplaceName}";
 
-		public bool Matches(ServicePrincipalName spn)
+		private static bool Matches(string str, string? pattern) => string.IsNullOrEmpty(pattern) || pattern == "*" || pattern.Equals(str, StringComparison.OrdinalIgnoreCase);
+		private static string? Replace(string? str, string? replace) => (string.IsNullOrEmpty(replace) || replace == "*") ? str : replace;
+
+		public bool Matches(SecurityPrincipalName spn)
 		{
 			ArgumentNullException.ThrowIfNull(spn);
 
 			bool matches =
-				(this.MatchServiceClass?.Equals(spn.ServiceClass, StringComparison.OrdinalIgnoreCase) ?? true)
-				&& (this.MatchServiceInstance?.Equals(spn.ServiceInstance, StringComparison.OrdinalIgnoreCase) ?? true)
-				;
+				(
+					(spn is ServicePrincipalName svcpn)
+					&& (this.MatchName is ServicePrincipalName matchSvc)
+					&& Matches(svcpn.ServiceClass, matchSvc.ServiceClass)
+				) || (
+					(spn is UserPrincipalName upn)
+					&& (this.MatchName is UserPrincipalName matchUpn)
+					&& Matches(upn.UserName, matchUpn.UserName)
+					&& Matches(upn.Realm, matchUpn.Realm)
+					);
 			return matches;
 		}
-		public ServicePrincipalName Map(ServicePrincipalName spn)
+		public SecurityPrincipalName Map(SecurityPrincipalName spn)
 		{
-			string sc = this.ReplaceServiceClass ?? spn.ServiceClass;
-			string si = this.ReplaceServiceInstance ?? spn.ServiceInstance;
-			return new ServicePrincipalName(sc, si);
+			ArgumentNullException.ThrowIfNull(spn);
+			if ((spn is ServicePrincipalName svcpn))
+			{
+				if (this.ReplaceName is ServicePrincipalName replaceSvc)
+				{
+					string sc = Replace(svcpn.ServiceClass, replaceSvc.ServiceClass);
+					string si = Replace(svcpn.ServiceInstance, replaceSvc.ServiceInstance);
+					return new ServicePrincipalName(sc, si);
+				}
+				else
+					return this.ReplaceName;
+			}
+			else if ((spn is UserPrincipalName upn))
+			{
+				if (this.ReplaceName is UserPrincipalName replaceUpn)
+				{
+					var realm = Replace(upn.Realm, replaceUpn.Realm);
+					var uname = Replace(upn.UserName, replaceUpn.UserName);
+					return new UserPrincipalName(uname, realm);
+				}
+				else
+					return this.ReplaceName;
+			}
+			else
+				return spn;
 		}
 	}
-	class SpnMappingConverter : TypeConverter
+
+	partial class SpnMappingConverter : TypeConverter
 	{
 		public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
 			=> (sourceType == typeof(string)) || base.CanConvertFrom(context, sourceType);
@@ -74,23 +110,29 @@ namespace Titanis.Cli
 			if (value is string str)
 			{
 				var match = rgxMapping.Match(str);
-				if (!match.Success)
-					throw new ArgumentException($"The SPN mapping must be of the format <serviceClass>/<serviceInstance>=<serviceClass>/<serviceInstance>");
+				if (
+					match.Success
+					&& SecurityPrincipalName.TryParse(match.Groups["match"].Value, out var matchName)
+					&& SecurityPrincipalName.TryParse(match.Groups["replace"].Value, out var replaceName))
+				{
+					SpnMappingOptions options = SpnMappingOptions.None;
+					if (match.Groups["r"].Success)
+						options |= SpnMappingOptions.Revert;
 
-				var sc = match.Groups["sc"].Value;
-				var si = match.Groups["si"].Value;
-				var sc2 = match.Groups["sc2"].Value;
-				var si2 = match.Groups["si2"].Value;
-
-				return new SpnMapping(
-					(sc == "*") ? null : sc, (si == "*") ? null : si,
-					(sc2 == "*") ? null : sc2, (si2 == "*") ? null : si2
-					);
+					return new SpnMapping(matchName, replaceName, options);
+				}
+				else
+				{
+					throw new ArgumentException($"The SPN mapping must be of the format <serviceClass>/<serviceInstance>[~]=<serviceClass>/<serviceInstance>");
+				}
 			}
 			return base.ConvertFrom(context, culture, value);
 		}
 
-		private static readonly Regex rgxMapping = new Regex(@"^(?<sc>[^/]*)/(?<si>.*)=(?<sc2>[^/]*)/(?<si2>.*)$");
+		private static readonly Regex rgxMapping = SpnMappingRegex();
+
+		[GeneratedRegex(@"^(?<match>(~[^=]|[^~=])+)(?<r>~)?=(?<replace>.*)?$")]
+		private static partial Regex SpnMappingRegex();
 	}
 
 	/// <summary>
@@ -452,8 +494,15 @@ namespace Titanis.Cli
 			SecurityCapabilities requiredCaps,
 			AuthOptions options)
 		{
-			if (spn is ServicePrincipalName svcpn)
-				spn = TryMapSpn(svcpn);
+			if (TryMapSpn(spn, out var ticketSpn, out var apreqSpn))
+			{
+				// Use the mappings
+			}
+			else
+			{
+				ticketSpn = spn;
+				apreqSpn = spn;
+			}
 
 			if (this.AuthProxy != null)
 			{
@@ -465,7 +514,7 @@ namespace Titanis.Cli
 				var proxyContext = new AuthProxyClientContext(this.UserName?.ToString(), socket)
 				{
 					RequiredCapabilities = requiredCaps,
-					TargetSpn = spn
+					TargetSpn = apreqSpn
 				};
 				return proxyContext;
 			}
@@ -473,9 +522,9 @@ namespace Titanis.Cli
 			int count = 0;
 
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
-			bool canCreateKerberos = spn != null && !this.Anonymous.IsSet;
+			bool canCreateKerberos = apreqSpn != null && !this.Anonymous.IsSet;
 			KerberosClientContext? extraKerbContext = null;
-			KerberosClientContextBase? krbContext = canCreateKerberos ? this.TryCreateKerberosContext(spn, requiredCaps, true, out extraKerbContext) : null;
+			KerberosClientContextBase? krbContext = canCreateKerberos ? this.TryCreateKerberosContext(ticketSpn, requiredCaps, true, out extraKerbContext) : null;
 			if (krbContext != null)
 			{
 				count = 2;
@@ -483,10 +532,13 @@ namespace Titanis.Cli
 
 				krbContext.RequiredCapabilities |= requiredCaps;
 				extraKerbContext.RequiredCapabilities |= requiredCaps;
+
+				krbContext.TargetSpn = apreqSpn;
+				extraKerbContext.TargetSpn = apreqSpn;
 			}
 
 			// Create NTLM context based on parameters
-			var ntlmContext = this.TryCreateNtlmContext(spn);
+			var ntlmContext = this.TryCreateNtlmContext(apreqSpn);
 			if (ntlmContext != null)
 			{
 				count++;
@@ -498,7 +550,7 @@ namespace Titanis.Cli
 			{
 				var authContext = new SpnegoClientContext()
 				{
-					TargetSpn = spn
+					TargetSpn = apreqSpn
 				};
 				if (krbContext != null)
 					authContext.Contexts.Add(krbContext);
@@ -517,7 +569,7 @@ namespace Titanis.Cli
 				return null;
 		}
 
-		private ServicePrincipalName TryMapSpn(ServicePrincipalName spn)
+		private bool TryMapSpn(SecurityPrincipalName spn, out SecurityPrincipalName? ticketSpn, out SecurityPrincipalName? apreqSpn)
 		{
 			if (this.SpnOverride != null)
 			{
@@ -528,12 +580,16 @@ namespace Titanis.Cli
 						var log = this.Services.GetService<ILog>();
 						var mappedSpn = spnMapping.Map(spn);
 						log?.WriteVerbose($"Overriding SPN: {spn} => {mappedSpn}");
-						return mappedSpn;
+						ticketSpn = mappedSpn;
+						apreqSpn = (0 != (spnMapping.Options & SpnMappingOptions.Revert)) ? spn : mappedSpn;
+						return true;
 					}
 				}
 			}
 
-			return spn;
+			ticketSpn = null;
+			apreqSpn = null;
+			return false;
 		}
 
 		private KerberosClient? _kerberosClient;
@@ -546,7 +602,11 @@ namespace Titanis.Cli
 		/// <param name="targetSpn">Target SPN</param>
 		/// <returns></returns>
 		/// <exception cref="InvalidOperationException"></exception>
-		public MskileClientContext? TryCreateKerberosContext(SecurityPrincipalName targetSpn, SecurityCapabilities requiredCaps, bool wantExtra, out KerberosClientContext? extraContext)
+		public MskileClientContext? TryCreateKerberosContext(
+			SecurityPrincipalName targetSpn,
+			SecurityCapabilities requiredCaps,
+			bool wantExtra,
+			out KerberosClientContext? extraContext)
 		{
 			ArgumentNullException.ThrowIfNull(targetSpn);
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program

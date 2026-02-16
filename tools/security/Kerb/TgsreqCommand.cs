@@ -29,7 +29,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("SPN(s) to request ticket(s) for")]
-		public SecurityPrincipalName[] Targets { get; set; }
+		public SecurityPrincipalName[] Target { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
 		[Parameter]
@@ -170,8 +170,8 @@ By default, all supported encryption types are sent in the request.  To limit th
 			else
 				serviceKey = null;
 
-			List<TicketInfo> newTickets = new List<TicketInfo>(this.Targets.Length);
-			foreach (var spn in this.Targets)
+			List<TicketInfo> newTickets = new List<TicketInfo>(this.Target.Length);
+			foreach (var spn in this.Target)
 			{
 				var ticket = await krb.RequestTicket(sourceTicket, spn, this.Realm ?? sourceTicket.TicketRealm, this.EncTypes, ticketParams, cancellationToken).ConfigureAwait(false);
 
