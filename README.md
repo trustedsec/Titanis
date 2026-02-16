@@ -11,6 +11,9 @@ Titanis is a library of protocol implementations and command line utilities, wri
 	* DCOM ([MS-DCOM](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-DCOM/%5bMS-DCOM%5d.pdf))
 	* EFS ([MS-EFSR](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-EFSR/%5bMS-EFSR%5d.pdf))
 	* LSA ([MS-LSAD](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-LSAD/%5bMS-LSAD%5d.pdf) and [MS-LSAT](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-LSAT/%5bMS-LSAT%5d.pdf))
+	* Remote Registry ([MS-RRP](https://winprotocoldoc.z19.web.core.windows.net/MS-RRP/%5bMS-RRP%5d.pdf))
+		* Includes support for backup semantics
+		* Includes SAM dump functionality
 	* Security Accounts Manager ([MS-SAMR](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-SAMR/%5bMS-SAMR%5d.pdf))
 	* Service Control Manager ([MS-SCMR](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-SCMR/%5bMS-SCMR%5d.pdf))
 	* Server service ([MS-SRVS](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-SRVS/%5bMS-SRVS%5d.pdf))
@@ -59,7 +62,6 @@ If you are a developer, see the [Developer Guide](doc/DevGuide/index.md) for inf
 
 # Planned Enhancements
 * Task Scheduler support ([MS-TSCH](https://winprotocoldoc.z19.web.core.windows.net/MS-TSCH/[MS-TSCH].pdf))
-* LDAP and LDAP-based tooling ([RFC4511](https://datatracker.ietf.org/doc/html/rfc4511), portions of [MS-ADTS](https://winprotocoldoc.z19.web.core.windows.net/MS-ADTS/[MS-ADTS].pdf))
 * Simplified credential management
 * DCSync and secret-dumping functionality ([MS-DRSR](https://winprotocoldoc.z19.web.core.windows.net/MS-DRSR/[MS-DRSR].pdf))
 * Integrated SOCKS 4a
