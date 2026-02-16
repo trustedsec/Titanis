@@ -37,9 +37,24 @@ namespace Titanis.Ldap
 		public Type? ShortEnumType { get; }
 	}
 
+	[Flags]
+	public enum UserAccountControlComputedFlags
+	{
+		LockedOut = (1 << 4),
+		PasswordExpired = (1 << 24),
+	}
+
+	[Flags]
+	public enum UserAccountControlComputedShortFlags
+	{
+		LO = (1 << 4),
+		PE = (1 << 24),
+	}
+
 	public static class NamedBitGroups
 	{
 		public static readonly NamedBitGroup UserAccountControl = new NamedBitGroup("userAccountControl", typeof(UserAccountControlFlags), typeof(UserAccountControlShortFlags));
+		public static readonly NamedBitGroup UserAccountControlComputed = new NamedBitGroup("msDS-User-Account-Control-Computed", typeof(UserAccountControlComputedFlags), typeof(UserAccountControlComputedShortFlags));
 		public static readonly NamedBitGroup SearchFlags = new NamedBitGroup("searchFlags", typeof(SearchFlags), typeof(SearchShortFlags));
 		public static readonly NamedBitGroup SystemFlags = new NamedBitGroup("systemFlags", typeof(SystemFlags), typeof(SystemShortFlags));
 		public static readonly NamedBitGroup SchemaFlagsEx = new NamedBitGroup("schemaFlagsEx", typeof(SchemaFlags), typeof(SchemaShortFlags));
@@ -53,6 +68,7 @@ namespace Titanis.Ldap
 		public static readonly NamedBitGroup[] AllGroups = new NamedBitGroup[]
 		{
 			UserAccountControl,
+			UserAccountControlComputed,
 			SearchFlags,
 			SystemFlags,
 			SchemaFlagsEx,

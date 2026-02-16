@@ -189,7 +189,7 @@ namespace Titanis.Ldap
 		UseDesKeyOnly = 0x20_0000,
 		NoPreauthRequired = 0x40_0000,
 		PasswordExpired = 0x80_0000,
-		TrustedForS4U2self = 0x100_0000,
+		TrustedForS4U = 0x100_0000,
 		NoAuthDataRequired = 0x200_0000,
 		PartialSecretsAccount = 0x400_0000,
 	}
