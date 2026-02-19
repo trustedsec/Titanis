@@ -62,19 +62,23 @@ namespace Titanis.DceRpc.Epm
 			IPAddress? hostAddress,
 			CancellationToken cancellationToken)
 		{
-			return this.TryMapIpv4(interfaceId, ProtocolId.Udp4, hostAddress ?? IPAddress.None, cancellationToken);
+			return this.TryMapIpv4(interfaceId, ProtocolId.Udp4, hostAddress, cancellationToken);
 		}
 		internal async Task<IPEndPoint?> TryMapIpv4(
 			RpcInterfaceId interfaceId,
 			ProtocolId protocol,
-			IPAddress addr,
+			IPAddress? address,
 			CancellationToken cancellationToken)
 		{
+			// TODO: Add support for looking up IPv6
+			if (address != null && address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+				throw new NotSupportedException("IPv6 addresses are not supported.");
+
 			RpcPointer<twr_t> pTower = new RpcPointer<twr_t>(Tower.EncodeIpv4(
 				interfaceId,
 				RpcEncoding.MsrpcSyntaxId,
 				protocol,
-				new System.Net.IPEndPoint(addr, 135)
+				new System.Net.IPEndPoint(address ?? IPAddress.Any, 135)
 				)._twr);
 			var towers = await MapTower(pTower, cancellationToken).ConfigureAwait(false);
 

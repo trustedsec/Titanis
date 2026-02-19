@@ -126,7 +126,7 @@ namespace Titanis.Certificates
 							}
 							else if (failOnKeyFailure)
 							{
-								throw new ArgumentException("Failed to decrypt the key with the provided password.", nameof(password));
+								throw new CryptographicException("Failed to decrypt the key with the provided password.");
 							}
 						}
 						else if (objType == "PRIVATE KEY")

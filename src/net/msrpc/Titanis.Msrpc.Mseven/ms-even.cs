@@ -111,7 +111,9 @@ namespace ms_even {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.4")]
     [Titanis.DceRpc.IidAttribute("82273fdc-e32a-18c3-3f78-827929dc23ea")]
     public class eventlogClientProxy : Titanis.DceRpc.Client.RpcClientProxy, eventlog, Titanis.DceRpc.IRpcClientProxy {
-        private static System.Guid _interfaceUuid = new System.Guid("82273fdc-e32a-18c3-3f78-827929dc23ea");
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(eventlog);
+		private static System.Guid _interfaceUuid = new System.Guid("82273fdc-e32a-18c3-3f78-827929dc23ea");
         public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;

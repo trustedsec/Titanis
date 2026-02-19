@@ -28,6 +28,10 @@ namespace Titanis.DceRpc.Client
 		/// <seealso cref="AbstractSyntaxId"/>
 		public abstract RpcVersion InterfaceVersion { get; }
 		/// <summary>
+		/// Gets the type of the underlying interface.
+		/// </summary>
+		public abstract Type InterfaceType { get; }
+		/// <summary>
 		/// Gets the abstract syntax ID.
 		/// </summary>
 		/// <seealso cref="InterfaceUuid"/>

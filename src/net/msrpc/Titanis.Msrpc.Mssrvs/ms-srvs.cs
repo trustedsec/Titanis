@@ -7777,6 +7777,8 @@ namespace ms_srvs
 	[Titanis.DceRpc.IidAttribute("4b324fc8-1670-01d3-1278-5a47bf6ee188")]
 	public class srvsvcClientProxy : Titanis.DceRpc.Client.RpcClientProxy, srvsvc, Titanis.DceRpc.IRpcClientProxy
 	{
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(srvsvc);
 		private static System.Guid _interfaceUuid = new System.Guid("4b324fc8-1670-01d3-1278-5a47bf6ee188");
 		public override System.Guid InterfaceUuid
 		{

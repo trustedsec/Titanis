@@ -26,11 +26,14 @@ namespace Titanis.Cli
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		public string? UserKeyPassword { get; set; }
 
+		public X509Certificate2 Certificate { get => this._userCert; set => this._userCert = value; }
+
 		private X509Certificate2? _userCert;
 		private X509Certificate2Collection? _userCertCollection;
 
-		public X509Certificate2? Validate(ParameterValidationContext context, ILog? log, ref UserPrincipalName? userName)
+		public X509Certificate2? Validate(ParameterValidationContext context, ref UserPrincipalName? userName)
 		{
+			var log = this.Log;
 			// Try loading the certificate
 			// This will populate or validate UserName and UserDomain
 

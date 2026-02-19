@@ -17,6 +17,7 @@ namespace Titanis.Cli
 		/// <inheritdoc/>
 		void IParameterGroup.Initialize(IServiceContainer services)
 		{
+			this.Services = services;
 			this.Initialize(services);
 		}
 		/// <summary>

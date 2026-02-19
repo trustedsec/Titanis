@@ -24,13 +24,30 @@ namespace Titanis.Security.Kerberos
 		/// <summary>
 		/// Initializes a new <see cref="TicketCache"/>.
 		/// </summary>
-		public TicketCache()
+		public TicketCache() : this(null)
 		{
 
 		}
+		/// <summary>
+		/// Initializes a new <see cref="TicketCache"/>.
+		/// </summary>
+		/// <param name="backingTicketList">Ticket list backing the cache</param>
+		/// <remarks>
+		/// The implementation uses <paramref name="backingTicketList"/> as its backing list.
+		/// It must not be read-only.
+		/// Callers can provide a backing list to receive notifications when tickets
+		/// are added and removed from the cache.
+		/// </remarks>
+		public TicketCache(IList<TicketInfo>? backingTicketList)
+		{
+			if (backingTicketList != null && backingTicketList.IsReadOnly)
+				throw new ArgumentException($"The ticket list cannot be read-only.", nameof(backingTicketList));
+
+			this._tickets = backingTicketList ?? new List<TicketInfo>();
+		}
 
 		public TicketInfo? HomeTgt { get; private set; }
-		private List<TicketInfo> _tickets = new List<TicketInfo>();
+		private IList<TicketInfo> _tickets;
 
 		public TicketInfo[] GetAllTickets() => this._tickets.ToArray();
 

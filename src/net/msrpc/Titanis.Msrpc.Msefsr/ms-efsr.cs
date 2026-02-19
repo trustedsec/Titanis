@@ -553,7 +553,9 @@ namespace ms_efsr {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.4")]
     [Titanis.DceRpc.IidAttribute("df1941c5-fe89-4e79-bf10-463657acf44d")]
     public class efsrpcClientProxy : Titanis.DceRpc.Client.RpcClientProxy, efsrpc, Titanis.DceRpc.IRpcClientProxy {
-        private static System.Guid _interfaceUuid = new System.Guid("df1941c5-fe89-4e79-bf10-463657acf44d");
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(efsrpc);
+		private static System.Guid _interfaceUuid = new System.Guid("df1941c5-fe89-4e79-bf10-463657acf44d");
         public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;

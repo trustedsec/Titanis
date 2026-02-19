@@ -102,8 +102,8 @@ namespace Titanis.Security.Kerberos
 		private readonly IKerberosCallback? _callback;
 		private readonly ISocketService? _socketService;
 
-		private TicketCache? _ticketCache;
-		public TicketCache TicketCache
+		private ITicketCache? _ticketCache;
+		public ITicketCache TicketCache
 		{
 			get => this._ticketCache ??= new TicketCache();
 			set
@@ -477,6 +477,7 @@ namespace Titanis.Security.Kerberos
 
 			this._callback?.OnReceivedTgt(tgtInfo);
 
+			bool cacheEligible = context.ticketParameters.AdditionalTicket == null;
 			this.TicketCache.AddTicket(tgtInfo);
 			return tgtInfo;
 		}
@@ -551,7 +552,8 @@ namespace Titanis.Security.Kerberos
 			ArgumentException.ThrowIfNullOrEmpty(realm);
 			ArgumentNullException.ThrowIfNull(credential);
 
-			var ticket = this.TicketCache.GetTicketFromCache(targetSpn, credential.UserName.UserName);
+			bool cacheEligible = (ticketParameters.AdditionalTicket is null);
+			var ticket = !cacheEligible ? null : this.TicketCache.GetTicketFromCache(targetSpn, credential.UserName.UserName);
 			if (ticket != null)
 				return ticket;
 
@@ -1761,7 +1763,7 @@ namespace Titanis.Security.Kerberos
 
 	public static class ServiceExtensions
 	{
-		public static KerberosClient CreateKerberosClient(this IServiceProvider services, IKdcLocator? locator)
+		public static KerberosClient CreateKerberosClient(this IServiceProvider services, IKdcLocator? locator = null)
 		{
 			var callback = services.GetService<IKerberosCallback>();
 			if (callback == null)
@@ -1770,6 +1772,9 @@ namespace Titanis.Security.Kerberos
 				if (log != null)
 					callback = new KerberosDiagnosticLogger(log);
 			}
+			if (locator is null)
+				locator = services.RequireService<IKdcLocator>();
+
 			return new KerberosClient(locator, services.GetService<ISocketService>(), callback);
 		}
 	}

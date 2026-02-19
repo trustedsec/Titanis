@@ -206,8 +206,22 @@ namespace Titanis.Cli
 		[Category(ParameterCategories.AuthenticationNtlm)]
 		public Version? NtlmVersion { get; set; }
 
+		private UserCertificateParameterGroup? _certParams;
 		[ParameterGroup]
-		public UserCertificateParameterGroup? CertificateParameters { get; set; }
+		public UserCertificateParameterGroup CertificateParameters
+		{
+			get
+			{
+				return _certParams ??= InitCertParams();
+			}
+		}
+
+		private UserCertificateParameterGroup? InitCertParams()
+		{
+			var certParams = new UserCertificateParameterGroup();
+			((IParameterGroup)certParams).Initialize(this.Services);
+			return certParams;
+		}
 
 		[Parameter]
 		[Description("KDC endpoint")]
@@ -272,7 +286,7 @@ namespace Titanis.Cli
 		{
 			var log = this.Services?.GetService<ILog>();
 
-			this._userCert = this.CertificateParameters?.Validate(context, log, ref this._userName);
+			this._userCert = this.CertificateParameters?.Validate(context, ref this._userName);
 
 			if (this.UserName != null)
 			{
@@ -373,7 +387,8 @@ namespace Titanis.Cli
 			[NotNullWhen(true)] out X509Certificate2Collection? store,
 			out UserPrincipalName? upn,
 			[CallerArgumentExpression(nameof(keyFile))] string? keyFileParamName = null,
-			[CallerArgumentExpression(nameof(keyPassphrase))] string? keyPassphraseName = null)
+			[CallerArgumentExpression(nameof(keyPassphrase))] string? keyPassphraseName = null,
+			bool passException = false)
 		{
             ArgumentNullException.ThrowIfNull(fileAccess);
 
@@ -428,7 +443,7 @@ namespace Titanis.Cli
 
 				return false;
 			}
-			catch (CryptographicException ex) when (keyPassphrase is null)
+			catch (CryptographicException ex) when (!passException && keyPassphrase is null)
 			{
 				validationContext.LogError($"Certificate file {certFileName} is encrypted.  Use -{keyPassphraseName} to specify the password to use to decrypt this file.");
 				return false;
@@ -613,37 +628,20 @@ namespace Titanis.Cli
 			ArgumentNullException.ThrowIfNull(targetSpn);
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
 
-			var log = this.Services.GetService<ILog>();
+			var log = this.Log;
 
 			// Configure the Kerberos client
-			var krb = this._kerberosClient;
-			if (krb == null)
+			KerberosClient? krb = this.TryGetKerberosClient();
+			if (krb is null)
 			{
-				SimpleKdcLocator? kdcLocator = null;
-				if (this.Kdc != null)
+				extraContext = null;
+				return null;
+			}
+
 				{
 					if ((targetSpn is ServicePrincipalName svcpn) && IPAddress.TryParse(svcpn.ServiceInstance, out var _))
 						log?.WriteWarning("The server is specified with an IP address.  This will probably result in Kerberos authentication failing.");
-
-					kdcLocator = new(this.Kdc);
 				}
-
-				krb = this.Services.CreateKerberosClient(kdcLocator);
-				if (!string.IsNullOrEmpty(this.Workstation))
-					krb.Workstation = HostAddress.FromNetbiosName(this.Workstation);
-				this._kerberosClient = krb;
-
-				if (!string.IsNullOrEmpty(this.TicketCache))
-				{
-					// TODO: ResolveFsPath
-
-					var cacheFileName = this.Owner.Context.ResolveFsPath(this.TicketCache);
-					log?.WriteDiagnostic($"Loading ticket cache from {cacheFileName}.");
-					// TODO: This doesn't match the search below, which checks user name.  Document the semantics of the ticket cache
-					var ticketCache = new TicketCacheFile(cacheFileName, krb);
-					krb.TicketCache = ticketCache;
-			}
-			}
 
 			// Now start processing credentials
 			TicketInfo? serviceTicket = null;
@@ -776,27 +774,7 @@ namespace Titanis.Cli
 				}
 			}
 
-			KerberosCredential? cred = null;
-			if (!string.IsNullOrEmpty(authRealm) && !string.IsNullOrEmpty(authUserName))
-			{
-				var authUser = this.UserName ?? new UserPrincipalName(authUserName, authRealm);
-
-				if (this.Password != null)
-					cred = new KerberosPasswordCredential(authUser, this.Password);
-				else if (this.NtlmHash != null)
-					cred = new KerberosKeyCredential(authUser, EType.Rc4Hmac, this.NtlmHash.Bytes);
-				else if (this.AesKey != null)
-					cred = new KerberosKeyCredential(authUser, this.AesKey.Bytes.Length switch
-					{
-						(128 / 8) => EType.Aes128CtsHmacSha1_96,
-						(256 / 8) => EType.Aes256CtsHmacSha1_96,
-						_ => throw new ArgumentException("The AES key is not the correct size for AES 128 or AES 256.")
-					}, this.AesKey.Bytes);
-				else if (this.DesKey != null)
-					cred = new KerberosKeyCredential(authUser, EType.DesCbcMd5, this.DesKey.Bytes);
-				else if (this._userCert != null)
-					cred = new KerberosPkinitCredential(authUser, this._userCert);
-			}
+			KerberosCredential? cred = TryGetKerberosCreds(authUserName, authRealm);
 
 			// A credential is required regardless of whether it is used for authentication
 			if (cred == null)
@@ -921,6 +899,76 @@ namespace Titanis.Cli
 			return null;
 		}
 
+		private KerberosClient? TryGetKerberosClient() => this._kerberosClient ??= this.Services?.GetService<KerberosClient>();
+
+		private KerberosClient? TryCreateKerberosClient()
+		{
+			var kdcLocator = this.Services?.GetService<IKdcLocator>();
+			if (kdcLocator is null)
+			{
+				if (this.Kdc != null)
+				{
+					kdcLocator = new SimpleKdcLocator(this.Kdc);
+					this.Services?.AddService(typeof(IKdcLocator), kdcLocator);
+				}
+				else
+					return null;
+			}
+
+			var krb = this.Services?.CreateKerberosClient();
+			if (!string.IsNullOrEmpty(this.Workstation))
+				krb.Workstation = HostAddress.FromNetbiosName(this.Workstation);
+			this._kerberosClient = krb;
+
+			if (!string.IsNullOrEmpty(this.TicketCache))
+			{
+				// TODO: ResolveFsPath
+
+				var cacheFileName = this.RequireFileAccess().ResolveFsPath(this.TicketCache);
+				this.Log?.WriteDiagnostic($"Loading ticket cache from {cacheFileName}.");
+				// TODO: This doesn't match the search below, which checks user name.  Document the semantics of the ticket cache
+				var ticketCache = new TicketCacheFile(cacheFileName, krb);
+				krb.TicketCache = ticketCache;
+			}
+			else
+			{
+				var cache = this.Services?.GetService<ITicketCache>();
+				if (cache != null)
+					krb.TicketCache = cache;
+			}
+
+			return krb;
+		}
+
+		public KerberosCredential? TryGetKerberosCreds() => this.TryGetKerberosCreds(this.UserName.WireName, this.UserDomain);
+
+		public KerberosCredential? TryGetKerberosCreds(string? authUserName, string? authRealm)
+		{
+			KerberosCredential? cred = null;
+			if (!string.IsNullOrEmpty(authRealm) && !string.IsNullOrEmpty(authUserName))
+			{
+				var authUser = this.UserName ?? new UserPrincipalName(authUserName, authRealm);
+
+				if (this.Password != null)
+					cred = new KerberosPasswordCredential(authUser, this.Password);
+				else if (this.NtlmHash != null)
+					cred = new KerberosKeyCredential(authUser, EType.Rc4Hmac, this.NtlmHash.Bytes);
+				else if (this.AesKey != null)
+					cred = new KerberosKeyCredential(authUser, this.AesKey.Bytes.Length switch
+					{
+						(128 / 8) => EType.Aes128CtsHmacSha1_96,
+						(256 / 8) => EType.Aes256CtsHmacSha1_96,
+						_ => throw new ArgumentException("The AES key is not the correct size for AES 128 or AES 256.")
+					}, this.AesKey.Bytes);
+				else if (this.DesKey != null)
+					cred = new KerberosKeyCredential(authUser, EType.DesCbcMd5, this.DesKey.Bytes);
+				else if (this._userCert != null)
+					cred = new KerberosPkinitCredential(authUser, this._userCert);
+			}
+
+			return cred;
+		}
+
 		private static bool CheckMatchingTicket(SecurityPrincipalName targetSpn, ILog? log, TicketInfo ticket,
 			ref string? userName,
 			ref string? userRealm)
@@ -961,14 +1009,15 @@ namespace Titanis.Cli
 			base.Initialize(services);
 			services.AddService(typeof(IClientCredentialService), this.CreateCredService);
 			services.AddService(typeof(IKerberosCallback), this.CreateKerberosCallback);
+			services.AddService(typeof(KerberosClient), (IServiceContainer container, Type serviceType) => this.TryCreateKerberosClient());
 		}
 
-		private CredentialService? CreateCredService(IServiceContainer container, Type serviceType)
+		public IClientCredentialService? CreateCredService(IServiceContainer container, Type serviceType)
 		{
 			return new CredentialService(this);
 		}
 
-		private IKerberosCallback? CreateKerberosCallback(IServiceContainer container, Type serviceType)
+		public IKerberosCallback? CreateKerberosCallback(IServiceContainer container, Type serviceType)
 		{
 			var log = this.Log;
 			var logger = (log != null) ? new KerberosDiagnosticLogger(log, this.GetCallback<IKerberosCallback>()) : null;

@@ -1054,7 +1054,9 @@ namespace ms_dcom {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9")]
     [Titanis.DceRpc.IidAttribute("4d9f4ab8-7d1c-11cf-861e-0020af6e7c57")]
     public class IActivationClientProxy : Titanis.DceRpc.Client.RpcClientProxy, IActivation, Titanis.DceRpc.IRpcClientProxy {
-        private static System.Guid _interfaceUuid = new System.Guid("4d9f4ab8-7d1c-11cf-861e-0020af6e7c57");
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(IActivation);
+		private static System.Guid _interfaceUuid = new System.Guid("4d9f4ab8-7d1c-11cf-861e-0020af6e7c57");
         public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;
@@ -1294,7 +1296,9 @@ namespace ms_dcom {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9")]
     [Titanis.DceRpc.IidAttribute("000001a0-0000-0000-c000-000000000046")]
     public class IRemoteSCMActivatorClientProxy : Titanis.DceRpc.Client.RpcClientProxy, IRemoteSCMActivator, Titanis.DceRpc.IRpcClientProxy {
-        private static System.Guid _interfaceUuid = new System.Guid("000001a0-0000-0000-c000-000000000046");
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(IRemoteSCMActivator);
+		private static System.Guid _interfaceUuid = new System.Guid("000001a0-0000-0000-c000-000000000046");
         public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;
@@ -1491,7 +1495,9 @@ namespace ms_dcom {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9")]
     [Titanis.DceRpc.IidAttribute("99fcfec4-5260-101b-bbcb-00aa0021347a")]
     public class IObjectExporterClientProxy : Titanis.DceRpc.Client.RpcClientProxy, IObjectExporter, Titanis.DceRpc.IRpcClientProxy {
-        private static System.Guid _interfaceUuid = new System.Guid("99fcfec4-5260-101b-bbcb-00aa0021347a");
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(IObjectExporter);
+		private static System.Guid _interfaceUuid = new System.Guid("99fcfec4-5260-101b-bbcb-00aa0021347a");
         public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;
@@ -1795,7 +1801,9 @@ namespace ms_dcom {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9")]
     [Titanis.DceRpc.IidAttribute("00000000-0000-0000-c000-000000000046")]
     public class IUnknownClientProxy : Titanis.DceRpc.Client.RpcObjectProxy, IUnknown, Titanis.DceRpc.IRpcObjectProxy {
-        private static System.Guid _interfaceUuid = new System.Guid("00000000-0000-0000-c000-000000000046");
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(IUnknown);
+		private static System.Guid _interfaceUuid = new System.Guid("00000000-0000-0000-c000-000000000046");
         public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;

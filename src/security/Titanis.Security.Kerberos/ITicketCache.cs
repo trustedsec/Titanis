@@ -10,6 +10,8 @@ namespace Titanis.Security.Kerberos
 	/// <seealso cref="TicketCache"/>
 	public interface ITicketCache
 	{
+		TicketInfo? HomeTgt { get; }
+
 		/// <summary>
 		/// Adds a ticket to the cache.
 		/// </summary>

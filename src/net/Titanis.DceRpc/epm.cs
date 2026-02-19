@@ -74,6 +74,9 @@ namespace epm
 	public class eptClientProxy : Titanis.DceRpc.Client.RpcClientProxy, ept, Titanis.DceRpc.IRpcClientProxy
 	{
 		private static System.Guid _interfaceUuid = new System.Guid("e1af8308-5d1f-11c9-91a4-08002b14a0fa");
+
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(ept);
 		public override System.Guid InterfaceUuid
 		{
 			get

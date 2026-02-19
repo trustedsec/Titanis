@@ -2122,7 +2122,9 @@ namespace ms_scmr {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.4")]
     [Titanis.DceRpc.IidAttribute("367abb81-9844-35f1-ad32-98f038001003")]
     public class svcctlClientProxy : Titanis.DceRpc.Client.RpcClientProxy, svcctl, Titanis.DceRpc.IRpcClientProxy {
-        private static System.Guid _interfaceUuid = new System.Guid("367abb81-9844-35f1-ad32-98f038001003");
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(svcctl);
+		private static System.Guid _interfaceUuid = new System.Guid("367abb81-9844-35f1-ad32-98f038001003");
         public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;

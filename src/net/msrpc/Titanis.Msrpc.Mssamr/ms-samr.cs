@@ -3751,7 +3751,9 @@ namespace ms_samr {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.3")]
     [Titanis.DceRpc.IidAttribute("12345778-1234-abcd-ef00-0123456789ac")]
     public class samrClientProxy : Titanis.DceRpc.Client.RpcClientProxy, samr, Titanis.DceRpc.IRpcClientProxy {
-        private static System.Guid _interfaceUuid = new System.Guid("12345778-1234-abcd-ef00-0123456789ac");
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(samr);
+		private static System.Guid _interfaceUuid = new System.Guid("12345778-1234-abcd-ef00-0123456789ac");
         public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;

@@ -3080,7 +3080,9 @@ namespace ms_lsar {
     [Titanis.DceRpc.IidAttribute("12345778-1234-abcd-ef00-0123456789ab")]
     public class lsarpcClientProxy : Titanis.DceRpc.Client.RpcClientProxy, lsarpc, Titanis.DceRpc.IRpcClientProxy {
         private static System.Guid _interfaceUuid = new System.Guid("12345778-1234-abcd-ef00-0123456789ab");
-        public override System.Guid InterfaceUuid {
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(lsarpc);
+		public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;
             }

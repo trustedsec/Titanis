@@ -231,6 +231,8 @@ namespace ms_rrp
 	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8"), IidAttribute("338cd001-2244-31f1-aaaa-900038001003")]
 	public partial class winregClientProxy : Titanis.DceRpc.Client.RpcClientProxy, winreg, Titanis.DceRpc.IRpcClientProxy
 	{
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(winreg);
 		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
 		public async Task<int> OpenClassesRoot(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken)
 		{

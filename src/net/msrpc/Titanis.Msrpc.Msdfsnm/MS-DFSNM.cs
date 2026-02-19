@@ -2295,7 +2295,9 @@ namespace MS_DFSNM {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.4")]
     [Titanis.DceRpc.IidAttribute("4fc742e0-4a10-11cf-8273-00aa004ae673")]
     public class netdfsClientProxy : Titanis.DceRpc.Client.RpcClientProxy, netdfs, Titanis.DceRpc.IRpcClientProxy {
-        private static System.Guid _interfaceUuid = new System.Guid("4fc742e0-4a10-11cf-8273-00aa004ae673");
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(netdfs);
+		private static System.Guid _interfaceUuid = new System.Guid("4fc742e0-4a10-11cf-8273-00aa004ae673");
         public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;

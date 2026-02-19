@@ -596,7 +596,9 @@ namespace MS_EVEN6 {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.5")]
     [Titanis.DceRpc.IidAttribute("f6beaff7-1e19-4fbb-9f8f-b89e2018337c")]
     public class IEventServiceClientProxy : Titanis.DceRpc.Client.RpcClientProxy, IEventService, Titanis.DceRpc.IRpcClientProxy {
-        private static System.Guid _interfaceUuid = new System.Guid("f6beaff7-1e19-4fbb-9f8f-b89e2018337c");
+		/// <inheritdoc/>
+		public override Type InterfaceType => typeof(IEventService);
+		private static System.Guid _interfaceUuid = new System.Guid("f6beaff7-1e19-4fbb-9f8f-b89e2018337c");
         public override System.Guid InterfaceUuid {
             get {
                 return _interfaceUuid;
