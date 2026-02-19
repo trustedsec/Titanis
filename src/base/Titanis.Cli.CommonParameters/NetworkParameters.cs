@@ -37,12 +37,10 @@ namespace Titanis.Cli
 		public EndPoint Socks5 { get; set; }
 
 
-		private ILog? _log;
-		protected sealed override void Initialize(Command owner, IServiceContainer services)
+		protected sealed override void Initialize(IServiceContainer services)
 		{
-			base.Initialize(owner, services);
+			base.Initialize(services);
 			services.AddService(typeof(ISocketService), this.CreateSocketService);
-			this._log = services.GetService<ILog>();
 		}
 
 		private ISocketService? CreateSocketService(IServiceContainer container, Type serviceType)
@@ -70,7 +68,7 @@ namespace Titanis.Cli
 		}
 
 		private INameResolverService? _resolver;
-		private INameResolverService GetPlatformResolver() => _resolver ??= new PlatformNameResolverService(ResolverOptions, this._log);
+		private INameResolverService GetPlatformResolver() => _resolver ??= new PlatformNameResolverService(ResolverOptions, this.Log);
 		private NameResolverOptions ResolverOptions =>
 			UseTcp4Only.IsSet ? NameResolverOptions.UseTcp4Only
 			: UseTcp6Only.IsSet ? NameResolverOptions.UseTcp6Only
@@ -81,7 +79,7 @@ namespace Titanis.Cli
 			if (hostName != null && HostAddress == null)
 				HostAddress = new string[] { hostName };
 
-			var log = this._log;
+			var log = this.Log;
 
 			// Resolve the host address
 			List<IPAddress> addrs = new List<IPAddress>();

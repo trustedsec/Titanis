@@ -13,8 +13,7 @@ namespace Titanis.Cli
 		/// <summary>
 		/// Called by the command line parser when creating the parameter group.
 		/// </summary>
-		/// <param name="owner">Owning <see cref="Command"/></param>
 		/// <param name="services">Service container to add services to.</param>
-		void Initialize(Command owner, IServiceContainer services);
+		void Initialize(IServiceContainer services);
 	}
 }

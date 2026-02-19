@@ -52,14 +52,14 @@ internal class ModCommand : LdapObjectCommandBase
 
 struct ChangeContext
 {
-	internal ChangeContext(ICommandContext command)
+	internal ChangeContext(ICommandContext commandContext)
 	{
-		this.command = command;
-		this.values = new List<object>();
+		this._commandContext = commandContext;
+		this._values = new List<object>();
 	}
 
-	private readonly ICommandContext command;
-	internal readonly List<object> values;
+	private readonly ICommandContext _commandContext;
+	internal readonly List<object> _values;
 	internal string? lastAttrName;
 	internal LdapChangeType changeType;
 
@@ -79,18 +79,18 @@ struct ChangeContext
 		object? value = change.Encoding switch
 		{
 			AttributeEncoding.Unspecified => LdapAttribute.ParseSpecialValue(change.Name, change.Value),
-			AttributeEncoding.File => File.ReadAllBytes(this.command.ResolveFsPath(change.Value)),
+			AttributeEncoding.File => File.ReadAllBytes(this._commandContext.FileAccess.ResolveFsPath(change.Value)),
 			AttributeEncoding.Hex => BinaryHelper.ParseHexString(change.Value),
 			AttributeEncoding.Base64 => Convert.FromBase64String(change.Value),
 			_ => throw new FormatException($"Unsupported encoding {change.Encoding}.")
 		};
-		values.Add(value);
+		_values.Add(value);
 	}
 
 	internal readonly void CommitChange(ILdapModifyRequest request)
 	{
-		request.AddChange(lastAttrName, values.ToArray(), changeType);
-		values.Clear();
+		request.AddChange(lastAttrName, _values.ToArray(), changeType);
+		_values.Clear();
 	}
 
 	internal void ProcessArgs(AttributeChangeSpec[] attrs, ILdapModifyRequest request)

@@ -11,21 +11,26 @@ namespace Titanis.Cli
 	public abstract class ParameterGroupBase : IParameterGroup
 	{
 		/// <summary>
-		/// Gets the <see cref="Command"/> owning the parameter group.
+		/// Gets the service container supporting the group.
 		/// </summary>
-		protected Command? Owner { get; private set; }
 		protected IServiceContainer? Services { get; private set; }
 		/// <inheritdoc/>
-		void IParameterGroup.Initialize(Command command, IServiceContainer services)
+		void IParameterGroup.Initialize(IServiceContainer services)
 		{
-			this.Owner = command;
-			this.Services = services;
-			this.Initialize(command, services);
+			this.Initialize(services);
 		}
 		/// <summary>
 		/// Called when the parameter group is initialized.
 		/// </summary>
-		/// <param name="owner"></param>
-		protected virtual void Initialize(Command owner, IServiceContainer services) { }
+		/// <param name="services">Services available to the group</param>
+		protected virtual void Initialize(IServiceContainer services) { }
+
+		protected IFileAccess RequireFileAccess() => this.Services?.RequireService<IFileAccess>();
+		protected string ResolveFsPath(string path) => this.RequireFileAccess().ResolveFsPath(path);
+		protected ILog? Log => this.Services?.GetService<ILog>();
+
+		protected TCallback? GetCallback<TCallback>()
+			where TCallback : class
+			=> null;
 	}
 }

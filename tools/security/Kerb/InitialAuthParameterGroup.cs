@@ -57,7 +57,7 @@ internal class InitialAuthParameterGroup : ParameterGroupBase
 		if (string.IsNullOrEmpty(realm))
 			context.LogError(new ParameterValidationError(nameof(Realm), $"Realm must be specified either with -{nameof(Realm)} or as part of -{nameof(UserName)}"));
 
-		this._userCert = this.CertificateParameters?.Validate(context, this.Owner.Context.Log, ref this._userName);
+		this._userCert = this.CertificateParameters?.Validate(context, ref this._userName);
 
 		int credCount = 0;
 		if (this.Password != null) credCount++;

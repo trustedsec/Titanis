@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Titanis.Cli
 {
-	public class WindowsConsoleContext : ICommandContext
+	public class WindowsConsoleContext : ICommandContext, IFileAccess
 	{
 		internal WindowsConsoleContext(CommandMetadataContext metadata)
 		{
@@ -22,6 +22,7 @@ namespace Titanis.Cli
 			Console.CancelKeyPress += this.Console_CancelKeyPress;
 
 			this._services.AddService(typeof(ILog), this.Log);
+			this._services.AddService(typeof(IFileAccess), this.FileAccess);
 		}
 
 		private CommandFrame _rootFrame;
@@ -50,7 +51,9 @@ namespace Titanis.Cli
 		private ServiceContainer _services = new ServiceContainer();
 		public IServiceProvider Services => this._services;
 
-		public Stream OpenRawInputStream()
+		public IFileAccess FileAccess => this;
+
+        public Stream OpenRawInputStream()
 		{
 			return Console.OpenStandardInput();
 		}
@@ -106,7 +109,7 @@ namespace Titanis.Cli
 
 		public object? GetVariable(string name) => Environment.GetEnvironmentVariable(name);
 
-		public string ResolveFsPath(string path)
+		string IFileAccess.ResolveFsPath(string path)
 		{
 			return Path.GetFullPath(path);
 		}

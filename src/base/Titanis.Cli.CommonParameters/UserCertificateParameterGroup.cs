@@ -37,7 +37,7 @@ namespace Titanis.Cli
 			if (!string.IsNullOrEmpty(this.UserCert))
 			{
 				AuthenticationParameters.LoadCertificateAndKey(
-					this.Owner.Context,
+					this.RequireFileAccess(),
 					this.UserCert,
 					this.UserKey,
 					this.UserKeyPassword,

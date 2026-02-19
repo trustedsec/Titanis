@@ -66,15 +66,15 @@ namespace Titanis.Cli
 			}
 		}
 
-		protected sealed override void Initialize(Command owner, IServiceContainer services)
+		protected sealed override void Initialize(IServiceContainer services)
 		{
-			base.Initialize(owner, services);
+			base.Initialize(services);
 			services.AddService(typeof(ISmb2TraceCallback), this.CreateTraceLogger);
 		}
 
 		private ISmb2TraceCallback CreateTraceLogger(IServiceContainer container, Type serviceType)
 		{
-			return new Smb2Logger(this.Services.RequireService<ILog>(), this.Owner?.GetCallback<ISmb2TraceCallback>());
+			return new Smb2Logger(this.Services.RequireService<ILog>(), this.GetCallback<ISmb2TraceCallback>());
 		}
 
 		public Smb2Client CreateClient()

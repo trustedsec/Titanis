@@ -363,7 +363,7 @@ namespace Titanis.Cli
 		}
 
 		public static bool LoadCertificateAndKey(
-			ICommandContext commandContext,
+			IFileAccess fileAccess,
 			string certFileName,
 			string? keyFile,
 			string? keyPassphrase,
@@ -375,8 +375,10 @@ namespace Titanis.Cli
 			[CallerArgumentExpression(nameof(keyFile))] string? keyFileParamName = null,
 			[CallerArgumentExpression(nameof(keyPassphrase))] string? keyPassphraseName = null)
 		{
-			certFileName = commandContext.ResolveFsPath(certFileName);
-			keyFile = string.IsNullOrEmpty(keyFile) ? null : commandContext.ResolveFsPath(keyFile);
+            ArgumentNullException.ThrowIfNull(fileAccess);
+
+            certFileName = fileAccess.ResolveFsPath(certFileName);
+			keyFile = string.IsNullOrEmpty(keyFile) ? null : fileAccess.ResolveFsPath(keyFile);
 
 			log?.WriteDiagnostic($"Opening certificate file {certFileName}");
 			cert = null;
@@ -463,7 +465,7 @@ namespace Titanis.Cli
 			if (ntlmCred != null)
 			{
 				var log = this.Services.GetService<ILog>();
-				var ntlmContext = new NtlmClientContext(ntlmCred, true, callback: (log != null) ? new NtlmDiagnosticLogger(log, this.Owner?.GetCallback<INtlmClientCallback>()) : null)
+				var ntlmContext = new NtlmClientContext(ntlmCred, true, callback: (log != null) ? new NtlmDiagnosticLogger(log, this.GetCallback<INtlmClientCallback>()) : null)
 				{
 					Workstation = this.Workstation,
 					WorkstationDomain = domain,
@@ -662,7 +664,7 @@ namespace Titanis.Cli
 			{
 				foreach (var ticketFileName_ in this.Tickets)
 				{
-					string ticketFileName = this.Owner.Context.ResolveFsPath(ticketFileName_);
+					string ticketFileName = this.ResolveFsPath(ticketFileName_);
 					// TODO: Resolve file name
 					log?.WriteVerbose($"Loading tickets from {ticketFileName}");
 					var fileCache = new TicketCacheFile(ticketFileName, krb);
@@ -734,7 +736,7 @@ namespace Titanis.Cli
 			// Check the -Tgt file
 			if ((serviceTicket is null) && (tgt is null) && !string.IsNullOrEmpty(tgtFileName))
 			{
-				tgtFileName = this.Owner.Context.ResolveFsPath(tgtFileName);
+				tgtFileName = this.RequireFileAccess().ResolveFsPath(tgtFileName);
 				log?.WriteVerbose($"Loading ticket(s) from {tgtFileName}");
 				var tgtCache = new TicketCacheFile(tgtFileName, krb);
 				var tickets = tgtCache.GetAllTickets();
@@ -954,9 +956,9 @@ namespace Titanis.Cli
 			return false;
 		}
 
-		protected override void Initialize(Command owner, IServiceContainer services)
+		protected override void Initialize(IServiceContainer services)
 		{
-			base.Initialize(owner, services);
+			base.Initialize(services);
 			services.AddService(typeof(IClientCredentialService), this.CreateCredService);
 			services.AddService(typeof(IKerberosCallback), this.CreateKerberosCallback);
 		}
@@ -968,8 +970,8 @@ namespace Titanis.Cli
 
 		private IKerberosCallback? CreateKerberosCallback(IServiceContainer container, Type serviceType)
 		{
-			var log = this.Services.GetService<ILog>();
-			var logger = (log != null) ? new KerberosDiagnosticLogger(log, this.Owner?.GetCallback<IKerberosCallback>()) : null;
+			var log = this.Log;
+			var logger = (log != null) ? new KerberosDiagnosticLogger(log, this.GetCallback<IKerberosCallback>()) : null;
 			return logger;
 		}
 
