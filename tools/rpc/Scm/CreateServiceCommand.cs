@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Titanis.Msrpc.Msscmr;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.ScmTool;
 
@@ -63,7 +64,7 @@ internal class CreateServiceCommand : ScmCommand
 	[Description("Start the service once created")]
 	public SwitchParam Start { get; set; }
 
-	protected sealed override ScmAccess RequiredScmAccess => ScmAccess.CreateService;
+	protected sealed override ScmAccessRights RequiredScmAccess => ScmAccessRights.CreateService;
 	protected sealed override async Task<int> RunAsync(Scm scm, CancellationToken cancellationToken)
 	{
 		using var svc = await scm.CreateServiceAsync(this.ServiceName, new ServiceConfig
@@ -78,7 +79,7 @@ internal class CreateServiceCommand : ScmCommand
 			ServiceStartName = this.StartName ?? string.Empty,
 			StartPassword = this.StartPassword ?? string.Empty,
 			DisplayName = this.DisplayName ?? this.ServiceName,
-		}, ServiceAccess.MaxAllowed, cancellationToken);
+		}, ServiceAccessRights.MaxAllowed, cancellationToken);
 
 		this.WriteMessage($"Created service '{this.ServiceName}'");
 		if (this.Start.IsSet)

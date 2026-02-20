@@ -5,17 +5,13 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Titanis.Cli.SddlTool</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\base\Titanis.Cli\Titanis.Cli.csproj" />
     <ProjectReference Include="..\..\..\src\base\Titanis.Core\Titanis.Core.csproj" />
-    <ProjectReference Include="..\..\..\src\base\Titanis.IO\Titanis.IO.csproj" />
     <ProjectReference Include="..\..\..\src\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
-    <ProjectReference Include="..\..\..\src\net\msrpc\Titanis.Msrpc.Mssamr\Titanis.Msrpc.Mssamr.csproj" />
-    <ProjectReference Include="..\..\..\src\net\Titanis.DceRpc.Core\Titanis.DceRpc.Core.csproj" />
-    <ProjectReference Include="..\..\..\src\net\Titanis.DceRpc.Epm\Titanis.DceRpc.Epm.csproj" />
-    <ProjectReference Include="..\..\..\src\net\Titanis.DceRpc\Titanis.DceRpc.csproj" />
   </ItemGroup>
 
 </Project>

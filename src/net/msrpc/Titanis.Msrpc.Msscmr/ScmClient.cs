@@ -49,7 +49,7 @@ namespace Titanis.Msrpc.Msscmr
 		// Binding succeeds, but operations report RPC_S_CANNOT_SUPPORT
 		public sealed override bool SupportsReauthOverNamedPipes => false;
 
-		public async Task<Scm> OpenScm(ScmAccess access, CancellationToken cancellationToken)
+		public async Task<Scm> OpenScm(ScmAccessRights access, CancellationToken cancellationToken)
 		{
 			try
 			{
@@ -72,7 +72,7 @@ namespace Titanis.Msrpc.Msscmr
 			RpcContextHandle handle,
 			string serviceName,
 			ServiceConfig config,
-			ServiceAccess access,
+			ServiceAccessRights access,
 			CancellationToken cancellationToken
 			)
 		{
@@ -513,7 +513,7 @@ namespace Titanis.Msrpc.Msscmr
 			return infos;
 		}
 
-		internal async Task<Service> OpenService(RpcContextHandle hscm, string serviceName, ServiceAccess access, CancellationToken cancellationToken)
+		internal async Task<Service> OpenService(RpcContextHandle hscm, string serviceName, ServiceAccessRights access, CancellationToken cancellationToken)
 		{
 			if (string.IsNullOrEmpty(serviceName))
 				throw new ArgumentNullException(nameof(serviceName));

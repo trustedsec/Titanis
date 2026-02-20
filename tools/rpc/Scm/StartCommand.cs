@@ -15,8 +15,8 @@ namespace Titanis.Cli.ScmTool;
 [Example("Start a service with arguments", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m! -EncryptRpc myservice arg1 arg2 arg3")]
 internal class StartCommand : ServiceCommand
 {
-	protected sealed override ServiceAccess RequiredServiceAccess => ServiceAccess.Start;
-	protected sealed override ScmAccess RequiredScmAccess => ScmAccess.None;
+	protected sealed override ServiceAccessRights RequiredServiceAccess => ServiceAccessRights.Start;
+	protected sealed override ScmAccessRights RequiredScmAccess => ScmAccessRights.None;
 
 	[Parameter(20)]
 	[Description("Optional arguments to pass to service")]

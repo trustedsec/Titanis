@@ -295,11 +295,11 @@ namespace Titanis.Winterop.Security
 			}
 			else
 			{
-				ctx.Advance(2);
-
 				var mapping = WellKnownSidMapping.TryFindWksMappingFromSddlCode(c1, c2);
 				if (!mapping.IsValid)
-					throw new FormatException($"The code '{c1}{c2}' does not represent a well-known SID.");
+					throw ctx.MakeException($"Unknown WKS '{c1}{c2}");
+
+				ctx.Advance(2);
 
 				var sid = mapping.BuildSid(domainSid);
 
@@ -418,7 +418,8 @@ namespace Titanis.Winterop.Security
 		public string? AsSddlCode()
 		{
 			var wks = FindWksMapping();
-			return WellKnownSidMapping.TryMapWksToCode(wks);
+			var code = WellKnownSidMapping.TryMapWksToCode(wks);
+			return code;
 		}
 
 		/// <summary>

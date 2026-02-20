@@ -51,7 +51,7 @@ public class UserInfo
 [Example("Enumerate all accounts", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!")]
 internal sealed class EnumUsersCommand : SamDomainEnumCommand
 {
-	protected sealed override SamDomainAccess RequiredDomainAccess => SamDomainAccess.ListAccounts | SamDomainAccess.Read | SamDomainAccess.Lookup;
+	protected sealed override SamDomainAccessRights RequiredDomainAccess => SamDomainAccessRights.ListAccounts | SamDomainAccessRights.Read | SamDomainAccessRights.Lookup;
 	protected override async Task RunAsync(SamDomain domain, SamEntry domainInfo, Sam sam, CancellationToken cancellationToken)
 	{
 		List<SamEntry> entries;
@@ -78,7 +78,7 @@ internal sealed class EnumUsersCommand : SamDomainEnumCommand
 			SamUser user;
 			try
 			{
-				user = await domain.OpenUserAsync(entry.Id, SamUserAccess.MaxAllowed, cancellationToken);
+				user = await domain.OpenUserAsync(entry.Id, SamUserAccessRights.MaxAllowed, cancellationToken);
 			}
 			catch (Exception ex)
 			{

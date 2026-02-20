@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
+using Titanis.Winterop.Registry;
 using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msrrp.Cli

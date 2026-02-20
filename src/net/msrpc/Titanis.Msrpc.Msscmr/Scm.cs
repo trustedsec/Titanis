@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Titanis.DceRpc;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msscmr
 {
@@ -76,7 +77,7 @@ namespace Titanis.Msrpc.Msscmr
 		}
 
 
-		public Task<Service> OpenServiceAsync(string serviceName, ServiceAccess access, CancellationToken cancellationToken)
+		public Task<Service> OpenServiceAsync(string serviceName, ServiceAccessRights access, CancellationToken cancellationToken)
 		{
 			return this.client.OpenService(this.handle, serviceName, access, cancellationToken);
 		}
@@ -86,7 +87,7 @@ namespace Titanis.Msrpc.Msscmr
 			return this.client.LockScm(this.handle, cancellationToken);
 		}
 
-		public Task<Service> CreateServiceAsync(string serviceName, ServiceConfig config, ServiceAccess access, CancellationToken cancellationToken)
+		public Task<Service> CreateServiceAsync(string serviceName, ServiceConfig config, ServiceAccessRights access, CancellationToken cancellationToken)
 		{
 			return this.client.CreateService(this.handle, serviceName, config, access, cancellationToken);
 		}

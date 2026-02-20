@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -65,6 +67,7 @@ namespace Titanis.Winterop.Security
 	/// Represents a security descriptor
 	/// </summary>
 	// [MS-DTYP] § 2.4.6 SECURITY_DESCRIPTOR
+	[TypeConverter(typeof(SecurityDescriptorConverter))]
 	public class SecurityDescriptor
 	{
 		private SecurityDescriptorControl _control;
@@ -363,6 +366,26 @@ namespace Titanis.Winterop.Security
 
 			var acl = new AccessControlList(aces, true);
 			return acl;
+		}
+	}
+
+	public class SecurityDescriptorConverter : TypeConverter
+	{
+		public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) =>
+			sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+
+		public static readonly SecurityIdentifier PlaceholderDomainSid = new SecurityIdentifier(SecurityIdentifierAuthority.NtAuthority, [21, 0, 0, 0]);
+
+		public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+		{
+			if (value is string str)
+			{
+				
+				var sd = SecurityDescriptor.ParseSddl(str, PlaceholderDomainSid);
+				return sd;
+			}
+			else
+				return base.ConvertFrom(context, culture, value);
 		}
 	}
 

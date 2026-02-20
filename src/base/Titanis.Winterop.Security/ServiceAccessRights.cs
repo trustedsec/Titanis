@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Titanis.Msrpc.Msscmr
+namespace Titanis.Winterop.Security
 {
 	[Flags]
-	public enum ServiceAccess
+	public enum ServiceAccessRights
 	{
 		None = 0,
 

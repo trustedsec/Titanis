@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
 using Titanis.Msrpc.Msscmr;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.ScmTool;
 
@@ -15,7 +16,7 @@ namespace Titanis.Cli.ScmTool;
 [OutputRecordType(typeof(ServiceTrigger))]
 internal class QueryTriggersCommand : MultiServiceCommand
 {
-	protected sealed override ServiceAccess RequiredServiceAccess => ServiceAccess.QueryConfig;
+	protected sealed override ServiceAccessRights RequiredServiceAccess => ServiceAccessRights.QueryConfig;
 
 	protected sealed override async Task RunAsync(Service service, CancellationToken cancellationToken)
 	{

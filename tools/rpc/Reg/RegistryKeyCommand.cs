@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using Titanis.Cli;
+using Titanis.Winterop.Registry;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {

@@ -1,5 +1,6 @@
 ﻿using ms_samr;
 using Titanis.Msrpc.Mssamr;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.SamTool
 {
@@ -11,7 +12,7 @@ namespace Titanis.Cli.SamTool
 		/// <summary>
 		/// Gets the access rights required to run the command.
 		/// </summary>
-		protected abstract SamServerAccess RequiredSamAccess { get; }
+		protected abstract SamServerAccessRights RequiredSamAccess { get; }
 
 		/// <inheritdoc/>
 		protected sealed override async Task<int> RunAsync(SamClient client, CancellationToken cancellationToken)

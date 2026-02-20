@@ -6,13 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Titanis.Msrpc.Msscmr;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.ScmTool;
 internal abstract class MultiServiceCommand : ScmCommand
 {
-	protected abstract ServiceAccess RequiredServiceAccess { get; }
+	protected abstract ServiceAccessRights RequiredServiceAccess { get; }
 
-	protected sealed override ScmAccess RequiredScmAccess => ScmAccess.EnumerateService;
+	protected sealed override ScmAccessRights RequiredScmAccess => ScmAccessRights.EnumerateService;
 
 	[Parameter(10)]
 	[Mandatory]

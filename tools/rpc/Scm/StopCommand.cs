@@ -14,8 +14,8 @@ namespace Titanis.Cli.ScmTool;
 [Example("Stop a service", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m! -EncryptRpc myservice")]
 internal class StopCommand : ServiceCommand
 {
-	protected sealed override ServiceAccess RequiredServiceAccess => ServiceAccess.Stop;
-	protected sealed override ScmAccess RequiredScmAccess => ScmAccess.None;
+	protected sealed override ServiceAccessRights RequiredServiceAccess => ServiceAccessRights.Stop;
+	protected sealed override ScmAccessRights RequiredScmAccess => ScmAccessRights.None;
 
 	protected sealed override async Task<int> RunAsync(Scm scm, Service service, CancellationToken cancellationToken)
 	{

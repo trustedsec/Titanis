@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Titanis.Winterop.Security
 {
+	// [MS-DTYP] § 2.4.7 SECURITY_INFORMATION
 	[Flags]
 	public enum SecurityInfo : uint
 	{

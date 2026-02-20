@@ -211,7 +211,7 @@ namespace Titanis.Msrpc.Mssamr
 		/// <returns>A <see cref="Sam"/> object representing the SAM.</returns>
 		/// <exception cref="NtstatusException">The call failed</exception>
 		public async Task<Sam> Connect(
-			SamServerAccess access,
+			SamServerAccessRights access,
 			string server,
 			CancellationToken cancellationToken)
 		{
@@ -248,7 +248,7 @@ namespace Titanis.Msrpc.Mssamr
 		internal async Task<SamDomain> OpenDomain(
 			RpcContextHandle phServer,
 			RPC_SID pDomainSid,
-			SamDomainAccess access,
+			SamDomainAccessRights access,
 			CancellationToken cancellationToken
 			)
 		{
@@ -267,7 +267,7 @@ namespace Titanis.Msrpc.Mssamr
 		internal async Task<SamGroup> OpenGroup(
 			RpcContextHandle phDomain,
 			uint groupId,
-			SamGroupAccess access,
+			SamGroupAccessRights access,
 			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken
 			)
@@ -288,7 +288,7 @@ namespace Titanis.Msrpc.Mssamr
 		internal async Task<SamAlias> OpenAlias(
 			RpcContextHandle phDomain,
 			uint aliasId,
-			SamAliasAccess access,
+			SamAliasAccessRights access,
 			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken
 			)
@@ -309,7 +309,7 @@ namespace Titanis.Msrpc.Mssamr
 		internal async Task<SamUser> OpenUser(
 			RpcContextHandle phDomain,
 			uint userId,
-			SamUserAccess access,
+			SamUserAccessRights access,
 			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken
 			)
@@ -594,7 +594,7 @@ namespace Titanis.Msrpc.Mssamr
 		internal async Task<SamGroup> CreateGroup(
 			RpcContextHandle phDomain,
 			string name,
-			SamGroupAccess access,
+			SamGroupAccessRights access,
 			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken)
 		{
@@ -616,7 +616,7 @@ namespace Titanis.Msrpc.Mssamr
 		internal async Task<SamAlias> CreateAlias(
 			RpcContextHandle phDomain,
 			string name,
-			SamAliasAccess access,
+			SamAliasAccessRights access,
 			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken)
 		{
@@ -638,7 +638,7 @@ namespace Titanis.Msrpc.Mssamr
 			RpcContextHandle phDomain,
 			string name,
 			SamUserAccountFlags accountType,
-			SamUserAccess access,
+			SamUserAccessRights access,
 			SecurityIdentifier domainSid,
 			CancellationToken cancellationToken)
 		{

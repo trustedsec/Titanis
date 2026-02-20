@@ -449,8 +449,8 @@ namespace Titanis.Winterop.Security
 			{
 				return string.Create(2, this.value, (b, s) =>
 				{
-					b[0] = (char)(byte)s;
-					b[1] = (char)(s >> 8);
+					b[0] = (char)(s >> 8);
+					b[1] = (char)(byte)s;
 				});
 			}
 

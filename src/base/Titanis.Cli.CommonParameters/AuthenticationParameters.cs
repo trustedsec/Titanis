@@ -298,7 +298,7 @@ namespace Titanis.Cli
 				else
 				{
 					// If the username includes the domain but the domain is specified separately, treat the entire username value as the actual user name (no parsing)
-					this.UserName = new UserPrincipalName(this.UserName.OriginalText, this.UserDomain, this.UserName.OriginalText, PrincipalNameType.Principal);
+					this.UserName = new UserPrincipalName(this.UserName.ToString(), this.UserDomain, this.UserName.ToString(), PrincipalNameType.Principal);
 				}
 			}
 
@@ -390,9 +390,9 @@ namespace Titanis.Cli
 			[CallerArgumentExpression(nameof(keyPassphrase))] string? keyPassphraseName = null,
 			bool passException = false)
 		{
-            ArgumentNullException.ThrowIfNull(fileAccess);
+			ArgumentNullException.ThrowIfNull(fileAccess);
 
-            certFileName = fileAccess.ResolveFsPath(certFileName);
+			certFileName = fileAccess.ResolveFsPath(certFileName);
 			keyFile = string.IsNullOrEmpty(keyFile) ? null : fileAccess.ResolveFsPath(keyFile);
 
 			log?.WriteDiagnostic($"Opening certificate file {certFileName}");
@@ -638,10 +638,10 @@ namespace Titanis.Cli
 				return null;
 			}
 
-				{
-					if ((targetSpn is ServicePrincipalName svcpn) && IPAddress.TryParse(svcpn.ServiceInstance, out var _))
-						log?.WriteWarning("The server is specified with an IP address.  This will probably result in Kerberos authentication failing.");
-				}
+			{
+				if ((targetSpn is ServicePrincipalName svcpn) && IPAddress.TryParse(svcpn.ServiceInstance, out var _))
+					log?.WriteWarning("The server is specified with an IP address.  This will probably result in Kerberos authentication failing.");
+			}
 
 			// Now start processing credentials
 			TicketInfo? serviceTicket = null;

@@ -19,5 +19,14 @@ namespace Titanis.Winterop.Security
 		ListChildren = 0x00000004,
 		DeleteChild = 0x00000002,
 		CreateChild = 0x00000001,
+
+		Delete = 0x00010000,
+		ReadControl = 0x00020000,
+		WriteDac = 0x00040000,
+		WriteOwner = 0x00080000,
+		Synchronize = 0x00100000,
+		RequiredRightsMask = 0x000F0000,
+
+		AllStandardRights = 0x001F0000,
 	}
 }

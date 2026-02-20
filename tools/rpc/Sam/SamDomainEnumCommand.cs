@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Titanis.Msrpc.Mssamr;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.SamTool;
 internal abstract class SamDomainEnumCommand : SamCommand
@@ -9,9 +10,9 @@ internal abstract class SamDomainEnumCommand : SamCommand
 	[Description("Continue even if errors occur")]
 	public SwitchParam ContinueOnError { get; set; }
 
-	protected sealed override SamServerAccess RequiredSamAccess => SamServerAccess.EnumerateDomains | SamServerAccess.LookupDomain;
+	protected sealed override SamServerAccessRights RequiredSamAccess => SamServerAccessRights.EnumerateDomains | SamServerAccessRights.LookupDomain;
 
-	protected abstract SamDomainAccess RequiredDomainAccess { get; }
+	protected abstract SamDomainAccessRights RequiredDomainAccess { get; }
 
 	protected sealed override async Task<int> RunAsync(Sam sam, CancellationToken cancellationToken)
 	{

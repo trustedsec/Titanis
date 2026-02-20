@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\base\Titanis.Core\Titanis.Core.csproj" />
     <ProjectReference Include="..\..\..\base\Titanis.IO\Titanis.IO.csproj" />
+    <ProjectReference Include="..\..\..\base\Titanis.Winterop.Registry\Titanis.Winterop.Registry.csproj" />
     <ProjectReference Include="..\..\Titanis.DceRpc.Core\Titanis.DceRpc.Core.csproj" />
     <ProjectReference Include="..\..\Titanis.DceRpc\Titanis.DceRpc.csproj" />
   </ItemGroup>

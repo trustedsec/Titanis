@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace Titanis.Msrpc.Msscmr
+namespace Titanis.Winterop.Security
 {
 	[Flags]
-	public enum ScmAccess
+	public enum ScmAccessRights
 	{
 		None = 0,
 

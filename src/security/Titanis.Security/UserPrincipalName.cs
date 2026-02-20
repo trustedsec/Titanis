@@ -121,7 +121,8 @@ namespace Titanis.Security
 
 		/// <inheritdoc/>
 		public sealed override string ToString() =>
-			(this.NameType is PrincipalNameType.Enterprise) ? this.WireName
+			(this.OriginalText != null) ? this.OriginalText
+			: (this.NameType is PrincipalNameType.Enterprise) ? this.WireName
 			: (!string.IsNullOrEmpty(this.Realm)) ? $"{this.Realm}\\{this.UserName}"
 			: this.UserName;
 

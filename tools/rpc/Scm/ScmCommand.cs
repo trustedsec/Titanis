@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
 using Titanis.Msrpc.Msscmr;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.ScmTool
 {
@@ -18,7 +19,7 @@ namespace Titanis.Cli.ScmTool
 		/// <summary>
 		/// Gets the access rights required to run the command.
 		/// </summary>
-		protected abstract ScmAccess RequiredScmAccess { get; }
+		protected abstract ScmAccessRights RequiredScmAccess { get; }
 
 		/// <inheritdoc/>
 		protected sealed override async Task<int> RunAsync(ScmClient client, CancellationToken cancellationToken)

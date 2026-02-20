@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
 using Titanis.Msrpc.Msscmr;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.ScmTool;
 
@@ -16,7 +17,7 @@ namespace Titanis.Cli.ScmTool;
 internal class QueryCommand : ScmCommand
 {
 	/// <inheritdoc/>
-	protected sealed override ScmAccess RequiredScmAccess => ScmAccess.EnumerateService;
+	protected sealed override ScmAccessRights RequiredScmAccess => ScmAccessRights.EnumerateService;
 
 	[Parameter]
 	[Description("Filter by service type")]

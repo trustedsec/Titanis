@@ -15,7 +15,9 @@ namespace Titanis.Msrpc.Mssamr
 		{
 		}
 
-		public async Task<SamDomain> OpenDomainAsync(string name, SamDomainAccess access, CancellationToken cancellationToken)
+		public const string InvalidAccountChars = @"""/\[]:|<>+=;?,*";
+
+		public async Task<SamDomain> OpenDomainAsync(string name, SamDomainAccessRights access, CancellationToken cancellationToken)
 		{
 			ArgumentNullException.ThrowIfNull(name);
 
@@ -23,7 +25,7 @@ namespace Titanis.Msrpc.Mssamr
 			return await this._samClient.OpenDomain(this._handle, domainSid, access, cancellationToken).ConfigureAwait(false);
 		}
 
-		public async Task<SamDomain> OpenDomainAsync(SecurityIdentifier domainSid, SamDomainAccess access, CancellationToken cancellationToken)
+		public async Task<SamDomain> OpenDomainAsync(SecurityIdentifier domainSid, SamDomainAccessRights access, CancellationToken cancellationToken)
 		{
 			ArgumentNullException.ThrowIfNull(domainSid);
 

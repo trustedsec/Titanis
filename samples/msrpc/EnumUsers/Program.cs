@@ -9,6 +9,7 @@ using Titanis.Msrpc.Mssamr;
 using Titanis.Net;
 using Titanis.Security;
 using Titanis.Security.Ntlm;
+using Titanis.Winterop.Security;
 
 namespace EnumUsers
 {
@@ -52,11 +53,11 @@ namespace EnumUsers
 
 			SamClient sam = new SamClient();
 			await rpcClient.ConnectTcp(sam, remoteEP, null, cancellationToken);
-			using var db = await sam.Connect(SamServerAccess.Connect | SamServerAccess.EnumerateDomains | SamServerAccess.LookupDomain, target, cancellationToken);
+			using var db = await sam.Connect(SamServerAccessRights.Connect | SamServerAccessRights.EnumerateDomains | SamServerAccessRights.LookupDomain, target, cancellationToken);
 			var doms = await db.GetDomains(cancellationToken);
 			foreach (var domInfo in doms)
 			{
-				using var dom = await db.OpenDomainAsync(domInfo.Name, SamDomainAccess.ListAccounts, cancellationToken);
+				using var dom = await db.OpenDomainAsync(domInfo.Name, SamDomainAccessRights.ListAccounts, cancellationToken);
 				var users = await dom.EnumUsers(cancellationToken);
 				foreach (var user in users)
 				{

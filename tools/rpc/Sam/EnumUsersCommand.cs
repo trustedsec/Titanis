@@ -42,7 +42,7 @@ public class AliasInfo
 [Example("Enumerate all aliases", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!")]
 internal sealed class EnumAliasesCommand : SamDomainEnumCommand
 {
-	protected sealed override SamDomainAccess RequiredDomainAccess => SamDomainAccess.ListAccounts | SamDomainAccess.Read | SamDomainAccess.Lookup;
+	protected sealed override SamDomainAccessRights RequiredDomainAccess => SamDomainAccessRights.ListAccounts | SamDomainAccessRights.Read | SamDomainAccessRights.Lookup;
 	protected override async Task RunAsync(SamDomain domain, SamEntry domainInfo, Sam sam, CancellationToken cancellationToken)
 	{
 		List<SamEntry> entries;
@@ -68,7 +68,7 @@ internal sealed class EnumAliasesCommand : SamDomainEnumCommand
 			SamAlias alias;
 			try
 			{
-				alias = await domain.OpenAliasAsync(entry.Id, SamAliasAccess.MaxAllowed, cancellationToken);
+				alias = await domain.OpenAliasAsync(entry.Id, SamAliasAccessRights.MaxAllowed, cancellationToken);
 			}
 			catch (Exception ex)
 			{

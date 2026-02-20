@@ -3,6 +3,8 @@ using ms_rrp;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
 using Titanis.Winterop;
+using Titanis.Winterop.Registry;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msrrp
 {
@@ -19,17 +21,7 @@ namespace Titanis.Msrpc.Msrrp
 		PerformanceNlsText,
 	}
 
-	// [MS-RRP] § 3.1.5.15
-	[Flags]
-	public enum RegistryKeyOptions
-	{
-		None = 0,
-
-		BackupRestore = 4,
-		OpenLink = 8,
-	}
-
-	public class RemoteRegistryClient : RpcServiceClient<winregClientProxy>
+	public class RemoteRegistryClient : RpcServiceClient<winregClientProxy>, IRegistryStore
 	{
 		// [MS-RRP] § 2.1.1
 		public override bool SupportsDynamicTcp => true;
@@ -93,6 +85,7 @@ namespace Titanis.Msrpc.Msrrp
 		public Task<RegistryKey> OpenCurrentUser(RegistryAccessRights access, CancellationToken cancellationToken)
 			=> this.OpenRootKey(RegistryRootKey.CurrentUser, access, this._proxy.OpenCurrentUser, cancellationToken);
 
+		async Task<IRegistryKey> IRegistryStore.OpenLocalMachine(RegistryAccessRights access, CancellationToken cancellationToken) => await OpenLocalMachine(access, cancellationToken).ConfigureAwait(false);
 		public Task<RegistryKey> OpenLocalMachine(RegistryAccessRights access, CancellationToken cancellationToken)
 			=> this.OpenRootKey(RegistryRootKey.LocalMachine, access, this._proxy.OpenLocalMachine, cancellationToken);
 

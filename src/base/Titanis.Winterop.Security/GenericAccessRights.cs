@@ -12,5 +12,7 @@ namespace Titanis.Winterop.Security
 		GenericWrite = 0x40000000,
 		GenericExecute = 0x20000000,
 		GenericAll = 0x10000000,
+
+		Mask = 0xF000_0000
 	}
 }

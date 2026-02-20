@@ -19,6 +19,7 @@ namespace Titanis.Winterop.Security
 		Execute = 0x20,
 		ReadAttributes = 0x80,
 		WriteAttributes = 0x100,
+
 		Delete = 0x00010000,
 		ReadControl = 0x00020000,
 		WriteDac = 0x00040000,

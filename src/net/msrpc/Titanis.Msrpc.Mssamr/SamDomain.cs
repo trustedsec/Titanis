@@ -9,7 +9,7 @@ namespace Titanis.Msrpc.Mssamr
 	/// <summary>
 	/// Represents a domain.
 	/// </summary>
-	/// <seealso cref="Sam.OpenDomainAsync(string, SamDomainAccess, CancellationToken)"/>
+	/// <seealso cref="Sam.OpenDomainAsync(string, SamDomainAccessRights, CancellationToken)"/>
 	public sealed class SamDomain : SamObject
 	{
 		internal SamDomain(SamClient samClient, RpcContextHandle handle, SecurityIdentifier sid)
@@ -50,18 +50,18 @@ namespace Titanis.Msrpc.Mssamr
 		public Task<List<SamEntry>> EnumUsers(CancellationToken cancellationToken)
 			=> this._samClient.EnumUsersInDomains(this._handle, cancellationToken);
 
-		public Task<SamGroup> OpenGroupAsync(uint groupId, SamGroupAccess access, CancellationToken cancellationToken)
+		public Task<SamGroup> OpenGroupAsync(uint groupId, SamGroupAccessRights access, CancellationToken cancellationToken)
 			=> this._samClient.OpenGroup(this._handle, groupId, access, this.Sid, cancellationToken);
-		public Task<SamAlias> OpenAliasAsync(uint aliasId, SamAliasAccess access, CancellationToken cancellationToken)
+		public Task<SamAlias> OpenAliasAsync(uint aliasId, SamAliasAccessRights access, CancellationToken cancellationToken)
 			=> this._samClient.OpenAlias(this._handle, aliasId, access, this.Sid, cancellationToken);
-		public Task<SamUser> OpenUserAsync(uint userId, SamUserAccess access, CancellationToken cancellationToken)
+		public Task<SamUser> OpenUserAsync(uint userId, SamUserAccessRights access, CancellationToken cancellationToken)
 			=> this._samClient.OpenUser(this._handle, userId, access, this.Sid, cancellationToken);
 
-		public Task<SamGroup> CreateGroup(string name, SamGroupAccess access, CancellationToken cancellationToken)
+		public Task<SamGroup> CreateGroup(string name, SamGroupAccessRights access, CancellationToken cancellationToken)
 			=> this._samClient.CreateGroup(this._handle, name, access, this.Sid, cancellationToken);
-		public Task<SamAlias> CreateAlias(string name, SamAliasAccess access, CancellationToken cancellationToken)
+		public Task<SamAlias> CreateAlias(string name, SamAliasAccessRights access, CancellationToken cancellationToken)
 			=> this._samClient.CreateAlias(this._handle, name, access, this.Sid, cancellationToken);
-		public Task<SamUser> CreateUser(string name, SamUserAccountFlags accountType, SamUserAccess access, CancellationToken cancellationToken)
+		public Task<SamUser> CreateUser(string name, SamUserAccountFlags accountType, SamUserAccessRights access, CancellationToken cancellationToken)
 			=> this._samClient.CreateUser(this._handle, name, accountType, access, this.Sid, cancellationToken);
 
 		public Task<SamDomainGeneralInfo> QueryGeneralInfo(CancellationToken cancellationToken)

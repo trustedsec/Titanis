@@ -6,11 +6,12 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Titanis.Msrpc.Msscmr;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.ScmTool;
 internal abstract class ServiceCommand : ScmCommand
 {
-	protected abstract ServiceAccess RequiredServiceAccess { get; }
+	protected abstract ServiceAccessRights RequiredServiceAccess { get; }
 
 	[Parameter(10)]
 	[Mandatory]

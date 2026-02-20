@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
-using System.Data;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Titanis.Winterop.Security
 {
@@ -74,14 +71,16 @@ namespace Titanis.Winterop.Security
 		/// </summary>
 		/// <param name="type"><see cref="AccessControlEntryType"/> specifying entry type</param>
 		/// <param name="flags"><see cref="AccessControlEntryFlags"/> affecting behavior</param>
-		protected AccessControlEntry(AccessControlEntryType type, AccessControlEntryFlags flags)
+		protected AccessControlEntry(AccessControlEntryType type, AccessControlEntryFlags flags, SecurityIdentifier trustee)
 		{
 			this.AceType = type;
 			this.AceFlags = flags;
+			this.Trustee = trustee;
 		}
 
 		public AccessControlEntryType AceType { get; }
 		public AccessControlEntryFlags AceFlags { get; }
+		public SecurityIdentifier Trustee { get; }
 
 		#region SDDL
 		/// <summary>
@@ -187,7 +186,7 @@ namespace Titanis.Winterop.Security
 				sb.Append(inheritGuid.Value);
 			sb.Append(';');
 			if (trustee != null)
-				sb.Append(trustee.AsSddlCode());
+				sb.Append(trustee.ToSddlString());
 		}
 
 		#endregion
@@ -373,7 +372,7 @@ namespace Titanis.Winterop.Security
 		const int GuidTextLength = 32 + 4;
 		private static Guid? ParseGuid(ref SddlParseContext ctx)
 		{
-			if (ctx.LengthRemaining >= GuidTextLength)
+			if (ctx.LengthRemaining >= GuidTextLength && ctx[0]!=';')
 			{
 				if (Guid.TryParse(ctx.Remaining(GuidTextLength), out var guid))
 				{
@@ -612,17 +611,12 @@ namespace Titanis.Winterop.Security
 			AccessControlEntryFlags flags,
 			uint accessMask,
 			SecurityIdentifier sid
-			) : base(aceType, flags)
+			) : base(aceType, flags, sid)
 		{
-			if (sid is null) throw new ArgumentNullException(nameof(sid));
-
 			this.AccessMask = accessMask;
-			this.Trustee = sid;
 		}
 
 		public sealed override uint AccessMask { get; }
-
-		public SecurityIdentifier Trustee { get; }
 
 		public override void BuildSddl(StringBuilder sb)
 		{
@@ -669,17 +663,13 @@ namespace Titanis.Winterop.Security
 			AccessControlEntryFlags flags,
 			MandatoryLabelPolicy policy,
 			SecurityIdentifier sid
-			) : base(type, flags)
+			) : base(type, flags, sid)
 		{
-			if (sid is null) throw new ArgumentNullException(nameof(sid));
 			this.Policy = policy;
-			this.Trustee = sid;
 		}
 
 		public MandatoryLabelPolicy Policy { get; }
 		public override uint AccessMask => (uint)this.Policy;
-
-		public SecurityIdentifier Trustee { get; }
 
 		private static readonly Dictionary<uint, string> accessRightCodes = new Dictionary<uint, string>()
 		{
@@ -724,17 +714,14 @@ namespace Titanis.Winterop.Security
 			uint accessMask,
 			SecurityIdentifier sid,
 			byte[] applicationData
-			) : base(type, flags)
+			) : base(type, flags, sid)
 		{
-			if (sid is null) throw new ArgumentNullException(nameof(sid));
 			if (applicationData is null) throw new ArgumentNullException(nameof(applicationData));
 			this.AccessMask = accessMask;
-			this.Trustee = sid;
 			this.ApplicationData = applicationData;
 		}
 
 		public sealed override uint AccessMask { get; }
-		public SecurityIdentifier Trustee { get; }
 		public byte[] ApplicationData { get; }
 
 		public override void BuildSddl(StringBuilder sb)
@@ -776,18 +763,16 @@ namespace Titanis.Winterop.Security
 			Guid? objectType,
 			Guid? inheritedObjectType,
 			SecurityIdentifier sid
-			) : base(type, flags)
+			) : base(type, flags, sid)
 		{
 			this.AccessMask = accessMask;
 			this.ObjectType = objectType;
 			this.InheritedObjectType = inheritedObjectType;
-			this.Trustee = sid;
 		}
 
 		public Guid? ObjectType { get; }
 		public Guid? InheritedObjectType { get; }
 		public sealed override uint AccessMask { get; }
-		public SecurityIdentifier Trustee { get; }
 
 		public override void BuildSddl(StringBuilder sb)
 		{
@@ -840,21 +825,18 @@ namespace Titanis.Winterop.Security
 			Guid? inheritedObjectType,
 			SecurityIdentifier sid,
 			byte[] applicationData
-			) : base(type, flags)
+			) : base(type, flags, sid)
 		{
-			if (sid is null) throw new ArgumentNullException(nameof(sid));
 			if (applicationData is null) throw new ArgumentNullException(nameof(applicationData));
 			this.AccessMask = accessMask;
 			this.ObjectType = objectType;
 			this.InheritedObjectType = inheritedObjectType;
-			this.Trustee = sid;
 			this.ApplicationData = applicationData;
 		}
 
 		public Guid? ObjectType { get; }
 		public Guid? InheritedObjectType { get; }
 		public sealed override uint AccessMask { get; }
-		public SecurityIdentifier Trustee { get; }
 		public byte[] ApplicationData { get; }
 
 		public override void BuildSddl(StringBuilder sb)
@@ -909,17 +891,14 @@ namespace Titanis.Winterop.Security
 			uint accessMask,
 			SecurityIdentifier sid,
 			byte[] attributeData
-			) : base(type, flags)
+			) : base(type, flags, sid)
 		{
-			if (sid is null) throw new ArgumentNullException(nameof(sid));
 			if (attributeData is null) throw new ArgumentNullException(nameof(attributeData));
 			this.AccessMask = accessMask;
-			this.Trustee = sid;
 			this.AttributeData = attributeData;
 		}
 
 		public sealed override uint AccessMask { get; }
-		public SecurityIdentifier Trustee { get; }
 		public byte[] AttributeData { get; }
 
 		public override void BuildSddl(StringBuilder sb)

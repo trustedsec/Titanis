@@ -35,9 +35,9 @@ namespace WeakServices
 			string myWorkstationName = "TEST-WKS";
 
 			// Here are the access rights that are interesting
-			const ServiceAccess InterestingAccessRights =
-				ServiceAccess.ChangeConfig
-				| (ServiceAccess)StandardAccessRights.WriteDac;
+			const ServiceAccessRights InterestingAccessRights =
+				ServiceAccessRights.ChangeConfig
+				| (ServiceAccessRights)StandardAccessRights.WriteDac;
 
 			// Maintain a list of what looks boring so we can ignore it later
 			WellKnownSid[] uninterestingSids = new WellKnownSid[]
@@ -84,7 +84,7 @@ namespace WeakServices
 			// Connect to SCM
 			ScmClient scmClient = new ScmClient();
 			await rpcClient.ConnectTcp(scmClient, scmEP, null, cancellationToken);
-			using var scm = await scmClient.OpenScm(ScmAccess.Connect | ScmAccess.EnumerateService, cancellationToken);
+			using var scm = await scmClient.OpenScm(ScmAccessRights.Connect | ScmAccessRights.EnumerateService, cancellationToken);
 
 			// Start looping through services
 			var services = await scm.GetServicesAsync(cancellationToken);
@@ -93,7 +93,7 @@ namespace WeakServices
 				try
 				{
 					// Open the service
-					using var service = await scm.OpenServiceAsync(serviceInfo.ServiceName, (ServiceAccess)StandardAccessRights.ReadControl, cancellationToken);
+					using var service = await scm.OpenServiceAsync(serviceInfo.ServiceName, (ServiceAccessRights)StandardAccessRights.ReadControl, cancellationToken);
 
 					// Query the service DACL
 					var sdBytes = await service.QuerySecurityAsync(Titanis.Winterop.Security.SecurityInfo.Dacl, cancellationToken);
@@ -108,7 +108,7 @@ namespace WeakServices
 							SimpleAce simple = (SimpleAce)ace;
 
 							// Does it have any interesting access rights?
-							if (0 != ((ServiceAccess)simple.AccessMask & InterestingAccessRights))
+							if (0 != ((ServiceAccessRights)simple.AccessMask & InterestingAccessRights))
 							{
 								// Convert to a well-known SID and check our list
 								var wks = simple.Trustee.AsWellKnownSid();

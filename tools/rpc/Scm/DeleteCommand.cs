@@ -14,8 +14,8 @@ namespace Titanis.Cli.ScmTool;
 [Example("Delete a service", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m! -EncryptRpc myservice")]
 internal class DeleteCommand : ServiceCommand
 {
-	protected sealed override ServiceAccess RequiredServiceAccess => (ServiceAccess)StandardAccessRights.Delete;
-	protected sealed override ScmAccess RequiredScmAccess => ScmAccess.None;
+	protected sealed override ServiceAccessRights RequiredServiceAccess => (ServiceAccessRights)StandardAccessRights.Delete;
+	protected sealed override ScmAccessRights RequiredScmAccess => ScmAccessRights.None;
 	protected sealed override async Task<int> RunAsync(Scm scm, Service service, CancellationToken cancellationToken)
 	{
 		await service.DeleteAsync(cancellationToken);

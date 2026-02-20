@@ -16,9 +16,16 @@ namespace Titanis.Winterop.Security
 		WriteOwner = 0x00080000,
 		Synchronize = 0x00100000,
 		RequiredRightsMask = 0x000F0000,
+
 		AllStandardRights = 0x001F0000,
-		SpecificRightsMask = 0x0000FFFF,
+	}
+
+	[Flags]
+	public enum SpecialAccessRights : uint
+	{
 		AccessSystemSecurity = 0x01000000,
 		MaxAllowed = 0x02000000,
+
+		Mask = 0x031F_0000
 	}
 }

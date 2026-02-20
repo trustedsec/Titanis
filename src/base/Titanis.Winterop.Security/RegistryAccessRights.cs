@@ -13,17 +13,22 @@ namespace Titanis.Winterop.Security
 	{
 		None=0,
 
-		KeyQueryValue = 1,
-		KeySetValue = 2,
+		QueryValue = 1,
+		SetValue = 2,
 		Default = 3,
-		KeyCreateSubKey = 4,
-		KeyEnumerateSubKey = 8,
-		KeyNotify = 0x10,
-		KeyCreate = 0x20,
-		Delete = 65536,
-		ReadControl = 131072,
-		WriteDac = 262144,
-		WriteOwner = 524288,
+		CreateSubkey = 4,
+		EnumerateSubkeys = 8,
+		Notify = 0x10,
+		CreateLink = 0x20,
+
+		Wow64_Use64 = 0x100,
+		Wow64_Use32 = 0x200,
+
+		Delete = 0x00010000,
+		ReadControl = 0x00020000,
+		WriteDac = 0x00040000,
+		WriteOwner = 0x00080000,
+		Synchronize = 0x00100000,
 
 		KeyAll=0x000F003F,
 		KeyRead=0x00020019,
