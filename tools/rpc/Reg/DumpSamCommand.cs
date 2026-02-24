@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
+using Titanis.Winterop.Lsa;
 using Titanis.Winterop.Registry;
 using Titanis.Winterop.Sam;
 using Titanis.Winterop.SamServer;
@@ -31,7 +32,14 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		{
 			var options = this.BackupSemantics.IsSet ? RegistryKeyOptions.BackupRestore : RegistryKeyOptions.None;
 
-			var samServer = await SamRegistryServer.Open(client, options, this.Log, cancellationToken);
+			var systemKey = await LsaStore.ExtractSyskey(client, options, this.Log, cancellationToken);
+
+			var samServer = await SamRegistryServer.Open(
+				systemKey,
+				client,
+				options,
+				this.Log,
+				cancellationToken);
 
 			var hashes = await samServer.DumpUserHashes(cancellationToken);
 			this.WriteRecords(hashes);

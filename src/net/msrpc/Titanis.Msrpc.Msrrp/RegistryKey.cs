@@ -28,6 +28,30 @@ namespace Titanis.Msrpc.Msrrp
 		public string KeyPath { get; }
 
 
+		public async Task<RegistryKey> CreateSubkey(string subkeyPath, RegistryAccessRights access, RegistryKeyOptions options, CancellationToken cancellationToken)
+		{
+			RpcPointer<RpcContextHandle> phkResult = new();
+			Win32ErrorCode res = (Win32ErrorCode)await this._owner.proxy.BaseRegCreateKey(this._hkey, (subkeyPath + '\0').ToRpcUnicodeString(), default, (uint)options, (uint)access, null, phkResult, new RpcPointer<uint>(), cancellationToken).ConfigureAwait(false);
+			res.CheckAndThrow();
+
+			return new RegistryKey(RegistryPath.GetSubkeyNameFromPath(subkeyPath), RegistryPath.Combine(this.KeyPath, subkeyPath), phkResult.value, this._owner);
+		}
+
+		public Task SetValue(string? valueName, string str, CancellationToken cancellationToken) => this.SetValue(valueName, RegistryValueType.String, Encoding.Unicode.GetBytes(str + '\0'), cancellationToken);
+
+		public async Task SetValue(string? valueName, RegistryValueType valueKind, byte[] data, CancellationToken cancellationToken)
+		{
+			var res = (Win32ErrorCode)await _owner.proxy.BaseRegSetValue(
+                _hkey,
+				(valueName+"\0").ToRpcUnicodeString(),
+				(uint)valueKind,
+				data,
+				(uint)data.Length,
+				cancellationToken).ConfigureAwait(false);
+			res.CheckAndThrow();
+		}
+
+
 		async Task<IRegistryKey> IRegistryKey.OpenSubkey(string subkeyPath, RegistryAccessRights access, RegistryKeyOptions options, CancellationToken cancellationToken) => await OpenSubkey(subkeyPath, access, options, cancellationToken).ConfigureAwait(false);
 		public async Task<RegistryKey> OpenSubkey(string subkeyPath, RegistryAccessRights access, RegistryKeyOptions options, CancellationToken cancellationToken)
 		{

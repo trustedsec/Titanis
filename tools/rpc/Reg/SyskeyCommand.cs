@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
+using Titanis.Winterop.Lsa;
 using Titanis.Winterop.Registry;
 using Titanis.Winterop.SamServer;
 using Titanis.Winterop.Security;
@@ -37,7 +38,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 
 		internal static async Task<byte[]> ExtractSyskey(IRegistryStore registry, RegistryKeyOptions options, ILog log, CancellationToken cancellationToken)
 		{
-			return await SamRegistryServer.ExtractSyskey(registry, options, log, cancellationToken);
+			return await LsaStore.ExtractSyskey(registry, options, log, cancellationToken);
 		}
 	}
 }

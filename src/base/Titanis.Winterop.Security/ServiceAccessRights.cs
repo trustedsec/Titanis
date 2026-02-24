@@ -20,6 +20,13 @@ namespace Titanis.Winterop.Security
 		UserDefinedControl = 0x0100,
 		AllRights = 0x000F01FF,
 
+		// Standard
+		Delete = 0x00010000,
+		ReadControl = 0x00020000,
+		WriteDac = 0x00040000,
+		WriteOwner = 0x00080000,
+		Synchronize = 0x00100000,
+
 		MaxAllowed = 0x02000000,
 	}
 }

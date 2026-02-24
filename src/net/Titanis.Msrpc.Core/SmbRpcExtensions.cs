@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
 using Titanis.Smb2;
+using Titanis.Winterop;
 
 namespace Titanis.Msrpc
 {
@@ -42,7 +43,19 @@ namespace Titanis.Msrpc
 			Smb2Pipe? pipe = null;
 			try
 			{
-				pipe = await smb2Client.OpenPipeAsync(pipeUncPath, cancellationToken).ConfigureAwait(false);
+				int retries = 3;
+				while (retries-- > 0)
+				{
+					try
+					{
+						pipe = await smb2Client.OpenPipeAsync(pipeUncPath, cancellationToken).ConfigureAwait(false);
+						break;
+					}
+					catch (NtstatusException ex) when (ex.StatusCode == Ntstatus.STATUS_PIPE_NOT_AVAILABLE)
+					{
+						await Task.Delay(100).ConfigureAwait(false);
+					}
+				}
 				var stream = pipe.GetStream(true);
 				pipe = null;
 

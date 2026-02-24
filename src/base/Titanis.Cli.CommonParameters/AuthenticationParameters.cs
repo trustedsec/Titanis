@@ -295,10 +295,14 @@ namespace Titanis.Cli
 					if (!string.IsNullOrEmpty(this.UserName.Realm))
 						this.UserDomain = this.UserName.Realm;
 				}
-				else
+				else if (!string.IsNullOrEmpty(this.UserName.Realm))
 				{
 					// If the username includes the domain but the domain is specified separately, treat the entire username value as the actual user name (no parsing)
 					this.UserName = new UserPrincipalName(this.UserName.ToString(), this.UserDomain, this.UserName.ToString(), PrincipalNameType.Principal);
+				}
+				else
+				{
+					this.UserName = this.UserName.WithRealm(this.UserDomain);
 				}
 			}
 
@@ -1014,6 +1018,8 @@ namespace Titanis.Cli
 
 		public IClientCredentialService? CreateCredService(IServiceContainer container, Type serviceType)
 		{
+			if (!this._validated)
+				this.Validate(false, new ParameterValidationContext());
 			return new CredentialService(this);
 		}
 

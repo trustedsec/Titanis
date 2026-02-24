@@ -443,7 +443,7 @@ namespace Titanis.Msrpc.Msscmr
 			res.CheckAndThrow();
 		}
 
-		internal async Task<byte[]> QuerySecurity(RpcContextHandle handle, SecurityInfo info, CancellationToken cancellationToken)
+		internal async Task<SecurityDescriptor> QuerySecurity(RpcContextHandle handle, SecurityInfo info, CancellationToken cancellationToken)
 		{
 			RpcPointer<byte[]> pBuf = new RpcPointer<byte[]>(null);
 			RpcPointer<uint> pcbNeeded = new RpcPointer<uint>();
@@ -468,7 +468,7 @@ namespace Titanis.Msrpc.Msscmr
 			}
 			res.CheckAndThrow();
 
-			return pBuf.value;
+			return new SecurityDescriptor(pBuf.value);
 		}
 
 		internal async Task CloseScm(RpcContextHandle handle, CancellationToken cancellationToken)

@@ -33,10 +33,8 @@ namespace Titanis.Winterop.SamServer
 
 	public partial class SamRegistryServer : SamServer
 	{
-		private const string LsaKeyPath = @"SYSTEM\CurrentControlSet\Control\Lsa";
-
-		private const ulong SyskeyByteSwap = 0xEC6B4D50F91273A8;
 		private readonly byte[] _syskey;
+		public byte[] SystemKey => this._syskey;
 		private readonly IRegistryStore _registry;
 		private readonly RegistryKeyOptions _regOptions;
 		private readonly ILog? _log;
@@ -54,54 +52,12 @@ namespace Titanis.Winterop.SamServer
 			this._log = log;
 		}
 
-		public static async Task<SamRegistryServer> Open(IRegistryStore registry, RegistryKeyOptions options, ILog? log, CancellationToken cancellationToken)
+		public static async Task<SamRegistryServer> Open(byte[] systemKey, IRegistryStore registry, RegistryKeyOptions options, ILog? log, CancellationToken cancellationToken)
 		{
-			var syskey = await ExtractSyskey(registry, options, log, cancellationToken).ConfigureAwait(false);
+            ArgumentNullException.ThrowIfNull(systemKey);
+            ArgumentNullException.ThrowIfNull(registry);
 
-			return new SamRegistryServer(syskey, registry, options, log);
-		}
-
-		public static async Task<byte[]> ExtractSyskey(IRegistryStore registry, RegistryKeyOptions options, ILog? log, CancellationToken cancellationToken)
-		{
-			log.WriteDiagnostic($"Opening HKLM");
-			var hklm = await registry.OpenLocalMachine(RegistryAccessRights.QueryValue, cancellationToken).ConfigureAwait(false);
-			await using (hklm)
-			{
-				log.WriteDiagnostic($"Opening HKLM\\{LsaKeyPath}");
-				var lsaKey = await hklm.OpenSubkey(LsaKeyPath, RegistryAccessRights.QueryValue, options, cancellationToken).ConfigureAwait(false);
-
-				await using (lsaKey)
-				{
-					string[] names = ["JD", "Skew1", "GBG", "Data"];
-
-					byte[] syskey = new byte[16];
-					int writeIndex = 0;
-					ulong swapKey = SyskeyByteSwap;
-					foreach (string? name in names)
-					{
-						log.WriteDiagnostic($"Opening HKLM\\{LsaKeyPath}\\{name}");
-						var subkey = await lsaKey.OpenSubkey(name, RegistryAccessRights.QueryValue, options, cancellationToken).ConfigureAwait(false);
-						await using (subkey)
-						{
-							var info = await subkey.QueryInfo(cancellationToken).ConfigureAwait(false);
-
-							log.WriteDiagnostic($"  className={info.ClassName}");
-							var bytes = BinaryHelper.ParseHexString(info.ClassName.TrimEnd('\0'));
-
-							syskey[(swapKey & 0x0F)] = bytes[0];
-							swapKey >>= 4;
-							syskey[(swapKey & 0x0F)] = bytes[1];
-							swapKey >>= 4;
-							syskey[(swapKey & 0x0F)] = bytes[2];
-							swapKey >>= 4;
-							syskey[(swapKey & 0x0F)] = bytes[3];
-							swapKey >>= 4;
-						}
-					}
-
-					return syskey;
-				}
-			}
+            return new SamRegistryServer(systemKey, registry, options, log);
 		}
 
 		public async Task<SamUserHash[]> DumpUserHashes(CancellationToken cancellationToken)
@@ -109,7 +65,6 @@ namespace Titanis.Winterop.SamServer
 			var log = this._log;
 
 			var syskey = this._syskey;
-			log?.WriteVerbose($"syskey = {syskey.ToHexString()}");
 
 			Dictionary<uint, string> userNames = new Dictionary<uint, string>();
 			var hklm = await _registry.OpenLocalMachine(RegistryAccessRights.QueryValue, cancellationToken).ConfigureAwait(false);

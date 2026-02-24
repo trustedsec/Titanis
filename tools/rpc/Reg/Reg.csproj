@@ -14,6 +14,7 @@
     <ProjectReference Include="..\..\..\src\base\Titanis.Cli\Titanis.Cli.csproj" />
     <ProjectReference Include="..\..\..\src\base\Titanis.Core\Titanis.Core.csproj" />
     <ProjectReference Include="..\..\..\src\base\Titanis.IO\Titanis.IO.csproj" />
+    <ProjectReference Include="..\..\..\src\base\Titanis.Winterop.Lsa\Titanis.Winterop.Lsa.csproj" />
     <ProjectReference Include="..\..\..\src\base\Titanis.Winterop.Sam\Titanis.Winterop.Sam.csproj" />
     <ProjectReference Include="..\..\..\src\net\msrpc\Titanis.Msrpc.Msrrp\Titanis.Msrpc.Msrrp.csproj" />
   </ItemGroup>

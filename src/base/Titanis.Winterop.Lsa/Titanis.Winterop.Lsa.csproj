@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\crypto\Titanis.Crypto.Sha2\Titanis.Crypto.Sha2.csproj" />
+    <ProjectReference Include="..\Titanis.Winterop.Registry\Titanis.Winterop.Registry.csproj" />
+  </ItemGroup>
+
+</Project>

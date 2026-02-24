@@ -107,7 +107,7 @@ namespace Titanis.Security
 			upn = null;
 			return false;
 		}
-		public static UserPrincipalName Parse(string text)
+		public new static UserPrincipalName Parse(string text)
 		{
 			if (string.IsNullOrEmpty(text)) throw new ArgumentException($"'{nameof(text)}' cannot be null or empty.", nameof(text));
 

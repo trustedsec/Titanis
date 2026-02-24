@@ -10,6 +10,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 	[Subcommand("keyinfo", typeof(KeyInfoCommand))]
 	[Subcommand("syskey", typeof(SyskeyCommand))]
 	[Subcommand("dumpsam", typeof(DumpSamCommand))]
+	[Subcommand("dumplsasecrets", typeof(DumpLsaSecretsCommand))]
 	[Description("Interacts with the registry")]
 	internal class Program : MultiCommand
 	{

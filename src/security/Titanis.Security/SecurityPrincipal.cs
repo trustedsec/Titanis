@@ -125,6 +125,12 @@ namespace Titanis.Security
 			return !(left == right);
 		}
 
+		public static SecurityPrincipalName Parse(string str)
+		{
+			if (!TryParse(str, out var spn))
+				throw new ArgumentException($"The string '{str}' is not a valid SPN.", nameof(str));
+			return spn;
+		}
 		public static bool TryParse(string str, out SecurityPrincipalName spn)
 		{
 			if (string.IsNullOrEmpty(str))

@@ -62,7 +62,7 @@ namespace Titanis.Msrpc.Msscmr
 		public Task DeleteAsync(CancellationToken cancellationToken)
 			=> this.client.DeleteService(this.handle, cancellationToken);
 
-		public Task<byte[]> QuerySecurityAsync(SecurityInfo sections, CancellationToken cancellationToken)
+		public Task<SecurityDescriptor> QuerySecurityAsync(SecurityInfo sections, CancellationToken cancellationToken)
 			=> this.client.QuerySecurity(this.handle, sections, cancellationToken);
 
 		public Task<ServiceStatus> QueryStatusAsync(CancellationToken cancellationToken)

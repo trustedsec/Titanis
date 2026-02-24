@@ -115,7 +115,7 @@ namespace Titanis.Security
 			spn = null;
 			return false;
 		}
-		public static ServicePrincipalName Parse(string text)
+		public new static ServicePrincipalName Parse(string text)
 		{
 			if (string.IsNullOrEmpty(text)) throw new ArgumentException($"'{nameof(text)}' cannot be null or empty.", nameof(text));
 
