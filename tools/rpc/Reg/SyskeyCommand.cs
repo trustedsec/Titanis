@@ -21,13 +21,9 @@ namespace Titanis.Msrpc.Msrrp.Cli
 	[Example("Prints the syskey using a backup operator", "{0} -UserName marks@LUMON -Kdc 10.66.0.11 -Password She'sAlive!! LUMON-FS1 -BackupSemantics")]
 	internal class SyskeyCommand : RegistryCommand
 	{
-		[Parameter]
-		[Description("Open with backup semantics")]
-		public SwitchParam BackupSemantics { get; set; }
-
 		protected override async Task<int> RunAsync(RemoteRegistryClient client, CancellationToken cancellationToken)
 		{
-			var options = this.BackupSemantics.IsSet ? RegistryKeyOptions.BackupRestore : RegistryKeyOptions.None;
+			var options = this.KeyOptions;
 
 			byte[] syskey = await ExtractSyskey(client, options, this.Log, cancellationToken);
 

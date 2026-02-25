@@ -12,10 +12,6 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		[Description("Path of target registry key")]
 		public string KeyPath { get; set; }
 
-		[Parameter]
-		[Description("Open with backup semantics")]
-		public SwitchParam BackupSemantics { get; set; }
-
 		/// <summary>
 		/// Gets the <see cref="RegistryAccessRights"/> required for the command.
 		/// </summary>
@@ -23,7 +19,6 @@ namespace Titanis.Msrpc.Msrrp.Cli
 
 		private RegistryRootKey _rootKey;
 		private string? _keyPath;
-		private RegistryKeyOptions _keyOptions;
 
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
@@ -57,8 +52,6 @@ namespace Titanis.Msrpc.Msrrp.Cli
 			RegistryKeyOptions options = RegistryKeyOptions.None;
 			if (this.BackupSemantics.IsSet)
 				options |= RegistryKeyOptions.BackupRestore;
-
-			this._keyOptions = options;
 		}
 
 
@@ -77,7 +70,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 			}
 			else
 			{
-				key = await rootKey.OpenSubkey(this._keyPath, this.RequiredKeyAccess, this._keyOptions, cancellationToken);
+				key = await rootKey.OpenSubkey(this._keyPath, this.RequiredKeyAccess, this.KeyOptions, cancellationToken);
 			}
 
 			return await this.RunAsync(key, client, cancellationToken);

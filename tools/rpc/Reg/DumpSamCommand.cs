@@ -23,14 +23,9 @@ namespace Titanis.Msrpc.Msrrp.Cli
 	[Example("Dump the SAM using a backup operator", "{0} -UserName marks@LUMON -Kdc 10.66.0.11 -Password She'sAlive!! LUMON-FS1 -BackupSemantics")]
 	class DumpSamCommand : RegistryCommand
 	{
-
-		[Parameter]
-		[Description("Open with backup semantics")]
-		public SwitchParam BackupSemantics { get; set; }
-
 		protected override async Task<int> RunAsync(RemoteRegistryClient client, CancellationToken cancellationToken)
 		{
-			var options = this.BackupSemantics.IsSet ? RegistryKeyOptions.BackupRestore : RegistryKeyOptions.None;
+			var options = this.KeyOptions;
 
 			var systemKey = await LsaStore.ExtractSyskey(client, options, this.Log, cancellationToken);
 
