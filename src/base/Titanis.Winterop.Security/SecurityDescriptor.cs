@@ -367,6 +367,30 @@ namespace Titanis.Winterop.Security
 			var acl = new AccessControlList(aces, true);
 			return acl;
 		}
+
+		public static StandardAccessRights GetRightsToRead(SecurityInfo securityInfo)
+		{
+			StandardAccessRights access = 0;
+			if (0 != (securityInfo & (SecurityInfo.Dacl | SecurityInfo.Owner | SecurityInfo.Group))) access |= StandardAccessRights.ReadControl;
+			if (0 != (securityInfo & (SecurityInfo.Dacl | SecurityInfo.Owner | SecurityInfo.Group))) access |= (StandardAccessRights)SpecialAccessRights.AccessSystemSecurity;
+
+			return access;
+		}
+
+		public StandardAccessRights RightsToSet
+		{
+			get
+			{
+				StandardAccessRights access = 0;
+				if (this.Dacl != null)
+					access |= StandardAccessRights.WriteDac;
+				if (this.Owner != null || this.Group != null)
+					access |= StandardAccessRights.WriteOwner;
+				if (this.Sacl != null)
+					access |= (StandardAccessRights)SpecialAccessRights.AccessSystemSecurity;
+				return access;
+			}
+		}
 	}
 
 	public class SecurityDescriptorConverter : TypeConverter

@@ -10,6 +10,8 @@ namespace Titanis.Winterop.Security
 	[Flags]
 	public enum StandardAccessRights : uint
 	{
+		None=0,
+
 		Delete = 0x00010000,
 		ReadControl = 0x00020000,
 		WriteDac = 0x00040000,
