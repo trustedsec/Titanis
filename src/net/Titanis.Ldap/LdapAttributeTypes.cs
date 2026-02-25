@@ -18,6 +18,10 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription MSDSConsistencyGuid = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.1360", ["mS-DS-ConsistencyGuid"], syntax: AdSyntaxes.StringOctetGuid);
 		public readonly static AttributeTypeDescription MsDSOptionalFeatureGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.2062", ["msDS-OptionalFeatureGUID"], syntax: AdSyntaxes.StringOctetGuid);
 		public readonly static AttributeTypeDescription ObjectGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.2", ["objectGUID"], syntax: AdSyntaxes.StringOctetGuid);
+		public readonly static AttributeTypeDescription AttributeSecurityGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.149", ["attributeSecurityGUID"], syntax: AdSyntaxes.StringOctetGuid);
+		public readonly static AttributeTypeDescription FRSReplicaSetGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.533", ["fRSReplicaSetGUID"], syntax: AdSyntaxes.StringOctetGuid);
+		public readonly static AttributeTypeDescription FRSVersionGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.43", ["fRSVersionGUID"], syntax: AdSyntaxes.StringOctetGuid);
+		public readonly static AttributeTypeDescription SchemaIDGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.148", ["schemaIDGUID"], syntax: AdSyntaxes.StringOctetGuid);
 		#endregion
 
 		#region rootDSE attributes
@@ -132,7 +136,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription AssociatedName = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "0.9.2342.19200300.100.1.38", ["associatedName"], syntax: AdSyntaxes.ObjectDsDn);
 		public readonly static AttributeTypeDescription AttributeDisplayNames = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.748", ["attributeDisplayNames"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription AttributeID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.2.30", ["attributeID"], syntax: AdSyntaxes.StringObjectIdentifier);
-		public readonly static AttributeTypeDescription AttributeSecurityGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.149", ["attributeSecurityGUID"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription AttributeSyntax = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.2.32", ["attributeSyntax"], syntax: AdSyntaxes.StringObjectIdentifier);
 		public readonly static AttributeTypeDescription AttributeTypes = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "2.5.21.5", ["attributeTypes"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription AttributeCertificateAttribute = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "2.5.4.58", ["attributeCertificateAttribute"], syntax: AdSyntaxes.StringOctet);
@@ -311,7 +314,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription FRSMemberReferenceBL = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.876", ["fRSMemberReferenceBL"], syntax: AdSyntaxes.ObjectDsDn);
 		public readonly static AttributeTypeDescription FRSPartnerAuthLevel = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.877", ["fRSPartnerAuthLevel"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription FRSPrimaryMember = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.878", ["fRSPrimaryMember"], syntax: AdSyntaxes.ObjectDsDn);
-		public readonly static AttributeTypeDescription FRSReplicaSetGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.533", ["fRSReplicaSetGUID"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription FRSReplicaSetType = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.31", ["fRSReplicaSetType"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription FRSRootPath = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.487", ["fRSRootPath"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription FRSRootSecurity = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.535", ["fRSRootSecurity"], syntax: AdSyntaxes.StringNtSecDesc);
@@ -322,7 +324,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription FRSTimeLastConfigChange = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.881", ["fRSTimeLastConfigChange"], syntax: AdSyntaxes.StringUtcTime);
 		public readonly static AttributeTypeDescription FRSUpdateTimeout = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.485", ["fRSUpdateTimeout"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription FRSVersion = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.882", ["fRSVersion"], syntax: AdSyntaxes.StringUnicode);
-		public readonly static AttributeTypeDescription FRSVersionGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.43", ["fRSVersionGUID"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription FRSWorkingPath = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.486", ["fRSWorkingPath"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription FSMORoleOwner = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.369", ["fSMORoleOwner"], syntax: AdSyntaxes.ObjectDsDn);
 		public readonly static AttributeTypeDescription GarbageCollPeriod = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.2.301", ["garbageCollPeriod"], syntax: AdSyntaxes.Integer);
@@ -1401,7 +1402,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription SamDomainUpdates = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.1969", ["samDomainUpdates"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription Schedule = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.211", ["schedule"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription SchemaFlagsEx = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.120", ["schemaFlagsEx"], syntax: AdSyntaxes.Integer);
-		public readonly static AttributeTypeDescription SchemaIDGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.148", ["schemaIDGUID"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription SchemaInfo = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.1358", ["schemaInfo"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription SchemaUpdate = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.481", ["schemaUpdate"], syntax: AdSyntaxes.StringGeneralizedTime);
 		public readonly static AttributeTypeDescription SchemaVersion = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.2.471", ["schemaVersion"], syntax: AdSyntaxes.Integer);

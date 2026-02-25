@@ -4,6 +4,7 @@ using System.ComponentModel;
 using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
+
 internal abstract class LdapSearchCommandBase : LdapCommandBase, ILdapClientSearchCallback
 {
 
@@ -99,6 +100,11 @@ internal abstract class LdapSearchCommandBase : LdapCommandBase, ILdapClientSear
 		query.IncludeDeletedLinks = this.IncludeDeletedLinks.IsSet;
 		query.Scope = this.Scope ?? (isRootDse ? LdapSearchScope.BaseObject : LdapSearchScope.WholeSubtree);
 		query.DirSyncCookie = this.DirSync?.Bytes;
+
+		if (this.OutputFields != null && this.OutputFields.Length > 0)
+		{
+			query.Attributes = Array.ConvertAll(this.OutputFields, r => new AttributeSpec(r));
+		}
 
 		int? recordLimit = this.RecordLimit;
 		do

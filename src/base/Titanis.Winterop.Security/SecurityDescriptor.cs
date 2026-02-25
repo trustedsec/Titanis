@@ -374,13 +374,14 @@ namespace Titanis.Winterop.Security
 		public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) =>
 			sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
-		public static readonly SecurityIdentifier PlaceholderDomainSid = new SecurityIdentifier(SecurityIdentifierAuthority.NtAuthority, [21, 0, 0, 0]);
+		// The subauthorities are arbitraty; they can't be zero since that would indicate claims
+		public static readonly SecurityIdentifier PlaceholderDomainSid = new SecurityIdentifier(SecurityIdentifierAuthority.NtAuthority, [21, 1, 1, 1]) { IsDomainPlaceholder = true };
 
 		public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
 		{
 			if (value is string str)
 			{
-				
+
 				var sd = SecurityDescriptor.ParseSddl(str, PlaceholderDomainSid);
 				return sd;
 			}

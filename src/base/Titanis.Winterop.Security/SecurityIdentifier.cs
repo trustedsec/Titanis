@@ -39,6 +39,7 @@ namespace Titanis.Winterop.Security
 	public class SecurityIdentifier
 	{
 		public const int RevisionValue = 1;
+		private const string DomainPlaceholderPrefix = "S-1-5-21-<domain>-";
 
 		internal SecurityIdentifier(byte[] bytes, int dummy)
 		{
@@ -169,6 +170,12 @@ namespace Titanis.Winterop.Security
 		/// Gets the value of the last subauthority.
 		/// </summary>
 		public uint Rid => this.GetSubauthority(this.SubauthorityCount - 1);
+
+		/// <summary>
+		/// Gets a value indicating whether this SID is a placeholder for a domain-specific sid
+		/// </summary>
+		public bool IsDomainPlaceholder { get; internal set; }
+
 		/// <summary>
 		/// Gets the subauthority at the specified index.
 		/// </summary>
@@ -244,9 +251,20 @@ namespace Titanis.Winterop.Security
 		}
 		public static SecurityIdentifier Parse(ReadOnlySpan<char> text, SecurityIdentifier? domainSid)
 		{
+			bool isPlaceholder = false;
+			if (text.StartsWith(DomainPlaceholderPrefix))
+			{
+				string sub = "S-1-5-21-1-1-1-";
+				Span<char> revised = stackalloc char[text.Length - DomainPlaceholderPrefix.Length + sub.Length];
+				sub.AsSpan().CopyTo(revised);
+				text.Slice(DomainPlaceholderPrefix.Length).CopyTo(revised.Slice(sub.Length));
+				text = sub;
+			}
+
 			var ctx = new SddlParseContext(text);
 
 			var sid = Parse(ref ctx, domainSid);
+			sid.IsDomainPlaceholder = true;
 			if (ctx.LengthRemaining > 0)
 				throw new FormatException("The provided text contained trailing characters that could not be parsed as a valid SID.");
 
@@ -320,6 +338,9 @@ namespace Titanis.Winterop.Security
 		// [MS-DTYP] § 2.4.2.1 SID String Format Syntax
 		private string BuildString()
 		{
+			if (this.IsDomainPlaceholder)
+				return $"{DomainPlaceholderPrefix}{this.Rid}";
+
 			StringBuilder sb = new StringBuilder();
 			sb.Append("S-1-");
 			if ((long)IdentifierAuthority <= uint.MaxValue)
@@ -469,7 +490,7 @@ namespace Titanis.Winterop.Security
 		{
 			if (value is string str)
 			{
-				return SecurityIdentifier.Parse(str, null);
+				return SecurityIdentifier.Parse(str, SecurityDescriptorConverter.PlaceholderDomainSid);
 			}
 			else
 				return base.ConvertFrom(context, culture, value);

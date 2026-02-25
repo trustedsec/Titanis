@@ -96,8 +96,7 @@ namespace WeakServices
 					using var service = await scm.OpenServiceAsync(serviceInfo.ServiceName, (ServiceAccessRights)StandardAccessRights.ReadControl, cancellationToken);
 
 					// Query the service DACL
-					var sdBytes = await service.QuerySecurityAsync(Titanis.Winterop.Security.SecurityInfo.Dacl, cancellationToken);
-					var sd = new SecurityDescriptor(sdBytes);
+					var sd = await service.QuerySecurityAsync(Titanis.Winterop.Security.SecurityInfo.Dacl, cancellationToken);
 
 					// Check each ACE
 					foreach (var ace in sd.Dacl.Entries)
