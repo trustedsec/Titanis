@@ -71,8 +71,8 @@ namespace Titanis.Smb2.Pdus
 			if (this.inputBuffer.Length > 0)
 			{
 				offData = BinaryHelper.Align(offData, 8);
-				body.inputOffset = offData;
-				body.inputCount = this.outputBuffer.Length;
+				body.outputOffset = offData;
+				body.outputCount = this.outputBuffer.Length;
 			}
 
 			writer.WriteIoctlRespHdr(body);

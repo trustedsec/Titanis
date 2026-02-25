@@ -18,7 +18,7 @@ namespace Titanis.Security.Ntlm
 			if (av.DnsComputerName != null)
 				writer.WriteAv(AvId.DnsComputerName, av.DnsComputerName);
 			if (av.DnsTreeName != null)
-				writer.WriteAv(AvId.DnsComputerName, av.DnsTreeName);
+				writer.WriteAv(AvId.DnsTreeName, av.DnsTreeName);
 			if (av.timestamp.HasValue)
 				writer.WriteAv(AvId.Timestamp, av.timestamp.Value);
 			if (av.flags != 0)

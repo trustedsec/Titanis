@@ -37,7 +37,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 			this.DataLength = value.DataLength;
 			this.Bytes = value.Bytes;
 
-			this.Value = (value.TypedValue is string[] multi) ? string.Join('|', multi) : value.TypedValue;
+			this.Value = value.TypedValue;
 		}
 
 		public string Name { get; }
@@ -47,6 +47,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		[Browsable(false)]
 		public int? DataLength { get; }
 		public object? Value { get; }
+		[Browsable(false)]
 		public byte[]? Bytes { get; }
 		public string? BytesAsHexString => (this.Bytes != null) ? this.Bytes.ToHexString() : null;
 	}

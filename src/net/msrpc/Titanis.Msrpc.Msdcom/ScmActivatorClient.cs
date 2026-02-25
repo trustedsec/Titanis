@@ -22,14 +22,17 @@ namespace Titanis.Msrpc.Msdcom
 		// [MS-DCOM] <23>
 		private const int CLSCTX_REMOTE_SERVER = 0x10;
 
-		internal ScmActivatorClient(DcomClient dcom)
+		internal ScmActivatorClient(DcomClient dcom, string serverName)
 		{
 			this._dcom = dcom;
+			this.ServerName = serverName;
 		}
 
-		// [MS-DCOM] § 1.9
-		/// <inheritdoc/>
-		public sealed override bool SupportsDynamicTcp => true;
+        public string ServerName { get; }
+
+        // [MS-DCOM] § 1.9
+        /// <inheritdoc/>
+        public sealed override bool SupportsDynamicTcp => true;
 		// [MS-DCOM] § 1.9
 		/// <inheritdoc/>
 		public sealed override int WellKnownTcpPort => 135;
@@ -52,7 +55,6 @@ namespace Titanis.Msrpc.Msdcom
 			// TODO: Parameterize session ID
 			// TODO: Parameterize console flag
 
-			string serverName = "WIN10-TEST";
 			ClientContext clientCtx = new ClientContext();
 
 			ActPropertiesIn actIn = new ActPropertiesIn()
@@ -99,7 +101,7 @@ namespace Titanis.Msrpc.Msdcom
 					pServerInfo = new RpcPointer<COSERVERINFO>(new COSERVERINFO
 					{
 						// [MS-DCOM] <36>
-						pwszName = new RpcPointer<string>(serverName)
+						pwszName = new RpcPointer<string>(this.ServerName)
 					}),
 					pdwReserved = null
 				},

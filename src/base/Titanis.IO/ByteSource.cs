@@ -220,11 +220,11 @@ namespace Titanis.IO
 			internal double f64;
 		}
 		public static double ReadDoubleBE(this IByteSource ctx)
-			//=> BinaryPrimitives.ReadDoubleBigEndian(ctx.Consume(4));
-			=> new UInt64Double { u64 = BinaryPrimitives.ReadUInt64BigEndian(ctx.Consume(4)) }.f64;
+			//=> BinaryPrimitives.ReadDoubleBigEndian(ctx.Consume(8));
+			=> new UInt64Double { u64 = BinaryPrimitives.ReadUInt64BigEndian(ctx.Consume(8)) }.f64;
 		public static double ReadDoubleLE(this IByteSource ctx)
-			//=> BinaryPrimitives.ReadDoubleLittleEndian(ctx.Consume(4));
-			=> new UInt64Double { u64 = BinaryPrimitives.ReadUInt64LittleEndian(ctx.Consume(4)) }.f64;
+			//=> BinaryPrimitives.ReadDoubleLittleEndian(ctx.Consume(8));
+			=> new UInt64Double { u64 = BinaryPrimitives.ReadUInt64LittleEndian(ctx.Consume(8)) }.f64;
 		public static double ReadDouble(this IByteSource ctx)
 			=> BitConverter.IsLittleEndian ? ctx.ReadDoubleLE() : ctx.ReadDoubleBE();
 

@@ -280,7 +280,7 @@ namespace Titanis.DceRpc.Client
 				context.encoding,
 				stubData.callContext,
 				context);
-			lock (this._pendingBinds)
+			lock (this._pendingRequests)
 				this._pendingRequests.Add(callId, pendingRequest);
 
 			int authLength = (context.authContext != null)
@@ -746,7 +746,7 @@ namespace Titanis.DceRpc.Client
 		/// </summary>
 		public uint ContextId { get; }
 		public AuthClientContext AuthContext { get; }
-		public RpcAuthLevel AuthLevel { get; }
+		public RpcAuthLevel AuthLevel { get; set; }
 
 		internal int GetMessageAuthTokenSize()
 		{

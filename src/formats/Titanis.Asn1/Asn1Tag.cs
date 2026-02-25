@@ -84,7 +84,7 @@ namespace Titanis.Asn1
 
 		public override int GetHashCode()
 		{
-			return System.HashCode.Combine(this._value);
+			return System.HashCode.Combine(this._value | ConstructedFlag);
 		}
 
 		public static bool operator ==(Asn1Tag left, Asn1Tag right)

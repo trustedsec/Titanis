@@ -277,13 +277,20 @@ namespace Titanis.Msrpc.Msefsr
 			ArgumentException.ThrowIfNullOrEmpty(fileName);
 			ArgumentNullException.ThrowIfNull(metadata);
 
-			RpcPointer<RpcPointer<EFS_RPC_BLOB>> efsStreamBlob = new();
-			var res = (Win32ErrorCode)await _proxy.EfsRpcGetEncryptedFileMetadata(
+			// TODO: Implement properly
+			var res = (Win32ErrorCode)await _proxy.EfsRpcSetEncryptedFileMetadata(
 				fileName,
-				efsStreamBlob,
+				new RpcPointer<EFS_RPC_BLOB>(),
+				NewBlob(metadata),
+				new RpcPointer<ENCRYPTED_FILE_METADATA_SIGNATURE>(),
 				cancellationToken
 				).ConfigureAwait(false);
 			res.CheckAndThrow();
+		}
+
+		private static EFS_RPC_BLOB NewBlob(byte[] bytes)
+		{
+			return new EFS_RPC_BLOB() { cbData = (uint)bytes.Length, bData = new RpcPointer<byte[]>(bytes) };
 		}
 
 		public async Task EncryptFile(string fileName, string? protector, CancellationToken cancellationToken)

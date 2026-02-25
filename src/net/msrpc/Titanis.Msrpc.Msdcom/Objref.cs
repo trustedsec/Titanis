@@ -328,7 +328,7 @@ namespace Titanis.Msrpc.Msdcom
 	// [MS-DCOM] § 2.2.18.5 - OBJREF_HANDLER
 	sealed class Objref_Handler : StdobjrefBase
 	{
-		protected override ObjrefType TypeFlag => ObjrefType.Standard;
+		protected override ObjrefType TypeFlag => ObjrefType.Handler;
 
 		public Guid Clsid { get; set; }
 		public DualStringArray? Bindings { get; set; }
@@ -397,7 +397,7 @@ namespace Titanis.Msrpc.Msdcom
 	// [MS-DCOM] § 2.2.18.7 - OBJREF_EXTENDED
 	sealed class Objref_Extended : StdobjrefBase
 	{
-		protected override ObjrefType TypeFlag => ObjrefType.Standard;
+		protected override ObjrefType TypeFlag => ObjrefType.Extended;
 
 		public DataElement[]? Elements { get; set; }
 
@@ -491,7 +491,7 @@ namespace Titanis.Msrpc.Msdcom
 			writer.WriteUInt16LE(0);
 
 			var offSecurityBindings = writer.Position;
-			foreach (var str in ary.StringBindings)
+			foreach (var str in ary.SecurityBindings)
 			{
 				writer.Write(str);
 			}

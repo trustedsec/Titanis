@@ -36,7 +36,7 @@ namespace Titanis.Smb2
 					offset += this.Position;
 					break;
 				case SeekOrigin.End:
-					offset = (this.Position - offset);
+					offset = (this.Length - offset);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException(nameof(origin));

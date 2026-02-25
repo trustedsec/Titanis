@@ -13,6 +13,8 @@ namespace Titanis.Cli
 		None = 0,
 		Specified = 1,
 		Set = 2,
+
+		SpecifiedAndSet = Specified | Set
 	}
 
 	/// <summary>
@@ -88,7 +90,7 @@ namespace Titanis.Cli
 		public sealed override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
 		{
 			var asDefault = (context is null);
-			var specFlag = asDefault ? SwitchParamFlags.Specified : SwitchParamFlags.None;
+			var specFlag = asDefault ? SwitchParamFlags.None : SwitchParamFlags.Specified;
 			if (value is Boolean b)
 				return new SwitchParam(specFlag | SwitchParamFlags.Set);
 			else if (value is string str)

@@ -17,7 +17,7 @@ namespace Titanis
 				StringComparison.InvariantCulture or StringComparison.Ordinal => CultureInfo.InvariantCulture,
 				_ => CultureInfo.CurrentCulture
 			};
-			return culture.CompareInfo.GetHashCode(str, CompareOptions.IgnoreCase);
+			return culture.CompareInfo.GetHashCode(str, ignoreCase ? CompareOptions.IgnoreCase : CompareOptions.None);
 		}
 
 
@@ -43,7 +43,7 @@ namespace Titanis
 			for (int i = 0; i <= str.Length; i++)
 			{
 				bool end = i == str.Length;
-				var c = end ? str[i] : '\0';
+				var c = end ? '\0' : str[i];
 
 				switch (escapeState)
 				{
@@ -78,6 +78,7 @@ namespace Titanis
 								'?' => '?',
 								_ => throw new FormatException($"The character '{c}' at position {i} is not a valid escape character.")
 							};
+							sb.Append(ce);
 							escapeState = EscapeState.Normal;
 						}
 						break;
@@ -124,9 +125,9 @@ namespace Titanis
 							// The value of the escape state is also the number of digits it requires.
 							if (digitCount == (int)escapeState)
 							{
-								if (runeValue > 0x1_0000)
+								if (runeValue < 0x1_0000)
 									sb.Append((char)runeValue);
-								else if (runeValue >= 0x10_0000 && runeValue < 0x11_0000)
+								else if (runeValue < 0x11_0000)
 								{
 									runeValue -= 0x10_0000;
 									uint low = runeValue & ((1 << 10) - 1);
@@ -148,7 +149,7 @@ namespace Titanis
 					default:
 						if (c == '\\')
 							escapeState = EscapeState.Escaped;
-						else
+						else if (!end)
 							sb.Append(c);
 						break;
 				}

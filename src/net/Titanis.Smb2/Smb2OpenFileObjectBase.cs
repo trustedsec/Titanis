@@ -91,7 +91,8 @@ FileInfoClass.NetworkOpenInfo), DefaultMaxResponseSize)
 				var reader = new ByteMemoryReader(resp.outputBuffer);
 				var dirInfo = reader.ReadFileNetOpenInfo();
 
-				this._info.attrs = new Smb2OpenFileAttributes {
+				this._info.attrs = new Smb2OpenFileAttributes
+				{
 					creationTime = dirInfo.creationTime,
 					lastAccessTime = dirInfo.lastAccessTime,
 					lastWriteTime = dirInfo.lastWriteTime,
@@ -315,14 +316,14 @@ FileInfoClass.NetworkOpenInfo), DefaultMaxResponseSize)
 		/// Gets the Basic file information of the file
 		/// </summary>
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
-		public async Task<FileBasicInfo> GetBasicInfoAsync( CancellationToken cancellationToken )
+		public async Task<FileBasicInfo> GetBasicInfoAsync(CancellationToken cancellationToken)
 		{
 			var buffer = new byte[FileBasicInfoStruct.StructSize];
 			var req = new Smb2QueryInfoRequest(this.Handle, Smb2QueryFileInfo.Generic(Smb2FileInfoType.File, FileInfoClass.BasicInfo), DefaultMaxResponseSize)
 			{
 				outputBuffer = buffer
 			};
-			var response = (Pdus.Smb2QueryInfoResponse)await this.Tree.SendSyncPduAsync(req, cancellationToken ).ConfigureAwait(false);
+			var response = (Pdus.Smb2QueryInfoResponse)await this.Tree.SendSyncPduAsync(req, cancellationToken).ConfigureAwait(false);
 			var reader = new ByteMemoryReader(response.outputBuffer);
 			var basicInfo = new FileBasicInfo(reader.ReadFileBasicInfo());
 			return basicInfo;
@@ -447,7 +448,7 @@ FileInfoClass.NetworkOpenInfo), DefaultMaxResponseSize)
 			BinaryPrimitives.WriteInt32LittleEndian(inputBuffer.Slice(24, 4), chunks.Length);
 			for (int i = 0; i < chunks.Length; i++)
 			{
-				MemoryMarshal.AsRef<ResumeKey.ResumeKeyData>(inputBuffer.Slice(32 + i * CopyChunk.StructSize)) = resumeKey.keyData;
+				MemoryMarshal.AsRef<CopyChunk>(inputBuffer.Slice(32 + i * CopyChunk.StructSize)) = chunks[i];
 			}
 
 			const int bufferSize = 32;
@@ -580,7 +581,7 @@ FileInfoClass.NetworkOpenInfo), DefaultMaxResponseSize)
 			{
 				if (disposing)
 				{
-					if (this.Handle != Smb2FileHandle.Invalid != !this.IsClosed)
+					if (!this.IsClosed && this.Handle != Smb2FileHandle.Invalid)
 						this.CloseAsync(CancellationToken.None);
 				}
 

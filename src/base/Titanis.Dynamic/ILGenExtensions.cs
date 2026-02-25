@@ -379,7 +379,7 @@ namespace Titanis.Dynamic
 			}
 			else
 			{
-				return OpCodes.Ldind_Ref;
+				return OpCodes.Stind_Ref;
 			}
 		}
 		public static ILGenerator Calli(this ILGenerator ilgen, CallingConventions callingConvention, Type returnType, Type[] parameterTypes, Type[] optionalParameterTypes)

@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -31,13 +32,13 @@ namespace Titanis.Crypto
 		internal static uint maj(uint x, uint y, uint z)
 			=> (x & y) ^ (x & z) ^ (y & z);
 		internal static uint bsig0(uint x)
-			=> BitHelper.RotateRight(x, 2) ^ BitHelper.RotateRight(x, 13) ^ BitHelper.RotateRight(x, 22);
+			=> BitOperations.RotateRight(x, 2) ^ BitOperations.RotateRight(x, 13) ^ BitOperations.RotateRight(x, 22);
 		internal static uint bsig1(uint x)
-			=> BitHelper.RotateRight(x, 6) ^ BitHelper.RotateRight(x, 11) ^ BitHelper.RotateRight(x, 25);
+			=> BitOperations.RotateRight(x, 6) ^ BitOperations.RotateRight(x, 11) ^ BitOperations.RotateRight(x, 25);
 		internal static uint ssig0(uint x)
-			=> BitHelper.RotateRight(x, 7) ^ BitHelper.RotateRight(x, 18) ^ (x >> 3);
+			=> BitOperations.RotateRight(x, 7) ^ BitOperations.RotateRight(x, 18) ^ (x >> 3);
 		internal static uint ssig1(uint x)
-			=> BitHelper.RotateRight(x, 17) ^ BitHelper.RotateRight(x, 19) ^ (x >> 10);
+			=> BitOperations.RotateRight(x, 17) ^ BitOperations.RotateRight(x, 19) ^ (x >> 10);
 	}
 
 	interface ISha2SmallPolicy

@@ -76,7 +76,7 @@ namespace Titanis.Asn1
 
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
-			encoder.EncodeOctetStringTlv(this.Octets);
+			encoder.EncodeOctetStringValue(this.Octets);
 		}
 
 		public void EncodeTlv(Asn1DerEncoder encoder)

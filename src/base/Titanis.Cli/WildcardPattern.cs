@@ -131,9 +131,9 @@ namespace Titanis.Cli
 					switch (seg.type)
 					{
 						case SegmentType.Asterisk:
-							for (int j = charIndex; j < text.Length; j++)
+							for (int j = charIndex; j <= text.Length; j++)
 							{
-								matches = this.Matches(text, charIndex + j, segIndex + 1);
+								matches = this.Matches(text, j, segIndex + 1);
 								if (matches)
 									return true;
 							}

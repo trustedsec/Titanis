@@ -2,6 +2,7 @@
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -219,22 +220,22 @@ namespace Titanis.Crypto
 
 		private uint Round1(uint a, uint b, uint c, uint d, int k, int s)
 		{
-			return b + BitHelper.RotateLeft((a + F(b, c, d) + this._block.words[k] + Md5.T[k]), s);
+			return b + BitOperations.RotateLeft((a + F(b, c, d) + this._block.words[k] + Md5.T[k]), s);
 		}
 
 		private uint Round2(uint a, uint b, uint c, uint d, int k, int s, int i)
 		{
-			return b + BitHelper.RotateLeft((a + G(b, c, d) + this._block.words[k] + Md5.T[i]), s);
+			return b + BitOperations.RotateLeft((a + G(b, c, d) + this._block.words[k] + Md5.T[i]), s);
 		}
 
 		private uint Round3(uint a, uint b, uint c, uint d, int k, int s, int i)
 		{
-			return b + BitHelper.RotateLeft((a + H(b, c, d) + this._block.words[k] + Md5.T[i]), s);
+			return b + BitOperations.RotateLeft((a + H(b, c, d) + this._block.words[k] + Md5.T[i]), s);
 		}
 
 		private uint Round4(uint a, uint b, uint c, uint d, int k, int s, int i)
 		{
-			return b + BitHelper.RotateLeft((a + I(b, c, d) + this._block.words[k] + Md5.T[i]), s);
+			return b + BitOperations.RotateLeft((a + I(b, c, d) + this._block.words[k] + Md5.T[i]), s);
 		}
 
 	}

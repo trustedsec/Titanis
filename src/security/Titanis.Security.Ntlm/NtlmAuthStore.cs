@@ -6,11 +6,11 @@ namespace Titanis.Security.Ntlm
 
 	public class NtlmAuthStore : INtlmAuthStore
 	{
-		private Dictionary<string, NtlmAuthRecord> _records = new Dictionary<string, NtlmAuthRecord>(StringComparer.OrdinalIgnoreCase);
+		private Dictionary<string, NtlmAuthRecord> _records;
 
 		public NtlmAuthStore()
 		{
-			this._records = new Dictionary<string, NtlmAuthRecord>();
+			this._records = new Dictionary<string, NtlmAuthRecord>(StringComparer.OrdinalIgnoreCase);
 		}
 		public NtlmAuthStore(Dictionary<string, NtlmAuthRecord> records)
 		{

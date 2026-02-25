@@ -644,22 +644,15 @@ namespace Titanis.Asn1.Serialization
 			if (this.IsIndefiniteLength)
 			{
 				MemoryStream bits = new MemoryStream();
-				int unusedBits = -1;
+				int unusedBits = 0;
 				this.DecodeTupleContentInto((b, f) =>
 				{
 					Debug.Assert(b.Length > 0);
-					if (unusedBits < 0)
-					{
-						unusedBits = b[0];
-						b = b.Slice(1);
-					}
+					unusedBits = b[0];
+					b = b.Slice(1);
 
 					bits.Write(b);
 				});
-
-				if (unusedBits == -1)
-					// This is an empty bitstring
-					unusedBits = 0;
 
 				return new Asn1BitString(bits.ToArray(), (byte)unusedBits);
 			}

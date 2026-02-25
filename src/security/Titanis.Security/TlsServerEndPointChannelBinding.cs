@@ -12,6 +12,7 @@ namespace Titanis.Security
 	/// <summary>
 	/// Implements the <c>tls-server-end-point</c> binding.
 	/// </summary>
+	// [RFC 5929] § 4. The 'tls-server-end-point' Channel Binding Type
 	public class TlsServerEndPointChannelBinding : ChannelBinding
 	{
 		public TlsServerEndPointChannelBinding(X509Certificate2 serverCertificate)
@@ -44,7 +45,7 @@ namespace Titanis.Security
 						hashAlg = SHA384.Create();
 						break;
 					case HashType.Sha512:
-						hashAlg = SHA384.Create();
+						hashAlg = SHA512.Create();
 						break;
 					default:
 						// TODO: Hash algorithm not supported, warn

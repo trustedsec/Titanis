@@ -87,6 +87,7 @@ namespace Titanis
 		/// <param name="value">Value to rotate</param>
 		/// <param name="bits">Number of bits to rotate by</param>
 		/// <returns>The value resulting from the rotation</returns>
+		[Obsolete("Use BitOperations", true)]
 		public static uint RotateLeft(uint value, int bits)
 		{
 			bits = Clamp32(bits);
@@ -98,10 +99,11 @@ namespace Titanis
 		/// <param name="value">Value to rotate</param>
 		/// <param name="bits">Number of bits to rotate by</param>
 		/// <returns>The value resulting from the rotation</returns>
+		[Obsolete("Use BitOperations", true)]
 		public static ulong RotateLeft(ulong value, int bits)
 		{
 			bits = Clamp64(bits);
-			return (value << bits) | (value >> (32 - bits));
+			return (value << bits) | (value >> (64 - bits));
 		}
 		/// <summary>
 		/// Rotates an unsigned integer to the left.
@@ -109,10 +111,11 @@ namespace Titanis
 		/// <param name="value">Value to rotate</param>
 		/// <param name="bits">Number of bits to rotate by</param>
 		/// <returns>The value resulting from the rotation</returns>
+		[Obsolete("Use BitOperations", true)]
 		public static uint RotateRight(uint value, int bits)
 		{
 			bits = Clamp32(bits);
-			return (value >> bits) | (value << (64 - bits));
+			return (value >> bits) | (value << (32 - bits));
 		}
 		/// <summary>
 		/// Rotates an unsigned integer to the left.
@@ -120,6 +123,7 @@ namespace Titanis
 		/// <param name="value">Value to rotate</param>
 		/// <param name="bits">Number of bits to rotate by</param>
 		/// <returns>The value resulting from the rotation</returns>
+		[Obsolete("Use BitOperations", true)]
 		public static ulong RotateRight(ulong value, int bits)
 		{
 			bits = Clamp64(bits);

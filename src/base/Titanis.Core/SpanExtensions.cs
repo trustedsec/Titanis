@@ -67,9 +67,9 @@ namespace Titanis
 					return cmp;
 			}
 
-			if (span.Length > max)
+			if (span.Length > other.Length)
 				return 1;
-			else if (span.Length < max)
+			else if (span.Length < other.Length)
 				return -1;
 			else
 				return 0;

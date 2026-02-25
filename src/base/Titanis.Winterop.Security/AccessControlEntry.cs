@@ -372,7 +372,7 @@ namespace Titanis.Winterop.Security
 		const int GuidTextLength = 32 + 4;
 		private static Guid? ParseGuid(ref SddlParseContext ctx)
 		{
-			if (ctx.LengthRemaining >= GuidTextLength && ctx[0]!=';')
+			if (ctx.LengthRemaining >= GuidTextLength && ctx[0] != ';')
 			{
 				if (Guid.TryParse(ctx.Remaining(GuidTextLength), out var guid))
 				{
@@ -569,15 +569,12 @@ namespace Titanis.Winterop.Security
 			var accessMask = BinaryPrimitives.ReadUInt32LittleEndian(bytes);
 			var objFlags = (ObjectAceFlags)BinaryPrimitives.ReadUInt32LittleEndian(bytes.Slice(4));
 
-			Guid? objectType =
-				0 != (objFlags & ObjectAceFlags.HasObjectType) ? MemoryMarshal.Read<Guid>(bytes.Slice(8, 16))
-				: null;
-			Guid? inheritedType =
-				0 != (objFlags & ObjectAceFlags.HasInheritedType) ? MemoryMarshal.Read<Guid>(bytes.Slice(8 + 16, 16))
-				: null;
+			int off = 8;
+			Guid? objectType = ReadGuidIf(0 != (objFlags & ObjectAceFlags.HasObjectType), bytes, ref off);
+			Guid? inheritedType = ReadGuidIf(0 != (objFlags & ObjectAceFlags.HasInheritedType), bytes, ref off);
 
-			var sid = new SecurityIdentifier(bytes.Slice(8 + 16 + 16));
-			var data = bytes.Slice(8 + 16 + 16 + sid.BinaryLength).ToArray();
+			var sid = new SecurityIdentifier(bytes.Slice(off));
+			var data = bytes.Slice(off + sid.BinaryLength).ToArray();
 			var ace = new CallbackObjectAce(type, flags, accessMask, objectType, inheritedType, sid, data);
 			return ace;
 		}

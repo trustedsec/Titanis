@@ -348,19 +348,20 @@ namespace Titanis.Msrpc.Msrrp
 			int startIndex = 0;
 			List<string> strs = new List<string>();
 
-			for (int i = 2; i <= bytes.Length; i += 2)
+			for (int i = 2; i < bytes.Length; i += 2)
 			{
 				var c = BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(i - 2, 2));
 				if (c == 0)
 				{
 					try
 					{
-						strs.Add(Encoding.Unicode.GetString(bytes.AsSpan(startIndex, i - startIndex)));
+						strs.Add(Encoding.Unicode.GetString(bytes.AsSpan(startIndex, i - startIndex - 2)));
 					}
 					catch
 					{
 						return null;
 					}
+					startIndex = i;
 				}
 			}
 

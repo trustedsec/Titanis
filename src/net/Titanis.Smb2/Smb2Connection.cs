@@ -746,8 +746,10 @@ namespace Titanis.Smb2
 						throw new InvalidOperationException("The packet is too large to send with the available credits.");
 					hdr.messageId = this.GetNextMessageId(hdr.creditCharge);
 				}
-				if (this._credits < this._preferredCredits)
-					hdr.creditReqResp = (ushort)(this._preferredCredits - this._credits);
+
+				int creditDeficit = this._preferredCredits - this._credits;
+				if (creditDeficit > 0)
+					hdr.creditReqResp = (ushort)creditDeficit;
 			}
 			else
 			{
@@ -830,7 +832,7 @@ namespace Titanis.Smb2
 			ref readonly Smb2PduSyncHeader hdr = ref reader.ReadSmb2PduSyncHeader();
 
 			int size = BinaryPrimitives.ReadUInt16LittleEndian(reader.PeekBytes(2));
-			Smb2Pdu pdu = CreatePdu(hdr, size);
+			Smb2Pdu? pdu = CreatePdu(hdr, size);
 			if (this._pendingRequests.TryGetValue(hdr.messageId, out var request))
 				pdu.request = request.requestPdu;
 
@@ -849,7 +851,7 @@ namespace Titanis.Smb2
 			}
 
 			// TODO: Do message processing like checking signature
-			if (pdu.IsSigned)
+			if (pdu != null && pdu.IsSigned)
 			{
 				if (request != null)
 				{
@@ -877,7 +879,7 @@ namespace Titanis.Smb2
 				}
 			}
 
-			this._credits += pdu.pduhdr.creditReqResp;
+			this._credits += hdr.creditReqResp;
 
 			return new Smb2Message(
 				pdu,

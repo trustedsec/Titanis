@@ -130,7 +130,7 @@ namespace Titanis.Security.Ntlm
 			NtlmAvInfo av = new NtlmAvInfo();
 
 			bool eol = false;
-			while (!eol || reader.Position < infoEndPos)
+			while (!eol && reader.Position < infoEndPos)
 			{
 				AvHeader avh = reader.ReadAvHeader();
 				int avEndPos = reader.Position + avh.avLen;
@@ -175,6 +175,8 @@ namespace Titanis.Security.Ntlm
 				// TODO: Throw FormatException if ending doesn't match
 				reader.Position = avEndPos;
 			}
+
+			// TODO: Alert if !eol ?
 
 			return av;
 		}

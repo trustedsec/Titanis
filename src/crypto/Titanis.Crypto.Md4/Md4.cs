@@ -2,6 +2,7 @@
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -199,17 +200,17 @@ namespace Titanis.Crypto
 
 		private uint Round1(uint a, uint b, uint c, uint d, int k, int s)
 		{
-			return BitHelper.RotateLeft((a + F(b, c, d) + this._block.words[k]), s);
+			return BitOperations.RotateLeft((a + F(b, c, d) + this._block.words[k]), s);
 		}
 
 		private uint Round2(uint a, uint b, uint c, uint d, int k, int s)
 		{
-			return BitHelper.RotateLeft((a + G(b, c, d) + this._block.words[k] + 0x5A827999), s);
+			return BitOperations.RotateLeft((a + G(b, c, d) + this._block.words[k] + 0x5A827999), s);
 		}
 
 		private uint Round3(uint a, uint b, uint c, uint d, int k, int s)
 		{
-			return BitHelper.RotateLeft((a + H(b, c, d) + this._block.words[k] + 0x6ED9EBA1), s);
+			return BitOperations.RotateLeft((a + H(b, c, d) + this._block.words[k] + 0x6ED9EBA1), s);
 		}
 	}
 

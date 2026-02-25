@@ -692,7 +692,7 @@ namespace Titanis.Msrpc.Msscmr
 				pConfig = new RpcPointer<byte[]>(new byte[cbBuf]);
 				res = (Win32ErrorCode)await this._proxy.RQueryServiceConfig2W(
 					handle,
-					1,
+					(uint)infoLevel,
 					pConfig,
 					cbBuf,
 					pcbNeeded,

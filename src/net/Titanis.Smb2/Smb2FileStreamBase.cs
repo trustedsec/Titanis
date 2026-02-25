@@ -110,7 +110,7 @@ namespace Titanis.Smb2
 			int count,
 			CancellationToken cancellationToken)
 		{
-			if (!this.CanRead)
+			if (!this.CanWrite)
 				throw new NotSupportedException("The stream does not support writing.");
 
 			int cbWrite = await this._file.WriteAsync(

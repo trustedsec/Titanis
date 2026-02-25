@@ -242,7 +242,7 @@ namespace Titanis.Dynamic
 			var ilgen = chainedCtor.GetILGenerator();
 
 			ilgen.Ldarg_0();
-			for (short i = 0; i < parms.Length - 1; i++)
+			for (short i = 0; i < parms.Length; i++)
 			{
 				var parm = parms[i];
 				var pb = chainedCtor.DefineParameter(i, parm.Attributes, parm.Name);
@@ -250,7 +250,7 @@ namespace Titanis.Dynamic
 				// TODO: Custom attributes
 
 				// TODO: Default value?
-				ilgen.Ldarg(i);
+				ilgen.Ldarg((short)(i + 1));
 			}
 			ilgen.Call(baseCtor).Ret();
 		}

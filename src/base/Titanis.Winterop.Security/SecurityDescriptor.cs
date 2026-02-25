@@ -158,22 +158,31 @@ namespace Titanis.Winterop.Security
 			if (this.Dacl != null && 0 != (sections & SecurityDescriptorSections.Access))
 			{
 				sb.Append("D:");
-				AclToSddl(sb, this.Dacl);
+				AclToSddl(sb, this.Dacl, false);
 			}
 			if (this.Sacl != null && 0 != (sections & SecurityDescriptorSections.Audit))
 			{
 				sb.Append("S:");
-				AclToSddl(sb, this.Sacl);
+				AclToSddl(sb, this.Sacl, true);
 			}
 
 			return sb.ToString();
 		}
 
-		private void AclToSddl(StringBuilder sb, AccessControlList acl)
+		private void AclToSddl(StringBuilder sb, AccessControlList acl, bool isSacl)
 		{
-			if (0 != (this._control & SecurityDescriptorControl.DaclProtected)) sb.Append('P');
-			if (0 != (this._control & SecurityDescriptorControl.DaclRequiredAutoInherit)) sb.Append("AR");
-			if (0 != (this._control & SecurityDescriptorControl.DaclAutoInherited)) sb.Append("AI");
+			if (isSacl)
+			{
+				if (0 != (this._control & SecurityDescriptorControl.SaclProtected)) sb.Append('P');
+				if (0 != (this._control & SecurityDescriptorControl.SaclRequiredAutoInherit)) sb.Append("AR");
+				if (0 != (this._control & SecurityDescriptorControl.SaclAutoInherited)) sb.Append("AI");
+			}
+			else
+			{
+				if (0 != (this._control & SecurityDescriptorControl.DaclProtected)) sb.Append('P');
+				if (0 != (this._control & SecurityDescriptorControl.DaclRequiredAutoInherit)) sb.Append("AR");
+				if (0 != (this._control & SecurityDescriptorControl.DaclAutoInherited)) sb.Append("AI");
+			}
 			// TODO: NO_ACCESS_CONTROL / SDDL_NULL_ACL
 
 			foreach (var ace in acl.Entries)

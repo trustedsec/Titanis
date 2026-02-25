@@ -391,7 +391,7 @@ namespace Titanis.Msrpc.Mssamr
 				{
 					throw new NtstatusException(status);
 				}
-			} while (status == Ntstatus.STATUS_NO_MORE_ENTRIES);
+			} while (status == Ntstatus.STATUS_MORE_ENTRIES);
 
 			return domains;
 		}

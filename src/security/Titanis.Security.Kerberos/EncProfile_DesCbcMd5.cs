@@ -130,7 +130,7 @@ namespace Titanis.Security.Kerberos
 			// Am I missing something here?
 
 			var value = BitConverter.ToUInt64(input);
-			DesPrimitives.AddParityAndReverse(value);
+			value = DesPrimitives.AddParityAndReverse(value);
 			BinaryPrimitives.WriteUInt64LittleEndian(keyBuffer, value);
 		}
 

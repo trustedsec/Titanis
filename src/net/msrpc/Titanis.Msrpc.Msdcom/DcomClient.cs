@@ -162,7 +162,7 @@ namespace Titanis.Msrpc.Msdcom
 			// SCMActivator
 			if (info.Version.MinorVersion >= 6)
 			{
-				var scmClient = new ScmActivatorClient(dcom);
+				var scmClient = new ScmActivatorClient(dcom, host);
 				dcom._scmActivator = scmClient;
 				await scmClient.BindToAsync(rpcChannel, false, exporter.Proxy.BoundAuthContext?.AuthContext, exporter.Proxy.BoundAuthContext?.AuthLevel ?? RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
 			}

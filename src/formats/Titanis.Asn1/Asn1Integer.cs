@@ -20,7 +20,7 @@ namespace Titanis.Asn1
 
 		public Asn1Tag Tag => Asn1PredefTag.Integer;
 
-		public void EncodeValue(Asn1DerEncoder encoder) => encoder.EncodeBigIntegerTlv(this.Value);
+		public void EncodeValue(Asn1DerEncoder encoder) => encoder.EncodeBigIntegerValue(this.Value);
 
 		public void EncodeTlv(Asn1DerEncoder encoder) => encoder.EncodeBigIntegerTlv(this.Value, Asn1PredefTag.Integer);
 

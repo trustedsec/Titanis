@@ -2,6 +2,7 @@
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -57,42 +58,42 @@ namespace Titanis.Crypto
 			}
 			for (int t = 16; t < BlockWordCount; t++)
 			{
-				w[t] = BitHelper.RotateLeft(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
+				w[t] = BitOperations.RotateLeft(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
 			}
 
 			for (int t = 0; t < 20; t++)
 			{
-				var temp = BitHelper.RotateLeft(state.a, 5) + F0(state.b, state.c, state.d) + state.e + w[t] + K0;
+				var temp = BitOperations.RotateLeft(state.a, 5) + F0(state.b, state.c, state.d) + state.e + w[t] + K0;
 				state.e = state.d;
 				state.d = state.c;
-				state.c = BitHelper.RotateLeft(state.b, 30);
+				state.c = BitOperations.RotateLeft(state.b, 30);
 				state.b = state.a;
 				state.a = temp;
 			}
 			for (int t = 20; t < 40; t++)
 			{
-				var temp = BitHelper.RotateLeft(state.a, 5) + F1(state.b, state.c, state.d) + state.e + w[t] + K1;
+				var temp = BitOperations.RotateLeft(state.a, 5) + F1(state.b, state.c, state.d) + state.e + w[t] + K1;
 				state.e = state.d;
 				state.d = state.c;
-				state.c = BitHelper.RotateLeft(state.b, 30);
+				state.c = BitOperations.RotateLeft(state.b, 30);
 				state.b = state.a;
 				state.a = temp;
 			}
 			for (int t = 40; t < 60; t++)
 			{
-				var temp = BitHelper.RotateLeft(state.a, 5) + F2(state.b, state.c, state.d) + state.e + w[t] + K2;
+				var temp = BitOperations.RotateLeft(state.a, 5) + F2(state.b, state.c, state.d) + state.e + w[t] + K2;
 				state.e = state.d;
 				state.d = state.c;
-				state.c = BitHelper.RotateLeft(state.b, 30);
+				state.c = BitOperations.RotateLeft(state.b, 30);
 				state.b = state.a;
 				state.a = temp;
 			}
 			for (int t = 60; t < BlockWordCount; t++)
 			{
-				var temp = BitHelper.RotateLeft(state.a, 5) + F3(state.b, state.c, state.d) + state.e + w[t] + K3;
+				var temp = BitOperations.RotateLeft(state.a, 5) + F3(state.b, state.c, state.d) + state.e + w[t] + K3;
 				state.e = state.d;
 				state.d = state.c;
-				state.c = BitHelper.RotateLeft(state.b, 30);
+				state.c = BitOperations.RotateLeft(state.b, 30);
 				state.b = state.a;
 				state.a = temp;
 			}

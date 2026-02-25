@@ -90,7 +90,7 @@ namespace Titanis.IO
 					int cbRead = this._stream.Read(buf);
 					count -= cbRead;
 				}
-				while (count >= 0);
+				while (count > 0);
 			}
 		}
 

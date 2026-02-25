@@ -399,9 +399,9 @@ namespace Titanis.Security.Ntlm
 				};
 			}
 
-			if (cbDomain > 0)
-				encoding.GetBytes(workstationName, buf.Slice(offWorkstation, cbWorkstation));
 			if (cbWorkstation > 0)
+				encoding.GetBytes(workstationName, buf.Slice(offWorkstation, cbWorkstation));
+			if (cbDomain > 0)
 				encoding.GetBytes(workstationDomain, buf.Slice(offDomainName, cbDomain));
 
 			return buf;

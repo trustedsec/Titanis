@@ -2,6 +2,7 @@
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -42,13 +43,13 @@ namespace Titanis.Crypto
 		internal static ulong maj(ulong x, ulong y, ulong z)
 			=> (x & y) ^ (x & z) ^ (y & z);
 		internal static ulong bsig0(ulong x)
-			=> BitHelper.RotateRight(x, 28) ^ BitHelper.RotateRight(x, 34) ^ BitHelper.RotateRight(x, 39);
+			=> BitOperations.RotateRight(x, 28) ^ BitOperations.RotateRight(x, 34) ^ BitOperations.RotateRight(x, 39);
 		internal static ulong bsig1(ulong x)
-			=> BitHelper.RotateRight(x, 14) ^ BitHelper.RotateRight(x, 18) ^ BitHelper.RotateRight(x, 41);
+			=> BitOperations.RotateRight(x, 14) ^ BitOperations.RotateRight(x, 18) ^ BitOperations.RotateRight(x, 41);
 		internal static ulong ssig0(ulong x)
-			=> BitHelper.RotateRight(x, 1) ^ BitHelper.RotateRight(x, 8) ^ (x >> 7);
+			=> BitOperations.RotateRight(x, 1) ^ BitOperations.RotateRight(x, 8) ^ (x >> 7);
 		internal static ulong ssig1(ulong x)
-			=> BitHelper.RotateRight(x, 19) ^ BitHelper.RotateRight(x, 61) ^ (x >> 6);
+			=> BitOperations.RotateRight(x, 19) ^ BitOperations.RotateRight(x, 61) ^ (x >> 6);
 	}
 
 	interface ISha2LargePolicy
@@ -217,13 +218,13 @@ namespace Titanis.Crypto
 
 	}
 
-	public class Sha384 : SlimHashAlgorithm<Sha224Context>
+	public class Sha384 : SlimHashAlgorithm<Sha384Context>
 	{
 		public const int BlockSize = 1024 / 8;
 		public static int DigestSize => 384 / 8;
 	}
 
-	public class Sha512 : SlimHashAlgorithm<Sha256Context>
+	public class Sha512 : SlimHashAlgorithm<Sha512Context>
 	{
 		public const int BlockSize = 1024 / 8;
 		public static int DigestSize => Sha2LargeState.StructSize;
