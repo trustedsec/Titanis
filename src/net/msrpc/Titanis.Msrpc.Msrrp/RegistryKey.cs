@@ -42,8 +42,8 @@ namespace Titanis.Msrpc.Msrrp
 		public async Task SetValue(string? valueName, RegistryValueType valueKind, byte[] data, CancellationToken cancellationToken)
 		{
 			var res = (Win32ErrorCode)await _owner.proxy.BaseRegSetValue(
-                _hkey,
-				(valueName+"\0").ToRpcUnicodeString(),
+				_hkey,
+				(valueName + "\0").ToRpcUnicodeString(),
 				(uint)valueKind,
 				data,
 				(uint)data.Length,
@@ -205,11 +205,64 @@ namespace Titanis.Msrpc.Msrrp
 				res.CheckAndThrow();
 		}
 
+		public async Task<SecurityDescriptor> GetSecurityDescriptor(SecurityInfo securityInfo, CancellationToken cancellationToken)
+		{
+			RpcPointer<ms_rrp.RPC_SECURITY_DESCRIPTOR> pRpcSecurityDescriptorOut = new();
+			var res = (Win32ErrorCode)await this._owner.proxy.BaseRegGetKeySecurity(
+				this._hkey,
+				(uint)securityInfo,
+				default,
+				pRpcSecurityDescriptorOut,
+				cancellationToken).ConfigureAwait(false);
+			if (res is Win32ErrorCode.ERROR_INSUFFICIENT_BUFFER)
+			{
+				pRpcSecurityDescriptorOut = new RpcPointer<ms_rrp.RPC_SECURITY_DESCRIPTOR>(new ms_rrp.RPC_SECURITY_DESCRIPTOR
+				{
+					cbInSecurityDescriptor = pRpcSecurityDescriptorOut.value.cbInSecurityDescriptor,
+					lpSecurityDescriptor = new RpcPointer<ArraySegment<byte>>(new ArraySegment<byte>(new byte[pRpcSecurityDescriptorOut.value.cbInSecurityDescriptor], 0, 0))
+				});
+				res = (Win32ErrorCode)await this._owner.proxy.BaseRegGetKeySecurity(
+					this._hkey,
+					(uint)securityInfo,
+					pRpcSecurityDescriptorOut.value,
+					pRpcSecurityDescriptorOut,
+					cancellationToken).ConfigureAwait(false);
+			}
+
+			if (res is not Win32ErrorCode.ERROR_SUCCESS)
+				res.CheckAndThrow();
+
+			return new SecurityDescriptor(pRpcSecurityDescriptorOut.value.lpSecurityDescriptor.value);
+		}
+		public async Task<SecurityDescriptor> SetSecurityDescriptor(SecurityInfo securityInfo, SecurityDescriptor sd, CancellationToken cancellationToken)
+		{
+			ArgumentNullException.ThrowIfNull(sd);
+
+			var sdBytes = sd.ToByteArray();
+
+			RpcPointer<ms_rrp.RPC_SECURITY_DESCRIPTOR> pRpcSecurityDescriptorOut = new();
+			var res = (Win32ErrorCode)await this._owner.proxy.BaseRegSetKeySecurity(
+				this._hkey,
+				(uint)securityInfo,
+				new ms_rrp.RPC_SECURITY_DESCRIPTOR
+				{
+					cbInSecurityDescriptor = (uint)sdBytes.Length,
+					cbOutSecurityDescriptor = (uint)sdBytes.Length,
+					lpSecurityDescriptor = new RpcPointer<ArraySegment<byte>>(sdBytes)
+				},
+				cancellationToken).ConfigureAwait(false);
+
+			if (res is not Win32ErrorCode.ERROR_SUCCESS)
+				res.CheckAndThrow();
+
+			return new SecurityDescriptor(pRpcSecurityDescriptorOut.value.lpSecurityDescriptor.value);
+		}
+
 		public async Task<RegistryValueInfo> GetValue(string? name, CancellationToken cancellationToken)
 		{
 			uint len = 0;
 
-			RpcPointer<uint> lpType = new(0xAA55);
+			RpcPointer<uint> lpType = new();
 			ms_dtyp.RPC_UNICODE_STRING lpValueName = string.IsNullOrEmpty(name) ? new ms_dtyp.RPC_UNICODE_STRING
 			{
 				Buffer = new RpcPointer<ArraySegment<char>>(new char[1]),
