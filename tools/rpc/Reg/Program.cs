@@ -13,6 +13,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 	[Subcommand("dumpsam", typeof(DumpSamCommand))]
 	[Subcommand("getsd", typeof(GetsdCommand))]
 	[Subcommand("setsd", typeof(SetsdCommand))]
+	[Subcommand("getdcomapp", typeof(GetDcomAppCommand))]
 	[Subcommand("dumplsasecrets", typeof(DumpLsaSecretsCommand))]
 	[Description("Interacts with the registry")]
 	internal class Program : MultiCommand

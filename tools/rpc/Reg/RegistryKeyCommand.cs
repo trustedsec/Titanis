@@ -24,36 +24,37 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		{
 			base.ValidateParameters(context);
 
-			int isep = this.KeyPath.IndexOfAny(new char[] { '/', '\\' });
-			string rootName;
-			string? path;
-			if (isep > 0)
-			{
-				rootName = this.KeyPath.Substring(0, isep);
-				path = this.KeyPath.Substring(isep + 1);
+			ParseKeyPath(this.KeyPath, out this._rootKey, out this._keyPath);
+			if (this._rootKey == RegistryRootKey.Invalid)
+				context.LogError($"The key path begins with an unsupported root key '{this._rootKey}'");
 
-				var sep = this.KeyPath[isep];
-				if (sep == '/')
-					path = path.Replace('/', '\\');
-			}
-			else
-			{
-				rootName = this.KeyPath;
-				path = null;
-			}
-
-			RegistryRootKey rootKey = RemoteRegistryClient.TryResolveRootKey(rootName);
-			if (rootKey == RegistryRootKey.Invalid)
-				context.LogError($"The key path begins with an unsupported root key '{rootName}'");
-
-			this._rootKey = rootKey;
-			this._keyPath = path;
 
 			RegistryKeyOptions options = RegistryKeyOptions.None;
 			if (this.BackupSemantics.IsSet)
 				options |= RegistryKeyOptions.BackupRestore;
 		}
 
+		public static void ParseKeyPath(string keySpec, out RegistryRootKey rootKey, out string? path)
+        {
+			int isep = keySpec.IndexOfAny(new char[] { '/', '\\' });
+			string rootName;
+			if (isep > 0)
+			{
+				rootName = keySpec.Substring(0, isep);
+				path = keySpec.Substring(isep + 1);
+
+				var sep = keySpec[isep];
+				if (sep == '/')
+					path = path.Replace('/', '\\');
+			}
+			else
+			{
+				rootName = keySpec;
+				path = null;
+			}
+
+			rootKey = RemoteRegistryClient.TryResolveRootKey(rootName);
+		}
 
 		protected abstract Task<int> RunAsync(RegistryKey key, RemoteRegistryClient client, CancellationToken cancellationToken);
 
