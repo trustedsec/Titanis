@@ -72,6 +72,7 @@ namespace Titanis.DceRpc.Client
 					try
 					{
 						channel = client.BindTo(ns);
+						await channel.StartedTask.ConfigureAwait(false);
 						ns = null;
 						using (EpmClient epm = new EpmClient())
 						{

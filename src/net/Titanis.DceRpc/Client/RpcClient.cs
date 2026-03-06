@@ -282,6 +282,7 @@ namespace Titanis.DceRpc.Client
 			try
 			{
 				channel = this.BindTo(stream);
+				await channel.StartedTask.ConfigureAwait(false);
 
 				AuthClientContext? authContext;
 				if (authLevel is RpcAuthLevel.None)

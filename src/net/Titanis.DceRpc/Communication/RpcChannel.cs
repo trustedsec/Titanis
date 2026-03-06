@@ -46,7 +46,7 @@ namespace Titanis.DceRpc.Communication
 		protected override async Task OnStarting(CancellationToken cancellationToken)
 		{
 			await base.OnStarting(cancellationToken).ConfigureAwait(false);
-			this._transport.Start();
+			await _transport.Start().ConfigureAwait(false);
 		}
 
 		private Dictionary<int, PduFragGroup> _fragGroups = new Dictionary<int, PduFragGroup>();
