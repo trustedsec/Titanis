@@ -12,6 +12,12 @@ namespace Titanis.Cli
 	/// <see cref="Command.GetCommandMetadata(Type, CommandMetadataContext)"/>
 	public class CommandMetadata
 	{
+		struct ParamInfo
+		{
+			internal ParameterMetadata param;
+			internal ParameterAttribute attr;
+		}
+
 		internal CommandMetadata(
 			Type implementingType,
 			CommandMetadataContext context
@@ -38,6 +44,7 @@ namespace Titanis.Cli
 				Dictionary<string, ParameterMetadata> paramsByName = new Dictionary<string, ParameterMetadata>(StringComparer.OrdinalIgnoreCase);
 				List<ParameterMetadata> parameters = new List<ParameterMetadata>();
 				SortedList<int, ParameterMetadata> positional = new SortedList<int, ParameterMetadata>();
+				List<ParamInfo> relposParams = new List<ParamInfo>();
 
 				Queue<ParameterGroupInfo> groupQueue = new Queue<ParameterGroupInfo>();
 				List<ParameterGroupInfo> groups = new List<ParameterGroupInfo>();
@@ -85,10 +92,17 @@ namespace Titanis.Cli
 						if (OutputRecordType is null && 0 != (attr.Flags & ParameterFlags.OutputOnly))
 							continue;
 
-						int position = attr.Position;
-
 						ParameterMetadata parm = CreateParameter(prop, attr, group, context);
 						parameters.Add(parm);
+
+						int position;
+						if (!string.IsNullOrEmpty(attr.After))
+						{
+							position = ParameterAttribute.NoPosition;
+							relposParams.Add(new ParamInfo { param = parm, attr = attr });
+						}
+						else
+							position = attr.Position;
 
 						if (position != ParameterAttribute.NoPosition)
 							positional.Add(position, parm);
@@ -108,7 +122,43 @@ namespace Titanis.Cli
 
 				this.ParameterGroups = new ReadOnlyCollection<ParameterGroupInfo>(groups);
 				this.Parameters = new ReadOnlyCollection<ParameterMetadata>(parameters);
-				this.PositionalParameters = new ReadOnlyCollection<ParameterMetadata>(positional.Values);
+
+				if (relposParams.Count > 0)
+				{
+					LinkedList<ParameterMetadata> s = new LinkedList<ParameterMetadata>(positional.Values);
+					List<ParameterMetadata> posparms = new List<ParameterMetadata>();
+
+					while (s.Count > 0)
+					{
+						var parm = s.First.Value;
+						s.RemoveFirst();
+
+						posparms.Add(parm);
+
+						var afters = relposParams.FindAll(r => r.attr.After == parm.Name);
+						if (afters.Count > 0)
+						{
+							foreach (var after in afters)
+							{
+								relposParams.Remove(after);
+								s.AddFirst(after.param);
+							}
+						}
+					}
+
+					if (relposParams.Count > 0)
+					{
+						var relpos = relposParams[0];
+						throw new MetadataException($"Parameter declaration for '{relpos.param.Name}' specifies relative positioning to '{relpos.attr.After}', but no parameter named '{relpos.attr.After}' has been declared.", relpos.param.Name);
+					}
+
+					this.PositionalParameters = new ReadOnlyCollection<ParameterMetadata>(posparms);
+				}
+				else
+				{
+					this.PositionalParameters = new ReadOnlyCollection<ParameterMetadata>(positional.Values);
+				}
+
 				this.ParametersByName = new ReadOnlyDictionary<string, ParameterMetadata>(paramsByName);
 			}
 		}

@@ -52,5 +52,13 @@ namespace Titanis.Cli
 		/// Gets the name of the environment variable to check for a default value for this parameter.
 		/// </summary>
 		public string? EnvironmentVariable { get; set; }
+
+		/// <summary>
+		/// Gets or sets the name of the positional parameter that this parameter appears after.
+		/// </summary>
+		/// <remarks>
+		/// The parameter named by this property must lexically occur before this attribute declaration.
+		/// </remarks>
+		public string? After { get; set; }
 	}
 }
