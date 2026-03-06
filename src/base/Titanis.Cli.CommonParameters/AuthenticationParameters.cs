@@ -249,7 +249,6 @@ namespace Titanis.Cli
 					Workstation = this.Workstation,
 					WorkstationDomain = domain,
 					TargetSpn = targetSpn,
-					ClientChannelBindingsUnhashed = new byte[16]
 				};
 
 				return ntlmContext;
