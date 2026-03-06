@@ -41,11 +41,6 @@ Epm lsep [options] <ServerName>
 |    -CompatVersion||&lt;RpcVersion&gt;|Filter for compatible version|
 |-M, -MajorVersion||&lt;UInt16&gt;|Filter for major version|
 |    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -60,6 +55,15 @@ Epm lsep [options] <ServerName>
 ||||  ObjectGuid|
 ||||  annotation|
 ||||  Tower|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -109,8 +113,12 @@ Epm lsep [options] <ServerName>
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)

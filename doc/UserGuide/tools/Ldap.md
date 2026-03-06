@@ -1,43 +1,46 @@
-# Wmi
-  Commands for interacting with the Windows Management Instrumentation service
+# Ldap
+  Performs LDAP operations
 
 ## Synopsis
 ```
-Wmi <subcommand>
+Ldap <subcommand>
 ```
 
 ### Subcommands
 
 |Command|Description|
 |-|-|
-|[query](#wmi-query)|Executes a WMI query|
-|[backup](#wmi-backup)|Backs up the WMI repository|
-|[restore](#wmi-restore)|Restores the WMI repository|
-|[lsns](#wmi-lsns)|Lists the available namespaces within a namespace.|
-|[lsclass](#wmi-lsclass)|Lists the classes within a namespace.|
-|[lsprop](#wmi-lsprop)|Lists the properties of a class or object.|
-|[lsmethod](#wmi-lsmethod)|Lists the methods of a class or object.|
-|[get](#wmi-get)|Gets an object with a WMI path|
-|[exec](#wmi-exec)|Executes a command on a remote system via WMI|
-|[invoke](#wmi-invoke)|Invokes a method on a WMI class or object|
-|[delete](#wmi-delete)|Deletes a WMI object|
+|[search](#ldap-search)|Searches the directory by name|
+|[query](#ldap-query)|Queries the directory|
+|[watch](#ldap-watch)|Watches for changes to an object or subtree|
+|[schema](#ldap-schema)|Gets the schema|
+|[listsyntax](#ldap-listsyntax)|Lists AD syntaxes|
+|[namedbits](#ldap-namedbits)|Prints the bits with symbolic names|
+|[add](#ldap-add)|Adds an object to the directory|
+|[addou](#ldap-addou)|Adds a new organizational unit|
+|[adduser](#ldap-adduser)|Adds a new user|
+|[addcomputer](#ldap-addcomputer)|Adds a computer account to the directory|
+|[mod](#ldap-mod)|Modifies an object in the directory|
+|[moduser](#ldap-moduser)|Modifies a directory entry|
+|[whoami](#ldap-whoami)|Gets the name of the authenticated user|
 
 
-  For help on a subcommand, use `Wmi <subcommand> -h`
-# Wmi backup
-  Backs up the WMI repository
+  For help on a subcommand, use `Ldap <subcommand> -h`
+# Ldap add
+  Adds an object to the directory
 
 ## Synopsis
 ```
-Wmi backup [options] <ServerName> <FileName>
+Ldap add [options] -ObjectClass <String> -ObjectName <String[]> <ServerName> <ObjectName> <ObjectClass>
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
-|&lt;FileName&gt;||&lt;String&gt;|Name of the file to write the backup to|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|    -ObjectClass||&lt;String&gt;|Object class of object to add|
 
 
 ## Options
@@ -45,7 +48,14 @@ Wmi backup [options] <ServerName> <FileName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -ObjectClass||&lt;String&gt;|Object class of object to add|
+|    -Attributes||&lt;AttributeChangeSpec[]&gt;|Attributes to set as name=value pars|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -132,28 +142,20 @@ Wmi backup [options] <ServerName> <FileName>
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
-
-## Examples
-
-### Example 1 - Back up to C:\wmibackup.bak
-
-```
-Wmi backup -UserName milchick -Password Br3@kr00m! LUMON-FS1 C:\wmibackup.bak
-```
-# Wmi delete
-  Deletes a WMI object
+# Ldap addcomputer
+  Adds a computer account to the directory
 
 ## Synopsis
 ```
-Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
+Ldap addcomputer [options] -ObjectName <String[]> <ServerName> <ObjectName>
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
-|&lt;ObjectPathOrWqlQuery&gt;||&lt;String[]&gt;|Path to object or WQL query of objects to invoke on|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
 
 
 ## Options
@@ -161,13 +163,20 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -NewPassword||&lt;String&gt;|Password of new account|
+|    -LogonName||&lt;String&gt;|User name for auth requests|
+|    -DisplayName||&lt;String&gt;|Display name for user|
+|    -UserCerts||&lt;String[]&gt;|Names of files containing certificates to associate with the user|
+|    -Os||&lt;String&gt;|Name of installed operating system|
+|    -OsVersion||&lt;String&gt;|Version of installed operating system|
+|-M, -MemberOf||&lt;String[]&gt;|Groups to make the user a member of|
+|    -Attributes||&lt;AttributeChangeSpec[]&gt;|Attributes to set as name=value pars|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -254,34 +263,20 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
-
-## Examples
-
-### Example 1 - Terminate a process by PID
-
-```
-Wmi delete -UserName milchick -Password Br3@kr00m! LUMON-DC1 Win32_Process.Handle=8008
-```
-
-### Example 2 - Terminate a process by name
-
-```
-Wmi delete -UserName milchick -Password Br3@kr00m! LUMON-DC1 "SELECT * FROM Win32_Process WHERE Caption='REGEDIT.EXE'"
-```
-# Wmi exec
-  Executes a command on a remote system via WMI
+# Ldap addou
+  Adds a new organizational unit
 
 ## Synopsis
 ```
-Wmi exec [options] <ServerName> <CommandLine>
+Ldap addou [options] -ObjectName <String[]> <ServerName> <ObjectName>
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
-|&lt;CommandLine&gt;||&lt;String&gt;|Command line to execute|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
 
 
 ## Options
@@ -289,17 +284,13 @@ Wmi exec [options] <ServerName> <CommandLine>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -CaptureOutput||&lt;SwitchParam&gt;|Redirects STDOUR and STDERR to a file|
-||||  Default: True|
-|    -WorkingDir||&lt;String&gt;|Sets the working directory for the new process|
-|    -CmdCall||&lt;SwitchParam&gt;|Prepends 'cmd /q /c' to the command|
-||||  Default: True|
-|    -Wait||&lt;SwitchParam&gt;|Waits for the command to complete|
-||||  Default: True|
-|    -PollInterval||&lt;Duration&gt;|Polling interval|
-||||  Default: 1s|
-|    -EnvironmentVariables||&lt;String[]&gt;|Environment variables to pass to the command|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Attributes||&lt;AttributeChangeSpec[]&gt;|Attributes to set as name=value pars|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -340,31 +331,125 @@ Wmi exec [options] <ServerName> <CommandLine>
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+
+
+### Authentication (NTLM)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
+# Ldap adduser
+  Adds a new user
 
-### Client Behavior
+## Synopsis
+```
+Ldap adduser [options] -ObjectName <String[]> <ServerName> <ObjectName>
+```
+
+## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -NewPassword||&lt;String&gt;|Password of new account|
+|    -LogonName||&lt;String&gt;|User name for auth requests|
+|    -GivenName||&lt;String&gt;|Given name (first name)|
+|    -Surname||&lt;String&gt;|Surname (last name)|
+|    -DisplayName||&lt;String&gt;|Display name for user|
+|    -UserCerts||&lt;String[]&gt;|Names of files containing certificates to associate with the user|
+|-M, -MemberOf||&lt;String[]&gt;|Groups to make the user a member of|
+|    -Attributes||&lt;AttributeChangeSpec[]&gt;|Attributes to set as name=value pars|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|    -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
 ### Authentication
@@ -405,86 +490,27 @@ Wmi exec [options] <ServerName> <CommandLine>
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
 
 
-## Details
-
-  This command uses WMI Win32_Process.Create to execute a command line,
-  optionally capturing the output and waiting for the executed program to exit.
-  
-  Both -CaptureOutput and -CmdCall are enabled by default.  To disable them,
-  specify -CaptureOutput:off or -CmdCall:off
-  
-  Use -PollInterval to specify the polling interval for checking output as well
-  as the Win32_ProcessTrace query.  Specify the value as a number followed by one
-  of [ ms, s, m, h ] specifying the unit.
-  
-  To specify environment variables for the started process, specify
-  -EnvironmentVariables followed by a list of &lt;name&gt;=&lt;value&gt; pairs, separated by
-  commas.  For example, to specify two variables named VAR1 and VAR2:
-  `-EnvironmentVariables VAR1=value1, VAR2=value2`
-  
-  -CaptureOutput redirects STDOUT and STDERR to a file using the redirection
-  provided by CMD.EXE and therefore requires -CmdCall as well.  Wmi exec
-  generates a file name using a new GUID and creates this file in
-  `C:\Windows\Temp` using SMB.  It periodically checks the file for updates using
-  the interval specified by -PollInterval.  Any updates are fetched and printed
-  to STDOUT.
-  
-  While the command is running, Wmi exec uses Win32_ProcessTrace to monitor the
-  started process and its child processes.  Once the root process of the tree
-  exits, Wmi exec exits, returning the exit status returned by the remote
-  process.
-  
-  Use Ctrl+C to terminate the remote process.  When -CmdCall is enabled, the
-  first child process is terminated (that isn't named `conhost.exe`).
-  
-  
-
-## Examples
-
-### Example 1 - Running a simple command
-
-```
-Wmi exec -UserName milchick -Password Br3@kr00m! LUMON-DC1 -Verbose SystemInfo.exe
-```
-
-### Example 2 - Specifying an environment variable
-
-```
-Wmi exec -UserName milchick -Password Br3@kr00m! LUMON-DC1 -Verbose "ECHO %MYVAR%" -EnvironmentVariables MYVAR=me
-```
-
-### Example 3 - Specifying a polling interval
-
-```
-Wmi exec -UserName milchick -Password Br3@kr00m! LUMON-DC1 -PollInterval 100ms -Verbose "PING -t localhost"
-```
-# Wmi get
-  Gets an object with a WMI path
-
-## Synopsis
-```
-Wmi get [options] <ServerName> <ObjectPath>
-```
-
-## Parameters
+### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
-|&lt;ObjectPath&gt;||&lt;String[]&gt;|Path of object to get|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
+# Ldap listsyntax
+  Lists AD syntaxes
+
+## Synopsis
+```
+Ldap listsyntax [options]
+```
 
 ## Options
 
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -496,9 +522,80 @@ Wmi get [options] <ServerName> <ObjectPath>
 ||||  Json|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
-||||  RelativePath|
-||||  ObjectFlags|
-||||  ObjectType|
+||||  EqualityContract|
+||||  syntaxKey|
+||||  memberName|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+
+
+## Details
+
+  A syntax describes the format of data within an attribute value and specifies
+  how the raw bytes are decoded into the logical value.
+  
+# Ldap mod
+  Modifies an object in the directory
+
+## Synopsis
+```
+Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> ]
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|    -Changes||&lt;AttributeChangeSpec[]&gt;|Changes to make as name?=value|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Changes||&lt;AttributeChangeSpec[]&gt;|Changes to make as name?=value|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -577,44 +674,38 @@ Wmi get [options] <ServerName> <ObjectPath>
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
 
-## Details
-
-  The object path is specified relative to the namespace.
-  
-  Since the command line parser strips double quotes, use single quotes to
-  delimit strings.  Single quotes are converted to double quotes before sending
-  the request to WMI.
-  
-
 ## Examples
 
-### Example 1 - Gets the Win32_Process class
+### Example 1 - Add a certificate to an account
 
 ```
-Wmi get -namespace root\cimv2 -UserName milchick -Password "Br3@kr00m!" LUMON-FS1 Win32_Process
+Ldap mod LUMON-DC1 -UserName milchick@LUMON -Password Br3@kr00m! ALLENTOWN$  userCertificate:file+=allentown.cer
 ```
+  This command authenticates as milchick, loads the certificate from the file
+  allentown.cer, and associates it with the ALLENTOWN$ account.
 
-### Example 2 - Gets the Win32_LogicalDisk for C:
+### Example 2 - Adding resource-based constrained delegate to a computer account
 
 ```
-Wmi get -namespace root\cimv2 -UserName milchick -Password "Br3@kr00m!" LUMON-FS1 Win32_LogicalDisk.DeviceID='C:
+Ldap mod LUMON-DC1 -UserName milchick@LUMON -Password Br3@kr00m!  Stealth$ msDS-AllowedToDelegateTo+=HOST/ALLENTOWN, msDS-AllowedToDelegateTo+=cifs/ALLENTOWN
 ```
-# Wmi invoke
-  Invokes a method on a WMI class or object
+  This command authenticates as milchick and allows the STEALTH$ account to
+  delegate to ALLENTOWN for the `cifs` and `host` SPNs.
+# Ldap moduser
+  Modifies a directory entry
 
 ## Synopsis
 ```
-Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> ]
+Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> ]
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
-|&lt;ObjectPathOrWqlQuery&gt;||&lt;String[]&gt;|Path to object or WQL query of objects to invoke on|
-|&lt;Method&gt;||&lt;String&gt;|Method to invoke|
-|&lt;Arguments&gt;||&lt;String[]&gt;|Arguments to pass to the method|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|    -Changes||&lt;AttributeChangeSpec[]&gt;|Changes to make as name?=value|
 
 
 ## Options
@@ -622,14 +713,15 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -SkipParams||&lt;String[]&gt;|List of parameters to skip|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -OldPassword||&lt;String&gt;|Old password (for password change)|
+|    -NewPassword||&lt;String&gt;|New password (for password change or reset)|
+|    -Changes||&lt;AttributeChangeSpec[]&gt;|Changes to make as name?=value|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -719,54 +811,59 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 
 ## Details
 
-  For each object, Wmi invoke looks up the specified method and parses/coerces
-  the command line arguments after the method name as arguments to the WMI
-  method.
+  Specify attribute changes as a series of name?=value pairs where ?= is:
   
-  To pass an array of values to a WMI method, enter each element as a separate
-  command line argument (separated by spaces) with [ before the first element and
-  ] after the last argument.  For example, to invoke this method:
+    +=   Add a value
+    -=   Remove a value
+    =    Replace all values
   
-  	void WmiMethod(string argFirst, int[] values, string argLast)
+  For example:
   
-  you would enter:
+  	servicePrincipleName+=HOST/ALLENTOWN   # Adds the SPN
+  	servicePrincipleName-=HOST/ALLENTOWN   # Removes the SPN
+  	servicePrincipleName=HOST/ALLENTOWN   # Replaces all SPNs
   
-  	Wmi invoke ... WmiMethod "first arg" [ 1 2 3 4 5 ] "last arg"
+  To add or remove multiple values, specify each value as a separate name?=value
+  pair:
+  
+  	# Adds 3 SPNs
+  	servicePrincipleName+=HOST/ALLENTOWN servicePrincipleName+=cifs/ALLENTOWN
+  servicePrincipleName+=RestrictedKrbHost/ALLENTOWN
+  
+  By default, the attribute values are parsed according to their syntax.  For
+  numeric attributes with bitflags, you may use the named bits, separating
+  multiple bit names with a comma.  For example, to set the encryption types for
+  an account:
+  
+  	msDS-SupportedEncryptionTypes=Aes128CtsHmacSha1_96,Aes256CtsHmacSha1_96
+  
+  Use the `namedbits` command to view a list of supported attributes with
+  bitflags.
   
   
-
-## Examples
-
-### Example 1 - Start EXPLORER.EXE
-
-```
-Wmi invoke -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-DC1 Win32_Process Create C:\WINDOWS\explorer.exe
-```
-
-### Example 2 - Terminate a process by PID
-
-```
-Wmi invoke -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-DC1 Win32_Process.Handle=8008 Terminate
-```
-
-### Example 3 - Terminate a process by name
-
-```
-Wmi invoke -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-DC1 "SELECT * FROM Win32_Process WHERE Caption='REGEDIT.EXE'" Terminate
-```
-# Wmi lsclass
-  Lists the classes within a namespace.
+  
+  You may specify multiple operations for the same attribute within a single
+  command line.  Each operation is sent to the LDAP server as part of the
+  modification request, in the order specified on the command line.  Note that
+  consecutive changes to the same attribute with the same operation are combined.
+   IN the above example, all 3 SPNs are added in a single operation.
+  
+  
+  
+  
+# Ldap namedbits
+  Prints the bits with symbolic names
 
 ## Synopsis
 ```
-Wmi lsclass [options] <ServerName>
+Ldap namedbits [options] [ <Attribute> ]
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
+|&lt;Attribute&gt;||&lt;String[]&gt;|Attribute(s) to print (default is all)|
 
 
 ## Options
@@ -774,14 +871,6 @@ Wmi lsclass [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
-||||  Default: 10|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -793,20 +882,13 @@ Wmi lsclass [options] <ServerName>
 ||||  Json|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
-||||  RelativePath|
-||||  ClassPartBytes|
-||||  HasMethodPart|
-||||  ObjectFlags|
+||||  EqualityContract|
+||||  Attribute|
 ||||  Name|
-||||  BaseClassName|
-||||  NdValueTableLength|
-||||  ValueTableLength|
-||||  ObjectType|
+||||  Value|
+||||  HexValue|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
@@ -829,70 +911,23 @@ Wmi lsclass [options] <ServerName>
 ||||  TextWithTimestamp|
 ||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
-
-### Authentication
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-
-
-### Authentication (Kerberos)
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
-
-
-### Authentication (NTLM)
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-
-# Wmi lsmethod
-  Lists the methods of a class or object.
+# Ldap query
+  Queries the directory
 
 ## Synopsis
 ```
-Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
+Ldap query [options] <ServerName> [ <Filter> ]
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
-|&lt;ObjectPathOrWqlQuery&gt;||&lt;String[]&gt;|Path to object or WQL query of objects to invoke on|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+|    -Filter||&lt;String&gt;|LDAP query|
 
 
 ## Options
@@ -900,13 +935,28 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Filter||&lt;String&gt;|LDAP query|
+|    -SearchBase||&lt;LdapDistinguishedName[]&gt;|DN of search root (default is domain root)|
+|    -Scope||&lt;LdapSearchScope&gt;|Scope of search|
+||||**Possible values:**|
+||||  BaseObject|
+||||  Base|
+||||  SingleLevel|
+||||  WholeSubtree|
+||||  Subtree|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
+||||  Default: 100|
+|    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
+|    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
+|    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
+|    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
+|-R, -RecordLimit||&lt;Int32&gt;|Max number of records to return|
+|    -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -916,22 +966,6 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  Flags|
-||||  Signature|
-||||  Name|
-||||  ClassOfOrigin|
-||||  QualifiersText|
-||||  Subtype|
-||||  SubtypeCode|
-||||  PrivilegesText|
-||||  IsReadOnly|
-||||  ShortDescription|
-||||  FullDescription|
-||||  IsStatic|
-||||  Id|
-||||  IsInputParameter|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -1012,49 +1046,110 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 
 ## Details
 
-  You may specify multiple object paths.  Each object path may be a class or an
-  instance.
+  Ldap query issues a query to an LDAP server.  Use -OutputFields to specify the
+  names of the attributes to retrieve; by default, only the DN of the entries is
+  printed.
   
-  Use -WithQualifiers to filter by one or more qualifiers.  Each entry may either
-  be a qualifier name or a name-value pair of the form &lt;name&gt;=&lt;value&gt;.  If only a
-  name is specified, the filter matches if the qualifier is present with a value
-  other than 'false'.  If the &lt;name&gt;=&lt;value&gt; syntax is used, the qualifier value
-  must match using a case-insensitive string comparison.  If the qualifier has
-  multiple values, only one value must match.
+  If no search base is provided, Ldap query uses the root of the domain.
+  
+  -SearchBase supports these special names:
+  
+  * DomainRoot - the default domain naming context of the server
+  * ForestRoot - the forest root naming context
+  * ConfigRoot - the configuration naming context
+  * SchemaRoot - the schema naming context
+  * RootDse - The root entry
+  
+  -Filter accepts an LDAP query.  An LDAP query consists of one or more
+  assertions of the form
+  
+  	(&lt;attr&gt; &lt;op&gt; &lt;value&gt;)
+  
+  where &lt;op&gt; is one of:
+    =   (exact match, has attribute, or matches substring)
+    ~=  (approximate match)
+    &lt;=  (less or equal)
+    &gt;=  (greater or equal)
+    &amp;=  (has all bits) (LDAP_MATCHING_RULE_BIT_AND)
+    |=  (has one or more bits) (LDAP_MATCHING_RULE_BIT_OR)
+    *=  (transitive match) (LDAP_MATCHING_RULE_TRANSITIVE_EVAL)
+  
+  NOTE: Active Directory treats `=` and `~=` the same, although the queries are
+  represented differently on the wire.
+  NOTE: `&=`, `|=`, and `*=` are extensions implemented by Active Directory.
+  
+  To invert a filter and return objects that do not meet the criteria, prepend a
+  `!`.  For example, to return disabled accounts:
+  
+  To query objects with an attribute, use `=*`.  For example, to query objects
+  with a servicePrincipalName, use:
+  
+    (servicePrincipalName=*)
+  
+  To combine multiple assertions, specify a `&` (all must match) or `|` (at least
+  one must match) followed by multiple filter clauses, surrounding the entire
+  expression with `(` and `)`.  For example:
+  
+    (&amp;(attr1=value)(attr2=value)(attr3=value))
+  
+  A few of the fields support named bits.  Use the `namedbits` command for a list
+  of supported attributes and bit names.
+  
+  
+  NOTE: Although not strictly required, it is a good idea to surround the filter
+  with quotes to avoid having to escape special characters.
   
 
 ## Examples
 
-### Example 1 - List the methods of the Win32_Process class
+### Example 1 - Find User with Logon Name 'milchick'
 
 ```
-Wmi lsmethod -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 Win32_Process
+Ldap query LUMON-DC1 '(samAccountName=milchick)' -OutputFields distinguishedName, objectSid
 ```
 
-### Example 2 - List only the static methods of the Win32_Process class
+### Example 2 - Find Objects with SPNs
 
 ```
-Wmi lsmethod -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 -WithQualifiers static Win32_Process
+Ldap query LUMON-DC1 '(servicePrincipalName=*)' -OutputFields distinguishedName, objectSid, servicePrincipalName
 ```
 
-### Example 3 - List the methods of the Win32_Process class that require the SeDebugPrivilege
+### Example 3 - Query rootDse with no authentication
 
 ```
-Wmi lsmethod -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 -WithQualifiers Privileges=SeDebugPrivilege Win32_Process
+Ldap query LUMON-DC1 -OutputFields * -OutputStyle List
 ```
-# Wmi lsns
-  Lists the available namespaces within a namespace.
+
+### Example 4 - Query for accounts trusted for unconstrained delegation
+
+```
+Ldap query LUMON-DC1 -OutputFields * "(userAccountControl|=TrustedForDelegation)"
+```
+
+### Example 5 - Query for accounts trusted for S4U2self
+
+```
+Ldap query LUMON-DC1 -OutputFields * "(userAccountControl|=TrustedForS4U2self)"
+```
+
+### Example 6 - Query for accounts trusted for constrained delegation
+
+```
+Ldap query LUMON-DC1 -OutputFields * "(msDS-AllowedToDelegateTo=*)"
+```
+# Ldap schema
+  Gets the schema
 
 ## Synopsis
 ```
-Wmi lsns [options] <ServerName>
+Ldap schema [options] <ServerName>
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
 
 
 ## Options
@@ -1062,14 +1157,11 @@ Wmi lsns [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
-||||  Default: 10|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1157,20 +1249,20 @@ Wmi lsns [options] <ServerName>
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
-# Wmi lsprop
-  Lists the properties of a class or object.
+# Ldap search
+  Searches the directory by name
 
 ## Synopsis
 ```
-Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
+Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
-|&lt;ObjectPath&gt;||&lt;String[]&gt;|Path of class or object to inspect|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+|    -SearchName||&lt;String[]&gt;|Name to search for|
 
 
 ## Options
@@ -1178,12 +1270,28 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -SearchName||&lt;String[]&gt;|Name to search for|
+|    -SearchBase||&lt;LdapDistinguishedName[]&gt;|DN of search root (default is domain root)|
+|    -Scope||&lt;LdapSearchScope&gt;|Scope of search|
+||||**Possible values:**|
+||||  BaseObject|
+||||  Base|
+||||  SingleLevel|
+||||  WholeSubtree|
+||||  Subtree|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
+||||  Default: 100|
+|    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
+|    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
+|    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
+|    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
+|-R, -RecordLimit||&lt;Int32&gt;|Max number of records to return|
+|-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1193,24 +1301,6 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  PropertyType|
-||||  DefaultValue|
-||||  RuntimeType|
-||||  ElementType|
-||||  Name|
-||||  ClassOfOrigin|
-||||  QualifiersText|
-||||  Subtype|
-||||  SubtypeCode|
-||||  PrivilegesText|
-||||  IsReadOnly|
-||||  ShortDescription|
-||||  FullDescription|
-||||  IsStatic|
-||||  Id|
-||||  IsInputParameter|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -1291,44 +1381,45 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 
 ## Details
 
-  You may specify multiple object paths.  Each object path may be a class or an
-  instance.
+  Ldap search uses the ANR feature of Active Directory to find objects where any
+  designated name-like field begins with a search string.
   
-  Use -WithQualifiers to filter by one or more qualifiers.  Each entry may either
-  be a qualifier name or a name-value pair of the form &lt;name&gt;=&lt;value&gt;.  If only a
-  name is specified, the filter matches if the qualifier is present with a value
-  other than 'false'.  If the &lt;name&gt;=&lt;value&gt; syntax is used, the qualifier value
-  must match using a case-insensitive string comparison.  If the qualifier has
-  multiple values, only one value must match.
+  To request items that match exactly (rather than those beginning with) a search
+  term, prepend `=` to the search term.
+  
+  Other substring searches (contains or begins with) are not supported; wildcards
+  will be interpreted literally.
+  
+  Note that these rules are observed and enforced by Active Directory; Ldap
+  search merely sends what you give it.
   
 
 ## Examples
 
-### Example 1 - List the properties of the Win32_Process class
+### Example 1 - Search for accounts beginning with `admin`
 
 ```
-Wmi lsprop -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 Win32_Process
+Ldap search admin
 ```
 
-### Example 2 - List the properties of the Win32_Process class that require the SeDebugPrivilege
+### Example 2 - Search for accounts matching `milchick` exactly
 
 ```
-Wmi lsprop -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 -WithQualifiers Privileges=SeDebugPrivilege Win32_Process
+Ldap search =milchick
 ```
-# Wmi query
-  Executes a WMI query
+# Ldap watch
+  Watches for changes to an object or subtree
 
 ## Synopsis
 ```
-Wmi query [options] <ServerName> <Query>
+Ldap watch [options] <ServerName>
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
-|&lt;Query&gt;||&lt;String&gt;|WQL query to execute|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
 
 
 ## Options
@@ -1336,14 +1427,27 @@ Wmi query [options] <ServerName> <Query>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
-||||  Default: 10|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -SearchBase||&lt;LdapDistinguishedName[]&gt;|DN of search root (default is domain root)|
+|    -Scope||&lt;LdapSearchScope&gt;|Scope of search|
+||||**Possible values:**|
+||||  BaseObject|
+||||  Base|
+||||  SingleLevel|
+||||  WholeSubtree|
+||||  Subtree|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
+||||  Default: 100|
+|    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
+|    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
+|    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
+|    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
+|-R, -RecordLimit||&lt;Int32&gt;|Max number of records to return|
+|-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1353,6 +1457,7 @@ Wmi query [options] <ServerName> <Query>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -1430,34 +1535,19 @@ Wmi query [options] <ServerName> <Query>
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
-
-## Examples
-
-### Example 1 - Query running processes with all fields
-
-```
-Wmi query LUMON-FS1 -UserName milchick -Password "Br3@kr00m!" "SELECT * FROM Win32_Process"
-```
-
-### Example 2 - Query running processes with select fields
-
-```
-Wmi query LUMON-FS1 -UserName milchick -Password "Br3@kr00m!" -OutputFields Caption, ProcessID, ParentProcessID  "SELECT * FROM Win32_Process"
-```
-# Wmi restore
-  Restores the WMI repository
+# Ldap whoami
+  Gets the name of the authenticated user
 
 ## Synopsis
 ```
-Wmi restore [options] <ServerName> <FileName>
+Ldap whoami [options] <ServerName>
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
-|&lt;FileName&gt;||&lt;String&gt;|Name of the file to read the backup from|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
 
 
 ## Options
@@ -1465,8 +1555,11 @@ Wmi restore [options] <ServerName> <FileName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ForceShutdown||&lt;SwitchParam&gt;|Forces any active clients to shut down|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1476,6 +1569,11 @@ Wmi restore [options] <ServerName> <FileName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
+||||**Possible values:**|
+||||  SaslString|
+||||  PrincipalName|
+||||  Kind|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -1553,17 +1651,3 @@ Wmi restore [options] <ServerName> <FileName>
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
-
-## Examples
-
-### Example 1 - Restore from C:\wmibackup.bak
-
-```
-Wmi restore -UserName milchick -Password Br3@kr00m! LUMON-FS1 C:\wmibackup.bak
-```
-
-### Example 2 - Restore from C:\wmibackup.bak, shutting down clients
-
-```
-Wmi restore -ForceShutdown -UserName milchick -Password Br3@kr00m! LUMON-FS1 C:\wmibackup.bak
-```

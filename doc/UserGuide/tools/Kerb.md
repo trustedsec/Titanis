@@ -59,7 +59,7 @@ Kerb asreq [options] <UserName> <Kdc>
 ||||  Rsa|
 ||||  RsaesOaep|
 ||||  DesEde3Cbc|
-|-T, -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-W, -Workstation||&lt;String&gt;|Name of client workstation|
 |    -Realm||&lt;String&gt;|Name of realm (domain)|
 |    -Password||&lt;String&gt;|Password|
@@ -73,13 +73,33 @@ Kerb asreq [options] <UserName> <Kdc>
 |    -RenewTill||&lt;DateTime&gt;|Requests a ticket renewable until the specified time (implies -Renewable)|
 |    -EndTime||&lt;DateTime&gt;|End time|
 |    -RenewableOk||&lt;SwitchParam&gt;|Accepts a renewable ticket if the end time is over the limit|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Target||&lt;SecurityPrincipalName[]&gt;|SPNs to request ticket(s) for|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -TicketComment||&lt;String&gt;|Comment to associate with ticket|
+|-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Spn||&lt;SecurityPrincipalName&gt;|Service principal name to request ticket for|
 |    -OutputFileName||&lt;String&gt;|Name of file to write ticket to|
 |    -Overwrite||&lt;SwitchParam&gt;|Overwrites the output file, if it exists|
 |    -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
@@ -101,22 +121,6 @@ Kerb asreq [options] <UserName> <Kdc>
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 |    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
 |    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
 ### Connection
@@ -224,6 +228,9 @@ Kerb changepw [options] <UserName> <Kdc> <NewPassword>
 |    -NtlmHash||&lt;HexString&gt;|NTLM hash (hex-encoded, no colons)|
 |-A, -AesKey||&lt;HexString&gt;|AES 128 key|
 |    -DesKey||&lt;HexString&gt;|DES key|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 |Name|Aliases|Value|Description|
@@ -237,8 +244,8 @@ Kerb changepw [options] <UserName> <Kdc> <NewPassword>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
 |-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -337,6 +344,8 @@ Kerb getasinfo [options] <UserName> <Kdc>
 ||||  EType|
 ||||  SaltText|
 ||||  SaltHex|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
 |-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -469,6 +478,9 @@ Kerb renew [options] <Kdc> [ <TargetSpn> ]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -TicketComment||&lt;String&gt;|Comment to associate with ticket|
 |-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -512,23 +524,16 @@ Kerb renew -TicketCache milchick.ccache 10.66.0.11 -TargetSpn host/lumon-fs1, ci
 
 ## Synopsis
 ```
-Kerb s2k [options] <Salt> <Password>
+Kerb s2k [options] <Password> [ <Salt> ] [ <EncType> ]
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;Salt&gt;||&lt;String&gt;|Salt as a string|
 |&lt;Password&gt;||&lt;String&gt;|String, such as the password|
-
-
-## Options
-
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-E, -EncTypes||&lt;EType[]&gt;|Encryption types to generate for|
+|-S, -Salt||&lt;String&gt;|Salt as a string|
+|-E, -EncType||&lt;EType[]&gt;|Encryption types to generate for|
 ||||**Possible values:**|
 ||||  DesCbcMd5|
 ||||  DesCbcCrc|
@@ -543,7 +548,30 @@ Kerb s2k [options] <Salt> <Password>
 ||||  Rsa|
 ||||  RsaesOaep|
 ||||  DesEde3Cbc|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue if errors occur|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-S, -Salt||&lt;String&gt;|Salt as a string|
+|-E, -EncType||&lt;EType[]&gt;|Encryption types to generate for|
+||||**Possible values:**|
+||||  DesCbcMd5|
+||||  DesCbcCrc|
+||||  Rc4Hmac|
+||||  Rc4HmacExp|
+||||  Aes128CtsHmacSha1_96|
+||||  Aes256CtsHmacSha1_96|
+||||  DsaWithSha1|
+||||  Md5WithRsa|
+||||  Sha1WithRsa|
+||||  Rc2Cbc|
+||||  Rsa|
+||||  RsaesOaep|
+||||  DesEde3Cbc|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -557,6 +585,8 @@ Kerb s2k [options] <Salt> <Password>
 ||||**Possible values:**|
 ||||  EType|
 ||||  KeyText|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
 
 
 ### Output
@@ -630,7 +660,7 @@ Kerb s2k LUMON.INDhostallentown.lumon.ind password
 
 ## Synopsis
 ```
-Kerb select [options] <From>
+Kerb select [options] [ <From> ]
 ```
 
 ## Parameters
@@ -643,66 +673,20 @@ Kerb select [options] <From>
 ## Options
 
 
+### Ticket Source
+
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Into||&lt;String&gt;|Target file name|
-|    -Current||&lt;SwitchParam&gt;|Only select tickets currently valid|
-|    -MatchingUserName||&lt;String[]&gt;|Regex of user name to match|
-|    -MatchingSpn||&lt;String[]&gt;|Regex of SPN to match|
-|    -MatchingEncType||&lt;EType[]&gt;|Filter for encryption type|
-||||**Possible values:**|
-||||  DesCbcMd5|
-||||  DesCbcCrc|
-||||  Rc4Hmac|
-||||  Rc4HmacExp|
-||||  Aes128CtsHmacSha1_96|
-||||  Aes256CtsHmacSha1_96|
-||||  DsaWithSha1|
-||||  Md5WithRsa|
-||||  Sha1WithRsa|
-||||  Rc2Cbc|
-||||  Rsa|
-||||  RsaesOaep|
-||||  DesEde3Cbc|
-|    -Overwrite||&lt;SwitchParam&gt;|Overwrites target file if it exists|
-|-T, -TicketKey||&lt;HexString&gt;|Key used to decrypt the ticket|
-|-S, -SeqNbr||&lt;NumberOrRange[]&gt;|Seq. nbr. or range|
-|    -InvertMatch||&lt;SwitchParam&gt;|Invert match; select whatever doesn't match|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  SeqNbr|
-||||  UserName|
-||||  UserRealm|
-||||  TicketRealm|
-||||  TargetSpn|
-||||  ServiceClass|
-||||  ServiceInstance|
-||||  ServiceRealm|
-||||  KdcOptions|
-||||  EndTime|
-||||  StartTime|
-||||  RenewTill|
-||||  EType|
-||||  SessionKeyText|
-||||  TicketEncryptionType|
-||||  TgsrepHashcatMethod|
-||||  TicketHash|
-||||  IsCurrent|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Overwrite||&lt;SwitchParam&gt;|Overwrites target file if it exists|
+|    -Into||&lt;String&gt;|Target file name|
+|-P, -PrintAuthData||&lt;SwitchParam&gt;|Prints ticket authorization data (if decrypted)|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -723,12 +707,111 @@ Kerb select [options] <From>
 |-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
+### Ticket Decryption
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -TicketKey||&lt;HexString[]&gt;|Key to decrypt the ticket|
+|    -ServicePassword||&lt;String[]&gt;|Password for service account|
+|    -ServiceSalt||&lt;String[]&gt;|Salt for service account|
+
+
+### Ticket Filter
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Current||&lt;SwitchParam&gt;|Only select tickets currently valid|
+|    -MatchingClientName||&lt;String[]&gt;|Regex of client name to match|
+|    -MatchingSpn||&lt;String[]&gt;|Regex of SPN to match|
+|    -MatchingTicketEType||&lt;EType[]&gt;|Filter for ticket encryption type|
+||||**Possible values:**|
+||||  DesCbcMd5|
+||||  DesCbcCrc|
+||||  Rc4Hmac|
+||||  Rc4HmacExp|
+||||  Aes128CtsHmacSha1_96|
+||||  Aes256CtsHmacSha1_96|
+||||  DsaWithSha1|
+||||  Md5WithRsa|
+||||  Sha1WithRsa|
+||||  Rc2Cbc|
+||||  Rsa|
+||||  RsaesOaep|
+||||  DesEde3Cbc|
+|    -MatchingSessionEType||&lt;EType[]&gt;|Filter for session key encryption type|
+||||**Possible values:**|
+||||  DesCbcMd5|
+||||  DesCbcCrc|
+||||  Rc4Hmac|
+||||  Rc4HmacExp|
+||||  Aes128CtsHmacSha1_96|
+||||  Aes256CtsHmacSha1_96|
+||||  DsaWithSha1|
+||||  Md5WithRsa|
+||||  Sha1WithRsa|
+||||  Rc2Cbc|
+||||  Rsa|
+||||  RsaesOaep|
+||||  DesEde3Cbc|
+|    -SeqNbr||&lt;NumberOrRange[]&gt;|Seq. nbr. or range|
+|    -InvertMatch||&lt;SwitchParam&gt;|Invert match; select whatever doesn't match|
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
+||||**Possible values:**|
+||||  SourceFileName|
+||||  SeqNbr|
+||||  Comment|
+||||  ClientName|
+||||  ClientRealm|
+||||  TicketRealm|
+||||  TargetSpn|
+||||  ServiceClass|
+||||  ServiceInstance|
+||||  ServiceRealm|
+||||  KdcOptions|
+||||  EndTime|
+||||  StartTime|
+||||  RenewTill|
+||||  AsrepKeyText|
+||||  TicketKeyText|
+||||  SupportedEncryptionTypes|
+||||  SessionEType|
+||||  SessionKeyText|
+||||  TicketEType|
+||||  TgsrepHashcatMethod|
+||||  TicketHash|
+||||  IsCurrent|
+||||  CachedAuthData|
+||||  SecurityGroups|
+||||  NtlmHashText|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+
+
 ## Details
 
   This command reads tickets from one or more files (.kirbi or .ccache),
   optionally filters them, and optionally writes the results to another file
   (either .kirbi or .ccache).  It can be used to inspect files, convert files,
   combine files, or remove tickets from files.
+  
+  The command accepts both -TicketCache and -From to specify one or more files to
+  read tickets from.  If -From is specified, -TicketCache is ignored.  This is to
+  facilitate the use of $KRB5CCNAME.  If this environment variable is set, you
+  don't need to specify -From.  If you specify -From, this expresses your desire
+  to ignore the ticket cache.
   
   Specify the source files using -From.  You may specify multiple files and
   multiple wildcard patterns.  Kerb select reads all files from the tickets and
@@ -810,6 +893,10 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
@@ -859,8 +946,12 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
@@ -906,7 +997,7 @@ Kerb setpw -UserName milchick@LUMON -Kdc 10.66.0.11 -Password Br3@kr00m! marks@l
 
 ## Synopsis
 ```
-Kerb tgsreq [options] <Kdc> <Targets>
+Kerb tgsreq [options] <Kdc> <Target>
 ```
 
 ## Parameters
@@ -914,7 +1005,7 @@ Kerb tgsreq [options] <Kdc> <Targets>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |&lt;Kdc&gt;||&lt;EndPoint&gt;|Host name or address of KDC|
-|&lt;Targets&gt;||&lt;SecurityPrincipalName[]&gt;|SPNs to request tickets for|
+|&lt;Target&gt;||&lt;SecurityPrincipalName[]&gt;|SPN(s) to request ticket(s) for|
 
 
 ## Options
@@ -958,6 +1049,8 @@ Kerb tgsreq [options] <Kdc> <Targets>
 |    -Realm||&lt;String&gt;|Realm of the KDC|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service account with S4U2proxy|
+|    -U2uTicket||&lt;String&gt;|Name of file containing U2U ticket|
+|    -ServicePassword||&lt;String&gt;|Password for service account (for decrypting authorization data)|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -967,7 +1060,18 @@ Kerb tgsreq [options] <Kdc> <Targets>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -TicketComment||&lt;String&gt;|Comment to associate with ticket|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+
+
+### Ticket Authorization Data (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ServiceSalt||&lt;String&gt;|Salt for service account (for decrypting authorization data)|
+|    -AsrepKey||&lt;HexString&gt;|Encryption key from AS-REP (for decryption NTLM hash)|
 
 
 ### Output
@@ -976,7 +1080,7 @@ Kerb tgsreq [options] <Kdc> <Targets>
 |-|-|-|-|
 |    -OutputFileName||&lt;String&gt;|Name of file to write ticket to|
 |    -Overwrite||&lt;SwitchParam&gt;|Overwrites the output file, if it exists|
-|-A, -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
+|    -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -1042,4 +1146,16 @@ Kerb tgsreq -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi LUMON-FS1 -OutputFile milchi
 
 ```
 Kerb tgsreq -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi cifs/LUMON-FS1, HOST/LUMON-FS1 -OutputFile milchick-LUMON-FS1.kirbi
+```
+
+### Example 4 - Requesting a U2U ticket
+
+```
+Kerb tgsreq -Kdc 10.66.0.11 -v -Tgt allentown-tgt.kirbi -Overwrite -U2u allentown-tgt.kirbi -OutputFileName allentown-u2u.kirbi host/allentown
+```
+
+### Example 5 - Requesting a U2U ticket and extracting NTLM hash
+
+```
+Kerb tgsreq -Kdc 10.66.0.11 -v -Tgt allentown-tgt.kirbi -Overwrite -U2u allentown-tgt.kirbi -OutputFileName allentown-u2u.kirbi host/allentown -AsrepKey 82d4ab5873cbfda126e00c28edb5bd97b6451aa06a291d85173e6fc4ed4aacee
 ```

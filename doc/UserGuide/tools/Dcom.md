@@ -1,17 +1,35 @@
-# CredCoerce
-  Sends RPC calls to coerce a system to authenticate to a remote system
+# Dcom
+  Utility for working with DCOM
 
 ## Synopsis
 ```
-CredCoerce [options] -Techniques <ComponentSelector`1[]> <ServerName> <VictimPath>
+Dcom <subcommand>
+```
+
+### Subcommands
+
+|Command|Description|
+|-|-|
+|[invoke](#dcom-invoke)|Invokes a method on an OLE automation object over DCOM|
+
+
+  For help on a subcommand, use `Dcom <subcommand> -h`
+# Dcom invoke
+  Invokes a method on an OLE automation object over DCOM
+
+## Synopsis
+```
+Dcom invoke [options] -Clsid <Guid> -MethodName <String> <ServerName> <Clsid> <MethodName> [ <Arguments> ]
 ```
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|Name of computer to coerce|
-|&lt;VictimPath&gt;||&lt;String&gt;|Path to send in RPC call|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
+|    -Clsid||&lt;Guid&gt;|CLSID of object to activate|
+|-M, -MethodName||&lt;String&gt;|Name of method to invoke|
+|    -Arguments||&lt;String[]&gt;|Arguments to pass to the method|
 
 
 ## Options
@@ -19,23 +37,10 @@ CredCoerce [options] -Techniques <ComponentSelector`1[]> <ServerName> <VictimPat
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Techniques||&lt;ComponentSelector`1[]>|List of coercion techniques to attempt|
-||||**Possible values:**|
-||||  *|
-||||  Efs.OpenFile|
-||||  Efs.EncryptFile|
-||||  Efs.DecryptFile|
-||||  Efs.QueryUsersOnFile|
-||||  Efs.QueryRecoveryAgents|
-||||  Efs.RemoveUsersFromFile|
-||||  Efs.AddUsersToFile|
-||||  Efs.FileKeyInfo|
-||||  Efs.DuplicateEncryptionInfoFile|
-||||  Efs.AddUsersToFileEx|
-||||  Efs.FileKeyInfoEx|
-||||  Efs.GetEncryptedFileMetadata|
-||||  Efs.SetEncryptedFileMetadata|
-||||  Efs.EncryptFileExSrv|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Clsid||&lt;Guid&gt;|CLSID of object to activate|
+|-M, -MethodName||&lt;String&gt;|Name of method to invoke|
+|    -Arguments||&lt;String[]&gt;|Arguments to pass to the method|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
