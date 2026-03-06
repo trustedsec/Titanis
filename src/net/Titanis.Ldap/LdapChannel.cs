@@ -38,10 +38,9 @@ namespace Titanis.Ldap
 			}, cancellationToken).ConfigureAwait(false);
 			var saslResult = resp.message.protocolOp.BindResponse.resultCode;
 
-			while (saslResult == LDAPResult_ResultCode.SaslBindInProgress)
+			while (saslResult == LDAPResult_ResultCode.SaslBindInProgress || (saslResult == LDAPResult_ResultCode.Success && !authContext.IsComplete))
 			{
 				var token = authContext.Initialize(resp.message.protocolOp.BindResponse.serverSaslCreds).ToArray();
-
 				if (token.Length > 0)
 				{
 					resp = await this.SendMessage(new LDAPMessage_ProtocolOp()
@@ -121,7 +120,12 @@ namespace Titanis.Ldap
 				byte[] encrypted = new byte[cbSealed];
 				bytes.CopyTo(encrypted.AsMemory(offBody, bytes.Length));
 
-				this._authContext.SealMessage(new MessageSealParams(default, SecBufferList.Create(SecBuffer.PrivacyWithIntegrity(encrypted.AsSpan(offBody, bytes.Length))), encrypted.AsSpan(offHeader, offBody - offHeader)));
+				this._authContext.SealMessage(new MessageSealParams(
+					encrypted.AsSpan(offHeader, offBody - offHeader),
+					SecBufferList.Create(
+						SecBuffer.PrivacyWithIntegrity(encrypted.AsSpan(offBody, bytes.Length))),
+					default
+					));
 
 				BinaryPrimitives.WriteInt32BigEndian(encrypted, encrypted.Length - 4);
 				bytes = encrypted;
@@ -214,9 +218,9 @@ namespace Titanis.Ldap
 
 
 							this._authContext.UnsealMessage(new MessageSealParams(
-								default,
+								buf.AsSpan(4, cbTrailer),
 								SecBufferList.Create(SecBuffer.PrivacyWithIntegrity(messageBytes.Span)),
-								buf.AsSpan(4, cbTrailer)
+								default
 								));
 							bufferDecrypted = true;
 						}

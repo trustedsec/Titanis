@@ -52,9 +52,19 @@ namespace Titanis.Ldap
 		private readonly ISocket _socket;
 		private readonly LdapChannel _channel;
 
+		/// <summary>
+		/// Port for normal LDAP
+		/// </summary>
 		public const int LdapPort = 389;
+		/// <summary>
+		/// Port for LDAP over SSL
+		/// </summary>
 		public const int LdapsPort = 636;
+		/// <summary>
+		/// Port for the Global Catalog service
+		/// </summary>
 		public const int GcLdapPort = 3268;
+		// Port for the Global Catalog service over SSL
 		public const int GcLdapsPort = 3269;
 
 		/// <summary>
@@ -90,44 +100,16 @@ namespace Titanis.Ldap
 			var stream = socket.GetStream(true);
 			bool useSsl = (sslOptions != null);
 			bool sslAuth = false;
-			byte[]? channelBinding = null;
+			ChannelBinding? channelBinding = null;
 			if (useSsl)
 			{
-				sslOptions.AllowTlsResume = false;
-				sslOptions.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
 				Debug.Assert(sslOptions != null);
 				var secureStream = new SslStream(stream, false);
 				secureStream.AuthenticateAsClient(sslOptions);
 				sslAuth = secureStream.IsMutuallyAuthenticated;
-				var remoteCert = (X509Certificate2)secureStream.RemoteCertificate;
-				var alg = SignatureAlgorithms.GetByOid(remoteCert.SignatureAlgorithm);
-				if (alg != null)
-				{
-					HashAlgorithm? hashAlg;
-					switch (alg.HashAlgorithm)
-					{
-						case HashType.Sha1:
-						case HashType.Md5:
-						case HashType.Sha256:
-							hashAlg = SHA256.Create();
-							break;
-						case HashType.Sha384:
-							hashAlg = SHA384.Create();
-							break;
-						case HashType.Sha512:
-							hashAlg = SHA384.Create();
-							break;
-						default:
-							// TODO: Hash algorithm not supported, warn
-							hashAlg = null;
-							break;
-					}
-
-					if (hashAlg != null)
-					{
-						channelBinding = hashAlg.ComputeHash(remoteCert.RawData);
-					}
-				}
+				var cert2 = secureStream.RemoteCertificate as X509Certificate2;
+				if (cert2 != null)
+					channelBinding = new TlsServerEndPointChannelBinding(cert2);
 
 				stream = secureStream;
 			}
@@ -187,7 +169,7 @@ namespace Titanis.Ldap
 						throw new ArgumentException($"The credential service did not provide an authentication context for {spn}.", nameof(credentials));
 
 					authContext.ChannelBinding = channelBinding;
-					//if (spn is null)
+					if (spn is null)
 					{
 						spn = new ServicePrincipalName("LDAP", dnsName);
 					}
