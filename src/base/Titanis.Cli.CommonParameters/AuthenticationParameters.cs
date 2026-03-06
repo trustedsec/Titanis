@@ -275,23 +275,31 @@ namespace Titanis.Cli
 			SecurityCapabilities requiredCaps,
 			AuthOptions options)
 		{
+			int count = 0;
+
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
 			bool canCreateKerberos = spn != null && !this.Anonymous.IsSet;
-			KerberosClientContext? krbContext = canCreateKerberos ? this.TryCreateKerberosContext(spn, requiredCaps) : null;
+			KerberosClientContext? extraKerbContext = null;
+			KerberosClientContextBase? krbContext = canCreateKerberos ? this.TryCreateKerberosContext(spn, requiredCaps, true, out extraKerbContext) : null;
 			if (krbContext != null)
 			{
+				count = 2;
+				Debug.Assert(extraKerbContext != null);
+
 				krbContext.RequiredCapabilities |= requiredCaps;
+				extraKerbContext.RequiredCapabilities |= requiredCaps;
 			}
 
 			// Create NTLM context based on parameters
 			var ntlmContext = this.TryCreateNtlmContext(spn);
 			if (ntlmContext != null)
 			{
+				count++;
 				ntlmContext.RequiredCapabilities |= requiredCaps;
 			}
 
 			// Create SPNEGO context if appropriate
-			if ((krbContext != null && ntlmContext != null) || (0 != (options & AuthOptions.PreferSpnego)))
+			if ((count > 1) || (0 != (options & AuthOptions.PreferSpnego)))
 			{
 				var authContext = new SpnegoClientContext()
 				{
@@ -299,6 +307,8 @@ namespace Titanis.Cli
 				};
 				if (krbContext != null)
 					authContext.Contexts.Add(krbContext);
+				if (extraKerbContext != null)
+					authContext.Contexts.Add(extraKerbContext);
 				if (ntlmContext != null)
 					authContext.Contexts.Add(ntlmContext);
 
@@ -316,12 +326,12 @@ namespace Titanis.Cli
 		private X509Certificate2 _s4UserCert;
 
 		/// <summary>
-		/// Creates a <see cref="KerberosClientContext"/>.
+		/// Creates a <see cref="KerberosClientContextBase"/>.
 		/// </summary>
 		/// <param name="targetSpn">Target SPN</param>
 		/// <returns></returns>
 		/// <exception cref="InvalidOperationException"></exception>
-		public KerberosClientContext? TryCreateKerberosContext(ServicePrincipalName targetSpn, SecurityCapabilities requiredCaps)
+		public MskileClientContext? TryCreateKerberosContext(ServicePrincipalName targetSpn, SecurityCapabilities requiredCaps, bool wantExtra, out KerberosClientContext? extraContext)
 		{
 			ArgumentNullException.ThrowIfNull(targetSpn);
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
@@ -556,7 +566,7 @@ namespace Titanis.Cli
 			if (serviceTicket is not null)
 			{
 				var logger = this.Services.GetService<IKerberosCallback>();
-				var krbContext = new KerberosClientContext(
+				var krbContext = new MskileClientContext(
 					cred,
 					this._kerberosClient,
 					targetSpn,
@@ -570,9 +580,24 @@ namespace Titanis.Cli
 						| SecurityCapabilities.ReplayDetection
 						| requiredCaps
 				};
+				extraContext = wantExtra ? new KerberosClientContext(
+					cred,
+					this._kerberosClient,
+					targetSpn,
+					serviceTicket,
+					callback: logger
+					)
+				{
+					RequiredCapabilities = 0
+						| SecurityCapabilities.MutualAuthentication
+						| SecurityCapabilities.SequenceDetection
+						| SecurityCapabilities.ReplayDetection
+						| requiredCaps
+				} : null;
 				return krbContext;
 			}
 
+			extraContext = null;
 			return null;
 		}
 
