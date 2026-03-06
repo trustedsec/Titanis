@@ -85,7 +85,7 @@ namespace Titanis.Smb2.Cli
 
 		protected sealed override async Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
 		{
-			this.SetOutputFormat(OutputStyle.Raw, null);
+			this.SetOutputFormat(OutputStyle.Raw);
 
 			// Determine the read options
 			Smb2ReadOptions readOptions = Smb2ReadOptions.None;
