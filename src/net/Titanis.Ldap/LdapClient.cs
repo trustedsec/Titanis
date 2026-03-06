@@ -44,13 +44,12 @@ namespace Titanis.Ldap
 	/// </summary>
 	public partial class LdapClient
 	{
-		private LdapClient(LdapChannel channel)
+		private LdapClient(LdapClientChannel channel)
 		{
 			this._channel = channel;
 		}
 
-		private readonly ISocket _socket;
-		private readonly LdapChannel _channel;
+		private readonly LdapClientChannel _channel;
 
 		/// <summary>
 		/// Port for normal LDAP
@@ -114,7 +113,7 @@ namespace Titanis.Ldap
 				stream = secureStream;
 			}
 
-			var channel = new LdapChannel(stream, useSsl);
+			var channel = new LdapClientChannel(stream);
 			await channel.Start().ConfigureAwait(false);
 			var ldap = new LdapClient(channel);
 
@@ -559,11 +558,11 @@ namespace Titanis.Ldap
 				attrs.Add(new PartialAttribute(attrSchema.EncodedName, encodedValues));
 			}
 
-			var resp = await _channel.SendMessage(new LDAPMessage_ProtocolOp()
+			var resp = await _channel.SendRequest(new LDAPMessage_ProtocolOp()
 			{
 				AddRequest = new AddRequest_Tagged8(Encoding.UTF8.GetBytes(dn.Text), attrs.ToArray())
 			}, cancellationToken).ConfigureAwait(false);
-			LdapChannel.CheckAndThrow(resp.message.protocolOp.AddResponse);
+			LdapClientChannel.CheckAndThrow(resp.message.protocolOp.AddResponse);
 		}
 
 		public async Task Modify(
@@ -606,11 +605,11 @@ namespace Titanis.Ldap
 			}
 
 			var dn = request.DistinguishedName;
-			var resp = await _channel.SendMessage(new LDAPMessage_ProtocolOp()
+			var resp = await _channel.SendRequest(new LDAPMessage_ProtocolOp()
 			{
 				ModifyRequest = new ModifyRequest_Tagged6(Encoding.UTF8.GetBytes(dn.Text), attrs.ToArray())
 			}, cancellationToken).ConfigureAwait(false);
-			LdapChannel.CheckAndThrow(resp.message.protocolOp.ModifyResponse);
+			LdapClientChannel.CheckAndThrow(resp.message.protocolOp.ModifyResponse);
 		}
 
 		public async Task Move(LdapDistinguishedName oldName, LdapDistinguishedName newName)

@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
 namespace Titanis.Ldap
 {
@@ -19,6 +16,57 @@ namespace Titanis.Ldap
 			this.Attributes = attributes;
 
 			this._attrsByType = attributes.ToDictionary(r => r.AttributeType);
+		}
+
+		internal LdapEntry(
+			LdapDistinguishedName? dn,
+			Dictionary<string, object> attributes)
+			: this(dn, AcceptAttributes(attributes))
+		{
+		}
+
+		private static LdapAttribute[] AcceptAttributes(Dictionary<string, object> attributes)
+		{
+			ArgumentNullException.ThrowIfNull(attributes);
+
+			List<LdapAttribute> attrs = new List<LdapAttribute>(attributes.Count);
+			foreach (var attrEntry in attributes)
+			{
+				if (attrEntry.Value is null)
+					throw new ArgumentException($"The attribute list contains an attribute '{attrEntry.Key}' with no value.");
+
+				var attrType = LdapAttributeTypes.TryGetByNameOrOid(attrEntry.Key);
+				if (attrType is null)
+					throw new ArgumentException($"The attributes list contains attribute '{attrEntry.Key}' that cannot be found.", nameof(attributes));
+
+				if (attrEntry.Value is object[] multiValues)
+					;
+				else
+					multiValues = [attrEntry.Value];
+
+				var encodedValues = new object[multiValues.Length];
+				for (int iValue = 0; iValue < encodedValues.Length; iValue++)
+				{
+					var multiValue = multiValues[iValue];
+
+					if (!attrType.Syntax.RuntimeType.IsAssignableFrom(multiValue.GetType()))
+					{
+						if (multiValue is string text)
+						{
+							multiValue = attrType.Syntax.Parse(text);
+						}
+						else
+						{
+							throw new NotImplementedException();
+						}
+					}
+
+					encodedValues[iValue] = multiValue;
+				}
+
+				attrs.Add(new LdapAttribute(new LdapAttributeDescription(attrType.Name), attrType, encodedValues));
+			}
+			return attrs.ToArray();
 		}
 
 		[DisplayName("dn")]
