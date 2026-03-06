@@ -40,10 +40,21 @@ namespace Titanis.Cli
 
 		public OutputStyle DefaultOutputStyle { get; private set; } = OutputStyle.List;
 
+
+		private string[]? _outputFields;
 		[Parameter(ParameterFlags.OutputOnly)]
 		[Description("Fields to display in output")]
 		[ValueListProvider(typeof(FieldListProvider))]
-		public string[]? OutputFields { get; set; }
+		public string[]? OutputFields
+		{
+			get => _outputFields;
+			set
+			{
+				this.OutputFieldsSpecified = true;
+				_outputFields = value;
+			}
+		}
+		protected bool OutputFieldsSpecified { get; private set; }
 
 		[Parameter]
 		[Description("Print headers for table/list/CSV/TSV styles")]
@@ -163,6 +174,11 @@ namespace Titanis.Cli
 				{
 					if (metadata.OutputRecordType is not null)
 					{
+						if (this.OutputFields == null)
+							this._outputFields = metadata.DefaultOutputFields;
+						else if (this.OutputFields.Length == 1 && this.OutputFields[0] is "*")
+							this.OutputFields = null;
+
 						this.SetOutputFormat(this.ConsoleOutputStyle ?? metadata.DefaultOutputStyle);
 					}
 				}
