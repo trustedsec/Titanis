@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PKIX1Implicit88;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -24,6 +25,20 @@ namespace Titanis.Certificates
 
 			bool hasEku = ekuExtension.EnhancedKeyUsages.OfType<Oid>().Any(s => usage.Value == s.Value);
 			return hasEku;
+		}
+
+		public static string? TryGetSubjectAltName(this X509Certificate2 certificate)
+		{
+			foreach (var ext in certificate.Extensions)
+			{
+				if (ext is X509SubjectAlternativeNameExtension altName)
+				{
+					var decoded = SubjectAltName.TryReadFrom(altName.RawData);
+					return decoded;
+				}
+			}
+
+			return null;
 		}
 	}
 }

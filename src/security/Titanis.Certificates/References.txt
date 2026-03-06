@@ -1,1 +1,11 @@
 ﻿[MS-GPNAP] - Group Policy NAP (list of hash algorithms)
+
+[RFC 3279] - Algorithms and Identifiers for the Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile
+[RFC 4055] - Additional Algorithms and Identifiers for RSA Cryptography for use in the Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile
+[RFC 5480] - Elliptic Curve Cryptography Subject Public Key Information
+[RFC 5756] - Updates for RSAES-OAEP and RSASSA-PSS Algorithm Parameters
+
+[RFC 3280] - Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile
+[RFC 3281] - An Internet Attribute Certificate Profile for Authorization
+
+[RFC 5755] - An Internet Attribute Certificate Profile for Authorization

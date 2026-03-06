@@ -1,4 +1,5 @@
 ﻿using PKIX1Explicit88;
+using PKIX1Implicit88;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,23 @@ using Titanis.IO;
 
 namespace PKIX1Explicit88
 {
-	public partial class AlgorithmIdentifier { }
+	class Extensions : Asn1SequenceOf<Extension>
+	{
+		public Extensions(Extension[] values) : base(values)
+		{
+		}
+	}
 }
 
 namespace PKIX1Implicit88
 {
+	class GeneralNames : Asn1SequenceOf<GeneralName>
+	{
+		public GeneralNames(GeneralName[] values) : base(values)
+		{
+		}
+	}
+
 	public static partial class SubjectAltName
 	{
 		public static string? TryReadFrom(ReadOnlyMemory<byte> bytes)
