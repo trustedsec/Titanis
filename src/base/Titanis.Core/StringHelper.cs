@@ -30,7 +30,7 @@ namespace Titanis
 			Utf32 = 8,
 			Octal = 3,
 		}
-		public static string UnescapeCStyle(this string str)
+		public static string UnescapeCStyle(this string str, bool allowBadEscapes = false)
 		{
 			if (str.IndexOf('\\') < 0)
 				return str;
@@ -76,7 +76,7 @@ namespace Titanis
 								'\'' => '\'',
 								'\"' => '\"',
 								'?' => '?',
-								_ => throw new FormatException($"The character '{c}' at position {i} is not a valid escape character.")
+								_ => allowBadEscapes ? c : throw new FormatException($"The character '{c}' at position {i} is not a valid escape character.")
 							};
 							sb.Append(ce);
 							escapeState = EscapeState.Normal;
