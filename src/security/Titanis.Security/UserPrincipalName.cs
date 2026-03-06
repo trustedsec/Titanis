@@ -82,8 +82,8 @@ namespace Titanis.Security
 		public bool Equals(UserPrincipalName? other)
 		{
 			return other is not null &&
-				   UserName.Equals(other.UserName, StringComparison.OrdinalIgnoreCase) &&
-				   Realm.Equals(other.Realm, StringComparison.OrdinalIgnoreCase);
+				   string.Equals(this.UserName, other.UserName, StringComparison.OrdinalIgnoreCase) &&
+				   string.Equals(this.Realm, other.Realm, StringComparison.OrdinalIgnoreCase);
 		}
 
 		public sealed override int GetHashCode()
