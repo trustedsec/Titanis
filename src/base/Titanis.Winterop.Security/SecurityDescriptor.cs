@@ -412,11 +412,18 @@ namespace Titanis.Winterop.Security
 
 		public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
 		{
-			if (value is string str)
+			if (value is string str && str.Length > 1)
 			{
-
-				var sd = SecurityDescriptor.ParseSddl(str, PlaceholderDomainSid);
-				return sd;
+				if (str[1] == ':')
+				{
+					var sd = SecurityDescriptor.ParseSddl(str, PlaceholderDomainSid);
+					return sd;
+				}
+				else
+				{
+					var bytes = BinaryHelper.ParseHexString(str);
+					return new SecurityDescriptor(bytes);
+				}
 			}
 			else
 				return base.ConvertFrom(context, culture, value);
