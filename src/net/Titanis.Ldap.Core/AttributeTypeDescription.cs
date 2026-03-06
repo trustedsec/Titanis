@@ -17,6 +17,9 @@ namespace Titanis.Ldap
 	// [RFC 4512] § 4.1.2
 	// [MS-ADTS] § 3.1.1.3.1.1.1
 	// NOTE: This implementation supports the full [RFC 4512] definition; [MS-ADTS] only supports a subset.
+	/// <summary>
+	/// Describes an attribute type.
+	/// </summary>
 	public partial class AttributeTypeDescription
 	{
 		public AttributeTypeDescription(

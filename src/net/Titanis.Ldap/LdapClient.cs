@@ -308,7 +308,7 @@ namespace Titanis.Ldap
 				return this.SchemaRoot;
 			else if (object.ReferenceEquals(dn, LdapDistinguishedNameConverter.RootDse))
 				return null;
-			else if (dn.Rdns.Length == 0)
+			else if (dn.Rdns.Count == 0)
 				return null;
 			else
 				return dn;
@@ -478,7 +478,7 @@ namespace Titanis.Ldap
 
 			var syntax = AdSyntaxes.TryGetSyntax(attrSyntaxId, omSyntax, omObjectClass);
 
-			var attr = new LdapAttributeSchema(null, ldapName, syntax);
+			var attr = new LdapAttributeSchema( ldapName, syntax);
 			return attr;
 		}
 

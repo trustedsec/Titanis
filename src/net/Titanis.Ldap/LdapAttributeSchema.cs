@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace Titanis.Ldap
 {
+	/// <summary>
+	/// Describes an attribute schema.
+	/// </summary>
 	public class LdapAttributeSchema
 	{
 		internal LdapAttributeSchema(
-			string schemaName,
 			string ldapName,
 			LdapSyntax? syntax)
 		{
-			SchemaName = schemaName;
 			LdapName = ldapName;
 			Syntax = syntax;
 		}
 
-		public string SchemaName { get; }
 		public string LdapName { get; }
 		public LdapSyntax? Syntax { get; }
 
