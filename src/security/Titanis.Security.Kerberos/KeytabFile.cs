@@ -28,7 +28,7 @@ namespace Titanis.Security.Kerberos
 				throw new InvalidDataException("The file is not a valid keytab file.");
 
 			int pos = 2;
-			List<KeytabEntry> entries = new List<KeytabEntry>();
+			KeytabFile kt = new KeytabFile();
 			while ((pos + 4) < bytes.Length)
 			{
 				var length = BinaryPrimitives.ReadInt32BigEndian(bytes.AsSpan(pos, 4));
@@ -43,17 +43,48 @@ namespace Titanis.Security.Kerberos
 				{
 					var entryBytes = bytes.AsMemory(pos, length);
 					ByteMemoryReader reader = new ByteMemoryReader(entryBytes);
-					var entry = reader.ReadPduStruct<KeytabEntryRecord>(PduByteOrder.BigEndian);
-					//var principal = entry.principal.nameType switch
-					//{
-					//	NameType.Principal
-					//};
+					var rec = reader.ReadPduStruct<KeytabEntryRecord>(PduByteOrder.BigEndian);
+
+					SecurityPrincipalName spn;
+					if (rec.principal.components.Length == 1)
+					{
+						if (ServiceClassNames.Krbtgt.Equals(rec.principal.components[0].str, StringComparison.OrdinalIgnoreCase))
+						{
+							spn = new ServicePrincipalName(rec.principal.components[0].str, rec.principal.realm.str);
+						}
+						else
+						{
+							spn = new UserPrincipalName(rec.principal.components[0].str, rec.principal.realm.str, null, rec.principal.nameType);
+						}
+					}
+					else if (rec.principal.components.Length is 2)
+					{
+						spn = new ServicePrincipalName(
+							rec.principal.components[0].str,
+							rec.principal.components[1].str
+							);
+					}
+					else if (rec.principal.components.Length is 3)
+					{
+						spn = new ServicePrincipalName(
+							rec.principal.components[0].str,
+							[
+								rec.principal.components[1].str,
+								rec.principal.components[2].str
+							]);
+					}
+					else
+						continue;
+
+					KeytabEntry entry = new KeytabEntry(spn, rec.keyVersion32, rec.encType, rec.keyContents);
+
+					kt.Entries.Add(entry);
 
 					pos += length;
 				}
 			}
 
-			throw new NotImplementedException();
+			return kt;
 		}
 
 		public List<KeytabEntry> Entries { get; } = new List<KeytabEntry>();
@@ -69,8 +100,8 @@ namespace Titanis.Security.Kerberos
 	/// </summary>
 	public class KeytabEntry
 	{
-		public KeytabEntry(
-			SecurityPrincipal principal,
+		internal KeytabEntry(
+			SecurityPrincipalName principal,
 			int kvno,
 			EType encType,
 			byte[] keyBytes)
@@ -79,9 +110,11 @@ namespace Titanis.Security.Kerberos
 			ArgumentNullException.ThrowIfNull(keyBytes);
 			Principal = principal;
 			KeyBytes = keyBytes;
+			this.EType = encType;
+			this.KeyBytes = keyBytes;
 		}
 
-		public SecurityPrincipal Principal { get; }
+		public SecurityPrincipalName Principal { get; }
 
 		[Browsable(false)]
 		public byte[] KeyBytes { get; }
@@ -91,7 +124,7 @@ namespace Titanis.Security.Kerberos
 		public EType EType { get; }
 
 		[DisplayName("Key")]
-		public string KeyText { get; }
+		public string KeyText => this.KeyBytes.ToHexString();
 	}
 
 	[PduStruct]
@@ -143,6 +176,8 @@ namespace Titanis.Security.Kerberos
 		public KeytabString[] components;
 
 		public PrincipalNameType nameType;
+
+		public override string ToString() => string.Join("/", this.components);
 	}
 
 	[PduStruct]
@@ -161,5 +196,7 @@ namespace Titanis.Security.Kerberos
 		public ushort length;
 		[PduString(CharSet.Ansi, nameof(length))]
 		public string str;
+
+		public override string ToString() => str;
 	}
 }
