@@ -89,10 +89,10 @@ namespace Titanis.Winterop.Security
 				this.Owner = new SecurityIdentifier(bytes.Slice(offOwner));
 			if (offGroup != 0 && 0 == (control & SecurityDescriptorControl.GroupDefaulted))
 				this.Group = new SecurityIdentifier(bytes.Slice(offGroup));
-			if (offDacl != 0 && 0 != (control & SecurityDescriptorControl.DaclPresent))
-				this.Dacl = new AccessControlList(bytes.Slice(offDacl));
-			if (offSacl != 0 && 0 != (control & SecurityDescriptorControl.SaclPresent))
-				this.Sacl = new AccessControlList(bytes.Slice(offDacl));
+			//if (offDacl != 0 && 0 != (control & SecurityDescriptorControl.DaclPresent))
+			//	this.Dacl = new AccessControlList(bytes.Slice(offDacl));
+			//if (offSacl != 0 && 0 != (control & SecurityDescriptorControl.SaclPresent))
+			//	this.Sacl = new AccessControlList(bytes.Slice(offDacl));
 		}
 		public SecurityDescriptor(
 			SecurityDescriptorControl control,
