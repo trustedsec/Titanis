@@ -9,11 +9,14 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Titanis.AuthProxy;
+using Titanis.Certificates;
 using Titanis.Cli;
 using Titanis.Net;
 using Titanis.Security;
@@ -160,6 +163,11 @@ namespace Titanis.Cli
 		public Version? NtlmVersion { get; set; }
 
 		[Parameter]
+		[Description("Name of file containing user's certificate (for PKINIT)")]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		public string? UserCert { get; set; }
+
+		[Parameter]
 		[Description("Name of file containing user's key (for PKINIT)")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		public string? UserKey { get; set; }
@@ -218,6 +226,9 @@ namespace Titanis.Cli
 
 		private bool _validated;
 
+		private X509Certificate2? _userCert;
+		private X509Certificate2Collection? _userCertCollection;
+
 		/// <summary>
 		/// Validates authentication parameters.
 		/// </summary>
@@ -226,6 +237,39 @@ namespace Titanis.Cli
 		public void Validate(bool isRequired, ParameterValidationContext context, bool requiresKerberos = false)
 		{
 			var log = this.Services?.GetService<ILog>();
+
+			// Try loading the certificate
+			// This will populate or validate UserName and UserDomain
+
+			if (!string.IsNullOrEmpty(this.UserCert))
+			{
+				AuthenticationParameters.LoadCertificateAndKey(
+					this.Owner.Context,
+					UserCert,
+					UserKey,
+					UserKeyPassword,
+					this.Owner.Context.Log,
+					context,
+					out this._userCert,
+					out this._userCertCollection,
+					out var upn
+					);
+
+				if (this.UserName == null)
+				{
+					if (upn is null)
+						context.LogError($"The certificate does not specify a user name.  Specify one with -{nameof(UserName)}.");
+					this.UserName = upn;
+				}
+				else
+				{
+					if (upn is not null)
+					{
+						if (!this.UserName.Equals(upn))
+							log?.WriteWarning($"The certificate specifies a user name '{upn}' that differs from the user name provided on the command line.  Using the user name from the command line.");
+					}
+				}
+			}
 
 			if (string.IsNullOrEmpty(this.UserDomain) && this.UserName != null)
 			{
@@ -251,15 +295,17 @@ namespace Titanis.Cli
 						|| (this.NtlmHash != null)
 						|| (this.AesKey != null)
 						|| (this.DesKey != null)
-						|| (!string.IsNullOrEmpty(this.UserKey))
+						|| (!string.IsNullOrEmpty(this.UserCert))
 						)
 				);
 			this.HasKerberosInfo = hasKerbCred;
 			if (!hasKerbCred && this.Kdc is not null)
 				log?.WriteWarning($"-Kdc option specified but not enough options specified for Kerberos; Kerberos will not be used.");
 
-			if (!string.IsNullOrEmpty(this.UserKeyPassword) && string.IsNullOrEmpty(this.UserKey))
-				context.LogError(new ParameterValidationError(nameof(UserKeyPassword), $"-{nameof(UserKeyPassword)} is only valid with -{nameof(UserKey)}"));
+			if (!string.IsNullOrEmpty(this.UserKey) && string.IsNullOrEmpty(this.UserCert))
+				context.LogError(new ParameterValidationError(nameof(UserKeyPassword), $"-{nameof(UserKey)} is only valid with -{nameof(UserCert)}"));
+			if (!string.IsNullOrEmpty(this.UserKeyPassword) && string.IsNullOrEmpty(this.UserCert))
+				context.LogError(new ParameterValidationError(nameof(UserKeyPassword), $"-{nameof(UserKeyPassword)} is only valid with -{nameof(UserCert)}"));
 
 			// For methods that require Kerberos, ensure  -Kdc is present
 			if (this.S4UserName is not null || this.S4UserCert is not null || !string.IsNullOrEmpty(this.UserKey))
@@ -310,6 +356,77 @@ namespace Titanis.Cli
 			}
 
 			this._validated = true;
+		}
+
+		public static bool LoadCertificateAndKey(
+			ICommandContext commandContext,
+			string certFileName,
+			string? keyFile,
+			string? keyPassphrase,
+			ILog? log,
+			ParameterValidationContext validationContext,
+			[NotNullWhen(true)] out X509Certificate2? cert,
+			[NotNullWhen(true)] out X509Certificate2Collection? store,
+			out UserPrincipalName? upn,
+			[CallerArgumentExpression(nameof(keyFile))] string? keyFileParamName = null,
+			[CallerArgumentExpression(nameof(keyPassphrase))] string? keyPassphraseName = null)
+		{
+			certFileName = commandContext.ResolveFsPath(certFileName);
+			keyFile = string.IsNullOrEmpty(keyFile) ? null : commandContext.ResolveFsPath(keyFile);
+
+			log?.WriteDiagnostic($"Opening certificate file {certFileName}");
+			cert = null;
+			store = null;
+			upn = null;
+			try
+			{
+				store = CertificateHelper.LoadFrom(certFileName, keyFile, keyPassphrase, true);
+
+				var certsWithPrivateKey = store.Where(r => r.HasPrivateKey).ToList();
+				if (certsWithPrivateKey.Count == 1)
+				{
+					cert = certsWithPrivateKey[0];
+				}
+				else
+				{
+					var certsWithClientAuth = certsWithPrivateKey.Where(r => r.HasEku(ExtendedKeyUsages.ClientAuthentication)).ToList();
+					cert = certsWithClientAuth.Count >= 1 ? certsWithClientAuth[0] : null;
+				}
+
+				if (cert != null)
+				{
+					log?.WriteVerbose($"Selected certificate {cert.Subject}");
+
+					foreach (var ext in cert.Extensions)
+					{
+						byte[]? subjectKeyId = null;
+						if (ext is X509SubjectKeyIdentifierExtension keyIdExt)
+							subjectKeyId = keyIdExt.SubjectKeyIdentifierBytes.ToArray();
+						else if (ext is X509SubjectAlternativeNameExtension altName)
+						{
+							var decoded = SubjectAltName.TryReadFrom(altName.RawData);
+							if (decoded != null)
+							{
+								upn = UserPrincipalName.Parse(decoded);
+								break;
+							}
+						}
+					}
+
+					return true;
+				}
+				else
+				{
+					log?.WriteError($"None of the provided certificates have a private key and the Client Authentication ({ExtendedKeyUsages.ClientAuthentication}) EKU.  If the key is contained in a separate file, specify it with -{keyFileParamName}");
+				}
+
+				return false;
+			}
+			catch (CryptographicException ex) when (keyPassphrase is null)
+			{
+				validationContext.LogError($"Certificate file {certFileName} is encrypted.  Use -{keyPassphraseName} to specify the password to use to decrypt this file.");
+				return false;
+			}
 		}
 
 		public NtlmClientContext? TryCreateNtlmContext(ServicePrincipalName? targetSpn)
@@ -648,35 +765,10 @@ namespace Titanis.Cli
 					}, this.AesKey.Bytes);
 				else if (this.DesKey != null)
 					cred = new KerberosKeyCredential(authUser, authRealm, EType.DesCbcMd5, this.DesKey.Bytes);
-				else if (!string.IsNullOrEmpty(this.UserKey))
+				else if (this._userCert != null)
 				{
-					string userKeyFile = this.UserKey;
-					string? userKeyPassword = this.UserKeyPassword;
-
-					log?.WriteDiagnostic($"Loading user key from file {userKeyFile}");
-					var bytes = File.ReadAllBytes(userKeyFile);
-					X509Certificate2Collection certs = new X509Certificate2Collection();
-					certs.Import(bytes, userKeyPassword, X509KeyStorageFlags.EphemeralKeySet);
-
-					byte[]? subjectKeyId = null;
-					UserPrincipalName? upn = null;
-					var cert = certs.LastOrDefault();
-					foreach (var ext in cert.Extensions)
-					{
-						if (ext is X509SubjectKeyIdentifierExtension keyIdExt)
-							subjectKeyId = keyIdExt.SubjectKeyIdentifierBytes.ToArray();
-						else if (ext is X509SubjectAlternativeNameExtension altName)
-						{
-							var decoded = SubjectAltName.TryReadFrom(altName.RawData);
-							if (decoded != null)
-							{
-								upn = UserPrincipalName.Parse(decoded);
-								break;
-							}
-						}
-					}
-
-					cred = new KerberosPkinitCredential(upn, upn.Realm ?? this.UserDomain, cert);
+					var upn = this.UserName;
+					cred = new KerberosPkinitCredential(upn, this.UserDomain, this._userCert);
 				}
 			}
 

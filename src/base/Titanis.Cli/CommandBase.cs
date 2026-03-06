@@ -339,7 +339,7 @@ namespace Titanis.Cli
 		/// Use this property rather than accessing the context directly to ensure it is non-null.
 		/// This also aids in nullability analysis, since the return value will never be <see langword="null"/>.
 		/// </remarks>
-		private ICommandContext VerifyContext()
+		protected ICommandContext VerifyContext()
 		{
 			if (this.Context == null)
 				throw new InvalidOperationException("This operation requires a context, but there is no context.");
