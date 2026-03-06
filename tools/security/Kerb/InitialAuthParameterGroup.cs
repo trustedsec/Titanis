@@ -35,11 +35,11 @@ internal class InitialAuthParameterGroup : ParameterGroupBase
 
 	[Parameter]
 	[Description("Name of file containing user's key")]
-	private string? UserKey { get; set; }
+	public string? UserKey { get; set; }
 
 	[Parameter]
 	[Description("Password to decrypt file containing user's key")]
-	private string? UserKeyPassword { get; set; }
+	public string? UserKeyPassword { get; set; }
 
 	internal string? EffectiveRealm => this.Realm ?? this.UserName.Realm;
 

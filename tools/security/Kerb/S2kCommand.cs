@@ -44,7 +44,7 @@ internal class S2kCommand : Command
 	public EType[]? EncTypes { get; set; }
 
 	[Parameter]
-	[Description("Continue if errors occur")]
+	[Description("Continue even if errors occur")]
 	public SwitchParam ContinueOnError { get; set; }
 
 	protected override Task<int> RunAsync(CancellationToken cancellationToken)

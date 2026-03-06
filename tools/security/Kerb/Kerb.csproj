@@ -11,6 +11,7 @@
     <ProjectReference Include="..\..\..\src\base\Titanis.Cli.CommonParameters\Titanis.Cli.CommonParameters.csproj" />
     <ProjectReference Include="..\..\..\src\base\Titanis.Cli\Titanis.Cli.csproj" />
     <ProjectReference Include="..\..\..\src\base\Titanis.Core\Titanis.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\security\Titanis.Certificates\Titanis.Certificates.csproj" />
     <ProjectReference Include="..\..\..\src\security\Titanis.Security.Kerberos\Titanis.Security.Kerberos.csproj" />
     <ProjectReference Include="..\..\..\src\security\Titanis.Security\Titanis.Security.csproj" />
   </ItemGroup>
