@@ -308,6 +308,8 @@ namespace Titanis.CodeGen
 			=> TypeRef(type);
 		public static TypeSyntax TypeRef(ITypeSymbol type)
 		{
+			if (type is null) throw new ArgumentNullException(nameof(type));
+
 			return type.SpecialType switch
 			{
 				SpecialType.System_Object
