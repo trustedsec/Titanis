@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Titanis.Asn1.Serialization;
 
@@ -11,6 +13,15 @@ namespace Titanis.Asn1
 	/// </summary>
 	public struct Asn1BitString : IEquatable<Asn1BitString>, IAsn1DerEncodableValue, IAsn1DerEncodableTlv
 	{
+		/// <summary>
+		/// Initializes a new <see cref="Asn1BitString"/>.
+		/// </summary>
+		/// <param name="octets">Bytes constituting the bitstring</param>
+		/// <param name="unusedBits">Number of unused bits at the end</param>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="unusedBits"/> exceeds the number of bits in <see cref="Asn1OctetString"/>.</exception>
+		/// <remarks>
+		/// <paramref name="unusedBits"/> may be any value up to the number of bits in <paramref name="octets"/>.
+		/// </remarks>
 		public Asn1BitString(byte[] octets, byte unusedBits)
 		{
 			ArgumentNullException.ThrowIfNull(octets);
@@ -21,7 +32,7 @@ namespace Titanis.Asn1
 			this.Octets = octets;
 		}
 		public Asn1BitString(uint value32)
-			:this(CreateOctetsFromUInt32(value32), 0)
+			: this(CreateOctetsFromUInt32(value32), 0)
 		{
 		}
 
@@ -32,16 +43,39 @@ namespace Titanis.Asn1
 			return bytes;
 		}
 
+		public bool IsEmpty => this.Octets == null || this.Octets.Length == 0 || (this.UnusedBits == (this.Octets.Length * 8));
+
+		/// <summary>
+		/// Gets the number of unused bits at the end of <see cref="Octets"/>.
+		/// </summary>
 		public byte UnusedBits { get; }
-		public byte[] Octets { get; }
-
-		public Asn1Tag Tag => Asn1PredefTag.BitString;
-
-		public ulong ToUInt64()
+		/// <summary>
+		/// Gets the octets constituting the bitstring.
+		/// </summary>
+		public byte[]? Octets { get; }
+		/// <inheritdoc/>
+		public readonly Asn1Tag Tag => Asn1PredefTag.BitString;
+		/// <summary>
+		/// Gets the value of the bitstring as <see langword="ulong"/>.
+		/// </summary>
+		/// <returns>A <see langword="ulong"/> value</returns>
+		/// <exception cref="OverflowException">The value of the bitstring exceeds what can be represented by a <see langword="ulong"/>.</exception>
+		/// <remarks>
+		/// The bitstring value is interpreted as a big-endian integer.  The size of the bitstring may exceed 64 bits so long as the excess leading bits are zero.  The last octet is included in its entirety.  That is, if <see cref="UnusedBits"/> is not a multiple of 8, the unused bits in the last (partial) octet are included.
+		/// </remarks>
+		public readonly ulong ToUInt64()
 		{
+			if (this.Octets is null)
+				return 0UL;
+
 			int cb = this.Octets.Length;
+			cb -= (this.UnusedBits / 8);
+
 			int i = 0;
-			if (cb <= 8)
+			for (i = 0; i < cb && this.Octets[i] == 0; i++)
+				;
+
+			if ((cb - i) <= 8)
 			{
 				ulong n = this.Octets[i++];
 				while (i < cb)
@@ -55,11 +89,27 @@ namespace Titanis.Asn1
 				throw new OverflowException(Messages.Asn1_IntegerOverflow);
 		}
 
-		public uint ToUInt32()
+		/// <summary>
+		/// Gets the value of the bitstring as <see langword="ulong"/>.
+		/// </summary>
+		/// <returns>A <see langword="ulong"/> value</returns>
+		/// <exception cref="OverflowException">The value of the bitstring exceeds what can be represented by a <see langword="ulong"/>.</exception>
+		/// <remarks>
+		/// The bitstring value is interpreted as a big-endian integer.  The size of the bitstring may exceed 64 bits so long as the excess leading bits are zero.  The last octet is included in its entirety.  That is, if <see cref="UnusedBits"/> is not a multiple of 8, the unused bits in the last (partial) octet are included.
+		/// </remarks>
+		public readonly uint ToUInt32()
 		{
+			if (this.Octets is null)
+				return 0U;
+
 			int cb = this.Octets.Length;
+			cb -= (this.UnusedBits / 8);
+
 			int i = 0;
-			if (cb <= 4)
+			for (i = 0; i < cb && this.Octets[i] == 0; i++)
+				;
+
+			if ((cb - i) <= 4)
 			{
 				uint n = this.Octets[i++];
 				while (i < cb)
@@ -73,35 +123,35 @@ namespace Titanis.Asn1
 				throw new OverflowException(Messages.Asn1_IntegerOverflow);
 		}
 
-		public override bool Equals(object obj)
+		/// <inheritdoc/>
+		public readonly void EncodeValue(Asn1DerEncoder encoder)
 		{
-			return obj is Asn1BitString @string && this.Equals(@string);
+			encoder.EncodeBitStringValue(this);
 		}
 
-		public bool Equals(Asn1BitString other)
+		/// <inheritdoc/>
+		public readonly void EncodeTlv(Asn1DerEncoder encoder)
+		{
+			encoder.EncodeBitStringTlv(this.Octets, this.UnusedBits, this.Tag);
+		}
+
+		/// <inheritdoc/>
+		public override readonly bool Equals(object? obj)
+		{
+			return obj is Asn1BitString bitstring && this.Equals(bitstring);
+		}
+
+		/// <inheritdoc/>
+		public readonly bool Equals(Asn1BitString other)
 		{
 			return this.UnusedBits == other.UnusedBits &&
 				   ArrayExtensions.ElementsEqual(this.Octets, other.Octets);
 		}
 
-		public override int GetHashCode()
+		/// <inheritdoc/>
+		public override readonly int GetHashCode()
 		{
 			return System.HashCode.Combine(this.UnusedBits, ArrayExtensions.GetElementsHashCode(this.Octets));
-		}
-
-		public void DecodeValue(Asn1DerDecoder decoder)
-		{
-			this = decoder.DecodeBitStringValue();
-		}
-
-		public void EncodeValue(Asn1DerEncoder encoder)
-		{
-			encoder.EncodeBitStringValue(this);
-		}
-
-		public void EncodeTlv(Asn1DerEncoder encoder)
-		{
-			encoder.EncodeBitStringTlv(this.Octets, this.UnusedBits, this.Tag);
 		}
 
 		public static bool operator ==(Asn1BitString left, Asn1BitString right)
@@ -115,22 +165,67 @@ namespace Titanis.Asn1
 		}
 	}
 
-	public struct Asn1BitString<TEnum> : IAsn1DerEncodableValue, IAsn1DerEncodableTlv
-		where TEnum : struct, Enum, IConvertible
+	/// <summary>
+	/// Represents an enumeration as a <c>BIT STRING</c>.
+	/// </summary>
+	/// <typeparam name="TEnum">Underlying enumeration</typeparam>
+	public readonly struct Asn1BitString<TEnum> : IAsn1DerEncodableValue, IAsn1DerEncodableTlv, IEquatable<Asn1BitString<TEnum>> where TEnum : struct, Enum, IConvertible
 	{
-		public Asn1BitString(TEnum value, int bitCount)
+		static Asn1BitString()
+		{
+			var bitCountAttr = typeof(TEnum).GetCustomAttribute<BitCountAttribute>();
+			if (bitCountAttr == null)
+				throw new InvalidProgramException($"Type {typeof(TEnum).FullName} is missing {nameof(bitCountAttr)} and cannot be used as a generic argument for {nameof(Asn1BitString)}.");
+
+			BitCount = bitCountAttr.BitCount;
+		}
+
+		public static int BitCount { get; }
+
+		/// <summary>
+		/// Initializes a new <see cref="Asn1BitString{TEnum}"/>.
+		/// </summary>
+		/// <param name="value">Value</param>
+		public Asn1BitString(TEnum value)
 		{
 			this.Value = value;
-			this.BitCount = bitCount;
 		}
 
 		public TEnum Value { get; }
-		public int BitCount { get; }
+		/// <inheritdoc/>
+		public readonly Asn1Tag Tag => Asn1PredefTag.BitString;
 
-		public Asn1Tag Tag => Asn1PredefTag.BitString;
+		/// <inheritdoc/>
+		public readonly void EncodeValue(Asn1DerEncoder encoder) => encoder.EncodeBitStringValue(this.Value.ToUInt64(null), BitCount);
 
-		public void EncodeValue(Asn1DerEncoder encoder) => encoder.EncodeBitStringValue(this.Value.ToUInt64(null), this.BitCount);
+		/// <inheritdoc/>
+		public readonly void EncodeTlv(Asn1DerEncoder encoder) => encoder.EncodeEnumeratedTlv(this.Value.ToInt64(null), Asn1PredefTag.BitString);
 
-		public void EncodeTlv(Asn1DerEncoder encoder) => encoder.EncodeEnumeratedTlv(this.Value.ToInt64(null), Asn1PredefTag.BitString);
+		public override bool Equals(object? obj)
+		{
+			return obj is Asn1BitString<TEnum> bitstring && Equals(bitstring);
+		}
+
+		public bool Equals(Asn1BitString<TEnum> other)
+		{
+			return EqualityComparer<TEnum>.Default.Equals(Value, other.Value) &&
+				   BitCount == BitCount
+				   ;
+		}
+
+		public override int GetHashCode()
+		{
+			return System.HashCode.Combine(Value, BitCount);
+		}
+
+		public static bool operator ==(Asn1BitString<TEnum> left, Asn1BitString<TEnum> right)
+		{
+			return left.Equals(right);
+		}
+
+		public static bool operator !=(Asn1BitString<TEnum> left, Asn1BitString<TEnum> right)
+		{
+			return !(left == right);
+		}
 	}
 }

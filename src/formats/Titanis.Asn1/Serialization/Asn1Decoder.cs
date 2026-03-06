@@ -64,7 +64,7 @@ namespace Titanis.Asn1.Serialization
 		/// Checks that the next tag matches an expected tag
 		/// </summary>
 		/// <param name="expectedTag">The tag expected</param>
-		/// <returns><c>true</c> if the next tag matches <paramref name="expectedTag"/>; otherwise, <c>false</c>.</returns>
+		/// <returns><see langword="true"/> if the next tag matches <paramref name="expectedTag"/>; otherwise, <see langword="false"/>.</returns>
 		public bool CheckTag(Asn1Tag expectedTag)
 		{
 			var actual = this.PeekTag();

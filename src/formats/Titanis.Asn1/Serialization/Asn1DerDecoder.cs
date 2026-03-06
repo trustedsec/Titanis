@@ -584,9 +584,7 @@ namespace Titanis.Asn1.Serialization
 		{
 			var byteCount = this.GetLength();
 			byte[] bytes = this._Consume(byteCount).ToArray();
-			if (BitConverter.IsLittleEndian)
-				Array.Reverse(bytes);
-			BigInteger bigint = new BigInteger(bytes);
+			BigInteger bigint = new BigInteger(bytes, false, true);
 			return bigint;
 		}
 		#endregion
@@ -621,6 +619,17 @@ namespace Titanis.Asn1.Serialization
 			this.CloseTlv(frame);
 
 			return bitstring;
+		}
+		public TEnum DecodeBitStringTlv<TEnum>(Asn1Tag tag)
+			where TEnum : struct, Enum, IConvertible
+		{
+			var frame = this.DecodeTlvStart(tag);
+			var bitstring = this.DecodeBitStringValue();
+			this.CloseTlv(frame);
+
+			var value = bitstring.ToUInt64();
+			var enumValue = (TEnum)Enum.ToObject(typeof(TEnum), value);
+			return enumValue;
 		}
 		/// <inheritdoc/>
 		// [X690] § 8.6
