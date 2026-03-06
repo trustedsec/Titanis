@@ -50,7 +50,7 @@ internal class SetPasswordCommand : Command
 	{
 		var krb = this.CreateKerberosClient(new SimpleKdcLocator(this.Authentication.Kdc));
 
-		var krbAuthContext = this.Authentication.TryCreateKerberosContext(KerberosClient.ChangePwSpn);
+		var krbAuthContext = this.Authentication.TryCreateKerberosContext(KerberosClient.ChangePwSpn, SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality, false, out _);
 		var cred = krbAuthContext.Credential;
 
 		await krb.SetPassword(
