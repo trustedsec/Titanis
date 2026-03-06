@@ -271,7 +271,7 @@ namespace Titanis.Cli
 		{
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
 			bool canCreateKerberos = spn != null && !this.Anonymous.IsSet;
-			KerberosClientContext? krbContext = canCreateKerberos ? this.TryCreateKerberosContext(spn) : null;
+			KerberosClientContext? krbContext = canCreateKerberos ? this.TryCreateKerberosContext(spn, requiredCaps) : null;
 			if (krbContext != null)
 			{
 				krbContext.RequiredCapabilities |= requiredCaps;
@@ -315,7 +315,7 @@ namespace Titanis.Cli
 		/// <param name="targetSpn">Target SPN</param>
 		/// <returns></returns>
 		/// <exception cref="InvalidOperationException"></exception>
-		public KerberosClientContext? TryCreateKerberosContext(ServicePrincipalName targetSpn)
+		public KerberosClientContext? TryCreateKerberosContext(ServicePrincipalName targetSpn, SecurityCapabilities requiredCaps)
 		{
 			ArgumentNullException.ThrowIfNull(targetSpn);
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
@@ -560,10 +560,9 @@ namespace Titanis.Cli
 				{
 					RequiredCapabilities = 0
 						| SecurityCapabilities.MutualAuthentication
-						| SecurityCapabilities.Integrity
-						| SecurityCapabilities.Confidentiality
 						| SecurityCapabilities.SequenceDetection
 						| SecurityCapabilities.ReplayDetection
+						| requiredCaps
 				};
 				return krbContext;
 			}
