@@ -4,22 +4,45 @@ using Titanis.Cli;
 using Titanis.Ldap;
 using Titanis.Winterop.Security;
 
-[Description("Describes a security descriptor represented in SDDL")]
+namespace Titanis.Cli.SddlTool;
+
+[Command]
+[Description("Describes a security descriptor")]
+[DetailedHelpText(@"This command accepts one or more security descriptors.  Each security descriptor may be specified either in the SDDL form, or in the binary form as a series of hex digits.  The -ObjectType specifies how the bits are translated to specific permissions.  If no object type is specified, it is assumed to be for a file.
+
+Specifying -PrintHex or -PrintSddl effectively allows you to convert between the SDDL and binary form of a security descriptor.
+")]
+[Example("Describe a security descriptor of a registry key", "{0} O:BAG:SYD:PAI(A;CI;KA;;;BA)(A;CI;KR;;;AU)(A;CI;KA;;;LS)(A;CI;KA;;;NS)(A;CI;KR;;;IU)(A;CI;KA;;;SY) -ObjectType RegistryKey")]
+[Example("Describe a binary security descriptor on a file", "{0} 010004805800000068000000000000001400000002004400030000000000140003000000010100000000000504000000000014000700000001010000000000050a00000000001400030000000101000000000005120000000102000000000005200000002002000001020000000000052000000020020000")]
 class DescribeCommand : Command
 {
 	[Parameter(0)]
-	[Description("Security descriptor in SDDL notation")]
-	public SecurityDescriptor[] Sddl { get; set; }
+	[Mandatory]
+	[Description("Security descriptor in hex or SDDL notation")]
+	public SecurityDescriptor[] SddlOrHex { get; set; }
 
 	[Parameter]
 	[Description("Type of object")]
 	public SecurityObjectType? ObjectType { get; set; }
 
+	[Parameter]
+	[Description("Prints the binary form as a string of hex digits")]
+	public SwitchParam PrintHex { get; set; }
+
+	[Parameter]
+	[Description("Prints the SDDL form")]
+	public SwitchParam PrintSddl { get; set; }
+
 	protected override Task<int> RunAsync(CancellationToken cancellationToken)
 	{
-		foreach (var sddl in this.Sddl)
+		foreach (var sddl in this.SddlOrHex)
 		{
 			var sd = sddl;
+
+			if (this.PrintSddl.IsSet)
+				this.WriteRecord($"SDDL: {sd.ToSddlString(SecurityDescriptorSections.All)}");
+			if (this.PrintHex.IsSet)
+				this.WriteRecord($"Hex: {sd.ToByteArray().ToHexString()}");
 
 			var objType = this.ObjectType ?? SecurityObjectType.File;
 			var model = ObjectSecurityModel.GetModelFor(objType);
