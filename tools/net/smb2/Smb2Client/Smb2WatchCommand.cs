@@ -32,7 +32,7 @@ namespace Titanis.Smb2.Cli
 
 		[Parameter]
 		[Description("Continue watching for changes if an error occurs")]
-		public SwitchParam ContinueOnErrors { get; set; }
+		public SwitchParam ContinueOnError { get; set; }
 
 		protected sealed override async Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
 		{
@@ -46,7 +46,7 @@ namespace Titanis.Smb2.Cli
 			await using (var dir = (Smb2Directory)await client.CreateFileAsync(this.UncPath, GetOpenDirectoryCreateInfo(), FileAccess.Read, cancellationToken))
 			{
 				WatchOptions options = WatchOptions.None;
-				if (this.ContinueOnErrors.IsSet)
+				if (this.ContinueOnError.IsSet)
 					options |= WatchOptions.ContinueOnError;
 				if (this.Recursive.IsSet)
 					options |= WatchOptions.WatchSubtree;
