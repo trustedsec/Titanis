@@ -97,14 +97,14 @@ namespace Titanis.Security.Kerberos
 			this._chainedCallback?.OnReceivedTicket(ticketInfo);
 		}
 
-		void IKerberosCallback.OnSendingApreq(KerberosClientContext? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, int sendSeqNbr)
+		void IKerberosCallback.OnSendingApreq(KerberosClientContextBase? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, int sendSeqNbr)
 		{
 			this.WriteMessage($"Sending AP-REQ to {targetSpn} for user {ticket.UserName}@{ticket.UserRealm} with session key {sessionKey.EType} {sessionKey.KeyBytes.ToHexString()} (sendSeqNbr={sendSeqNbr})(gssFlags={caps})");
 
 			this._chainedCallback?.OnSendingApreq(authContext, targetSpn, ticket, credential, caps, sessionKey, sendSeqNbr);
 		}
 
-		void IKerberosCallback.OnReceivedAprep(KerberosClientContext? authContext, uint recvSeqNbr, SessionKey? acceptorSubkey)
+		void IKerberosCallback.OnReceivedAprep(KerberosClientContextBase? authContext, uint recvSeqNbr, SessionKey? acceptorSubkey)
 		{
 			//this.WriteMessage($"Received AP-REP from {authContext.TargetSpn} for user {authContext.UserName}@{authContext.Credential.Realm} {((acceptorSubkey != null) ? $"with session key {acceptorSubkey.EType} {acceptorSubkey.KeyBytes.ToHexString()} (recvSeqNbr={recvSeqNbr})" : "(no session key)")}");
 			this.WriteMessage($"Received AP-REP {((acceptorSubkey != null) ? $"with session key {acceptorSubkey.EType} {acceptorSubkey.KeyBytes.ToHexString()} (recvSeqNbr={recvSeqNbr})" : "(no session key)")}");

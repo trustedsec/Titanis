@@ -20,8 +20,8 @@ namespace Titanis.Security.Kerberos
 
 		void OnRequestingTicket(SecurityPrincipalName spn, TicketInfo tgt, KdcOptions kdcOptions);
 		void OnReceivedTicket(TicketInfo ticketInfo) { }
-		void OnSendingApreq(KerberosClientContext? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey initiatorSubkey, int sendSeqNbr);
-		void OnReceivedAprep(KerberosClientContext? authContext, uint recvSeqNbr, SessionKey? acceptorSubkey) { }
+		void OnSendingApreq(KerberosClientContextBase? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey initiatorSubkey, int sendSeqNbr);
+		void OnReceivedAprep(KerberosClientContextBase? authContext, uint recvSeqNbr, SessionKey? acceptorSubkey) { }
 
 		void OnReferralReceived(SecurityPrincipalName spn, TicketInfo ticket);
 	}

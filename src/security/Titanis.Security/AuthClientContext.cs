@@ -8,9 +8,10 @@ namespace Titanis.Security
 	/// <summary>
 	/// Specifies security capabilities to negotiate during authentication.
 	/// </summary>
-	/// <seealso cref="AuthClientContext.RequiredCapabilities"/>
-	/// <seealso cref="AuthClientContext.NegotiatedCapabilities"/>
+	/// <seealso cref="AuthContext.RequiredCapabilities"/>
+	/// <seealso cref="AuthContext.NegotiatedCapabilities"/>
 	// [RFC 1509]
+	[Flags]
 	public enum SecurityCapabilities : uint
 	{
 		/// <summary>
@@ -64,61 +65,6 @@ namespace Titanis.Security
 		/// Gets the identifier to use for this authentication type within an RPC negotiation.
 		/// </summary>
 		public virtual byte RpcAuthType { get; } = 0;
-		/// <summary>
-		/// Gets the mechanism ID that identifies this authentication mechanism within a GSS API context.
-		/// </summary>
-		public virtual Oid? MechOid => null;
-
-		public bool IsDceRpcStyle => (0 != (this._requiredCaps & SecurityCapabilities.DceStyle));
-		public bool IsMutualAuthRequired => (0 != (this._requiredCaps & SecurityCapabilities.MutualAuthentication));
-
-		private SecurityCapabilities _requiredCaps;
-		/// <summary>
-		/// Gets or sets a <see cref="SecurityCapabilities"/> that specifies
-		/// capabilities that must be negotiated.
-		/// </summary>
-		/// <remarks>
-		/// If the capabilities are not available, the negotiation fails.
-		/// </remarks>
-		public SecurityCapabilities RequiredCapabilities
-		{
-			get => this._requiredCaps;
-			set
-			{
-				VerifyNew();
-				this._requiredCaps = value;
-			}
-		}
-
-		private bool _isInitialized;
-		protected void VerifyNew()
-		{
-			if (this._isInitialized)
-				throw new InvalidOperationException("Cannot change required capabilities once the context has begun negotiation.");
-		}
-
-		/// <summary>
-		/// Gets a <see cref="SecurityCapabilities"/> that specifies
-		/// which capabilities were negotiated.
-		/// </summary>
-		public abstract SecurityCapabilities NegotiatedCapabilities { get; }
-
-		/// <summary>
-		/// Gets a <see cref="SecurityCapabilities"/> indicating which capabilities the context can provide.
-		/// </summary>
-		/// This value is determined by the protocol and provider implementation, not by the negotiation.
-		/// <seealso cref="RequiredCapabilities"/>
-		/// <seealso cref="NegotiatedCapabilities"/>
-		public abstract SecurityCapabilities SupportedCapabilities { get; }
-
-		/// <summary>
-		/// Gets a value indicating whether this context supports signing.
-		/// </summary>
-		public bool SupportsSigning => 0 != (this.NegotiatedCapabilities & SecurityCapabilities.Integrity);
-		/// <summary>
-		/// Gets a value indicating whether this context supports sealing.
-		/// </summary>
-		public bool SupportsEncryption => 0 != (this.NegotiatedCapabilities & SecurityCapabilities.Confidentiality);
 
 		/// <summary>
 		/// Gets or sets the target service principal name.
@@ -142,7 +88,7 @@ namespace Titanis.Security
 		/// <returns>The token to send to the other party</returns>
 		public ReadOnlySpan<byte> Initialize()
 		{
-			this._isInitialized = true;
+			this.MarkUsed();
 			return this.InitializeImpl();
 		}
 		/// <summary>
@@ -157,7 +103,7 @@ namespace Titanis.Security
 		/// <returns>The token to send to the other party</returns>
 		public ReadOnlySpan<byte> Initialize(ReadOnlySpan<byte> token)
 		{
-			this._isInitialized = true;
+			this.MarkUsed();
 			return (token.Length == 0)
 				? this.Initialize()
 				: this.InitializeWithToken(token);
@@ -169,5 +115,15 @@ namespace Titanis.Security
 		/// <param name="token">Token received from the other party</param>
 		/// <returns>The token to send to the other party</returns>
 		protected abstract ReadOnlySpan<byte> InitializeWithToken(ReadOnlySpan<byte> token);
+
+		/// <summary>
+		/// Gets the implementing security context.
+		/// </summary>
+		/// <returns>The inner mechanism security context, if wrapped; otherwise, <see langword="this"/></returns>
+		/// <remarks>
+		/// This allows the caller to interact directly with the underlying security
+		/// context.
+		/// </remarks>
+		public virtual AuthClientContext GetMechContext() => this;
 	}
 }

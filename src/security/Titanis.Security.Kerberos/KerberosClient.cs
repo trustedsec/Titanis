@@ -652,9 +652,8 @@ namespace Titanis.Security.Kerberos
 			if (!ticketParameters.EndTime.HasValue)
 				ticketParameters.EndTime = tgt.EndTime ?? TicketParameters.DefaultEndTime;
 
-			// TODO: Using the subkey breaks RC4 HMAC with S4U
-			bool usingSubkey = false;
-			//bool usingSubkey = true;
+			//bool usingSubkey = false;
+			bool usingSubkey = true;
 			var sessionKey = usingSubkey ? tgt.GenerateSessionKey() : tgt.SessionKey;
 			TicketRequestContext context = new TicketRequestContext(null, sessionKey, usingSubkey);
 
@@ -1093,7 +1092,7 @@ namespace Titanis.Security.Kerberos
 			var socket = await socketService.ConnectTcp(kdcEP, cancellationToken).ConfigureAwait(false);
 			await using (socket)
 			{
-				KerberosClientContext authContext = new KerberosClientContext(credential, this, KerberosClient.ChangePwSpn, ticket, null);
+				var authContext = new MskileClientContext(credential, this, KerberosClient.ChangePwSpn, ticket, null);
 				authContext.RequiredCapabilities |= SecurityCapabilities.DceStyle;
 				var apreqBytes = authContext.Initialize().ToArray();
 
@@ -1680,19 +1679,19 @@ namespace Titanis.Security.Kerberos
 			Span<byte> rpcHeader = buffer.Slice(0, RpcHeaderSize);
 			Span<byte> stubData = buffer.Slice(RpcHeaderSize, cbBody);
 			Span<byte> authTrailer = buffer.Slice(RpcHeaderSize + cbBody, AuthHeaderSize);
-			Span<byte> sealTrailer = buffer.Slice(cbFrag - authLength, authLength);
+			Span<byte> wrapToken = buffer.Slice(cbFrag - authLength, authLength);
 			acceptorSubkey.UnsealMessage(
 				KeyUsage.InitiatorSeal,
 				(uint)(sendSeqNbr + 1),
 				WrapFlags.AcceptorSubkey | WrapFlags.Sealed,
 				new MessageSealParams(
-					default,
+					wrapToken,
 					SecBufferList.Create(
 						SecBuffer.Integrity(rpcHeader),
 						SecBuffer.PrivacyWithIntegrity(stubData),
 						SecBuffer.Integrity(authTrailer)
 					),
-					sealTrailer
+					default
 				));
 		}
 	}

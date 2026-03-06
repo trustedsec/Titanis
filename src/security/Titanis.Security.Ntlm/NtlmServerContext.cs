@@ -33,8 +33,10 @@ namespace Titanis.Security.Ntlm
 		/// <inheritdoc/>
 		public sealed override int Legs => 2;
 
+		public override SecurityCapabilities SupportedCapabilities => throw new NotImplementedException();
+		public override SecurityCapabilities NegotiatedCapabilities => throw new NotImplementedException();
 
-		public override ReadOnlySpan<byte> Accept()
+		protected override ReadOnlySpan<byte> AcceptImpl()
 		{
 			throw new NotImplementedException();
 		}
@@ -52,9 +54,6 @@ namespace Titanis.Security.Ntlm
 			set => this._state.serverVersion = value;
 		}
 		private readonly INtlmAuthStore store;
-
-		private Memory<byte> _token;
-		public override ReadOnlySpan<byte> Token => this._token.Span;
 
 		// Used in testing
 		internal void SetAuthState(
@@ -95,7 +94,7 @@ namespace Titanis.Security.Ntlm
 			set => this._state.dnsDomainName = value;
 		}
 
-		public override ReadOnlySpan<byte> Accept(ReadOnlySpan<byte> token)
+		protected override ReadOnlySpan<byte> AcceptImpl(ReadOnlySpan<byte> token)
 		{
 			if (this._state.negotiateFlags == 0)
 			{
@@ -103,12 +102,12 @@ namespace Titanis.Security.Ntlm
 				this._state.timestamp = DateTime.UtcNow;
 
 				Memory<byte> reply = HandleNegotiate(ref this._state, token);
-				return (this._token = reply).Span;
+				return reply.Span;
 			}
 			else
 			{
 				Memory<byte> reply = HandleAuth(token, null);
-				return (this._token = reply).Span;
+				return reply.Span;
 			}
 		}
 
@@ -305,7 +304,10 @@ namespace Titanis.Security.Ntlm
 
 		#region Message security
 		public override int SignTokenSize => NtlmMessageSignatureV1.StructSize;
-		public override int SealTrailerSize => NtlmMessageSignatureV1.StructSize;
+		private const int SealTokenSize = NtlmMessageSignatureV1.StructSize;
+		/// <inheritdoc/>
+		public override int GetWrapTokenSize(WrapOptions options)
+			=> SealTokenSize;
 
 		/// <inheritdoc/>
 		public sealed override void IncrementRecvSeqNbr()
@@ -354,8 +356,8 @@ namespace Titanis.Security.Ntlm
 			in MessageSealParams sealParams
 			)
 		{
-			if (sealParams.Header.Length != this.SealHeaderSize
-				|| sealParams.Trailer.Length != this.SealTrailerSize
+			if (sealParams.Header.Length != SealTokenSize
+				|| sealParams.Trailer.Length != 0
 				)
 				throw new ArgumentException("The header or trailer buffer size is incorrect.");
 			Ntlm.SealMessage(
@@ -371,8 +373,8 @@ namespace Titanis.Security.Ntlm
 			in MessageSealParams unsealParams
 			)
 		{
-			if (unsealParams.Header.Length != this.SealHeaderSize
-				|| unsealParams.Trailer.Length != this.SealTrailerSize
+			if (unsealParams.Header.Length != SealTokenSize
+				|| unsealParams.Trailer.Length != 0
 				)
 				throw new ArgumentException("The header or trailer buffer size is incorrect.");
 			Ntlm.UnsealMessage(

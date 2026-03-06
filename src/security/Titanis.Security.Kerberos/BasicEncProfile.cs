@@ -42,16 +42,37 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		protected sealed override int SpecificKeySizeBytes => this.KeySizeBytes;
 
+		private int SealHeaderSize =>
+				// Clear token
+				WrapToken.StructSize
+				// Confounder
+				+ this.CipherHeaderSizeBytes;
+		private int SealTrailerMinimumSize =>
+			// Encrypted token
+			+WrapToken.StructSize
+			// Checksum
+			+ this.CipherTrailerSizeBytes
+			;
+
 		// [RFC 4121] § 4.2.4 - Encryption and Checksum Operations
 		// [RFC 4121] § 4.2.6.2 - Wrap Tokens
 		// [MS-KILE] § 3.4.5.4.1 - Kerberos Binding of GSS_WrapEx()
 		/// <inheritdoc/>
-		public sealed override int SealHeaderSize => WrapToken.StructSize + this.CipherHeaderSizeBytes /* confounder */;
-		/// <inheritdoc/>
-		// [RFC 4121] § 4.2.4 - Encryption and Checksum Operations
-		// [RFC 4121] § 4.2.6.2 - Wrap Tokens
-		// [MS-KILE] § 3.4.5.4.1 - Kerberos Binding of GSS_WrapEx()
-		public sealed override int SealTrailerSize => this.CipherBlockSizeBytes + WrapToken.StructSize + this.CipherTrailerSizeBytes;
+		public override void GetWrapBufferSizes(WrapOptions options, out int requiredHeaderSize, out int requiredTrailerSize)
+		{
+			// For the confounder
+			requiredHeaderSize = this.SealHeaderSize;
+			requiredTrailerSize =
+				// EC
+				// NOTE: For an as-of-yet unknown reason, when used with LDAP, EC == 0,
+				// and setting EC according to [MS-KILE] results in an error.
+				// WrapOptions.Rpc provides a way to distinguish between RPC and LDAP
+				((0 != (options & WrapOptions.Rpc)) ? this.CipherBlockSizeBytes : 0)
+				// Encrypted token
+				// Checksum
+				+ this.SealTrailerMinimumSize
+				;
+		}
 
 		#region Key derivation
 		private void DeriveKey(ReadOnlySpan<byte> baseKey, ReadOnlySpan<byte> salt, Span<byte> keyBuffer)
@@ -377,34 +398,59 @@ namespace Titanis.Security.Kerberos
 			Debug.Assert(0 != (flags & WrapFlags.Sealed));
 			Debug.Assert(usage is KeyUsage.InitiatorSeal or KeyUsage.AcceptorSeal);
 
-			// TODO: Incorrect error message
-			//if (sealParams.Header.Length < this.SealHeaderSize)
-			//	throw new ArgumentException(Messages.Krb5_ChecksumBufferTooSmall, nameof(sealParams));
+			if (sealParams.Header.Length < this.SealHeaderSize)
+				throw new ArgumentException("The header buffer is too small.", nameof(sealParams));
 
-			var sealTrailer = sealParams.Header;
-			if (sealTrailer.Length < (this.SealTrailerSize + this.SealHeaderSize))
-				throw new ArgumentException(Messages.Krb5_ChecksumBufferTooSmall, nameof(sealParams));
+			ref WrapToken clearToken = ref MemoryMarshal.AsRef<WrapToken>(sealParams.Header.Slice(0, WrapToken.StructSize));
 
-			ref WrapToken clearToken = ref MemoryMarshal.AsRef<WrapToken>(sealTrailer.Slice(0, WrapToken.StructSize));
+			int rrc;
+			int ec;
+			Span<byte> wrapTrailer;
+			Span<byte> confounder;
+			if (sealParams.Trailer.Length == 0)
+			{
+				// This requires rotation
+
+				var cbTrailer = sealParams.Header.Length - this.SealHeaderSize;
+				if (cbTrailer < this.SealTrailerMinimumSize)
+					throw new ArgumentException("The header buffer is too small.", nameof(sealParams));
+
+				rrc = WrapToken.StructSize + this.CipherTrailerSizeBytes;
+				ec = cbTrailer - this.SealTrailerMinimumSize;
+
+				wrapTrailer = sealParams.Header.Slice(WrapToken.StructSize, cbTrailer);
+				confounder = sealParams.Header.Slice(WrapToken.StructSize + cbTrailer, this.CipherHeaderSizeBytes);
+
+				Debug.Assert(sealParams.Header.Length == (WrapToken.StructSize + wrapTrailer.Length + confounder.Length));
+			}
+			else if (sealParams.Trailer.Length >= this.SealTrailerMinimumSize)
+			{
+				rrc = 0;
+				ec = sealParams.Trailer.Length - this.SealTrailerMinimumSize;
+
+				confounder = sealParams.Header.Slice(WrapToken.StructSize, this.CipherBlockSizeBytes);
+				wrapTrailer = sealParams.Trailer;
+			}
+			else
+				throw new ArgumentException("The wrap buffers are too small.", nameof(sealParams));
 
 			var cbBlock = this.CipherBlockSizeBytes;
 
-			var wrapTrailer = sealTrailer.Slice(WrapToken.StructSize, cbBlock + WrapToken.StructSize);
-			var checksum = sealTrailer.Slice(WrapToken.StructSize + wrapTrailer.Length, this.ChecksumSizeBytes);
-			var confounder = sealTrailer.Slice(WrapToken.StructSize + wrapTrailer.Length + checksum.Length, cbBlock);
+			ref WrapToken encToken = ref MemoryMarshal.AsRef<WrapToken>(wrapTrailer.Slice(ec, WrapToken.StructSize));
+			var checksum = wrapTrailer.Slice(ec + WrapToken.StructSize, this.ChecksumSizeBytes);
+			wrapTrailer = wrapTrailer.Slice(0, WrapToken.StructSize + ec);
 
-			ref WrapToken encToken = ref MemoryMarshal.AsRef<WrapToken>(wrapTrailer.Slice(cbBlock, WrapToken.StructSize));
 			encToken = new WrapToken
 			{
 				TokID = WrapTokenType.Wrap,
 				flags = flags,
 				filler_FF = 0xFF,
-				ExtraCount = (ushort)cbBlock,
+				ExtraCount = (ushort)ec,
 				Rrc = 0,
 				SeqNbr = seqNbr
 			};
 			clearToken = encToken;
-			clearToken.Rrc = (ushort)(cbBlock + this.ChecksumSizeBytes);
+			clearToken.Rrc = (ushort)rrc;
 
 			var combined = sealParams.bufferList.WithCombined(
 				default,
@@ -422,41 +468,48 @@ namespace Titanis.Security.Kerberos
 		{
 			Debug.Assert(0 != (flags & WrapFlags.Sealed));
 			Debug.Assert(usage is KeyUsage.InitiatorSeal or KeyUsage.AcceptorSeal);
-			Debug.Assert((usage == KeyUsage.AcceptorSeal) == (0 != (flags & WrapFlags.SentByAcceptor)));
 
 			var sealHeader = sealParams.Header;
-			if (sealHeader.Length < this.SealHeaderSize)
+			if (sealHeader.Length < WrapToken.StructSize)
 				throw new ArgumentException("The header is too small.", nameof(sealParams));
 
 			ref WrapToken clearToken = ref MemoryMarshal.AsRef<WrapToken>(sealHeader.Slice(0, WrapToken.StructSize));
 
+			int cbHeader = this.SealHeaderSize;
+			int cbTrailer =
+				// Padding
+				clearToken.ExtraCount
+				// Encrypted token
+				+ WrapToken.StructSize
+				// Checksum
+				+ this.CipherTrailerSizeBytes
+				;
+
 			var sealTrailer = sealParams.Trailer;
-			int rrc;
-			if (sealHeader.Length == this.SealHeaderSize && sealTrailer.Length == this.SealTrailerSize)
+			if (sealHeader.Length == cbHeader && sealTrailer.Length == cbTrailer)
 			{
-				rrc = 0;
 				sealHeader = sealHeader.Slice(WrapToken.StructSize);
 			}
-			else if (sealTrailer.Length == 0 && sealHeader.Length == (this.SealHeaderSize + this.SealTrailerSize))
+			else if (sealTrailer.Length == 0 && sealHeader.Length == (cbHeader + cbTrailer))
 			{
 				sealHeader = sealHeader.Slice(WrapToken.StructSize);
 
 				// [MS-KILE] § 3.4.5.4.1 Kerberos Binding of GSS_WrapEx()
-				rrc = clearToken.Rrc + clearToken.ExtraCount;
-				if (rrc == this.SealTrailerSize)
+				int rotated = clearToken.Rrc + clearToken.ExtraCount;
+				if (rotated == cbTrailer)
 				{
-					sealTrailer = sealHeader.Slice(0, rrc);
-					sealHeader = sealHeader.Slice(rrc);
+					sealTrailer = sealHeader.Slice(0, rotated);
+					sealHeader = sealHeader.Slice(rotated);
 				}
 				else
 				{
 					byte[] rrcBuffer = new byte[sealHeader.Length];
 
-					sealHeader.Slice(rrc).CopyTo(rrcBuffer);
-					sealHeader.Slice(0, rrc).CopyTo(rrcBuffer.AsSpan(rrcBuffer.Length - rrc));
+					sealHeader.Slice(rotated).CopyTo(rrcBuffer);
+					sealHeader.Slice(0, rotated).CopyTo(rrcBuffer.AsSpan(rrcBuffer.Length - rotated));
 
-					sealHeader = rrcBuffer.AsSpan(0, this.SealHeaderSize - WrapToken.StructSize);
-					sealTrailer = rrcBuffer.AsSpan(rrcBuffer.Length - this.SealTrailerSize);
+					sealHeader = rrcBuffer.AsSpan(0, cbHeader - WrapToken.StructSize);
+					sealTrailer = rrcBuffer.AsSpan(rrcBuffer.Length - cbTrailer);
 				}
 			}
 			else
@@ -470,7 +523,8 @@ namespace Titanis.Security.Kerberos
 				&& (clearToken.flags == flags)
 				&& (clearToken.filler_FF == 0xFF)
 				//&& (ec == this.CipherBlockSizeBytes)
-				&& (clearToken.Rrc == (CipherBlockSizeBytes + this.ChecksumSizeBytes))
+				// UNDONE: Not necessary
+				//&& (clearToken.Rrc == rrc)
 				&& (clearToken.SeqNbr == seqNbr)
 				;
 			if (!isClearTokenValid)

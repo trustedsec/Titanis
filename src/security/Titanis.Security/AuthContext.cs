@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Titanis.Security
@@ -27,6 +28,10 @@ namespace Titanis.Security
 		/// </summary>
 		public abstract ReadOnlySpan<byte> Token { get; }
 
+		/// <summary>
+		/// Gets the mechanism ID that identifies this authentication mechanism within a GSS API context.
+		/// </summary>
+		public virtual Oid? MechOid => null;
 		/// <summary>
 		/// Gets the number of legs required for authentication.
 		/// </summary>
@@ -63,7 +68,7 @@ namespace Titanis.Security
 		/// <summary>
 		/// When implemented in a derived class, gets the session key.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>Bytes composing the session key</returns>
 		protected abstract ReadOnlySpan<byte> GetSessionKeyImpl();
 
 		/// <summary>
@@ -79,6 +84,64 @@ namespace Titanis.Security
 		/// If the context does not signing, this property returns <c>0</c>.
 		/// </remarks>
 		public virtual int SignTokenSize => 0;
+
+		#region Capabilities
+
+		public bool IsDceRpcStyle => (0 != (this._requiredCaps & SecurityCapabilities.DceStyle));
+		public bool IsMutualAuthRequired => (0 != (this._requiredCaps & SecurityCapabilities.MutualAuthentication));
+
+		private SecurityCapabilities _requiredCaps;
+		/// <summary>
+		/// Gets or sets a <see cref="SecurityCapabilities"/> that specifies
+		/// capabilities that must be negotiated.
+		/// </summary>
+		/// <remarks>
+		/// If the capabilities are not available, the negotiation fails.
+		/// </remarks>
+		public SecurityCapabilities RequiredCapabilities
+		{
+			get => this._requiredCaps;
+			set
+			{
+				VerifyNew();
+				this._requiredCaps = value;
+			}
+		}
+
+		private bool _isUsed;
+		protected void VerifyNew()
+		{
+			if (this._isUsed)
+				throw new InvalidOperationException("Cannot change required capabilities once the context has begun negotiation.");
+		}
+		private protected void MarkUsed()
+		{
+			this._isUsed = true;
+		}
+
+		/// <summary>
+		/// Gets a <see cref="SecurityCapabilities"/> that specifies
+		/// which capabilities were negotiated.
+		/// </summary>
+		public abstract SecurityCapabilities NegotiatedCapabilities { get; }
+
+		/// <summary>
+		/// Gets a <see cref="SecurityCapabilities"/> indicating which capabilities the context can provide.
+		/// </summary>
+		/// This value is determined by the protocol and provider implementation, not by the negotiation.
+		/// <seealso cref="AuthContext.RequiredCapabilities"/>
+		/// <seealso cref="NegotiatedCapabilities"/>
+		public abstract SecurityCapabilities SupportedCapabilities { get; }
+
+		/// <summary>
+		/// Gets a value indicating whether this context supports signing.
+		/// </summary>
+		public bool SupportsSigning => 0 != (this.NegotiatedCapabilities & SecurityCapabilities.Integrity);
+		/// <summary>
+		/// Gets a value indicating whether this context supports sealing.
+		/// </summary>
+		public bool SupportsEncryption => 0 != (this.NegotiatedCapabilities & SecurityCapabilities.Confidentiality);
+		#endregion
 
 		/// <summary>
 		/// Signs a message.
@@ -123,19 +186,42 @@ namespace Titanis.Security
 		#endregion
 		#region Sealing
 		/// <summary>
-		/// Gets the size required for the sealing token header.
+		/// Gets the required buffer sizes for wrapping a message.
 		/// </summary>
+		/// <param name="options">Options</param>
+		/// <param name="requiredHeaderSize">Size required for the header buffer</param>
+		/// <param name="requiredTrailerSize">Size required for the trailer buffer</param>
 		/// <remarks>
-		/// If the context does not support sealing, this property returns <c>0</c>.
+		/// By calling this overload, the caller indicates that it can accommodate separate buffers for a header and a trailer.
 		/// </remarks>
-		public virtual int SealHeaderSize => 0;
+		public virtual void GetWrapBufferSizes(WrapOptions options, out int requiredHeaderSize, out int requiredTrailerSize)
+		{
+			requiredHeaderSize = this.GetWrapTokenSize(options);
+			requiredTrailerSize = 0;
+		}
 		/// <summary>
-		/// Gets the size required for the sealing token trailer.
+		/// Gets the sizes of the header and trailer from a message buffer.
 		/// </summary>
+		/// <param name="messageBuffer">Buffer containing received message</param>
+		/// <param name="options">Options</param>
+		/// <param name="headerSize">Size of the header</param>
+		/// <param name="trailerSize">Size of the trailer</param>
 		/// <remarks>
-		/// If the context does not support sealing, this property returns <c>0</c>.
+		/// This method is for the case where the message and token are combined into the same buffer (e.g. LDAP, SASL).
 		/// </remarks>
-		public virtual int SealTrailerSize => 0;
+		public virtual void GetUnwrapBufferSizes(ReadOnlySpan<byte> messageBuffer, WrapOptions options, out int headerSize, out int trailerSize)
+		{
+			this.GetWrapBufferSizes(options, out headerSize, out trailerSize);
+		}
+		/// <summary>
+		/// Gets the required token buffer size for wrapping a message.
+		/// </summary>
+		/// <param name="options">Options</param>
+		/// <returns>Size required for the token buffer in bytes</returns>
+		/// <remarks>
+		/// By calling this overload, the caller indicates that it can only accommodate a single token buffer.  In other words, it cannot accommodate a separate buffer for both a header and a trailer.
+		/// </remarks>
+		public abstract int GetWrapTokenSize(WrapOptions options);
 
 		/// <summary>
 		/// Seals a message.
@@ -186,5 +272,19 @@ namespace Titanis.Security
 			GC.SuppressFinalize(this);
 		}
 		#endregion
+	}
+
+	[Flags]
+	public enum WrapOptions
+	{
+		None = 0,
+		/// <summary>
+		/// Message buffer requests confidentiality
+		/// </summary>
+		Confidentiality = 1,
+		/// <summary>
+		/// Wrap message for RPC
+		/// </summary>
+		Rpc = 0x10,
 	}
 }

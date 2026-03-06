@@ -93,9 +93,13 @@ namespace Titanis.Security.Spnego
 		public sealed override int SignTokenSize
 			=> this.GetCompletedContext().SignTokenSize;
 		/// <inheritdoc/>
-		public sealed override int SealHeaderSize => this.GetCompletedContext().SealHeaderSize;
+		public override int GetWrapTokenSize(WrapOptions options)
+			=> this.GetCompletedContext().GetWrapTokenSize(options);
 		/// <inheritdoc/>
-		public sealed override int SealTrailerSize => this.GetCompletedContext().SealTrailerSize;
+		public override void GetWrapBufferSizes(WrapOptions options, out int requiredHeaderSize, out int requiredTrailerSize)
+		{
+			this.GetCompletedContext().GetWrapBufferSizes(options, out requiredHeaderSize, out requiredTrailerSize);
+		}
 
 		// Used for compute MIC
 		private Asn1Oid[]? _mechTypeList;
@@ -123,6 +127,8 @@ namespace Titanis.Security.Spnego
 			{
 				SyncAuthSettings(ctx);
 			}
+
+			this.Contexts.Add(new NegoexClientContext());
 
 			this._initiator = SpnegoInitiator.Client;
 
@@ -335,6 +341,9 @@ namespace Titanis.Security.Spnego
 			preferred = false;
 			return null;
 		}
+
+		/// <inheritdoc/>
+		public override AuthClientContext GetMechContext() => this.GetCompletedContext().GetMechContext();
 
 		public sealed override void IncrementRecvSeqNbr()
 		{

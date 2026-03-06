@@ -41,7 +41,7 @@ namespace Titanis.Security.Kerberos
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	record struct WrapToken
 	{
-		internal static unsafe int StructSize => sizeof(WrapToken);
+		internal const int StructSize = 16;
 
 		private UInt16NE tokID;
 		internal WrapTokenType TokID

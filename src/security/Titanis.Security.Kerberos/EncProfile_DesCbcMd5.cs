@@ -23,9 +23,11 @@ namespace Titanis.Security.Kerberos
 
 		public override int SignTokenSize => throw new NotImplementedException();
 
-		public override int SealHeaderSize => throw new NotImplementedException();
-
-		public override int SealTrailerSize => throw new NotImplementedException();
+		/// <inheritdoc/>
+		public override void GetWrapBufferSizes(WrapOptions options, out int requiredHeaderSize, out int requiredTrailerSize)
+		{
+			throw new NotImplementedException();
+		}
 
 		public sealed override int CipherHeaderSizeBytes => 8 + this.ChecksumSizeBytes;
 
@@ -290,7 +292,7 @@ namespace Titanis.Security.Kerberos
 	{
 		public override int ChecksumSizeBytes => 128 / 8;
 
-		internal override EType EType => EType.DesCbcMd5;
+		public override EType EType => EType.DesCbcMd5;
 
 		internal override EncChecksumType ChecksumType => EncChecksumType.RsaMd5Des;
 

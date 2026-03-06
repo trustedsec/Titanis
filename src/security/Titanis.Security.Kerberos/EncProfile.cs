@@ -99,18 +99,18 @@ namespace Titanis.Security.Kerberos
 		// [RFC 4121] § 4.2.6.1 - MIC Tokens
 		public abstract int SignTokenSize { get; }
 
-		/// <summary>
-		/// Gets the size required for the sealing token header.
-		/// </summary>
 		// [RFC 4121] § 4.2.4 - Encryption and Checksum Operations
 		// [RFC 4121] § 4.2.6.2 - Wrap Tokens
-		public abstract int SealHeaderSize { get; }
 		/// <summary>
-		/// Gets the size required for the sealing token trailer.
+		/// Gets the required buffer sizes for wrapping a message.
 		/// </summary>
-		// [RFC 4121] § 4.2.4 - Encryption and Checksum Operations
-		// [RFC 4121] § 4.2.6.2 - Wrap Tokens
-		public abstract int SealTrailerSize { get; }
+		/// <param name="options">Options</param>
+		/// <param name="requiredHeaderSize">Size required for the header buffer</param>
+		/// <param name="requiredTrailerSize">Size required for the trailer buffer</param>
+		/// <remarks>
+		/// By calling this overload, the caller indicates that it can accommodate separate buffers for a header and a trailer.
+		/// </remarks>
+		public abstract void GetWrapBufferSizes(WrapOptions options, out int requiredHeaderSize, out int requiredTrailerSize);
 
 		/// <summary>
 		/// Gets the size of the header required for encryption, in bytes.
@@ -124,7 +124,7 @@ namespace Titanis.Security.Kerberos
 		/// <summary>
 		/// Gets the <see cref="EType"/> value for this encryption profile.
 		/// </summary>
-		internal abstract EType EType { get; }
+		public abstract EType EType { get; }
 
 		/// <summary>
 		/// Gets the <see cref="EncChecksumType"/> value for this encryption profile.

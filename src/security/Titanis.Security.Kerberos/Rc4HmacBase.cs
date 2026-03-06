@@ -64,9 +64,11 @@ namespace Titanis.Security.Kerberos
 		public sealed override int CipherHeaderSizeBytes => Rc4HmacHeaderSize;
 
 		/// <inheritdoc/>
-		public sealed override int SealHeaderSize => 0;
-		/// <inheritdoc/>
-		public sealed override int SealTrailerSize => 0;
+		public override void GetWrapBufferSizes(WrapOptions options, out int requiredHeaderSize, out int requiredTrailerSize)
+		{
+			requiredHeaderSize = 0;
+			requiredTrailerSize = 0;
+		}
 
 		/// <summary>
 		/// Describes the structure of a sealed message.
@@ -314,6 +316,7 @@ namespace Titanis.Security.Kerberos
 			public WrapMic checksum;
 		}
 
+		// [RFC 4757] § 7.2. GSS-API MIC Semantics
 		internal sealed override void SignMessage(ReadOnlySpan<byte> sessionKey, KeyUsage usage, uint seqNbr, WrapFlags flags, in MessageSignParams signParams)
 		{
 			if (signParams.MacBuffer.Length != WrapToken.StructSize)
@@ -383,7 +386,7 @@ namespace Titanis.Security.Kerberos
 	// [RFC 4757]
 	public sealed class Rc4Hmac : Rc4HmacBase
 	{
-		internal sealed override EType EType => EType.Rc4Hmac;
+		public sealed override EType EType => EType.Rc4Hmac;
 
 		private protected sealed override void DeriveKey(ReadOnlySpan<byte> protoKey, int T, ref Keys keyBuffer)
 		{
@@ -409,7 +412,7 @@ namespace Titanis.Security.Kerberos
 	public sealed class Rc4HmacExp : Rc4HmacBase
 	{
 		/// <inheritdoc/>
-		internal sealed override EType EType => EType.Rc4HmacExp;
+		public sealed override EType EType => EType.Rc4HmacExp;
 
 		// [RFC 4757] § 5. Encryption Types
 		private static readonly byte[] FortyBits = new byte[] {

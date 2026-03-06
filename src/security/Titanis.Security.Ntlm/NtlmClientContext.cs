@@ -862,8 +862,9 @@ namespace Titanis.Security.Ntlm
 
 
 
-		public sealed override int SealHeaderSize => NtlmMessageSignatureV1.StructSize;
-		public sealed override int SealTrailerSize => 0;
+		private const int SealTokenSize = NtlmMessageSignatureV1.StructSize;
+		/// <inheritdoc/>
+		public override int GetWrapTokenSize(WrapOptions options) => SealTokenSize;
 
 		public sealed override void SealMessage(
 			in MessageSealParams sealParams
@@ -873,7 +874,7 @@ namespace Titanis.Security.Ntlm
 			if (tokenBuffer.Length == 0)
 				tokenBuffer = sealParams.Trailer;
 
-			if (tokenBuffer.Length != this.SealHeaderSize
+			if (tokenBuffer.Length != SealTokenSize
 				)
 				throw new ArgumentException("The header or trailer buffer size is incorrect.");
 			Ntlm.SealMessage(
@@ -889,8 +890,8 @@ namespace Titanis.Security.Ntlm
 			in MessageSealParams unsealParams
 			)
 		{
-			if (unsealParams.Header.Length != this.SealHeaderSize
-				|| unsealParams.Trailer.Length != this.SealTrailerSize
+			if (unsealParams.Header.Length != SealTokenSize
+				|| unsealParams.Trailer.Length != 0
 				)
 				throw new ArgumentException("The header or trailer buffer size is incorrect.");
 			Ntlm.UnsealMessage(

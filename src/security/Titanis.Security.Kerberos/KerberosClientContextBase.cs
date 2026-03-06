@@ -15,11 +15,13 @@ using Titanis.Asn1.Serialization;
 namespace Titanis.Security.Kerberos
 {
 	/// <summary>
-	/// Provides functionality to authenticate as a Kerberos client.
+	/// Implements a Kerberos authentication client.
 	/// </summary>
-	public sealed class KerberosClientContext : AuthClientContext
+	/// <seealso cref="MskileClientContext"/>
+	/// <seealso cref="KerberosClientContext"/>
+	public abstract class KerberosClientContextBase : AuthClientContext
 	{
-		public KerberosClientContext(
+		public KerberosClientContextBase(
 			KerberosCredential credential,
 			KerberosClient client,
 			ServicePrincipalName targetSpn,
@@ -79,10 +81,8 @@ namespace Titanis.Security.Kerberos
 		/// Gets the OID for [MS-KILE]
 		/// </summary>
 		public static readonly Oid MskileOid = new Oid("1.2.840.48018.1.2.2");
-		/// <inheritdoc/>
-		public sealed override Oid MechOid => MskileOid;
 
-		private SessionKey GetSessionKeyStruct()
+		private SessionKey VerifySessionKey()
 		{
 			var sessionKey = this._sessionKey;
 			if (sessionKey == null)
@@ -104,7 +104,7 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		public sealed override bool HasSessionKey => true;
 		/// <inheritdoc/>
-		public sealed override int SessionKeySize => this.GetSessionKeyStruct().key.keyvalue.Length;
+		public sealed override int SessionKeySize => this.VerifySessionKey().key.keyvalue.Length;
 
 		public TicketInfo Ticket { get; }
 
@@ -114,7 +114,7 @@ namespace Titanis.Security.Kerberos
 		public SessionKey? InitiatorSubkey { get; private set; }
 		public SessionKey? AcceptorSubkey { get; private set; }
 		private SessionKey? _sessionKey;
-		private bool _isAcceptorSubkey = true;
+		private bool _useAcceptorSubkey = true;
 
 		public int SendSeqNbr { get; private set; }
 		public uint RecvSeqNbr { get; private set; }
@@ -217,7 +217,7 @@ namespace Titanis.Security.Kerberos
 			{
 				this.AcceptorSubkey = this._client.CreateSessionKeyFor(aprep_encPart.subkey);
 				this._sessionKey = this.AcceptorSubkey;
-				this._isAcceptorSubkey = true;
+				this._useAcceptorSubkey = true;
 			}
 
 			this._callback?.OnReceivedAprep(this, this.RecvSeqNbr, this.AcceptorSubkey);
@@ -252,7 +252,7 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		protected sealed override ReadOnlySpan<byte> GetSessionKeyImpl()
 		{
-			return this.GetSessionKeyStruct().key.keyvalue;
+			return this.VerifySessionKey().key.keyvalue;
 		}
 
 		private static Exception MakeBadMacSizeException(string paramName)
@@ -262,17 +262,23 @@ namespace Titanis.Security.Kerberos
 
 
 		/// <inheritdoc/>
-		public sealed override int SignTokenSize => this.GetSessionKeyStruct().EncryptionProfile.SignTokenSize;
+		public sealed override int SignTokenSize => this.VerifySessionKey().EncryptionProfile.SignTokenSize;
+
 		/// <inheritdoc/>
 		/// <remarks>
-		/// The value of this property depends on which encryption profile was negotiated.
+		/// Kerberos supports header rotation to effectively combine the header and trailer into a single token buffer.
 		/// </remarks>
-		public sealed override int SealHeaderSize => this.GetSessionKeyStruct().EncryptionProfile.SealHeaderSize;
+		public sealed override int GetWrapTokenSize(WrapOptions options)
+		{
+			this.GetWrapBufferSizes(options, out var header, out var trailer);
+			return header + trailer;
+		}
 		/// <inheritdoc/>
-		/// <remarks>
-		/// The value of this property depends on which encryption profile was negotiated.
-		/// </remarks>
-		public sealed override int SealTrailerSize => this.GetSessionKeyStruct().EncryptionProfile.SealTrailerSize;
+		public override void GetWrapBufferSizes(WrapOptions options, out int requiredHeaderSize, out int requiredTrailerSize)
+		{
+			var encProfile = this.VerifySessionKey().EncryptionProfile;
+			encProfile.GetWrapBufferSizes(options, out requiredHeaderSize, out requiredTrailerSize);
+		}
 
 		/// <inheritdoc/>
 		public sealed override void IncrementRecvSeqNbr()
@@ -289,8 +295,8 @@ namespace Titanis.Security.Kerberos
 			if (signParams.MacBuffer.Length != this.SignTokenSize)
 				throw MakeBadMacSizeException(nameof(signParams));
 
-			var sessionKey = this.GetSessionKeyStruct();
-			var flags = this._isAcceptorSubkey
+			var sessionKey = this.VerifySessionKey();
+			var flags = this._useAcceptorSubkey
 				? (WrapFlags.AcceptorSubkey)
 				: WrapFlags.None;
 
@@ -310,8 +316,8 @@ namespace Titanis.Security.Kerberos
 			if (verifyParams.MacBuffer.Length != this.SignTokenSize)
 				throw MakeBadMacSizeException(nameof(verifyParams));
 
-			var sessionKey = this.GetSessionKeyStruct();
-			var flags = WrapFlags.SentByAcceptor | (this._isAcceptorSubkey
+			var sessionKey = this.VerifySessionKey();
+			var flags = WrapFlags.SentByAcceptor | (this._useAcceptorSubkey
 				? (WrapFlags.AcceptorSubkey)
 				: WrapFlags.None);
 
@@ -333,10 +339,10 @@ namespace Titanis.Security.Kerberos
 		public sealed override void SealMessage(in MessageSealParams sealParams)
 		{
 			Debug.Assert(this.NegotiatedConfidentiality);
-			var sessionKey = this.GetSessionKeyStruct();
+			var sessionKey = this.VerifySessionKey();
 
 			uint seqNbr = this.GetSeqNbrForSend();
-			var flags = this._isAcceptorSubkey
+			var flags = this._useAcceptorSubkey
 				? (WrapFlags.Sealed | WrapFlags.AcceptorSubkey)
 				: WrapFlags.Sealed;
 			sessionKey.SealMessage(
@@ -350,10 +356,11 @@ namespace Titanis.Security.Kerberos
 		/// <inheritdoc/>
 		public sealed override void UnsealMessage(in MessageSealParams unsealParams)
 		{
-			SessionKey sessionKey = this.GetSessionKeyStruct();
+			Debug.Assert(this.NegotiatedConfidentiality);
+			SessionKey sessionKey = this.VerifySessionKey();
 
 			uint seqNbr = (uint)(this.RecvSeqNbr++);
-			var flags = this._isAcceptorSubkey
+			var flags = this._useAcceptorSubkey
 				? (WrapFlags.Sealed | WrapFlags.AcceptorSubkey)
 				: WrapFlags.Sealed;
 
@@ -380,5 +387,45 @@ namespace Titanis.Security.Kerberos
 
 			return privBytes.ToArray();
 		}
+	}
+	/// <summary>
+	/// Implements a Kerberos authentication client.
+	/// </summary>
+	/// <remarks>
+	/// This class presents the RFC 4120 Kerberos mechanism OID.
+	/// </remarks>
+	public sealed class KerberosClientContext : KerberosClientContextBase
+	{
+		public KerberosClientContext(
+			KerberosCredential credential,
+			KerberosClient client,
+			ServicePrincipalName targetSpn,
+			TicketInfo ticket,
+			IKerberosCallback? callback = null
+			)
+			: base(credential, client, targetSpn, ticket, callback)
+		{ }
+		/// <inheritdoc/>
+		public sealed override Oid MechOid => KerberosOid;
+	}
+	/// <summary>
+	/// Implements a Kerberos authentication client.
+	/// </summary>
+	/// <remarks>
+	/// This class presents the [MS-KILE] Kerberos mechanism OID.
+	/// </remarks>
+	public sealed class MskileClientContext : KerberosClientContextBase
+	{
+		public MskileClientContext(
+			KerberosCredential credential,
+			KerberosClient client,
+			ServicePrincipalName targetSpn,
+			TicketInfo ticket,
+			IKerberosCallback? callback = null
+			)
+			: base(credential, client, targetSpn, ticket, callback)
+		{ }
+		/// <inheritdoc/>
+		public sealed override Oid MechOid => MskileOid;
 	}
 }

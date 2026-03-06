@@ -1215,7 +1215,7 @@ LmChallengeResponse [0..7]))
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	internal struct NtlmMessageSignatureV1 : IEquatable<NtlmMessageSignatureV1>
 	{
-		internal unsafe static int StructSize => sizeof(NtlmMessageSignatureV1);
+		internal const int StructSize = 16;
 
 		internal uint version;
 		internal uint randomPad;
