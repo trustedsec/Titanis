@@ -50,6 +50,19 @@ namespace Titanis.Winterop.Registry
 		Qword = 11,
 	}
 
+	// [MS-RRP] § 3.1.1.5 Values
+	public enum RegistryValueTypeAlt
+	{
+		NONE = 0,
+		SZ = 1,
+		EXPAND_SZ = 2,
+		BINARY = 3,
+		DWORD = 4,
+		DWORD_BIG_ENDIAN = 5,
+		MULTI_SZ = 7,
+		QWORD = 11,
+	}
+
 	// [MS-RRP] § 3.1.5.27 BaseRegSaveKeyEx (Opnum 31
 	public enum RegistrySaveFormat
 	{
@@ -84,8 +97,8 @@ namespace Titanis.Winterop.Registry
 	public interface IRegistryKey : IAsyncDisposable
 	{
 		Task<IRegistryKey> OpenSubkey(string subkeyPath, RegistryAccessRights access, RegistryKeyOptions options, CancellationToken cancellationToken);
-        Task<RegistryKeyInfo> QueryInfo(CancellationToken cancellationToken);
+		Task<RegistryKeyInfo> QueryInfo(CancellationToken cancellationToken);
 		Task<RegistryValueInfo> GetValue(string? name, CancellationToken cancellationToken);
 		IAsyncEnumerable<RegistrySubkeyInfo> GetSubkeyNames(CancellationToken cancellationToken);
-    }
+	}
 }
