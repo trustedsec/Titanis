@@ -282,7 +282,7 @@ namespace Titanis.Smb2
 				conn._preauthHashAlg = preauthHashAlg;
 				conn._preauthIntegrityValue = preauthIntegrityValue;
 
-				channel.Start();
+				await channel.Start().ConfigureAwait(false);
 				channel = null;
 
 				return conn;
