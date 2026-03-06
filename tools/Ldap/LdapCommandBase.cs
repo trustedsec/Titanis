@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Security;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -14,6 +16,7 @@ using Titanis.Certificates;
 using Titanis.Cli;
 using Titanis.Ldap;
 using Titanis.Net;
+using Titanis.Security;
 
 namespace Ldap
 {
@@ -29,7 +32,7 @@ namespace Ldap
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public NetworkParameters NetworkParams { get; set; }
 
-		[Parameter(10)]
+		[Parameter(0)]
 		[Mandatory]
 		[Description("Name of LDAP server")]
 		public string ServerName { get; set; }
@@ -58,6 +61,8 @@ namespace Ldap
 
 		private X509Certificate2Collection? _sslCerts;
 		private X509Certificate2? _sslCert;
+		private UserPrincipalName? _sslUpn;
+
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			base.ValidateParameters(context);
@@ -68,38 +73,17 @@ namespace Ldap
 			{
 				if (this.SslCert != null)
 				{
-					this.Log.WriteDiagnostic($"Opening SSL certificate file {this.SslCert}");
-					var certFileName = this.ResolveFsPath(this.SslCert);
-					try
-					{
-						X509Certificate2Collection store = CertificateHelper.LoadFrom(this.SslCert, this.SslKeyFile, this.SslKeyPassword, true);
-
-						var certsWithPrivateKey = store.Where(r => r.HasPrivateKey).ToList();
-						if (certsWithPrivateKey.Count == 1)
-						{
-							this._sslCert = certsWithPrivateKey[0];
-						}
-						else
-						{
-							var certsWithClientAuth = certsWithPrivateKey.Where(r => r.HasEku(ExtendedKeyUsages.ClientAuthentication)).ToList();
-							if (certsWithClientAuth.Count >= 1)
-								this._sslCert = certsWithClientAuth[0];
-						}
-
-						if (this._sslCert != null)
-						{
-							this.WriteVerbose($"Selected certificate {this._sslCert.Subject}");
-						}
-						else
-						{
-							this.WriteError($"None of the provided certificates have a private key and the Client Authentication ({ExtendedKeyUsages.ClientAuthentication}) EKU");
-						}
-
-					}
-					catch (CryptographicException ex) when (this.SslKeyPassword is null)
-					{
-						context.LogError($"Certificate file {certFileName} is encrypted.  Use -{nameof(SslKeyPassword)} to specify the password to use to decrypt this file.");
-					}
+					AuthenticationParameters.LoadCertificateAndKey(
+						this.VerifyContext(),
+						SslCert,
+						SslKeyFile,
+						SslKeyPassword,
+						this.Log,
+						context,
+						out this._sslCert,
+						out this._sslCerts,
+						out this._sslUpn
+						);
 				}
 			}
 			else
