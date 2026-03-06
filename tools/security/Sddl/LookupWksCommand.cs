@@ -19,6 +19,7 @@ internal class LookupWksCommand : Command
 {
 	[Parameter(0)]
 	[Mandatory]
+	[Description("SID or WKS of interest")]
 	public SecurityIdentifier[] SidOrWks { get; set; }
 
 	protected override Task<int> RunAsync(CancellationToken cancellationToken)

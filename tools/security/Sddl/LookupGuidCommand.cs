@@ -18,6 +18,7 @@ internal class LookupGuidCommand : Command
 {
 	[Parameter(0)]
 	[Mandatory]
+	[Description("GUID of interest")]
 	public Guid[] Guid { get; set; }
 
 	protected override Task<int> RunAsync(CancellationToken cancellationToken)
