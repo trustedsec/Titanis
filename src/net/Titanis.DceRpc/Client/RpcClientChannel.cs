@@ -284,7 +284,7 @@ namespace Titanis.DceRpc.Client
 				this._pendingRequests.Add(callId, pendingRequest);
 
 			int authLength = (context.authContext != null)
-				? context.authContext.MessageAuthTokenSize
+				? context.authContext.GetMessageAuthTokenSize()
 				: 0;
 			PfcFlags flags = (stubData.HasObjectId)
 				? PfcFlags.ObjectUuid
@@ -320,7 +320,7 @@ namespace Titanis.DceRpc.Client
 				{
 					var writer = RpcPduWriter.Create();
 					int authLength = (pendingRequest.bindContext.authContext != null)
-						? pendingRequest.bindContext.authContext.MessageAuthTokenSize
+					? pendingRequest.bindContext.authContext.GetMessageAuthTokenSize()
 						: 0;
 					await this.SendPduAsync(
 						PduType.CoCancel, PfcFlags.None,
@@ -748,10 +748,13 @@ namespace Titanis.DceRpc.Client
 		public AuthClientContext AuthContext { get; }
 		public RpcAuthLevel AuthLevel { get; }
 
-		internal int MessageAuthTokenSize
-			=>
-				(this.AuthLevel == RpcAuthLevel.PacketIntegrity) ? this.AuthContext.SignTokenSize
-				: (this.AuthLevel == RpcAuthLevel.PacketPrivacy) ? (this.AuthContext.SealHeaderSize + this.AuthContext.SealTrailerSize)
-				: 0;
+		internal int GetMessageAuthTokenSize()
+		{
+			if (this.AuthLevel == RpcAuthLevel.PacketIntegrity) return this.AuthContext.SignTokenSize;
+			else if (this.AuthLevel == RpcAuthLevel.PacketPrivacy)
+				return this.AuthContext.GetWrapTokenSize(WrapOptions.Rpc | WrapOptions.Confidentiality);
+			else
+				return 0;
+	}
 	}
 }

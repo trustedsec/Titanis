@@ -426,11 +426,9 @@ namespace Titanis.DceRpc.Communication
 
 				var buf = writer.GetData();
 
-				int cbHeader = pduType switch
-				{
-					PduType.Request => PduHeader.PduStructSize + ((0 != (pduFlags & PfcFlags.ObjectUuid)) ? RequestPduHeader.StructSizeWithObjectId : RequestPduHeader.StructSize),
-					_ => throw new NotImplementedException($"Cannot fragment PDU type {pduType}")
-				};
+				int cbHeader = GetPduHeaderSize(pduType, pduFlags);
+				if (cbHeader <= 0)
+					throw new NotImplementedException($"Cannot fragment PDU type {pduType}");
 
 				int cbStubData = cbPdu - cbHeader;
 				int cbMaxFragBody = fragThreshold - cbHeader;
@@ -523,7 +521,7 @@ namespace Titanis.DceRpc.Communication
 						auth_context_id = authContext.ContextId
 					});
 
-					int macSize = authContext.MessageAuthTokenSize;
+					int macSize = authContext.GetMessageAuthTokenSize();
 					writer.Consume(macSize);
 				}
 
@@ -556,6 +554,15 @@ namespace Titanis.DceRpc.Communication
 					sendOptions |= RpcChannelSendOptions.ExpectsResponse;
 				await this.SendPduAsync(writer.GetData(), sendOptions, cancellationToken).ConfigureAwait(false);
 			}
+		}
+
+		private static int GetPduHeaderSize(PduType pduType, PfcFlags pduFlags)
+		{
+			return pduType switch
+			{
+				PduType.Request => PduHeader.PduStructSize + ((0 != (pduFlags & PfcFlags.ObjectUuid)) ? RequestPduHeader.StructSizeWithObjectId : RequestPduHeader.StructSize),
+				_ => -1
+			};
 		}
 
 		private static PduHeader SetFragFlagsAndLength(byte[] fragbuf, PfcFlags fragFlags, ushort fragLength)
