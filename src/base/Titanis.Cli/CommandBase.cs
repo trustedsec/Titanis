@@ -57,6 +57,8 @@ namespace Titanis.Cli
 		public async Task<int> InvokeAsync(ICommandContext context, string command, Token[] args, int startIndex, CancellationToken cancellationToken)
 		{
 			this.Context = context;
+			this.Services.AddService(typeof(IFileAccess), context.FileAccess);
+
 			try
 			{
 				var ret = await this.InvokeAsync(command, args, startIndex, cancellationToken);
