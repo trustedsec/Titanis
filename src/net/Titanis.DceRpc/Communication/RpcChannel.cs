@@ -138,13 +138,13 @@ namespace Titanis.DceRpc.Communication
 			int cbBody = message.Length - cbRespHeader - header.authLength - AuthVerifierHeader.PduStructSize;
 			authContext.AuthContext.UnsealMessage(
 				new MessageSealParams(
-					default,
+					message.Slice(message.Length - header.authLength, header.authLength),
 					SecBufferList.Create(
 						SecBuffer.Integrity(hdrs.AsSpan()),
 						SecBuffer.PrivacyWithIntegrity(message.Slice(cbRespHeader, cbBody)),
 						SecBuffer.Integrity(message.Slice(cbRespHeader + cbBody, AuthVerifierHeader.PduStructSize))
 					),
-					message.Slice(message.Length - header.authLength, header.authLength)
+					default
 				));
 		}
 		#endregion
@@ -374,13 +374,13 @@ namespace Titanis.DceRpc.Communication
 				int cbBody = cbFrag - cbHeader - authLength - AuthVerifierHeader.PduStructSize;
 				authContext.AuthContext.SealMessage(
 					new MessageSealParams(
-						default,
+						buffer.Slice(cbFrag - authLength, authLength),
 						SecBufferList.Create(
 							SecBuffer.Integrity(buffer.Slice(0, cbHeader)),
 							SecBuffer.PrivacyWithIntegrity(buffer.Slice(cbHeader, cbBody)),
 							SecBuffer.Integrity(buffer.Slice(cbHeader + cbBody, AuthVerifierHeader.PduStructSize))
 						),
-						buffer.Slice(cbFrag - authLength, authLength)
+						default
 					));
 			}
 		}
