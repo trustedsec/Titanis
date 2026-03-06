@@ -1,15 +1,19 @@
-﻿using System;
+﻿using PKIX1Implicit88;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Titanis.AuthProxy;
 using Titanis.Cli;
 using Titanis.Net;
 using Titanis.Security;
@@ -19,6 +23,72 @@ using Titanis.Security.Spnego;
 
 namespace Titanis.Cli
 {
+	[TypeConverter(typeof(SpnMappingConverter))]
+	public class SpnMapping
+	{
+		public SpnMapping(string? matchServiceClass, string? matchServiceInstance, string? replaceServiceClass, string? replaceServiceInstance)
+		{
+			MatchServiceClass = matchServiceClass;
+			MatchServiceInstance = matchServiceInstance;
+			ReplaceServiceClass = replaceServiceClass;
+			ReplaceServiceInstance = replaceServiceInstance;
+		}
+
+		public string? MatchServiceClass { get; }
+		public string? MatchServiceInstance { get; }
+		public string? ReplaceServiceClass { get; }
+		public string? ReplaceServiceInstance { get; }
+
+		public override string ToString()
+		{
+			return $"{this.MatchServiceInstance ?? "*"}/{this.MatchServiceInstance ?? "*"} => {this.ReplaceServiceClass ?? "*"}/{this.ReplaceServiceInstance ?? "*"}";
+		}
+
+		public bool Matches(ServicePrincipalName spn)
+		{
+			ArgumentNullException.ThrowIfNull(spn);
+
+			bool matches =
+				(this.MatchServiceClass?.Equals(spn.ServiceClass, StringComparison.OrdinalIgnoreCase) ?? true)
+				&& (this.MatchServiceInstance?.Equals(spn.ServiceInstance, StringComparison.OrdinalIgnoreCase) ?? true)
+				;
+			return matches;
+		}
+		public ServicePrincipalName Map(ServicePrincipalName spn)
+		{
+			string sc = this.ReplaceServiceClass ?? spn.ServiceClass;
+			string si = this.ReplaceServiceInstance ?? spn.ServiceInstance;
+			return new ServicePrincipalName(sc, si);
+		}
+	}
+	class SpnMappingConverter : TypeConverter
+	{
+		public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
+			=> (sourceType == typeof(string)) || base.CanConvertFrom(context, sourceType);
+		public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
+		{
+			if (value is string str)
+			{
+				var match = rgxMapping.Match(str);
+				if (!match.Success)
+					throw new ArgumentException($"The SPN mapping must be of the format <serviceClass>/<serviceInstance>=<serviceClass>/<serviceInstance>");
+
+				var sc = match.Groups["sc"].Value;
+				var si = match.Groups["si"].Value;
+				var sc2 = match.Groups["sc2"].Value;
+				var si2 = match.Groups["si2"].Value;
+
+				return new SpnMapping(
+					(sc == "*") ? null : sc, (si == "*") ? null : si,
+					(sc2 == "*") ? null : sc2, (si2 == "*") ? null : si2
+					);
+			}
+			return base.ConvertFrom(context, culture, value);
+		}
+
+		private static readonly Regex rgxMapping = new Regex(@"^(?<sc>[^/]*)/(?<si>.*)=(?<sc2>[^/]*)/(?<si2>.*)$");
+	}
+
 	/// <summary>
 	/// Defines parameters for authentication.
 	/// </summary>
@@ -90,6 +160,16 @@ namespace Titanis.Cli
 		public Version? NtlmVersion { get; set; }
 
 		[Parameter]
+		[Description("Name of file containing user's key (for PKINIT)")]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		public string? UserKey { get; set; }
+
+		[Parameter]
+		[Description("Password to decrypt file containing user's key (for PKINIT)")]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		public string? UserKeyPassword { get; set; }
+
+		[Parameter]
 		[Description("KDC endpoint")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[DefaultPort(KerberosClient.KdcTcpPort)]
@@ -112,6 +192,16 @@ namespace Titanis.Cli
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		public SecurityPrincipalName? S4ProxyService { get; set; }
 
+		[Parameter]
+		[Description("Specifies an SPN override")]
+		public SpnMapping[]? SpnOverride { get; set; }
+
+		#region AuthProxy
+		[Parameter]
+		[Description("Endpoint of auth proxy")]
+		public EndPoint AuthProxy { get; set; }
+		#endregion
+
 		/// <summary>
 		/// Gets a value indicating whether the user provided Kerberos parameters.
 		/// </summary>
@@ -120,10 +210,11 @@ namespace Titanis.Cli
 		/// Gets a value indicating whether the user provided NTLM parameters.
 		/// </summary>
 		public bool HasNtlmInfo { get; private set; }
+		public bool HasAuthProxy => this.AuthProxy != null;
 		/// <summary>
 		/// Gets a value indicating whether the user provided authentication parameters.
 		/// </summary>
-		public bool HasAuthInfo => this.HasKerberosInfo | this.HasNtlmInfo;
+		public bool HasAuthInfo => this.HasKerberosInfo | this.HasNtlmInfo | this.HasAuthProxy;
 
 		private bool _validated;
 
@@ -160,13 +251,18 @@ namespace Titanis.Cli
 						|| (this.NtlmHash != null)
 						|| (this.AesKey != null)
 						|| (this.DesKey != null)
+						|| (!string.IsNullOrEmpty(this.UserKey))
 						)
 				);
 			this.HasKerberosInfo = hasKerbCred;
 			if (!hasKerbCred && this.Kdc is not null)
 				log?.WriteWarning($"-Kdc option specified but not enough options specified for Kerberos; Kerberos will not be used.");
 
-			if (this.S4UserName is not null || this.S4UserCert is not null)
+			if (!string.IsNullOrEmpty(this.UserKeyPassword) && string.IsNullOrEmpty(this.UserKey))
+				context.LogError(new ParameterValidationError(nameof(UserKeyPassword), $"-{nameof(UserKeyPassword)} is only valid with -{nameof(UserKey)}"));
+
+			// For methods that require Kerberos, ensure  -Kdc is present
+			if (this.S4UserName is not null || this.S4UserCert is not null || !string.IsNullOrEmpty(this.UserKey))
 			{
 				if (this.Kdc is null)
 				{
@@ -174,6 +270,8 @@ namespace Titanis.Cli
 						context.LogError(new ParameterValidationError(nameof(S4UserName), $"-{nameof(S4UserName)} requires -{nameof(Kdc)}"));
 					if (this.S4UserCert is not null)
 						context.LogError(new ParameterValidationError(nameof(S4UserCert), $"-{nameof(S4UserCert)} requires -{nameof(Kdc)}"));
+					if (!string.IsNullOrEmpty(this.UserKey))
+						context.LogError(new ParameterValidationError(nameof(UserKey), $"-{nameof(UserKey)} requires -{nameof(Kdc)}"));
 				}
 
 				if (!string.IsNullOrEmpty(this.S4UserCert))
@@ -201,7 +299,7 @@ namespace Titanis.Cli
 			}
 			this.HasNtlmInfo = hasNtlm;
 
-			if (isRequired && !hasKerbCred && !hasNtlm)
+			if (isRequired && !hasKerbCred && !hasNtlm && this.AuthProxy == null)
 			{
 				context.LogError(nameof(Anonymous), "No authentication specified.  Either provide a user name with -UserName, or specify -Anonymous to authenticate as anonymous.");
 			}
@@ -222,7 +320,7 @@ namespace Titanis.Cli
 				return null;
 
 			// Don't use NTLM in S4U scenarios
-			if (this.S4UserName != null || this.S4UserCert != null || this.S4ProxyService != null)
+			if (this.S4UserName != null || this.S4UserCert != null || this.S4ProxyService != null || !string.IsNullOrEmpty(this.UserKey))
 				return null;
 
 			var domain = this.UserDomain;
@@ -275,6 +373,24 @@ namespace Titanis.Cli
 			SecurityCapabilities requiredCaps,
 			AuthOptions options)
 		{
+			if (spn != null)
+				spn = TryMapSpn(spn);
+
+			if (this.AuthProxy != null)
+			{
+				var cancellationToken = CancellationToken.None;
+
+				var sockService = this.Services.RequireService<ISocketService>();
+				var socket = sockService.ConnectTcp(this.AuthProxy, cancellationToken).Result;
+
+				var proxyContext = new AuthProxyClientContext(this.UserName?.ToString(), socket)
+				{
+					RequiredCapabilities = requiredCaps,
+					TargetSpn = spn
+				};
+				return proxyContext;
+			}
+
 			int count = 0;
 
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
@@ -320,6 +436,25 @@ namespace Titanis.Cli
 				return ntlmContext;
 			else
 				return null;
+		}
+
+		private ServicePrincipalName TryMapSpn(ServicePrincipalName spn)
+		{
+			if (this.SpnOverride != null)
+			{
+				foreach (var spnMapping in this.SpnOverride)
+				{
+					if (spnMapping.Matches(spn))
+					{
+						var log = this.Services.GetService<ILog>();
+						var mappedSpn = spnMapping.Map(spn);
+						log?.WriteVerbose($"Overriding SPN: {spn} => {mappedSpn}");
+						return mappedSpn;
+					}
+				}
+			}
+
+			return spn;
 		}
 
 		private KerberosClient? _kerberosClient;
@@ -513,6 +648,36 @@ namespace Titanis.Cli
 					}, this.AesKey.Bytes);
 				else if (this.DesKey != null)
 					cred = new KerberosKeyCredential(authUser, authRealm, EType.DesCbcMd5, this.DesKey.Bytes);
+				else if (!string.IsNullOrEmpty(this.UserKey))
+				{
+					string userKeyFile = this.UserKey;
+					string? userKeyPassword = this.UserKeyPassword;
+
+					log?.WriteDiagnostic($"Loading user key from file {userKeyFile}");
+					var bytes = File.ReadAllBytes(userKeyFile);
+					X509Certificate2Collection certs = new X509Certificate2Collection();
+					certs.Import(bytes, userKeyPassword, X509KeyStorageFlags.EphemeralKeySet);
+
+					byte[]? subjectKeyId = null;
+					UserPrincipalName? upn = null;
+					var cert = certs.LastOrDefault();
+					foreach (var ext in cert.Extensions)
+					{
+						if (ext is X509SubjectKeyIdentifierExtension keyIdExt)
+							subjectKeyId = keyIdExt.SubjectKeyIdentifierBytes.ToArray();
+						else if (ext is X509SubjectAlternativeNameExtension altName)
+						{
+							var decoded = SubjectAltName.TryReadFrom(altName.RawData);
+							if (decoded != null)
+							{
+								upn = UserPrincipalName.Parse(decoded);
+								break;
+							}
+						}
+					}
+
+					cred = new KerberosPkinitCredential(upn, upn.Realm ?? this.UserDomain, cert);
+				}
 			}
 
 			// A credential is required regardless of whether it is used for authentication
