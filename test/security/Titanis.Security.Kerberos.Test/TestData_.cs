@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using Titanis;
 using Titanis.Asn1.Serialization;
 using Titanis.Crypto;
 
-namespace Titanis.Security.Kerberos
+namespace Titanis.Security.Kerberos.Test
 {
 	static class TestData_
 	{

@@ -7,7 +7,7 @@ namespace Titanis.Security.Kerberos
 	/// <summary>
 	/// Represents a Kerberos credential specified as a cleartext password.
 	/// </summary>
-	public class KerberosPasswordCredential : KerberosCredential
+	public class KerberosPasswordCredential : KerberosKeyCredentialBase
 	{
 		public KerberosPasswordCredential(string userName, string realm, string password)
 			: base(userName, realm)
@@ -18,6 +18,9 @@ namespace Titanis.Security.Kerberos
 			this.Password = password;
 		}
 
+		/// <summary>
+		/// Gets the cleartext password.
+		/// </summary>
 		public string Password { get; }
 
 		/// <inheritdoc/>

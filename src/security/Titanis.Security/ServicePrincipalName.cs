@@ -82,7 +82,7 @@ namespace Titanis.Security
 		public sealed override string GetNamePart(int index) => index switch
 		{
 			0 => this.ServiceClass,
-			1 => this.ServiceInstance,
+			1 => this._instanceParts[index - 1],
 			_ => throw new ArgumentOutOfRangeException(nameof(index))
 		};
 

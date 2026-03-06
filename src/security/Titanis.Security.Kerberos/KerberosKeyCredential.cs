@@ -7,7 +7,7 @@ namespace Titanis.Security.Kerberos
 	/// <summary>
 	/// Represents a Kerberos credential provided as a protocol key.
 	/// </summary>
-	public class KerberosKeyCredential : KerberosCredential
+	public class KerberosKeyCredential : KerberosKeyCredentialBase
 	{
 		/// <summary>
 		/// Initializes a new <see cref="KerberosKeyCredential"/>.

@@ -283,18 +283,16 @@ namespace Titanis.Security.Kerberos
 			if (encTypes == null)
 				encTypeValues = GetETypes(credential);
 
-			PreauthInfo paInfo = new PreauthInfo(this, credential, this._callback)
-			{
-				_requestPac = true
-			};
+			PreauthContext paContext = credential.CreatePreauthContext(this, this._callback);
+			paContext._requestPac = true;
 			TicketRequestContext context = new TicketRequestContext(credential, null, false)
 			{
-				preauth = paInfo
+				preauth = paContext
 			};
 
 			var asreq = this.CreateASReq(
 				context,
-				paInfo,
+				paContext,
 				Structs.KdcReqBody(
 					ticketParameters,
 					ticketParameters.Options,
@@ -318,14 +316,14 @@ namespace Titanis.Security.Kerberos
 				var err = rep.Error;
 				if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_PREAUTH_REQUIRED && !err.e_data.IsNullOrEmpty())
 				{
-					paInfo.Skew = new KerberosTime(err.stime, err.susec).AsDateTime() - sendTime;
+					paContext.Skew = new KerberosTime(err.stime, err.susec).AsDateTime() - sendTime;
 
 					var paList = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<PA_DATA>>(err.e_data).Values;
 					this._callback?.OnReceiveAsrepPadataList(paList);
-					bool supportedPreauth = paInfo.ProcessPadata(paList);
-					if (supportedPreauth)
+					var paResponseData = paContext.TryProcessPadata(paList);
+					if (paResponseData != null)
 					{
-						asreq.Asreq.padata = paInfo.BuildPadataList();
+						asreq.Asreq.padata = paResponseData;
 
 						pduBytes = BuildPdu(asreq);
 						sendTime = DateTime.UtcNow;
@@ -349,7 +347,7 @@ namespace Titanis.Security.Kerberos
 			}
 
 			if (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Asrep)
-				return ProcessASRep(rep.Asrep, context, Midpoint(sendTime, recvTime));
+				return ProcessASRep(rep.Asrep, paContext, context, Midpoint(sendTime, recvTime));
 			else
 				throw new SecurityException(Messages.Krb5_NoASRep);
 		}
@@ -362,7 +360,7 @@ namespace Titanis.Security.Kerberos
 			ArgumentException.ThrowIfNullOrEmpty(targetRealm);
 			ArgumentException.ThrowIfNullOrEmpty(userName);
 
-			PreauthInfo paInfo = new PreauthInfo(this, null, this._callback)
+			PreauthContext paInfo = new PreauthKeyContext(this, null, this._callback)
 			{
 				_requestPac = true
 			};
@@ -394,7 +392,7 @@ namespace Titanis.Security.Kerberos
 				if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_PREAUTH_REQUIRED)
 				{
 					var paList = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<PA_DATA>>(err.e_data).Values;
-					paInfo.ProcessPadata(paList);
+					paInfo.TryProcessPadata(paList);
 					return new KdcInfo(
 						new KerberosTime(err.stime, err.susec).AsDateTime(),
 						(IList<KdcEncryptionTypeInfo>?)paInfo.etypesFromKdc ?? Array.Empty<KdcEncryptionTypeInfo>()
@@ -461,10 +459,13 @@ namespace Titanis.Security.Kerberos
 
 		internal TicketInfo ProcessASRep(
 			KDC_REP asrep,
+			PreauthContext paContext,
 			TicketRequestContext context,
 			DateTime midpoint)
 		{
-			var encPart = this.ExtractASRepEncPart(asrep, context.credential, out var encProfile);
+			paContext.TryProcessPadata(asrep.padata);
+
+			var encPart = this.ExtractASRepEncPart(asrep, paContext);
 			if (encPart.nonce != context.nonce)
 				throw new SecurityException("The nonce in the AS-REP does not match the nonce sent in the AS-REQ.");
 
@@ -486,29 +487,16 @@ namespace Titanis.Security.Kerberos
 
 		private EncKDCRepPart ExtractASRepEncPart(
 			KDC_REP asrep,
-			KerberosCredential credential,
-			out EncProfile? encProfile)
+			PreauthContext paContext
+			)
 		{
-			encProfile = null;
 			var padata = asrep.padata;
-			byte[]? salt = null;
 			if (padata != null)
 			{
-				PreauthInfo paInfo = new PreauthInfo(this, credential, this._callback);
-				paInfo.ProcessPadata(asrep.padata);
-				var encType = paInfo.TryGetSupportedEncProfile();
-				if (encType != null)
-				{
-					encProfile = encType.encProfile;
-					salt = encType.Salt;
-				}
-				else if (paInfo.passwordSalt != null)
-					salt = paInfo.passwordSalt;
 			}
-			if (encProfile == null)
-				encProfile = this.GetEncProfile((EType)asrep.enc_part.etype);
 
-			var protoKey = credential.DeriveProtocolKeyFor(encProfile, salt);
+			var encProfile = this.GetEncProfile((EType)asrep.enc_part.etype);
+			var protoKey = paContext.DeriveProtocolKey(encProfile);
 			var encPart = Asn1DerDecoder.DecodeTlv<EncASRepPart>(
 				protoKey.Decrypt(KeyUsage.AsrepEncPart, asrep.enc_part)
 				).Value;
@@ -652,8 +640,7 @@ namespace Titanis.Security.Kerberos
 			if (!ticketParameters.EndTime.HasValue)
 				ticketParameters.EndTime = tgt.EndTime ?? TicketParameters.DefaultEndTime;
 
-			//bool usingSubkey = false;
-			bool usingSubkey = true;
+			bool usingSubkey = tgt.SessionKey.EType != EType.Rc4Hmac;
 			var sessionKey = usingSubkey ? tgt.GenerateSessionKey() : tgt.SessionKey;
 			TicketRequestContext context = new TicketRequestContext(null, sessionKey, usingSubkey);
 
@@ -742,10 +729,10 @@ namespace Titanis.Security.Kerberos
 
 			internal readonly KerberosCredential? credential;
 			internal readonly SessionKey? sessionKey;
-			internal readonly bool usingSubkey;
+			internal bool usingSubkey;
 
 			internal int nonce;
-			internal PreauthInfo preauth;
+			internal PreauthContext preauth;
 			internal KerberosTime now;
 		}
 
@@ -800,7 +787,7 @@ namespace Titanis.Security.Kerberos
 
 		private KDC_REQ_CHOICE CreateASReq(
 			TicketRequestContext context,
-			PreauthInfo preauth,
+			PreauthContext preauth,
 			KDC_REQ_BODY reqBody
 			)
 		{
@@ -808,7 +795,7 @@ namespace Titanis.Security.Kerberos
 			KDC_REQ_CHOICE req = new KDC_REQ_CHOICE
 			{
 				Asreq = Structs.ASReq(
-					preauth.BuildPadataList(),
+					preauth.BuildPadataList(reqBody),
 					reqBody
 					)
 			};
@@ -1204,7 +1191,7 @@ namespace Titanis.Security.Kerberos
 			)
 		{
 			var asrep = ParseReplyPdu(buf);
-			var encPart = ExtractASRepEncPart(asrep.Asrep, credential, out var encProfile);
+			var encPart = ExtractASRepEncPart(asrep.Asrep, credential.CreatePreauthContext(this, null));
 		}
 		#endregion
 
@@ -1539,7 +1526,7 @@ namespace Titanis.Security.Kerberos
 		{
 			var asrep = Asn1DerDecoder.DecodeTlv<KDC_REP>(asrepBytes);
 			this.Asrep = asrep;
-			var tgt = this.kerb.ProcessASRep(asrep, new TicketRequestContext(credential, null, false)
+			var tgt = this.kerb.ProcessASRep(asrep, null, new TicketRequestContext(credential, null, false)
 			{ nonce = authNonce }, DateTime.Now);
 			this.Tgt = tgt;
 			this.TgtSessionKey = tgt.SessionKey;

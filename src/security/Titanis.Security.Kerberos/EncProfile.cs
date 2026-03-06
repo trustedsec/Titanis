@@ -46,11 +46,14 @@ namespace Titanis.Security.Kerberos
 		/// <remarks>
 		/// Please appreciate the randomness of each byte equally without showing favor to any particular byte.
 		/// </remarks>
-		public byte[] RandomToKey(ReadOnlySpan<byte> input)
+		public SessionKey RandomToKey(ReadOnlySpan<byte> input)
 		{
 			byte[] keybuf = new byte[this.KeySizeBytes];
 			this.RandomToKey(input, keybuf);
-			return keybuf;
+			return new SessionKey(
+				this,
+				keybuf
+				);
 		}
 		public abstract void RandomToKey(ReadOnlySpan<byte> input, Span<byte> keyBuffer);
 		/// <summary>
@@ -63,10 +66,7 @@ namespace Titanis.Security.Kerberos
 			Span<byte> key = stackalloc byte[this.KeySizeBytes];
 			GetRandomBytes(key);
 
-			return new SessionKey(
-				this,
-				this.RandomToKey(key)
-				);
+			return this.RandomToKey(key);
 		}
 
 		/// <summary>

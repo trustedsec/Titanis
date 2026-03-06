@@ -1,6 +1,6 @@
 ﻿using KerberosV5Spec2;
-using PKINIT;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -33,28 +33,50 @@ namespace Titanis.Security.Kerberos
 		}
 	}
 
-	class PreauthInfo
+	abstract class PreauthContext
 	{
-		public PreauthInfo(
+		public PreauthContext(
 			KerberosClient client,
-			KerberosCredential? credential,
 			IKerberosCallback? callback = null
 			)
 		{
-			this._client = client;
-			this._credential = credential;
-			this._callback = callback;
+			this.Client = client;
+			this.Callback = callback;
 		}
 
-		private readonly KerberosClient _client;
-		private readonly KerberosCredential? _credential;
-		private readonly IKerberosCallback? _callback;
+		protected KerberosClient Client { get; }
+		protected abstract KerberosCredential Credential { get; }
+		protected IKerberosCallback? Callback { get; }
+
+		public virtual SessionKey DeriveProtocolKey(EncProfile encProfile)
+		{
+			byte[]? salt = null;
+			var encType = this.TryGetSupportedEncProfile();
+
+			if (encType != null)
+			{
+				salt = encType.Salt;
+			}
+			else if (this.passwordSalt != null)
+				salt = this.passwordSalt;
+
+			var protoKey = this.Credential.DeriveProtocolKeyFor(encProfile, salt);
+			return protoKey;
+		}
+
+		/// <summary>
+		/// Gets the time skew sent by the AS.
+		/// </summary>
+		public TimeSpan Skew { get; internal set; }
 
 		/// <summary>
 		/// Processes preauthentication data returned by the AS.
 		/// </summary>
 		/// <param name="paList">List of <see cref="PA_DATA"/></param>
-		internal bool ProcessPadata(IList<PA_DATA>? paList)
+		/// <remarks>
+		/// This is called by <see cref="KerberosClient"/> when it receives an <c>AS-REP</c> PDU.
+		/// </remarks>
+		internal PA_DATA[]? TryProcessPadata(IList<PA_DATA>? paList)
 		{
 			if (paList != null)
 			{
@@ -66,69 +88,51 @@ namespace Titanis.Security.Kerberos
 					bool isSupported = this.ProcessPadata(padata);
 					hasSupportedPreauth |= isSupported;
 				}
-				return hasSupportedPreauth;
+
+				if (hasSupportedPreauth)
+					return this.BuildPadataList(this._lastReqBody);
 			}
 
-			return false;
+			return null;
 		}
 
-		public bool ProcessPadata(PA_DATA padata)
+		/// <summary>
+		/// Processes a <see cref="PA_DATA"/> from the AS.
+		/// </summary>
+		/// <param name="padata"><see cref="PA_DATA"/> from the AS</param>
+		/// <returns><see langword="true"/> if <see cref="PA_DATA"/> is supported and can be used to produce a <see cref="PA_DATA"/> authenticating the user.</returns>
+		/// <remarks>
+		/// The return value is used by the caller to determine whether any of the <see cref="PA_DATA"/> sent by the server are supported.
+		/// </remarks>
+		protected virtual bool ProcessPadata(PA_DATA padata)
 		{
 			this.paTypes.Add((PadataType)padata.padata_type);
 
 			// TODO: Implement the rest of these types
 			switch ((PadataType)padata.padata_type)
 			{
-				case PadataType.TgsReq:
-					break;
-				case PadataType.EncTimestamp:
-					this.ProcessEncTimestamp(padata.padata_value);
-					return true;
 				case PadataType.PasswordSalt:
 					this.ProcessPasswordSalt(padata.padata_value);
 					return true;
 				case PadataType.ETypeInfo:
 					this.ProcessETypeInfo(padata.padata_value);
 					return true;
-				case PadataType.PkASreqOld:
-					break;
-
 				case PadataType.ETypeInfo2:
 					this.ProcessETypeInfo2(padata.padata_value);
 					return true;
+
+
+				case PadataType.TgsReq:
 				case PadataType.PacRequest:
-					break;
 				case PadataType.SvrReferralInfo:
-					break;
 				case PadataType.FxCookie:
-					break;
 				case PadataType.FxFast:
-					break;
 				case PadataType.FxError:
-					break;
 				case PadataType.EncryptedChallenge:
-					break;
 				case PadataType.SupportedEncTypes:
-					break;
 				case PadataType.PacOptions:
-					break;
 				case PadataType.KerbKeyListReq:
-					break;
 				case PadataType.KerbKeyListRep:
-					break;
-
-				// [RFC 4556] § 3.1.3
-				case PadataType.PkASReq:
-					this.ProcessPkAsreq(padata.padata_value);
-					break;
-				case PadataType.PkASRep:
-					break;
-
-				// [MS-PKCA] 
-				case PadataType.PkASrepOld:
-					this.ProcessPkAsrepOld(padata.padata_value);
-					break;
-
 				default:
 					break;
 			}
@@ -136,24 +140,6 @@ namespace Titanis.Security.Kerberos
 			return false;
 		}
 
-		#region PKINIT
-		private PadataType _pkinitType;
-		private void ProcessPkAsreq(byte[] data)
-		{
-			if (this._pkinitType is 0)
-			{
-				this._pkinitType = PadataType.PkASReq;
-			}
-		}
-
-		private void ProcessPkAsrepOld(byte[] data)
-		{
-			if (this._pkinitType is 0)
-			{
-				this._pkinitType = PadataType.PkASrepOld;
-			}
-		}
-		#endregion
 
 		private List<PadataType> paTypes = new List<PadataType>();
 		public bool SupportsPAType(PadataType patype)
@@ -187,12 +173,12 @@ namespace Titanis.Security.Kerberos
 		{
 			var etypes = (this.etypesFromKdc ??= new List<KdcEncryptionTypeInfo>());
 			var etypeInfos = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<ETYPE_INFO2_ENTRY>>(padata_value).Values;
-			this._callback?.OnProcessETypes(etypeInfos);
+			this.Callback?.OnProcessETypes(etypeInfos);
 			foreach (var elem in etypeInfos)
 			{
 				etypes.Add(new KdcEncryptionTypeInfo(
 					(EType)elem.etype,
-					this._client.TryGetEncProfile((EType)elem.etype),
+					this.Client.TryGetEncProfile((EType)elem.etype),
 					elem.salt.HasValue ? Encoding.UTF8.GetBytes(elem.salt) : null
 				// TODO: Handle s2k parameters
 				));
@@ -203,64 +189,47 @@ namespace Titanis.Security.Kerberos
 		{
 			var etypes = (this.etypesFromKdc ??= new List<KdcEncryptionTypeInfo>());
 			var etypeInfos = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<ETYPE_INFO_ENTRY>>(padata_value).Values;
-			this._callback?.OnProcessETypes(etypeInfos);
+			this.Callback?.OnProcessETypes(etypeInfos);
 			foreach (var elem in etypeInfos)
 			{
 				etypes.Add(new KdcEncryptionTypeInfo(
 					(EType)elem.etype,
-					this._client.TryGetEncProfile((EType)elem.etype),
+					this.Client.TryGetEncProfile((EType)elem.etype),
 					elem.salt
 				));
 			}
 		}
 
 		#region EncTimestamp
-		private Memory<byte> EncryptTS()
+		protected virtual void ProcessEncTimestamp(byte[] padata_value)
 		{
-			if (this._credential == null)
-				throw new InvalidOperationException("Cannot encrypt timestame because no credential was provided.");
-
-			PA_ENC_TS_ENC tsenc = Structs.PAEnc_TSEnc(this.Skew);
-
-			byte[] tsencBytes = Asn1DerEncoder.EncodeTlv(tsenc).ToArray();
-			var encInfo = this.TryGetSupportedEncProfile();
-			byte[]? salt = encInfo.Salt;
-
-			var encProfile = encInfo.encProfile;
-			var protoKey = this._credential.DeriveProtocolKeyFor(encProfile, salt);
-			this._callback?.OnEncryptingTS(protoKey, salt);
-			var tsencData = protoKey.EncryptAndWrap(KeyUsage.AsreqPaEncTimestamp, tsencBytes);
-
-			var padataBytes = Asn1DerEncoder.EncodeTlv(tsencData);
-
-			return padataBytes;
-		}
-
-		internal PA_DATA? _tsenc;
-
-		public TimeSpan Skew { get; internal set; }
-
-		private void ProcessEncTimestamp(byte[] padata_value)
-		{
-			if (this._credential != null && this._credential.SupportsPreauthType(PadataType.EncTimestamp))
-			{
-				var tsenc = this.EncryptTS();
-				this._tsenc = Structs.PAData_TSEnc(tsenc.ToArray());
-			}
+			// Do nothing
 		}
 		#endregion
 
-
-		internal PA_DATA[] BuildPadataList()
+		private KDC_REQ_BODY? _lastReqBody;
+		internal PA_DATA[] BuildPadataList(KDC_REQ_BODY reqBody)
 		{
+			this._lastReqBody = reqBody;
+
 			List<PA_DATA> paList = new List<PA_DATA>(2);
-			if (this._tsenc is not null)
-				paList.Add(this._tsenc);
-
-			if (this._requestPac)
-				paList.Add(Structs.PAData_PacRequest(true));
-
+			this.BuildPadataList(reqBody, paList);
 			return paList.ToArray();
 		}
+		protected virtual void BuildPadataList(KDC_REQ_BODY reqBody, List<PA_DATA> padataList)
+		{
+			if (this._requestPac)
+				padataList.Add(Structs.PAData_PacRequest(true));
+		}
+	}
+
+	class PreauthNullContext : PreauthContext
+	{
+		public PreauthNullContext(KerberosClient client, KerberosNullCredential credential, IKerberosCallback? callback = null) : base(client, callback)
+		{
+			Credential = credential;
+		}
+
+		protected override KerberosNullCredential Credential { get; }
 	}
 }

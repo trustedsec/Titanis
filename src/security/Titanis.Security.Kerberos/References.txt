@@ -31,3 +31,5 @@ https://datatracker.ietf.org/doc/html/draft-ietf-cat-kerb-chg-password-02
 
 [RFC 3244] - Microsoft Windows 2000 Kerberos Change & Set
 
+[RFC 4556] - PKINIT
+[MS-PKCA] - PKINIT

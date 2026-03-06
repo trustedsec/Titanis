@@ -18,6 +18,14 @@ namespace Titanis.Security
 		/// No options
 		/// </summary>
 		None = 0,
+
+		#region RFC 1509
+		/*
+		 * These values match the constants declared in the SSPI headers
+		 */
+
+		Rfc1509Mask = Delegation | MutualAuthentication | ReplayDetection | SequenceDetection | Confidentiality,
+
 		/// <summary>
 		/// Delegate credentials to remote peer
 		/// </summary>
@@ -38,6 +46,8 @@ namespace Titanis.Security
 		/// Request confidentiality services
 		/// </summary>
 		Confidentiality = 0x10,
+		#endregion
+
 		/// <summary>
 		/// Request integrity services
 		/// </summary>

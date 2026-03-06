@@ -1,4 +1,4 @@
-namespace PKINIT
+namespace KerberosV5_PK_INIT_SPEC
 {
 	using System;
 	using System.CodeDom.Compiler;
@@ -9,38 +9,85 @@ namespace PKINIT
 	using Titanis.Asn1;
 	using Titanis.Asn1.Metadata;
 	using Titanis.Asn1.Serialization;
+	using SubjectPublicKeyInfo = PKIX1Explicit88.SubjectPublicKeyInfo;
+	using AlgorithmIdentifier = PKIX1Explicit88.AlgorithmIdentifier;
 	using PrincipalName = KerberosV5Spec2.PrincipalName;
 	using EncryptionKey = KerberosV5Spec2.EncryptionKey;
-	using AlgorithmIdentifier = PKIX1Explicit88.AlgorithmIdentifier;
+	using Checksum = KerberosV5Spec2.Checksum;
 
-	partial class PKINITModule
+	partial class KerberosV5_PK_INIT_SPECModule
 	{
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		private PKINITModule()
+		public static Titanis.Asn1.Asn1Oid id_pkinit => new Asn1Oid("1.3.6.1.5.2.3");
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Titanis.Asn1.Asn1Oid id_pkinit_authData => new Asn1Oid("1.3.6.1.5.2.3.1");
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Titanis.Asn1.Asn1Oid id_pkinit_DHKeyData => new Asn1Oid("1.3.6.1.5.2.3.2");
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Titanis.Asn1.Asn1Oid id_pkinit_rkeyData => new Asn1Oid("1.3.6.1.5.2.3.3");
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Titanis.Asn1.Asn1Oid id_pkinit_KPClientAuth => new Asn1Oid("1.3.6.1.5.2.3.4");
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Titanis.Asn1.Asn1Oid id_pkinit_KPKdc => new Asn1Oid("1.3.6.1.5.2.3.5");
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Titanis.Asn1.Asn1Oid id_pkinit_san => new Asn1Oid("1.3.6.1.5.2.2");
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static byte pa_pk_as_req => 16;
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static byte pa_pk_as_rep => 17;
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static byte ad_initial_verified_cas => 9;
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static byte td_trusted_certifiers => 104;
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static byte td_invalid_certificates => 105;
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static byte td_dh_parameters => 109;
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		private KerberosV5_PK_INIT_SPECModule()
 		{
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		private static PKINITModule _instance = new PKINITModule();
+		private static KerberosV5_PK_INIT_SPECModule _instance = new KerberosV5_PK_INIT_SPECModule();
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public static PKINITModule Instance => _instance;
+		public static KerberosV5_PK_INIT_SPECModule Instance => _instance;
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public string Name => "PKINIT";
+		public string Name => "KerberosV5-PK-INIT-SPEC";
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public string Oid => "";
+		public string Oid => "1.3.6.1.5.2.4.5";
 	}
 
 	[Asn1Sequence()]
-	partial class PA_PK_AS_REQ : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<PA_PK_AS_REQ>, IAsn1DerDecodableValue<PA_PK_AS_REQ>
+	partial class ExternalPrincipalIdentifier : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<ExternalPrincipalIdentifier>, IAsn1DerDecodableValue<ExternalPrincipalIdentifier>
 	{
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		internal Byte[] signedAuthPack;
+		internal Byte[]? subjectName;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public PA_PK_AS_REQ(Byte[] signedAuthPack)
+		internal Byte[]? issuerAndSerialNumber;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal Byte[]? subjectKeyIdentifier;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public ExternalPrincipalIdentifier(Byte[]? subjectName = default, Byte[]? issuerAndSerialNumber = default, Byte[]? subjectKeyIdentifier = default)
 		{
-			this.signedAuthPack = signedAuthPack;
+			this.subjectName = subjectName;
+			this.issuerAndSerialNumber = issuerAndSerialNumber;
+			this.subjectKeyIdentifier = subjectKeyIdentifier;
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
@@ -52,7 +99,99 @@ namespace PKINIT
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
-			encoder.EncodeOctetStringTlv(this.signedAuthPack);
+			if (this.subjectKeyIdentifier is not null)
+				encoder.EncodeOctetStringTlv(this.subjectKeyIdentifier, new Asn1Tag(0x80000002));
+			if (this.issuerAndSerialNumber is not null)
+				encoder.EncodeOctetStringTlv(this.issuerAndSerialNumber, new Asn1Tag(0x80000001));
+			if (this.subjectName is not null)
+				encoder.EncodeOctetStringTlv(this.subjectName, new Asn1Tag(0x80000000));
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeTlv(Asn1DerEncoder encoder)
+		{
+			encoder.EncodeValueTlv(this, this.Tag);
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static ExternalPrincipalIdentifier DecodeValueFrom(Asn1DerDecoder decoder)
+		{
+			var instance = new ExternalPrincipalIdentifier(decoder);
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static ExternalPrincipalIdentifier DecodeTlvFrom(Asn1DerDecoder decoder)
+		{
+			var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+			var instance = ExternalPrincipalIdentifier.DecodeValueFrom(decoder);
+			decoder.CloseTlv(tlvFrame);
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out ExternalPrincipalIdentifier? instance)
+		{
+			if (decoder.CheckTag(new Asn1Tag(0x20000010)))
+			{
+				var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+				instance = ExternalPrincipalIdentifier.DecodeValueFrom(decoder);
+				decoder.CloseTlv(tlvFrame);
+				return true;
+			}
+			else
+			{
+				instance = default;
+				return false;
+			}
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		private ExternalPrincipalIdentifier(Asn1DerDecoder decoder)
+		{
+			this.subjectName = decoder.CheckTag(new Asn1Tag(0x80000000)) ? decoder.DecodeOctetStringTlv(new Asn1Tag(0x80000000)) : default(Byte[]);
+			this.issuerAndSerialNumber = decoder.CheckTag(new Asn1Tag(0x80000001)) ? decoder.DecodeOctetStringTlv(new Asn1Tag(0x80000001)) : default(Byte[]);
+			this.subjectKeyIdentifier = decoder.CheckTag(new Asn1Tag(0x80000002)) ? decoder.DecodeOctetStringTlv(new Asn1Tag(0x80000002)) : default(Byte[]);
+		}
+	}
+
+	[Asn1Sequence()]
+	partial class PA_PK_AS_REQ : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<PA_PK_AS_REQ>, IAsn1DerDecodableValue<PA_PK_AS_REQ>
+	{
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal Byte[] signedAuthPack;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal ExternalPrincipalIdentifier[]? trustedCertifiers;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal Byte[]? kdcPkId;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public PA_PK_AS_REQ(Byte[] signedAuthPack, ExternalPrincipalIdentifier[]? trustedCertifiers = default, Byte[]? kdcPkId = default)
+		{
+			this.signedAuthPack = signedAuthPack;
+			this.trustedCertifiers = trustedCertifiers;
+			this.kdcPkId = kdcPkId;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public Asn1Tag Tag => new Asn1Tag(0x20000010);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Asn1Tag StaticTag => new Asn1Tag(0x20000010);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeValue(Asn1DerEncoder encoder)
+		{
+			if (this.kdcPkId is not null)
+				encoder.EncodeOctetStringTlv(this.kdcPkId, new Asn1Tag(0x80000002));
+			if (this.trustedCertifiers is not null)
+				encoder.EncodeExplicitTlv<ExternalPrincipalIdentifier[]>(new Asn1Tag(0xA0000001), this.trustedCertifiers, (encoder, r) =>
+				{
+					encoder.EncodeListTlv(new Asn1Tag(0x20000010), this.trustedCertifiers, (encoder, r) =>
+					{
+						encoder.EncodeValueTlv(r);
+					});
+				});
+			encoder.EncodeOctetStringTlv(this.signedAuthPack, new Asn1Tag(0x80000000));
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
@@ -98,6 +237,8 @@ namespace PKINIT
 		private PA_PK_AS_REQ(Asn1DerDecoder decoder)
 		{
 			this.signedAuthPack = decoder.DecodeOctetStringTlv(new Asn1Tag(0x80000000));
+			this.trustedCertifiers = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<ExternalPrincipalIdentifier[]>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeListTlv<ExternalPrincipalIdentifier>(new Asn1Tag(0x20000010), (encoder) => decoder.DecodeTlv<ExternalPrincipalIdentifier>())) : default(ExternalPrincipalIdentifier[]);
+			this.kdcPkId = decoder.CheckTag(new Asn1Tag(0x80000002)) ? decoder.DecodeOctetStringTlv(new Asn1Tag(0x80000002)) : default(Byte[]);
 		}
 	}
 
@@ -105,23 +246,20 @@ namespace PKINIT
 	partial class PKAuthenticator : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<PKAuthenticator>, IAsn1DerDecodableValue<PKAuthenticator>
 	{
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		internal PrincipalName kdc_name;
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		internal GeneralString kdc_realm;
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		internal System.Numerics.BigInteger cusec;
+		internal uint cusec;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		internal GeneralizedTime ctime;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		internal System.Numerics.BigInteger nonce;
+		internal uint nonce;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public PKAuthenticator(PrincipalName kdc_name, GeneralString kdc_realm, System.Numerics.BigInteger cusec, GeneralizedTime ctime, System.Numerics.BigInteger nonce)
+		internal Byte[]? paChecksum;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public PKAuthenticator(uint cusec, GeneralizedTime ctime, uint nonce, Byte[]? paChecksum = default)
 		{
-			this.kdc_name = kdc_name;
-			this.kdc_realm = kdc_realm;
 			this.cusec = cusec;
 			this.ctime = ctime;
 			this.nonce = nonce;
+			this.paChecksum = paChecksum;
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
@@ -133,25 +271,22 @@ namespace PKINIT
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
-			encoder.EncodeExplicitTlv<System.Numerics.BigInteger>(new Asn1Tag(0xA0000004), this.nonce, (encoder, r) =>
+			if (this.paChecksum is not null)
+				encoder.EncodeExplicitTlv<Byte[]>(new Asn1Tag(0xA0000003), this.paChecksum, (encoder, r) =>
+				{
+					encoder.EncodeOctetStringTlv(this.paChecksum);
+				});
+			encoder.EncodeExplicitTlv<uint>(new Asn1Tag(0xA0000002), this.nonce, (encoder, r) =>
 			{
-				encoder.EncodeBigIntegerTlv(this.nonce);
+				encoder.EncodeUInt32Tlv(this.nonce);
 			});
-			encoder.EncodeExplicitTlv<GeneralizedTime>(new Asn1Tag(0xA0000003), this.ctime, (encoder, r) =>
+			encoder.EncodeExplicitTlv<GeneralizedTime>(new Asn1Tag(0xA0000001), this.ctime, (encoder, r) =>
 			{
 				encoder.EncodeDateTimeTlv(this.ctime);
 			});
-			encoder.EncodeExplicitTlv<System.Numerics.BigInteger>(new Asn1Tag(0xA0000002), this.cusec, (encoder, r) =>
+			encoder.EncodeExplicitTlv<uint>(new Asn1Tag(0xA0000000), this.cusec, (encoder, r) =>
 			{
-				encoder.EncodeBigIntegerTlv(this.cusec);
-			});
-			encoder.EncodeExplicitTlv<GeneralString>(new Asn1Tag(0xA0000001), this.kdc_realm, (encoder, r) =>
-			{
-				encoder.EncodeStringTlv(this.kdc_realm);
-			});
-			encoder.EncodeExplicitTlv<PrincipalName>(new Asn1Tag(0xA0000000), this.kdc_name, (encoder, r) =>
-			{
-				encoder.EncodeValueTlv(this.kdc_name);
+				encoder.EncodeUInt32Tlv(this.cusec);
 			});
 		}
 
@@ -197,11 +332,10 @@ namespace PKINIT
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		private PKAuthenticator(Asn1DerDecoder decoder)
 		{
-			this.kdc_name = decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000000), (encoder) => PrincipalName.DecodeTlvFrom(decoder));
-			this.kdc_realm = decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeStringTlv<GeneralString>());
-			this.cusec = decoder.DecodeTaggedValue<System.Numerics.BigInteger>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeIntegerTlvAsBigInteger());
-			this.ctime = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeDateTimeTlv());
-			this.nonce = decoder.DecodeTaggedValue<System.Numerics.BigInteger>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeIntegerTlvAsBigInteger());
+			this.cusec = decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeIntegerTlvAsUInt32());
+			this.ctime = decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeDateTimeTlv());
+			this.nonce = decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeIntegerTlvAsUInt32());
+			this.paChecksum = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeOctetStringTlv()) : default(Byte[]);
 		}
 	}
 
@@ -211,9 +345,18 @@ namespace PKINIT
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		internal PKAuthenticator pkAuthenticator;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public AuthPack(PKAuthenticator pkAuthenticator)
+		internal SubjectPublicKeyInfo? clientPublicValue;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal AlgorithmIdentifier[]? supportedCMSTypes;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal Byte[]? clientDHNonce;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public AuthPack(PKAuthenticator pkAuthenticator, SubjectPublicKeyInfo? clientPublicValue = default, AlgorithmIdentifier[]? supportedCMSTypes = default, Byte[]? clientDHNonce = default)
 		{
 			this.pkAuthenticator = pkAuthenticator;
+			this.clientPublicValue = clientPublicValue;
+			this.supportedCMSTypes = supportedCMSTypes;
+			this.clientDHNonce = clientDHNonce;
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
@@ -225,6 +368,24 @@ namespace PKINIT
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
+			if (this.clientDHNonce is not null)
+				encoder.EncodeExplicitTlv<Byte[]>(new Asn1Tag(0xA0000003), this.clientDHNonce, (encoder, r) =>
+				{
+					encoder.EncodeOctetStringTlv(this.clientDHNonce);
+				});
+			if (this.supportedCMSTypes is not null)
+				encoder.EncodeExplicitTlv<AlgorithmIdentifier[]>(new Asn1Tag(0xA0000002), this.supportedCMSTypes, (encoder, r) =>
+				{
+					encoder.EncodeListTlv(new Asn1Tag(0x20000010), this.supportedCMSTypes, (encoder, r) =>
+					{
+						encoder.EncodeValueTlv(r);
+					});
+				});
+			if (this.clientPublicValue is not null)
+				encoder.EncodeExplicitTlv<SubjectPublicKeyInfo>(new Asn1Tag(0xA0000001), this.clientPublicValue, (encoder, r) =>
+				{
+					encoder.EncodeValueTlv(this.clientPublicValue);
+				});
 			encoder.EncodeExplicitTlv<PKAuthenticator>(new Asn1Tag(0xA0000000), this.pkAuthenticator, (encoder, r) =>
 			{
 				encoder.EncodeValueTlv(this.pkAuthenticator);
@@ -273,22 +434,25 @@ namespace PKINIT
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		private AuthPack(Asn1DerDecoder decoder)
 		{
-			this.pkAuthenticator = decoder.DecodeTaggedValue<PKAuthenticator>(new Asn1Tag(0xA0000000), (encoder) => PKAuthenticator.DecodeTlvFrom(decoder));
+			this.pkAuthenticator = decoder.DecodeTaggedValue<PKAuthenticator>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeTlv<PKAuthenticator>());
+			this.clientPublicValue = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<SubjectPublicKeyInfo>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeTlv<SubjectPublicKeyInfo>()) : default(SubjectPublicKeyInfo);
+			this.supportedCMSTypes = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<AlgorithmIdentifier[]>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeListTlv<AlgorithmIdentifier>(new Asn1Tag(0x20000010), (encoder) => decoder.DecodeTlv<AlgorithmIdentifier>())) : default(AlgorithmIdentifier[]);
+			this.clientDHNonce = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeOctetStringTlv()) : default(Byte[]);
 		}
 	}
 
 	[Asn1Sequence()]
-	partial class KERB_REPLY_KEY_PACKAGE : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<KERB_REPLY_KEY_PACKAGE>, IAsn1DerDecodableValue<KERB_REPLY_KEY_PACKAGE>
+	partial class KRB5PrincipalName : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<KRB5PrincipalName>, IAsn1DerDecodableValue<KRB5PrincipalName>
 	{
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		internal EncryptionKey replyKey;
+		internal GeneralString realm;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		internal System.Numerics.BigInteger nonce;
+		internal PrincipalName principalName;
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public KERB_REPLY_KEY_PACKAGE(EncryptionKey replyKey, System.Numerics.BigInteger nonce)
+		public KRB5PrincipalName(GeneralString realm, PrincipalName principalName)
 		{
-			this.replyKey = replyKey;
-			this.nonce = nonce;
+			this.realm = realm;
+			this.principalName = principalName;
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
@@ -300,9 +464,360 @@ namespace PKINIT
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
-			encoder.EncodeExplicitTlv<System.Numerics.BigInteger>(new Asn1Tag(0xA0000001), this.nonce, (encoder, r) =>
+			encoder.EncodeExplicitTlv<PrincipalName>(new Asn1Tag(0xA0000001), this.principalName, (encoder, r) =>
 			{
-				encoder.EncodeBigIntegerTlv(this.nonce);
+				encoder.EncodeValueTlv(this.principalName);
+			});
+			encoder.EncodeExplicitTlv<GeneralString>(new Asn1Tag(0xA0000000), this.realm, (encoder, r) =>
+			{
+				encoder.EncodeStringTlv(this.realm);
+			});
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeTlv(Asn1DerEncoder encoder)
+		{
+			encoder.EncodeValueTlv(this, this.Tag);
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static KRB5PrincipalName DecodeValueFrom(Asn1DerDecoder decoder)
+		{
+			var instance = new KRB5PrincipalName(decoder);
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static KRB5PrincipalName DecodeTlvFrom(Asn1DerDecoder decoder)
+		{
+			var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+			var instance = KRB5PrincipalName.DecodeValueFrom(decoder);
+			decoder.CloseTlv(tlvFrame);
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out KRB5PrincipalName? instance)
+		{
+			if (decoder.CheckTag(new Asn1Tag(0x20000010)))
+			{
+				var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+				instance = KRB5PrincipalName.DecodeValueFrom(decoder);
+				decoder.CloseTlv(tlvFrame);
+				return true;
+			}
+			else
+			{
+				instance = default;
+				return false;
+			}
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		private KRB5PrincipalName(Asn1DerDecoder decoder)
+		{
+			this.realm = decoder.DecodeTaggedValue<GeneralString>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeStringTlv<GeneralString>());
+			this.principalName = decoder.DecodeTaggedValue<PrincipalName>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeTlv<PrincipalName>());
+		}
+	}
+
+	[Asn1Sequence()]
+	partial class DHRepInfo : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<DHRepInfo>, IAsn1DerDecodableValue<DHRepInfo>
+	{
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal Byte[] dhSignedData;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal Byte[]? serverDHNonce;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public DHRepInfo(Byte[] dhSignedData, Byte[]? serverDHNonce = default)
+		{
+			this.dhSignedData = dhSignedData;
+			this.serverDHNonce = serverDHNonce;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public Asn1Tag Tag => new Asn1Tag(0x20000010);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Asn1Tag StaticTag => new Asn1Tag(0x20000010);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeValue(Asn1DerEncoder encoder)
+		{
+			if (this.serverDHNonce is not null)
+				encoder.EncodeExplicitTlv<Byte[]>(new Asn1Tag(0xA0000001), this.serverDHNonce, (encoder, r) =>
+				{
+					encoder.EncodeOctetStringTlv(this.serverDHNonce);
+				});
+			encoder.EncodeOctetStringTlv(this.dhSignedData, new Asn1Tag(0x80000000));
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeTlv(Asn1DerEncoder encoder)
+		{
+			encoder.EncodeValueTlv(this, this.Tag);
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static DHRepInfo DecodeValueFrom(Asn1DerDecoder decoder)
+		{
+			var instance = new DHRepInfo(decoder);
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static DHRepInfo DecodeTlvFrom(Asn1DerDecoder decoder)
+		{
+			var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+			var instance = DHRepInfo.DecodeValueFrom(decoder);
+			decoder.CloseTlv(tlvFrame);
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out DHRepInfo? instance)
+		{
+			if (decoder.CheckTag(new Asn1Tag(0x20000010)))
+			{
+				var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+				instance = DHRepInfo.DecodeValueFrom(decoder);
+				decoder.CloseTlv(tlvFrame);
+				return true;
+			}
+			else
+			{
+				instance = default;
+				return false;
+			}
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		private DHRepInfo(Asn1DerDecoder decoder)
+		{
+			this.dhSignedData = decoder.DecodeOctetStringTlv(new Asn1Tag(0x80000000));
+			this.serverDHNonce = decoder.CheckTag(new Asn1Tag(0xA0000001)) ? decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeOctetStringTlv()) : default(Byte[]);
+		}
+	}
+
+	[Asn1Choice()]
+	partial class PA_PK_AS_REP : IAsn1DerEncodableTlv, IAsn1DerDecodableTlv<PA_PK_AS_REP>
+	{
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public DHRepInfo DhInfo
+		{
+			get => this.dhInfo;
+			set
+			{
+				this.dhInfo = value;
+				this._choiceTag = ChoiceIndex.DhInfo;
+			}
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		private DHRepInfo? dhInfo;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public Byte[] EncKeyPack
+		{
+			get => this.encKeyPack;
+			set
+			{
+				this.encKeyPack = value;
+				this._choiceTag = ChoiceIndex.EncKeyPack;
+			}
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		private Byte[]? encKeyPack;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public PA_PK_AS_REP()
+		{
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public Asn1Tag Tag => new Asn1Tag((uint)this._choiceTag);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeTlv(Asn1DerEncoder encoder)
+		{
+			switch (this._choiceTag)
+			{
+				case ChoiceIndex.EncKeyPack:
+					Debug.Assert(this.encKeyPack is not null);
+					encoder.EncodeOctetStringTlv(this.encKeyPack, new Asn1Tag(0x80000001));
+					break;
+				case ChoiceIndex.DhInfo:
+					Debug.Assert(this.dhInfo is not null);
+					encoder.EncodeExplicitTlv<DHRepInfo>(new Asn1Tag(0xA0000000), this.dhInfo, (encoder, r) =>
+					{
+						encoder.EncodeValueTlv(this.dhInfo);
+					});
+					break;
+				default:
+					throw new InvalidOperationException("The object of type PA-PK-AS-REP has not been initialized.");
+			}
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static PA_PK_AS_REP DecodeTlvFrom(Asn1DerDecoder decoder)
+		{
+			if (!PA_PK_AS_REP.TryDecodeTlvFrom(decoder, out var instance))
+				throw new InvalidDataException();
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out PA_PK_AS_REP? instance)
+		{
+			if (decoder.CheckTag(new Asn1Tag(0xA0000000)))
+				instance = new PA_PK_AS_REP()
+				{
+					_choiceTag = ChoiceIndex.DhInfo,
+					dhInfo = decoder.DecodeTaggedValue<DHRepInfo>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeTlv<DHRepInfo>())
+				};
+			else if (decoder.CheckTag(new Asn1Tag(0x80000001)))
+				instance = new PA_PK_AS_REP()
+				{
+					_choiceTag = ChoiceIndex.EncKeyPack,
+					encKeyPack = decoder.DecodeOctetStringTlv(new Asn1Tag(0x80000001))
+				};
+			else
+			{
+				instance = null;
+				return false;
+			}
+
+			return true;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public enum ChoiceIndex : uint
+		{
+			None = 0U,
+			DhInfo = 0xA0000000,
+			EncKeyPack = 0x80000001
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		private ChoiceIndex _choiceTag;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal ChoiceIndex SelectedChoice => this._choiceTag;
+	}
+
+	[Asn1Sequence()]
+	partial class KDCDHKeyInfo : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<KDCDHKeyInfo>, IAsn1DerDecodableValue<KDCDHKeyInfo>
+	{
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal Asn1BitString subjectPublicKey;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal uint nonce;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal GeneralizedTime? dhKeyExpiration;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public KDCDHKeyInfo(Asn1BitString subjectPublicKey, uint nonce, GeneralizedTime? dhKeyExpiration = default)
+		{
+			this.subjectPublicKey = subjectPublicKey;
+			this.nonce = nonce;
+			this.dhKeyExpiration = dhKeyExpiration;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public Asn1Tag Tag => new Asn1Tag(0x20000010);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Asn1Tag StaticTag => new Asn1Tag(0x20000010);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeValue(Asn1DerEncoder encoder)
+		{
+			if (this.dhKeyExpiration is not null)
+				encoder.EncodeExplicitTlv<GeneralizedTime>(new Asn1Tag(0xA0000002), this.dhKeyExpiration.Value, (encoder, r) =>
+				{
+					encoder.EncodeDateTimeTlv(this.dhKeyExpiration.Value);
+				});
+			encoder.EncodeExplicitTlv<uint>(new Asn1Tag(0xA0000001), this.nonce, (encoder, r) =>
+			{
+				encoder.EncodeUInt32Tlv(this.nonce);
+			});
+			encoder.EncodeExplicitTlv<Asn1BitString>(new Asn1Tag(0xA0000000), this.subjectPublicKey, (encoder, r) =>
+			{
+				encoder.EncodeBitStringTlv(this.subjectPublicKey);
+			});
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeTlv(Asn1DerEncoder encoder)
+		{
+			encoder.EncodeValueTlv(this, this.Tag);
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static KDCDHKeyInfo DecodeValueFrom(Asn1DerDecoder decoder)
+		{
+			var instance = new KDCDHKeyInfo(decoder);
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static KDCDHKeyInfo DecodeTlvFrom(Asn1DerDecoder decoder)
+		{
+			var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+			var instance = KDCDHKeyInfo.DecodeValueFrom(decoder);
+			decoder.CloseTlv(tlvFrame);
+			return instance;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out KDCDHKeyInfo? instance)
+		{
+			if (decoder.CheckTag(new Asn1Tag(0x20000010)))
+			{
+				var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+				instance = KDCDHKeyInfo.DecodeValueFrom(decoder);
+				decoder.CloseTlv(tlvFrame);
+				return true;
+			}
+			else
+			{
+				instance = default;
+				return false;
+			}
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		private KDCDHKeyInfo(Asn1DerDecoder decoder)
+		{
+			this.subjectPublicKey = decoder.DecodeTaggedValue<Asn1BitString>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeBitStringTlv());
+			this.nonce = decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsUInt32());
+			this.dhKeyExpiration = decoder.CheckTag(new Asn1Tag(0xA0000002)) ? decoder.DecodeTaggedValue<GeneralizedTime>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeDateTimeTlv()) : default(GeneralizedTime? );
+		}
+	}
+
+	[Asn1Sequence()]
+	partial class ReplyKeyPack : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<ReplyKeyPack>, IAsn1DerDecodableValue<ReplyKeyPack>
+	{
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal EncryptionKey replyKey;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		internal Checksum asChecksum;
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public ReplyKeyPack(EncryptionKey replyKey, Checksum asChecksum)
+		{
+			this.replyKey = replyKey;
+			this.asChecksum = asChecksum;
+		}
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public Asn1Tag Tag => new Asn1Tag(0x20000010);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public static Asn1Tag StaticTag => new Asn1Tag(0x20000010);
+
+		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
+		public void EncodeValue(Asn1DerEncoder encoder)
+		{
+			encoder.EncodeExplicitTlv<Checksum>(new Asn1Tag(0xA0000001), this.asChecksum, (encoder, r) =>
+			{
+				encoder.EncodeValueTlv(this.asChecksum);
 			});
 			encoder.EncodeExplicitTlv<EncryptionKey>(new Asn1Tag(0xA0000000), this.replyKey, (encoder, r) =>
 			{
@@ -317,28 +832,28 @@ namespace PKINIT
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public static KERB_REPLY_KEY_PACKAGE DecodeValueFrom(Asn1DerDecoder decoder)
+		public static ReplyKeyPack DecodeValueFrom(Asn1DerDecoder decoder)
 		{
-			var instance = new KERB_REPLY_KEY_PACKAGE(decoder);
+			var instance = new ReplyKeyPack(decoder);
 			return instance;
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public static KERB_REPLY_KEY_PACKAGE DecodeTlvFrom(Asn1DerDecoder decoder)
+		public static ReplyKeyPack DecodeTlvFrom(Asn1DerDecoder decoder)
 		{
 			var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
-			var instance = KERB_REPLY_KEY_PACKAGE.DecodeValueFrom(decoder);
+			var instance = ReplyKeyPack.DecodeValueFrom(decoder);
 			decoder.CloseTlv(tlvFrame);
 			return instance;
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out KERB_REPLY_KEY_PACKAGE? instance)
+		public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out ReplyKeyPack? instance)
 		{
 			if (decoder.CheckTag(new Asn1Tag(0x20000010)))
 			{
 				var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
-				instance = KERB_REPLY_KEY_PACKAGE.DecodeValueFrom(decoder);
+				instance = ReplyKeyPack.DecodeValueFrom(decoder);
 				decoder.CloseTlv(tlvFrame);
 				return true;
 			}
@@ -350,90 +865,10 @@ namespace PKINIT
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		private KERB_REPLY_KEY_PACKAGE(Asn1DerDecoder decoder)
+		private ReplyKeyPack(Asn1DerDecoder decoder)
 		{
-			this.replyKey = decoder.DecodeTaggedValue<EncryptionKey>(new Asn1Tag(0xA0000000), (encoder) => EncryptionKey.DecodeTlvFrom(decoder));
-			this.nonce = decoder.DecodeTaggedValue<System.Numerics.BigInteger>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeIntegerTlvAsBigInteger());
-		}
-	}
-
-	[Asn1Sequence()]
-	partial class PAChecksum2 : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<PAChecksum2>, IAsn1DerDecodableValue<PAChecksum2>
-	{
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		internal Byte[] checksum;
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		internal AlgorithmIdentifier algorithmIdentifier;
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public PAChecksum2(Byte[] checksum, AlgorithmIdentifier algorithmIdentifier)
-		{
-			this.checksum = checksum;
-			this.algorithmIdentifier = algorithmIdentifier;
-		}
-
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public Asn1Tag Tag => new Asn1Tag(0x20000010);
-
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public static Asn1Tag StaticTag => new Asn1Tag(0x20000010);
-
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public void EncodeValue(Asn1DerEncoder encoder)
-		{
-			encoder.EncodeExplicitTlv<AlgorithmIdentifier>(new Asn1Tag(0xA0000001), this.algorithmIdentifier, (encoder, r) =>
-			{
-				encoder.EncodeValueTlv(this.algorithmIdentifier);
-			});
-			encoder.EncodeExplicitTlv<Byte[]>(new Asn1Tag(0xA0000000), this.checksum, (encoder, r) =>
-			{
-				encoder.EncodeOctetStringTlv(this.checksum);
-			});
-		}
-
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public void EncodeTlv(Asn1DerEncoder encoder)
-		{
-			encoder.EncodeValueTlv(this, this.Tag);
-		}
-
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public static PAChecksum2 DecodeValueFrom(Asn1DerDecoder decoder)
-		{
-			var instance = new PAChecksum2(decoder);
-			return instance;
-		}
-
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public static PAChecksum2 DecodeTlvFrom(Asn1DerDecoder decoder)
-		{
-			var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
-			var instance = PAChecksum2.DecodeValueFrom(decoder);
-			decoder.CloseTlv(tlvFrame);
-			return instance;
-		}
-
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out PAChecksum2? instance)
-		{
-			if (decoder.CheckTag(new Asn1Tag(0x20000010)))
-			{
-				var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
-				instance = PAChecksum2.DecodeValueFrom(decoder);
-				decoder.CloseTlv(tlvFrame);
-				return true;
-			}
-			else
-			{
-				instance = default;
-				return false;
-			}
-		}
-
-		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		private PAChecksum2(Asn1DerDecoder decoder)
-		{
-			this.checksum = decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeOctetStringTlv());
-			this.algorithmIdentifier = decoder.DecodeTaggedValue<AlgorithmIdentifier>(new Asn1Tag(0xA0000001), (encoder) => AlgorithmIdentifier.DecodeTlvFrom(decoder));
+			this.replyKey = decoder.DecodeTaggedValue<EncryptionKey>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeTlv<EncryptionKey>());
+			this.asChecksum = decoder.DecodeTaggedValue<Checksum>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeTlv<Checksum>());
 		}
 	}
 }

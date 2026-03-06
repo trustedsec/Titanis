@@ -26,5 +26,10 @@ namespace Titanis.Security.Kerberos
 		{
 			throw new NotSupportedException("This credential cannot be used with this encryption profile.");
 		}
+
+		internal override PreauthContext CreatePreauthContext(KerberosClient client, IKerberosCallback? callback)
+		{
+			return new PreauthNullContext(client, this, callback);
+		}
 	}
 }

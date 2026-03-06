@@ -59,5 +59,7 @@ namespace Titanis.Security.Kerberos
 		/// <param name="salt">Key salt</param>
 		/// <returns>A <see cref="SessionKey"/> suitable for <paramref name="profile"/></returns>
 		public abstract SessionKey DeriveProtocolKeyFor(EncProfile profile, byte[]? salt);
+
+		internal abstract PreauthContext CreatePreauthContext(KerberosClient client, IKerberosCallback? callback);
 	}
 }
