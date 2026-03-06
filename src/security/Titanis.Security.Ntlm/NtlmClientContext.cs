@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using Titanis.Crypto;
-using Titanis.IO;
 
 namespace Titanis.Security.Ntlm
 {
@@ -223,11 +218,6 @@ namespace Titanis.Security.Ntlm
 			get => GetOption(NtlmOptions.HasUnverifiedTargetName);
 			set => SetOption(NtlmOptions.HasUnverifiedTargetName, value);
 		}
-
-		/// <summary>
-		/// Gets the channel binding.
-		/// </summary>
-		public Memory<byte> ClientChannelBindingsUnhashed { get; set; }
 
 		/// <inheritdoc/>
 		protected sealed override ReadOnlySpan<byte> InitializeImpl()
@@ -601,15 +591,21 @@ namespace Titanis.Security.Ntlm
 			if (targetInfo == null)
 				throw new SecurityException("The target machine did not send the information required for NTLMv2");
 
+			if (this.ChannelBinding != null)
+			{
+				var bytes = this.ChannelBinding.GetBytes();
+				targetInfo.channelBindingHashed = new Guid(Md5.ComputeHash<Md5Context>(bytes));
+			}
+
 			return HandleChallengeV2(
-				ref this._state,
-				this.RequiredCapabilities,
-				this._options,
-				this.Credential,
-				targetInfo,
-				Ntlm.GetExportedSessionKey(this._state.negAuthFlags, new Buffer128(), this._state.randomKey),
-				this._callback
-				);
+					ref this._state,
+					this.RequiredCapabilities,
+					this._options,
+					this.Credential,
+					targetInfo,
+					Ntlm.GetExportedSessionKey(this._state.negAuthFlags, new Buffer128(), this._state.randomKey),
+					this._callback
+					);
 		}
 
 		internal void SetClientChallenge(ulong challengeFromClient)
@@ -859,15 +855,18 @@ namespace Titanis.Security.Ntlm
 
 
 
-		public sealed override int SealHeaderSize => 0;
-		public sealed override int SealTrailerSize => NtlmMessageSignatureV1.StructSize;
+		public sealed override int SealHeaderSize => NtlmMessageSignatureV1.StructSize;
+		public sealed override int SealTrailerSize => 0;
 
 		public sealed override void SealMessage(
 			in MessageSealParams sealParams
 			)
 		{
-			if (sealParams.Header.Length != this.SealHeaderSize
-				|| sealParams.Trailer.Length != this.SealTrailerSize
+			var tokenBuffer = sealParams.Header;
+			if (tokenBuffer.Length == 0)
+				tokenBuffer = sealParams.Trailer;
+
+			if (tokenBuffer.Length != this.SealHeaderSize
 				)
 				throw new ArgumentException("The header or trailer buffer size is incorrect.");
 			Ntlm.SealMessage(

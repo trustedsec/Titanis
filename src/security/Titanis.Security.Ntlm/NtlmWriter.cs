@@ -25,8 +25,8 @@ namespace Titanis.Security.Ntlm
 				writer.WriteAv(AvId.Flags, av.flags);
 			if (av.singleHost.HasValue)
 				writer.WriteAv(AvId.SingleHost, av.singleHost.Value);
-			if (av.channelBinding.HasValue)
-				writer.WriteAv(AvId.ChannelBindings, av.channelBinding.Value);
+			//if (av.channelBindingHashed != null)
+				writer.WriteAv(AvId.ChannelBindings, av.channelBindingHashed);
 			if (av.targetName != null)
 				writer.WriteAv(AvId.TargetName, av.targetName);
 

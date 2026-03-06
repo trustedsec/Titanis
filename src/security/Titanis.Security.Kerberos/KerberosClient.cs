@@ -439,7 +439,7 @@ namespace Titanis.Security.Kerberos
 			if (encProfile == null)
 				throw new NotSupportedException($"The encryption key uses an unsupported encryption profile {etype}.");
 
-			return encProfile.CreateSessionKey(Structs.EncryptionKey(etype, keyBytes.ToArray()));
+			return encProfile.CreateSessionKey(keyBytes.ToArray());
 		}
 
 		public TicketAuthorizationData GetTicketAuthorizationData(TicketInfo ticket, byte[] keyBytes)
@@ -956,12 +956,21 @@ namespace Titanis.Security.Kerberos
 			KerberosTime now,
 			int initialSeqNbr,
 			APOptions options,
-			SecurityCapabilities caps
+			SecurityCapabilities caps,
+			ChannelBinding? channelBinding
 			)
 		{
 			// Use from ticket instead of credentials
 			var cname = Structs.PrincipalName(PrincipalNameType.Principal, ticket.UserName);
 			string crealm = ticket.UserRealm;
+
+			Guid channelBind = new Guid();
+			if (channelBinding != null)
+			{
+				var bytes = channelBinding.GetBytes();
+				var hash = Md5.ComputeHash<Md5Context>(bytes);
+				channelBind = new Guid(hash);
+			}
 
 			//var reqBodyBytes = Asn1DerEncoder.EncodeTlv(reqBody);
 			var authenticator = Structs.Authenticator(
@@ -973,6 +982,7 @@ namespace Titanis.Security.Kerberos
 					new AuthChecksumToken()
 					{
 						bindLength = 0x10,
+						channelBind = channelBind,
 						capabilities = caps
 					}.AsSpan().ToArray()
 				),

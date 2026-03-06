@@ -15,7 +15,7 @@ namespace Titanis.Security.Ntlm
 		public DateTime? timestamp;
 		public string? targetName;
 		public SingleHostData? singleHost;
-		public Guid? channelBinding;
+		public Guid channelBindingHashed;
 
 		public Memory<byte> ToBytes()
 		{
@@ -38,7 +38,7 @@ namespace Titanis.Security.Ntlm
 			if (this.timestamp.HasValue) cb += 4 + 8;
 			if (this.targetName != null) cb += 4 + Encoding.Unicode.GetByteCount(this.targetName);
 			if (this.singleHost.HasValue) cb += 4 + 0x30;
-			if (this.channelBinding.HasValue) cb += 4 + 0x10;
+			/* channelBinding */ cb += 4 + 0x10;
 			cb += 4;    // End
 			return cb;
 		}

@@ -179,6 +179,7 @@ namespace Titanis.Security.Kerberos
 
 			return new SessionKey(this, ekey);
 		}
+		internal SessionKey CreateSessionKey(byte[] bytes) => this.CreateSessionKey(Structs.EncryptionKey(this.EType, bytes));
 
 		#region Checksum
 		#region ComputeChecksum

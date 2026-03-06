@@ -50,14 +50,7 @@ namespace Titanis.Security.Spnego
 		public sealed override ServicePrincipalName? TargetSpn
 		{
 			get => this._targetSpn;
-			set
-			{
-				this._targetSpn = value;
-				foreach (var ctx in this.Contexts)
-				{
-					ctx.TargetSpn = value;
-				}
-			}
+			set => this._targetSpn = value;
 		}
 
 		/// <inheritdoc/>
@@ -128,8 +121,7 @@ namespace Titanis.Security.Spnego
 
 			foreach (var ctx in this.Contexts)
 			{
-				ctx.TargetSpn = this.TargetSpn;
-				ctx.IsTargetSpnUntrusted = this.IsTargetSpnUntrusted;
+				SyncAuthSettings(ctx);
 			}
 
 			this._initiator = SpnegoInitiator.Client;
@@ -204,6 +196,8 @@ namespace Titanis.Security.Spnego
 					out bool preferred);
 				if (ctx == null)
 					throw new SecurityException(Messages.Spnego_NoSupportedMechs);
+
+				SyncAuthSettings(ctx);
 
 				innerTokenBytes = preferred
 					? this._selectedContext.Initialize(initToken.mechToken)
@@ -309,6 +303,13 @@ namespace Titanis.Security.Spnego
 			return this._token = tokenBytes;
 		}
 
+		private void SyncAuthSettings(AuthClientContext ctx)
+		{
+			ctx.ChannelBinding = this.ChannelBinding;
+			ctx.TargetSpn = this.TargetSpn;
+			ctx.IsTargetSpnUntrusted = this.IsTargetSpnUntrusted;
+		}
+
 		private AuthClientContext FindMatchingContext(params Asn1Oid[] mechList)
 			=> this.FindMatchingContext(mechList, out _);
 
@@ -337,18 +338,18 @@ namespace Titanis.Security.Spnego
 
 		/// <inheritdoc/>
 		public sealed override void SealMessage(in MessageSealParams sealParams)
-			=> this._selectedContext.SealMessage(sealParams);
+			=> this.GetCompletedContext().SealMessage(sealParams);
 		/// <inheritdoc/>
 		public sealed override void SignMessage(
 			in MessageSignParams signParams,
 			MessageSignOptions options
 			)
-			=> this._selectedContext.SignMessage(signParams, options);
+			=> this.GetCompletedContext().SignMessage(signParams, options);
 		/// <inheritdoc/>
 		public sealed override void UnsealMessage(in MessageSealParams unsealParams)
-			=> this._selectedContext.UnsealMessage(unsealParams);
+			=> this.GetCompletedContext().UnsealMessage(unsealParams);
 		/// <inheritdoc/>
 		public sealed override void VerifyMessage(in MessageVerifyParams verifyParams, MessageSignOptions options)
-			=> this._selectedContext.VerifyMessage(verifyParams, options);
+			=> this.GetCompletedContext().VerifyMessage(verifyParams, options);
 	}
 }

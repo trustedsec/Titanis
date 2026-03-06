@@ -380,16 +380,18 @@ namespace Titanis.Security.Kerberos
 			// TODO: Incorrect error message
 			//if (sealParams.Header.Length < this.SealHeaderSize)
 			//	throw new ArgumentException(Messages.Krb5_ChecksumBufferTooSmall, nameof(sealParams));
-			if (sealParams.Trailer.Length < (this.SealTrailerSize + this.SealHeaderSize))
+
+			var sealTrailer = sealParams.Header;
+			if (sealTrailer.Length < (this.SealTrailerSize + this.SealHeaderSize))
 				throw new ArgumentException(Messages.Krb5_ChecksumBufferTooSmall, nameof(sealParams));
 
-			ref WrapToken clearToken = ref MemoryMarshal.AsRef<WrapToken>(sealParams.Trailer.Slice(0, WrapToken.StructSize));
+			ref WrapToken clearToken = ref MemoryMarshal.AsRef<WrapToken>(sealTrailer.Slice(0, WrapToken.StructSize));
 
 			var cbBlock = this.CipherBlockSizeBytes;
 
-			var wrapTrailer = sealParams.Trailer.Slice(WrapToken.StructSize, cbBlock + WrapToken.StructSize);
-			var checksum = sealParams.Trailer.Slice(WrapToken.StructSize + wrapTrailer.Length, this.ChecksumSizeBytes);
-			var confounder = sealParams.Trailer.Slice(WrapToken.StructSize + wrapTrailer.Length + checksum.Length, cbBlock);
+			var wrapTrailer = sealTrailer.Slice(WrapToken.StructSize, cbBlock + WrapToken.StructSize);
+			var checksum = sealTrailer.Slice(WrapToken.StructSize + wrapTrailer.Length, this.ChecksumSizeBytes);
+			var confounder = sealTrailer.Slice(WrapToken.StructSize + wrapTrailer.Length + checksum.Length, cbBlock);
 
 			ref WrapToken encToken = ref MemoryMarshal.AsRef<WrapToken>(wrapTrailer.Slice(cbBlock, WrapToken.StructSize));
 			encToken = new WrapToken
@@ -422,15 +424,44 @@ namespace Titanis.Security.Kerberos
 			Debug.Assert(usage is KeyUsage.InitiatorSeal or KeyUsage.AcceptorSeal);
 			Debug.Assert((usage == KeyUsage.AcceptorSeal) == (0 != (flags & WrapFlags.SentByAcceptor)));
 
-			if (sealParams.Trailer.Length < this.SealTrailerSize)
+			var sealHeader = sealParams.Header;
+			if (sealHeader.Length < this.SealHeaderSize)
+				throw new ArgumentException("The header is too small.", nameof(sealParams));
+
+			ref WrapToken clearToken = ref MemoryMarshal.AsRef<WrapToken>(sealHeader.Slice(0, WrapToken.StructSize));
+
+			var sealTrailer = sealParams.Trailer;
+			int rrc;
+			if (sealHeader.Length == this.SealHeaderSize && sealTrailer.Length == this.SealTrailerSize)
+			{
+				rrc = 0;
+				sealHeader = sealHeader.Slice(WrapToken.StructSize);
+			}
+			else if (sealTrailer.Length == 0 && sealHeader.Length == (this.SealHeaderSize + this.SealTrailerSize))
+			{
+				sealHeader = sealHeader.Slice(WrapToken.StructSize);
+
+				// [MS-KILE] § 3.4.5.4.1 Kerberos Binding of GSS_WrapEx()
+				rrc = clearToken.Rrc + clearToken.ExtraCount;
+				if (rrc == this.SealTrailerSize)
+				{
+					sealTrailer = sealHeader.Slice(0, rrc);
+					sealHeader = sealHeader.Slice(rrc);
+				}
+				else
+				{
+					byte[] rrcBuffer = new byte[sealHeader.Length];
+
+					sealHeader.Slice(rrc).CopyTo(rrcBuffer);
+					sealHeader.Slice(0, rrc).CopyTo(rrcBuffer.AsSpan(rrcBuffer.Length - rrc));
+
+					sealHeader = rrcBuffer.AsSpan(0, this.SealHeaderSize - WrapToken.StructSize);
+					sealTrailer = rrcBuffer.AsSpan(rrcBuffer.Length - this.SealTrailerSize);
+				}
+			}
+			else
 				// TODO: Message
 				throw new ArgumentException(Messages.Krb5_ChecksumBufferTooSmall, nameof(sealParams));
-
-			//ref WrapToken clearToken = ref MemoryMarshal.AsRef<WrapToken>((sealParams.Header.Length == 0)
-			//	? sealParams.Trailer.Slice(0, WrapToken.StructSize)
-			//	: sealParams.Header.Slice(0, WrapToken.StructSize)
-			//	);
-			ref WrapToken clearToken = ref MemoryMarshal.AsRef<WrapToken>(sealParams.Trailer.Slice(0, WrapToken.StructSize));
 
 			// First handle the WrapToken
 			var ec = clearToken.ExtraCount;
@@ -438,18 +469,14 @@ namespace Titanis.Security.Kerberos
 				(clearToken.TokID == WrapTokenType.Wrap)
 				&& (clearToken.flags == flags)
 				&& (clearToken.filler_FF == 0xFF)
-				&& (ec == this.CipherBlockSizeBytes)
-				&& (clearToken.Rrc == (clearToken.ExtraCount + this.ChecksumSizeBytes))
+				//&& (ec == this.CipherBlockSizeBytes)
+				&& (clearToken.Rrc == (CipherBlockSizeBytes + this.ChecksumSizeBytes))
 				&& (clearToken.SeqNbr == seqNbr)
 				;
 			if (!isClearTokenValid)
 				throw new SecurityException(Messages.Krb5_InvalidSealedMessage);
 
 			var cbBlock = this.CipherBlockSizeBytes;
-
-			if (sealParams.Trailer.Length < (WrapToken.StructSize /* the cealr one */ + ec + WrapToken.StructSize /* the encrypted one */ + this.ChecksumSizeBytes + cbBlock /* confounder */))
-				// TODO: Message
-				throw new ArgumentException(Messages.Krb5_ChecksumBufferTooSmall, nameof(sealParams));
 
 			// Because of [MS-KILE] and [MS-RPCE], here is the actual layout
 			//   Plaintext WrapToken
@@ -458,17 +485,17 @@ namespace Titanis.Security.Kerberos
 			//   Checksum
 			//   Confounder
 
-			var wrapTrailer = sealParams.Trailer.Slice(WrapToken.StructSize, ec + WrapToken.StructSize);
-			var checksum = sealParams.Trailer.Slice(WrapToken.StructSize + wrapTrailer.Length, this.ChecksumSizeBytes);
-			var confounder = sealParams.Trailer.Slice(WrapToken.StructSize + wrapTrailer.Length + checksum.Length, cbBlock);
+			var checksum = sealTrailer[^this.ChecksumSizeBytes..];
+			sealTrailer = sealTrailer[..^this.ChecksumSizeBytes];
+			var confounder = sealHeader;
 
 			var combined = sealParams.bufferList.WithCombined(
 				default,
-				SecBuffer.PrivacyWithIntegrity(wrapTrailer)
+				SecBuffer.PrivacyWithIntegrity(sealTrailer)
 				);
+			ref WrapToken encToken = ref MemoryMarshal.AsRef<WrapToken>(sealTrailer.Slice(ec, WrapToken.StructSize));
 			this.Decrypt(sessionKey, usage, confounder, combined, checksum);
 
-			ref WrapToken encToken = ref MemoryMarshal.AsRef<WrapToken>(wrapTrailer.Slice(ec, WrapToken.StructSize));
 			bool isEncTokenValid =
 				(encToken.TokID == WrapTokenType.Wrap)
 				&& (encToken.flags == clearToken.flags)
@@ -477,7 +504,7 @@ namespace Titanis.Security.Kerberos
 				&& (encToken.SeqNbr == seqNbr)
 				&& (encToken.Rrc == 0)
 				;
-			if (!isClearTokenValid)
+			if (!isEncTokenValid)
 				throw new SecurityException(Messages.Krb5_InvalidSealedMessage);
 		}
 		#endregion

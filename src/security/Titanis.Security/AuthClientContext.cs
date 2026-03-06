@@ -131,6 +131,10 @@ namespace Titanis.Security
 		/// Gets or sets a value indicating whether the SPN was supplied by an untrusted source.
 		/// </summary>
 		public bool IsTargetSpnUntrusted { get; set; }
+		/// <summary>
+		/// Gets or sets the channel binding.
+		/// </summary>
+		public ChannelBinding? ChannelBinding { get; set; }
 
 		/// <summary>
 		/// Initializes this authentication context.

@@ -167,7 +167,7 @@ namespace Titanis.Security.Ntlm
 						av.targetName = reader.ReadStringUni(avh.avLen);
 						break;
 					case AvId.ChannelBindings:
-						av.channelBinding = reader.ReadChannelBinding(avh.avLen);
+						av.channelBindingHashed = reader.ReadChannelBinding(avh.avLen);
 						break;
 					default:
 						break;

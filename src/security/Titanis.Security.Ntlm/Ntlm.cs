@@ -760,7 +760,11 @@ LmChallengeResponse [0..7]))
 				ref sealingKey,
 				out NtlmMessageSignatureV1 expectedSignature);
 
-			ref NtlmMessageSignatureV1 signature = ref MemoryMarshal.AsRef<NtlmMessageSignatureV1>(unsealParams.Trailer);
+			var tokenBuffer = unsealParams.Header;
+			if (tokenBuffer.Length == 0)
+				tokenBuffer = unsealParams.Trailer;
+
+			ref NtlmMessageSignatureV1 signature = ref MemoryMarshal.AsRef<NtlmMessageSignatureV1>(tokenBuffer);
 			if (
 				(signature.checksum != expectedSignature.checksum)
 				|| (signature.seqnbr != expectedSignature.seqnbr)
@@ -777,10 +781,14 @@ LmChallengeResponse [0..7]))
 			bool useKxkey
 			)
 		{
+			var tokenBuffer = sealParams.Header;
+			if (tokenBuffer.Length == 0)
+				tokenBuffer = sealParams.Trailer;
+
 			{
 				// TODO: Does the MAC have to be calculated twice?
 
-				ref NtlmMessageSignatureV2 signature = ref MemoryMarshal.AsRef<NtlmMessageSignatureV2>(sealParams.Trailer);
+				ref NtlmMessageSignatureV2 signature = ref MemoryMarshal.AsRef<NtlmMessageSignatureV2>(tokenBuffer);
 				MacV2(
 					in sealParams.bufferList,
 					signingKey,
@@ -798,7 +806,7 @@ LmChallengeResponse [0..7]))
 
 			if (useKxkey)
 			{
-				ref NtlmMessageSignatureV2 signature = ref MemoryMarshal.AsRef<NtlmMessageSignatureV2>(sealParams.Trailer);
+				ref NtlmMessageSignatureV2 signature = ref MemoryMarshal.AsRef<NtlmMessageSignatureV2>(tokenBuffer);
 				var checksumSpan = signature.ChecksumAsSpan();
 				sealingKey.Transform(checksumSpan, checksumSpan);
 			}
@@ -812,6 +820,10 @@ LmChallengeResponse [0..7]))
 			bool useKxkey
 			)
 		{
+			var tokenBuffer = unsealParams.Header;
+			if (tokenBuffer.Length == 0)
+				tokenBuffer = unsealParams.Trailer;
+
 			for (int i = 0; i < unsealParams.bufferList.BufferCount; i++)
 			{
 				TransformIfPrivacy(ref sealingKey, unsealParams.bufferList.GetBuffer(i));
@@ -826,7 +838,7 @@ LmChallengeResponse [0..7]))
 				out NtlmMessageSignatureV2 expectedSignature);
 
 			{
-				ref NtlmMessageSignatureV2 signature = ref MemoryMarshal.AsRef<NtlmMessageSignatureV2>(unsealParams.Trailer);
+				ref NtlmMessageSignatureV2 signature = ref MemoryMarshal.AsRef<NtlmMessageSignatureV2>(tokenBuffer);
 				if (
 					(signature.checksum != expectedSignature.checksum)
 					|| (signature.seqnbr != seqNbr)
@@ -1036,8 +1048,12 @@ LmChallengeResponse [0..7]))
 			in Buffer128 signKey
 			)
 		{
-			if (sealParams.Trailer.Length < NtlmMessageSignatureV1.StructSize)
-				throw new ArgumentException(Messages.Ntlm_MacBufferTooSmall, nameof(sealParams.Trailer));
+			var tokenBuffer = sealParams.Header;
+			if (tokenBuffer.Length == 0)
+				tokenBuffer = sealParams.Trailer;
+
+			if (tokenBuffer.Length < NtlmMessageSignatureV1.StructSize)
+				throw new ArgumentException(Messages.Ntlm_MacBufferTooSmall, nameof(sealParams));
 
 			if (0 != (negFlags & NegotiateFlags.P_NegotiateExtendedSessionSecurity))
 			{
@@ -1068,8 +1084,12 @@ LmChallengeResponse [0..7]))
 			in Buffer128 signKey
 			)
 		{
-			if (unsealParams.Trailer.Length < NtlmMessageSignatureV1.StructSize)
-				throw new ArgumentException(Messages.Ntlm_MacBufferTooSmall, nameof(unsealParams.Trailer));
+			var tokenBuffer = unsealParams.Header;
+			if (tokenBuffer.Length == 0)
+				tokenBuffer = unsealParams.Trailer;
+
+			if (tokenBuffer.Length < NtlmMessageSignatureV1.StructSize)
+				throw new ArgumentException(Messages.Ntlm_MacBufferTooSmall, nameof(unsealParams));
 
 			if (0 != (negFlags & NegotiateFlags.P_NegotiateExtendedSessionSecurity))
 			{

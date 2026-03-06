@@ -151,7 +151,8 @@ namespace Titanis.Security.Kerberos
 				this._now,
 				sendSeqNbr,
 				options,
-				gssFlags
+				gssFlags,
+				this.ChannelBinding
 				);
 
 			var encoder = Asn1DerEncoding.CreateDerEncoder();
