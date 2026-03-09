@@ -1,5 +1,38 @@
 Change Log
 
+# 2026-03-09
+
+* Kerberos
+	* PKINIT
+	* Ticket decryption and authorization data support
+		* Includes getting NTLM hash from PKINIT
+	* Supports U2U
+		* Support for MS_PRINCIPAL
+* RPC
+	* [MS-RRP]
+* LDAP
+	* SSL and channel binding
+	* Support for named bits
+	* Shorthand notation for BIT_OR, BIT_AND, and TRANSITIVE_EVAL
+* Security
+	* Object security models for common object types
+	* Parse and generate SDDL strings
+	* SPN overriding
+	* Better support for well-known security principals
+* Cryptography
+	* Diffie-Hellman MODP key exchange
+* Reg command
+	* SAM dump
+	* Get system key
+	* Access registry with backup semantics
+* Dcom standalone utility
+	* Activate and invoke on a remote automation object
+* Sddl command
+	* Describe SDDL descriptor
+* CLI
+	* Support for dynamic output fields
+	* Relative parameter ordering
+
 # 2025-11-03
 
 * Kerberos
