@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -218,6 +219,16 @@ namespace Titanis.Ldap
 		{
 			return int.Parse(text);
 		}
+
+		// [MS-DRSR] § 5.16.1.1
+		/// <inheritdoc/>
+		public override object DecodeDsrep(byte[] bytes)
+		{
+			if (bytes.Length != 4)
+				throw new FormatException($"The encoded value must be exactly 4 bytes.");
+
+			return BinaryPrimitives.ReadInt32LittleEndian(bytes);
+		}
 	}
 
 	// [RFC 4517] § 3.3.16
@@ -253,6 +264,16 @@ namespace Titanis.Ldap
 		}
 
 		public override object Parse(string text) => long.Parse(text);
+
+		// [MS-DRSR] § 5.16.1.2
+		/// <inheritdoc/>
+		public override object DecodeDsrep(byte[] bytes)
+		{
+			if (bytes.Length != 8)
+				throw new FormatException($"The encoded value must be exactly 8 bytes.");
+
+			return BinaryPrimitives.ReadInt64LittleEndian(bytes);
+		}
 	}
 
 	public class AccessPointRef

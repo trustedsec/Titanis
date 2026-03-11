@@ -2,6 +2,8 @@
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Security.Cryptography;
+using System.Text;
+using Titanis.IO;
 using Titanis.Msrpc.Msrrp.Cli;
 using Titanis.Winterop.Registry;
 using Titanis.Winterop.Sam;
@@ -28,7 +30,91 @@ namespace Titanis.Winterop.SamServer
 
 	public abstract class SamServer
 	{
+		// [MS-SAMR] § 2.2.10.1 USER_PROPERTIES
+		public static SupplementalCredentials DecodeSupplementalCredential(ReadOnlySpan<byte> bytes)
+		{
+			SupplementalCredentials creds = new SupplementalCredentials();
 
+			var reader = new ByteMemoryReader(bytes.ToArray());
+			var userProps = reader.ReadPduStruct<USER_PROPERTIES>();
+			List<KerberosKeyInfo> keys = new List<KerberosKeyInfo>();
+			List<KerberosKeyInfo> oldKeys = new List<KerberosKeyInfo>();
+			foreach (var prop in userProps.properties)
+			{
+				var propBytes = BinaryHelper.ParseHexString(prop.valueBytes);
+				reader = new ByteMemoryReader(propBytes);
+				switch (prop.name)
+				{
+					case "Primary:WDigest":
+						{
+							var wdigest = reader.ReadPduStruct<WDIGEST_CREDENTIALS>();
+							creds.WDigestHashes = Array.ConvertAll(wdigest.hashes, r => r.bytes);
+						}
+						break;
+					case "Primary:Kerberos":
+						{
+							var kerb = reader.ReadPduStruct<KERB_STORED_CREDENTIAL>();
+							ExtractKerberosKeysInto(propBytes, kerb.credentials, keys);
+							ExtractKerberosKeysInto(propBytes, kerb.oldCredentials, oldKeys);
+							creds.KerberosSalt = propBytes.Slice(kerb.defaultSaltOffset, kerb.defaultSaltLength).ToArray();
+						}
+						break;
+					case "Primary:Kerberos-Newer-Keys":
+						{
+							var kerb = reader.ReadPduStruct<KERB_STORED_CREDENTIAL_NEW>();
+							ExtractKerberosKeysInto(propBytes, kerb.credentials, keys);
+							ExtractKerberosKeysInto(propBytes, kerb.serviceCredentials, keys);
+							ExtractKerberosKeysInto(propBytes, kerb.oldCredentials, oldKeys);
+							ExtractKerberosKeysInto(propBytes, kerb.olderCredentials, oldKeys);
+							creds.KerberosSalt = propBytes.Slice(kerb.defaultSaltOffset, kerb.defaultSaltLength).ToArray();
+						}
+						break;
+					case "Primary:CLEARTEXT":
+						{
+							creds.CleartextPassword = Encoding.Unicode.GetString(propBytes);
+						}
+						break;
+					case "Primary:NTLM-Strong-NTOWF":
+						{
+							creds.NtlmStrongNtowf = propBytes;
+						}
+						break;
+					case "Packages":
+						break;
+					default:
+						break;
+				}
+			}
+
+			creds.KerberosKeys = keys.ToArray();
+			creds.KerberosOldKeys = keys.ToArray();
+
+			return creds;
+		}
+
+		private static void ExtractKerberosKeysInto(byte[] propBytes, KERB_KEY_DATA[]? keyData, List<KerberosKeyInfo> keys)
+		{
+			if (keyData != null)
+			{
+				foreach (var key in keyData)
+				{
+					var keyInfo = new KerberosKeyInfo(key.keyType, propBytes.Slice(key.keyOffset, key.keyLength).ToArray());
+					keys.Add(keyInfo);
+				}
+			}
+		}
+
+		private static void ExtractKerberosKeysInto(byte[] propBytes, KERB_KEY_DATA_NEW[]? keyData, List<KerberosKeyInfo> keys)
+		{
+			if (keyData != null)
+			{
+				foreach (var key in keyData)
+				{
+					var keyInfo = new KerberosKeyInfo(key.keyType, propBytes.Slice(key.keyOffset, key.keyLength).ToArray(), key.iterationCount);
+					keys.Add(keyInfo);
+				}
+			}
+		}
 	}
 
 	public partial class SamRegistryServer : SamServer
@@ -54,10 +140,10 @@ namespace Titanis.Winterop.SamServer
 
 		public static async Task<SamRegistryServer> Open(byte[] systemKey, IRegistryStore registry, RegistryKeyOptions options, ILog? log, CancellationToken cancellationToken)
 		{
-            ArgumentNullException.ThrowIfNull(systemKey);
-            ArgumentNullException.ThrowIfNull(registry);
+			ArgumentNullException.ThrowIfNull(systemKey);
+			ArgumentNullException.ThrowIfNull(registry);
 
-            return new SamRegistryServer(systemKey, registry, options, log);
+			return new SamRegistryServer(systemKey, registry, options, log);
 		}
 
 		public async Task<SamUserHash[]> DumpUserHashes(CancellationToken cancellationToken)

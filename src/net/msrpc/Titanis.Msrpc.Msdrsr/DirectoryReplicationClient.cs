@@ -10,6 +10,7 @@ using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
 using Titanis.IO;
 using Titanis.Winterop;
+using Titanis.Winterop.SamServer;
 
 namespace Titanis.Msrpc.Msdrsr
 {
@@ -78,6 +79,7 @@ namespace Titanis.Msrpc.Msdrsr
 		public override bool SupportsDynamicTcp => true;
 
 		private const int DrsExtSize = (12 * 4 + 4);
+		private const string SupplementalCredentialsOid = "1.2.840.113556.1.4.125";
 
 		// [MS-DRSR] 5.138 NTSAPI_CLIENT_GUID
 		private static readonly Guid NtdsapiClientGuid = new Guid("e24d201a-4fd6-11d1-a3da-0000f875ae0d");
@@ -271,6 +273,7 @@ namespace Titanis.Msrpc.Msdrsr
 			), cancellationToken);
 		}
 
+		// [MS-DRSR] § 5.41 DRS_OPTIONS
 		[Flags]
 		enum DrsOptions : uint
 		{
@@ -316,6 +319,7 @@ namespace Titanis.Msrpc.Msdrsr
 			GetAllGroupMembership = 0x8000_0000,
 		}
 
+		// [MS-DRSR] § 4.1.10.2.22 EXOP_REQ Codes
 		enum ExtendedOpRequest
 		{
 			FsmoReqRole = 1,
@@ -439,7 +443,7 @@ namespace Titanis.Msrpc.Msdrsr
 		private static DsAttribute[] AttrsFromBlock(in ATTRBLOCK attrBlock, string[] prefixTable, byte[] sessionKey)
 		{
 			var attrSrcs = attrBlock.pAttr.value;
-			DsAttribute[] attrs = new DsAttribute[attrSrcs.Length];
+			var attrs = new List<DsAttribute>(attrSrcs.Length);
 			for (int iAttr = 0; iAttr < attrSrcs.Length; iAttr++)
 			{
 				ATTR attrSrc = attrSrcs[iAttr];
@@ -453,10 +457,10 @@ namespace Titanis.Msrpc.Msdrsr
 				var values = (pAttrVal == null) ? null : Array.ConvertAll(pAttrVal, r => new DsAttributeValue(DecryptIfNeeded(oid, r.pVal.value, sessionKey)));
 
 				DsAttribute dsattr = new DsAttribute(oid, values ?? []);
-				attrs[iAttr] = dsattr;
+				attrs.Add(dsattr);
 			}
 
-			return attrs;
+			return attrs.ToArray();
 		}
 
 		// [MS-DRSR] § 4.1.10.5.11 - EncryptValuesIfNecessary
@@ -498,7 +502,7 @@ namespace Titanis.Msrpc.Msdrsr
 			"LMPWDHISTORY", "1.2.840.113556.1.4.160",
 			"NTPWDHISTORY", "1.2.840.113556.1.4.94",
 			"PRIORVALUE", "1.2.840.113556.1.4.100",
-			"SUPPLEMENTALCREDENTIALS", "1.2.840.113556.1.4.125",
+			"SUPPLEMENTALCREDENTIALS", SupplementalCredentialsOid,
 			"TRUSTAUTHINCOMING", "1.2.840.113556.1.4.129",
 			"TRUSTAUTHOUTGOING", "1.2.840.113556.1.4.135",
 			"UNICODEPWD", "1.2.840.113556.1.4.90",

@@ -8,8 +8,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\crypto\Titanis.Crypto.Des\Titanis.Crypto.Des.csproj" />
+    <ProjectReference Include="..\Titanis.IO\Titanis.IO.csproj" />
     <ProjectReference Include="..\Titanis.Winterop.Registry\Titanis.Winterop.Registry.csproj" />
     <ProjectReference Include="..\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
+    <ProjectReference Include="..\..\build\Titanis.SourceGen\Titanis.SourceGen.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

@@ -67,11 +67,17 @@ namespace Titanis.Ldap
 		public abstract Type RuntimeType { get; }
 
 		/// <summary>
-		/// Decodes a value using this syntax.
+		/// Decodes an LDAP value using this syntax.
 		/// </summary>
 		/// <param name="bytes">Bytes</param>
-		/// <returns></returns>
+		/// <returns>Decode value</returns>
 		public abstract object Decode(byte[] bytes);
+		/// <summary>
+		/// Decodes a value from [MS-DRSR] using this syntax.
+		/// </summary>
+		/// <param name="bytes">Bytes</param>
+		/// <returns>Decode value</returns>
+		public virtual object DecodeDsrep(byte[] bytes) => this.Decode(bytes);
 		/// <summary>
 		/// Encodes a value using this syntax.
 		/// </summary>

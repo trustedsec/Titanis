@@ -50,6 +50,17 @@ namespace Titanis.Ldap
 			Syntax = syntax;
 		}
 
+		public AttributeTypeDescription(
+			AttributeTypeDescriptionFlags flags,
+			string name
+			)
+		{
+			ArgumentNullException.ThrowIfNull(name);
+			this.Flags = flags;
+			this.Names = [name];
+			this.Oid = name;
+		}
+
 		public AttributeTypeDescriptionFlags Flags { get; }
 		public bool IsObsolete => (this.Flags & AttributeTypeDescriptionFlags.Obsolete) != 0;
 		public bool IsSingleValued => (this.Flags & AttributeTypeDescriptionFlags.SingleValue) != 0;
