@@ -7,7 +7,7 @@ namespace Titanis.Ldap
 {
 	public sealed partial class LdapEntry
 	{
-		internal LdapEntry(
+		public LdapEntry(
 			LdapDistinguishedName? dn,
 			LdapAttribute[] attributes
 			)

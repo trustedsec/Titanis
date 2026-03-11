@@ -18,9 +18,11 @@ namespace Titanis.Ldap
 			this.AttributeType = attrType;
 			this.Values = values;
 		}
-		internal LdapAttribute(AttributeTypeDescription attrType, object[] values)
+		public LdapAttribute(AttributeTypeDescription attrType, object[] values)
 			: this(new LdapAttributeDescription((attrType ?? throw new ArgumentNullException(nameof(attrType))).Name), attrType, values)
 		{
+			ArgumentNullException.ThrowIfNull(attrType);
+			ArgumentNullException.ThrowIfNull(values);
 		}
 
 		/// <summary>
