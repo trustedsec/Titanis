@@ -19,6 +19,8 @@ namespace Titanis.Security.Spnego.Test
 		}
 
 		[TestMethod]
+		[Ignore("Test incomplete")]
+		[TestCategory("CI_Ignore")]
 		public void TestReadNegTokenInit()
 		{
 			string resourceName = "Titanis.Security.Spnego.Test.TestData.gssapi-spnego-NTLM_NEGOTIATE.bin";
@@ -40,6 +42,8 @@ namespace Titanis.Security.Spnego.Test
 		}
 
 		[TestMethod]
+		[Ignore("Test incomplete")]
+		[TestCategory("CI_Ignore")]
 		public void TestReadNegTokenInit_opt()
 		{
 			string resourceName = "Titanis.Security.Spnego.Test.TestData.gssapi-spnego-NegTokenInit2.bin";

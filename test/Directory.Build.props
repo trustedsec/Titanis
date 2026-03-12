@@ -5,5 +5,8 @@
 
 	<PropertyGroup>
 		<ArtifactsPath>$(ArtifactsPath)/test</ArtifactsPath>
+
+		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
 	</PropertyGroup>
 </Project>

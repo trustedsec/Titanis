@@ -154,14 +154,16 @@ namespace Titanis.Asn1.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(OverflowException))]
 		public void TestTlv_Byte1_TooLarge()
 		{
 			byte[] data = new byte[]
 			{
 				0x02, 0x02, 0x01, 0x02
 			};
-			TestDecodeTlv(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsByte(), 0x00);
+			Assert.Throws<OverflowException>(() =>
+			{
+				TestDecodeTlv(data, Asn1PredefTag.Integer, r => r.DecodeIntegerTlvAsByte(), 0x00);
+			});
 		}
 
 		[TestMethod]

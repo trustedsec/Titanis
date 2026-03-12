@@ -2,10 +2,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Text;
 
-namespace Titanis.NFoldTest
+namespace Titanis.Crypto.Test
 {
 	[TestClass]
-	public class UnitTest1
+	public class NFoldTests
 	{
 		private static readonly byte[] input = new byte[]
 		{

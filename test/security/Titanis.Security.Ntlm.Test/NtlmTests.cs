@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -177,7 +175,7 @@ namespace Titanis.Security.Ntlm.Test
 
 			CollectionAssert.AreEqual(TestOutputValues.EncryptedMessage_422, message);
 
-			ref NtlmMessageSignatureV1 sig = ref MemoryMarshal.AsRef<NtlmMessageSignatureV1>(mac);
+			ref readonly NtlmMessageSignatureV1 sig = ref MemoryMarshal.AsRef<NtlmMessageSignatureV1>(mac);
 
 			Assert.AreEqual(TestOutputValues.ExpectedRandomPadCipher_422, sig.randomPad);
 			Assert.AreEqual(TestOutputValues.EncryptedChecksum_422, sig.checksum);

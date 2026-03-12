@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Titanis.Crypto.Aes128CmacTest
+namespace Titanis.Crypto.Test
 {
 	[TestClass]
 	public class Aes128CmacTest

@@ -77,8 +77,6 @@ namespace Titanis.Asn1.Serialization
 		public IByteSource GetReader() => this._reader;
 		private byte _ReadNextByte()
 		{
-			Debug.Assert(!this.HasPeekTag);
-
 			var b = this._reader.ReadByte();
 			return b;
 		}
@@ -86,14 +84,10 @@ namespace Titanis.Asn1.Serialization
 		{
 			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
 
-			Debug.Assert(!this.HasPeekTag);
-
 			this._reader.Advance(count);
 		}
 		private ReadOnlySpan<byte> _Consume(int count)
 		{
-			Debug.Assert(!this.HasPeekTag);
-
 			return this._reader.Consume(count);
 		}
 
@@ -107,26 +101,21 @@ namespace Titanis.Asn1.Serialization
 				? this._ReadNextByte()
 				: throw new EndOfStreamException();
 
+		private long _peekedTagPos = -1;
 		private Asn1Tag _peekedTag;
-		private long _peekIndex = -1;
-		private bool HasPeekTag => this._peekIndex >= 0;
-		private long _peekedLength;
 
 		/// <inheritdoc/>
 		public override Asn1Tag PeekTag()
 		{
-			if (!this.HasPeekTag)
+			if (this.Position != this._peekedTagPos)
 			{
 				// DecodeTag and DecodeLength call IsEndOfTuple
 
 				if (this._frame.IsIndefiniteLength || !this.IsEndOfDefTuple)
 				{
-					long peekPos = this.Position;
-
+					this._peekedTagPos = this.Position;
 					this._peekedTag = this.DecodeTag();
-					this._peekedLength = this.DecodeLength();
-
-					this._peekIndex = peekPos;
+					this.Position = this._peekedTagPos;
 				}
 				else
 				{
@@ -213,12 +202,8 @@ namespace Titanis.Asn1.Serialization
 			if (((tag._value | Asn1Tag.ConstructedFlag) != (expectedTag._value | Asn1Tag.ConstructedFlag)))
 				throw new Asn1UnexpectedTagException(this, expectedTag, tag, null);
 
-
-			Debug.Assert(this.HasPeekTag);
-			tag = this._peekedTag;
-			var length = this._peekedLength;
-			this.ConsumePeekState();
-
+			tag = this.DecodeTag();
+			var length = this.DecodeLength();
 
 			long innerEndIndex;
 			if (length < 0)
@@ -245,20 +230,6 @@ namespace Titanis.Asn1.Serialization
 			return outerFrame;
 		}
 
-		private void ConsumePeekState()
-		{
-			this._peekIndex = -1;
-		}
-
-		private void DiscardPeekState()
-		{
-			if (this.HasPeekTag)
-			{
-				this.Position = this._peekIndex;
-				this._peekIndex = -1;
-			}
-		}
-
 		private void EnsurePrimitive()
 		{
 			if (this._frame.IsConstructed)
@@ -273,8 +244,6 @@ namespace Titanis.Asn1.Serialization
 		/// <exception cref="EndOfStreamException"></exception>
 		public long DecodeLength()
 		{
-			Debug.Assert(!this.HasPeekTag);
-
 			if (!this._frame.IsConstructed && this.IsEndOfDefTuple)
 				throw new EndOfStreamException();
 
@@ -323,6 +292,13 @@ namespace Titanis.Asn1.Serialization
 					this.SkipTlvs();
 					this.CloseTlv(frame);
 				}
+
+				// Eat the end tag
+				var tag = this.DecodeTag();
+				Debug.Assert(tag == default);
+				var length = this.DecodeLength();
+				// TODO: How to handle if length isn't 0
+				Debug.Assert(length == 0);
 			}
 			else
 			{
@@ -335,7 +311,6 @@ namespace Titanis.Asn1.Serialization
 		{
 			// TODO: Does ''frame'' need to be verified?
 
-			this.DiscardPeekState();
 			this.SkipTlvs();
 			this._frame = frame;
 		}
@@ -643,7 +618,11 @@ namespace Titanis.Asn1.Serialization
 		{
 			if (this.IsIndefiniteLength)
 			{
+				// TODO: OPT
 				MemoryStream bits = new MemoryStream();
+#if DEBUG
+				var frame = this._frame;
+#endif
 				int unusedBits = 0;
 				this.DecodeTupleContentInto((b, f) =>
 				{
@@ -653,6 +632,10 @@ namespace Titanis.Asn1.Serialization
 
 					bits.Write(b);
 				});
+
+#if DEBUG
+				Debug.Assert(frame.endPosition == this._frame.endPosition);
+#endif
 
 				return new Asn1BitString(bits.ToArray(), (byte)unusedBits);
 			}
@@ -1001,15 +984,16 @@ namespace Titanis.Asn1.Serialization
 		/// <summary>
 		/// Reads the next tuple as a string of bytes.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>A byte array of the tuple bytes</returns>
 		public byte[] DecodeNextTupleAsBytes()
 		{
-			var tag = this.PeekTag();
-			var startPos = this._peekIndex;
-			var length = (this.Position + this._peekedLength) - this._peekIndex;
+			var startPos = this.Position;
+			var tag = this.DecodeTag();
+			var valueLength = this.DecodeLength();
+			var totalLength = this.Position - startPos + valueLength;
 
-			this.DiscardPeekState();
-			var bytes = this._reader.ReadBytes(checked((int)length));
+			this._reader.Position = startPos;
+			var bytes = this._reader.ReadBytes(checked((int)totalLength));
 			return bytes;
 		}
 

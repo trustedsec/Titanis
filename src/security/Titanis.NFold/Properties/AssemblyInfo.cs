@@ -15,4 +15,5 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM.
 
+[assembly: Guid("5cd98387-d45d-4f82-906a-3ed93bcc9d48")]
 [assembly: InternalsVisibleTo("Titanis.Crypto.Test")]

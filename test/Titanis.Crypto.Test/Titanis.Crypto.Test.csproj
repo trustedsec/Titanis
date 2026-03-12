@@ -1,0 +1,25 @@
+﻿<Project Sdk="MSTest.Sdk/4.0.1">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TestingExtensionsProfile>None</TestingExtensionsProfile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\crypto\Titanis.Crypto.Aes128Cmac\Titanis.Crypto.Aes128Cmac.csproj" />
+    <ProjectReference Include="..\..\src\crypto\Titanis.Crypto.AesCcm\Titanis.Crypto.AesCcm.csproj" />
+    <ProjectReference Include="..\..\src\crypto\Titanis.Crypto.DiffieHellman\Titanis.Crypto.DiffieHellman.csproj" />
+    <ProjectReference Include="..\..\src\crypto\Titanis.Crypto.Md4\Titanis.Crypto.Md4.csproj" />
+    <ProjectReference Include="..\..\src\crypto\Titanis.Crypto.Md5\Titanis.Crypto.Md5.csproj" />
+    <ProjectReference Include="..\..\src\crypto\Titanis.Crypto.Rc4\Titanis.Crypto.Rc4.csproj" />
+    <ProjectReference Include="..\..\src\crypto\Titanis.Crypto.Sha1\Titanis.Crypto.Sha1.csproj" />
+    <ProjectReference Include="..\..\src\crypto\Titanis.Crypto.Sha2\Titanis.Crypto.Sha2.csproj" />
+    <ProjectReference Include="..\..\src\crypto\Titanis.Crypto.Sp800_108\Titanis.Crypto.Sp800_108.csproj" />
+    <ProjectReference Include="..\..\src\crypto\Titanis.Crypto\Titanis.Crypto.csproj" />
+    <ProjectReference Include="..\..\src\security\Titanis.NFold\Titanis.NFold.csproj" />
+  </ItemGroup>
+
+</Project>
