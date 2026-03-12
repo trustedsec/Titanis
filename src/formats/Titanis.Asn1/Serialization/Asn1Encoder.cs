@@ -79,14 +79,6 @@ namespace Titanis.Asn1.Serialization
 
 		public void EncodeOidTlv(Asn1Oid oid) => this.EncodeOidTlv(oid, Asn1PredefTag.ObjectIdentifier);
 		public abstract void EncodeOidTlv(Asn1Oid oid, Asn1Tag tag);
-		public void EncodeOidTlv(Oid oid) => this.EncodeOidTlv(oid, Asn1PredefTag.ObjectIdentifier);
-		public void EncodeOidTlv(Oid oid, Asn1Tag tag)
-		{
-			if (oid == null)
-				throw new ArgumentNullException(nameof(oid));
-
-			this.EncodeOidTlv(new Asn1Oid(oid), tag);
-		}
 		public void EncodeRelativeOidTlv(Asn1Oid oid) => this.EncodeRelativeOidTlv(oid, Asn1PredefTag.RelativeOid);
 		public abstract void EncodeRelativeOidTlv(Asn1Oid oid, Asn1Tag tag);
 		public void EncodeUtcTimeTlv(DateTime dt) => this.EncodeUtcTimeTlv(dt, Asn1PredefTag.UtcTime);

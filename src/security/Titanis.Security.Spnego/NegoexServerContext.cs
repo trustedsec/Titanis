@@ -4,12 +4,13 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis.Asn1;
 
 namespace Titanis.Security.Spnego
 {
 	public class NegoexServerContext : AuthServerContext
 	{
-		public override Oid? MechOid => new Oid(NegoexClientContext.NegoexOid);
+		public override Asn1Oid MechOid => NegoexClientContext.NegoexOid;
 
 		public override bool IsComplete => false;
 

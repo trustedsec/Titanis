@@ -19,7 +19,7 @@ namespace Titanis.Security.Spnego
 	/// </remarks>
 	public sealed class SpnegoClientContext : AuthClientContext
 	{
-		public static readonly Oid SpnegoOid = new Oid("1.3.6.1.5.5.2");
+		public static readonly Asn1Oid SpnegoOid = new Asn1Oid("1.3.6.1.5.5.2");
 
 		/// <summary>
 		/// Initializes a new <see cref="SpnegoClientContext"/>.
@@ -40,7 +40,7 @@ namespace Titanis.Security.Spnego
 		public sealed override bool IsAnonymous => this._selectedContext?.IsAnonymous ?? false;
 
 		/// <inheritdoc/>
-		public sealed override Oid MechOid => SpnegoOid;
+		public sealed override Asn1Oid MechOid => SpnegoOid;
 
 		/// <inheritdoc/>
 		public sealed override byte RpcAuthType => 0x09;
@@ -136,10 +136,10 @@ namespace Titanis.Security.Spnego
 			for (int i = 0; i < mechList.Length; i++)
 			{
 				var mechOid = this.Contexts[i].MechOid;
-				if (mechOid == null)
+				if (mechOid.IsEmpty)
 					throw new InvalidOperationException(Messages.Spnego_NoContextMechOid);
 
-				mechList[i] = new Asn1Oid(mechOid);
+				mechList[i] = mechOid;
 			}
 			this._mechTypeList = mechList;
 
@@ -157,7 +157,7 @@ namespace Titanis.Security.Spnego
 
 			var gssToken = new InitialContextToken(
 				new InitialContextToken_Tagged0(
-					new Asn1Oid(SpnegoOid),
+					SpnegoOid,
 					Asn1Any.CreateFromObject(spnegoToken)
 					));
 
@@ -209,7 +209,7 @@ namespace Titanis.Security.Spnego
 					? this._selectedContext.Initialize(initToken.mechToken)
 					: this._selectedContext.Initialize();
 
-				mechList = new Asn1Oid[] { new Asn1Oid(this._selectedContext.MechOid) };
+				mechList = new Asn1Oid[] { this._selectedContext.MechOid };
 				this._mechTypeList = mechList;
 				spnegoToken = new NegotiationToken
 				{
@@ -221,7 +221,7 @@ namespace Titanis.Security.Spnego
 
 				gssRespToken = new InitialContextToken(
 					new InitialContextToken_Tagged0(
-						new Asn1Oid(SpnegoOid),
+						SpnegoOid,
 						Asn1Any.CreateFromObject(spnegoToken)
 					));
 				tokenBytes = Asn1DerEncoder.EncodeTlv(gssRespToken).ToArray();
@@ -328,10 +328,10 @@ namespace Titanis.Security.Spnego
 			for (int i = 0; i < mechList.Length; i++)
 			{
 				var mech = mechList[i];
-				var mechOid = mech.ToOid();
+				var mechOid = mech;
 				foreach (var ctx in this.Contexts)
 				{
-					if (mechOid.Value.Equals(ctx.MechOid?.Value))
+					if (mechOid.Equals(ctx.MechOid))
 					{
 						preferred = (i == 0);
 						return ctx;

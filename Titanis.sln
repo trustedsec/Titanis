@@ -273,7 +273,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.AuthProxy", "src\se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Crypto.DiffieHellman", "src\crypto\Titanis.Crypto.DiffieHellman\Titanis.Crypto.DiffieHellman.csproj", "{6AD83087-405D-4BD5-90CB-A280BE06D0A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Crypto.DiffieHellman.Test", "test\crypto\Titanis.Crypto.DiffieHellman.Test\Titanis.Crypto.DiffieHellman.Test.csproj", "{8870AD35-39B2-497D-8539-4D6EE567D581}"
+
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cert", "tools\Cert\Cert.csproj", "{3E02E114-2C02-42FA-B7D3-171003B0143F}"
 EndProject

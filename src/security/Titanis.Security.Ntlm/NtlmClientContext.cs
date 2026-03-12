@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
+using Titanis.Asn1;
 using Titanis.Crypto;
 
 namespace Titanis.Security.Ntlm
@@ -67,10 +68,10 @@ namespace Titanis.Security.Ntlm
 		public sealed override byte RpcAuthType => 0x0A;
 
 		/// Mechanism ID
-		public static readonly Oid NtlmOid = new Oid("1.3.6.1.4.1.311.2.2.10");
+		public static readonly Asn1Oid NtlmOid = new Asn1Oid("1.3.6.1.4.1.311.2.2.10");
 
 		/// <inheritdoc/>
-		public sealed override Oid MechOid => NtlmOid;
+		public sealed override Asn1Oid MechOid => NtlmOid;
 
 		/// <inheritdoc/>
 		public sealed override SecurityCapabilities NegotiatedCapabilities

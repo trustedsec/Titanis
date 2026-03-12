@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\base\Titanis.Core\Titanis.Core.csproj" />
+    <ProjectReference Include="..\..\formats\Titanis.Asn1\Titanis.Asn1.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -31,8 +31,26 @@ namespace Titanis.Asn1
 			this.UnusedBits = unusedBits;
 			this.Octets = octets;
 		}
+		/// <summary>
+		/// Initializes a new <see cref="Asn1BitString"/>.
+		/// </summary>
+		/// <param name="value32">Value as a <see cref="uint"/></param>
+		/// <remarks>
+		/// The initialized <see cref="Asn1BitString"/> includes 4 octets with no unused bits.
+		/// </remarks>
 		public Asn1BitString(uint value32)
 			: this(CreateOctetsFromUInt32(value32), 0)
+		{
+		}
+		/// <summary>
+		/// Initializes a new <see cref="Asn1BitString"/>.
+		/// </summary>
+		/// <param name="value64">Value as a <see cref="ulong"/></param>
+		/// <remarks>
+		/// The initialized <see cref="Asn1BitString"/> includes 8 octets with no unused bits.
+		/// </remarks>
+		public Asn1BitString(ulong value64)
+			: this(CreateOctetsFromUInt64(value64), 0)
 		{
 		}
 
@@ -40,6 +58,13 @@ namespace Titanis.Asn1
 		{
 			byte[] bytes = new byte[4];
 			BinaryPrimitives.WriteUInt32BigEndian(bytes, value32);
+			return bytes;
+		}
+
+		private static byte[] CreateOctetsFromUInt64(ulong value64)
+		{
+			byte[] bytes = new byte[8];
+			BinaryPrimitives.WriteUInt64BigEndian(bytes, value64);
 			return bytes;
 		}
 

@@ -397,44 +397,43 @@ namespace Titanis.Asn1.Serialization
 
 		public void EncodeOidValue(Asn1Oid oid)
 		{
-			var etc = oid._subparts;
+			var etc = oid._arcs;
 			if (etc != null)
 			{
 				for (int i = etc.Length - 1; i >= 2; i--)
 				{
-					this._EncodeOidPart(etc[i]);
+					this._EncodeOidArc(etc[i]);
 				}
 			}
 
-			var initial = oid[0].Value * 40 + oid[1].Value;
+			var initial = oid[0] * 40 + oid[1];
 			this._WriteByte((byte)initial);
 		}
 
 		public override void EncodeRelativeOidTlv(Asn1Oid oid, Asn1Tag tag)
 		{
 			var pos = this.Position;
-			var etc = oid._subparts;
+			var etc = oid._arcs;
 			if (etc != null)
 			{
 				for (int i = etc.Length - 1; i >= 0; i--)
 				{
-					this._EncodeOidPart(etc[i]);
+					this._EncodeOidArc(etc[i]);
 				}
 			}
 
 			this.EncodeCloseTlvHeader(tag, pos);
 		}
 
-		private void _EncodeOidPart(Asn1OidPart part)
+		private void _EncodeOidArc(uint arc)
 		{
-			var value = part.Value.Value;
-			this._WriteByte((byte)(value & 0x7F));
-			value >>= 7;
-			while (value != 0)
+			this._WriteByte((byte)(arc & 0x7F));
+			arc >>= 7;
+			while (arc != 0)
 			{
 				// Since 0x80 is being set anyway, there is no need to mask value
-				this._WriteByte((byte)(0x80 | value));
-				value >>= 7;
+				this._WriteByte((byte)(0x80 | arc));
+				arc >>= 7;
 			}
 		}
 	}

@@ -217,8 +217,8 @@ namespace Titanis.Asn1.Serialization
 		public Asn1Oid DecodeOidTlv() => DecodeOidTlv(Asn1PredefTag.ObjectIdentifier);
 		public abstract Asn1Oid DecodeOidValue();
 		public abstract Asn1Oid DecodeOidTlv(Asn1Tag tag);
-		public Asn1OidPart[] DecodeRelativeOidTlv() => DecodeRelativeOidTlv(Asn1PredefTag.RelativeOid);
-		public abstract Asn1OidPart[] DecodeRelativeOidTlv(Asn1Tag tag);
+		public uint[] DecodeRelativeOidTlv() => DecodeRelativeOidTlv(Asn1PredefTag.RelativeOid);
+		public abstract uint[] DecodeRelativeOidTlv(Asn1Tag tag);
 		// TODO: Decode IRIs
 		#region Strings
 		public string DecodeUtf8StringTlv() => DecodeUtf8StringTlv(Asn1PredefTag.UTF8String);

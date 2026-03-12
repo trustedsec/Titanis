@@ -98,11 +98,11 @@ namespace Titanis.Security.Kerberos
 		/// <summary>
 		/// Gets the OID for Kerberos.
 		/// </summary>
-		public static readonly Oid KerberosOid = new Oid("1.2.840.113554.1.2.2");
+		public static readonly Asn1Oid KerberosOid = new Asn1Oid("1.2.840.113554.1.2.2");
 		/// <summary>
 		/// Gets the OID for [MS-KILE]
 		/// </summary>
-		public static readonly Oid MskileOid = new Oid("1.2.840.48018.1.2.2");
+		public static readonly Asn1Oid MskileOid = new("1.2.840.48018.1.2.2");
 
 		private SessionKey VerifySessionKey()
 		{
@@ -209,7 +209,7 @@ namespace Titanis.Security.Kerberos
 				{
 					return this._token = Asn1DerEncoder.EncodeTlv(new Asn1.Krb5Token
 					{
-						mechId = new Asn1Oid(KerberosOid),
+						mechId = KerberosOid,
 						tokenId = GssapiTokenId.APReq,
 						apreq = apreq
 					}).ToArray();
@@ -481,7 +481,7 @@ namespace Titanis.Security.Kerberos
 			: base(credential, client, targetSpn, clientCred, callback)
 		{ }
 		/// <inheritdoc/>
-		public sealed override Oid MechOid => KerberosOid;
+		public sealed override Asn1Oid MechOid => KerberosOid;
 	}
 	/// <summary>
 	/// Implements a Kerberos authentication client.
@@ -501,6 +501,6 @@ namespace Titanis.Security.Kerberos
 			: base(credential, client, targetSpn, clientCred, callback)
 		{ }
 		/// <inheritdoc/>
-		public sealed override Oid MechOid => MskileOid;
+		public sealed override Asn1Oid MechOid => MskileOid;
 	}
 }

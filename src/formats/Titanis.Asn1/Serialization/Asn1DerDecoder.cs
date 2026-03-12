@@ -719,7 +719,7 @@ namespace Titanis.Asn1.Serialization
 				throw new FormatException(Messages.Asn1DerDecoder_BadOidBytes);
 
 			var initial = bytes[0];
-			Asn1OidPart[] etc;
+			uint[] etc;
 			if (bytes.Length > 1)
 			{
 				etc = DecodeRelativeOidValueFromBytes(bytes);
@@ -731,18 +731,18 @@ namespace Titanis.Asn1.Serialization
 
 			var oid = new Asn1Oid(
 				[
-				new Asn1OidPart(initial / 40U),
-				new Asn1OidPart(initial % 40U),
+				(initial / 40U),
+				(initial % 40U),
 				..etc
 				]);
 			return oid;
 		}
 
 		// [X690] § 8.20
-		public static Asn1OidPart[] DecodeRelativeOidValueFromBytes(ReadOnlySpan<byte> bytes)
+		public static uint[] DecodeRelativeOidValueFromBytes(ReadOnlySpan<byte> bytes)
 		{
-			Asn1OidPart[] etc;
-			List<Asn1OidPart> parts = null;
+			uint[] etc;
+			List<uint> parts = null;
 			uint value = 0;
 			for (int i = 1; i < bytes.Length; i++)
 			{
@@ -756,8 +756,8 @@ namespace Titanis.Asn1.Serialization
 				{
 					value |= b;
 					if (parts == null)
-						parts = new List<Asn1OidPart>();
-					parts.Add(new Asn1OidPart(value));
+						parts = new List<uint>();
+					parts.Add((value));
 					value = 0;
 				}
 			}
@@ -769,11 +769,11 @@ namespace Titanis.Asn1.Serialization
 		}
 
 		// [X690] § 8.20
-		public override Asn1OidPart[] DecodeRelativeOidTlv(Asn1Tag tag)
+		public override uint[] DecodeRelativeOidTlv(Asn1Tag tag)
 		{
 			var frame = this.DecodeTlvStart(tag);
 
-			Asn1OidPart[] etc = DecodeRelativeOidValueFromBytes(this._Consume(this.GetLength()));
+			uint[] etc = DecodeRelativeOidValueFromBytes(this._Consume(this.GetLength()));
 
 			this.CloseTlv(frame);
 

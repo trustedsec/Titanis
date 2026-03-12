@@ -4,13 +4,14 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis.Asn1;
 
 namespace Titanis.Security.Spnego
 {
 	public class NegoexClientContext : AuthClientContext
 	{
-		public const string NegoexOid = "1.3.6.1.4.1.311.2.2.30";
-		public override Oid? MechOid => new Oid(NegoexOid);
+		public static readonly Asn1Oid NegoexOid = new Asn1Oid("1.3.6.1.4.1.311.2.2.30");
+		public override Asn1Oid MechOid => NegoexOid;
 
 		public override string UserName => throw new NotImplementedException();
 

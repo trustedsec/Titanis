@@ -35,8 +35,8 @@ namespace Titanis.Security.Kerberos
 		protected override KerberosPkinitCredential Credential { get; }
 
 		// [RFC 4556] § 3.2.1
-		private static readonly Oid IdSignedData = new("1.2.840.113549.1.7.2");
-		private static readonly Oid DhPublicNumber = new("1.2.840.10046.2.1");
+		private static readonly Asn1Oid IdSignedData = new Asn1Oid("1.2.840.113549.1.7.2");
+		private static readonly Asn1Oid DhPublicNumber = new Asn1Oid("1.2.840.10046.2.1");
 		private readonly ModpKeyPair _dhkey;
 
 		protected override bool ProcessPadata(PA_DATA padata)
@@ -94,8 +94,8 @@ namespace Titanis.Security.Kerberos
 			signed.Decode(pkasrep.DhInfo.dhSignedData);
 			// TODO: Verify signatures and trust and all that stuff
 
-			if (signed.ContentInfo.ContentType.Value != KerberosV5_PK_INIT_SPECModule.id_pkinit_DHKeyData.ToOid().Value)
-				throw new ProtocolViolationException($"The server returned a PK-AS-REP with the wrong content type.  Expected '{KerberosV5_PK_INIT_SPECModule.id_pkinit_DHKeyData.ToOid().Value}' but received '{signed.ContentInfo.ContentType}'");
+			if (KerberosV5_PK_INIT_SPECModule.id_pkinit_DHKeyData != signed.ContentInfo.ContentType)
+				throw new ProtocolViolationException($"The server returned a PK-AS-REP with the wrong content type.  Expected '{KerberosV5_PK_INIT_SPECModule.id_pkinit_DHKeyData.Text}' but received '{signed.ContentInfo.ContentType}'");
 
 			var dhInfo = Asn1DerDecoder.DecodeTlv<KDCDHKeyInfo>(signed.ContentInfo.Content);
 			var serverNonce = pkasrep.DhInfo.serverDHNonce;
@@ -170,7 +170,7 @@ namespace Titanis.Security.Kerberos
 					this._freshnessToken
 				),
 				new PKIX1Explicit88.SubjectPublicKeyInfo(
-					new PKIX1Explicit88.AlgorithmIdentifier(new Asn1Oid(DhPublicNumber), this._dhkey.EncodeDomainParameters()),
+					new PKIX1Explicit88.AlgorithmIdentifier(DhPublicNumber, this._dhkey.EncodeDomainParameters()),
 					new Asn1BitString(this._dhkey.EncodePublicExponent(), 0)
 					),
 				[],

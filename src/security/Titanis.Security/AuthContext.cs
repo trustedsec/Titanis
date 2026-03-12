@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using Titanis.Asn1;
 
 namespace Titanis.Security
 {
@@ -31,7 +32,7 @@ namespace Titanis.Security
 		/// <summary>
 		/// Gets the mechanism ID that identifies this authentication mechanism within a GSS API context.
 		/// </summary>
-		public virtual Oid? MechOid => null;
+		public virtual Asn1Oid MechOid => Asn1Oid.Empty;
 		/// <summary>
 		/// Gets the number of legs required for authentication.
 		/// </summary>

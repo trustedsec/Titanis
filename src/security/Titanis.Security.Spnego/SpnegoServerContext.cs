@@ -14,7 +14,7 @@ namespace Titanis.Security.Spnego
 {
 	public interface ISpnegoServerContextProvider
 	{
-		AuthServerContext? TryGetContext(Oid mechanism);
+		AuthServerContext? TryGetContext(Asn1Oid mechanism);
 
 	}
 
@@ -83,7 +83,7 @@ namespace Titanis.Security.Spnego
 			{
 				var gssToken = Asn1DerDecoder.DecodeTlv<InitialContextToken>(token.ToArray()).Value;
 
-				if (gssToken.thisMech.ToOid().Equals(SpnegoClientContext.SpnegoOid))
+				if (gssToken.thisMech == SpnegoClientContext.SpnegoOid)
 					// TODO: Figure out real error code
 					throw new NotImplementedException();
 
@@ -95,13 +95,13 @@ namespace Titanis.Security.Spnego
 
 				this._mechTypeList = negInit.mechTypes;
 
-				var authContext = this._provider.TryGetContext(negInit.mechTypes[0].ToOid());
+				var authContext = this._provider.TryGetContext(negInit.mechTypes[0]);
 				if (authContext is null)
 				{
 					// Find first matching
 					foreach (var mechOid in neg.NegTokenInit.mechTypes)
 					{
-						authContext = this._provider.TryGetContext(mechOid.ToOid());
+						authContext = this._provider.TryGetContext(mechOid);
 						if (authContext != null)
 							break;
 					}
@@ -113,7 +113,7 @@ namespace Titanis.Security.Spnego
 
 					return Asn1DerEncoder.EncodeTlv(new NegotiationToken()
 					{
-						NegTokenResp = new NegTokenResp(NegTokenResp_NegState_Tagged0.Request_mic, new Asn1Oid(authContext.MechOid))
+						NegTokenResp = new NegTokenResp(NegTokenResp_NegState_Tagged0.Request_mic, authContext.MechOid)
 					}).Span;
 
 				}
@@ -139,7 +139,7 @@ namespace Titanis.Security.Spnego
 
 			var gssRespToken = Asn1DerEncoder.EncodeTlv(new NegotiationToken()
 			{
-				NegTokenResp = new NegTokenResp(mechContext.IsComplete ? NegTokenResp_NegState_Tagged0.Accept_completed : NegTokenResp_NegState_Tagged0.Accept_incomplete, new Asn1Oid(mechContext.MechOid), mechRespToken.ToArray())
+				NegTokenResp = new NegTokenResp(mechContext.IsComplete ? NegTokenResp_NegState_Tagged0.Accept_completed : NegTokenResp_NegState_Tagged0.Accept_incomplete, mechContext.MechOid, mechRespToken.ToArray())
 			});
 
 			return gssRespToken.Span;

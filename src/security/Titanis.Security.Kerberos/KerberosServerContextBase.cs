@@ -90,10 +90,10 @@ namespace Titanis.Security.Kerberos
 
 				var krb5Token = Asn1DerDecoder.DecodeTlv<Asn1.Krb5Token>(token.ToArray());
 
-				var mechOid = krb5Token.mechId.ToOid();
+				var mechOid = krb5Token.mechId;
 				if (!(
-					mechOid.Value == KerberosClientContextBase.KerberosOid.Value
-					|| mechOid.Value == KerberosClientContextBase.MskileOid.Value
+					mechOid == KerberosClientContextBase.KerberosOid
+					|| mechOid == KerberosClientContextBase.MskileOid
 					))
 					throw new NotImplementedException();
 				if (krb5Token.tokenId != GssapiTokenId.APReq)
@@ -190,7 +190,7 @@ namespace Titanis.Security.Kerberos
 				{
 					tokenId = GssapiTokenId.APRep,
 					aprep = aprep,
-					mechId = new Asn1Oid(KerberosClientContextBase.KerberosOid)
+					mechId = KerberosClientContextBase.KerberosOid
 				}).ToArray();
 			}
 			else
@@ -280,7 +280,7 @@ namespace Titanis.Security.Kerberos
 		}
 
 		/// <inheritdoc/>
-		public override Oid? MechOid => KerberosClientContextBase.MskileOid;
+		public override Asn1Oid MechOid => KerberosClientContextBase.MskileOid;
 	}
 	/// <summary>
 	/// Implementation of <see cref="KerberosServerContextBase"/> that identifies itself using the mechanism OID for [RFC 4120].
@@ -293,6 +293,6 @@ namespace Titanis.Security.Kerberos
 		}
 
 		/// <inheritdoc/>
-		public override Oid? MechOid => KerberosClientContextBase.KerberosOid;
+		public override Asn1Oid MechOid => KerberosClientContextBase.KerberosOid;
 	}
 }

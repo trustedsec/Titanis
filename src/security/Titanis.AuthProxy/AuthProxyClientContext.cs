@@ -9,6 +9,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks.Dataflow;
+using Titanis.Asn1;
 using Titanis.IO;
 using Titanis.Net;
 using Titanis.Security;
@@ -31,9 +32,9 @@ namespace Titanis.AuthProxy
 
 		/// <remarks>Returns a value indicating SP-NEGO</remarks>
 		public override byte RpcAuthType => 0x09;
-		public static readonly Oid SpnegoOid = new Oid("1.3.6.1.5.5.2");
+		public static readonly Asn1Oid SpnegoOid = new Asn1Oid("1.3.6.1.5.5.2");
 		/// <remarks>Returns a value indicating SP-NEGO</remarks>
-		public override Oid? MechOid => SpnegoOid;
+		public override Asn1Oid MechOid => SpnegoOid;
 
 
 		public override string UserName { get; }
