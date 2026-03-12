@@ -169,20 +169,7 @@ namespace Titanis.SourceGen
 
 		private PduTypeInfo? GetPduStructOrNullWrapper(GeneratorSyntaxContext context, CancellationToken token)
 		{
-			try
-			{
-				return this.GetPduStructOrNull(context, token);
-			}
-			catch (OperationCanceledException)
-			{
-				throw;
-			}
-			catch (Exception ex)
-			{
-				Debugger.Launch();
-				Debug.WriteLine(ex);
-				throw;
-			}
+			return this.GetPduStructOrNull(context, token);
 		}
 		private PduTypeInfo? GetPduStructOrNull(GeneratorSyntaxContext context, CancellationToken token)
 		{
@@ -227,8 +214,7 @@ namespace Titanis.SourceGen
 			}
 			catch (Exception ex)
 			{
-				Debugger.Launch();
-				Debug.WriteLine(ex);
+				context.AddSource($"PduStructError.txt", SourceText.From(ex.ToString()));
 				throw;
 			}
 		}
