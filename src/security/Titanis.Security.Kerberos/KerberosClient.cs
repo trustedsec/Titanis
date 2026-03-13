@@ -1785,7 +1785,7 @@ namespace Titanis.Security.Kerberos
 					callback = new KerberosDiagnosticLogger(log);
 			}
 			if (locator is null)
-				locator = services.RequireService<IKdcLocator>();
+				locator = services.GetService<IKdcLocator>();
 
 			return new KerberosClient(locator, services.GetService<ISocketService>(), callback);
 		}
