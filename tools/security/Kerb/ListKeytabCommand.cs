@@ -7,7 +7,7 @@ namespace Titanis.Cli.Kerb;
 [Command]
 [Description("Lists the entries in a keytab file")]
 [OutputRecordType(typeof(KeytabEntry))]
-internal class ListKeytabCommand : Command
+public class ListKeytabCommand : Command
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 	[Parameter(0, EnvironmentVariable = "DEFCKTNAME")]

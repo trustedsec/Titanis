@@ -1436,26 +1436,38 @@ namespace Titanis.Security.Kerberos
 			return authData.ToArray();
 		}
 
+		[Obsolete("Use IFileAccess to read the file.", true)]
 		public TicketInfo[] LoadTicketsFromFile(string sourceFileName, out KerberosFileFormat format)
 		{
 			ArgumentException.ThrowIfNullOrEmpty(sourceFileName);
 			return this.LoadTicketsFromFile(File.ReadAllBytes(sourceFileName), sourceFileName, out format);
 		}
-		public TicketInfo[] LoadTicketsFromFile(byte[] bytes, string? sourceFileName, out KerberosFileFormat format)
+		/// <summary>
+		/// Loads tickets from file data.
+		/// </summary>
+		/// <param name="fileBytes">File bytes</param>
+		/// <param name="sourceFileName">Name of source file</param>
+		/// <param name="format">Format of the file</param>
+		/// <returns>An array of <see cref="TicketInfo"/> loaded from <paramref name="fileBytes"/>.</returns>
+		/// <exception cref="ArgumentException"><paramref name="fileBytes"/> is empty</exception>
+		/// <remarks>
+		/// This method does not interact directly with the file system.  <paramref name="sourceFileName"/> is only used to populate <see cref="TicketInfo.SourceFileName"/>.
+		/// </remarks>
+		public TicketInfo[] LoadTicketsFromFile(byte[] fileBytes, string? sourceFileName, out KerberosFileFormat format)
 		{
-			ArgumentNullException.ThrowIfNull(bytes);
-			if (bytes.Length == 0)
-				throw new ArgumentException("The byte array is empty.", nameof(bytes));
+			ArgumentNullException.ThrowIfNull(fileBytes);
+			if (fileBytes.Length == 0)
+				throw new ArgumentException("The byte array is empty.", nameof(fileBytes));
 
-			if (bytes[0] == 0x76)
+			if (fileBytes[0] == 0x76)
 			{
-				var tickets = this.LoadTicketsFromKirbiFile(bytes);
+				var tickets = this.LoadTicketsFromKirbiFile(fileBytes);
 				format = KerberosFileFormat.Kirbi;
 				return tickets;
 			}
-			else if (bytes[0] == 0x05)
+			else if (fileBytes[0] == 0x05)
 			{
-				var tickets = this.LoadTicketsFromCcacheFile(bytes, sourceFileName);
+				var tickets = this.LoadTicketsFromCcacheFile(fileBytes, sourceFileName);
 				format = KerberosFileFormat.Ccache;
 				return tickets.ToArray();
 			}

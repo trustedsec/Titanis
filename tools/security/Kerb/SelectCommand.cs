@@ -24,14 +24,14 @@ namespace Titanis.Cli.Kerb
 The command accepts both -TicketCache and -From to specify one or more files to read tickets from.  If -From is specified, -TicketCache is ignored.  This is to facilitate the use of $KRB5CCNAME.  If this environment variable is set, you don't need to specify -From.  If you specify -From, this expresses your desire to ignore the ticket cache.
 
 Specify the source files using -From.  You may specify multiple files and multiple wildcard patterns.  {0} reads all files from the tickets and applies any filters specified before printing the tickets to the screen.  If you specify -Into, the results are written to the file you specify.  Use -Overwrite to overwrite the outptu file if it already exists.")]
-	[Example("Print tickets from all mlichick*.kirbi files", @"{0} -From milchick*.kirbi")]
+	[Example("Print tickets from all mlichick*.kirbi files", @"{0} -From milchick*.kirbi", Tag ="AllMilchickKirbi")]
 	[Example("Combine tickets from all mlichick*.kirbi files", @"{0} -From milchick*.kirbi -Into all-milchick.kirbi")]
 	[Example("Print only current tickets from all mlichick*.kirbi files", @"{0} -From milchick*.kirbi -Current")]
 	[Example("Print only TGTs", @"{0} -From milchick*.kirbi -MatchingSpn krbtgt/.*")]
 	[Example("Print only tickets for CIFS", @"{0} -From milchick*.kirbi -MatchingSpn cifs/.*")]
 	[Example("Print only tickets targeting LUMON-FS1", @"{0} -From milchick*.kirbi -MatchingSpn .*/LUMON-FS1")]
 	[Example("Print only tickets #1, 3-5, 7+", @"{0} -From milchick*.kirbi -SeqNbr 1, 3-5, 7-*")]
-	internal class SelectCommand : Command
+	public class SelectCommand : Command
 	{
 		private const string TicketSourceCategory = "Ticket Source";
 		private const string TicketFilterCategory = "Ticket Filter";
@@ -196,7 +196,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 				if (string.IsNullOrEmpty(dir))
 					dir = ".";
 				pattern = Path.GetFileName(pattern);
-				var fileNames = Directory.GetFiles(dir, pattern);
+				var fileNames = this.FileAccessService.GetFiles(dir, pattern);
 				if (fileNames.Length == 0)
 				{
 					this.WriteError($"No files found matching '{pattern}'.");
@@ -208,7 +208,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 						var filePath = this.ResolveFsPath(fileName);
 						this.WriteVerbose($"Reading file {filePath}");
 
-						var tickets = krb.LoadTicketsFromFile(filePath, out _);
+						var tickets = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(filePath), filePath, out _);
 
 						var selected = tickets.Where(this.Matches).ToList();
 
@@ -333,7 +333,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 	}
 
 	[TypeConverter(typeof(NumberOrRangeConverter))]
-	struct NumberOrRange
+	public struct NumberOrRange
 	{
 		public NumberOrRange(int value)
 		{

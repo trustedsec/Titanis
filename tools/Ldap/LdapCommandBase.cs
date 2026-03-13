@@ -62,7 +62,7 @@ namespace Titanis.Cli.LdapTool
 				if (this.SslCert != null)
 				{
 					AuthenticationParameters.LoadCertificateAndKey(
-						this.VerifyContext().FileAccess,
+						this.FileAccessService,
 						SslCert,
 						SslKeyFile,
 						SslKeyPassword,

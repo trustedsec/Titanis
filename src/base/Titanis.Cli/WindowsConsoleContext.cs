@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Titanis.Cli
 {
-	public class WindowsConsoleContext : ICommandContext, IFileAccess
+	public class WindowsConsoleContext : ICommandContext, IServiceProvider
 	{
 		internal WindowsConsoleContext(CommandMetadataContext metadata)
 		{
@@ -16,6 +16,8 @@ namespace Titanis.Cli
 			this.WorkingDirectory = Environment.CurrentDirectory;
 			this.Log = new TerminalLog(this.Terminal);
 			this.MetadataContext = metadata;
+
+			this.FileAccess = new HostFileAccess();
 
 			this._rootFrame = new CommandFrame(null);
 			this._currentFrame = this._rootFrame;
@@ -49,11 +51,11 @@ namespace Titanis.Cli
 		public CommandMetadataContext MetadataContext { get; }
 
 		private ServiceContainer _services = new ServiceContainer();
-		public IServiceProvider Services => this._services;
+		public IServiceProvider HostServices => this;
 
-		public IFileAccess FileAccess => this;
+		public IFileAccess FileAccess { get; }
 
-        public Stream OpenRawInputStream()
+		public Stream OpenRawInputStream()
 		{
 			return Console.OpenStandardInput();
 		}
@@ -109,9 +111,13 @@ namespace Titanis.Cli
 
 		public object? GetVariable(string name) => Environment.GetEnvironmentVariable(name);
 
-		string IFileAccess.ResolveFsPath(string path)
+		/// <inheritdoc/>
+		/// <remarks>
+		/// Wrap the <see cref="ServiceContainer"/> rather than granting access to it directly.  This prevents components from adding host services.
+		/// </remarks>
+		object IServiceProvider.GetService(Type serviceType)
 		{
-			return Path.GetFullPath(path);
+			return _services.GetService(serviceType);
 		}
 	}
 }

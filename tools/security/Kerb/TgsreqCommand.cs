@@ -22,7 +22,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 	[Example("Requesting a ticket for SMB and Host", "{0} -Kdc 10.66.0.11 -Tgt milchick-tgt.kirbi cifs/LUMON-FS1, HOST/LUMON-FS1 -OutputFile milchick-LUMON-FS1.kirbi")]
 	[Example("Requesting a U2U ticket", "{0} -Kdc 10.66.0.11 -v -Tgt allentown-tgt.kirbi -Overwrite -U2u allentown-tgt.kirbi -OutputFileName allentown-u2u.kirbi host/allentown")]
 	[Example("Requesting a U2U ticket and extracting NTLM hash", "{0} -Kdc 10.66.0.11 -v -Tgt allentown-tgt.kirbi -Overwrite -U2u allentown-tgt.kirbi -OutputFileName allentown-u2u.kirbi host/allentown -AsrepKey 82d4ab5873cbfda126e00c28edb5bd97b6451aa06a291d85173e6fc4ed4aacee")]
-	internal class RequestTicketCommand : TicketRequestCommand
+	public class RequestTicketCommand : TicketRequestCommand
 	{
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 		[Parameter(KdcPosition + 1)]
@@ -220,7 +220,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 		{
 			ticketStoreFileUnresolved = this.ResolveFsPath(ticketStoreFileUnresolved);
 			this.WriteVerbose($"Reading TGT from {ticketStoreFileUnresolved}");
-			var tgtStore = krb.LoadTicketsFromFile(ticketStoreFileUnresolved, out _);
+			var tgtStore = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(ticketStoreFileUnresolved), ticketStoreFileUnresolved, out _);
 
 			TicketInfo? sourceTicket;
 			if (ticketStoreFileUnresolved.Length == 0)

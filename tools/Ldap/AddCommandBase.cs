@@ -55,7 +55,7 @@ internal abstract class AddCommandBase : LdapObjectCommandBase
 		var addreq = new LdapAddRequest();
 		if (this.Attributes != null)
 		{
-			ChangeContext ctx = new ChangeContext(this.Context);
+			ChangeContext ctx = new ChangeContext(this.Services);
 			ctx.ProcessArgs(this.Attributes, addreq);
 		}
 

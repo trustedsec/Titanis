@@ -669,7 +669,7 @@ namespace Titanis.Cli
 					string ticketFileName = this.ResolveFsPath(ticketFileName_);
 					// TODO: Resolve file name
 					log?.WriteVerbose($"Loading tickets from {ticketFileName}");
-					var fileCache = new TicketCacheFile(ticketFileName, krb);
+					var fileCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(ticketFileName), ticketFileName, krb);
 					log?.WriteVerbose($"Loaded {fileCache.TicketCount} tickets from {ticketFileName}");
 
 					string? userDomain = this.UserDomain;
@@ -740,7 +740,7 @@ namespace Titanis.Cli
 			{
 				tgtFileName = this.RequireFileAccess().ResolveFsPath(tgtFileName);
 				log?.WriteVerbose($"Loading ticket(s) from {tgtFileName}");
-				var tgtCache = new TicketCacheFile(tgtFileName, krb);
+				var tgtCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(tgtFileName), tgtFileName, krb);
 				var tickets = tgtCache.GetAllTickets();
 				foreach (var ticket in tickets)
 				{
@@ -931,7 +931,7 @@ namespace Titanis.Cli
 				var cacheFileName = this.RequireFileAccess().ResolveFsPath(this.TicketCache);
 				this.Log?.WriteDiagnostic($"Loading ticket cache from {cacheFileName}.");
 				// TODO: This doesn't match the search below, which checks user name.  Document the semantics of the ticket cache
-				var ticketCache = new TicketCacheFile(cacheFileName, krb);
+				var ticketCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(cacheFileName), cacheFileName, krb);
 				krb.TicketCache = ticketCache;
 			}
 			else

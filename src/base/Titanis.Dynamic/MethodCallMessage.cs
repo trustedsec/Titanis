@@ -5,8 +5,12 @@ using System.Text;
 
 namespace Titanis.Dynamic
 {
+	/// <summary>
+	/// Represents a method call.
+	/// </summary>
 	public class MethodCallMessage
 	{
+		// NOTE: This must be public so that it can be accessed by the mock implementations
 		public MethodCallMessage(RuntimeMethodHandle methodHandle, int count)
 		{
 			var method = (MethodInfo)MethodBase.GetMethodFromHandle(methodHandle);
@@ -14,11 +18,18 @@ namespace Titanis.Dynamic
 			this.args = new object[count];
 			this._names = new string[count];
 		}
-
+		/// <summary>
+		/// Gets the method called.
+		/// </summary>
 		public MethodInfo Method { get; }
 		private readonly string[] _names;
 
 		internal readonly object[] args;
+		/// <summary>
+		/// Gets an argument.
+		/// </summary>
+		/// <param name="index">Argument index</param>
+		/// <returns>The value of argument at position <paramref name="index"/></returns>
 		public object GetArgument(int index)
 			=> this.args[index];
 
@@ -33,9 +44,9 @@ namespace Titanis.Dynamic
 			this._names[index] = name;
 		}
 
-		public object GetParam(int index)
+		public object[] GetArguments()
 		{
-			return this.args[index];
+			return this.args;
 		}
 	}
 }

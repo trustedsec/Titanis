@@ -20,5 +20,6 @@ namespace Titanis.Cli
 		public string Caption { get; }
 		public string CommandLine { get; }
 		public string? Explanation { get; }
+		public string? Tag { get; set; }
 	}
 }

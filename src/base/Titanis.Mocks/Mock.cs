@@ -17,35 +17,26 @@ namespace Titanis.Mocks
 		Ordered
 	}
 
-	public class Mock<T> : IStubHandler
-		where T : class
+	/// <summary>
+	/// Base class for all mocks.
+	/// </summary>
+	public class Mock
 	{
-		private T _stubObj;
-
-		internal Mock(T stubObj, MockBehavior behavior)
+		private protected Mock(MockBehavior behavior)
 		{
-			this._stubObj = stubObj;
 			this.Behavior = behavior;
-			IStub stub = (IStub)stubObj;
-			stub.SetHandler(this);
 		}
 
-		public T Object => this._stubObj;
-
+		/// <summary>
+		/// Gets the <see cref="MockBehavior"/> specifying the behavior of this mock.
+		/// </summary>
 		public MockBehavior Behavior { get; }
 
-		void IStubHandler.HandleCall(MethodCallMessage message)
+		#region Expectations
+		internal readonly List<Expectation> expectations = new List<Expectation>();
+		internal Expectation? FindExpectationFor(MethodCallMessage message)
 		{
-			message.callBase = true;
-
-			Expectation exp = this.FindExpectationFor(message);
-			// TODO: Throw exception
-			exp.HandleCall(message);
-		}
-
-		private Expectation? FindExpectationFor(MethodCallMessage message)
-		{
-			foreach (var exp in this._expectations)
+			foreach (var exp in this.expectations)
 			{
 				if (exp.Matches(message))
 					return exp;
@@ -53,17 +44,54 @@ namespace Titanis.Mocks
 
 			return null;
 		}
+		#endregion
+	}
 
-		private List<Expectation> _expectations = new List<Expectation>();
+	/// <summary>
+	/// Represents a mock implementation.
+	/// </summary>
+	/// <typeparam name="T">Type to mock.</typeparam>
+	/// <seealso cref="MockRepository.Create{T}()"/>
+	public class Mock<T> : Mock, IStubHandler
+		where T : class
+	{
+		private T _stubObj;
+
+		internal Mock(MockBehavior behavior, T stubObj)
+            : base(behavior)
+		{
+			this._stubObj = stubObj;
+			IStub stub = (IStub)stubObj;
+			stub.SetHandler(this);
+		}
+
+		/// <summary>
+		/// Gets the mock implementation of <typeparamref name="T"/>.
+		/// </summary>
+		public T Object => this._stubObj;
+
+		void IStubHandler.HandleCall(MethodCallMessage message)
+		{
+			message.callBase = true;
+
+			var exp = this.FindExpectationFor(message);
+			if (exp is null)
+				throw new MissingExpectationException(message);
+
+			exp.MarkMet();
+			exp.HandleCall(message);
+		}
 
 		private Expectation<T, TReturn> ExpectInternal<TReturn>(
 			LambdaExpression lambda,
-			ExpectationType type)
+			ExpectationType type,
+			ExpectationOptions options
+			)
 		{
 			var pattern = CheckLambda(lambda, type);
 			ExpectationFlags flags = (type == ExpectationType.Action) ? ExpectationFlags.NoReturnValue : ExpectationFlags.None;
-			Expectation<T, TReturn> expect = new Expectation<T, TReturn>(pattern, flags);
-			this._expectations.Add(expect);
+			Expectation<T, TReturn> expect = new Expectation<T, TReturn>(pattern, flags, options);
+			this.expectations.Add(expect);
 
 			return expect;
 		}
@@ -84,7 +112,8 @@ namespace Titanis.Mocks
 
 		private Expectation ExpectSetInternal<TValue>(
 			Expression<Func<T, TValue>> lambda,
-			Expression<Func<TValue, bool>> comparerExpr)
+			Expression<Func<TValue, bool>> comparerExpr,
+			ExpectationOptions options)
 		{
 			var property = CheckPropertySetter(lambda);
 			if (property == null)
@@ -93,26 +122,26 @@ namespace Titanis.Mocks
 			var pattern = CheckLambda(lambda, ExpectationType.Setter);
 			Expectation expect = new Expectation(new ExpectPattern(property.SetMethod, new Expression[] {
 				Expression.Call(ReflectionHelper.MethodOf<Func<TValue,bool>,TValue>(x=>Arg.Matches(x)), comparerExpr)
-			}), ExpectationFlags.NoReturnValue);
-			this._expectations.Add(expect);
+			}), ExpectationFlags.NoReturnValue, options);
+			this.expectations.Add(expect);
 
 			return expect;
 		}
 
-		private ExpectationAsync<T> ExpectAsyncInternal(LambdaExpression lambda, ExpectationType type)
+		private ExpectationAsync<T> ExpectAsyncInternal(LambdaExpression lambda, ExpectationType type, ExpectationOptions options)
 		{
 			var pattern = CheckLambda(lambda, type);
-			ExpectationAsync<T> expect = new ExpectationAsync<T>(pattern);
-			this._expectations.Add(expect);
+			ExpectationAsync<T> expect = new ExpectationAsync<T>(pattern, options);
+			this.expectations.Add(expect);
 
 			return expect;
 		}
 
-		private ExpectationAsync<T, TReturn> ExpectAsyncInternal<TReturn>(LambdaExpression lambda, ExpectationType type)
+		private ExpectationAsync<T, TReturn> ExpectAsyncInternal<TReturn>(LambdaExpression lambda, ExpectationType type, ExpectationOptions options)
 		{
 			var pattern = CheckLambda(lambda, type);
-			ExpectationAsync<T, TReturn> expect = new ExpectationAsync<T, TReturn>(pattern);
-			this._expectations.Add(expect);
+			ExpectationAsync<T, TReturn> expect = new ExpectationAsync<T, TReturn>(pattern, options);
+			this.expectations.Add(expect);
 
 			return expect;
 		}
@@ -144,21 +173,21 @@ namespace Titanis.Mocks
 			throw new ArgumentException(Messages.Mock_InvalidExpectionExpression, nameof(lambda));
 		}
 
-		public IExpect ExpectSet<TValue>(Expression<Func<T, TValue>> properteyGetter, TValue expectedValue)
-			=> this.ExpectSetInternal(properteyGetter, x => EqualityComparer<TValue>.Default.Equals(x, expectedValue));
-		public IExpect ExpectSet<TValue>(Expression<Func<T, TValue>> properteyGetter, Expression<Func<TValue, bool>> expectedValueComparer)
-			=> this.ExpectSetInternal(properteyGetter, expectedValueComparer);
+		public IExpect ExpectSet<TValue>(Expression<Func<T, TValue>> properteyGetter, TValue expectedValue, ExpectationOptions options = ExpectationOptions.None)
+			=> this.ExpectSetInternal(properteyGetter, x => EqualityComparer<TValue>.Default.Equals(x, expectedValue), options);
+		public IExpect ExpectSet<TValue>(Expression<Func<T, TValue>> properteyGetter, Expression<Func<TValue, bool>> expectedValueComparer, ExpectationOptions options = ExpectationOptions.None)
+			=> this.ExpectSetInternal(properteyGetter, expectedValueComparer, options);
 
-		public IExpect Expect(Expression<Action<T>> lambda)
-			=> this.ExpectInternal<int>(lambda, ExpectationType.Action);
+		public IExpect Expect(Expression<Action<T>> lambda, ExpectationOptions options = ExpectationOptions.None)
+			=> this.ExpectInternal<int>(lambda, ExpectationType.Action, options);
 
-		public IExpect<T, TReturn> Expect<TReturn>(Expression<Func<T, TReturn>> lambda)
-			=> this.ExpectInternal<TReturn>(lambda, ExpectationType.MethodCall);
+		public IExpect<T, TReturn> Expect<TReturn>(Expression<Func<T, TReturn>> lambda, ExpectationOptions options = ExpectationOptions.None)
+			=> this.ExpectInternal<TReturn>(lambda, ExpectationType.MethodCall, options);
 
-		public IExpectAsync Expect(Expression<Func<T, Task>> lambda)
-			=> this.ExpectAsyncInternal(lambda, ExpectationType.AsyncAction);
+		public IExpectAsync Expect(Expression<Func<T, Task>> lambda, ExpectationOptions options = ExpectationOptions.None)
+			=> this.ExpectAsyncInternal(lambda, ExpectationType.AsyncAction, options);
 
-		public IExpectAsync<T, TReturn> Expect<TReturn>(Expression<Func<T, Task<TReturn>>> lambda)
-			=> this.ExpectAsyncInternal<TReturn>(lambda, ExpectationType.AsyncFunc);
+		public IExpectAsync<T, TReturn> Expect<TReturn>(Expression<Func<T, Task<TReturn>>> lambda, ExpectationOptions options = ExpectationOptions.None)
+			=> this.ExpectAsyncInternal<TReturn>(lambda, ExpectationType.AsyncFunc, options);
 	}
 }

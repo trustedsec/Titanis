@@ -3,7 +3,7 @@ using Titanis.Security.Kerberos;
 
 namespace Titanis.Cli.Kerb
 {
-	internal class TicketParameterGroup : ParameterGroupBase
+	public class TicketParameterGroup : ParameterGroupBase
 	{
 		#region Ticket options
 		[Parameter]

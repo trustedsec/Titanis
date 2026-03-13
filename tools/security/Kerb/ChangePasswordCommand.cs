@@ -11,7 +11,7 @@ namespace Titanis.Cli.Kerb;
 
 This protocol requires an initial ticket.  That is, it requires a ticket from an ASREQ/ASREP exchange and not from a TGSREQ/TGSREP exchange.  Therefore, this command requires credentials and does not accept a ticket as a parameter.  The `setpw` command does not have this restriction and accepts a ticket as a parameter.")]
 [Example("milchick changing his own password", "{0} milchick@LUMON 10.66.0.11 -Password EradicateFolly! Br3@kr00m!")]
-class ChangePasswordCommand : KdcCommand
+public class ChangePasswordCommand : KdcCommand
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 

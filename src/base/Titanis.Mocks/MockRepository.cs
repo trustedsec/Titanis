@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using Titanis.Dynamic;
 
 namespace Titanis.Mocks
@@ -22,13 +21,16 @@ namespace Titanis.Mocks
 
 		private Dictionary<Type, TypeInfo> _stubTypes = new Dictionary<Type, TypeInfo>();
 
+		private List<Mock> _mocks = new List<Mock>();
 		public Mock<T> Create<T>()
 			where T : class
 		{
 			TypeInfo stubType = GetStubType<T>();
 			var stub = Activator.CreateInstance(stubType.AsType());
 
-			return new Mock<T>((T)stub, MockBehavior.Loose);
+			Mock<T> mock = new(MockBehavior.Loose, (T)stub);
+			this._mocks.Add(mock);
+			return mock;
 		}
 
 		private TypeInfo GetStubType<T>() where T : class
@@ -56,6 +58,26 @@ namespace Titanis.Mocks
 			where T : class
 		{
 			return null;
+		}
+
+		/// <summary>
+		/// Verifies that all expectations were met.
+		/// </summary>
+		public void VerifyExpectations()
+		{
+			List<Expectation> unmet = new List<Expectation>();
+			foreach (var mock in this._mocks)
+			{
+				foreach (var expect in mock.expectations)
+				{
+					unmet.Add(expect);
+				}
+			}
+
+			if (unmet.Count > 0)
+			{
+				throw new ExpectationException(unmet.ToArray());
+			}
 		}
 	}
 }

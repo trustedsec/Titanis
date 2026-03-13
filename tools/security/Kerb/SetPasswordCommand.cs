@@ -11,7 +11,7 @@ namespace Titanis.Cli.Kerb;
 [DetailedHelpText(@"{0} uses the Windows 2000 Kerberos Change Password protocol (RFC 3244) and can be used to change the password of a user account that may or may not be the same as the authenticating user.  This service does not require an initial ticket and is more flexible than `changepw`.")]
 [Example("milchick setting his own password", "{0} -UserName milchick@LUMON -Kdc 10.66.0.11 -Password Br3@kr00m! milchick@lumon.ind EradicateFolly!")]
 [Example("milchick setting password for marks", "{0} -UserName milchick@LUMON -Kdc 10.66.0.11 -Password Br3@kr00m! marks@lumon.ind SafelySituated")]
-internal class SetPasswordCommand : Command
+public class SetPasswordCommand : Command
 {
 
 	[Parameter(0)]

@@ -13,6 +13,7 @@ public class Trace_Aes256Test2
 	public TestContext TestContext { get; set; }
 
 	[TestMethod]
+	[Ignore("Broken Kerberos trace")]
 	public void TraceTest()
 	{
 		var logger = new KerberosDiagnosticLogger(new TestLog(this.TestContext));

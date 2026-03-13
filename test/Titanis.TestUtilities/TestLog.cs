@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Titanis.Security.Kerberos.Test;
+namespace Titanis;
 public class TestLog : ILog
 {
 	public TestLog(TestContext context)

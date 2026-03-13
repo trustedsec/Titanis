@@ -16,6 +16,15 @@ namespace Titanis.Mocks
 	public interface IExpect<TInstance, TReturn> : IExpect<TInstance>
 	{
 		void Return(TReturn value);
+		void Return(Func<object[], TReturn> valueFunc);
+	}
+
+	public static class ExpectExtensions
+	{
+		public static void Return<TInstance, TReturn, TArg0>(this IExpect<TInstance, TReturn> expect, Func<TArg0, TReturn> valueFunc)
+		{
+			expect.Return((object[] args) => valueFunc((TArg0)args[0]));
+		}
 	}
 
 	public interface IExpectAsync

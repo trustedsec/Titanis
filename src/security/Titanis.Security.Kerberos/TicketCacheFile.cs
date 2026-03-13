@@ -11,7 +11,8 @@ namespace Titanis.Security.Kerberos
 	public class TicketCacheFile : TicketCache
 	{
 		public TicketCacheFile(
-			string fileName,
+			byte[] cacheBytes,
+			string? fileName,
 			KerberosClient krb
 			)
 		{
@@ -25,7 +26,7 @@ namespace Titanis.Security.Kerberos
 			{
 				var info = new FileInfo(fileName);
 				this._modDate = info.LastWriteTimeUtc;
-				var tickets = krb.LoadTicketsFromFile(fileName, out var format);
+				var tickets = krb.LoadTicketsFromFile(cacheBytes, fileName, out var format);
 				this._format = format;
 
 				foreach (var ticket in tickets)

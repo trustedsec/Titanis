@@ -7,7 +7,7 @@ namespace Titanis.Cli.Kerb;
 /// <summary>
 /// Base implementation for commands 
 /// </summary>
-internal abstract class KdcCommand : Command
+public abstract class KdcCommand : Command
 {
 	internal const int KdcPosition = 0;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Titanis.Dynamic;
 using Titanis.Reflection;
@@ -17,6 +18,13 @@ namespace Titanis.Mocks
 		Setter,
 	}
 
+	[Flags]
+	public enum ExpectationOptions
+	{
+		None = 0,
+		MultipleCall = 1,
+	}
+
 	/// <summary>
 	/// Describes a pattern to match a method call to an expectation.
 	/// </summary>
@@ -24,8 +32,8 @@ namespace Titanis.Mocks
 	{
 		public ExpectPattern(MethodInfo method, IList<Expression>? argExprs)
 		{
-			this.method = method;
-			this.args = argExprs;
+			this._method = method;
+			this._args = argExprs;
 
 			if (argExprs != null && argExprs.Count > 0)
 			{
@@ -92,6 +100,18 @@ namespace Titanis.Mocks
 			}
 		}
 
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append($"{this._method.DeclaringType.Name}.{this._method.Name}(");
+			foreach (var arg in this._args)
+			{
+				sb.Append($", {arg}");
+			}
+			sb.Append(')');
+			return sb.ToString();
+		}
+
 		private static Func<object, bool> CreateConstComparer(object comparand)
 		{
 			return x => EqualityComparer<object>.Default.Equals(comparand, x);
@@ -102,14 +122,14 @@ namespace Titanis.Mocks
 			return EqualityComparer<object>.Default.Equals(comparand, arg);
 		}
 
-		internal readonly MethodInfo method;
-		private readonly IList<Expression>? args;
+		internal readonly MethodInfo _method;
+		private readonly IList<Expression>? _args;
 		private readonly Func<object, bool>?[] comparers;
-		private int ArgCount => (this.args == null) ? 0 : this.args.Count;
+		private int ArgCount => (this._args == null) ? 0 : this._args.Count;
 
 		internal bool Matches(MethodCallMessage message)
 		{
-			if (message.Method == this.method)
+			if (message.Method == this._method)
 			{
 				var argCount = this.ArgCount;
 				if (message.ArgCount == argCount)
@@ -144,14 +164,18 @@ namespace Titanis.Mocks
 		internal Exception? _exception;
 		internal int calledCount;
 
-		internal Expectation(ExpectPattern pattern, ExpectationFlags flags)
+		internal Expectation(ExpectPattern pattern, ExpectationFlags flags, ExpectationOptions options)
 		{
-			this.pattern = pattern;
+			this._pattern = pattern;
 			this._flags = flags;
+			this._options = options;
 		}
 
 		private protected ExpectationFlags _flags;
-		private readonly ExpectPattern pattern;
+		private readonly ExpectationOptions _options;
+		private readonly ExpectPattern _pattern;
+
+		public override string ToString() => this._pattern.ToString();
 
 		internal bool HasResult => (0 != (this._flags & ExpectationFlags.ResultMask));
 		internal bool HasReturnValue => (0 != (this._flags & ExpectationFlags.ReturnValueSet));
@@ -168,7 +192,7 @@ namespace Titanis.Mocks
 		}
 
 		internal bool Matches(MethodCallMessage message)
-			=> this.pattern.Matches(message);
+			=> this._pattern.Matches(message);
 
 		internal void HandleCall(MethodCallMessage message)
 		{
@@ -176,24 +200,32 @@ namespace Titanis.Mocks
 			if (this.HasException)
 				throw this._exception!;
 			else if (this.HasReturnValue)
-				message.returnValue = this.ReturnValue;
+				message.returnValue = this.GetReturnValue(message);
 			else if (this.CallsBase)
 				message.callBase = true;
 			else if (this.MustReturnValue)
-				throw new InvalidOperationException(string.Format(Messages.Expectation_NoResultSet, this.pattern.method.Name, this.pattern.method.DeclaringType.FullName));
+				throw new InvalidOperationException(string.Format(Messages.Expectation_NoResultSet, this._pattern._method.Name, this._pattern._method.DeclaringType.FullName));
 		}
 
 		public void CallBase()
 		{
 			if (this.HasResult)
 				throw new InvalidOperationException(Messages.Expectation_ResultAlreadySet);
-			if (this.pattern.method.IsAbstract)
-				throw new InvalidOperationException(string.Format(Messages.Expectation_CannotCallBaseAbstractMethod, this.pattern.method.Name, this.pattern.method.DeclaringType.FullName));
+			if (this._pattern._method.IsAbstract)
+				throw new InvalidOperationException(string.Format(Messages.Expectation_CannotCallBaseAbstractMethod, this._pattern._method.Name, this._pattern._method.DeclaringType.FullName));
 
 			this._flags |= ExpectationFlags.CallBaseSet;
 		}
 
-		internal virtual object? ReturnValue => null;
+		internal virtual object? GetReturnValue(MethodCallMessage message) => null;
+
+		public bool HasBeenMet { get; private set; }
+
+		internal void MarkMet()
+		{
+			this.HasBeenMet = true;
+		}
+
 		internal bool MustReturnValue => (0 == (this._flags & ExpectationFlags.NoReturnValue));
 	}
 
@@ -216,30 +248,51 @@ namespace Titanis.Mocks
 
 	internal class Expectation<TInstance, TReturn> : Expectation, IExpect<TInstance, TReturn>
 	{
-		internal Expectation(ExpectPattern pattern, ExpectationFlags flags)
-			: base(pattern, flags)
+		internal Expectation(ExpectPattern pattern, ExpectationFlags flags, ExpectationOptions options)
+			: base(pattern, flags, options)
 		{
 
 		}
 
 		private TReturn? _returnValue;
+		private Func<object[], TReturn>? _returnValueFunc;
 
-		internal override object? ReturnValue => this._returnValue;
+		internal override object? GetReturnValue(MethodCallMessage methodCall)
+		{
+			if (this._returnValueFunc != null)
+				return this._returnValueFunc(methodCall.GetArguments());
+			else
+				return this._returnValue;
+		}
 
 		public void Return(TReturn value)
+		{
+			EnsureResultNotSet();
+
+			this._returnValue = value;
+			this._flags |= ExpectationFlags.ReturnValueSet;
+		}
+
+		private void EnsureResultNotSet()
+		{
+			if (this.HasResult)
+				throw new InvalidOperationException(Messages.Expectation_ResultAlreadySet);
+		}
+
+		public void Return(Func<object[], TReturn> valueFunc)
 		{
 			if (this.HasResult)
 				throw new InvalidOperationException(Messages.Expectation_ResultAlreadySet);
 
-			this._returnValue = value;
+			this._returnValueFunc = valueFunc;
 			this._flags |= ExpectationFlags.ReturnValueSet;
 		}
 	}
 
 	internal class ExpectationAsync<TInstance> : Expectation<TInstance, Task>, IExpectAsync
 	{
-		internal ExpectationAsync(ExpectPattern pattern)
-			: base(pattern, ExpectationFlags.None)
+		internal ExpectationAsync(ExpectPattern pattern, ExpectationOptions options)
+			: base(pattern, ExpectationFlags.None, options)
 		{
 		}
 
@@ -251,8 +304,8 @@ namespace Titanis.Mocks
 
 	internal class ExpectationAsync<TInstance, TReturn> : Expectation<TInstance, Task<TReturn>>, IExpectAsync<TInstance, TReturn>
 	{
-		internal ExpectationAsync(ExpectPattern pattern)
-			: base(pattern, ExpectationFlags.None)
+		internal ExpectationAsync(ExpectPattern pattern, ExpectationOptions options)
+			: base(pattern, ExpectationFlags.None, options)
 		{
 		}
 

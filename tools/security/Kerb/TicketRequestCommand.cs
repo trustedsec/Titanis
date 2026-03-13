@@ -9,7 +9,7 @@ namespace Titanis.Cli.Kerb;
 {
 		nameof(TicketInfo.ClientName), nameof(TicketInfo.ClientRealm), nameof(TicketInfo.TargetSpn), nameof(TicketInfo.EndTime), nameof(TicketInfo.KdcOptions)
 })]
-abstract class TicketRequestCommand : KdcCommand
+public abstract class TicketRequestCommand : KdcCommand
 {
 
 	[Parameter]
@@ -63,14 +63,14 @@ abstract class TicketRequestCommand : KdcCommand
 		if (!string.IsNullOrEmpty(this.TicketCache))
 		{
 			string ticketCacheFile = this.ResolveFsPath(this.TicketCache);
-			krb.TicketCache = new TicketCacheFile(ticketCacheFile, krb);
+			krb.TicketCache = new TicketCacheFile(this.FileAccessService.ReadAllBytesFrom(ticketCacheFile), ticketCacheFile, krb);
 		}
 
 		// Load tickets from file, if it exists
 		List<TicketInfo> tickets = new List<TicketInfo>();
 		if ((outFileName is not null) && this.Append.IsSet && File.Exists(outFileName))
 		{
-			TicketInfo[] existingTickets = krb.LoadTicketsFromFile(outFileName, out _);
+			TicketInfo[] existingTickets = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(outFileName), outFileName, out _);
 			this.WriteVerbose($"Loaded {existingTickets.Length} ticket(s) from {outFileName}.");
 			tickets.AddRange(existingTickets);
 		}

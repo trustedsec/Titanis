@@ -1,0 +1,17 @@
+﻿<Project Sdk="MSTest.Sdk/4.0.1">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TestingExtensionsProfile>None</TestingExtensionsProfile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\base\Titanis.Mocks\Titanis.Mocks.csproj" />
+    <ProjectReference Include="..\test\Titanis.TestUtilities\Titanis.TestUtilities.csproj" />
+    <ProjectReference Include="..\tools\security\Kerb\Kerb.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -8,7 +8,7 @@ namespace Titanis.Cli.Kerb;
 /// <summary>
 /// Defines parameters for initial authentication with a KDC.
 /// </summary>
-internal class InitialAuthParameterGroup : ParameterGroupBase
+public class InitialAuthParameterGroup : ParameterGroupBase
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 	private UserPrincipalName _userName;

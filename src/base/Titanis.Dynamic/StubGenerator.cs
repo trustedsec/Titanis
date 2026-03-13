@@ -118,7 +118,7 @@ namespace Titanis.Dynamic
 
 			if (hasOutParams)
 			{
-				MethodInfo methGetParam = ReflectionHelper.MethodOf<MethodCallMessage>(r => r.GetParam(0));
+				MethodInfo methGetParam = ReflectionHelper.MethodOf<MethodCallMessage>(r => r.GetArgument(0));
 				for (short i = 0; i < parms.Length; i++)
 				{
 					var parm = parms[i];

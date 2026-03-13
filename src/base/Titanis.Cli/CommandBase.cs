@@ -57,7 +57,6 @@ namespace Titanis.Cli
 		public async Task<int> InvokeAsync(ICommandContext context, string command, Token[] args, int startIndex, CancellationToken cancellationToken)
 		{
 			this.Context = context;
-			this.Services.AddService(typeof(IFileAccess), context.FileAccess);
 
 			try
 			{
@@ -108,7 +107,7 @@ namespace Titanis.Cli
 				this._context = value;
 				if (value != null)
 				{
-					this._services = new ServiceContainer(value.Services);
+					this._services = new ServiceContainer(value.HostServices);
 				}
 			}
 		}
@@ -118,6 +117,7 @@ namespace Titanis.Cli
 		/// Gets services available to the command.
 		/// </summary>
 		protected internal ServiceContainer Services => this._services;
+		protected IFileAccess FileAccessService => this.Services.RequireService<IFileAccess>();
 
 		/// <summary>
 		/// Gets a value indicating whether the command has a context.
@@ -684,7 +684,7 @@ namespace Titanis.Cli
 		#endregion
 		protected string ResolveFsPath(string path)
 		{
-			return this.VerifyContext().FileAccess.ResolveFsPath(path);
+			return this.FileAccessService.ResolveFsPath(path);
 		}
 
 		internal const string Indent = "  ";

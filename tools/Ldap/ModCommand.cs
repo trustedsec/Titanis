@@ -40,7 +40,7 @@ internal class ModCommand : LdapObjectCommandBase
 		LdapModifyRequest request = new LdapModifyRequest(objName);
 		if (this.Changes != null)
 		{
-			ChangeContext ctx = new ChangeContext(this.Context);
+			ChangeContext ctx = new ChangeContext(this.Services);
 			ctx.ProcessArgs(this.Changes, request);
 		}
 
@@ -52,14 +52,14 @@ internal class ModCommand : LdapObjectCommandBase
 
 struct ChangeContext
 {
-	internal ChangeContext(ICommandContext commandContext)
+	internal ChangeContext(IServiceProvider services)
 	{
-		this._commandContext = commandContext;
 		this._values = new List<object>();
+		this._fileAccess = services.GetService<IFileAccess>();
 	}
 
-	private readonly ICommandContext _commandContext;
 	internal readonly List<object> _values;
+	private readonly IFileAccess? _fileAccess;
 	internal string? lastAttrName;
 	internal LdapChangeType changeType;
 
@@ -79,7 +79,7 @@ struct ChangeContext
 		object? value = change.Encoding switch
 		{
 			AttributeEncoding.Unspecified => LdapAttribute.ParseSpecialValue(change.Name, change.Value),
-			AttributeEncoding.File => File.ReadAllBytes(this._commandContext.FileAccess.ResolveFsPath(change.Value)),
+			AttributeEncoding.File => File.ReadAllBytes((this._fileAccess??throw new InvalidOperationException($"Unable to read file '{change.Value}' because the command host does not provide file access.")).ResolveFsPath(change.Value)),
 			AttributeEncoding.Hex => BinaryHelper.ParseHexString(change.Value),
 			AttributeEncoding.Base64 => Convert.FromBase64String(change.Value),
 			_ => throw new FormatException($"Unsupported encoding {change.Encoding}.")

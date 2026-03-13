@@ -11,7 +11,10 @@ namespace Titanis.Cli
 	{
 		ITerminal Terminal { get; }
 		string WorkingDirectory { get; }
-		IServiceProvider Services { get; }
+		/// <summary>
+		/// Provides access to services offered by the host.
+		/// </summary>
+		IServiceProvider HostServices { get; }
 
 		CommandMetadataContext MetadataContext { get; }
 		object? GetVariable(string name);
@@ -28,7 +31,5 @@ namespace Titanis.Cli
 		ILog Log { get; }
 
 		Task ExecuteFrameAsync(Func<CancellationToken, Task> func);
-
-		IFileAccess FileAccess { get; }
 	}
 }

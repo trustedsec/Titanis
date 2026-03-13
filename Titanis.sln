@@ -297,6 +297,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Winterop.Registry",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Winterop.Lsa", "src\base\Titanis.Winterop.Lsa\Titanis.Winterop.Lsa.csproj", "{59CC33D4-D21F-4305-90B9-BC3CE4FC2F5E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.TestUtilities", "test\Titanis.TestUtilities\Titanis.TestUtilities.csproj", "{A950B1F4-546B-45EA-BB67-24C267E379B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1517,6 +1519,18 @@ Global
 		{59CC33D4-D21F-4305-90B9-BC3CE4FC2F5E}.Release|x64.Build.0 = Release|Any CPU
 		{59CC33D4-D21F-4305-90B9-BC3CE4FC2F5E}.Release|x86.ActiveCfg = Release|Any CPU
 		{59CC33D4-D21F-4305-90B9-BC3CE4FC2F5E}.Release|x86.Build.0 = Release|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Debug|x64.Build.0 = Debug|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Debug|x86.Build.0 = Debug|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Release|x64.ActiveCfg = Release|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Release|x64.Build.0 = Release|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Release|x86.ActiveCfg = Release|Any CPU
+		{A950B1F4-546B-45EA-BB67-24C267E379B7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1645,6 +1659,7 @@ Global
 		{221CE4E0-B4EB-44E8-8F9F-EF063DC6B805} = {47F210D5-CE8B-43B4-8941-D1F9712B526C}
 		{68C149C1-56BB-4F6F-94B0-5DA2048FFB57} = {2C4AB468-8265-4B1D-BACF-B4E6307BCCE3}
 		{59CC33D4-D21F-4305-90B9-BC3CE4FC2F5E} = {2C4AB468-8265-4B1D-BACF-B4E6307BCCE3}
+		{A950B1F4-546B-45EA-BB67-24C267E379B7} = {A04CCBD6-4F5D-493B-8BE5-B1DF8A5EDDC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {02A3BCA8-C9C0-462E-8DF9-4B0B8DFD7BCB}

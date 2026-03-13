@@ -13,7 +13,7 @@ If you specify -TargetSpn with one or more SPNs, {0} only renews tickets matchin
 ")]
 [Example("Renewing all tickets in a file", "{0} -Ticket milchick-lumon-fs1.kirbi 10.66.0.11 -OutputFileName milchick-lumon-fs1.kirbi -Overwrite")]
 [Example("Renewing tickets from cache", "{0} -TicketCache milchick.ccache 10.66.0.11 -TargetSpn host/lumon-fs1, cifs/lumon-fs1")]
-internal class RenewTicketCommand : TicketRequestCommand
+public class RenewTicketCommand : TicketRequestCommand
 {
 
 	[Parameter]
@@ -50,7 +50,7 @@ internal class RenewTicketCommand : TicketRequestCommand
 		{
 			string ticketFile = this.ResolveFsPath(this.Ticket);
 			this.WriteDiagnostic($"Loading tickets from {ticketFile}");
-			var tickets = krb.LoadTicketsFromFile(ticketFile, out var format);
+			var tickets = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(ticketFile), ticketFile, out var format);
 
 			if (this.TargetSpn != null)
 			{

@@ -45,10 +45,15 @@ namespace Titanis.Cli.Test
 			var md = Command.GetCommandMetadata(typeof(TCommand), mdContext);
 			var log = new TestLog();
 
-			ServiceContainer services = new ServiceContainer();
 			MockRepository mocks = new Mocks.MockRepository();
+
+			// Initialize host services
+			ServiceContainer services = new ServiceContainer();
+			var mFileAccess = mocks.Create<IFileAccess>();
+			services.AddService(typeof(IFileAccess), mFileAccess.Object);
+
 			var cmdContext = mocks.Create<ICommandContext>();
-			cmdContext.Expect(r => r.Services).Return(services);
+			cmdContext.Expect(r => r.HostServices).Return(services);
 			cmdContext.Expect(r => r.GetVariable(Arg.Matches<string>(r => !string.IsNullOrEmpty(r)))).Return(null);
 			cmdContext.Expect(r => r.MetadataContext).Return(mdContext);
 			cmdContext.Expect(r => r.Log).Return(log);
