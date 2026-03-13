@@ -1425,12 +1425,15 @@ namespace Titanis.Security.Kerberos
 				if (ticket.Comment != null)
 					suppItems.Add(new PA_DATA((int)SupplementalPadataType.TicketComment, Encoding.UTF8.GetBytes(ticket.Comment)));
 
+				if (suppItems.Count > 0)
+				{
 				var suppBytes = Asn1DerEncoder.EncodeTlv(new Asn1SequenceOf<PA_DATA>(suppItems.ToArray()));
 				byte[] suppPadataBytes = new byte[4 + suppBytes.Length];
 				BinaryPrimitives.WriteUInt32LittleEndian(suppPadataBytes, SupplementalPadata.Signature);
 				suppBytes.Span.CopyTo(suppPadataBytes.AsSpan(4));
 
 				authData.Add(new CCacheAuthData(PadataType.PasswordSalt, suppPadataBytes));
+			}
 			}
 
 			return authData.ToArray();
