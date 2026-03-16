@@ -26,5 +26,12 @@ namespace Titanis.Cli
 		/// <param name="fileName">Name of file</param>
 		/// <returns>A <see cref="byte"/> array with the contents of <paramref name="fileName"/></returns>
 		byte[] ReadAllBytesFrom(string fileName);
+
+		/// <summary>
+		/// Determines whether a file exists.
+		/// </summary>
+		/// <param name="path">File name to check</param>
+		/// <returns><see langword="true"/> if <paramref name="path"/> names an existing file; otherwise, <see langword="false"/></returns>
+		bool FileExists(string path);
 	}
 }

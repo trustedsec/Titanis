@@ -62,16 +62,31 @@ public class TestFileAccess : IFileAccess
 
 	public byte[] ReadAllBytesFrom(string fileName)
 	{
-		if (fileName.StartsWith(TestFsPrefix))
-			fileName = fileName.Substring(TestFsPrefix.Length + 1);
-
-		var resName = this._resNamePrefix + fileName;
+		string resName = this.FileNameToResourceName(fileName);
 		var resStream = this._resourceAssembly.GetManifestResourceStream(resName);
+
 		if (resStream is null)
 			throw new FileNotFoundException($"No test file found with name: {fileName}");
 
 		byte[] bytes = new byte[resStream.Length];
 		resStream.Read(bytes);
+		resStream.Close();
 		return bytes;
+	}
+
+	private string FileNameToResourceName(string fileName)
+	{
+		if (fileName.StartsWith(TestFsPrefix))
+			fileName = fileName.Substring(TestFsPrefix.Length + 1);
+
+		var resName = this._resNamePrefix + fileName;
+		return resName;
+	}
+
+	public bool FileExists(string path)
+	{
+		var resName = this.FileNameToResourceName(path);
+		var info = this._resourceAssembly.GetManifestResourceInfo(resName);
+		return info != null;
 	}
 }

@@ -145,7 +145,7 @@ namespace Titanis.Smb2.Cli
 
 					if (string.IsNullOrEmpty(destPath))
 						throw new InvalidOperationException($"The source path is a directory, but no destination path was specified.");
-					if (File.Exists(destPath))
+					if (this.FileAccessService.FileExists(destPath))
 						throw new InvalidOperationException($"The source path is a directory but the destination path identifies a file.  The destination for a directory copy operation must be a directory.");
 
 					Directory.CreateDirectory(destPath);
@@ -219,7 +219,7 @@ namespace Titanis.Smb2.Cli
 		{
 			if (!string.IsNullOrEmpty(fileName))
 			{
-				if (File.Exists(fileName))
+				if (this.FileAccessService.FileExists(fileName))
 				{
 					if (this.Overwrite.IsSet)
 					{

@@ -25,5 +25,7 @@ namespace Titanis.Cli
 			fileName = this.ResolveFsPath(fileName);
 			return File.ReadAllBytes(fileName);
 		}
-	}
+
+		public bool FileExists(string path) => File.Exists(this.ResolveFsPath(path));
+    }
 }

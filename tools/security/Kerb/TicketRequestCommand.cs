@@ -46,7 +46,7 @@ public abstract class TicketRequestCommand : KdcCommand
 		else
 		{
 			string outFileName = this.ResolveFsPath(this.OutputFileName);
-			if (File.Exists(outFileName) && !(this.Overwrite.IsSet || this.Append.IsSet))
+			if (this.FileAccessService.FileExists(outFileName) && !(this.Overwrite.IsSet || this.Append.IsSet))
 			{
 				context.LogError($"Output file '{outFileName}' already exists.  Specify a different file name or use -Overwrite to overwrite it or -Append to append to it.");
 			}
@@ -68,7 +68,7 @@ public abstract class TicketRequestCommand : KdcCommand
 
 		// Load tickets from file, if it exists
 		List<TicketInfo> tickets = new List<TicketInfo>();
-		if ((outFileName is not null) && this.Append.IsSet && File.Exists(outFileName))
+		if ((outFileName is not null) && this.Append.IsSet && this.FileAccessService.FileExists(outFileName))
 		{
 			TicketInfo[] existingTickets = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(outFileName), outFileName, out _);
 			this.WriteVerbose($"Loaded {existingTickets.Length} ticket(s) from {outFileName}.");
