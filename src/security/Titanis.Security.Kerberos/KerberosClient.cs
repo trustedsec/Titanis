@@ -433,11 +433,16 @@ namespace Titanis.Security.Kerberos
 			return CreateSessionKeyFor((EType)encKey.keytype, encKey.keyvalue);
 		}
 
-		public SessionKey CreateSessionKeyFor(EType etype, ReadOnlySpan<byte> keyBytes)
+		public SessionKey CreateSessionKeyFor(EType etype, ReadOnlySpan<byte> keyBytes, bool allowInvalidEType = false)
 		{
 			var encProfile = this.TryGetEncProfile(etype);
 			if (encProfile == null)
+			{
+				if (allowInvalidEType)
+					encProfile = new DummyEncProfile(etype);
+				else
 				throw new NotSupportedException($"The encryption key uses an unsupported encryption profile {etype}.");
+			}
 
 			return encProfile.CreateSessionKey(keyBytes.ToArray());
 		}

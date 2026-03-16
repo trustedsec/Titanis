@@ -165,6 +165,7 @@ namespace Titanis.Security.Kerberos
 		/// <returns>A byte array of the specific key bytes</returns>
 		protected abstract void DeriveSpecificKey(ReadOnlySpan<byte> protocolKey, KeyUsage usage, KeyIntent intent, Span<byte> specificKeyBuffer);
 
+		public virtual bool IsValidKeySizeBytes(int byteCount) => (byteCount == this.KeySizeBytes);
 		internal SessionKey CreateSessionKey(EncryptionKey ekey)
 		{
 			// Don't actually need the EncryptionKey, just the keyvalue
@@ -174,7 +175,7 @@ namespace Titanis.Security.Kerberos
 			Debug.Assert((EType)ekey.keytype == this.EType);
 
 			var bytes = ekey.keyvalue;
-			if (bytes.Length != this.KeySizeBytes)
+			if (!IsValidKeySizeBytes(bytes.Length))
 				throw new ArgumentException("The provided key data does not match the size of key required by this encryption profile.", nameof(bytes));
 
 			return new SessionKey(this, ekey);
