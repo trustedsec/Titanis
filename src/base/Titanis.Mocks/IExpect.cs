@@ -7,16 +7,24 @@ namespace Titanis.Mocks
 	{
 		void Throw(Exception? ex);
 		void CallBase();
+
+		IExpect Do(Action<object[]> callback);
+		IExpect Do<TArg>(Action<TArg> callback);
 	}
 
 	public interface IExpect<TInstance> : IExpect
 	{
+		new IExpect<TInstance> Do(Action<object[]> callback);
+		new IExpect<TInstance> Do<TArg>(Action<TArg> callback);
 	}
 
 	public interface IExpect<TInstance, TReturn> : IExpect<TInstance>
 	{
 		void Return(TReturn value);
 		void Return(Func<object[], TReturn> valueFunc);
+
+		new IExpect<TInstance, TReturn> Do(Action<object[]> callback);
+		new IExpect<TInstance, TReturn> Do<TArg>(Action<TArg> callback);
 	}
 
 	public static class ExpectExtensions

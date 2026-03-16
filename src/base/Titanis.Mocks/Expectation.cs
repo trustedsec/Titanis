@@ -104,9 +104,12 @@ namespace Titanis.Mocks
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.Append($"{this._method.DeclaringType.Name}.{this._method.Name}(");
-			foreach (var arg in this._args)
+			if (this._args != null)
 			{
-				sb.Append($", {arg}");
+				foreach (var arg in this._args)
+				{
+					sb.Append($", {arg}");
+				}
 			}
 			sb.Append(')');
 			return sb.ToString();
@@ -163,6 +166,7 @@ namespace Titanis.Mocks
 	{
 		internal Exception? _exception;
 		internal int calledCount;
+		private List<Action<MethodCallMessage>>? _callbacks;
 
 		internal Expectation(ExpectPattern pattern, ExpectationFlags flags, ExpectationOptions options)
 		{
@@ -191,12 +195,34 @@ namespace Titanis.Mocks
 			this._flags |= ExpectationFlags.ExceptionSet;
 		}
 
+		public void AddCallback(Action<MethodCallMessage> callback)
+		{
+			if (callback is null) throw new ArgumentNullException(nameof(callback));
+			(this._callbacks ??= new List<Action<MethodCallMessage>>()).Add(callback);
+		}
+
+		public IExpect Do(Action<object[]> callback)
+		{
+			this.AddCallback(r => callback(r.GetArguments()));
+			return this;
+		}
+
+		public IExpect Do<TArg>(Action<TArg> callback)
+		{
+			this.AddCallback(r => callback((TArg)r.GetArgument(0)));
+			return this;
+		}
+
 		internal bool Matches(MethodCallMessage message)
 			=> this._pattern.Matches(message);
 
 		internal void HandleCall(MethodCallMessage message)
 		{
 			this.calledCount++;
+			this.MarkMet();
+
+			this._callbacks?.ForEach(r => r.Invoke(message));
+
 			if (this.HasException)
 				throw this._exception!;
 			else if (this.HasReturnValue)
@@ -287,6 +313,21 @@ namespace Titanis.Mocks
 			this._returnValueFunc = valueFunc;
 			this._flags |= ExpectationFlags.ReturnValueSet;
 		}
+
+		IExpect<TInstance> IExpect<TInstance>.Do(Action<object[]> callback) => this.Do(callback);
+		IExpect<TInstance> IExpect<TInstance>.Do<TArg>(Action<TArg> callback) => this.Do(callback);
+
+		public new IExpect<TInstance, TReturn> Do(Action<object[]> callback)
+		{
+			base.AddCallback(r => callback(r.GetArguments()));
+			return this;
+		}
+
+		public new IExpect<TInstance, TReturn> Do<TArg>(Action<TArg> callback)
+		{
+			base.AddCallback(r => callback((TArg)r.GetArgument(0)));
+			return this;
+		}
 	}
 
 	internal class ExpectationAsync<TInstance> : Expectation<TInstance, Task>, IExpectAsync
@@ -317,6 +358,18 @@ namespace Titanis.Mocks
 		public void ThrowAsync(Exception ex)
 		{
 			base.Return(Task.FromException<TReturn>(ex));
+		}
+
+		IExpect<Task<TReturn>> IExpect<Task<TReturn>>.Do(Action<object[]> callback)
+		{
+			base.Do(callback);
+			return this;
+		}
+
+		IExpect<Task<TReturn>> IExpect<Task<TReturn>>.Do<TArg>(Action<TArg> callback)
+		{
+			base.Do(callback);
+			return this;
 		}
 	}
 }

@@ -70,7 +70,8 @@ namespace Titanis.Mocks
 			{
 				foreach (var expect in mock.expectations)
 				{
-					unmet.Add(expect);
+					if (!expect.HasBeenMet)
+						unmet.Add(expect);
 				}
 			}
 
