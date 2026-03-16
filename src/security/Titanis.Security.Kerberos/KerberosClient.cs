@@ -441,7 +441,7 @@ namespace Titanis.Security.Kerberos
 				if (allowInvalidEType)
 					encProfile = new DummyEncProfile(etype);
 				else
-				throw new NotSupportedException($"The encryption key uses an unsupported encryption profile {etype}.");
+					throw new NotSupportedException($"The encryption key uses an unsupported encryption profile {etype}.");
 			}
 
 			return encProfile.CreateSessionKey(keyBytes.ToArray());
@@ -1366,6 +1366,12 @@ namespace Titanis.Security.Kerberos
 
 		private byte[] ExportCcacheBytes(IList<TicketInfo> tickets)
 		{
+			List<CCacheCredential> creds = new List<CCacheCredential>(tickets.Count);
+			foreach (var ticket in tickets)
+			{
+				ToCCacheCred(ticket, creds);
+			}
+
 			CCache ccache = new CCache
 			{
 				format = 5,
@@ -1379,7 +1385,7 @@ namespace Titanis.Security.Kerberos
 				defaultPrincipal = CCachePrincipal.FromTicketClient(tickets[0]),
 				credList = new CCacheCredentialList
 				{
-					credentials = tickets.Select(ToCCacheCred).ToArray()
+					credentials = creds.ToArray()
 				},
 			};
 
@@ -1388,7 +1394,7 @@ namespace Titanis.Security.Kerberos
 			return writer.GetData().ToArray();
 		}
 
-		private CCacheCredential ToCCacheCred(TicketInfo ticket)
+		private void ToCCacheCred(TicketInfo ticket, List<CCacheCredential> credList)
 		{
 			CCacheCredential cred = new CCacheCredential
 			{
@@ -1413,7 +1419,12 @@ namespace Titanis.Security.Kerberos
 				ticket = new CCacheData(Asn1DerEncoder.EncodeTlv(new Ticket(ticket.ticket)).ToArray()),
 				ticket2 = new CCacheData(Array.Empty<byte>())
 			};
-			return cred;
+			credList.Add(cred);
+			var configs = ticket.GetConfigEntries();
+			if (configs!=null)
+			{
+				credList.AddRange(configs);
+			}
 		}
 
 		private static CCacheAuthData[] GetCcacheAuthData(TicketInfo ticket)
@@ -1432,13 +1443,13 @@ namespace Titanis.Security.Kerberos
 
 				if (suppItems.Count > 0)
 				{
-				var suppBytes = Asn1DerEncoder.EncodeTlv(new Asn1SequenceOf<PA_DATA>(suppItems.ToArray()));
-				byte[] suppPadataBytes = new byte[4 + suppBytes.Length];
-				BinaryPrimitives.WriteUInt32LittleEndian(suppPadataBytes, SupplementalPadata.Signature);
-				suppBytes.Span.CopyTo(suppPadataBytes.AsSpan(4));
+					var suppBytes = Asn1DerEncoder.EncodeTlv(new Asn1SequenceOf<PA_DATA>(suppItems.ToArray()));
+					byte[] suppPadataBytes = new byte[4 + suppBytes.Length];
+					BinaryPrimitives.WriteUInt32LittleEndian(suppPadataBytes, SupplementalPadata.Signature);
+					suppBytes.Span.CopyTo(suppPadataBytes.AsSpan(4));
 
-				authData.Add(new CCacheAuthData(PadataType.PasswordSalt, suppPadataBytes));
-			}
+					authData.Add(new CCacheAuthData(PadataType.PasswordSalt, suppPadataBytes));
+				}
 			}
 
 			return authData.ToArray();
@@ -1519,11 +1530,27 @@ namespace Titanis.Security.Kerberos
 			var ccache = reader.ReadPduStruct<CCache>();
 
 			List<TicketInfo> tickets = new List<TicketInfo>(ccache.credList.credentials.Length);
+
+			// Configuration entries are attached to the preceeding tickt
+			// This isn't strictly correct, as the position of a configuration
+			// entry isn't specified, but has been observed in the limited cases of
+			// a ccache containing configuration entries and enables this implementation to rewrite a ccache file without losing configuration entries
+			TicketInfo? lastTicket = null;
 			foreach (var cred in ccache.credList.credentials)
 			{
-				var key = this.CreateSessionKeyFor(cred.key.encType, cred.key.keyData.bytes);
-				TicketInfo info = new TicketInfo(sourceFileName, GetNextTicketSeqnbr(), key, cred, this);
-				tickets.Add(info);
+				if (cred.IsConfigurationEntry)
+				{
+					if (lastTicket != null)
+						lastTicket.AddConfigEntry(cred);
+				}
+				else
+				{
+					var key = this.CreateSessionKeyFor(cred.key.encType, cred.key.keyData.bytes, true);
+
+					TicketInfo info = new TicketInfo(sourceFileName, GetNextTicketSeqnbr(), key, cred, this);
+					lastTicket = info;
+					tickets.Add(info);
+				}
 			}
 
 			return tickets;

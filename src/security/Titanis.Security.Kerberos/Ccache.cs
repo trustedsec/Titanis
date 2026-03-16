@@ -154,11 +154,15 @@ namespace Titanis.Security.Kerberos
 	[PduByteOrder(PduByteOrder.BigEndian)]
 	partial class CCacheCredential
 	{
-		[PduParameter]
+        internal const string ConfigRealm = "X-CACHECONF:";
+        internal const string ConfigClass = "krb5_ccache_conf_data";
+
+        [PduParameter]
 		internal byte version;
 
 		[PduArguments(nameof(version))]
 		internal CCachePrincipal client;
+
 		[PduArguments(nameof(version))]
 		internal CCachePrincipal server;
 		internal CCacheKeyBlock key;
@@ -179,6 +183,33 @@ namespace Titanis.Security.Kerberos
 		partial void OnBeforeWritePdu(Titanis.IO.ByteWriter writer)
 		{
 			this.authDataCount = this.authData?.Length ?? 0;
+		}
+
+		[PduIgnore]
+		public bool IsConfigurationEntry { get; private set; }
+		[PduIgnore]
+		public string? ConfigurationKey { get; set; }
+		[PduIgnore]
+		public string? ConfigurationValue { get; set; }
+		[PduIgnore]
+		public string? ConfigurationClientName { get; set; }
+
+		partial void OnAfterReadPdu(Titanis.IO.IByteSource writer)
+		{
+			var server = this.server;
+			bool isConfig = (server != null)
+				&& (server.componentCount >= 2)
+				&& (server.realm.str == ConfigRealm)
+				&& (server.components[0].str == ConfigClass);
+			if (isConfig)
+			{
+				this.ConfigurationKey = server.components[1].str;
+				this.ConfigurationValue = Encoding.UTF8.GetString(this.ticket.bytes);
+				if (server.componentCount > 2)
+					this.ConfigurationClientName = server.components[2].str;
+
+				this.IsConfigurationEntry = true;
+			}
 		}
 
 

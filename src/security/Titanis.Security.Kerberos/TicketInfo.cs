@@ -149,6 +149,13 @@ namespace Titanis.Security.Kerberos
 			this.Padata = padataList?.ToArray();
 		}
 
+		private List<CCacheCredential>? _configEntries;
+		internal CCacheCredential[] GetConfigEntries() => this._configEntries.ToArray();
+		internal void AddConfigEntry(CCacheCredential cred)
+		{
+			(this._configEntries ??= new List<CCacheCredential>()).Add(cred);
+		}
+
 		public sealed override string ToString() => $"{this.ClientName}@{this.ClientRealm} => {this.TargetSpn}";
 
 		private static bool IsSuppPadata(PA_DATA padata)
