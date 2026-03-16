@@ -63,7 +63,7 @@ namespace Titanis.Cli
 
 		protected void SetOutputFormat(OutputStyle style)
 		{
-			base.SetOutputFormat(style, this, this.OutputHeaders.IsSet);
+			this.VerifyContext().SetOutputFormat(style, this, this.OutputHeaders.IsSet);
 		}
 
 

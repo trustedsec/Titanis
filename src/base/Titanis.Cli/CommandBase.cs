@@ -61,22 +61,7 @@ namespace Titanis.Cli
 			try
 			{
 				var ret = await this.InvokeAsync(command, args, startIndex, cancellationToken);
-				if (this._resultsPending)
-					this.FlushOutput();
-				if (this._outputStyle is OutputStyle.Json)
-					context.WriteOutput("]");
-
-				if (this._recordsExpected)
-				{
-					if (this._recordsWritten == 0)
-					{
-						this.WriteMessage(new LogMessage(LogMessageSeverity.Info, null, "Command completed but no records written"));
-					}
-					else
-					{
-						this.WriteMessage(new LogMessage(LogMessageSeverity.Verbose, null, $"{this._recordsWritten} record(s) written"));
-					}
-				}
+				context.FlushOutput();
 
 				return ret;
 			}
@@ -413,79 +398,16 @@ namespace Titanis.Cli
 		#endregion
 
 		#region Output formatting
-		private OutputStyle _outputStyle;
-		private IOutputFieldProvider? _outputFieldProvider;
-		private OutputField[]? _outputFieldList;
-		private TextTable? _resultTable;
-
-		/// <summary>
-		/// Set when writing records as a table
-		/// </summary>
-		private bool _resultsPending;
-
-		/// <summary>
-		/// Set during any call that anticipates output
-		/// </summary>
-		private bool _recordsExpected;
-		private int _recordsWritten;
 
 		/// <summary>
 		/// Indicates whether a field is selected to be printed in the output.
 		/// </summary>
 		/// <param name="fieldName">Name of field</param>
 		/// <returns><see langword="true"/> if the field will be in the output; otherwise, <see langword="false"/>.</returns>
-		protected bool IsFieldInOutput(string fieldName)
-			=> this._outputFieldProvider?.IncludesField(fieldName) ?? true;
+		protected bool IsFieldInOutput(string fieldName) => this.VerifyContext().IsFieldInOutput(fieldName);
 
-		private bool _includeHeaders;
-		protected void SetOutputFormat(OutputStyle style, IOutputFieldProvider? fields, bool includeHeaders)
-		{
-			if (style is not OutputStyle.Raw)
-				this._recordsExpected = true;
-			this._includeHeaders = includeHeaders;
-
-			this.FlushOutput();
-
-			this._outputStyle = style;
-			this._outputFieldProvider = fields ?? new OutputFieldProvider(this.VerifyContext().MetadataContext);
-
-			if (style is OutputStyle.Json)
-			{
-				this.VerifyContext().WriteOutputLine("[");
-			}
-		}
-
-		private static TextTable BuildResultTable(OutputField[]? fields, bool includeHeaders)
-		{
-			TextTable tbl = new TextTable();
-			if (includeHeaders)
-			{
-				var trHeader = tbl.AddRow();
-				var trLine = tbl.AddRow();
-				foreach (var field in fields!)
-				{
-					trHeader.AddCell(field.Caption);
-					trLine.AddCell(new TextTableCell() { Padding = '-' });
-				}
-			}
-
-			return tbl;
-		}
-
-		static string FormatValue(string sep, string? text)
-		{
-			if (string.IsNullOrEmpty(text))
-				return text;
-
-			var qual = '"';
-			if (text.Contains(sep))
-			{
-				if (text.Contains(qual))
-					text = text.Replace("\"", "\"\"");
-				text = qual + text + qual;
-			}
-			return text;
-		}
+		protected void WriteRecords(System.Collections.IEnumerable records) => this.VerifyContext().WriteRecords(records);
+		protected void WriteRecord(object? record) => this.VerifyContext().WriteRecord(record);
 
 		protected Stream OpenRawOutputStream()
 		{
@@ -497,189 +419,6 @@ namespace Titanis.Cli
 		{
 			this.VerifyContext();
 			return this.VerifyContext().OpenRawInputStream();
-		}
-
-		protected void WriteRecords(IEnumerable records)
-		{
-			// Set regardless of whether there are any records for zero-record message
-			this._recordsExpected = true;
-
-			foreach (var rec in records)
-			{
-				this.WriteRecord(rec);
-			}
-		}
-		protected void WriteRecord(object? record)
-		{
-			this._recordsExpected = true;
-			var context = this.VerifyContext();
-
-			var fields = this._outputFieldList;
-			if ((this._outputStyle is OutputStyle.Table or OutputStyle.List or OutputStyle.Csv or OutputStyle.Tsv or OutputStyle.Json) && fields is null)
-			{
-				if (record != null)
-				{
-					fields = (this._outputFieldProvider ??= CreateDefaultFieldProvider()).GetFieldsForRecord(record);
-				}
-				else
-					throw new ArgumentNullException(nameof(fields));
-
-				// These formats require consistent fields across records
-				if (this._outputStyle is OutputStyle.Table or OutputStyle.Csv or OutputStyle.Tsv)
-				{
-					this._outputFieldList = fields;
-
-					if (this._outputStyle is OutputStyle.Csv or OutputStyle.Tsv)
-					{
-						var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
-						string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.Name)));
-						this.VerifyContext().WriteOutputLine(line);
-					}
-				}
-			}
-
-			switch (this._outputStyle)
-			{
-				case OutputStyle.Freeform:
-					context.WriteOutputLine(record?.ToString());
-					break;
-				case OutputStyle.Table:
-					if (this._resultTable is null)
-					{
-						Debug.Assert(fields != null);
-
-						TextTable tbl = BuildResultTable(fields, this._includeHeaders);
-						this._resultTable = tbl;
-					}
-
-					{
-						var tbl = this._resultTable;
-						if (tbl != null)
-						{
-							Debug.Assert(fields != null);
-
-							this._resultsPending = true;
-
-							if (record is not null)
-							{
-								int maxArrayLength = 1;
-								for (int arrayIndex = 0; arrayIndex < maxArrayLength; arrayIndex++)
-								{
-									var tr = tbl.AddRow();
-									for (int fieldIndex = 0; fieldIndex < fields!.Length; fieldIndex++)
-									{
-										OutputField? field = fields![fieldIndex];
-										var value = field.GetValue(record);
-										string? formatted;
-
-										if (value is Array arr)
-										{
-											maxArrayLength = Math.Max(maxArrayLength, arr.Length);
-											if (arrayIndex < arr.Length)
-											{
-												value = arr.GetValue(arrayIndex);
-												formatted = field.FormatValue(value, this._outputStyle);
-											}
-											else
-												formatted = null;
-										}
-										else if (arrayIndex == 0 || fieldIndex == 0)
-										{
-											formatted = field.FormatValue(value, this._outputStyle);
-										}
-										else
-											formatted = null;
-
-										tr.AddCell(formatted, field.Alignment);
-									}
-								}
-							}
-							else
-							{
-								var tr = tbl.AddRow();
-							}
-						}
-					}
-					break;
-				case OutputStyle.List:
-					Debug.Assert(fields != null);
-
-					if (record is not null)
-					{
-						foreach (var field in fields!)
-						{
-							var value = field.GetValue(record);
-							if (value is not null)
-							{
-								if (!(value is Array array))
-									array = new object[] { value };
-
-								foreach (var elem in array)
-								{
-									var formatted = field.FormatValue(elem, this._outputStyle);
-
-									if (this._includeHeaders)
-										context.WriteOutputLine($"{field.Caption}: {formatted}");
-									else
-										context.WriteOutputLine(formatted);
-								}
-							}
-						}
-					}
-					context.WriteOutputLine(string.Empty);
-					break;
-				case OutputStyle.Csv or OutputStyle.Tsv:
-					if (fields != null && record is not null)
-					{
-						if (_includeHeaders)
-						{
-							var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
-							string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._outputStyle))));
-							this.VerifyContext().WriteOutputLine(line);
-						}
-					}
-					break;
-				case OutputStyle.Json:
-					if (fields != null && record is not null)
-					{
-						Dictionary<string, object?> values = new Dictionary<string, object?>();
-						foreach (var field in fields)
-						{
-							var fieldValue = field.GetValue(record);
-							if (fieldValue != null)
-							{
-								string formatted = field.FormatValue(fieldValue, OutputStyle.Json);
-								values.Add(field.Name, fieldValue);
-							}
-						}
-						if (this._recordsWritten > 0)
-							context.WriteOutput(",");
-						var jsonLine = JsonSerializer.Serialize(values);
-						context.WriteOutputLine(jsonLine);
-					}
-					break;
-				default:
-					break;
-			}
-			this._recordsWritten++;
-		}
-
-		private OutputFieldProvider CreateDefaultFieldProvider()
-		{
-			return new(this.VerifyContext().MetadataContext);
-		}
-
-		private void FlushOutput()
-		{
-			if (this._resultsPending)
-			{
-				if (this._resultTable != null)
-				{
-					this.VerifyContext().WriteOutputLine(this._resultTable.ToString());
-					this._resultsPending = false;
-					this._resultTable = null;
-				}
-			}
 		}
 		#endregion
 		protected string ResolveFsPath(string path)

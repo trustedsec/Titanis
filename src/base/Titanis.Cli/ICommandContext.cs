@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -31,5 +32,20 @@ namespace Titanis.Cli
 		ILog Log { get; }
 
 		Task ExecuteFrameAsync(Func<CancellationToken, Task> func);
+
+
+
+
+		void FlushOutput();
+
+		/// <summary>
+		/// Indicates whether a field is selected to be printed in the output.
+		/// </summary>
+		/// <param name="fieldName">Name of field</param>
+		/// <returns><see langword="true"/> if the field will be in the output; otherwise, <see langword="false"/>.</returns>
+		bool IsFieldInOutput(string fieldName);
+		void SetOutputFormat(OutputStyle style, IOutputFieldProvider? fields, bool includeHeaders);
+		void WriteRecords(IEnumerable records);
+		void WriteRecord(object? record);
 	}
 }
