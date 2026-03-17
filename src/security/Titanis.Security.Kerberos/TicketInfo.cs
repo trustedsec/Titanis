@@ -150,7 +150,7 @@ namespace Titanis.Security.Kerberos
 		}
 
 		private List<CCacheCredential>? _configEntries;
-		internal CCacheCredential[] GetConfigEntries() => this._configEntries.ToArray();
+		internal CCacheCredential[]? GetConfigEntries() => this._configEntries?.ToArray();
 		internal void AddConfigEntry(CCacheCredential cred)
 		{
 			(this._configEntries ??= new List<CCacheCredential>()).Add(cred);
