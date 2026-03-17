@@ -348,7 +348,7 @@ namespace Titanis.Cli
 				if (!string.IsNullOrEmpty(this.S4UserCert))
 				{
 					log?.WriteDiagnostic($"Loading user certificate from {this.S4UserCert}...");
-					var certBytes = File.ReadAllBytes(this.S4UserCert);
+					var certBytes = this.RequireFileAccess().ReadAllBytesFrom(this.S4UserCert);
 					_s4UserCert = new X509Certificate2(certBytes);
 					log?.WriteVerbose($"Loaded certificate for {_s4UserCert.Subject}");
 				}

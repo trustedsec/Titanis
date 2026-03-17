@@ -324,7 +324,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 					return Task.FromResult(1);
 				}
 
-				File.WriteAllBytes(outFileName, bytes);
+				this.FileAccessService.WriteAllBytesTo(outFileName, bytes);
 			}
 
 

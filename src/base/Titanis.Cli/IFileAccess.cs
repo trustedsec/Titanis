@@ -33,5 +33,15 @@ namespace Titanis.Cli
 		/// <param name="path">File name to check</param>
 		/// <returns><see langword="true"/> if <paramref name="path"/> names an existing file; otherwise, <see langword="false"/></returns>
 		bool FileExists(string path);
+
+		/// <summary>
+		/// Writes bytes to a file.
+		/// </summary>
+		/// <param name="fileName">Name of file to write</param>
+		/// <param name="contents">Bytes to write</param>
+		/// <remarks>
+		/// If the file exists, it is replaced.
+		/// </remarks>
+		void WriteAllBytesTo(string fileName, byte[] contents);
 	}
 }

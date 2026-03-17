@@ -9,7 +9,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {
-    [TypeConverter(typeof(RegistryValueSpecConverter))]
+	[TypeConverter(typeof(RegistryValueSpecConverter))]
 	abstract class RegistryItemSpec
 	{
 		internal abstract void Accept(IRegistryItemVisitor visitor);
@@ -46,7 +46,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		public string? KeyPath { get; }
 
 		internal sealed override void Accept(IRegistryItemVisitor visitor) => visitor.Visit(this);
-    }
+	}
 	sealed class RegistryValueSpec : RegistryItemSpec
 	{
 		public RegistryValueSpec(string valueName, RegistryValueType valueType, byte[] valueData)
@@ -222,13 +222,14 @@ namespace Titanis.Msrpc.Msrrp.Cli
 			return Encoding.Unicode.GetBytes(valueText);
 		}
 
-		private byte[] ParseFileData(string filePath, IFileAccess? fileAccess, ILog? log)
+		private byte[] ParseFileData(string filePath, IFileAccess fileAccess, ILog? log)
 		{
-			if (fileAccess != null)
-				filePath = fileAccess?.ResolveFsPath(filePath);
+            ArgumentNullException.ThrowIfNull(fileAccess);
+
+            filePath = fileAccess?.ResolveFsPath(filePath);
 
 			log.WriteDiagnostic($"Reading file {filePath}");
-			var data = File.ReadAllBytes(filePath);
+			var data = fileAccess.ReadAllBytesFrom(filePath);
 			return data;
 		}
 

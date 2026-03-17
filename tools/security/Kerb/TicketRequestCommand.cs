@@ -83,7 +83,7 @@ public abstract class TicketRequestCommand : KdcCommand
 			{
 				tickets.AddRange(newTickets);
 				var tgtBytes = krb.ExportTickets(tickets, KerberosClient.GetFormatFromFileName(outFileName));
-				File.WriteAllBytes(outFileName, tgtBytes);
+				this.FileAccessService.WriteAllBytesTo(outFileName, tgtBytes);
 
 				this.WriteVerbose($"Exported {tickets.Count} ticket(s) to {outFileName}");
 			}

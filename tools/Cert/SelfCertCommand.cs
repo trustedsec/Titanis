@@ -136,7 +136,7 @@ internal class SelfCertCommand : Command
 		var pfxFile = this.ResolveFsPath(this.PfxFileName);
 
 		// Write PFX
-		File.WriteAllBytes(pfxFile, newCert.Export(X509ContentType.Pfx));
+		this.FileAccessService.WriteAllBytesTo(pfxFile, newCert.Export(X509ContentType.Pfx));
 
 		if (!string.IsNullOrEmpty(this.CertFileName))
 		{
@@ -146,7 +146,7 @@ internal class SelfCertCommand : Command
 			if (outExt.Equals(".PEM", StringComparison.OrdinalIgnoreCase))
 				File.WriteAllText(certFileName, newCert.ExportCertificatePem());
 			else
-				File.WriteAllBytes(certFileName, newCert.Export(X509ContentType.Cert));
+				this.FileAccessService.WriteAllBytesTo(certFileName, newCert.Export(X509ContentType.Cert));
 		}
 
 

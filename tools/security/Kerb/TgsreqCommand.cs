@@ -97,7 +97,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 				try
 				{
 					this.Log?.WriteMessage(LogMessage.Verbose(null, $"Loading certificate file {this.S4UserCert}"));
-					var certBytes = File.ReadAllBytes(this.S4UserCert);
+					var certBytes = this.FileAccessService.ReadAllBytesFrom(this.S4UserCert);
 					this._s4uCert = new X509Certificate2(certBytes);
 				}
 				catch (Exception ex)
