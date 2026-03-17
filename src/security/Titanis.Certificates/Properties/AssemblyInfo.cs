@@ -19,3 +19,5 @@ using System.Runtime.InteropServices;
 
 [assembly:InternalsVisibleTo("Titanis.Crypto.Cms")]
 [assembly:InternalsVisibleTo("Titanis.Security.Kerberos")]
+[assembly: InternalsVisibleTo("Titanis.Security.Kerberos.Test")]
+[assembly: InternalsVisibleTo("Titanis.Cli.Kerb.Test")]

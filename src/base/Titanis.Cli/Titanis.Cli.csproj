@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<!-- This is referenced by the build tools and must remain compatible with .NET Framework -->
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
@@ -12,8 +13,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Titanis.Core\Titanis.Core.csproj" />
-	  <ProjectReference Include="..\Titanis.Reflection\Titanis.Reflection.csproj" />
+		<ProjectReference Include="..\Titanis.Core\Titanis.Core.csproj" />
+		<ProjectReference Include="..\Titanis.Reflection\Titanis.Reflection.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

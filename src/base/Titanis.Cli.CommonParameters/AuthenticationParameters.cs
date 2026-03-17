@@ -405,7 +405,10 @@ namespace Titanis.Cli
 			upn = null;
 			try
 			{
-				store = CertificateHelper.LoadFrom(certFileName, keyFile, keyPassphrase, true);
+				byte[] certBytes = LoadCertFile(fileAccess, certFileName);
+				byte[]? keyFileBytes = (keyFile == null) ? null : LoadCertFile(fileAccess, keyFile);
+
+				store = CertificateHelper.LoadFrom(certBytes, keyFileBytes, keyPassphrase, true);
 
 				var certsWithPrivateKey = store.Where(r => r.HasPrivateKey).ToList();
 				if (certsWithPrivateKey.Count == 1)

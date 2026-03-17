@@ -24,7 +24,10 @@ Note that the ticket flags and time parameters affect the request sent to the KD
 
 If you don't specify any options for the ticket, {0} uses default values, requesting a ticket that expires 10 hours from now with the options Canonicalize, RenewableOk, Renewable, and Forwardable.  If any options are specified, then no default values are applied and only the options specified are used.
 ")]
-	[Example("Requesting a TGT with a password", "{0} -UserName milchick -Realm LUMON -Password Br3@kr00m! -Kdc 10.66.0.11 -v -OutputFileName milchick-tgt.kirbi -Overwrite")]
+	[Example("Requesting a TGT with a user name / password", "{0} -UserName milchick -Realm LUMON -Password Br3@kr00m! -Kdc LUMON-DC1 -v -OutputFileName milchick-tgt.kirbi -Overwrite", Tag = "milchick_password")]
+	[Example("Requesting a TGT with a UPN / password", "{0} -UserName milchick@LUMON.IND -Password Br3@kr00m! -Kdc LUMON-DC1 -v -OutputFileName milchick-tgt.kirbi -Overwrite", Tag = "milchickUpn_password")]
+	[Example("Requesting a TGT with PKINIT", "{0} -UserName milchick@LUMON.IND -UserCert milchick.pfx -UserKeyPassword password -Kdc LUMON-DC1 -v -OutputFileName milchick-tgt.kirbi -Overwrite", Tag = "milchick_pkinit")]
+
 	[Example("Requesting a TGT with a password request Rc4Hmac", "{0} -UserName milchick -Realm LUMON -Password Br3@kr00m! -EncTypes Rc4Hmac -Kdc 10.66.0.11 -v -OutputFileName milchick-tgt.kirbi -Overwrite")]
 	[Example("Requesting a TGT with a password request AES 128 or AES 256", "{0} -UserName milchick -Realm LUMON -Password Br3@kr00m! -EncTypes Aes128CtsHmacSha1_96, Aes256CtsHmacSha1_96 -Kdc 10.66.0.11 -v -OutputFileName milchick-tgt.kirbi -Overwrite")]
 	[Example("Requesting a TGT with an NTLM Hash", "{0} -UserName milchick -NtlmHash B406A01772D0AD225D7B1C67DD81496F -Kdc 10.66.0.11 -Realm LUMON -v -OutputFileName milchick-tgt.kirbi -Overwrite")]

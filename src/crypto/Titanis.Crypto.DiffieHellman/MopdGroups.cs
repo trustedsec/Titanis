@@ -1,5 +1,8 @@
-﻿using System.Diagnostics;
+﻿using PKIX1Algorithms88;
+using System.Diagnostics;
 using System.Numerics;
+using Titanis.Asn1;
+using Titanis.Asn1.Serialization;
 
 namespace Titanis.Crypto.DiffieHellman
 {
@@ -29,10 +32,40 @@ namespace Titanis.Crypto.DiffieHellman
 			this.Q = q;
 		}
 
+		private static int VerifyBitLength(long bitLength)
+		{
+			if (bitLength > int.MaxValue)
+				throw new ArgumentOutOfRangeException("The length of the modulus exceeds the limit of this implementation.");
+			return (int)bitLength;
+		}
+		public ModpGroup(Asn1Any domainParams)
+		{
+            ArgumentNullException.ThrowIfNull(domainParams);
+            var parms = Asn1DerDecoder.DecodeTlv<DomainParameters>(domainParams.TlvBytes);
+
+			Debug.Assert((parms.q * 2 + 1) == parms.p);
+
+            this.BitLength = VerifyBitLength(parms.p.GetBitLength());
+			this.P = parms.p;
+			this.Generator = parms.g;
+			this.Q = parms.q;
+
+		}
+
 		public int BitLength { get; }
 		public BigInteger P { get; }
 		public BigInteger Generator { get; }
 		public BigInteger Q { get; }
+
+		public Asn1Any EncodeDomainParameters()
+		{
+			PKIX1Algorithms88.DomainParameters domainParams = new PKIX1Algorithms88.DomainParameters(
+				this.P,
+				this.Generator,
+				this.Q
+				);
+			return Asn1Any.CreateFromObject(domainParams);
+		}
 	}
 
 	public static class ModpGroups

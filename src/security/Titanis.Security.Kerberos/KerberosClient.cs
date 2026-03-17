@@ -69,6 +69,14 @@ namespace Titanis.Security.Kerberos
 		public static readonly ServicePrincipalName ChangePwSpn = new ServicePrincipalName("kadmin", "changepw");
 
 		/// <summary>
+		/// Initializes a new <see cref="KerberosClient"/> for offline use.
+		/// </summary>
+		public KerberosClient()
+		{
+
+		}
+
+		/// <summary>
 		/// Initializes a new <see cref="KerberosClient"/>.
 		/// </summary>
 		/// <param name="locator">KDC locator</param>
@@ -88,9 +96,28 @@ namespace Titanis.Security.Kerberos
 			{
 				// Only required for KDC locator
 				// TODO: Log
-				socketService ??= new PlatformSocketService(null, null);
-				this._socketService = socketService;
+				if (socketService != null)
+					this._transport = new KerberosSocketTransport(socketService);
 			}
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="KerberosClient"/>.
+		/// </summary>
+		/// <param name="locator">KDC locator</param>
+		/// <param name="transport"><see cref="IKerberosTransport"/> implementation for network communication</param>
+		/// <remarks>
+		/// If <paramref name="locator"/> is <see langword="null"/>, this client instance can only provide tickets from the cache.
+		/// </remarks>
+		internal KerberosClient(
+			IKdcLocator? locator,
+			IKerberosTransport? transport = null,
+			IKerberosCallback? callback = null
+			)
+		{
+			this._locator = locator;
+			this._callback = callback;
+			this._transport = transport;
 		}
 
 		/// <summary>
@@ -100,7 +127,7 @@ namespace Titanis.Security.Kerberos
 
 		private readonly IKdcLocator? _locator;
 		private readonly IKerberosCallback? _callback;
-		private readonly ISocketService? _socketService;
+		private readonly IKerberosTransport? _transport;
 
 		private ITicketCache? _ticketCache;
 		public ITicketCache TicketCache
@@ -111,6 +138,14 @@ namespace Titanis.Security.Kerberos
 				ArgumentNullException.ThrowIfNull(value);
 				this._ticketCache = value;
 			}
+		}
+
+		private IKerberosTransport EnsureTransport()
+		{
+			if (this._transport is null)
+				throw new InvalidOperationException("The Kerberos client is not configured for network configuration.");
+
+			return this._transport;
 		}
 
 		/// <summary>
@@ -136,46 +171,14 @@ namespace Titanis.Security.Kerberos
 		private async Task<KDC_REP_CHOICE> TransceiveKdcAsync(
 			string realm,
 			LocateKdcOptions options,
-			Memory<byte> memory,
+			KDC_REQ_CHOICE kdcreq,
 			CancellationToken cancellationToken)
 		{
-			Debug.Assert(!string.IsNullOrEmpty(realm));
-
 			EndPoint kdcEP = this.VerifyKdcLocator().LocateKdc(realm, options);
 			if (kdcEP == null)
 				throw new NotSupportedException(string.Format(Messages.Krb5_NoKdc, realm));
 
-			using (var s = await _socketService!.ConnectTcp(kdcEP, cancellationToken).ConfigureAwait(false))
-			{
-				var stream = s.GetStream(false);
-				await stream.WriteAsync(memory, cancellationToken).ConfigureAwait(false);
-
-				byte[]? buf = null;
-				const int BufferSize = 64 * 1024;
-				try
-				{
-					buf = ArrayPool<byte>.Shared.Rent(BufferSize);
-
-					int cbTotalRecv = await stream.ReadAtLeastAsync(buf, 0, buf.Length, 4, cancellationToken).ConfigureAwait(false);
-
-					int cbPdu = BinaryPrimitives.ReadInt32BigEndian(buf.SliceReadOnly(0, 4));
-					if (cbPdu < 4)
-						throw new ProtocolViolationException("The KDC returned an empty response.  This may indicate that it could not parse the request.");
-
-					await stream.ReadAllAsync(buf, cbTotalRecv, (cbPdu + 4 - cbTotalRecv), cancellationToken).ConfigureAwait(false);
-
-					s.Shutdown(SocketShutdown.Both);
-
-
-					var rep = ParseReplyPdu(buf);
-					return rep;
-				}
-				finally
-				{
-					if (buf != null)
-						ArrayPool<byte>.Shared.Return(buf);
-				}
-			}
+			return await EnsureTransport().TransceiveKdcAsync(realm, kdcEP, kdcreq, cancellationToken).ConfigureAwait(false);
 		}
 
 		#endregion
@@ -317,9 +320,8 @@ namespace Titanis.Security.Kerberos
 
 			this._callback?.OnRequestingTgt(targetRealm, credential, asreq.Asreq.req_body.nonce);
 
-			Memory<byte> pduBytes = BuildPdu(asreq);
 			var sendTime = DateTime.UtcNow;
-			var rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, pduBytes, cancellationToken).ConfigureAwait(false);
+			var rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, asreq, cancellationToken).ConfigureAwait(false);
 			var recvTime = DateTime.UtcNow;
 			// TODO: Add a max loop count to avoid getting stuck.
 			while (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Error)
@@ -336,9 +338,8 @@ namespace Titanis.Security.Kerberos
 					{
 						asreq.Asreq.padata = paResponseData;
 
-						pduBytes = BuildPdu(asreq);
 						sendTime = DateTime.UtcNow;
-						rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, pduBytes, cancellationToken).ConfigureAwait(false);
+						rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, asreq, cancellationToken).ConfigureAwait(false);
 						recvTime = DateTime.UtcNow;
 						continue;
 					}
@@ -385,9 +386,8 @@ namespace Titanis.Security.Kerberos
 					this.MakeHostAddress()
 				));
 
-			Memory<byte> pduBytes = BuildPdu(asreq);
 			var sendTime = DateTime.UtcNow;
-			var rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, pduBytes, cancellationToken).ConfigureAwait(false);
+			var rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, asreq, cancellationToken).ConfigureAwait(false);
 			if (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Error)
 			{
 				var err = rep.Error;
@@ -665,8 +665,7 @@ namespace Titanis.Security.Kerberos
 
 			this._callback?.OnRequestingTicket(spn, tgt, (KdcOptions)tgsreq.Tgsreq.req_body.kdc_options.ToUInt32());
 
-			Memory<byte> pduBytes = BuildPdu(tgsreq);
-			var rep = await this.TransceiveKdcAsync(realm, string.Equals(realm, tgt.ClientRealm) ? LocateKdcOptions.Home : LocateKdcOptions.None, pduBytes, cancellationToken).ConfigureAwait(false);
+			var rep = await this.TransceiveKdcAsync(realm, string.Equals(realm, tgt.ClientRealm) ? LocateKdcOptions.Home : LocateKdcOptions.None, tgsreq, cancellationToken).ConfigureAwait(false);
 
 			if (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Tgsrep)
 				return ProcessTgsRep(rep.Tgsrep, ticketParameters, context);
@@ -709,22 +708,6 @@ namespace Titanis.Security.Kerberos
 			var kdcOptions = (KdcOptions)encPart.Value.flags.ToUInt32();
 
 			return encPart;
-		}
-
-		/// <summary>
-		/// Builds a PDU from a <see cref="KDC_REQ_CHOICE"/>.
-		/// </summary>
-		/// <param name="obj">Protocol object</param>
-		/// <returns>A buffer containing the PDU suitable for transmission within the application protocol</returns>
-		private static Memory<byte> BuildPdu(KDC_REQ_CHOICE obj)
-		{
-			Asn1DerEncoder encoder = Asn1DerEncoding.CreateDerEncoder();
-			obj.EncodeTlv(encoder);
-			var writer = encoder.GetWriter();
-			int cbPdu = writer.Position;
-			writer.WriteInt32BE(cbPdu);
-			Memory<byte> pduBytes = writer.GetData();
-			return pduBytes;
 		}
 
 		internal static KDC_REQ_CHOICE ParseRequestPdu(ReadOnlyMemory<byte> pduBytes)
@@ -1078,12 +1061,12 @@ namespace Titanis.Security.Kerberos
 
 			byte[] privData = Encoding.UTF8.GetBytes(newPassword);
 
-			await SendChangepwRequest(
+			await this.EnsureTransport().SendChangepwRequest(
+				this,
 				kdcEP,
-				ticket,
-				credential,
 				privData,
 				ChangepwMessage.ChangepwVersionNumber,
+				new ChangepwRequest(credential, ticket),
 				cancellationToken).ConfigureAwait(false);
 		}
 
@@ -1110,74 +1093,13 @@ namespace Titanis.Security.Kerberos
 				targetAccount?.PrincipalName(),
 				(targetRealm is null) ? default(GeneralString?) : targetRealm)).ToArray();
 
-			await SendChangepwRequest(
+			await this.EnsureTransport().SendChangepwRequest(
+				this,
 				kdcEP,
-				ticket,
-				credential,
 				privData,
 				ChangepwMessage.Win2kResetPasswordVersionNumber,
+				new ChangepwRequest(credential, ticket),
 				cancellationToken).ConfigureAwait(false);
-		}
-
-		private async Task SendChangepwRequest(EndPoint kdcEP, TicketInfo ticket, KerberosCredential credential, byte[] privData, ushort version, CancellationToken cancellationToken)
-		{
-			var socketService = this._socketService;
-			var socket = await socketService.ConnectTcp(kdcEP, cancellationToken).ConfigureAwait(false);
-			await using (socket)
-			{
-				var authContext = new MskileClientContext(credential, this, KerberosClient.ChangePwSpn, ticket, null);
-				authContext.RequiredCapabilities |= SecurityCapabilities.DceStyle;
-				var apreqBytes = authContext.Initialize().ToArray();
-
-				var privBytes = authContext.EncodeKrbPriv(privData);
-
-
-
-				var msg = new ChangepwMessage
-				{
-					MessageLength = checked((ushort)(6 + apreqBytes.Length + privBytes.Length)),
-					ProtocolVersionNumber = version,
-					ApreqLength = checked((ushort)apreqBytes.Length),
-					Apreqdata = apreqBytes,
-					PrivMessage = privBytes.ToArray()
-				};
-				var writer = new ByteWriter(4 + msg.MessageLength);
-				writer.WriteInt32BE(msg.MessageLength);
-				writer.WritePduStruct(msg);
-
-				var bytes = writer.GetData();
-
-				await socket.SendAsync(bytes, SocketFlags.None, cancellationToken).ConfigureAwait(false);
-
-				var replyBuf = new byte[32 * 1024];
-
-				int cbRecv = await socket.ReceiveAtLeastAsync(
-					replyBuf,
-					4 + 6,
-					cancellationToken).ConfigureAwait(false);
-				var cbMessage = BinaryPrimitives.ReadInt32BigEndian(replyBuf) + 4;
-				if (cbRecv < cbMessage)
-					cbRecv += await socket.ReceiveAtLeastAsync(replyBuf.AsMemory(cbRecv), cbMessage - cbRecv, cancellationToken).ConfigureAwait(false);
-
-				var reader = new ByteMemoryReader(replyBuf.AsMemory(4, cbRecv - 4));
-				var reply = reader.ReadPduStruct<ChangepwMessage>();
-				authContext.Initialize(reply.Apreqdata);
-				var privReply = Asn1DerDecoder.DecodeTlv<KRB_PRIV>(reply.PrivMessage);
-
-				var privEncpart = authContext.InitiatorSubkey.DecryptTlv<EncKrbPrivPart>(KeyUsage.Priv, privReply.Value.enc_part).Value;
-				if (privEncpart.user_data.Length >= 2)
-				{
-					var status = (ChangepwStatus)BinaryPrimitives.ReadUInt16BigEndian(privEncpart.user_data);
-					if (status != ChangepwStatus.Success)
-					{
-						string? errorMessage = null;
-						if (privEncpart.user_data.Length > 2)
-							errorMessage = Encoding.UTF8.GetString(privEncpart.user_data.Slice(2));
-
-						throw new KrbChangePasswordException(status, errorMessage);
-					}
-				}
-			}
 		}
 
 		#endregion
@@ -1332,12 +1254,9 @@ namespace Titanis.Security.Kerberos
 				encParts[i] = new KrbCredInfo(
 					ticket.SessionKey.key,
 					new GeneralString(ticket.ClientRealm),
-					new PrincipalName(
-						(int)PrincipalNameType.Principal,
-						new GeneralString[]
-						{
-							new GeneralString(ticket.ClientName)
-						}
+					Structs.PrincipalName(
+						PrincipalNameType.Principal,
+						new GeneralString(ticket.ClientName)
 					),
 					new Asn1BitString(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((int)ticket.KdcOptions)), 0),
 					null,
@@ -1421,7 +1340,7 @@ namespace Titanis.Security.Kerberos
 			};
 			credList.Add(cred);
 			var configs = ticket.GetConfigEntries();
-			if (configs!=null)
+			if (configs != null)
 			{
 				credList.AddRange(configs);
 			}
@@ -1822,7 +1741,15 @@ namespace Titanis.Security.Kerberos
 			if (locator is null)
 				locator = services.GetService<IKdcLocator>();
 
-			return new KerberosClient(locator, services.GetService<ISocketService>(), callback);
+			var transport = services.GetService<IKerberosTransport>();
+			if (transport is null)
+			{
+				ISocketService? socketService = services.GetService<ISocketService>();
+				if (socketService != null)
+					transport = new KerberosSocketTransport(socketService);
+			}
+
+			return new KerberosClient(locator, transport, callback);
 		}
 	}
 }

@@ -11,19 +11,25 @@ namespace Titanis.Certificates
 {
 	public static partial class CertificateHelper
 	{
-		public static X509Certificate2Collection LoadFrom(string fileName)
+		public static X509Certificate2Collection LoadFrom(byte[] bytes)
 		{
+			if (bytes.IsNullOrEmpty())
+				throw new ArgumentNullException(nameof(bytes));
+
 			LoadContext ctx = new LoadContext();
-			LoadFrom(fileName, null, ctx, false);
+			LoadFrom(bytes, null, ctx, false);
 
 			return ctx.certs;
 		}
-		public static X509Certificate2Collection LoadFrom(string fileName, string? keyFile, string? password, bool failOnKeyFailure)
+		public static X509Certificate2Collection LoadFrom(byte[] bytes, byte[]? keyFileBytes, string? password, bool failOnKeyFailure)
 		{
+			if (bytes is null || bytes.Length == 0)
+				throw new ArgumentNullException(nameof(bytes));
+
 			LoadContext ctx = new LoadContext();
-			if (!string.IsNullOrEmpty(keyFile))
-				LoadFrom(keyFile, password, ctx, failOnKeyFailure);
-			LoadFrom(fileName, password, ctx, failOnKeyFailure);
+			if (!keyFileBytes.IsNullOrEmpty())
+				LoadFrom(keyFileBytes, password, ctx, failOnKeyFailure);
+			LoadFrom(bytes, password, ctx, failOnKeyFailure);
 
 			return ctx.certs;
 		}
@@ -35,13 +41,8 @@ namespace Titanis.Certificates
 			internal List<RSA> allKeys = new List<RSA>();
 		}
 
-		private static void LoadFrom(string fileName, string? password, LoadContext context, bool failOnKeyFailure)
+		private static void LoadFrom(byte[] bytes, string? password, LoadContext context, bool failOnKeyFailure)
 		{
-			ArgumentException.ThrowIfNullOrEmpty(fileName);
-
-			byte[] bytes = File.ReadAllBytes(fileName);
-			if (bytes.Length == 0)
-				throw new ArgumentException($"File {fileName} does not contain any data.", nameof(fileName));
 			if (bytes[0] == 0x30)
 			{
 				// Probably a .pfx file

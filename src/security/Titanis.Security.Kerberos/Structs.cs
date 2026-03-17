@@ -147,5 +147,8 @@ namespace Titanis.Security.Kerberos
 				ticket,
 				authenticator
 				));
+
+		internal static ETYPE_INFO2_ENTRY PAData_ETypeInfo2Entry(EType etype, string? salt) => new ETYPE_INFO2_ENTRY((int)etype, (salt is null) ? null : new GeneralString(salt));
+		internal static PA_DATA PAData_ETypeInfo2(params ETYPE_INFO2_ENTRY[] entries) => new PA_DATA((int)PadataType.ETypeInfo2, Asn1DerEncoder.EncodeTlv(new Asn1SequenceOf<ETYPE_INFO2_ENTRY>(entries)).ToArray());
 	}
 }

@@ -16,8 +16,7 @@ public class Trace_Aes256Test
 	[Ignore("Broken Kerberos trace")]
 	public void TraceTest()
 	{
-		var logger = new KerberosDiagnosticLogger(new TestLog(this.TestContext));
-		KerberosClient client = new KerberosClient(null, callback: logger);
+		KerberosClient client = new KerberosClient();
 		KerberosPasswordCredential cred = new KerberosPasswordCredential(new UserPrincipalName("milchick", "LUMON.IND"), "Br3@kr00m!");
 		throw new NotImplementedException();
 		//client.Trace(cred,

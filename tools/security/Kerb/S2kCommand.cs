@@ -16,9 +16,9 @@ For more details, see [MS-KILE] § 3.1.1.2
 
 The domain name used for the salt must be the FQDN of the domain, not the shorter NetBIOS name.
 ")]
-[Example("Generate keys for milchick in domain LUMON.IND", "{0} LUMON.INDmilchick Br3@kr00m!")]
-[Example("Generate AES keys for milchick in domain LUMON.IND", "{0} LUMON.INDmilchick Br3@kr00m! -EncTypes Aes128CtsHmacSha1_96, Aes256CtsHmacSha1_96")]
-[Example("Generate keys for computer ALLENTOWN$ in domain LUMON.IND", "{0} LUMON.INDhostallentown.lumon.ind password")]
+[Example("Generate keys for milchick in domain LUMON.IND", "{0} Br3@kr00m! LUMON.INDseth", Tag = "AllKeys")]
+[Example("Generate AES keys for milchick in domain LUMON.IND", "{0} Br3@kr00m! LUMON.INDseth -EncType Aes128CtsHmacSha1_96, Aes256CtsHmacSha1_96", Tag = "AesKeys")]
+[Example("Generate keys for computer ALLENTOWN$ in domain LUMON.IND", "{0} password LUMON.INDhostallentown.lumon.ind", Tag = "AllAllentown")]
 [OutputRecordType(typeof(SessionKey), DefaultFields = new string[] { nameof(SessionKey.EType), nameof(SessionKey.KeyText) })]
 public class S2kCommand : Command
 {
@@ -39,7 +39,7 @@ public class S2kCommand : Command
 	[Description("Continue even if errors occur")]
 	public SwitchParam ContinueOnError { get; set; }
 
-	private KerberosClient _krb = new KerberosClient(null);
+	private KerberosClient _krb = new KerberosClient();
 	private EType[] _etypes;
 	protected override void ValidateParameters(ParameterValidationContext context)
 	{

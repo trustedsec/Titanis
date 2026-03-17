@@ -19,7 +19,7 @@ public class ResearchTests
 		//var tgt = Asn1DerDecoder.DecodeTlv<KerberosV5Spec2.Ticket_Tagged1>(MyTgtBytes);
 		var serverTgt = Asn1DerDecoder.DecodeTlv<KerberosV5Spec2.Ticket_Tagged1>(TgtFromServerBytes);
 
-		KerberosClient krb = new KerberosClient(null);
+		KerberosClient krb = new KerberosClient();
 		var krbtgtKey = krb.CreateSessionKeyFor(EType.Aes256CtsHmacSha1_96, BinaryHelper.ParseHexString("6e8c4a34b5775ab24b10392735d3a2ca053ad00a8f267866e33fb82483217921"));
 
 		//var addlEncPart = krbtgtKey.DecryptTlv<EncTicketPart>(KeyUsage.Asrep_Tgsrep_Ticket, addlTicket.enc_part);

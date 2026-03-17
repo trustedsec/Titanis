@@ -78,6 +78,10 @@ namespace Titanis.Asn1
 		/// Gets the octets constituting the bitstring.
 		/// </summary>
 		public byte[]? Octets { get; }
+		/// <summary>
+		/// Gets the number of bits in the string, excluding unused bits.
+		/// </summary>
+		public int BitLength => (this.Octets?.Length ?? 0) * 8 - this.UnusedBits;
 		/// <inheritdoc/>
 		public readonly Asn1Tag Tag => Asn1PredefTag.BitString;
 		/// <summary>

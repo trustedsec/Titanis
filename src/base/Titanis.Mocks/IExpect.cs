@@ -48,5 +48,6 @@ namespace Titanis.Mocks
 	{
 		void ThrowAsync(Exception ex);
 		void ReturnAsync(TReturn value);
+		void ReturnAsync(Func<object[], Task<TReturn>> valueFunc);
 	}
 }

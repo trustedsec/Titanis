@@ -17,7 +17,7 @@ public class AuthzDataTest
 	{
 		TicketAuthorizationData authorizationData = new TicketAuthorizationData();
 		AuthorizationData_Element elem = Asn1DerDecoder.DecodeTlv<AuthorizationData_Element>(PacBytes);
-		var krb = new KerberosClient(null);
+		var krb = new KerberosClient();
 		authorizationData.Process(elem, true, null);
 	}
 

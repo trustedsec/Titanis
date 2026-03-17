@@ -294,7 +294,7 @@ namespace Titanis.Security.Kerberos
 		{
 			var bytes = this.ticket.enc_part.cipher;
 			StringBuilder sb = new StringBuilder();
-			var krb = new KerberosClient(null);
+			var krb = new KerberosClient();
 			EType etype = this.TicketEType;
 			var encProf = krb.GetEncProfile(etype);
 

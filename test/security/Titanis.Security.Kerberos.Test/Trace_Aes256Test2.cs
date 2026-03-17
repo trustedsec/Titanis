@@ -16,8 +16,7 @@ public class Trace_Aes256Test2
 	[Ignore("Broken Kerberos trace")]
 	public void TraceTest()
 	{
-		var logger = new KerberosDiagnosticLogger(new TestLog(this.TestContext));
-		KerberosClient client = new KerberosClient(null, callback: logger);
+		KerberosClient client = new KerberosClient();
 		KerberosPasswordCredential cred = new KerberosPasswordCredential(new UserPrincipalName("milchick", "LUMON.IND"), "Br3@kr00m!");
 		var keyBytes = BinaryHelper.ParseHexString("bf0ff1d9446a72f0aba40d91668588a071a592c846d2a0496bc6c7959f45e1ad");
 		var ticketSessionKey = client.CreateSessionKeyFor(EType.Aes256CtsHmacSha1_96, keyBytes);

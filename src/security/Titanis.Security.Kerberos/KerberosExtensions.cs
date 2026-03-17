@@ -102,8 +102,57 @@ namespace KerberosV5Spec2
 
 	}
 
-	public partial class PrincipalName
+	public sealed partial class PrincipalName : IEquatable<PrincipalName>
 	{
+		public sealed override bool Equals(object? obj) => (obj is PrincipalName other) && this.Equals(other);
+
+		public bool Equals(PrincipalName? other)
+		{
+			bool equals = (other != null)
+				&& (this.name_type == other.name_type)
+				&& (this.name_string.Length == other.name_string.Length);
+			if (equals)
+			{
+				for (int i = 0; i < this.name_string.Length; i++)
+				{
+					if (!string.Equals(this.name_string[i].Value, other.name_string[i].Value, StringComparison.OrdinalIgnoreCase))
+						return false;
+				}
+				return true;
+			}
+			return false;
+		}
+
+		public sealed override int GetHashCode()
+		{
+			int hash = this.name_type;
+			foreach (var name in this.name_string)
+			{
+				hash = HashCode.Combine(hash, name.Value.GetHashCode(StringComparison.OrdinalIgnoreCase));
+			}
+			return hash;
+		}
+
+		public static bool operator ==(PrincipalName left, PrincipalName right) => object.ReferenceEquals(left, right) || (left is not null && left.Equals(right));
+		public static bool operator !=(PrincipalName left, PrincipalName right) => !(left == right);
+
+		internal bool? Matches(PrincipalNameType nameType, string name0)
+		{
+			return (PrincipalNameType)this.name_type == nameType
+				&& (this.name_string.Length == 1)
+				&& name0.Equals(this.name_string[0].Value, StringComparison.OrdinalIgnoreCase)
+				;
+		}
+
+		internal bool? Matches(PrincipalNameType nameType, string name0, string name1)
+		{
+			return (PrincipalNameType)this.name_type == nameType
+				&& (this.name_string.Length == 2)
+				&& name0.Equals(this.name_string[0].Value, StringComparison.OrdinalIgnoreCase)
+				&& name1.Equals(this.name_string[1].Value, StringComparison.OrdinalIgnoreCase)
+				;
+		}
+
 		internal SecurityPrincipalName ToSecurityPrincipalName()
 			=> SecurityPrincipalName.Create((PrincipalNameType)this.name_type, Array.ConvertAll(this.name_string, r => r.Value));
 

@@ -11,7 +11,7 @@ internal class Trace_Rc4Hmac
 	[TestMethod]
 	public void TraceTest()
 	{
-		KerberosClient client = new KerberosClient(null);
+		KerberosClient client = new KerberosClient();
 
 		KerberosPasswordCredential cred = new KerberosPasswordCredential(new UserPrincipalName("milchick", "LUMON.IND"), "Br3@kr00m!");
 		throw new NotImplementedException();

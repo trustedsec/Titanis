@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <ArtifactsPath>$(ArtifactsBasePath)\build</ArtifactsPath>
+	  <ArtifactsPath>$(ArtifactsBasePath)build\</ArtifactsPath>
 	  
     <TargetFramework>net472</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

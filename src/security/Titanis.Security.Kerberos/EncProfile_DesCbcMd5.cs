@@ -275,6 +275,8 @@ namespace Titanis.Security.Kerberos
 			if (specificKeyBuffer.Length != this.KeySizeBytes)
 				throw new ArgumentException("Invalid key size", nameof(specificKeyBuffer));
 
+			// DesCbcMd5 doesn't specify key derivation
+
 			protocolKey.CopyTo(specificKeyBuffer);
 		}
 

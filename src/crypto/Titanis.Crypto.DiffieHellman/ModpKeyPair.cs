@@ -60,15 +60,6 @@ namespace Titanis.Crypto.DiffieHellman
 			return new ModpKeyPair(group, x);
 		}
 
-		public Asn1Any EncodeDomainParameters()
-		{
-			PKIX1Algorithms88.DomainParameters domainParams = new PKIX1Algorithms88.DomainParameters(
-				this.Group.P,
-				this.Group.Generator,
-				this.Group.Q
-				);
-			return Asn1Any.CreateFromObject(domainParams);
-		}
 		public byte[] EncodePublicExponent()
 		{
 			return Asn1DerEncoder.EncodeTlv(new Asn1Integer(this.PublicExponent)).ToArray();
@@ -76,6 +67,9 @@ namespace Titanis.Crypto.DiffieHellman
 
 		public byte[] GenerateSessionKey(Asn1BitString subjectPublicKey)
 		{
+			// TODO: Check for unused bytes
+			Debug.Assert(subjectPublicKey.UnusedBits == 0);
+
 			var yb = Asn1DerDecoder.DecodeTlv<Asn1Integer>(subjectPublicKey.Octets).Value;
 			BigInteger zz = CalculateAgreement(yb);
 

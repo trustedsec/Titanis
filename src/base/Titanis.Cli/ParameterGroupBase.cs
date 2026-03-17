@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Titanis.Cli
@@ -33,5 +34,29 @@ namespace Titanis.Cli
 		protected TCallback? GetCallback<TCallback>()
 			where TCallback : class
 			=> null;
+
+
+		protected static byte[] LoadCertFile(IFileAccess fileAccess, string fileName, [CallerArgumentExpression(nameof(fileName))] string? argName = null)
+		{
+			byte[] certBytes = fileAccess.ReadAllBytesFrom(fileName);
+			if (certBytes.Length == 0)
+				throw new ArgumentException($"File {fileName} does not contain any data.", argName);
+
+			return certBytes;
+		}
+	}
+}
+
+namespace System.Runtime.CompilerServices
+{
+	[AttributeUsage(AttributeTargets.Parameter)]
+	sealed class CallerArgumentExpressionAttribute : Attribute
+	{
+		public CallerArgumentExpressionAttribute(string parameterName)
+		{
+			ParameterName = parameterName;
+		}
+
+		public string ParameterName { get; }
 	}
 }

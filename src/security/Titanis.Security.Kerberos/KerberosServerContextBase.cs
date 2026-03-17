@@ -79,7 +79,7 @@ namespace Titanis.Security.Kerberos
 			throw new NotImplementedException();
 		}
 
-		private static readonly KerberosClient krb = new KerberosClient(null);
+		private static readonly KerberosClient krb = new KerberosClient();
 
 		protected override ReadOnlySpan<byte> AcceptImpl(ReadOnlySpan<byte> token)
 		{

@@ -97,6 +97,8 @@ namespace Titanis.Security.Kerberos
 			if (KerberosV5_PK_INIT_SPECModule.id_pkinit_DHKeyData != signed.ContentInfo.ContentType)
 				throw new ProtocolViolationException($"The server returned a PK-AS-REP with the wrong content type.  Expected '{KerberosV5_PK_INIT_SPECModule.id_pkinit_DHKeyData.Text}' but received '{signed.ContentInfo.ContentType}'");
 
+			// TODO: Certificate and signature verification
+
 			var dhInfo = Asn1DerDecoder.DecodeTlv<KDCDHKeyInfo>(signed.ContentInfo.Content);
 			var serverNonce = pkasrep.DhInfo.serverDHNonce;
 			var zz = this._dhkey.GenerateSessionKey(dhInfo.subjectPublicKey);
@@ -135,10 +137,10 @@ namespace Titanis.Security.Kerberos
 			}
 		}
 
-		public override SessionKey DeriveProtocolKey(EncProfile encProfile)
+		public static SessionKey DeriveProtocolKey(EncProfile encProfile, byte[] zz, byte[] clientDhNonce, byte[] serverNonce)
 		{
 			Span<byte> seed = stackalloc byte[encProfile.KeyGenerationSeedSizeBytes];
-			DeriveKey(this._zz, this._clientDhNonce, this._serverNonce, seed);
+			DeriveKey(zz, clientDhNonce, serverNonce, seed);
 
 #if DEBUG
 			Debug.Print($"protokey = " + seed.ToHexString());
@@ -146,6 +148,7 @@ namespace Titanis.Security.Kerberos
 			var key = encProfile.RandomToKey(seed);
 			return key;
 		}
+		public override SessionKey DeriveProtocolKey(EncProfile encProfile) => DeriveProtocolKey(encProfile, this._zz, this._clientDhNonce, this._serverNonce);
 
 		private PA_DATA? _pkinitResponse;
 
@@ -170,7 +173,7 @@ namespace Titanis.Security.Kerberos
 					this._freshnessToken
 				),
 				new PKIX1Explicit88.SubjectPublicKeyInfo(
-					new PKIX1Explicit88.AlgorithmIdentifier(DhPublicNumber, this._dhkey.EncodeDomainParameters()),
+					new PKIX1Explicit88.AlgorithmIdentifier(DhPublicNumber, this._dhkey.Group.EncodeDomainParameters()),
 					new Asn1BitString(this._dhkey.EncodePublicExponent(), 0)
 					),
 				[],

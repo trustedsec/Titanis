@@ -14,7 +14,7 @@ public class TicketTest
 	[Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
 	public void TestKirbi()
 	{
-		KerberosClient client = new KerberosClient(null);
+		KerberosClient client = new KerberosClient();
 		var tickets = client.LoadTicketsFromFile(TgtBytes, null, out var format);
 
 		var actual = client.ExportTickets(tickets, KerberosFileFormat.Kirbi);
@@ -29,7 +29,7 @@ public class TicketTest
 	{
 		var bytes = CcacheBytes;
 
-		KerberosClient client = new KerberosClient(null);
+		KerberosClient client = new KerberosClient();
 		var tickets = client.LoadTicketsFromFile(bytes, null, out var format);
 
 		var actual = client.ExportTickets(tickets, KerberosFileFormat.Ccache);

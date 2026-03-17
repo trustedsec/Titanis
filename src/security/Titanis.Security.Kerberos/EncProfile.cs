@@ -165,6 +165,11 @@ namespace Titanis.Security.Kerberos
 		/// <returns>A byte array of the specific key bytes</returns>
 		protected abstract void DeriveSpecificKey(ReadOnlySpan<byte> protocolKey, KeyUsage usage, KeyIntent intent, Span<byte> specificKeyBuffer);
 
+		/// <remarks>
+		/// This member is provided for testing.
+		/// </remarks>
+		internal void DeriveSpecificKeyInternal(ReadOnlySpan<byte> protocolKey, KeyUsage usage, KeyIntent intent, Span<byte> specificKeyBuffer) => this.DeriveSpecificKey(protocolKey, usage, intent, specificKeyBuffer);
+
 		public virtual bool IsValidKeySizeBytes(int byteCount) => (byteCount == this.KeySizeBytes);
 		internal SessionKey CreateSessionKey(EncryptionKey ekey)
 		{

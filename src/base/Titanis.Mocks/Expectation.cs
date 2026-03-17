@@ -70,7 +70,7 @@ namespace Titanis.Mocks
 								{
 									var comparerExpr = call.Arguments[0];
 									ParameterExpression comparandArg = Expression.Parameter(typeof(object));
-									var invoker = Expression.Invoke(comparerExpr, Expression.Convert(comparandArg, parm.ParameterType));
+									var invoker = Expression.Invoke(comparerExpr, Expression.Convert(comparandArg, call.Method.ReturnType));
 									var invokerLambda = Expression.Lambda(invoker, comparandArg);
 
 									comparer = (Func<object, bool>)invokerLambda.Compile();
@@ -353,6 +353,11 @@ namespace Titanis.Mocks
 		public void ReturnAsync(TReturn value)
 		{
 			base.Return(Task.FromResult(value));
+		}
+
+		public void ReturnAsync(Func<object[], Task<TReturn>> valueFunc)
+		{
+			base.Return(valueFunc);
 		}
 
 		public void ThrowAsync(Exception ex)

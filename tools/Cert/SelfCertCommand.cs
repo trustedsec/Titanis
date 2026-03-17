@@ -90,7 +90,12 @@ internal class SelfCertCommand : Command
 		{
 			var certFileName = this.ResolveFsPath(this.TemplateFile);
 			this.WriteDiagnostic($"Loading template certificate from '{certFileName}'");
-			var certs = CertificateHelper.LoadFrom(certFileName);
+
+			byte[] certBytes = File.ReadAllBytes(certFileName);
+			if (certBytes.Length == 0)
+				throw new ArgumentException($"File {certFileName} does not contain any data.", nameof(certFileName));
+
+			var certs = CertificateHelper.LoadFrom(certBytes);
 			templateCert = certs[0];
 			this.WriteDiagnostic($"Loaded certificate with subject `{templateCert.Subject}'.");
 		}

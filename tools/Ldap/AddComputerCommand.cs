@@ -67,7 +67,7 @@ internal class AddComputerCommand : AddCommandBase
 			foreach (var userCertFile in this.UserCerts)
 			{
 				this.WriteDiagnostic($"Loading certificate from '{userCertFile}'");
-				var certs = CertificateHelper.LoadFrom(userCertFile);
+				var certs = CertificateHelper.LoadFrom(this.FileAccessService.ReadAllBytesFrom( userCertFile));
 				foreach (var cert in certs)
 				{
 					if (cert.HasEku(ExtendedKeyUsages.ClientAuthentication))
