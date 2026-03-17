@@ -57,6 +57,13 @@ public class TestFileAccess : IFileAccess
 				found.Add(Path.Combine(TestFsPrefix, name));
 		}
 
+
+		foreach (var name in this._writtenFiles.Keys)
+		{
+			if (pattern.Matches(name))
+				found.Add(name);
+		}
+
 		return found.ToArray();
 	}
 
@@ -88,5 +95,13 @@ public class TestFileAccess : IFileAccess
 		var resName = this.FileNameToResourceName(path);
 		var info = this._resourceAssembly.GetManifestResourceInfo(resName);
 		return info != null;
+	}
+
+	private Dictionary<string, byte[]> _writtenFiles = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+
+	public void WriteAllBytesTo(string fileName, byte[] contents)
+	{
+		fileName = this.ResolveFsPath(fileName);
+		this._writtenFiles[fileName] = contents;
 	}
 }

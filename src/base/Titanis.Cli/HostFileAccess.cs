@@ -10,7 +10,7 @@ namespace Titanis.Cli
 	/// </summary>
 	public class HostFileAccess : IFileAccess
 	{
-        public string ResolveFsPath(string path)
+		public string ResolveFsPath(string path)
 		{
 			return Path.GetFullPath(path);
 		}
@@ -27,5 +27,11 @@ namespace Titanis.Cli
 		}
 
 		public bool FileExists(string path) => File.Exists(this.ResolveFsPath(path));
-    }
+
+		public void WriteAllBytesTo(string fileName, byte[] contents)
+		{
+			fileName = this.ResolveFsPath(fileName);
+			File.WriteAllBytes(fileName, contents);
+		}
+	}
 }
