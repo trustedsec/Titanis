@@ -4,6 +4,6 @@
 	<Import Project="$(SolutionDir)Directory.Build.props"/>
 
 	<PropertyGroup>
-		<ArtifactsPath>$(ArtifactsPath)/samples</ArtifactsPath>
+		<ArtifactsPath>$(ArtifactsPath)samples\</ArtifactsPath>
 	</PropertyGroup>
 </Project>

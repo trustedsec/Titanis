@@ -4,7 +4,7 @@
 	<Import Project="$(SolutionDir)Directory.Build.props"/>
 
 	<PropertyGroup>
-		<ArtifactsPath>$(ArtifactsPath)/tools</ArtifactsPath>
+		<ArtifactsPath>$(ArtifactsPath)tools\</ArtifactsPath>
 		<RuntimeIdentifiers>win-x86;win-x64;linux-x64</RuntimeIdentifiers>
 
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>

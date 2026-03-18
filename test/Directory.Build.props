@@ -4,9 +4,21 @@
 	<Import Project="$(SolutionDir)Directory.Build.props"/>
 
 	<PropertyGroup>
-		<ArtifactsPath>$(ArtifactsPath)/test</ArtifactsPath>
+		<!-- These lines are required for testing -->
+		<!-- BUILD_BINARIESDIRECTORY won't be set if running tests manually -->
+		<BUILD_BINARIESDIRECTORY Condition="'$(BUILD_BINARIESDIRECTORY)'==''">$(SolutionDir)artifacts</BUILD_BINARIESDIRECTORY>
+		<ArtifactsPath Condition="'$(ArtifactsPath)'==''">$(BUILD_BINARIESDIRECTORY)\</ArtifactsPath>
+		<ArtifactsPath>$(ArtifactsPath)artifacts</ArtifactsPath>
+		
+		<ArtifactsPath>$(ArtifactsPath)\test\</ArtifactsPath>
 
 		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
 		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Testing.Extensions.AzureDevOpsReport" Version="2.1.0" />
+		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.5.2" />
+		<PackageReference Include="Microsoft.Testing.Extensions.TrxReport" Version="2.1.0" />
+	</ItemGroup>
 </Project>

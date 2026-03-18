@@ -2,8 +2,10 @@
 <Project>
 	<PropertyGroup>
 		<UseArtifactsOutput>true</UseArtifactsOutput>
-		<ArtifactsPath>$(BUILD_BINARIESDIRECTORY)</ArtifactsPath>
-		<ArtifactsPath Condition="'$(ArtifactsPath)'==''">$(SolutionDir)artifacts\</ArtifactsPath>
+		<BUILD_BINARIESDIRECTORY Condition="'$(BUILD_BINARIESDIRECTORY)'==''">$(SolutionDir)artifacts</BUILD_BINARIESDIRECTORY>
+		<ArtifactsPath>$(BUILD_BINARIESDIRECTORY)\</ArtifactsPath>
+		<ArtifactsPath Condition="'$(OS)'!='Windows_NT'">$(ArtifactsPath)$(OS)\</ArtifactsPath>
+
 		<ArtifactsBasePath>$(ArtifactsPath)</ArtifactsBasePath>
 
 		<LangVersion>12.0</LangVersion>
@@ -11,9 +13,9 @@
 		<!-- Versioning and Packaging -->
 		<Build_InfoVersion Condition="'$(Build_InfoVersion)'==''">dev</Build_InfoVersion>
 		<Build_Version Condition="'$(Build_Version)'==''">0.9</Build_Version>
-		<Build_FileBuildNumber Condition="'$(Build_FileBuildNumber)'==''">0</Build_FileBuildNumber>
-		<Build_Revision>0</Build_Revision>
-		<AssemblyVersion>$(Build_Version).0.0</AssemblyVersion>
+		<Build_FileBuildNumber Condition="'$(Build_FileBuildNumber)'==''">$([System.DateTime]::Now.ToString('yyyyMMddHHmmss'))</Build_FileBuildNumber>
+		<Build_Revision>Q</Build_Revision>
+		<AssemblyVersion>$(Build_Version).7.7</AssemblyVersion>
 		<Version>$(AssemblyVersion)</Version>
 		<FileVersion>$(Build_Version).$(Build_FileBuildNumber).$(Build_Revision)</FileVersion>
 		<InformationalVersion>$(FileVersion)-$(Build_InfoVersion)</InformationalVersion>
