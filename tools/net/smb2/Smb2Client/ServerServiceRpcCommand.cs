@@ -6,7 +6,7 @@ using Titanis.Msrpc.Mswkst;
 
 namespace Titanis.Smb2.Cli
 {
-	internal abstract class ServerServiceRpcCommand : RpcCommand<ServerServiceClient>
+	public abstract class ServerServiceRpcCommand : RpcCommand<ServerServiceClient>
 	{
 		protected sealed override Type InterfaceType => typeof(srvsvc);
 
