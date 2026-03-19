@@ -168,9 +168,12 @@ namespace Titanis.Cli
 			// Set regardless of whether there are any records for zero-record message
 			this._recordsExpected = true;
 
-			foreach (var rec in records)
+			if (records != null)
 			{
-				this.WriteRecord(rec);
+				foreach (var rec in records)
+				{
+					this.WriteRecord(rec);
+				}
 			}
 		}
 		public void WriteRecord(object? record)

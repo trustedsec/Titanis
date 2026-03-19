@@ -47,7 +47,7 @@ namespace Titanis.Msrpc.Mswkst
 		[Browsable(false)]
 		public string? Password { get; set; }
 		[DisplayName("Sec. Desc.")]
-		public string? SecurityDescriptorSddl { get; }
+		public SecurityDescriptor? SecurityDescriptor { get; }
 		public ShareFlags Flags { get; set; }
 
 		internal ShareInfo(ref readonly SHARE_INFO_1 info)
@@ -88,7 +88,7 @@ namespace Titanis.Msrpc.Mswkst
 			this.Path = info.shi502_path?.value;
 			this.Password = info.shi502_passwd?.value;
 
-			this.SecurityDescriptorSddl = SecurityHelpers.ConvertSdBytesToSddl(info.shi502_security_descriptor?.value);
+			this.SecurityDescriptor = (info.shi502_security_descriptor?.value).IsNullOrEmpty() ? null : new SecurityDescriptor(info.shi502_security_descriptor!.value);
 		}
 
 		internal ShareInfo(ref readonly SHARE_INFO_503_I info)
@@ -103,7 +103,7 @@ namespace Titanis.Msrpc.Mswkst
 			this.Password = info.shi503_passwd?.value;
 			this.ServerName = info.shi503_servername?.value;
 
-			this.SecurityDescriptorSddl = SecurityHelpers.ConvertSdBytesToSddl(info.shi503_security_descriptor?.value);
+			this.SecurityDescriptor = new SecurityDescriptor(info.shi503_security_descriptor?.value);
 		}
 
 		internal ShareInfo(ref readonly SHARE_INFO_1004 info)

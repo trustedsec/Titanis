@@ -406,7 +406,12 @@ namespace Titanis.Cli
 		/// <returns><see langword="true"/> if the field will be in the output; otherwise, <see langword="false"/>.</returns>
 		protected bool IsFieldInOutput(string fieldName) => this.VerifyContext().IsFieldInOutput(fieldName);
 
-		protected void WriteRecords(System.Collections.IEnumerable records) => this.VerifyContext().WriteRecords(records);
+		protected void WriteRecords(System.Collections.IEnumerable records)
+		{
+			if (records != null)
+				this.VerifyContext().WriteRecords(records);
+		}
+
 		protected void WriteRecord(object? record) => this.VerifyContext().WriteRecord(record);
 
 		protected Stream OpenRawOutputStream()

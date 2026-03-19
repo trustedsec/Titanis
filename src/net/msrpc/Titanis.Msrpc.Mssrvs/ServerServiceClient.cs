@@ -18,6 +18,10 @@ namespace Titanis.Msrpc.Mswkst
 	public enum ShareInfoLevel
 	{
 		/// <summary>
+		/// Requests a <see cref="SHARE_INFO_0"/>.
+		/// </summary>
+		Level0 = 0,
+		/// <summary>
 		/// Requests a <see cref="SHARE_INFO_1"/>.
 		/// </summary>
 		Level1 = 1,
