@@ -33,6 +33,7 @@ namespace Titanis.Ldap
 		public static readonly LdapSyntax ObjectDsDn = new ObjectDsDnSyntax();
 		public static readonly LdapSyntax ObjectPresentationAddress = new ObjectPresentationAddressSyntax();
 		public static readonly LdapSyntax ObjectReplicaLink = new ObjectReplicaLinkSyntax();
+		public static readonly LdapSyntax DnsRecord = new DnsRecordSyntax();
 		public static readonly LdapSyntax StringCase = new StringCaseSyntax();
 		public static readonly LdapSyntax StringIa5 = new StringIa5Syntax();
 		public static readonly LdapSyntax StringNtSecDesc = new StringNtSecDescSyntax();

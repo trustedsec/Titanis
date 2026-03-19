@@ -22,6 +22,7 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription FRSReplicaSetGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.533", ["fRSReplicaSetGUID"], syntax: AdSyntaxes.StringOctetGuid);
 		public readonly static AttributeTypeDescription FRSVersionGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.43", ["fRSVersionGUID"], syntax: AdSyntaxes.StringOctetGuid);
 		public readonly static AttributeTypeDescription SchemaIDGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.148", ["schemaIDGUID"], syntax: AdSyntaxes.StringOctetGuid);
+		public readonly static AttributeTypeDescription DnsRecord = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.382", ["dnsRecord"], syntax: AdSyntaxes.DnsRecord);
 		#endregion
 
 		#region rootDSE attributes
@@ -246,7 +247,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription DNSHostName = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.619", ["dNSHostName"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription DnsNotifySecondaries = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.381", ["dnsNotifySecondaries"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription DNSProperty = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.1306", ["dNSProperty"], syntax: AdSyntaxes.StringOctet);
-		public readonly static AttributeTypeDescription DnsRecord = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.382", ["dnsRecord"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription DnsRoot = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.28", ["dnsRoot"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription DnsSecureSecondaries = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.380", ["dnsSecureSecondaries"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription DNSTombstoned = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.1414", ["dNSTombstoned"], syntax: AdSyntaxes.Boolean);

@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\base\Titanis.Core\Titanis.Core.csproj" />
     <ProjectReference Include="..\..\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
+    <ProjectReference Include="..\..\build\Titanis.SourceGen\Titanis.SourceGen.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\formats\Titanis.Asn1\Titanis.Asn1.csproj" />
   </ItemGroup>
 
