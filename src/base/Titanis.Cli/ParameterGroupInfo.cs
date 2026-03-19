@@ -49,7 +49,7 @@ namespace Titanis.Cli
 				{
 					propValue = this.Constructor.Invoke(null);
 					if (propValue is IParameterGroup parmGroup)
-						parmGroup.Initialize(command.Services);
+						parmGroup.Initialize(command.Services, command);
 					this.GroupProperty.SetValue(owner, propValue);
 				}
 				return propValue;

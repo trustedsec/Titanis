@@ -15,10 +15,16 @@ namespace Titanis.Cli
 		/// Gets the service container supporting the group.
 		/// </summary>
 		protected IServiceContainer? Services { get; private set; }
-		/// <inheritdoc/>
-		void IParameterGroup.Initialize(IServiceContainer services)
+		/// <summary>
+		/// Gets the object owning this group.
+		/// </summary>
+        protected object? Owner { get; private set; }
+
+        /// <inheritdoc/>
+        void IParameterGroup.Initialize(IServiceContainer services, object? owner)
 		{
 			this.Services = services;
+			this.Owner = owner;
 			this.Initialize(services);
 		}
 		/// <summary>

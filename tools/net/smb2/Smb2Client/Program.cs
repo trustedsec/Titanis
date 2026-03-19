@@ -31,7 +31,7 @@ namespace Titanis.Smb2.Cli
 	[Subcommand("enumsessions", typeof(Smb2EnumSessionsCommand))]
 	[Subcommand("enumsnapshots", typeof(Smb2EnumSnapshotsCommand))]
 	[Subcommand("enumstreams", typeof(Smb2EnumStreamsCommand))]
-	internal class Program : MultiCommand
+	internal partial class Program : MultiCommand
 	{
 		static int Main(string[] args)
 			=> RunProgramAsync<Program>(args);
@@ -49,7 +49,7 @@ namespace Titanis.Smb2.Cli
 	/// </para>
 	/// </remarks>
 	[DetailedHelpResource(typeof(Messages), nameof(Messages.Smb2Client_Detailed))]
-	public abstract partial class Smb2CommandBase : Command
+	public abstract partial class Smb2CommandBase : Command, IHaveServerName
 	{
 		internal readonly static char[] WildcardChars = new char[] { '*', '?' };
 		protected const int UncParamPos = 0;
@@ -74,6 +74,8 @@ namespace Titanis.Smb2.Cli
 		protected virtual string? DefaultShareName => null;
 
 		protected string? ServerName => this.UncPath?.ServerName;
+		string? IHaveServerName.ServerName => this.ServerName;
+
 		protected string? ShareName => this.UncPath?.ShareName;
 		protected string? ShareRelativePath => this.UncPath?.ShareRelativePath;
 		protected int RemotePort => this.UncPath?.Port ?? Smb2Client.TcpPort;
@@ -97,7 +99,7 @@ namespace Titanis.Smb2.Cli
 
 			// Use default share if appropriate
 			if (string.IsNullOrEmpty(this.UncPath.ShareName) && !string.IsNullOrEmpty(this.DefaultShareName))
-				this.UncPath= this.UncPath.Append(this.DefaultShareName);
+				this.UncPath = this.UncPath.Append(this.DefaultShareName);
 
 			this.AuthenticationParameters.Validate(true, context);
 			this.SmbParameters.Validate(context, this.AuthenticationParameters);

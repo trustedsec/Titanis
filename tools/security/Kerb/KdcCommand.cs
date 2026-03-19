@@ -7,7 +7,7 @@ namespace Titanis.Cli.Kerb;
 /// <summary>
 /// Base implementation for commands 
 /// </summary>
-public abstract class KdcCommand : Command
+public abstract class KdcCommand : Command, IHaveServerName
 {
 	internal const int KdcPosition = 0;
 
@@ -18,6 +18,7 @@ public abstract class KdcCommand : Command
 	[Description("Host name or address of KDC")]
 	[DefaultPort(KerberosClient.KdcTcpPort)]
 	public EndPoint Kdc { get; set; }
+    string? IHaveServerName.ServerName => (this.Kdc as DnsEndPoint)?.Host;
 
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 	public NetworkParameters NetworkParameters { get; set; }

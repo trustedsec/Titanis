@@ -26,14 +26,15 @@ namespace Titanis.Smb2.Cli
 	[OutputFieldFormat(nameof(Smb2DirEntry.FileAttributes), null, typeof(FileAttributeFormatter))]
 	[Description("Lists the contents of a directory (including named pipes).")]
 	[DetailedHelpResource(typeof(Messages), nameof(Messages.Smb2Client_ls_Detailed), Placement = DocumentationPlacement.BeforeBase)]
-	[Example("Listing the contents of a share", @"{0} \\SERVER\Share -u User -ud DOMAIN -p password")]
-	[Example("Listing named pipes", @"{0} \\SERVER\IPC$ -u User -ud DOMAIN -p password")]
-	[Example("Listing the contents of a share with an alternate host name", @"{0} \\SERVER\Share -ha fileserver.domain.local -u User -ud DOMAIN -p password", "In this example, the command line specifies a host name differing from the server name to resolve for connecting to the server.")]
+	[Example("Listing the contents of a share (NTLM)", @"{0} \\LUMON-FS1\MDR -u milchick -p Br3@kr00m!", Tag = "MilchickNtlm_Mdr")]
+	[Example("Listing SYSVOL as anonymous", @"{0} \\LUMON-DC1\sysvol -anon", Tag ="Anon_Sysvol")]
+	[Example("Listing named pipes", @"{0} \\SERVER\IPC$ -u milchick -p Br3@kr00m!", Tag = "Milchick_ListPipes")]
+	[Example("Listing the contents of a share with an alternate host name", @"{0} \\SERVER\MDR -ha 10.66.0.13 -u Administrator -p 9CorePrinciples", "In this example, the command line specifies a host name differing from the server name to resolve for connecting to the server.  When connecting to the target, the specified host address (10.66.0.13) is used.  Once the TCP connection is established, the name 'SERVER' is used in the application protocol.  In addition, the name SERVER is used as the SPN, both with NTLM and Kerberos; if strict SPN checking is enabled, this results in STATUS_ACCESS_DENIED.", Tag ="Milchick_AltHostAddress")]
 	[Example("Listing the contents of a share with an alternate host address", @"{0} \\SERVER\Share -ha 10.0.0.1 -u User -ud DOMAIN -p password", "In this example, the command line specifies the host address explicitly so that SERVER does not need to be resolved.")]
 	[Example("Passing the hash", @"{0} \\SERVER\Share -u User -ud DOMAIN -NtlmHash 8846F7EAEE8FB117AD06BDD830B7586C", "This command line provides the password as an NTLM hash.")]
 	[Example("Customizing NTLM", @"{0} \\SERVER\Share -u User -ud DOMAIN -p password -ntlmver 10.0.0.0 -w MYWORKSTATION", "This command line specifies a different NTLM version and workstation name to send during authentication.")]
 	[Example("Using Kerberos with a password", @"{0} \\SERVER\Share -u User -ud DOMAIN -p password -Kdc 10.0.0.10", "This command line specifies credentials along with the -Kdc option specifying the KDC to request a ticket from.")]
-	sealed class Smb2LsCommand : Smb2TreeCommand
+	public sealed class Smb2LsCommand : Smb2TreeCommand
 	{
 		[Parameter]
 		[Description("Specifies the buffer size for querying the directory listing.")]

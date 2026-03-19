@@ -17,7 +17,7 @@ If the account does not exist or the realm name is wrong, the KDC returns an err
 
 If the user exists but does not require preauthentication, the KDC will instead reply with a TGT without providing encryption types.  In that case, use the requesttgt command to analyze the ticket.")]
 	[Example("Get AS info for milchick", "{0} milchick@LUMON 10.66.0.11")]
-	public class GetASInfoCommand : Command
+	public class GetASInfoCommand : Command, IHaveServerName
 	{
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 		[Parameter(0)]
@@ -36,6 +36,7 @@ If the user exists but does not require preauthentication, the KDC will instead 
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Host name or address of KDC")]
 		public string Kdc { get; set; }
+		string? IHaveServerName.ServerName => this.Kdc;
 
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public NetworkParameters NetParameters { get; set; }

@@ -20,7 +20,7 @@ namespace Titanis.CredCoerce
 	/// <task>Coerce a system to authenticate to a remote target</task>
 	[Command]
 	[Description("Sends RPC calls to coerce a system to authenticate to a remote system")]
-	internal class Program : Command
+	internal class Program : Command, IHaveServerName
 	{
 		[ParameterGroup(ParameterGroupOptions.Required | ParameterGroupOptions.AlwaysInstantiate)]
 		public AuthenticationParameters Authentication { get; set; }
@@ -61,9 +61,6 @@ namespace Titanis.CredCoerce
 			rpcClient.DefaultAuthLevel = RpcAuthLevel.PacketPrivacy;
 			rpcClient.ConnectTimeout = TimeSpan.FromSeconds(60);
 
-			// Look up host address
-			var hostAddress = await this.NetworkParameters.ResolveAsync(this.ServerName, cancellationToken);
-
 			// Set up credentials
 			ServicePrincipalName targetSpn = new(this.ServerName, ServiceClassNames.HostU);
 
@@ -72,7 +69,7 @@ namespace Titanis.CredCoerce
 
 			// Set up EPM
 			using var epm = new EpmClient();
-			await rpcClient.ConnectTcp(epm, new IPEndPoint(hostAddress[0], EpmClient.EPMapperPort), null, cancellationToken);
+			await rpcClient.ConnectTcp(epm, new DnsEndPoint(this.ServerName, EpmClient.EPMapperPort), null, cancellationToken);
 			var context = new CoercionContext(
 				this,
 				this.CreateSmb2Client(),

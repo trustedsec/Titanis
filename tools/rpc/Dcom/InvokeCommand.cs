@@ -10,7 +10,7 @@ namespace Titanis.Cli.DcomTool;
 
 [Command]
 [Description("Invokes a method on an OLE automation object over DCOM")]
-internal class InvokeCommand : Command
+internal class InvokeCommand : Command, IHaveServerName
 {
 
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]

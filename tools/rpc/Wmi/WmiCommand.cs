@@ -8,7 +8,7 @@ using Titanis.Net;
 using Titanis.Security;
 
 namespace Titanis.Cli.WmiTool;
-internal abstract class WmiCommand : Command
+internal abstract class WmiCommand : Command, IHaveServerName
 {
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 	public AuthenticationParameters Authentication { get; set; }

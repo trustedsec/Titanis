@@ -36,11 +36,17 @@ namespace Titanis.Cli
 		[Placeholder("host-or-ip:port")]
 		public EndPoint Socks5 { get; set; }
 
+		private INameResolverService? _hostResolver;
+		private ISocketService? _hostSocketService;
 
 		protected sealed override void Initialize(IServiceContainer services)
 		{
+			this._hostResolver = services.GetService<INameResolverService>();
+			this._hostSocketService = services.GetService<ISocketService>();
+
 			base.Initialize(services);
 			services.AddService(typeof(ISocketService), this.CreateSocketService);
+			services.AddService(typeof(INameResolverService), this);
 		}
 
 		private ISocketService? CreateSocketService(IServiceContainer container, Type serviceType)
@@ -48,7 +54,7 @@ namespace Titanis.Cli
 			var log = container.GetService<ILog>();
 			if (log != null)
 			{
-				ISocketService socketService = new PlatformSocketService(this.GetPlatformResolver(), log);
+				ISocketService socketService = this._hostSocketService ?? new PlatformSocketService(this, log);
 				if (this.Socks5 != null)
 				{
 					socketService = new Socks5Client(this.Socks5, socketService, new Socks5Logger(log));
@@ -67,32 +73,44 @@ namespace Titanis.Cli
 				context.LogError("Both -4 and -6 were specified.  You may choose only one.");
 		}
 
-		private INameResolverService? _resolver;
-		private INameResolverService GetPlatformResolver() => _resolver ??= new PlatformNameResolverService(ResolverOptions, this.Log);
+		private INameResolverService GetHostResolver() => this._hostResolver ??= new PlatformNameResolverService(ResolverOptions, this.Log);
 		private NameResolverOptions ResolverOptions =>
 			UseTcp4Only.IsSet ? NameResolverOptions.UseTcp4Only
 			: UseTcp6Only.IsSet ? NameResolverOptions.UseTcp6Only
 			: NameResolverOptions.Default;
 
+		protected string? TargetServerName => (this.Owner as IHaveServerName)?.ServerName;
+
 		private async Task<IPAddress[]> ResolveStaticAsync(string hostName, CancellationToken cancellationToken)
 		{
-			if (hostName != null && HostAddress == null)
-				HostAddress = new string[] { hostName };
-
+			var primaryTarget = this.TargetServerName;
 			var log = this.Log;
+
+			// Only override the address of the primary target
+			string[]? hostNames = null;
+			if (string.Equals(hostName, primaryTarget, StringComparison.OrdinalIgnoreCase))
+				hostNames = this.HostAddress;
+
+			// If this is not the primary target, or there are no overrides specified, use the caller-provided name.
+			hostNames ??= [hostName];
 
 			// Resolve the host address
 			List<IPAddress> addrs = new List<IPAddress>();
+			var hostResolver = this.GetHostResolver();
 			try
 			{
-				foreach (var hostAddress in HostAddress)
+				foreach (var hostAddress in hostNames)
 				{
 					if (IPAddress.TryParse(hostAddress, out IPAddress ipaddr))
 						addrs.Add(ipaddr);
 					else
 					{
-						var entry = await Dns.GetHostEntryAsync(hostAddress, cancellationToken).ConfigureAwait(false);
-						addrs.AddRange(entry.AddressList);
+						try
+						{
+							var entries = await hostResolver.ResolveAsync(hostAddress, cancellationToken).ConfigureAwait(false);
+							addrs.AddRange(entries);
+						}
+						catch { }
 					}
 
 					if (UseTcp4Only.IsSet || UseTcp6Only.IsSet)
@@ -127,13 +145,7 @@ namespace Titanis.Cli
 		{
 			ArgumentNullException.ThrowIfNull(hostName);
 
-			if (HostAddress == null)
-				return ResolveStaticAsync(hostName, cancellationToken);
-			else
-			{
-				var resolver = GetPlatformResolver();
-				return resolver.ResolveAsync(hostName, cancellationToken);
-			}
+			return ResolveStaticAsync(hostName, cancellationToken);
 		}
 	}
 }

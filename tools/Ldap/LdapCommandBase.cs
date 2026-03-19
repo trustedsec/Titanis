@@ -12,7 +12,7 @@ namespace Titanis.Cli.LdapTool
 	/// Base class for commands using <see cref="LdapClient"/>.
 	/// </summary>
 	[OutputRecordType(typeof(LdapEntry), DefaultFields = new string[] { nameof(LdapEntry.EntryName) })]
-	internal abstract class LdapCommandBase : Command
+	internal abstract class LdapCommandBase : Command, IHaveServerName
 	{
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public AuthenticationParameters AuthenticationParams { get; set; }

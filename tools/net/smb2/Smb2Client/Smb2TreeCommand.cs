@@ -13,7 +13,7 @@ namespace Titanis.Smb2.Cli
 	/// is extended to ensure that <see cref="Smb2CommandBase.UncPath"/>
 	/// specifies a share name.
 	/// </remarks>
-	abstract class Smb2TreeCommand : Smb2CommandBase
+	public abstract class Smb2TreeCommand : Smb2CommandBase
 	{
 		[Parameter]
 		[Category(ParameterCategories.Connection)]

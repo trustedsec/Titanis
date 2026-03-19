@@ -1,15 +1,23 @@
-﻿using System.Reflection;
+﻿using System.Collections.Immutable;
+using System.Reflection;
 
 namespace Titanis.Cli.Kerb.Test;
 
 public sealed class CliTestAttribute : Attribute, ITestDataSource
 {
-	public CliTestAttribute(string tag)
+	public CliTestAttribute(params string[] tags)
 	{
-		this.Tag = tag;
+		this.Tags = tags;
 	}
 
-	public string Tag { get; }
+	public string[] Tags { get; }
+
+	record class TestCaseInfo(ExampleAttribute Example, object[] Args)
+	{
+
+	}
+
+	private Dictionary<object[], TestCaseInfo> _testCases;
 
 	private static ExampleAttribute? FindExample(Type commandType, string tag)
 	{
@@ -27,16 +35,27 @@ public sealed class CliTestAttribute : Attribute, ITestDataSource
 	public IEnumerable<object?[]> GetData(MethodInfo methodInfo)
 	{
 		Type? commandType = FindCommandType(methodInfo);
-		var example = FindExample(commandType, this.Tag);
-		if (example is null)
-			throw new ArgumentException($"No example found on command '{commandType.Name}' matching tag '{this.Tag}' (referenced by test {TestNameFrom(methodInfo)})");
-		var args = example.CommandLine;
-		if (args.StartsWith("{0}"))
-			args = args.Substring(3).TrimStart();
+		List<object[]> argsList = new List<object[]>(this.Tags.Length);
+		Dictionary<object[], TestCaseInfo> testCases = new Dictionary<object[], TestCaseInfo>();
 
-		var argv = CommandLineParser.Tokenize(args);
+		foreach (var tag in this.Tags)
+		{
+			var example = FindExample(commandType, tag);
+			if (example is null)
+				throw new ArgumentException($"No example found on command '{commandType.Name}' matching tag '{tag}' (referenced by test {TestNameFrom(methodInfo)})");
+			var args = example.CommandLine;
+			if (args.StartsWith("{0}"))
+				args = args.Substring(3).TrimStart();
 
-		return [[argv]];
+			var tokens = CommandLineParser.Tokenize(args);
+            object[] argv = [tokens];
+            argsList.Add(argv);
+
+			testCases.Add(argv, new TestCaseInfo(example,argv));
+		}
+
+		this._testCases = testCases;
+		return argsList.ToArray();
 	}
 
 	private static Type FindCommandType(MethodInfo methodInfo)
@@ -58,8 +77,10 @@ public sealed class CliTestAttribute : Attribute, ITestDataSource
 
 	public string? GetDisplayName(MethodInfo methodInfo, object?[]? data)
 	{
-		Type? commandType = FindCommandType(methodInfo);
-		var example = FindExample(commandType, this.Tag);
-		return (example?.Caption ?? this.Tag);
+		if (this._testCases != null && this._testCases.TryGetValue(data, out var test))
+			return test.Example.Caption;
+
+		return methodInfo.Name;
+		//return $"{methodInfo.Name}({string.Join(",",data)})";
 	}
 }

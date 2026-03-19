@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Net;
 using Titanis.Net;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
@@ -11,9 +12,8 @@ namespace Titanis.Cli.Kerb;
 [DetailedHelpText(@"{0} uses the Windows 2000 Kerberos Change Password protocol (RFC 3244) and can be used to change the password of a user account that may or may not be the same as the authenticating user.  This service does not require an initial ticket and is more flexible than `changepw`.")]
 [Example("milchick setting his own password", "{0} -UserName milchick@LUMON -Kdc 10.66.0.11 -Password Br3@kr00m! milchick@lumon.ind EradicateFolly!")]
 [Example("milchick setting password for marks", "{0} -UserName milchick@LUMON -Kdc 10.66.0.11 -Password Br3@kr00m! marks@lumon.ind SafelySituated")]
-public class SetPasswordCommand : Command
+public class SetPasswordCommand : Command, IHaveServerName
 {
-
 	[Parameter(0)]
 	// NOTE: [RFC 3244] declares targname and targrealm as optional, although in practice this fails
 	[Mandatory]
@@ -25,8 +25,10 @@ public class SetPasswordCommand : Command
 	[Description("New password to set")]
 	public string NewPassword { get; set; }
 
+	// Using AuthenticationParameters instead of InitialAuthParameterGroup allows the use of ticket files
 	[ParameterGroup(ParameterGroupOptions.Required)]
 	public AuthenticationParameters Authentication { get; set; }
+	string? IHaveServerName.ServerName => (this.Authentication.Kdc as DnsEndPoint)?.Host;
 
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 	public NetworkParameters NetworkParameters { get; set; }
