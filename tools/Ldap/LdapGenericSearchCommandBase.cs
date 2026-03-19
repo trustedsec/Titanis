@@ -1,0 +1,125 @@
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Titanis.Ldap;
+
+namespace Titanis.Cli.LdapTool;
+
+/// <summary>
+/// Base class for commands that run queries.
+/// </summary>
+/// <remarks>
+/// This class has properties that allow the user to control query execution, such as page size and whether to follow references.
+/// </remarks>
+public abstract class LdapGenericSearchCommandBase : LdapCommandBase, ILdapClientSearchCallback
+{
+	[Parameter]
+	[Description("Number of results to fetch per page")]
+	[DefaultValue(100)]
+	public int? PageSize { get; set; }
+
+	[Parameter]
+	[Description("Max number of records to return")]
+	public int? RecordLimit { get; set; }
+
+	[Parameter]
+	[Description("Follows referrals")]
+	public SwitchParam FollowReferrals { get; set; }
+
+	protected override void ValidateParameters(ParameterValidationContext context)
+	{
+		base.ValidateParameters(context);
+
+		if (this.RecordLimit.HasValue)
+		{
+			if (this.RecordLimit == 0)
+			{
+				this.WriteWarning($"-{nameof(RecordLimit)} is set to 0.  There will be no results.  To return all records, don't specify any limit.");
+			}
+			else if (this.RecordLimit < 0)
+			{
+				context.LogError(new ParameterValidationError(nameof(RecordLimit), $"-{nameof(RecordLimit)} must be a positive integer."));
+			}
+			else if (this.PageSize > this.RecordLimit)
+			{
+				this.WriteWarning($"-{nameof(RecordLimit)} is less than -{nameof(PageSize)}; -{nameof(PageSize)} will be ignored.");
+			}
+		}
+
+		if (this.PageSize.HasValue)
+		{
+			if (this.PageSize == 0)
+			{
+				this.WriteWarning($"-{nameof(PageSize)} is set to 0.  There will be no results.  To search without using paging, don't specify -{nameof(PageSize)}.");
+			}
+		}
+	}
+
+	/// <summary>
+	/// Base class can further customize the query.
+	/// </summary>
+	/// <param name="query">Query to be run</param>
+	protected virtual void SetQueryProperties(LdapQuery query)
+	{
+
+	}
+
+	protected async Task BuildAndRunQuery(LdapClient ldap, LdapQuery query, CancellationToken cancellationToken)
+	{
+
+		if (this.PageSize.HasValue)
+			query.PageSize = this.PageSize.Value;
+
+		this.SetQueryProperties(query);
+
+
+		if (!this.OutputFields.IsNullOrEmpty())
+		{
+			query.Attributes = Array.ConvertAll(this.OutputFields!, r => new AttributeSpec(r));
+		}
+
+		int? recordLimit = this.RecordLimit;
+		do
+		{
+			if (query.WatchForChanges)
+				this.WriteMessage($"Watching changes; press Ctrl+C to quit.");
+
+			if (recordLimit.HasValue)
+			{
+				query.PageSize = Math.Min(query.PageSize ?? recordLimit.Value, recordLimit.Value);
+			}
+
+			this._pageHasResult = false;
+			var results = await ldap.Search(query, cancellationToken, this).ConfigureAwait(false);
+			query.PagingBookmark = results.Bookmark;
+			query.DirSyncCookie = results.DirsyncCookie;
+
+			if (recordLimit.HasValue)
+			{
+				recordLimit = Math.Max(0, recordLimit.Value - results.EntryCount);
+			}
+
+			if (!results.DirsyncCookie.IsNullOrEmpty())
+				this.WriteMessage($"Received dirsync cookie: {results.DirsyncCookie.ToHexString()}");
+		} while ((!query.PagingBookmark.IsNullOrEmpty() || !query.DirSyncCookie.IsNullOrEmpty()) && this._pageHasResult && !cancellationToken.IsCancellationRequested);
+	}
+
+	private bool _pageHasResult;
+	void ILdapClientSearchCallback.OnEntry(LdapEntry entry)
+	{
+		this._pageHasResult = true;
+		this.WriteRecord(entry);
+	}
+
+	protected readonly ConcurrentQueue<string> referralQueue = new ConcurrentQueue<string>();
+	void ILdapClientSearchCallback.OnReference(string reference)
+	{
+		this.WriteMessage($"Received reference to " + reference);
+		this.referralQueue.Enqueue(reference);
+	}
+
+}

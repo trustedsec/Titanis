@@ -23,7 +23,7 @@ namespace Titanis.Ldap.FilterExpressions
 
 	public sealed partial class FilterExpression
 	{
-		internal FilterExpression(FilterClause rootClause, ImmutableArray<FilterParameterUsage> paramUsages)
+		public FilterExpression(FilterClause rootClause, ImmutableArray<FilterParameterUsage> paramUsages = default)
 		{
 			ArgumentNullException.ThrowIfNull(rootClause);
 			RootClause = rootClause;

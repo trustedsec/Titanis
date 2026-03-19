@@ -16,6 +16,7 @@ namespace Titanis.Cli.LdapTool
 	[Subcommand("mod", typeof(ModCommand))]
 	[Subcommand("moduser", typeof(ModUserCommand))]
 	[Subcommand("whoami", typeof(WhoamiCommand))]
+	[Subcommand("lspart", typeof(ListPartitionsCommand))]
 	internal partial class Program : MultiCommand
 	{
 		static void Main(string[] args)

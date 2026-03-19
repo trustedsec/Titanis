@@ -18,7 +18,7 @@ Other substring searches (contains or begins with) are not supported; wildcards 
 Note that these rules are observed and enforced by Active Directory; {0} merely sends what you give it.")]
 [Example(@"Search for accounts beginning with `admin`", "{0} admin")]
 [Example(@"Search for accounts matching `milchick` exactly", "{0} =milchick")]
-internal class SearchCommand : QueryCommandBase
+public class SearchCommand : QueryCommandBase
 {
 	[Parameter(After = nameof(ServerName))]
 	[Mandatory]

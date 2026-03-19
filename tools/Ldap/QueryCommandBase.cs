@@ -2,7 +2,10 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
-internal abstract class QueryCommandBase : LdapSearchCommandBase
+/// <summary>
+/// Base class for commands that 
+/// </summary>
+public abstract class QueryCommandBase : LdapSearchCommandBase
 {
 
 	protected sealed override async Task<int> RunAsync(LdapClient ldap, CancellationToken cancellationToken)

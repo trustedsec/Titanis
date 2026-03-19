@@ -303,6 +303,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.TestUtilities", "te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Cli.Smb2Client.Test", "test\tools\Titanis.Cli.Smb2Client.Test\Titanis.Cli.Smb2Client.Test.csproj", "{567DDD42-F7EB-452D-97C6-B2F2494E7E9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Cli.Ldap.Test", "test\tools\Titanis.Cli.Ldap.Test\Titanis.Cli.Ldap.Test.csproj", "{5035E803-6091-4A35-BA3A-37C26A05F707}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1559,6 +1561,18 @@ Global
 		{567DDD42-F7EB-452D-97C6-B2F2494E7E9B}.Release|x64.Build.0 = Release|Any CPU
 		{567DDD42-F7EB-452D-97C6-B2F2494E7E9B}.Release|x86.ActiveCfg = Release|Any CPU
 		{567DDD42-F7EB-452D-97C6-B2F2494E7E9B}.Release|x86.Build.0 = Release|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Debug|x64.Build.0 = Debug|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Debug|x86.Build.0 = Debug|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Release|x64.ActiveCfg = Release|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Release|x64.Build.0 = Release|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Release|x86.ActiveCfg = Release|Any CPU
+		{5035E803-6091-4A35-BA3A-37C26A05F707}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1691,6 +1705,7 @@ Global
 		{418BAF8E-8BCF-4082-8BC8-AB2DDC8A7B0B} = {3FC5B551-B4DD-43A0-8FF6-DDF1FC596067}
 		{A950B1F4-546B-45EA-BB67-24C267E379B7} = {A04CCBD6-4F5D-493B-8BE5-B1DF8A5EDDC8}
 		{567DDD42-F7EB-452D-97C6-B2F2494E7E9B} = {3FC5B551-B4DD-43A0-8FF6-DDF1FC596067}
+		{5035E803-6091-4A35-BA3A-37C26A05F707} = {3FC5B551-B4DD-43A0-8FF6-DDF1FC596067}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {02A3BCA8-C9C0-462E-8DF9-4B0B8DFD7BCB}
