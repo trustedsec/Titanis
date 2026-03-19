@@ -5,21 +5,24 @@ using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Titanis.Cli;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Titanis;
 
-public class TestCommandContext : ICommandContext
+public class TestCommandContext : CommandContextBase, ICommandContext
 {
 	public TestCommandContext(TestContext testContext, IServiceContainer hostServices)
+		: base(new CommandMetadataContext(new ReflectionMetadataResolver()))
 	{
-		ReflectionMetadataResolver mdResolver = new ReflectionMetadataResolver();
-
+		this._testContext = testContext;
 		this._hostServices = hostServices;
-		this.MetadataContext = new CommandMetadataContext(mdResolver);
 		this.Log = new TestLog(testContext);
+		hostServices.AddService(typeof(ILog), this.Log);
 	}
 
+	private readonly TestContext _testContext;
 	private readonly IServiceContainer _hostServices;
 
 	public ITerminal Terminal => throw new NotImplementedException();
@@ -29,24 +32,16 @@ public class TestCommandContext : ICommandContext
 	public IServiceProvider HostServices => this._hostServices;
 
 
-	public CommandMetadataContext MetadataContext { get; }
+	public override ILog Log { get; }
 
-	public ILog Log { get; }
-
-	public Task ExecuteFrameAsync(Func<CancellationToken, Task> func)
+	public bool OutputFlushed { get; private set; }
+	public override void FlushOutput()
 	{
-		throw new NotImplementedException();
+		base.FlushOutput();
+		this.OutputFlushed = true;
 	}
-
-	public bool OutputFlushed { get; set; }
-	public void FlushOutput() => this.OutputFlushed = true;
 
 	public object? GetVariable(string name) => null;
-
-	public bool IsFieldInOutput(string fieldName)
-	{
-		throw new NotImplementedException();
-	}
 
 	public Stream OpenRawInputStream()
 	{
@@ -64,32 +59,31 @@ public class TestCommandContext : ICommandContext
 	}
 
 	public OutputStyle OutputStyle { get; set; }
-	public void SetOutputFormat(OutputStyle style, IOutputFieldProvider? fields, bool includeHeaders)
-	{
-		this.OutputStyle = style;
-	}
 
 	public void WriteError(string text)
 	{
-		throw new NotImplementedException();
+		this._testContext.WriteLine($"[ERROR] {text}");
 	}
 
 	public void WriteMessage(string? text)
 	{
-		throw new NotImplementedException();
+		this._testContext.WriteLine($"[MSG] {text}");
 	}
 
-	public void WriteOutput(string? text)
+	public override void WriteOutput(string? message)
 	{
-		throw new NotImplementedException();
+		this._testContext.Write(message);
 	}
 
-	public void WriteOutputLine(string? text)
+	public override void WriteOutputLine(string? message)
 	{
-		throw new NotImplementedException();
+		this._testContext.WriteLine(message);
 	}
 
 	public List<object> OutputRecords { get; } = new List<object>();
-	public void WriteRecord(object? record) => this.OutputRecords.Add(record);
-	public void WriteRecords(IEnumerable records) => this.OutputRecords.AddRange(records.OfType<object>());
+    protected override void OnRecordWritten(object? record)
+    {
+        base.OnRecordWritten(record);
+		this.OutputRecords.Add(record);
+    }
 }

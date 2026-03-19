@@ -11,6 +11,7 @@
 		<ArtifactsPath>$(ArtifactsPath)artifacts</ArtifactsPath>
 		
 		<ArtifactsPath>$(ArtifactsPath)\test\</ArtifactsPath>
+		<TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
 
 		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
 		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
