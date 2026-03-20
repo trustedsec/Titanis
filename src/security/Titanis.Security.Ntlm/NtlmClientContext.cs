@@ -167,9 +167,10 @@ namespace Titanis.Security.Ntlm
 			| NegotiateFlags.U_Negotiate128
 			| NegotiateFlags.T_NegotiateVersion
 			| NegotiateFlags.M_NegotiateAlwaysSign
-			| NegotiateFlags.V_NegotiateKeyExchange
 			| NegotiateFlags.H_NegotiateNtlm
 			| NegotiateFlags.C_RequestTarget
+			// UNDONE: This flag should only be set when confidentiality is required; it breaks LDAPS
+			// | NegotiateFlags.V_NegotiateKeyExchange
 			;
 
 		// TODO: Verify that the value conforms with feature mask
