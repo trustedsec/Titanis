@@ -43,6 +43,9 @@ namespace Titanis.Smb2
 		[Browsable(false)]
 		public bool IsDirectory => (0 != (this.FileAttributes & FileAttributes.Directory));
 
+		[Browsable(false)]
+		public bool IsReparsePoint=> (0 != (this.FileAttributes & FileAttributes.ReparsePoint));
+
 		public uint EaSize { get; set; }
 
 		[DisplayName("Short Name")]
