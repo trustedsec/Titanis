@@ -22,12 +22,13 @@ namespace Titanis.Security
 		/// </summary>
 		/// <param name="serviceClass">Name of service</param>
 		/// <param name="serviceInstance">Service instance name (usually the host name)</param>
-		public ServicePrincipalName(string serviceClass, string serviceInstance)
+		public ServicePrincipalName(PrincipalNameType nameType, string serviceClass, string serviceInstance)
 		{
 			if (serviceClass is null) throw new ArgumentNullException(nameof(serviceClass));
 			if (string.IsNullOrEmpty(serviceInstance)) throw new ArgumentException($"'{nameof(serviceInstance)}' cannot be null or empty.", nameof(serviceInstance));
 
-			ServiceClass = serviceClass;
+			this.NameType = nameType;
+			this.ServiceClass = serviceClass;
 			this._instance = serviceInstance;
 			this._instanceParts = serviceInstance.Split('/');
 		}
@@ -36,16 +37,17 @@ namespace Titanis.Security
 		/// </summary>
 		/// <param name="serviceClass">Name of service</param>
 		/// <param name="serviceInstanceParts">Parts of the service instance name (usually the host name)</param>
-		public ServicePrincipalName(string serviceClass, string[] serviceInstanceParts)
+		public ServicePrincipalName(PrincipalNameType nameType, string serviceClass, string[] serviceInstanceParts)
 		{
 			if (serviceClass is null) throw new ArgumentNullException(nameof(serviceClass));
 			if (serviceInstanceParts is null || serviceInstanceParts.Length == 0)
 				throw new ArgumentNullException(nameof(serviceInstanceParts));
 
-			ServiceClass = serviceClass;
-			_instanceParts = serviceInstanceParts;
+			this.NameType = nameType;
+			this.ServiceClass = serviceClass;
+			this._instanceParts = serviceInstanceParts;
 		}
-		internal ServicePrincipalName(string serviceClass, string serviceInstance, string[] parts)
+		internal ServicePrincipalName(PrincipalNameType nameType, string serviceClass, string serviceInstance, string[] parts)
 		{
 			ServiceClass = serviceClass;
 			_instance = serviceInstance;
@@ -73,7 +75,7 @@ namespace Titanis.Security
 		public string[] ServiceInstanceParts => (this._instanceParts ??= this._instance!.Split('/'));
 
 		/// <inheritdoc/>
-		public sealed override PrincipalNameType NameType { get; } = PrincipalNameType.ServiceInstance;
+		public sealed override PrincipalNameType NameType { get; }
 		/// <inheritdoc/>
 		public sealed override string[] GetNameParts() => [this.ServiceClass, .. this._instanceParts];
 		/// <inheritdoc/>
@@ -107,7 +109,7 @@ namespace Titanis.Security
 					var serviceClass = text.Substring(0, isep0);
 					var instance = text.Substring(isep0 + 1);
 
-					spn = new ServicePrincipalName(serviceClass, instance, instanceParts.ToArray());
+					spn = new ServicePrincipalName(PrincipalNameType.ServiceInstance, serviceClass, instance, instanceParts.ToArray());
 					return true;
 				}
 			}
@@ -151,13 +153,13 @@ namespace Titanis.Security
 		public ServicePrincipalName WithServiceClass(string serviceClass)
 		{
 			if (string.IsNullOrEmpty(serviceClass)) throw new ArgumentException($"'{nameof(serviceClass)}' cannot be null or empty.", nameof(serviceClass));
-			return new ServicePrincipalName(serviceClass, this.ServiceInstance);
+			return new ServicePrincipalName(this.NameType, serviceClass, this.ServiceInstance);
 		}
 
 		public ServicePrincipalName WithServiceInstance(string serviceInstance)
 		{
 			if (string.IsNullOrEmpty(serviceInstance)) throw new ArgumentException($"'{nameof(serviceInstance)}' cannot be null or empty.", nameof(serviceInstance));
-			return new ServicePrincipalName(this.ServiceClass, serviceInstance);
+			return new ServicePrincipalName(this.NameType, this.ServiceClass, serviceInstance);
 		}
 
 		public static bool operator ==(ServicePrincipalName? left, ServicePrincipalName? right)

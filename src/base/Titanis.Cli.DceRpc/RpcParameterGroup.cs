@@ -114,7 +114,7 @@ namespace Titanis.Cli
 				{
 					var epm = await rpcClient.ConnectTcp<EpmClient>(
 						new DnsEndPoint(serverName, EpmClient.EPMapperPort),
-						new ServicePrincipalName(ServiceClassNames.Rpc, serverName),
+						new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.Rpc, serverName),
 						this.EncryptEpm.IsSet ? RpcAuthLevel.PacketPrivacy : this.AuthEpm.IsSet ? RpcAuthLevel.PacketIntegrity : RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
 					remoteEP = await epm.TryMapTcp(RpcInterfaceId.GetForType(svcClient.Proxy.InterfaceType), remoteAddr, cancellationToken).ConfigureAwait(false);
 				}

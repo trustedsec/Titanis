@@ -33,7 +33,7 @@ namespace EnumUsers
 				var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential("milchick", "LUMON", "Br3@kr00m!"), true)
 				{
 					Workstation = myWorkstationName,
-					TargetSpn = new ServicePrincipalName(ServiceClassNames.HostU, target)
+					TargetSpn = new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.HostU, target)
 				};
 				ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
 				return ntlmContext;

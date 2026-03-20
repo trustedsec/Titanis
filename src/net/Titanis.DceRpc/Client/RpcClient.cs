@@ -173,7 +173,7 @@ namespace Titanis.DceRpc.Client
 			if (spn is null && serviceEP.TryGetHostAndPort(out var host, out var port))
 			{
 				if (host is not null)
-					spn = new ServicePrincipalName(svc.ServiceClass ?? ServiceClassNames.RestrictedKrbHost, host);
+					spn = new ServicePrincipalName(PrincipalNameType.ServiceInstance, svc.ServiceClass ?? ServiceClassNames.RestrictedKrbHost, host);
 			}
 			await this.ConnectTcp(svc.Proxy, serviceEP, spn, authLevel, cancellationToken).ConfigureAwait(false);
 		}
@@ -205,7 +205,7 @@ namespace Titanis.DceRpc.Client
 			if (spn is null && serviceEP.TryGetHostAndPort(out var host, out var port))
 			{
 				if (host is not null)
-					spn = new ServicePrincipalName(ServiceClassNames.RestrictedKrbHost, host);
+					spn = new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.RestrictedKrbHost, host);
 			}
 
 			ISocket? socket = null;

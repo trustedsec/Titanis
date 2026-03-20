@@ -154,7 +154,7 @@ namespace Titanis.Ldap
 						var m = rgxLdapServiceName.Match(serviceName);
 						if (m.Success)
 						{
-							spn = new ServicePrincipalName("LDAP", [dnsName, m.Groups["domain"].Value]);
+							spn = new ServicePrincipalName(PrincipalNameType.ServiceInstance, "LDAP", [dnsName, m.Groups["domain"].Value]);
 						}
 					}
 				}
@@ -172,7 +172,7 @@ namespace Titanis.Ldap
 					authContext.ChannelBinding = channelBinding;
 					if (spn is null)
 					{
-						spn = new ServicePrincipalName("LDAP", dnsName);
+						spn = new ServicePrincipalName(PrincipalNameType.ServiceInstance, "LDAP", dnsName);
 					}
 					var resp2 = await channel.Bind(authContext, cancellationToken).ConfigureAwait(false);
 				}

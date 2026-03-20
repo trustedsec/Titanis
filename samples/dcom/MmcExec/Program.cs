@@ -35,7 +35,7 @@ namespace MmcExec
 				var ntlmContext = new NtlmClientContext(new NtlmPasswordCredential("milchick", "LUMON", "Br3@kr00m!"), true);
 				ntlmContext.RequiredCapabilities |= SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality;
 				ntlmContext.Workstation = myWorkstationName;
-				ntlmContext.TargetSpn = new ServicePrincipalName(ServiceClassNames.RestrictedKrbHost, target);
+				ntlmContext.TargetSpn = new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.RestrictedKrbHost, target);
 				return ntlmContext;
 			};
 			this.Services.AddService(typeof(IClientCredentialService), creds);

@@ -50,7 +50,7 @@ namespace Titanis.Security.Kerberos
 					{
 						if (ServiceClassNames.Krbtgt.Equals(rec.principal.components[0].str, StringComparison.OrdinalIgnoreCase))
 						{
-							spn = new ServicePrincipalName(rec.principal.components[0].str, rec.principal.realm.str);
+							spn = new ServicePrincipalName(rec.principal.nameType, rec.principal.components[0].str, rec.principal.realm.str);
 						}
 						else
 						{
@@ -60,6 +60,7 @@ namespace Titanis.Security.Kerberos
 					else if (rec.principal.components.Length is 2)
 					{
 						spn = new ServicePrincipalName(
+							rec.principal.nameType,
 							rec.principal.components[0].str,
 							rec.principal.components[1].str
 							);
@@ -67,6 +68,7 @@ namespace Titanis.Security.Kerberos
 					else if (rec.principal.components.Length is 3)
 					{
 						spn = new ServicePrincipalName(
+							rec.principal.nameType,
 							rec.principal.components[0].str,
 							[
 								rec.principal.components[1].str,

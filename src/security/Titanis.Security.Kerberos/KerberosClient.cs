@@ -66,7 +66,7 @@ namespace Titanis.Security.Kerberos
 	{
 		public const string Krb5CacheVariableName = "KRB5CCNAME";
 
-		public static readonly ServicePrincipalName ChangePwSpn = new ServicePrincipalName("kadmin", "changepw");
+		public static readonly ServicePrincipalName ChangePwSpn = new ServicePrincipalName(PrincipalNameType.ServiceInstance, "kadmin", "changepw");
 
 		/// <summary>
 		/// Initializes a new <see cref="KerberosClient"/> for offline use.
@@ -286,7 +286,7 @@ namespace Titanis.Security.Kerberos
 		{
 			ArgumentException.ThrowIfNullOrEmpty(targetRealm);
 			ArgumentNullException.ThrowIfNull(credential);
-			targetSpn ??= new ServicePrincipalName(ServiceClassNames.Krbtgt, targetRealm);
+			targetSpn ??= new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.Krbtgt, targetRealm);
 
 			if (ticketParameters == null)
 				ticketParameters = GetDefaultTgtOptions();
@@ -516,13 +516,13 @@ namespace Titanis.Security.Kerberos
 			KerberosCredential? credential,
 			CancellationToken cancellationToken)
 		{
-			var spn = new ServicePrincipalName(ServiceClassNames.Krbtgt, realm);
+			var spn = new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.Krbtgt, realm);
 			var ticket = this.TicketCache.GetTicketFromCache(spn, credential?.UserName.UserName);
 			if (ticket == null)
 			{
 				if (this._realmMapping.TryGetValue(realm, out string? mapped))
 				{
-					spn = new ServicePrincipalName(ServiceClassNames.Krbtgt, mapped);
+					spn = new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.Krbtgt, mapped);
 					ticket = this.TicketCache.GetTicketFromCache(spn, credential?.UserName.UserName);
 				}
 			}

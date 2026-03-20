@@ -23,18 +23,18 @@ namespace Titanis.CredCoerce
 			if (efs is null)
 			{
 				efs = new EfsClient();
-				var epm = context.EpmClient;
-				try
-				{
-					var efsEP = await epm.TryMapTcp(efs.AbstractSyntaxId, IPAddress.Any, cancellationToken);
-				}
-				catch (TimeoutException ex)
-				{
-					// This usually happens when the service is already running
-					context.Log.WriteVerbose("EPM lookup for EFS time out; this usually indicates the service is already running on the target");
-				}
+				//var epm = context.EpmClient;
+				//try
+				//{
+				//	var efsEP = await epm.TryMapTcp(efs.AbstractSyntaxId, IPAddress.Any, cancellationToken);
+				//}
+				//catch (TimeoutException ex)
+				//{
+				//	// This usually happens when the service is already running
+				//	context.Log.WriteVerbose("EPM lookup for EFS time out; this usually indicates the service is already running on the target");
+				//}
 
-				ServicePrincipalName targetSpn = new(context.ServerName, ServiceClassNames.HostU);
+				ServicePrincipalName targetSpn = new(PrincipalNameType.ServiceInstance, ServiceClassNames.HostU,context.ServerName);
 
 				var rpcClient = context.RpcClient;
 				var smbClient = context.SmbClient;

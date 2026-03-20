@@ -62,7 +62,7 @@ namespace Titanis.CredCoerce
 			rpcClient.ConnectTimeout = TimeSpan.FromSeconds(60);
 
 			// Set up credentials
-			ServicePrincipalName targetSpn = new(this.ServerName, ServiceClassNames.HostU);
+			ServicePrincipalName targetSpn = new(PrincipalNameType.ServiceInstance, ServiceClassNames.HostU, this.ServerName);
 
 			// Set up SMB for named pipes
 			var smbClient = this.CreateSmb2Client();

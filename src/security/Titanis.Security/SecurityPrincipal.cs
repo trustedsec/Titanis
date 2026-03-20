@@ -27,18 +27,14 @@ namespace Titanis.Security
 		{
 			if (nameParts is null || nameParts.Length is 0) throw new ArgumentNullException(nameof(nameParts));
 
-			if (nameType is PrincipalNameType.ServiceInstance && nameParts.Length is 2)
+			SecurityPrincipalName name = (nameType, nameParts.Length) switch
 			{
-				return new ServicePrincipalName(nameParts[0], nameParts[1]);
-			}
-			else if (nameType is PrincipalNameType.Principal && nameParts.Length is 1)
-			{
-				return new SimplePrincipalName(nameParts[0]);
-			}
-			else
-			{
-				return new GenericPrincipalName(nameType, nameParts);
-			}
+				(_, 2) => new ServicePrincipalName(nameType, nameParts[0], nameParts[1]),
+				(_, 3) => new ServicePrincipalName(nameType, nameParts[0], nameParts[1..]),
+				(PrincipalNameType.Principal, 1)=>new SimplePrincipalName(nameParts[0]),
+				_ => new GenericPrincipalName(nameType, nameParts)
+			};
+			return name;
 		}
 
 		/// <summary>

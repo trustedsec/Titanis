@@ -59,7 +59,7 @@ namespace Titanis.Cli
 				{
 					string sc = Replace(svcpn.ServiceClass, replaceSvc.ServiceClass);
 					string si = Replace(svcpn.ServiceInstance, replaceSvc.ServiceInstance);
-					return new ServicePrincipalName(sc, si);
+					return new ServicePrincipalName(svcpn.NameType, sc, si);
 				}
 				else
 					return this.ReplaceName;

@@ -98,7 +98,7 @@ namespace Titanis.DceRpc.Client
 		public ServicePrincipalName GetSpnFor(string host)
 		{
 			ArgumentException.ThrowIfNullOrEmpty(host);
-			return new ServicePrincipalName(this.ServiceClass ?? ServiceClassNames.RestrictedKrbHost, host);
+			return new ServicePrincipalName(PrincipalNameType.ServiceInstance, this.ServiceClass ?? ServiceClassNames.RestrictedKrbHost, host);
 		}
 		#endregion
 
