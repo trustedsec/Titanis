@@ -14,7 +14,9 @@ namespace Titanis.Cli.ScmTool;
 [Command]
 [Description("Queries the status of a service")]
 [OutputRecordType(typeof(EnumServiceStatusInfo))]
-internal class QueryCommand : ScmCommand
+[Example("Query all services (NTLM)", "{0} lumon-fs1 -UserName milchick@LUMON -Password Br3@kr00m!", Tag = "milchickNtlm_query")]
+[Example("Query all services (Kerberos)", "{0} lumon-fs1 -UserName milchick@LUMON -Password Br3@kr00m! -Kdc LUMON-DC1", Tag = "milchickKerb_query")]
+public class QueryCommand : ScmCommand
 {
 	/// <inheritdoc/>
 	protected sealed override ScmAccessRights RequiredScmAccess => ScmAccessRights.EnumerateService;

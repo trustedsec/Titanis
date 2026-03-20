@@ -9,7 +9,7 @@ using Titanis.Msrpc.Msscmr;
 using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.ScmTool;
-internal abstract class ServiceCommand : ScmCommand
+public abstract class ServiceCommand : ScmCommand
 {
 	protected abstract ServiceAccessRights RequiredServiceAccess { get; }
 

@@ -11,8 +11,8 @@ namespace Titanis.Cli.ScmTool;
 
 /// <task category="SCM">Delete a service</task>
 [Description("Deletes a service")]
-[Example("Delete a service", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m! -EncryptRpc myservice")]
-internal class DeleteCommand : ServiceCommand
+[Example("Delete a service", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m! myservice", Tag = "milchickNtlm_delete")]
+public class DeleteCommand : ServiceCommand
 {
 	protected sealed override ServiceAccessRights RequiredServiceAccess => (ServiceAccessRights)StandardAccessRights.Delete;
 	protected sealed override ScmAccessRights RequiredScmAccess => ScmAccessRights.None;

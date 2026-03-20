@@ -11,7 +11,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.ScmTool
 {
-	internal abstract class ScmCommand : RpcCommand<ScmClient>
+	public abstract class ScmCommand : RpcCommand<ScmClient>
 	{
 		/// <inheritdoc/>
 		protected sealed override Type InterfaceType => typeof(svcctl);
