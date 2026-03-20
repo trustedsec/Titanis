@@ -18,6 +18,8 @@ Other substring searches (contains or begins with) are not supported; wildcards 
 Note that these rules are observed and enforced by Active Directory; {0} merely sends what you give it.")]
 [Example(@"Search for accounts beginning with `admin`", "{0} admin")]
 [Example(@"Search for accounts matching `milchick` exactly", "{0} =milchick")]
+[Example("Search using SSL (Kerberos)", "{0} LUMON-DC1 -UserName marks@LUMON -Password She's@live!! -Kdc LUMON-DC1 -Ssl milchick", Tag = "milchickKerb_ldaps_ChannelBinding")]
+[Example("Search using SSL (NTLM)", "{0} LUMON-DC1 -UserName marks@LUMON -Password She's@live!! -Ssl milchick", Tag = "milchickNtlm_ldaps_ChannelBinding")]
 public class SearchCommand : QueryCommandBase
 {
 	[Parameter(After = nameof(ServerName))]
