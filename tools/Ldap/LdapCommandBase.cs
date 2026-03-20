@@ -12,7 +12,7 @@ namespace Titanis.Cli.LdapTool
 	/// Base class for commands using <see cref="LdapClient"/>.
 	/// </summary>
 	[OutputRecordType(typeof(LdapEntry), DefaultFields = new string[] { nameof(LdapEntry.EntryName) })]
-	public abstract class LdapCommandBase : Command, IHaveServerName
+	public abstract class LdapCommandBase : Command, IHaveServerName, ISupportTreeOutput
 	{
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public AuthenticationParameters AuthenticationParams { get; set; }
@@ -122,6 +122,11 @@ namespace Titanis.Cli.LdapTool
 		private bool ValidateSsl(object sender, X509Certificate? certificate, X509Chain? chain, SslPolicyErrors sslPolicyErrors)
 		{
 			return true;
+		}
+
+		TreeHandler ISupportTreeOutput.CreateTreeHandler()
+		{
+			return new TreeHandler<LdapDistinguishedName, LdapEntry>(r => r.EntryName, r => r.EntryName.GetParentName(), null, Comparer<LdapDistinguishedName>.Default);
 		}
 	}
 }

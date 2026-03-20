@@ -4,6 +4,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,7 +15,7 @@ namespace Titanis.Ldap
 	/// <summary>
 	/// Represents a relative distinguished name within LDAP.
 	/// </summary>
-	public sealed class LdapRelativeDistinguishedName
+	public sealed class LdapRelativeDistinguishedName : IEquatable<LdapRelativeDistinguishedName>, IComparable<LdapRelativeDistinguishedName>
 	{
 		/// <summary>
 		/// Initializes a new <see cref="LdapRelativeDistinguishedName"/>.
@@ -155,12 +158,55 @@ namespace Titanis.Ldap
 
 			return sb;
 		}
+
+		public static bool operator ==(LdapRelativeDistinguishedName? x, LdapRelativeDistinguishedName? y) => object.ReferenceEquals(x, y) || (x is not null && x.Equals(y));
+		public static bool operator !=(LdapRelativeDistinguishedName? x, LdapRelativeDistinguishedName? y) => !(x == y);
+		public sealed override bool Equals(object? obj) => (obj is LdapRelativeDistinguishedName other) && this.Equals(other);
+		/// <inheritdoc/>
+		public bool Equals(LdapRelativeDistinguishedName? other)
+		{
+			if (other is null)
+				return false;
+			if (object.ReferenceEquals(this, other))
+				return true;
+
+			return this.Values.SequenceEqual(other.Values);
+		}
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			int hash = 0;
+			foreach (var value in this.Values)
+			{
+				hash = HashCode.Combine(hash, value?.GetHashCode() ?? 0);
+			}
+			return hash;
+		}
+
+		/// <inheritdoc/>
+		public int CompareTo(LdapRelativeDistinguishedName? other)
+		{
+			if (other is null)
+				return 1;
+
+			int valueCount = Math.Min(this.Values.Length, other.Values.Length);
+			for (int i = 0; i < valueCount; i++)
+			{
+				string? x = this.Values[i];
+				string? y = other.Values[i];
+				int cmp = string.Compare(x, y);
+				if (cmp != 0)
+					return cmp;
+			}
+
+			return this.Values.Length.CompareTo(other.Values.Length);
+		}
 	}
 	/// <summary>
 	/// Represents a distinguished name within LDAP.
 	/// </summary>
 	[TypeConverter(typeof(LdapDistinguishedNameConverter))]
-	public sealed class LdapDistinguishedName
+	public sealed class LdapDistinguishedName : IEquatable<LdapDistinguishedName>, IComparable<LdapDistinguishedName>
 	{
 		/// <summary>
 		/// Initializes a new <see cref="LdapDistinguishedName"/>.
@@ -280,6 +326,7 @@ namespace Titanis.Ldap
 				this._rdns = rdns.ToArray();
 				this.Rdns = new ReadOnlyCollection<LdapRelativeDistinguishedName>(this._rdns);
 			}
+
 		}
 
 		private readonly LdapRelativeDistinguishedName[] _rdns;
@@ -324,6 +371,78 @@ namespace Titanis.Ldap
 			ArgumentNullException.ThrowIfNull(subordinateRdn);
 
 			return new LdapDistinguishedName(this._rdns.Prepend(subordinateRdn));
+		}
+
+		/// <summary>
+		/// Gets the DN of the parent.
+		/// </summary>
+		/// <returns>A <see cref="LdapDistinguishedName"/> of the parent, or <see langword="null"/> if there is no parent.</returns>
+		public LdapDistinguishedName? GetParentName()
+		{
+			if (this._rdns.Length > 1)
+			{
+				LdapDistinguishedName parentDN = new LdapDistinguishedName(this._rdns[1..].AsReadOnly());
+				return parentDN;
+			}
+			else
+				return null;
+		}
+
+		public static bool operator ==(LdapDistinguishedName? x, LdapDistinguishedName? y) => object.ReferenceEquals(x, y) || (x is not null && x.Equals(y));
+		public static bool operator !=(LdapDistinguishedName? x, LdapDistinguishedName? y) => !(x == y);
+		/// <inheritdoc/>
+		public sealed override bool Equals(object? obj) => (obj is LdapDistinguishedName other) && this.Equals(other);
+		/// <inheritdoc/>
+		public bool Equals(LdapDistinguishedName? other)
+		{
+			if (other is null)
+				return false;
+			if (object.ReferenceEquals(this, other))
+				return true;
+
+			if (this._rdns.Length != other._rdns.Length)
+				return false;
+
+			for (int i = 0; i < _rdns.Length; i++)
+			{
+				LdapRelativeDistinguishedName? rdn = this._rdns[i];
+				LdapRelativeDistinguishedName? otherRdn = other._rdns[i];
+
+				if (rdn != otherRdn)
+					return false;
+			}
+
+			return true;
+		}
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			int hash = 0;
+			foreach (var rdn in this._rdns)
+			{
+				hash = HashCode.Combine(hash, rdn.GetHashCode());
+			}
+			return hash;
+		}
+
+		/// <inheritdoc/>
+		public int CompareTo(LdapDistinguishedName? other)
+		{
+			if (other is null)
+				return 1;
+
+			var rdnCount = Math.Min(this._rdns.Length, other._rdns.Length);
+			for (int i = 1; i <= rdnCount; i++)
+			{
+				var x = this._rdns[^i];
+				var y = other._rdns[^i];
+
+				int cmp = x.CompareTo(y);
+				if (cmp != 0)
+					return cmp;
+			}
+
+			return this._rdns.Length.CompareTo(other._rdns.Length);
 		}
 	}
 
