@@ -7,11 +7,11 @@ namespace Titanis;
 public abstract class CliCommandTest<TCommand>
 	where TCommand : Command, new()
 {
-    protected MockRepository mocks;
-    protected ServiceContainer hostServices;
-    protected TestFileAccess fileAccess;
+	protected MockRepository mocks;
+	protected ServiceContainer hostServices;
+	protected TestFileAccess fileAccess;
 
-    [TestInitialize]
+	[TestInitialize]
 	public void InitializeCommandTest()
 	{
 		MockRepository mocks = new MockRepository();
@@ -45,6 +45,7 @@ public abstract class CliCommandTest<TCommand>
 	{
 		var cmd = new TCommand();
 		const OutputStyle outputStyle = OutputStyle.Table;
+		this.TestContext.WriteLine($"Command line arguments: " + string.Join(" ", args.Select(r => r.Text.Contains(' ') ? $"\"{r.Text}\"" : r.Text)));
 
 		// Command context
 		TestCommandContext cmdContext = new TestCommandContext(this.TestContext, this.hostServices);
