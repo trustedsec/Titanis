@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 
 namespace Titanis.Cli
 {
@@ -24,6 +25,17 @@ namespace Titanis.Cli
 			DisplayAlignment alignment = DisplayAlignment.Left
 			)
 			=> new OutputField<TRecord, TValue>(name, caption, projection, format, alignment);
+		public static OutputField CreateForProperty(Type recordType, string propertyName, CommandMetadataContext mdContext)
+		{
+			if (recordType is null) throw new ArgumentNullException(nameof(recordType));
+			if (string.IsNullOrEmpty(propertyName)) throw new ArgumentException($"'{nameof(propertyName)}' cannot be null or empty.", nameof(propertyName));
+			if (mdContext is null) throw new ArgumentNullException(nameof(mdContext));
+			var prop = TypeDescriptor.GetProperties(recordType)[propertyName];
+			if (prop is null)
+				throw new ArgumentException($"Type '{recordType.FullName}' does not have a property '{propertyName}'");
+
+			return new PropertyOutputField(prop, mdContext);
+		}
 
 		public abstract string Name { get; }
 		public abstract string Caption { get; }

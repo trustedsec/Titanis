@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace Titanis.Cli
 
 		#region Command Frames
 		private CommandFrame? _currentFrame;
+		internal CommandBase currentCommand;
 		private CommandFrame _rootFrame;
 		protected virtual CancellationTokenSource? GetCancellationSource() => this._currentFrame?.CancellationSource;
 
@@ -58,6 +60,14 @@ namespace Titanis.Cli
 
 			this.FlushOutput();
 
+			if (style is OutputStyle.TreeTable && this.currentCommand is ISupportTreeOutput treeProvider)
+				this._treeHandler = treeProvider.CreateTreeHandler();
+			else
+				this._treeHandler = null;
+
+			if (style is OutputStyle.TreeTable && this._treeHandler is null)
+				style = OutputStyle.Table;
+
 			this._outputStyle = style;
 			this._outputFieldProvider = fields ?? new OutputFieldProvider(this.MetadataContext);
 
@@ -84,21 +94,45 @@ namespace Titanis.Cli
 		/// </summary>
 		private bool _recordsExpected;
 		private int _recordsWritten;
-		private TextTable? _resultTable;
+		private TableHandler? _resultTable;
+
+		// Tree stuff
+		private TreeHandler? _treeHandler;
 
 		public virtual void FlushOutput()
 		{
-			if (this._resultsPending)
+			if (this._treeHandler != null)
 			{
-				if (this._resultTable != null)
+				StringBuilder sb = new StringBuilder();
+
+				var allNodes = this._treeHandler.BuildTree();
+				if (allNodes.Count > 0)
 				{
-					this.WriteOutputLine(this._resultTable.ToString());
-					this._resultsPending = false;
-					this._resultTable = null;
+					var tbl = new TableHandler(this._treeHandler.GetDisplayFields(), this._includeHeaders, this._outputStyle);
+					foreach (var node in allNodes)
+					{
+						tbl.AddRow(node.Record, node.BuildLineArt(false), node.BuildLineArt(true), false);
+					}
+
+					this.WriteOutput(tbl.BuildOutput());
 				}
+				this._treeHandler = null;
 			}
-			if (this._outputStyle is OutputStyle.Json)
-				this.WriteOutput("]");
+			else
+			{
+				if (this._resultsPending)
+				{
+					if (this._resultTable != null)
+					{
+						this.WriteOutputLine(this._resultTable.BuildOutput());
+						this._resultsPending = false;
+						this._resultTable = null;
+					}
+				}
+
+				if (this._outputStyle is OutputStyle.Json)
+					this.WriteOutput("]");
+			}
 
 			if (this._recordsExpected)
 			{
@@ -110,6 +144,8 @@ namespace Titanis.Cli
 				{
 					this.Log.WriteMessage(new LogMessage(LogMessageSeverity.Verbose, null, $"{this._recordsWritten} record(s) written"));
 				}
+				this._recordsExpected = false;
+				this._recordsWritten = 0;
 			}
 
 		}
@@ -119,22 +155,6 @@ namespace Titanis.Cli
 
 
 		#region Formatting support
-		private static TextTable BuildResultTable(OutputField[]? fields, bool includeHeaders)
-		{
-			TextTable tbl = new TextTable();
-			if (includeHeaders)
-			{
-				var trHeader = tbl.AddRow();
-				var trLine = tbl.AddRow();
-				foreach (var field in fields!)
-				{
-					trHeader.AddCell(field.Caption);
-					trLine.AddCell(new TextTableCell() { Padding = '-' });
-				}
-			}
-
-			return tbl;
-		}
 
 		static string FormatValue(string sep, string? text)
 		{
@@ -181,151 +201,120 @@ namespace Titanis.Cli
 			this._recordsExpected = true;
 
 			var fields = this._outputFieldList;
-			if ((this._outputStyle is OutputStyle.Table or OutputStyle.List or OutputStyle.Csv or OutputStyle.Tsv or OutputStyle.Json) && fields is null)
+			if (this._treeHandler != null)
 			{
-				if (record != null)
-				{
-					fields = (this._outputFieldProvider ??= CreateDefaultFieldProvider()).GetFieldsForRecord(record);
-				}
-				else
-					throw new ArgumentNullException(nameof(fields));
-
-				// These formats require consistent fields across records
-				if (this._outputStyle is OutputStyle.Table or OutputStyle.Csv or OutputStyle.Tsv)
-				{
-					this._outputFieldList = fields;
-
-					if (this._outputStyle is OutputStyle.Csv or OutputStyle.Tsv)
-					{
-						var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
-						string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.Name)));
-						this.WriteOutputLine(line);
-					}
-				}
+				this._treeHandler.fields ??= (this._outputFieldProvider ??= CreateDefaultFieldProvider()).GetFieldsForRecord(record);
+				this._treeHandler.AddRecord(record);
 			}
-
-			switch (this._outputStyle)
+			else
 			{
-				case OutputStyle.Freeform:
-					this.WriteOutputLine(record?.ToString());
-					break;
-				case OutputStyle.Table:
-					if (this._resultTable is null)
+				if ((this._outputStyle is OutputStyle.Table or OutputStyle.TreeTable or OutputStyle.List or OutputStyle.Csv or OutputStyle.Tsv or OutputStyle.Json) && fields is null)
+				{
+					if (record != null)
 					{
-						Debug.Assert(fields != null);
-
-						TextTable tbl = BuildResultTable(fields, this._includeHeaders);
-						this._resultTable = tbl;
+						fields = (this._outputFieldProvider ??= CreateDefaultFieldProvider()).GetFieldsForRecord(record);
 					}
+					else
+						throw new ArgumentNullException(nameof(fields));
 
+					// These formats require consistent fields across records
+					if (this._outputStyle is OutputStyle.Table or OutputStyle.TreeTable or OutputStyle.Csv or OutputStyle.Tsv)
 					{
-						var tbl = this._resultTable;
-						if (tbl != null)
-						{
-							Debug.Assert(fields != null);
+						this._outputFieldList = fields;
 
-							this._resultsPending = true;
-
-							if (record is not null)
-							{
-								int maxArrayLength = 1;
-								for (int arrayIndex = 0; arrayIndex < maxArrayLength; arrayIndex++)
-								{
-									var tr = tbl.AddRow();
-									for (int fieldIndex = 0; fieldIndex < fields!.Length; fieldIndex++)
-									{
-										OutputField? field = fields![fieldIndex];
-										var value = field.GetValue(record);
-										string? formatted;
-
-										if (value is Array arr)
-										{
-											maxArrayLength = Math.Max(maxArrayLength, arr.Length);
-											if (arrayIndex < arr.Length)
-											{
-												value = arr.GetValue(arrayIndex);
-												formatted = field.FormatValue(value, this._outputStyle);
-											}
-											else
-												formatted = null;
-										}
-										else if (arrayIndex == 0 || fieldIndex == 0)
-										{
-											formatted = field.FormatValue(value, this._outputStyle);
-										}
-										else
-											formatted = null;
-
-										tr.AddCell(formatted, field.Alignment);
-									}
-								}
-							}
-							else
-							{
-								var tr = tbl.AddRow();
-							}
-						}
-					}
-					break;
-				case OutputStyle.List:
-					Debug.Assert(fields != null);
-
-					if (record is not null)
-					{
-						foreach (var field in fields!)
-						{
-							var value = field.GetValue(record);
-							if (value is not null)
-							{
-								if (!(value is Array array))
-									array = new object[] { value };
-
-								foreach (var elem in array)
-								{
-									var formatted = field.FormatValue(elem, this._outputStyle);
-
-									if (this._includeHeaders)
-										this.WriteOutputLine($"{field.Caption}: {formatted}");
-									else
-										this.WriteOutputLine(formatted);
-								}
-							}
-						}
-					}
-					this.WriteOutputLine(string.Empty);
-					break;
-				case OutputStyle.Csv or OutputStyle.Tsv:
-					if (fields != null && record is not null)
-					{
-						if (_includeHeaders)
+						if (this._outputStyle is OutputStyle.Csv or OutputStyle.Tsv)
 						{
 							var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
-							string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._outputStyle))));
+							string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.Name)));
 							this.WriteOutputLine(line);
 						}
 					}
-					break;
-				case OutputStyle.Json:
-					if (fields != null && record is not null)
-					{
-						Dictionary<string, object?> values = new Dictionary<string, object?>();
-						foreach (var field in fields)
+				}
+
+				switch (this._outputStyle)
+				{
+					case OutputStyle.Freeform:
+						this.WriteOutputLine(record?.ToString());
+						break;
+					case OutputStyle.Table or OutputStyle.TreeTable:
+						if (this._resultTable is null)
 						{
-							var fieldValue = field.GetValue(record);
-							if (fieldValue != null)
+							Debug.Assert(fields != null);
+
+							this._resultTable = new TableHandler(fields, this._includeHeaders, this._outputStyle);
+						}
+
+						{
+							var tbl = this._resultTable;
+							if (tbl != null)
 							{
-								string formatted = field.FormatValue(fieldValue, OutputStyle.Json);
-								values.Add(field.Name, fieldValue);
+								Debug.Assert(fields != null);
+
+								this._resultsPending = true;
+								this._resultTable.AddRow(record);
 							}
 						}
-						if (this._recordsWritten > 0)
-							this.WriteOutput(",");
-						var jsonLine = JsonSerializer.Serialize(values);
-						this.WriteOutputLine(jsonLine);
-					}
-					break;
-				default:
-					break;
+						break;
+					case OutputStyle.List:
+						Debug.Assert(fields != null);
+
+						if (record is not null)
+						{
+							foreach (var field in fields!)
+							{
+								var value = field.GetValue(record);
+								if (value is not null)
+								{
+									if (!(value is Array array))
+										array = new object[] { value };
+
+									foreach (var elem in array)
+									{
+										var formatted = field.FormatValue(elem, this._outputStyle);
+
+										if (this._includeHeaders)
+											this.WriteOutputLine($"{field.Caption}: {formatted}");
+										else
+											this.WriteOutputLine(formatted);
+									}
+								}
+							}
+						}
+						this.WriteOutputLine(string.Empty);
+						break;
+					case OutputStyle.Csv or OutputStyle.Tsv:
+						if (fields != null && record is not null)
+						{
+							if (_includeHeaders)
+							{
+								var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
+								string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._outputStyle))));
+								this.WriteOutputLine(line);
+							}
+						}
+						break;
+					case OutputStyle.Json:
+						if (fields != null && record is not null)
+						{
+							Dictionary<string, object?> values = new Dictionary<string, object?>();
+							foreach (var field in fields)
+							{
+								var fieldValue = field.GetValue(record);
+								if (fieldValue != null)
+								{
+									string formatted = field.FormatValue(fieldValue, OutputStyle.Json);
+									values.Add(field.Name, fieldValue);
+								}
+							}
+							if (this._recordsWritten > 0)
+								this.WriteOutput(",");
+							var jsonLine = JsonSerializer.Serialize(values);
+							this.WriteOutputLine(jsonLine);
+						}
+						break;
+					default:
+						break;
+				}
 			}
 			this._recordsWritten++;
 

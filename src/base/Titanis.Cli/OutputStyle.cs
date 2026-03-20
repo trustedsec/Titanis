@@ -13,5 +13,7 @@ namespace Titanis.Cli
 		Csv,
 		Tsv,
 		Json,
+
+		TreeTable,
 	}
 }

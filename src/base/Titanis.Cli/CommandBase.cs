@@ -57,6 +57,9 @@ namespace Titanis.Cli
 		public async Task<int> InvokeAsync(ICommandContext context, string command, Token[] args, int startIndex, CancellationToken cancellationToken)
 		{
 			this.Context = context;
+			// TODO: This is a bit of a kludge
+			if (context is CommandContextBase ctxBase)
+				ctxBase.currentCommand = this;
 
 			try
 			{
