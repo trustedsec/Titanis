@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
 using Titanis.DceRpc.Communication;
+using Titanis.DceRpc.WireProtocol;
 using Titanis.IO;
 using Titanis.Security;
 using Titanis.Winterop;
@@ -58,7 +59,7 @@ namespace Titanis.Msrpc.Msscmr
 				res.CheckAndThrow();
 				return new Scm(pHandle.value, this);
 			}
-			catch (NotSupportedException ex)
+			catch (RpcFaultException ex) when(ex.Status == RpcFaultCode.OpnumRange)
 			{
 				RpcPointer<RpcContextHandle> pHandle = new RpcPointer<RpcContextHandle>();
 				var res = (Win32ErrorCode)await this._proxy.ROpenSCManagerW(null, null, (uint)access, pHandle, cancellationToken).ConfigureAwait(false);
