@@ -135,8 +135,15 @@ namespace Titanis.Msrpc.Msdcom
 			if (string.IsNullOrEmpty(host)) throw new ArgumentException($"'{nameof(host)}' cannot be null or empty.", nameof(host));
 			ArgumentNullException.ThrowIfNull(rpcClient);
 
+			string simpleName = host;
+			if (simpleName.Contains('.'))
+			{
+				int isep = host.IndexOf('.');
+				simpleName = simpleName.Substring(0, isep);
+			}
+
 			DcomClient dcom = new DcomClient(rpcClient, callback);
-			dcom.PreferredHostName = host;
+			dcom.PreferredHostName = simpleName;
 
 			// Get server info
 			ObjectExporterClient exporter = new ObjectExporterClient();
@@ -162,7 +169,7 @@ namespace Titanis.Msrpc.Msdcom
 			// SCMActivator
 			if (info.Version.MinorVersion >= 6)
 			{
-				var scmClient = new ScmActivatorClient(dcom, host);
+				var scmClient = new ScmActivatorClient(dcom, simpleName);
 				dcom._scmActivator = scmClient;
 				await scmClient.BindToAsync(rpcChannel, false, exporter.Proxy.BoundAuthContext?.AuthContext, exporter.Proxy.BoundAuthContext?.AuthLevel ?? RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
 			}

@@ -16,6 +16,7 @@ The -MethodName may specify either a method or a property.  If it is a property,
 
 If the method is specified as a dot-separated multi-part name, this is interpreted as a property path.  The properties are retrieved one by one.  The last part is interpreted as the actual name of the method to invoke on the resulting object.")]
 [Example("Invoke MMC20 ExecuteShellCommand", "{0} LUMON-FS1 -UserName milchick@LUMON -Password Br3@kr00m! 49B2791A-B1AE-4C90-9B8E-E860BA07F889 Document.ActiveView.ExecuteShellCommand \"cmd.exe\" C:\\ \" /c whoami\" \"\"", "The CLSID corresponds to MMC20.Application.  This object is activated, then the properties Document and retrieved ActiveView, and finally ExecuteShellCommand is executed on the ActiveView object.", Tag = "milchickNtlm_Mmc20Exec")]
+[Example("Invoke MMC20 ExecuteShellCommand with FQDN", "{0} LUMON-FS1.lumon.ind -UserName milchick@LUMON -Password Br3@kr00m! -Kdc LUMON-DC1 49B2791A-B1AE-4C90-9B8E-E860BA07F889 Document.ActiveView.ExecuteShellCommand \"cmd.exe\" C:\\ \" /c whoami\" \"\"", "The CLSID corresponds to MMC20.Application.  This object is activated, then the properties Document and retrieved ActiveView, and finally ExecuteShellCommand is executed on the ActiveView object.", Tag = "milchickKerb_Mmc20Exec_fqdn")]
 public class InvokeCommand : Command, IHaveServerName
 {
 
