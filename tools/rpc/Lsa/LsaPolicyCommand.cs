@@ -3,7 +3,10 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.LsaTool;
 
-internal abstract class LsaPolicyCommand : LsaCommand
+/// <summary>
+/// Base class for commands that interact with <see cref="LsaPolicy"/>.
+/// </summary>
+public abstract class LsaPolicyCommand : LsaCommand
 {
 	/// <summary>
 	/// Gets the <see cref="LsaPolicyAccess"/> required by the command.

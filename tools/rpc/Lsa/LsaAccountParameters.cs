@@ -3,7 +3,7 @@ using Titanis.Msrpc.Mslsar;
 using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.LsaTool;
-internal class LsaAccountParameters : ParameterGroupBase
+public class LsaAccountParameters : ParameterGroupBase
 {
 	[Parameter]
 	[Description("SID of account")]

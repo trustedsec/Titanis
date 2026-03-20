@@ -11,9 +11,9 @@ namespace Titanis.Cli.LsaTool;
 This command cannot be used to grant a user right.
 
 Note that the LSA tracks accounts separate from the SAM.  Even for local accounts, you make need to create the LSA account first.")]
-[Example("Add SeLoadDriverPrivilege and SeTcbPrivilege to Administrators", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administrators SeLoadDriver SeTcb")]
-[Example("Add SeLoadDriverPrivilege and SeTcbPrivilege to S-1-5-32-646", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-32-646 SeLoadDriver SeTcb")]
-internal class AddPrivCommand : LsaPolicyCommand
+[Example("Add SeLoadDriverPrivilege and SeTcbPrivilege to Administrators", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administrators SeLoadDriver SeTcb", Tag ="milchickNtlm_ByName")]
+[Example("Add SeLoadDriverPrivilege and SeTcbPrivilege to S-1-5-21-1752138614-393460150-3098146133-1103", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-21-1752138614-393460150-3098146133-1103 SeLoadDriver SeTcb", Tag = "milchickNtlm_BySid")]
+public class AddPrivCommand : LsaPolicyCommand
 {
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 	public LsaAccountParameters Account { get; set; }

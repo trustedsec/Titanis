@@ -9,8 +9,9 @@ namespace Titanis.Cli.LsaTool;
 [OutputRecordType(typeof(LsaAccountMapping))]
 [Description("Translates one or more SIDs to their account names")]
 [DetailedHelpText("The command accepts multiple SIDs")]
-[Example("Look up multiple names", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m! S-1-5-21-1752138614-393460150-3098146133-1103 S-1-5-21-1752138614-393460150-3098146133-1107")]
-internal class LookupSidCommand : LsaPolicyCommand
+[Example("Look up multiple names", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m! S-1-5-21-1752138614-393460150-3098146133-1103 S-1-5-21-1752138614-393460150-3098146133-1107", "Titanis tries to connect via TCP but cannot find an enpoint, and falls back to connecting over SMB.", Tag ="milchickNtlm_LookupDomainSids")]
+[Example("Look up multiple names on a DC", "{0} LUMON-DC1 -PreferSmb -UserName milchick -Password Br3@kr00m! S-1-5-21-1752138614-393460150-3098146133-1103 S-1-5-21-1752138614-393460150-3098146133-1107", "By default, Titanis checks for a TCP endpoint and tries to connect over IP first.  Specifying -PreferSmb forces it to skip the check for the TCP endpoint and uses named pipes instead.", Tag = "milchickNtlm_LookupDomainSidsOnDc")]
+public class LookupSidCommand : LsaPolicyCommand
 {
 	protected sealed override LsaPolicyAccess RequiredPolicyAccess => LsaPolicyAccess.LookupNames;
 
