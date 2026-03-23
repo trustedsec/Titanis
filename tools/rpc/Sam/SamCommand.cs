@@ -4,7 +4,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.SamTool
 {
-	internal abstract class SamCommand : RpcCommand<SamClient>
+	public abstract class SamCommand : RpcCommand<SamClient>
 	{
 		/// <inheritdoc/>
 		protected sealed override Type InterfaceType => typeof(samr);

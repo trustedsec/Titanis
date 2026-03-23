@@ -3,7 +3,8 @@ using Titanis.Msrpc.Mssamr;
 using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.SamTool;
-internal abstract class SamDomainEnumCommand : SamCommand
+
+public abstract class SamDomainEnumCommand : SamCommand
 {
 	[Parameter]
 	[DefaultValue(true)]

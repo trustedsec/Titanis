@@ -566,7 +566,7 @@ namespace Titanis.Msrpc.Mssamr
 			return list;
 		}
 
-		internal async Task<List<SamSid>> EnumAliasMembers(RpcContextHandle handle, CancellationToken cancellationToken)
+		internal async Task<List<SecurityIdentifier>> GetAliasMembers(RpcContextHandle handle, CancellationToken cancellationToken)
 		{
 			var pMemberBuf = new RpcPointer<SAMPR_PSID_ARRAY_OUT>();
 			NtstatusException.CheckAndThrow((Ntstatus)await this._proxy.SamrGetMembersInAlias(
@@ -576,7 +576,7 @@ namespace Titanis.Msrpc.Mssamr
 				).ConfigureAwait(false));
 
 			var enumBuf = pMemberBuf.value.Sids?.value;
-			List<SamSid> list = new List<SamSid>();
+			List<SecurityIdentifier> list = new List<SecurityIdentifier>();
 
 			if (
 				(enumBuf != null)
@@ -585,7 +585,7 @@ namespace Titanis.Msrpc.Mssamr
 				foreach (var entry in enumBuf)
 				{
 					if (entry.SidPointer != null)
-						list.Add(new SamSid(entry.SidPointer.value));
+						list.Add(entry.SidPointer.value.ToSid());
 				}
 			}
 			return list;

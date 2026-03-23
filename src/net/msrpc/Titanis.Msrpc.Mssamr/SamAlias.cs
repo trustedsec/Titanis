@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Titanis.DceRpc;
@@ -16,8 +17,8 @@ namespace Titanis.Msrpc.Mssamr
 
 		public SecurityIdentifier Sid { get; }
 
-		public Task<List<SamSid>> EnumMembersAsync(CancellationToken cancellationToken)
-			=> this._samClient.EnumAliasMembers(this._handle, cancellationToken);
+		public Task<List<SecurityIdentifier>> GetMembersAsync(CancellationToken cancellationToken)
+			=> this._samClient.GetAliasMembers(this._handle, cancellationToken);
 
 		public Task<SamAliasGeneralInfo> QueryGeneralInfo(CancellationToken cancellationToken)
 			=> this._samClient.QueryAliasGeneralInfo(this._handle, cancellationToken);

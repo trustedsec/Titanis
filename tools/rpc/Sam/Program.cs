@@ -7,7 +7,7 @@ namespace Titanis.Cli.SamTool;
 [Subcommand("enumusers", typeof(EnumUsersCommand))]
 [Subcommand("enumgroups", typeof(EnumGroupsCommand))]
 [Subcommand("enumaliases", typeof(EnumAliasesCommand))]
-internal class Program : MultiCommand
+[Subcommand("aliasmembers", typeof(AliasMembersCommand))]
 {
 	static void Main(string[] args)
 		=> RunProgramAsync<Program>(args);
