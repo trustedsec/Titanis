@@ -34,7 +34,7 @@ namespace Titanis.Smb2.Cli
 	[Example("Passing the hash", @"{0} \\LUMON-FS1\MDR -u milchick -NtlmHash B406A01772D0AD225D7B1C67DD81496F", "This command line provides the credentials as an NTLM hash.", Tag = "MilchickNtlmHash")]
 	[Example("Listing all columns", @"{0} \\LUMON-FS1\C$\Windows -u milchick -Password Br3@kr00m! -OutputFields *", "This command prints all file properties.", Tag = "MilchickNtlm_AllFields")]
 	[Example("Customizing NTLM", @"{0} \\LUMON-FS1\MDR -u milchick -p Br3@kr00m! -ntlmver 10.0.0.0 -w MILCHICK-WKS", "This command line specifies a different NTLM version and workstation name to send during authentication.", Tag = "MilchickNtlm_WorkstationVersion")]
-	public sealed class Smb2LsCommand : Smb2TreeCommand
+	public sealed class Smb2LsCommand : Smb2TreeCommand, ISupportTreeOutput
 	{
 		[Parameter]
 		[Description("Specifies the buffer size for querying the directory listing.")]
@@ -143,7 +143,7 @@ namespace Titanis.Smb2.Cli
 			foreach (var item in items)
 			{
 				this.WriteRecord(item);
-				if (item.IsDirectory && depth > 0)
+				if (item.IsDirectory && !item.IsReparsePoint && depth > 0)
 				{
 					try
 					{
@@ -219,6 +219,20 @@ namespace Titanis.Smb2.Cli
 
 				return items;
 			}
+		}
+
+		TreeHandler ISupportTreeOutput.CreateTreeHandler()
+		{
+			return new TreeHandler<string, Smb2DirEntry>(
+				r => r.RelativePath,
+				r => Path.GetDirectoryName(r.RelativePath),
+				null,
+				StringComparer.OrdinalIgnoreCase
+				)
+			{
+				KeyField = nameof(Smb2DirEntry.RelativePath),
+				KeyDisplayField = OutputField.CreateForProperty(typeof(Smb2DirEntry), nameof(Smb2DirEntry.FileName), this.VerifyContext().MetadataContext)
+			};
 		}
 	}
 }
