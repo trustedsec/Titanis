@@ -39,8 +39,8 @@ public class AliasInfo
 [Description("Enumerates aliases")]
 [OutputRecordType(typeof(AliasInfo))]
 [DetailedHelpText(@"{0} attempts to query the general info and attributes for the groups returned by the server.")]
-[Example("Enumerate all aliases", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!")]
-internal sealed class EnumAliasesCommand : SamDomainEnumCommand
+[Example("Enumerate all aliases", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!", Tag ="milchickNtlm_enum")]
+public sealed class EnumAliasesCommand : SamDomainEnumCommand
 {
 	protected sealed override SamDomainAccessRights RequiredDomainAccess => SamDomainAccessRights.ListAccounts | SamDomainAccessRights.Read | SamDomainAccessRights.Lookup;
 	protected override async Task RunAsync(SamDomain domain, SamEntry domainInfo, Sam sam, CancellationToken cancellationToken)

@@ -40,8 +40,8 @@ public class GroupInfo
 [Description("Enumerates groups")]
 [OutputRecordType(typeof(GroupInfo))]
 [DetailedHelpText(@"{0} attempts to query the general info for the groups returned by the server.")]
-[Example("Enumerate all groups", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!")]
-internal sealed class EnumGroupsCommand : SamDomainEnumCommand
+[Example("Enumerate all groups", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!", Tag ="milchickNtlm_enum")]
+public sealed class EnumGroupsCommand : SamDomainEnumCommand
 {
 	protected sealed override SamDomainAccessRights RequiredDomainAccess => SamDomainAccessRights.ListAccounts | SamDomainAccessRights.Read | SamDomainAccessRights.Lookup;
 	protected override async Task RunAsync(SamDomain domain, SamEntry domainInfo, Sam sam, CancellationToken cancellationToken)
