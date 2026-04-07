@@ -277,7 +277,7 @@ namespace Titanis.Cli
 			{
 				writer.AppendLine().WriteHeading("Options").AppendLine();
 
-				var groups = namedParams.GroupBy(r => r.Category);
+				var groups = namedParams.GroupBy(r => r.Category).OrderBy(r=>r.Key);
 				foreach (var group in groups)
 				{
 					if (!string.IsNullOrEmpty(group.Key))

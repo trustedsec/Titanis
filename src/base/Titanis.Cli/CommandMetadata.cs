@@ -121,6 +121,8 @@ namespace Titanis.Cli
 				}
 
 				this.ParameterGroups = new ReadOnlyCollection<ParameterGroupInfo>(groups);
+
+				parameters.Sort((x, y) => x.Name.CompareTo(y.Name));
 				this.Parameters = new ReadOnlyCollection<ParameterMetadata>(parameters);
 
 				if (relposParams.Count > 0)
