@@ -35,10 +35,10 @@ namespace Titanis.Msrpc.Msdcom
 	public interface IDcomCallback
 	{
 		void OnDcomConnected(ObjectExporterServerInfo info);
-		void OnActivatingObject(Guid clsid, Guid iid);
-		void OnActivatedObject(Guid clsid, Guid iid, ActivationResult result);
-		void OnActivationFailed(Guid clsid, Guid iid, Exception ex);
-		void OnConnectingToExporter(ulong oxid, StringBinding binding);
+		void OnActivatingObject(Guid correlationId, Guid clsid, Guid iid);
+		void OnActivatedObject(Guid correlationId, Guid clsid, Guid iid, ActivationResult result);
+		void OnActivationFailed(Guid correlationId, Guid clsid, Guid iid, Exception ex);
+		void OnConnectingToExporter(Guid correlationId, ulong oxid, StringBinding binding);
 	}
 	/// <seealso cref="ConnectTo(string, RpcClient, CancellationToken, IDcomCallback?)"/>
 	public class DcomClient : IObjrefMarshal
@@ -238,8 +238,10 @@ namespace Titanis.Msrpc.Msdcom
 				7
 			};
 
+			Guid correlationId = Guid.NewGuid();
+
 			ActivationResult result;
-			this._callback?.OnActivatingObject(clsid, iid);
+			this._callback?.OnActivatingObject(correlationId, clsid, iid);
 			try
 			{
 				if (this._scmActivator != null)
@@ -250,6 +252,7 @@ namespace Titanis.Msrpc.Msdcom
 						this.NegotiatedVersion,
 						new Guid[] { iid, iid, iid, iid },
 						protseqs,
+						correlationId,
 						cancellationToken).ConfigureAwait(false);
 				}
 				else
@@ -260,16 +263,17 @@ namespace Titanis.Msrpc.Msdcom
 						this.NegotiatedVersion,
 						new Guid[] { iid },
 						protseqs,
+						correlationId,
 						cancellationToken).ConfigureAwait(false);
 				}
 			}
 			catch (Exception ex)
 			{
-				this._callback?.OnActivationFailed(clsid, iid, ex);
+				this._callback?.OnActivationFailed(correlationId, clsid, iid, ex);
 				throw;
 			}
 
-			this._callback?.OnActivatedObject(clsid, iid, result);
+			this._callback?.OnActivatedObject(correlationId, clsid, iid, result);
 
 			var exporter = await GetExporterRecord(result, cancellationToken).ConfigureAwait(false);
 
@@ -378,7 +382,7 @@ namespace Titanis.Msrpc.Msdcom
 					var ep = new DnsEndPoint(binding.HostName, binding.Port);
 					try
 					{
-						this._callback?.OnConnectingToExporter(result.Oxid, binding);
+						this._callback?.OnConnectingToExporter(result.CorrelationId, result.Oxid, binding);
 
 						// TODO: This loses the "untrusted" bit
 						await this._rpcClient.ConnectTcp(remUnk, ep, exporterSpn, authLevel, cancellationToken).ConfigureAwait(false);

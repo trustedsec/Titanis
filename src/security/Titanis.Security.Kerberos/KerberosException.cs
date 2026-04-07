@@ -1,60 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
+using Titanis.Winterop;
 
 namespace Titanis.Security.Kerberos
 {
 	/// <summary>
 	/// Thrown when an error occurs during a Kerberos protocol exchange.
 	/// </summary>
+	/// <remarks>
+	/// If the KDC returns an extended error code, that error code is returned through the <see cref="IHaveErrorCode"/>.  For Active Directory, this error code may be distinguished from a Kerberos error code by checking that the high bit is set.
+	/// </remarks>
 	[Serializable]
 	public class KerberosException : Exception, IHaveErrorCode
 	{
 		/// <summary>
 		/// Gets the Kerberos error that caused the exception.
 		/// </summary>
-		public KerberosErrorCode ErrorCode { get; }
+		public KerberosErrorCode KerberosErrorCode { get; }
 
+		/// <summary>
+		/// Gets the underlying error code, if sent.
+		/// </summary>
+		public Ntstatus? UnderlyingNtstatus { get; set; }
+
+		private int _effErrorCode;
 		/// <inheritdoc/>
-		int IHaveErrorCode.ErrorCode => (int)this.ErrorCode;
+		int IHaveErrorCode.ErrorCode => this._effErrorCode;
 
 		/// <summary>
 		/// Initializes a new <see cref="KerberosException"/>
 		/// </summary>
 		/// <param name="errorCode">Kerberos error that caused the current exception</param>
-		public KerberosException(KerberosErrorCode errorCode)
-			: base(KerberosErrorMessages.TryGetErrorMessage(errorCode))
+		public KerberosException(KerberosErrorCode errorCode, Ntstatus? underlyingNtstatus, string? details = null)
+			: base(BuildMessage(errorCode, underlyingNtstatus, details))
 		{
-			this.ErrorCode = errorCode;
+			this.KerberosErrorCode = errorCode;
+			this.UnderlyingNtstatus = underlyingNtstatus;
+			if (underlyingNtstatus.HasValue)
+				this._effErrorCode = (int)underlyingNtstatus.Value;
+			else
+				this._effErrorCode = (int)errorCode;
 		}
 
-		/// <summary>
-		/// Initializes a new <see cref="KerberosException"/>
-		/// </summary>
-		/// <param name="errorCode">Kerberos error that caused the current exception</param>
-		public KerberosException(KerberosErrorCode errorCode, Exception? innerException)
-			: base(BuildMessage(errorCode, innerException), innerException)
-		{
-			this.ErrorCode = errorCode;
-		}
-
-		private static string BuildMessage(KerberosErrorCode errorCode, Exception? innerException)
+		private static string BuildMessage(KerberosErrorCode errorCode, Ntstatus? ntstatus, string? details)
 		{
 			var message = KerberosErrorMessages.TryGetErrorMessage(errorCode);
-			if (innerException != null)
-				message += "  Details: " + innerException.Message;
+			if (ntstatus.HasValue)
+				message += "  " + ntstatus.Value.GetErrorMessage();
+			if (details != null)
+				message += "  Details: " + details;
 			return message;
-		}
-
-		/// <summary>
-		/// Initializes a new <see cref="KerberosException"/>
-		/// </summary>
-		/// <param name="errorCode">Kerberos error that caused the current exception</param>
-		public KerberosException(KerberosErrorCode errorCode, string details)
-			: base(KerberosErrorMessages.TryGetErrorMessage(errorCode) + "  Details: " + details)
-		{
-			this.ErrorCode = errorCode;
 		}
 
 		/// <summary>
@@ -66,13 +64,13 @@ namespace Titanis.Security.Kerberos
 		  SerializationInfo info,
 		  StreamingContext context) : base(info, context)
 		{
-			this.ErrorCode = (KerberosErrorCode)info.GetInt32(nameof(ErrorCode));
+			this.KerberosErrorCode = (KerberosErrorCode)info.GetInt32(nameof(KerberosErrorCode));
 		}
 
 		/// <inheritdoc/>
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue(nameof(this.ErrorCode), (int)this.ErrorCode);
+			info.AddValue(nameof(this.KerberosErrorCode), (int)this.KerberosErrorCode);
 			base.GetObjectData(info, context);
 		}
 	}

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<logSchema xmlns="xsd://titanis/LogSchema.xsd">
+	<source ns="Titanis.Socks" name="SocksClient">
+		<using ns="System.Net"/>
+		<message name="Connecting" severity="Diagnostic">
+			<param name="version" type="int"/>
+			<param name="socksEP" type="EndPoint"/>
+			<param name="upstreamEP" type="EndPoint"/>
+			<![CDATA[Connecting to SOCKS v{version} server {socksEP} for upstream connection to {upstreamEP}]]>
+		</message>
+		<message name="Connected" severity="Diagnostic">
+			<param name="version" type="int"/>
+			<param name="socksEP" type="EndPoint"/>
+			<param name="upstreamEP" type="EndPoint"/>
+			<param name="remoteBindEP" type="EndPoint"/>
+			<![CDATA[Connected to SOCKS v{version} server {socksEP} for upstream connection to {upstreamEP} with remote bind EP {remoteBindEP}.]]>
+		</message>
+	</source>
+</logSchema>

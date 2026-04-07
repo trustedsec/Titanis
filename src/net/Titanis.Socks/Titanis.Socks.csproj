@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="logschema.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Titanis.Core" />
     <PackageReference Include="Titanis.IO" />
   </ItemGroup>
@@ -14,7 +18,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\base\Titanis.Core\Titanis.Core.csproj" />
     <ProjectReference Include="..\..\base\Titanis.IO\Titanis.IO.csproj" />
-    <ProjectReference Include="..\..\build\Titanis.SourceGen\Titanis.SourceGen.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+	  <ProjectReference Include="..\..\build\Titanis.Logging.SourceGeneration\Titanis.Logging.SourceGeneration.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+	  <ProjectReference Include="..\..\build\Titanis.SourceGen\Titanis.SourceGen.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\Titanis.Net\Titanis.Net.csproj" />
   </ItemGroup>
 

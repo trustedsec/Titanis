@@ -20,7 +20,7 @@ namespace KerberosV5Spec2
 
 	public partial class KRB_ERROR_Tagged30
 	{
-		internal Exception GetException()
+		internal KerberosException GetException()
 		{
 			if (this.e_data != null)
 			{
@@ -70,19 +70,12 @@ namespace KerberosV5Spec2
 			}
 
 			// TODO: Provide e-text, although it's usually empty
-			return new KerberosException((KerberosErrorCode)this.error_code);
+			return new KerberosException((KerberosErrorCode)this.error_code, null);
 		}
 
-		private static Exception CreateNtstatusKerberosException(KerberosErrorCode kerbErrorCode, Ntstatus ntstatus)
+		private static KerberosException CreateNtstatusKerberosException(KerberosErrorCode kerbErrorCode, Ntstatus ntstatus)
 		{
-			// It may actually be HRESULT
-			Exception innerException;
-			if (Enum.IsDefined((Hresult)ntstatus))
-				innerException = ((Hresult)ntstatus).GetException();
-			else
-				innerException = ntstatus.GetException();
-
-			return new KerberosException(kerbErrorCode, innerException);
+			return new KerberosException(kerbErrorCode, ntstatus);
 		}
 	}
 	public partial class EncryptionKey

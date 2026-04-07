@@ -203,7 +203,7 @@ namespace Titanis.Security.Kerberos
 				var encoder = Asn1DerEncoding.CreateDerEncoder();
 				encoder.EncodeValueTlv(apreq);
 
-				this._callback?.OnSendingApreq(this, this.TargetSpn, ticket, this.Credential, gssFlags, initiatorSubkey, sendSeqNbr);
+				this._callback?.OnSendingApreq(this.CorrelationId, this, this.TargetSpn, ticket, this.Credential, gssFlags, initiatorSubkey, sendSeqNbr);
 
 				if (!this.IsDceRpcStyle)
 				{
@@ -294,7 +294,7 @@ namespace Titanis.Security.Kerberos
 					this._useAcceptorSubkey = true;
 				}
 
-				this._callback?.OnReceivedAprep(this, this.RecvSeqNbr, this.AcceptorSubkey);
+				this._callback?.OnReceivedAprep(this.CorrelationId, this, this.RecvSeqNbr, this.AcceptorSubkey);
 
 				if (this.IsDceRpcStyle)
 				{

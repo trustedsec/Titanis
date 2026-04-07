@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<logSchema xmlns="xsd://titanis/LogSchema.xsd">
+	<source ns="Titanis.DceRpc" name="DceRpcClient">
+		<using ns="System.Net"/>
+		<message name="ConnectingProxy" severity="Diagnostic">
+			<param name="serviceEP" type="EndPoint"/>
+			<param name="proxyType" type="string"/>
+			<param name="abstractSyntax" type="RpcInterfaceId"/>
+			<![CDATA[Connecting socket to {serviceEP} for proxy {proxyType} (syntax={abstractSyntax})]]>
+		</message>
+		<message name="BindingProxy" severity="Diagnostic">
+			<param name="proxyType" type="string"/>
+			<param name="abstractSyntax" type="RpcInterfaceId"/>
+			<param name="userName" type="string"/>
+			<param name="authLevel" type="RpcAuthLevel"/>
+			<![CDATA[Binding proxy {proxyType} with syntax {abstractSyntax} using auth context {userName} with level {authLevel}.]]>
+		</message>
+	</source>
+</logSchema>

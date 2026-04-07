@@ -67,7 +67,6 @@ namespace Titanis.Security.Kerberos
 
 		internal static KDC_REQ_BODY KdcReqBody(
 			TicketParameters ticketParameters,
-			KdcOptions options,
 			KerberosV5Spec2.PrincipalName? cname,
 			string crealm,
 			KerberosV5Spec2.PrincipalName? sname,
@@ -76,7 +75,7 @@ namespace Titanis.Security.Kerberos
 			KerberosV5Spec2.HostAddress[]? hostAddresses
 			)
 			=> new KDC_REQ_BODY(
-				new Asn1BitString((uint)options),
+				new Asn1BitString((uint)ticketParameters.Options),
 				crealm,
 				ticketParameters.EndTime ?? TicketParameters.DefaultEndTime,
 				nonce,

@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<logSchema xmlns="xsd://titanis/LogSchema.xsd">
+	<source ns="Titanis.Security.Ntlm" name="NtlmClient">
+		<using ns="System.Net"/>
+		<message name="SendingNegotiate" severity="Diagnostic">
+			<param name="version" type="string"/>
+			<param name="flags" type="NegotiateFlags"/>
+			<![CDATA[Sending NTLM_NEGOTIATE
+	Flags  : {flags}
+	Version: {version}]]>
+		</message>
+		<message name="ReceivedChallenge" severity="Diagnostic">
+			<param name="serverVersion" type="string"/>
+			<param name="flags" type="NegotiateFlags"/>
+			<param name="targetType" type="string"/>
+			<param name="hostNetbiosName" type="string?"/>
+			<param name="hostDnsName" type="string?"/>
+			<param name="hostNetbiosDomain" type="string?"/>
+			<param name="hostDnsDomain" type="string?"/>
+			<param name="hostDnsTree" type="string?"/>
+			<param name="timestamp" type="DateTime?"/>
+			<param name="challenge" type="ulong"/>
+			<![CDATA[Received NTLM_CHALLENGE:
+	Server version: {serverVersion}
+	Flags                : {flags}
+	Target type          : {targetType}
+	Host name (NetBIOS)  : {hostNetbiosName}
+	Host domain (NetBIOS): {hostNetbiosDomain}
+	Host name (DNS)      : {hostDnsName}
+	Host domain (DNS)    : {hostDnsDomain}
+	Host DNS tree (DNS)  : {hostDnsTree}
+	Timestamp            : {timestamp:O}
+	Challenge            : 0x{challenge:X16}]]>
+		</message>
+		<message name="SendingAuth" severity="Diagnostic">
+			<param name="flags" type="NegotiateFlags"/>
+			<param name="version" type="string"/>
+			<param name="workstation" type="string?"/>
+			<param name="userName" type="string?"/>
+			<param name="userDomain" type="string?"/>
+			<param name="challengeFromClient" type="ulong"/>
+			<param name="sessionBaseKey" type="string?" sensitive="true"/>
+			<param name="keyExchangeKey" type="string?" sensitive="true"/>
+			<param name="exportedSessionKey" type="string?" sensitive="true"/>
+			<param name="signKeyC2S" type="string?" sensitive="true"/>
+			<param name="signKeyS2C" type="string?" sensitive="true"/>
+			<param name="sealKeyC2S" type="string?" sensitive="true"/>
+			<param name="sealKeyS2C" type="string?" sensitive="true"/>
+			<![CDATA[Received NTLM_AUTHENTICATE:
+	Flags                : {flags}
+	Version              : {version}
+	Workstation          : {workstation}
+	User name            : {userName}
+	User domain          : {userDomain}
+	Challenge from client: 0x{challengeFromClient:X16}
+	Session base key     : {sessionBaseKey}
+	Key exchange key     : {keyExchangeKey}
+	Exported session key : {exportedSessionKey}
+	Sign key (C2S)       : {signKeyC2S}
+	Sign key (S2C)       : {signKeyS2C}
+	Seal key (C2S)       : {sealKeyC2S}
+	Seal key (S2C)       : {sealKeyS2C}]]>
+		</message>
+	</source>
+</logSchema>

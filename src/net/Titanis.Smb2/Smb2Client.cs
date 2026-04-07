@@ -107,7 +107,7 @@ namespace Titanis.Smb2
 						options,
 						this,
 						cancellationToken).ConfigureAwait(false);
-					this.traceCallback?.OnConnected(serverEP, conn);
+					this.traceCallback?.OnConnected(serverEP, serverName, options.ClientGuid, conn);
 					stream = null;
 					return conn;
 				}

@@ -221,11 +221,16 @@ namespace Titanis.Cli
 				{
 					ex = agg.InnerException;
 				}
-#if DEBUG
+
+				if (this._logLevel >= LogMessageSeverity.Diagnostic)
+				{
 				Console.Error.WriteLine(ex);
-#else
+				}
+				else
+				{
 				Console.Error.WriteLine(ex.Message);
-#endif
+				}
+
 				Console.Error.WriteLine($"Tool execution failed with exit code {ex.HResult} (0x{ex.HResult:X8})");
 				if (ex is IHaveErrorCode hasErrorCode)
 					Console.Error.WriteLine($"  Specific error code: {hasErrorCode.ErrorCode} (0x{hasErrorCode.ErrorCode:X8})");

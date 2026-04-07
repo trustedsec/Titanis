@@ -49,6 +49,7 @@ namespace Titanis.Security
 		}
 		internal ServicePrincipalName(PrincipalNameType nameType, string serviceClass, string serviceInstance, string[] parts)
 		{
+			this.NameType = NameType;
 			ServiceClass = serviceClass;
 			_instance = serviceInstance;
 			_instanceParts = parts;

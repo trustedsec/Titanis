@@ -22,6 +22,7 @@ namespace Titanis.Msrpc.Msdcom
 			COMVERSION version,
 			Guid[] interfaceIDs,
 			ushort[] protseqs,
+			Guid correlationId,
 			System.Threading.CancellationToken cancellationToken)
 		{
 			int[] qiResults = new int[interfaceIDs.Length];
@@ -60,7 +61,7 @@ namespace Titanis.Msrpc.Msdcom
 			result.CheckAndThrow();
 			DcomClient.CheckHresultAndThrow((Hresult)pResultCode.value);
 
-			ActivationResult actInfo = new ActivationResult()
+			ActivationResult actInfo = new ActivationResult(correlationId)
 			{
 				Oxid = pOxid.value,
 				OxidBinding = DualStringArray.FromIdl(pOxidBindings.value.value),
@@ -119,8 +120,12 @@ namespace Titanis.Msrpc.Msdcom
 	/// </summary>
 	public class ActivationResult
 	{
-		internal ActivationResult() { }
+		internal ActivationResult(Guid correlationId)
+		{
+			CorrelationId = correlationId;
+		}
 
+		public Guid CorrelationId { get; }
 		public Guid IpidRemUnknown { get; internal set; }
 		public ulong Oxid { get; internal set; }
 		public DualStringArray OxidBinding { get; internal set; }

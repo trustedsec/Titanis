@@ -39,7 +39,7 @@ namespace Titanis.Security.Kerberos
 		private static readonly Asn1Oid DhPublicNumber = new Asn1Oid("1.2.840.10046.2.1");
 		private readonly ModpKeyPair _dhkey;
 
-		protected override bool ProcessPadata(PA_DATA padata)
+		protected override bool ProcessPadata(Guid correlationId, PA_DATA padata)
 		{
 			switch ((PadataType)padata.padata_type)
 			{
@@ -64,7 +64,7 @@ namespace Titanis.Security.Kerberos
 					//	this.ProcessPkAsrepOld(padata.padata_value);
 					//	break;
 			}
-			return base.ProcessPadata(padata);
+			return base.ProcessPadata(correlationId, padata);
 		}
 
 		private PadataType _pkinitType;

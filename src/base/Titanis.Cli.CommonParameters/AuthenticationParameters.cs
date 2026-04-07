@@ -716,7 +716,7 @@ namespace Titanis.Cli
 									ticketParams,
 									CancellationToken.None).ConfigureAwait(false);
 							}
-							catch (KerberosException ex) when (ex.ErrorCode == KerberosErrorCode.KDC_ERR_S_PRINCIPAL_UNKNOWN && (ex.InnerException as NtstatusException)?.StatusCode == Ntstatus.STATUS_USER2USER_REQUIRED)
+							catch (KerberosException ex) when (ex.KerberosErrorCode == KerberosErrorCode.KDC_ERR_S_PRINCIPAL_UNKNOWN && ex.UnderlyingNtstatus == Ntstatus.STATUS_USER2USER_REQUIRED)
 							{
 								u2UserName = targetSpn as UserPrincipalName;
 								return null;
@@ -823,10 +823,21 @@ namespace Titanis.Cli
 			{
 				// TODO: ResolveFsPath
 
-				var cacheFileName = this.RequireFileAccess().ResolveFsPath(this.TicketCache);
-				this.Log?.WriteDiagnostic($"Loading ticket cache from {cacheFileName}.");
+				var fileAccess = this.RequireFileAccess();
+				var cacheFileName = fileAccess.ResolveFsPath(this.TicketCache);
+				byte[]? cacheBytes;
+				if (fileAccess.FileExists(cacheFileName))
+				{
+					this.Log?.WriteDiagnostic($"Loading ticket cache from '{cacheFileName}'.");
+					cacheBytes = fileAccess.ReadAllBytesFrom(cacheFileName);
+				}
+				else
+				{
+					this.Log?.WriteWarning($"Ticket cache file '{cacheFileName}' doesn't exist.  A new cache will be created.");
+					cacheBytes = null;
+				}
 				// TODO: This doesn't match the search below, which checks user name.  Document the semantics of the ticket cache
-				var ticketCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(cacheFileName), cacheFileName, krb);
+				var ticketCache = new TicketCacheFile(cacheBytes, cacheFileName, krb);
 				krb.TicketCache = ticketCache;
 			}
 			else

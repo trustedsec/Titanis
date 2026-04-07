@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace Titanis.Security.Kerberos
 	public class TicketCacheFile : TicketCache
 	{
 		public TicketCacheFile(
-			byte[] cacheBytes,
+			byte[]? cacheBytes,
 			string? fileName,
 			KerberosClient krb
 			)
@@ -22,8 +23,10 @@ namespace Titanis.Security.Kerberos
 			this._fileName = fileName;
 			this._krb = krb;
 
-			if (File.Exists(fileName))
+			if (!cacheBytes.IsNullOrEmpty())
 			{
+				Debug.Assert(cacheBytes != null);
+
 				var info = new FileInfo(fileName);
 				this._modDate = info.LastWriteTimeUtc;
 				var tickets = krb.LoadTicketsFromFile(cacheBytes, fileName, out var format);

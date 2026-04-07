@@ -21,9 +21,13 @@ namespace Titanis.Security
 	public abstract class AuthContext : IDisposable
 	{
 		/// <summary>
-		/// Gets a value indicating whether authentication is complete.
+		/// Provides a unique identifier to correlate this authentication context with a higher-level operation.
 		/// </summary>
-		public abstract bool IsComplete { get; }
+		public Guid CorrelationId { get; set; } = Guid.NewGuid();
+        /// <summary>
+        /// Gets a value indicating whether authentication is complete.
+        /// </summary>
+        public abstract bool IsComplete { get; }
 		/// <summary>
 		/// Gets the token to send to the remote party.
 		/// </summary>

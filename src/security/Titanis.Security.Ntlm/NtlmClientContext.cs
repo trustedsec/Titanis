@@ -566,6 +566,7 @@ namespace Titanis.Security.Ntlm
 				workstationName = this.Workstation,
 				userName = creds?.UserName,
 				userDomain = creds?.Domain,
+				challengeFromClient = challengeFromClient,
 				resp = resp,
 				kxkey = kxkey,
 				exportedSessionKey = Ntlm.GetExportedSessionKey(authFlags, kxkey, state.randomKey),
@@ -664,6 +665,7 @@ namespace Titanis.Security.Ntlm
 				workstationName = state.workstationName,
 				userName = cred?.UserName,
 				userDomain = cred?.Domain ?? authTargetInfo.NbDomainName,
+				challengeFromClient = state.challengeFromClient,
 				exportedSessionKey = exportedSessionKey,
 			};
 			ref var resp = ref authInfo.resp;
@@ -962,6 +964,7 @@ namespace Titanis.Security.Ntlm
 		internal string? workstationName;
 		internal string? userName;
 		internal string? userDomain;
+		internal ulong challengeFromClient;
 		internal NtlmResponse resp;
 		internal Buffer128 kxkey;
 		internal Buffer128 exportedSessionKey;

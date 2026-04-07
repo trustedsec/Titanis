@@ -97,7 +97,13 @@ namespace Titanis.Winterop
 		}
 
 		public static string GetErrorMessage(this Ntstatus ntstatus)
-			=> GetMessageForCode(ntstatus, (uint)ntstatus, NtstatusMessageTable.ResourceManager);
+		{
+			// This may actuall be an HRESULT
+			if (Enum.IsDefined(typeof(Hresult), (Hresult)ntstatus))
+				return ((Hresult)ntstatus).GetErrorMessage();
+
+			return GetMessageForCode(ntstatus, (uint)ntstatus, NtstatusMessageTable.ResourceManager);
+		}
 
 		/// <summary>
 		/// Creates an <see cref="Exception"/> corresponding to the specified <see cref="Ntstatus"/>.

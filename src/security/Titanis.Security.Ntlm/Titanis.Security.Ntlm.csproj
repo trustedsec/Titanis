@@ -14,6 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AdditionalFiles Include="logschema.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
 	  <PackageReference Include="Titanis.Crypto.Des" />
     <PackageReference Include="Titanis.Crypto.Md4" />
     <PackageReference Include="Titanis.Crypto.Md5" />
@@ -29,6 +33,7 @@
     <ProjectReference Include="..\..\crypto\Titanis.Crypto.Md5\Titanis.Crypto.Md5.csproj" />
     <ProjectReference Include="..\..\crypto\Titanis.Crypto.Rc4\Titanis.Crypto.Rc4.csproj" />
     <ProjectReference Include="..\Titanis.Security\Titanis.Security.csproj" />
+	  <ProjectReference Include="..\..\build\Titanis.Logging.SourceGeneration\Titanis.Logging.SourceGeneration.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
   <ItemGroup>

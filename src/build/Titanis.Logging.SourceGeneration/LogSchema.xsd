@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="LogSchema"
+    targetNamespace="xsd://titanis/LogSchema.xsd"
+    elementFormDefault="qualified"
+    xmlns="xsd://titanis/LogSchema.xsd"
+    xmlns:mstns="xsd://titanis/LogSchema.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+	<xs:simpleType name="Severity">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Debug" />
+			<xs:enumeration value="Diagnostic" />
+			<xs:enumeration value="Verbose" />
+			<xs:enumeration value="Info" />
+			<xs:enumeration value="Warning" />
+			<xs:enumeration value="Error" />
+			<xs:enumeration value="Critical" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ParamType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="int"/>
+			<xs:enumeration value="string"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Parameter">
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="type" type="ParamType" use="required"/>
+		<xs:attribute name="sensitive" type="xs:boolean"/>
+	</xs:complexType>
+
+	<xs:complexType name="Message" mixed="true">
+		<xs:sequence>
+			<xs:element name="param" type="Parameter" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+
+		<xs:attribute name="name" use="required" type="xs:string"/>
+		<xs:attribute name="severity" use="required" type="Severity"/>
+	</xs:complexType>
+
+	<xs:complexType name="Using">
+		<xs:attribute name="ns" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="Source">
+		<xs:sequence>
+			<xs:element name="using" type="Using" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="message" type="Message" maxOccurs="unbounded"/>
+		</xs:sequence>
+			
+		<xs:attribute name="ns" type="xs:string" use="required"/>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+	</xs:complexType>
+	
+	<xs:element name="logSchema">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="source" type="Source" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

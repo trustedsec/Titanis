@@ -8,7 +8,7 @@ namespace Titanis.Security.Kerberos
 	/// Specifies the type of preauthentication data.
 	/// </summary>
 	// [RFC 4120] § 7.5.2
-	enum PadataType : ushort // Underlying used by CCache
+	public enum PadataType : ushort // Underlying used by CCache
 	{
 		TgsReq = 1,
 		EncTimestamp = 2,

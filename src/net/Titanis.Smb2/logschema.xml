@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<logSchema xmlns="xsd://titanis/LogSchema.xsd">
+	<source ns="Titanis.Smb2" name="Smb2Client">
+		<using ns="System.Net"/>
+		<using ns="Titanis.Winterop"/>
+		<using ns="Titanis.Smb2.Pdus"/>
+		<message name="Connecting" severity="Diagnostic">
+			<param name="serverName" type="string"/>
+			<param name="serverEP" type="EndPoint"/>
+			<param name="clientGuid" type="Guid"/>
+			<param name="capabilities" type="Smb2Capabilities"/>
+			<param name="securityMode" type="Smb2SecurityMode"/>
+			<![CDATA[The Titanis Smb2Client is connecting to \\{serverName} at {serverEP}
+	Client GUID  : {clientGuid}
+	Capabilities : {capabilities}
+	Security mode: {securityMode}]]>
+		</message>
+		<message name="Connected" severity="Diagnostic">
+			<param name="serverName" type="string"/>
+			<param name="serverEP" type="EndPoint"/>
+			<param name="clientGuid" type="Guid"/>
+			<param name="serverGuid" type="Guid"/>
+			<param name="dialect" type="Smb2Dialect"/>
+			<param name="serverTimeUtc" type="DateTime"/>
+			<param name="capabilities" type="Smb2Capabilities"/>
+			<param name="securityMode" type="Smb2SecurityMode"/>
+			<param name="signingAlgorithm" type="SigningAlgorithm"/>
+			<param name="cipher" type="Cipher"/>
+			<![CDATA[The Titanis Smb2Client has connected to \\{serverName} at {serverEP}
+	Client GUID     : {clientGuid}
+	Server GUID     : {serverGuid}
+	Dialect         : {dialect}
+	Server time UTC : {serverTimeUtc}
+	Capabilities    : {capabilities}
+	Security mode   : {securityMode}
+	Signing alg.    : {signingAlgorithm}
+	Cipher          : {cipher}]]>
+		</message>
+		<message name="SessionAuthenticated" severity="Diagnostic">
+			<param name="serverName" type="string"/>
+			<param name="sessionId" type="ulong"/>
+			<param name="sessionKey" type="string"/>
+			<![CDATA[Authenticated to \\{serverName}
+	Session ID: 0x{sessionId:X16}
+	Session key: {sessionKey}]]>
+		</message>
+
+
+		<message name="ShareConnected" severity="Diagnostic">
+			<param name="serverName" type="string"/>
+			<param name="shareName" type="string"/>
+			<param name="shareCapabilities" type="Smb2ShareCaps"/>
+			<param name="shareFlags" type="Smb2ShareFlags"/>
+			<![CDATA[Connect to share \\{serverName}\{shareName}
+	Share capabilities: {shareCapabilities}
+	Share flags       : {shareFlags}]]>
+		</message>
+
+		<message name="DfsReferralReceived" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="originalPath" type="string"/>
+			<![CDATA[The server sent a DFS referral for {originalPath}.  The details of the referral are reported in subsequent events. (correlation={correlationId})]]>
+		</message>
+
+
+		<message name="DfsReferralDetail" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="dfsTarget" type="string"/>
+			<param name="serverType" type="DfsServerType"/>
+			<param name="dfsPath" type="string"/>
+			<param name="dfsAltPath" type="string"/>
+			<param name="ttl" type="int"/>
+			<param name="siteServiceGuid" type="Guid"/>
+			<![CDATA[DFS target {dfsTarget}
+	Server type: {serverType}
+	Path: {dfsPath}
+	Alt. path: {dfsAltPath}
+	TTL: {ttl}
+	Site service GUID: {siteServiceGuid}]]>
+		</message>
+
+
+		<message name="DfsReferralFollowed" severity="Verbose">
+			<param name="originalPath" type="string"/>
+			<param name="referredPath" type="string"/>
+			<![CDATA[Followed a DFS referral.
+	Original path: {originalPath}
+	Referred path: {referredPath}]]>
+		</message>
+		<message name="DfsReferralConnectFailed" severity="Error">
+			<param name="originalPath" type="string"/>
+			<param name="referredPath" type="string"/>
+			<param name="hres" type="Hresult"/>
+			<param name="errorMessage" type="string"/>
+			<param name="details" type="string"/>
+			<![CDATA[Failed to follow a DFS referral.
+	Original path: {originalPath}
+	Referred path: {referredPath}
+	Error code: {hres} (0x{hres:X8})
+	Error message: {errorMessage}
+	Details:
+
+{details}]]>
+		</message>
+	</source>
+</logSchema>

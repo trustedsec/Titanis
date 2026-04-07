@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<logSchema xmlns="xsd://titanis/LogSchema.xsd">
+	<source ns="Titanis.Msrpc.Msdcom" name="DcomClient">
+		<using ns="Titanis.DceRpc"/>
+		<message name="Connected" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="versionMajor" type="int"/>
+			<param name="versionMinor" type="int"/>
+			<![CDATA[Connected to DCOM server with COM version {versionMajor}.{versionMinor}. (correlation={correlationId})]]>
+		</message>
+		<message name="BindingInfo" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="towerId" type="ushort"/>
+			<param name="hostName" type="string"/>
+			<param name="hostAddress" type="string"/>
+			<param name="port" type="int"/>
+			<![CDATA[  Binding: TowerId={towerId}, HostName='{hostName}', NetworkAddress='{hostAddress}', Port={port} (correlation={correlationId})]]>
+		</message>
+		<message name="SecurityBindingInfo" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="authService" type="RpcAuthType"/>
+			<param name="authServiceValue" type="int"/>
+			<param name="principal" type="string"/>
+			<![CDATA[  Security binding: AuthService={authService} ({authServiceValue}), Principal={principal} (correlation={correlationId})]]>
+		</message>
+		<message name="ActivatingObject" severity="Verbose">
+			<param name="correlationId" type="Guid"/>
+			<param name="clsid" type="Guid"/>
+			<param name="iid" type="Guid"/>
+			<![CDATA[Activating object with CLSID {{{clsid}}} requesting IID {{{iid}}} (correlation={correlationId})]]>
+		</message>
+		<message name="ActivatedObject" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="clsid" type="Guid"/>
+			<param name="iid" type="Guid"/>
+			<param name="ipid" type="Guid"/>
+			<param name="oxid" type="ulong"/>
+			<param name="authLevelHint" type="RpcAuthLevel"/>
+			<param name="authLevelHintValue" type="int"/>
+			<![CDATA[Activated object with CLSID {{{clsid}}} requesting IID {{{iid}}}: IPID={{{ipid}}}, OXID={oxid:X8}, auth level hint={authLevelHint} ({authLevelHintValue}) (correlation={correlationId})]]>
+		</message>
+		<message name="ActivationFailed" severity="Error">
+			<param name="correlationId" type="Guid"/>
+			<param name="clsid" type="Guid"/>
+			<param name="iid" type="Guid"/>
+			<param name="hres" type="uint"/>
+			<param name="errorMessage" type="string"/>
+			<![CDATA[Activation failed for CLSID {{{clsid}}} requesting IID {{{iid}}} with error code {hres} (0x{hres:X8}): {errorMessage} (correlation={correlationId})]]>
+		</message>
+		<message name="ConnectingToExporter" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="oxid" type="ulong"/>
+			<param name="address" type="string"/>
+			<param name="port" type="int"/>
+			<![CDATA[Connecting to exporter OXID={oxid:X8} on {address}:{port} (correlation={correlationId})]]>
+		</message>
+	</source>
+</logSchema>

@@ -63,7 +63,7 @@ namespace Titanis.Security.Kerberos
 			// TODO: How should PADATA be encoded?
 		}
 		/// <remarks>
-		/// Called from <see cref="KerberosClient.ProcessASRep(KDC_REP, KerberosClient.TicketRequestContext, DateTime)"/> and <see cref="KerberosClient.ProcessTgsRep(KDC_REP, TicketParameters, KerberosClient.TicketRequestContext)"/>.
+		/// Called from <see cref="KerberosClient.ProcessASRep"/> and <see cref="KerberosClient.ProcessTgsRep"/>.
 		/// </remarks>
 		internal TicketInfo(
 			int seqnbr,
@@ -197,6 +197,7 @@ namespace Titanis.Security.Kerberos
 
 		[DisplayName("Client name")]
 		public string? ClientName { get; }
+
 		[DisplayName("Client realm")]
 		public string? ClientRealm { get; }
 

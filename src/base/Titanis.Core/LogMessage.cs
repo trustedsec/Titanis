@@ -20,19 +20,27 @@ namespace Titanis
 	}
 	public class LogMessageType
 	{
+		[Obsolete("Use the the log schema generater instead of creating your own messages.", true)]
 		public LogMessageType(LogMessageSeverity severity, string? source, int messageId, string text, params string[] parameterNames)
+			: this(severity, source, null, messageId, text, parameterNames)
+		{
+
+		}
+		public LogMessageType(LogMessageSeverity severity, string? source, string? name, int messageId, string text, params string[] parameterNames)
 		{
 			if (text is null) throw new ArgumentNullException(nameof(text));
 			this.LogDate = DateTime.UtcNow;
 
 			Severity = severity;
 			Source = source;
+			Name = name;
 			MessageId = messageId;
 			MessageFormat = text;
 			ParameterNames = parameterNames;
 
 			string[] formats = new string[parameterNames.Length];
 			var matches = rgxPlaceholders.Matches(text);
+			bool hasNumericParams = false;
 			for (int i = 0; i < matches.Count; i++)
 			{
 				var m = (Match)matches[i];
@@ -40,17 +48,31 @@ namespace Titanis
 				Group phGroup = m.Groups["p"];
 				if (phGroup.Success)
 				{
-					var ordinal = int.Parse(phGroup.Value);
-					if (ordinal >= parameterNames.Length)
-						throw new ArgumentException("The placeholders in the format string do not have corresponding parameters.", nameof(text));
+					if (int.TryParse(phGroup.Value, out var ordinal))
+					{
+						if (ordinal >= parameterNames.Length)
+							throw new ArgumentException("The placeholders in the format string do not have corresponding parameters.", nameof(text));
 
-					Group fGroup = m.Groups["f"];
-					formats[ordinal] = fGroup.Value;
+						Group fGroup = m.Groups["f"];
+						formats[ordinal] = fGroup.Value;
+
+						hasNumericParams = true;
+					}
+					else
+					{
+						this._hasNamedParams = true;
+						var phName = phGroup.Value;
+						if (Array.IndexOf(ParameterNames, phName) < 0)
+							throw new ArgumentException($"The format string includes a parameter name '{phGroup.Value}', but this name is not in the parameter list.", nameof(text));
+					}
 				}
 			}
+			if (hasNumericParams && this._hasNamedParams)
+				throw new ArgumentException("The format string contains both named and numeric parameters.  This is not allowed.", nameof(text));
 			this.ParameterFormats = formats;
 #if DEBUG
 			// Test format string
+			if (!this._hasNamedParams)
 			{
 				object[] args = new object[formats.Length];
 				for (int i = 0; i < args.Length; i++)
@@ -62,6 +84,9 @@ namespace Titanis
 #endif
 		}
 
+		private readonly bool _hasNamedParams;
+
+#if DEBUG
 		class DummyArg : IFormattable
 		{
 			public DummyArg() { }
@@ -73,12 +98,14 @@ namespace Titanis
 				return format;
 			}
 		}
+#endif
 
-		Regex rgxPlaceholders = new Regex(@"({{)|({(?<p>\d+)(:(?<f>[^}]*))?})");
+		private static readonly Regex rgxPlaceholders = new Regex(@"({{)|({(?<p>\w+)(:(?<f>[^}]*))?})");
 
 		public DateTime LogDate { get; }
 		public LogMessageSeverity Severity { get; }
 		public string? Source { get; }
+		public string? Name { get; }
 		public int MessageId { get; }
 		public string MessageFormat { get; }
 		public string[] ParameterNames { get; }
@@ -88,9 +115,20 @@ namespace Titanis
 		{
 			if (parameters is null) throw new ArgumentNullException(nameof(parameters));
 			if (parameters.Length != this.ParameterNames.Length)
-				throw new ArgumentException($"Incorrect number of parameters specified for {this.MessageId}.", nameof(parameters));
+				Array.Resize(ref parameters, this.ParameterNames.Length);
+			//throw new ArgumentException($"Incorrect number of parameters specified for {this.MessageId}.", nameof(parameters));
 
-			return new LogMessage(this, parameters);
+			return new LogMessage(this, null, parameters);
+		}
+
+		public LogMessage CreateWithText(string formattedText, params object?[] parameters)
+		{
+			if (parameters is null) throw new ArgumentNullException(nameof(parameters));
+			if (parameters.Length != this.ParameterNames.Length)
+				Array.Resize(ref parameters, this.ParameterNames.Length);
+			//throw new ArgumentException($"Incorrect number of parameters specified for {this.MessageId}.", nameof(parameters));
+
+			return new LogMessage(this, formattedText, parameters);
 		}
 
 		#region FactoryMethods
@@ -114,7 +152,7 @@ namespace Titanis
 			this._text = text;
 			this.Parameters = Array.Empty<object>();
 		}
-		internal LogMessage(LogMessageType messageType, object?[] parameters)
+		internal LogMessage(LogMessageType messageType, string formattedText, object?[] parameters)
 		{
 			this.LogDate = DateTime.UtcNow;
 
@@ -124,6 +162,7 @@ namespace Titanis
 			this.MessageType = messageType;
 			this.Parameters = parameters;
 
+			this._text = formattedText;
 			this._messageFormat = messageType.MessageFormat;
 		}
 

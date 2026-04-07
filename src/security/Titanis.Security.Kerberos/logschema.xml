@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<logSchema xmlns="xsd://titanis/LogSchema.xsd">
+	<source ns="Titanis.Security.Kerberos" name="KerberosClient">
+		<using ns="System.Net"/>
+		<using ns="Titanis.Ldap"/>
+		<using ns="Titanis.Winterop"/>
+		<message name="RequestingTgt" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="cname" type="string"/>
+			<param name="cnameType" type="PrincipalNameType"/>
+			<param name="targetRealm" type="string"/>
+			<param name="kdcOptions" type="KdcOptions"/>
+			<param name="nonce" type="int"/>
+			<![CDATA[Requesting TGT for  client {cname} ({cnameType}) in realm {targetRealm} (nonce={nonce})]]>
+		</message>
+		<message name="EncryptingTimestamp" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="salt" type="string"/>
+			<param name="protocolKeyEType" type="EType"/>
+			<param name="protocolKey" type="string" sensitive="true"/>
+			<![CDATA[Encrypting timestamp with {protocolKeyEType} key {protocolKey} (salt={(string.IsNullOrEmpty(salt) ? "<none>" : salt)}).]]>
+		</message>
+		<message name="ReceivedPreauthRequired_PadataType" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="padataType" type="PadataType"/>
+			<param name="padataTypeValue" type="int"/>
+			<![CDATA[	KDC supports PA-DATA type {padataType} ({padataTypeValue})]]>
+		</message>
+		<message name="ReceivedPreauthRequired_EType" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="etype" type="EType"/>
+			<param name="etypeValue" type="int"/>
+			<param name="salt" type="string?"/>
+			<![CDATA[	KDC supports encryption type {etype} ({etypeValue}) with salt={(string.IsNullOrEmpty(salt) ? "<none>" : salt)}]]>
+		</message>
+		<!--<message name="AsrepReceivedPadataType" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="padataType" type="PadataType"/>
+			<param name="padataTypeValue" type="int"/>
+			<![CDATA[KDC supports PA-DATA type {padataType} ({padataTypeValue})]]>
+		</message>-->
+		<message name="ReceivedAsrep" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="salt" type="string"/>
+			<param name="realm" type="string"/>
+			<param name="cname" type="string"/>
+			<param name="cnameType" type="PrincipalNameType"/>
+			<param name="crealm" type="string"/>
+			<param name="sname" type="string"/>
+			<param name="snameType" type="PrincipalNameType"/>
+			<param name="srealm" type="string"/>
+			<param name="ticketFlags" type="KdcOptions"/>
+			<param name="asrepKey" type="string?" sensitive="true"/>
+			<param name="asrepKeyEType" type="EType?"/>
+			<param name="sessionKey" type="string" sensitive="true"/>
+			<param name="sessionKeyEType" type="EType"/>
+			<param name="supportedETypes" type="SupportedEncryptionTypes?"/>
+			<![CDATA[The KDC has responded with an AS-REP.
+	Salt: {salt}
+	Ticket realm: {realm}
+	Client name: {cname} ({cnameType})
+	Client realm: {crealm}
+	Service name: {sname} ({snameType})
+	Service realm: {srealm}
+	Ticket flags: {ticketFlags}
+	Service-supported ETypes: {supportedETypes}
+	AS-REP key: {asrepKey} ({asrepKeyEType})
+	Session key: {sessionKey} ({sessionKeyEType})]]>
+		</message>
+		<message name="ReceivedAsrepError" severity="Error">
+			<param name="correlationId" type="Guid"/>
+			<param name="errorCode" type="KerberosErrorCode"/>
+			<param name="errorCodeValue" type="int"/>
+			<param name="ntstatus" type="Ntstatus?"/>
+			<param name="ntstatusValue" type="uint?"/>
+			<param name="errorMessage" type="string"/>
+			<![CDATA[The KDC responded with an error:
+	Kerberos error code: {errorCode} ({errorCodeValue})
+	NTSTATUS           : {(ntstatus.HasValue ? $"{ntstatus} (0x{ntstatusValue:X8})" : "<not provided>")}
+	
+{errorMessage}]]>
+		</message>
+		<message name="RequestingTicket" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="cname" type="string"/>
+			<param name="crealm" type="string"/>
+			<param name="realm" type="string"/>
+			<param name="sname" type="string"/>
+			<param name="snameType" type="PrincipalNameType"/>
+			<param name="kdcOptions" type="KdcOptions"/>
+			<![CDATA[Requesting a service ticket.
+	Realm: {realm}
+	Client: {cname}
+	Client realm: {crealm}
+	Service: {sname} ({snameType})
+	Options: {kdcOptions}]]>
+		</message>
+
+		<message name="ReceivedTicket" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="realm" type="string"/>
+			<param name="cname" type="string"/>
+			<param name="cnameType" type="PrincipalNameType"/>
+			<param name="crealm" type="string"/>
+			<param name="sname" type="string"/>
+			<param name="snameType" type="PrincipalNameType"/>
+			<param name="srealm" type="string"/>
+			<param name="ticketFlags" type="KdcOptions"/>
+			<param name="sessionKey" type="string" sensitive="true"/>
+			<param name="sessionKeyEType" type="EType"/>
+			<param name="supportedETypes" type="SupportedEncryptionTypes?"/>
+			<![CDATA[The KDC has responded with an AS-REP.
+	Ticket realm: {realm}
+	Client name: {cname} ({cnameType})
+	Client realm: {crealm}
+	Service name: {sname} ({snameType})
+	Service realm: {srealm}
+	Ticket flags: {ticketFlags}
+	Service-supported ETypes: {supportedETypes}
+	Session key: {sessionKey} ({sessionKeyEType})]]>
+		</message>
+		<message name="SendingApreq" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="cname" type="string"/>
+			<param name="sname" type="string"/>
+			<param name="snameType" type="PrincipalNameType"/>
+			<param name="sessionKey" type="string" sensitive="true"/>
+			<param name="sessionKeyEType" type="EType"/>
+			<param name="initiatorSubkey" type="string?" sensitive="true"/>
+			<param name="initiatorSubkeyEType" type="EType?"/>
+			<param name="sendSeqnbr" type="int"/>
+			<![CDATA[Sending an AP-REQ
+	Client name: {cname}
+	Target SPN: {sname} ({snameType})
+	Send seq #: {sendSeqnbr}
+	Session key: {sessionKey} ({sessionKeyEType})
+	Initiator subkey: {(string.IsNullOrEmpty(initiatorSubkey) ? "<none>" : $"{initiatorSubkey} ({initiatorSubkeyEType})")}]]>
+		</message>
+		<message name="ReceivedAprep" severity="Diagnostic">
+			<param name="correlationId" type="Guid"/>
+			<param name="acceptorSubkey" type="string?" sensitive="true"/>
+			<param name="acceptorSubkeyEType" type="EType?"/>
+			<param name="recvSeqnbr" type="uint"/>
+			<![CDATA[Received an AP-REP
+	Receive seq#: {recvSeqnbr}
+	Acceptor subkey: {(string.IsNullOrEmpty(acceptorSubkey) ? "<none>" : $"{acceptorSubkey} ({acceptorSubkeyEType})")}]]>
+		</message>
+	</source>
+</logSchema>

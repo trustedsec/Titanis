@@ -50,6 +50,7 @@ namespace Titanis.Msrpc.Msdcom
 			COMVERSION version,
 			Guid[] interfaceIDs,
 			ushort[] protseqs,
+			Guid correlationId,
 			System.Threading.CancellationToken cancellationToken)
 		{
 			// TODO: Parameterize session ID
@@ -145,7 +146,7 @@ namespace Titanis.Msrpc.Msdcom
 
 			customREMOTE_REPLY_SCM_INFO scmReply = actOut.ScmReplyInfoData.remoteReply.value;
 			PropsOutInfo propsOut = actOut.PropsOutInfo;
-			return new ActivationResult()
+			return new ActivationResult(correlationId)
 			{
 				Oxid = scmReply.Oxid,
 				OxidBinding = DualStringArray.FromIdl(scmReply.pdsaOxidBindings.value),

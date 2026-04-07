@@ -78,7 +78,7 @@ namespace Titanis.Security.Kerberos
 		/// <remarks>
 		/// This is called by <see cref="KerberosClient"/> when it receives an <c>AS-REP</c> PDU.
 		/// </remarks>
-		internal PA_DATA[]? TryProcessPadata(IList<PA_DATA>? paList)
+		internal PA_DATA[]? TryProcessPadata(Guid correlationId, IList<PA_DATA>? paList)
 		{
 			if (paList != null)
 			{
@@ -87,7 +87,7 @@ namespace Titanis.Security.Kerberos
 				bool hasSupportedPreauth = false;
 				foreach (var padata in paList)
 				{
-					bool isSupported = this.ProcessPadata(padata);
+					bool isSupported = this.ProcessPadata(correlationId, padata);
 					hasSupportedPreauth |= isSupported;
 				}
 
@@ -110,7 +110,7 @@ namespace Titanis.Security.Kerberos
 		/// <remarks>
 		/// The return value is used by the caller to determine whether any of the <see cref="PA_DATA"/> sent by the server are supported.
 		/// </remarks>
-		protected virtual bool ProcessPadata(PA_DATA padata)
+		protected virtual bool ProcessPadata(Guid correlationId, PA_DATA padata)
 		{
 			PadataType patype = (PadataType)padata.padata_type;
 			this.paTypes.Add(patype);
@@ -122,10 +122,10 @@ namespace Titanis.Security.Kerberos
 					this.ProcessPasswordSalt(padata.padata_value);
 					return true;
 				case PadataType.ETypeInfo:
-					this.ProcessETypeInfo(padata.padata_value);
+					this.ProcessETypeInfo(correlationId, padata.padata_value);
 					return true;
 				case PadataType.ETypeInfo2:
-					this.ProcessETypeInfo2(padata.padata_value);
+					this.ProcessETypeInfo2(correlationId, padata.padata_value);
 					return true;
 
 				case PadataType.SupportedEncTypes:
@@ -209,11 +209,11 @@ namespace Titanis.Security.Kerberos
 			return null;
 		}
 
-		private void ProcessETypeInfo2(byte[] padata_value)
+		private void ProcessETypeInfo2(Guid correlationId, byte[] padata_value)
 		{
 			var etypes = (this.etypesFromKdc ??= new List<KdcEncryptionTypeInfo>());
 			var etypeInfos = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<ETYPE_INFO2_ENTRY>>(padata_value).Values;
-			this.Callback?.OnProcessETypes(etypeInfos);
+			this.Callback?.OnProcessETypes(correlationId, etypeInfos);
 			foreach (var elem in etypeInfos)
 			{
 				etypes.Add(new KdcEncryptionTypeInfo(
@@ -225,11 +225,11 @@ namespace Titanis.Security.Kerberos
 			}
 		}
 
-		private void ProcessETypeInfo(byte[] padata_value)
+		private void ProcessETypeInfo(Guid correlationId, byte[] padata_value)
 		{
 			var etypes = (this.etypesFromKdc ??= new List<KdcEncryptionTypeInfo>());
 			var etypeInfos = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<ETYPE_INFO_ENTRY>>(padata_value).Values;
-			this.Callback?.OnProcessETypes(etypeInfos);
+			this.Callback?.OnProcessETypes(correlationId, etypeInfos);
 			foreach (var elem in etypeInfos)
 			{
 				etypes.Add(new KdcEncryptionTypeInfo(
@@ -241,7 +241,7 @@ namespace Titanis.Security.Kerberos
 		}
 
 		#region EncTimestamp
-		protected virtual void ProcessEncTimestamp(byte[] padata_value)
+		protected virtual void ProcessEncTimestamp(Guid correlationId, byte[] padata_value)
 		{
 			// Do nothing
 		}

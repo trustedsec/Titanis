@@ -25,7 +25,7 @@ namespace Titanis.Security.Kerberos
 		#region Encrypted timestamp
 		private PA_DATA? _tsenc;
 
-		private Memory<byte> EncryptTimestamp()
+		private Memory<byte> EncryptTimestamp(Guid correlationId)
 		{
 			var cred = this.Credential;
 			if (cred == null)
@@ -39,7 +39,7 @@ namespace Titanis.Security.Kerberos
 
 			var encProfile = encInfo.encProfile;
 			var protoKey = cred.DeriveProtocolKeyFor(encProfile, salt);
-			this.Callback?.OnEncryptingTS(protoKey, salt);
+			this.Callback?.OnEncryptingTS(correlationId, protoKey, salt);
 			var tsencData = protoKey.EncryptAndWrap(KeyUsage.AsreqPaEncTimestamp, tsencBytes);
 
 			var padataBytes = Asn1DerEncoder.EncodeTlv(tsencData);
@@ -47,26 +47,26 @@ namespace Titanis.Security.Kerberos
 			return padataBytes;
 		}
 
-		protected override void ProcessEncTimestamp(byte[] padata_value)
+		protected override void ProcessEncTimestamp(Guid correlationId, byte[] padata_value)
 		{
 			var cred = this.Credential;
 			if (cred != null && cred.SupportsPreauthType(PadataType.EncTimestamp))
 			{
-				var tsenc = this.EncryptTimestamp();
+				var tsenc = this.EncryptTimestamp(correlationId);
 				this._tsenc = Structs.PAData_TSEnc(tsenc.ToArray());
 			}
 		}
 		#endregion
 
-		protected override bool ProcessPadata(PA_DATA padata)
+		protected override bool ProcessPadata(Guid correlationId, PA_DATA padata)
 		{
 			switch ((PadataType)padata.padata_type)
 			{
 				case PadataType.EncTimestamp:
-					this.ProcessEncTimestamp(padata.padata_value);
+					this.ProcessEncTimestamp(correlationId, padata.padata_value);
 					return true;
 			}
-			return base.ProcessPadata(padata);
+			return base.ProcessPadata(correlationId, padata);
 		}
 	}
 }

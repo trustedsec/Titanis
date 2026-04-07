@@ -24,8 +24,9 @@ namespace Titanis.Smb2
 		/// Called after the SMB client establishes a connection.
 		/// </summary>
 		/// <param name="serverEP">Remote server endpoint</param>
+		/// <param name="serverName">Name of server</param>
 		/// <param name="connection">Established connection</param>
-		void OnConnected(EndPoint serverEP, Smb2Connection connection);
+		void OnConnected(EndPoint serverEP, string serverName, Guid clientGuid, Smb2Connection connection);
 		/// <summary>
 		/// Called after authenticating a session.
 		/// </summary>

@@ -6,18 +6,13 @@ using System.Net;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis.Certificates;
 
 namespace Titanis.Security.Kerberos
 {
 	[CallbackLogger]
 	public class KerberosDiagnosticLogger : IKerberosCallback
 	{
-		public const string KerberosLogSource = "Kerberos";
-
-		private const LogMessageSeverity LogSeverity = LogMessageSeverity.Diagnostic;
-		private readonly ILog log;
-		private readonly IKerberosCallback? _chainedCallback;
-
 		public KerberosDiagnosticLogger(ILog log, IKerberosCallback? chainedCallback = null)
 		{
 			ArgumentNullException.ThrowIfNull(log);
@@ -25,96 +20,109 @@ namespace Titanis.Security.Kerberos
 			this._chainedCallback = chainedCallback;
 		}
 
-		private void WriteMessage(string text)
+		private readonly ILog log;
+		private readonly IKerberosCallback? _chainedCallback;
+
+		/// <inheritdoc/>
+		void IKerberosCallback.OnRequestingTgt(string targetRealm, KerberosCredential credential, TicketParameters ticketParameters, int nonce)
 		{
-			this.log.WriteMessage(new LogMessage(LogSeverity, KerberosLogSource, text));
+			this.log.WriteKerberosClientRequestingTgtMessage(ticketParameters.CorrelationId, credential.UserName.WireName, credential.UserName.NameType, targetRealm, ticketParameters.Options, nonce);
+
+			this._chainedCallback?.OnRequestingTgt(targetRealm, credential, ticketParameters, nonce);
 		}
 
-		void IKerberosCallback.OnReceiveAsrepPadataList(IList<PA_DATA> padataList)
+		/// <inheritdoc/>
+		void IKerberosCallback.OnReceivedAsrepPreauthRequired(Guid correlationId, IList<PA_DATA> padataList)
 		{
 			foreach (var padata in padataList)
 			{
-				WriteMessage($"KDC supports PA-DATA type {(PadataType)padata.padata_type} ({padata.padata_type})");
+				this.log.WriteKerberosClientReceivedPreauthRequired_PadataTypeMessage(correlationId, (PadataType)padata.padata_type, padata.padata_type);
 			}
 
-			this._chainedCallback?.OnReceiveAsrepPadataList(padataList);
+			this._chainedCallback?.OnReceivedAsrepPreauthRequired(correlationId, padataList);
 		}
 
-		void IKerberosCallback.OnRequestingTgt(string targetRealm, KerberosCredential credential, int nonce)
+		void IKerberosCallback.OnReceivedAsrepError(Guid correlationId, KerberosException ex)
 		{
-			WriteMessage($"Requesting TGT for realm {targetRealm} for user {credential.UserName} (nonce={nonce})");
-
-			this._chainedCallback?.OnRequestingTgt(targetRealm, credential, nonce);
+			this.log.WriteKerberosClientReceivedAsrepErrorMessage(correlationId, ex.KerberosErrorCode, (int)ex.KerberosErrorCode, ex.UnderlyingNtstatus, (uint?)ex.UnderlyingNtstatus, ex.Message);
 		}
 
-		void IKerberosCallback.OnEncryptingTS(SessionKey protocolKey, byte[]? salt)
+		void IKerberosCallback.OnReceivedAsrep(Guid correlationId, KdcRepInfo asrep)
 		{
-			WriteMessage($"Encrypting timestamp with {protocolKey.EncryptionProfile.EType} key {protocolKey.KeyBytes.ToHexString()} (salt={((salt != null) ? salt.ToHexString() : "<none>")}.");
-
-			this._chainedCallback?.OnEncryptingTS(protocolKey, salt);
+			var client = asrep.ClientName;
+			var spn = asrep.Spn;
+			this.log.WriteKerberosClientReceivedAsrepMessage(correlationId, asrep.Salt, asrep.TicketRealm, client.ToString(), client.NameType, asrep.ClientRealm, spn.ToString(), spn.NameType, asrep.ServiceRealm, asrep.TicketFlags, asrep.AsrepKey?.KeyBytes.ToHexString(), asrep.AsrepKey?.EType, asrep.SessionKey.KeyBytes.ToHexString(), asrep.SessionKey.EType, asrep.SupportedETypes);
 		}
 
-		void IKerberosCallback.OnProcessETypes(IList<ETYPE_INFO_ENTRY> etypeInfos)
+		private void WriteMessage(string message)
+		{
+			this.log.WriteDiagnostic(message);
+		}
+
+		void IKerberosCallback.OnEncryptingTS(Guid correlationId, SessionKey protocolKey, byte[]? salt)
+		{
+			this.log.WriteKerberosClientEncryptingTimestampMessage(correlationId, salt.ToHexString(), protocolKey.EType, protocolKey.KeyBytes.ToHexString());
+
+			this._chainedCallback?.OnEncryptingTS(correlationId, protocolKey, salt);
+		}
+
+		void IKerberosCallback.OnProcessETypes(Guid correlationId, IList<ETYPE_INFO_ENTRY> etypeInfos)
 		{
 			foreach (var item in etypeInfos)
 			{
-				WriteMessage($"KDC supports EType {(EType)item.etype}");
+				this.log.WriteKerberosClientReceivedPreauthRequired_ETypeMessage(correlationId, (EType)item.etype, (int)item.etype, null);
 			}
 
-			this._chainedCallback?.OnProcessETypes(etypeInfos);
+			this._chainedCallback?.OnProcessETypes(correlationId, etypeInfos);
 		}
 
-		void IKerberosCallback.OnProcessETypes(IList<ETYPE_INFO2_ENTRY> etypeInfos)
+		void IKerberosCallback.OnProcessETypes(Guid correlationId, IList<ETYPE_INFO2_ENTRY> etypeInfos)
 		{
 			foreach (var item in etypeInfos)
 			{
-				WriteMessage($"KDC supports EType {(EType)item.etype} salt={((item.salt.HasValue) ? item.salt.Value.Value : "<none>")}");
+				this.log.WriteKerberosClientReceivedPreauthRequired_ETypeMessage(correlationId, (EType)item.etype, (int)item.etype, item.salt?.Value);
 			}
 
-			this._chainedCallback?.OnProcessETypes(etypeInfos);
-		}
-
-		void IKerberosCallback.OnReceivedAsrepEncPart(AsrepInfo asrep)
-		{
-			this.log.WriteVerbose($"ASREP key: etype={asrep.AsrepKey.EType} bytes={asrep.AsrepKey.KeyText}");
+			this._chainedCallback?.OnProcessETypes(correlationId, etypeInfos);
 		}
 
 		void IKerberosCallback.OnReceivedTgt(TicketInfo tgtInfo)
 		{
-			this.WriteMessage($"Received TGT for realm {tgtInfo.TicketRealm}: {tgtInfo.SessionKey.EType} session key {tgtInfo.SessionKey.KeyBytes.ToHexString()}");
+			// UNDONE: The details are logged with the AS-REP
+			//this.WriteMessage($"Received TGT for realm {tgtInfo.TicketRealm}: {tgtInfo.SessionKey.EType} session key {tgtInfo.SessionKey.KeyBytes.ToHexString()}");
 
 			this._chainedCallback?.OnReceivedTgt(tgtInfo);
 		}
 
-		void IKerberosCallback.OnRequestingTicket(SecurityPrincipalName spn, TicketInfo tgt, KdcOptions kdcOptions)
+		void IKerberosCallback.OnRequestingTicket(SecurityPrincipalName spn, TicketInfo tgt, TicketParameters ticketParameters)
 		{
 			// Since this is a TGT, the TicketRealm indicates the issuing realm,
 			// but ServiceInstance indicates the target realm
-			this.WriteMessage($"Requesting ticket for {spn} within {tgt.ServiceInstance} for user {tgt.ClientName}@{tgt.ClientRealm} (KDC options = {kdcOptions})");
+			this.log.WriteKerberosClientRequestingTicketMessage(ticketParameters.CorrelationId, tgt.ClientName, tgt.ClientRealm, tgt.TicketRealm, spn.ToString(), spn.NameType, ticketParameters.Options);
 
-			this._chainedCallback?.OnRequestingTicket(spn, tgt, kdcOptions);
+			this._chainedCallback?.OnRequestingTicket(spn, tgt, ticketParameters);
 		}
 
-		void IKerberosCallback.OnReceivedTicket(TicketInfo ticketInfo)
+		void IKerberosCallback.OnReceivedTicket(Guid correlationId, KdcRepInfo tgsrep)
 		{
-			this.WriteMessage($"Received ticket for {ticketInfo.TargetSpn} within {ticketInfo.TicketRealm} for user {ticketInfo.ClientName}@{ticketInfo.ClientRealm}: {ticketInfo.SessionKey.EType} session key {ticketInfo.SessionKey.KeyBytes.ToHexString()} with options {ticketInfo.KdcOptions}");
+			var spn = tgsrep.Spn;
+			this.log.WriteKerberosClientReceivedTicketMessage(correlationId, tgsrep.TicketRealm, tgsrep.ClientName.ToString(), tgsrep.ClientName.NameType, tgsrep.ClientRealm, spn.ToString(), spn.NameType, tgsrep.ServiceRealm, tgsrep.TicketFlags, tgsrep.SessionKey.KeyBytes.ToHexString(), tgsrep.SessionKey.EType, tgsrep.SupportedETypes);
 
-			this._chainedCallback?.OnReceivedTicket(ticketInfo);
+			this._chainedCallback?.OnReceivedTicket(correlationId, tgsrep);
 		}
 
-		void IKerberosCallback.OnSendingApreq(KerberosClientContextBase? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey sessionKey, int sendSeqNbr)
+		void IKerberosCallback.OnSendingApreq(Guid correlationId, KerberosClientContextBase? authContext, SecurityPrincipalName targetSpn, TicketInfo ticket, KerberosCredential credential, SecurityCapabilities caps, SessionKey? initiatorSubkey, int sendSeqNbr)
 		{
-			this.WriteMessage($"Sending AP-REQ to {targetSpn} for user {ticket.ClientName}@{ticket.ClientRealm} with session key {sessionKey.EType} {sessionKey.KeyBytes.ToHexString()} (sendSeqNbr={sendSeqNbr})(gssFlags={caps})");
+			this.log.WriteKerberosClientSendingApreqMessage(correlationId, ticket.ClientName, targetSpn.ToString(), targetSpn.NameType, ticket.SessionKey.KeyBytes.ToHexString(), ticket.SessionKey.EType, initiatorSubkey?.KeyBytes?.ToHexString(), initiatorSubkey?.EType, sendSeqNbr);
 
-			this._chainedCallback?.OnSendingApreq(authContext, targetSpn, ticket, credential, caps, sessionKey, sendSeqNbr);
+			this._chainedCallback?.OnSendingApreq(correlationId, authContext, targetSpn, ticket, credential, caps, initiatorSubkey, sendSeqNbr);
 		}
 
-		void IKerberosCallback.OnReceivedAprep(KerberosClientContextBase? authContext, uint recvSeqNbr, SessionKey? acceptorSubkey)
+		void IKerberosCallback.OnReceivedAprep(Guid correlationId, KerberosClientContextBase? authContext, uint recvSeqNbr, SessionKey? acceptorSubkey)
 		{
-			//this.WriteMessage($"Received AP-REP from {authContext.TargetSpn} for user {authContext.UserName}@{authContext.Credential.Realm} {((acceptorSubkey != null) ? $"with session key {acceptorSubkey.EType} {acceptorSubkey.KeyBytes.ToHexString()} (recvSeqNbr={recvSeqNbr})" : "(no session key)")}");
-			this.WriteMessage($"Received AP-REP {((acceptorSubkey != null) ? $"with session key {acceptorSubkey.EType} {acceptorSubkey.KeyBytes.ToHexString()} (recvSeqNbr={recvSeqNbr})" : "(no session key)")}");
+			this.log.WriteKerberosClientReceivedAprepMessage(correlationId, acceptorSubkey?.KeyBytes?.ToHexString(), acceptorSubkey?.EType, recvSeqNbr);
 
-			this._chainedCallback?.OnReceivedAprep(authContext, recvSeqNbr, acceptorSubkey);
+			this._chainedCallback?.OnReceivedAprep(correlationId, authContext, recvSeqNbr, acceptorSubkey);
 		}
 
 		void IKerberosCallback.OnReferralReceived(SecurityPrincipalName spn, TicketInfo ticket)
