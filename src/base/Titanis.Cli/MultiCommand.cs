@@ -93,6 +93,7 @@ namespace Titanis.Cli
 			writer.WriteSubheading("Subcommands");
 
 			SubcommandAttribute[] attrs = context.Resolver.GetCustomAttributes<SubcommandAttribute>(commandType, true).ToArray();
+			Array.Sort(attrs, (x, y) => x.Name.CompareTo(y.Name));
 			TextTable tbl = new TextTable() { LeftMargin = "  " };
 			foreach (var attr in attrs)
 			{
