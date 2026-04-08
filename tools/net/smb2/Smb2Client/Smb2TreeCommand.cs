@@ -23,7 +23,8 @@ namespace Titanis.Smb2.Cli
 		[Parameter]
 		[Category(ParameterCategories.ClientBehavior)]
 		[Description("Opens remote resource with backup semantics")]
-		public SwitchParam UseBackupSemantics { get; set; }
+		[Alias("UseBackupSemantics")]
+		public SwitchParam BackupSemantics { get; set; }
 
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
@@ -42,7 +43,7 @@ namespace Titanis.Smb2.Cli
 		/// otherwise, the original options.</returns>
 		protected Smb2FileCreateOptions GetCreateOptions(Smb2FileCreateOptions options)
 		{
-			if (this.UseBackupSemantics.IsSet)
+			if (this.BackupSemantics.IsSet)
 				options |= Smb2FileCreateOptions.OpenForBackupIntent;
 			return options;
 		}
