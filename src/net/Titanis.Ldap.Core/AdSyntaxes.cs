@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
@@ -26,6 +27,7 @@ namespace Titanis.Ldap
 		public static readonly LdapSyntax Enumeration = new EnumerationSyntax();
 		public static readonly LdapSyntax Integer = new IntegerSyntax();
 		public static readonly LdapSyntax LargeInteger = new LargeIntegerSyntax();
+		public static readonly LdapSyntax LargeInteger_Timestamp = new LargeIntegerSyntax();
 		public static readonly LdapSyntax ObjectAccessPoint = new ObjectAccessPointSyntax();
 		public static readonly LdapSyntax ObjectDnString = new ObjectDnStringSyntax();
 		public static readonly LdapSyntax ObjectOrName = new ObjectOrNameSyntax();
@@ -274,6 +276,85 @@ namespace Titanis.Ldap
 				throw new FormatException($"The encoded value must be exactly 8 bytes.");
 
 			return BinaryPrimitives.ReadInt64LittleEndian(bytes);
+		}
+	}
+
+	public struct AdTimestamp
+	{
+		public AdTimestamp(long value)
+		{
+			this.Value = value;
+		}
+		public AdTimestamp(DateTime value)
+		{
+			this.Value = value.ToFileTimeUtc();
+		}
+
+		public readonly long Value { get; }
+
+		public readonly DateTime AsDateTimeUtc() => DateTime.FromFileTimeUtc(this.Value);
+
+		public override string ToString() => $"{this.Value:N0} ({this.AsDateTimeUtc():O})";
+
+		public static AdTimestamp Parse(string text)
+		{
+			if (long.TryParse(text, NumberStyles.AllowThousands, null, out var n))
+			{
+				return new AdTimestamp(n);
+			}
+			else if (DateTime.TryParse(text, out var dt))
+			{
+				return new AdTimestamp(dt);
+			}
+			else
+			{
+				throw new ArgumentException($"Could not parse timestamp as either a numeric value or date/time.");
+			}
+		}
+	}
+	// cf.:
+	// [RFC 4517] § 3.3.16
+	// [RFC 2252] § 6.16
+	// TODO: The RFC mentions an integer of unlimited length, but in AD it's an Int64.
+	public sealed class LargeIntegerTimestampSyntax : LdapSyntax<AdTimestamp>
+	{
+		internal LargeIntegerTimestampSyntax()
+		{
+
+		}
+
+		/// <inheritdoc/>
+		public sealed override string RfcName => "INTEGER";
+		/// <inheritdoc/>
+		public sealed override string RfcOid => "1.2.840.113556.1.4.906";
+		/// <inheritdoc/>
+		public sealed override string? ActiveDirectoryName => "LargeInteger";
+		/// <inheritdoc/>
+		public sealed override string? ActiveDirectoryOid => "2.5.5.16";
+		/// <inheritdoc/>
+		public sealed override int OmSyntax => 65;
+
+		/// <inheritdoc/>
+		protected sealed override AdTimestamp DecodeImpl(byte[] bytes)
+		{
+			return AdTimestamp.Parse(Encoding.UTF8.GetString(bytes));
+		}
+		/// <inheritdoc/>
+		protected sealed override byte[] EncodeImpl(AdTimestamp value)
+		{
+			return Encoding.UTF8.GetBytes(value.Value.ToString());
+		}
+
+		public override object Parse(string text) => AdTimestamp.Parse(text);
+
+		// [MS-DRSR] § 5.16.1.2
+		/// <inheritdoc/>
+		public override object DecodeDsrep(byte[] bytes)
+		{
+			if (bytes.Length != 8)
+				throw new FormatException($"The encoded value must be exactly 8 bytes.");
+
+			return new AdTimestamp(BinaryPrimitives.ReadInt64LittleEndian(bytes));
 		}
 	}
 
@@ -532,8 +613,7 @@ namespace Titanis.Ldap
 
 		public override object Parse(string text)
 		{
-			// TODO: How to handle?
-			throw new NotImplementedException();
+			return DecodeImpl(Encoding.UTF8.GetBytes(text));
 		}
 	}
 

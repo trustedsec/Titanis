@@ -9,7 +9,7 @@ namespace Titanis.Ldap
 	/// <seealso cref="LdapEntry.Attributes"/>
 	public class LdapAttribute
 	{
-		internal LdapAttribute(LdapAttributeDescription attrDesc, AttributeTypeDescription attrType, object[] values)
+		public LdapAttribute(LdapAttributeDescription attrDesc, AttributeTypeDescription attrType, object[] values)
 		{
 			ArgumentNullException.ThrowIfNull(attrDesc);
 			ArgumentNullException.ThrowIfNull(values);

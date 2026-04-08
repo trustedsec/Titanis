@@ -67,7 +67,7 @@ internal class QueryCommand : QueryCommandBase
 		{
 			try
 			{
-				this._filter = FilterExpression.Parse(this.Filter).ToFilter();
+				this._filter = LdapFilter.Parse(this.Filter);
 			}
 			catch (Exception ex)
 			{

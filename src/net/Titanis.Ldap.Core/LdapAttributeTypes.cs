@@ -24,6 +24,23 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription SchemaIDGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.148", ["schemaIDGUID"], syntax: AdSyntaxes.StringOctetGuid);
 		public readonly static AttributeTypeDescription DnsRecord = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.382", ["dnsRecord"], syntax: AdSyntaxes.DnsRecord);
 		#endregion
+		#region Date/time
+		public readonly static AttributeTypeDescription AccountExpires = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.159", ["accountExpires"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription BadPasswordTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.49", ["badPasswordTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription BuiltinCreationTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.13", ["builtinCreationTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription CreationTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.26", ["creationTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription DhcpUpdateTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.720", ["dhcpUpdateTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription ForceLogoff = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.39", ["forceLogoff"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription LastBackupRestorationTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.519", ["lastBackupRestorationTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription LastContentIndexed = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.50", ["lastContentIndexed"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription LastLogoff = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.51", ["lastLogoff"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription LastLogon = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.52", ["lastLogon"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription LastLogonTimestamp = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.1696", ["lastLogonTimestamp"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription LastSetTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.53", ["lastSetTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription LockoutTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.662", ["lockoutTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription PwdLastSet = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.96", ["pwdLastSet"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+
+		#endregion
 
 		#region rootDSE attributes
 		public static AttributeTypeDescription dsServiceName = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["dsServiceName"], syntax: AdSyntaxes.ObjectDsDn);
@@ -62,7 +79,6 @@ namespace Titanis.Ldap
 		}
 
 		#region Win2025 Schema
-		public readonly static AttributeTypeDescription AccountExpires = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.159", ["accountExpires"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription AccountNameHistory = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.1307", ["accountNameHistory"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription ACSAggregateTokenRatePerUser = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.760", ["aCSAggregateTokenRatePerUser"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription ACSAllocableRSVPBandwidth = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.766", ["aCSAllocableRSVPBandwidth"], syntax: AdSyntaxes.LargeInteger);
@@ -145,7 +161,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription AuthenticationOptions = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.11", ["authenticationOptions"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription AuthorityRevocationList = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "2.5.4.38", ["authorityRevocationList"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription AuxiliaryClass = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.2.351", ["auxiliaryClass"], syntax: AdSyntaxes.StringObjectIdentifier);
-		public readonly static AttributeTypeDescription BadPasswordTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.49", ["badPasswordTime"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription BadPwdCount = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.12", ["badPwdCount"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription BirthLocation = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.332", ["birthLocation"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription BootFile = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.3.6.1.1.1.1.24", ["bootFile"], syntax: AdSyntaxes.StringIa5);
@@ -153,7 +168,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription BridgeheadServerListBL = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.820", ["bridgeheadServerListBL"], syntax: AdSyntaxes.ObjectDsDn);
 		public readonly static AttributeTypeDescription BridgeheadTransportList = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.819", ["bridgeheadTransportList"], syntax: AdSyntaxes.ObjectDsDn);
 		public readonly static AttributeTypeDescription BuildingName = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "0.9.2342.19200300.100.1.48", ["buildingName"], syntax: AdSyntaxes.StringUnicode);
-		public readonly static AttributeTypeDescription BuiltinCreationTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.13", ["builtinCreationTime"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription BuiltinModifiedCount = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.14", ["builtinModifiedCount"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription BusinessCategory = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "2.5.4.15", ["businessCategory"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription BytesPerMinute = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.284", ["bytesPerMinute"], syntax: AdSyntaxes.Integer);
@@ -193,7 +207,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription CreateDialog = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.810", ["createDialog"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription CreateTimeStamp = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "2.5.18.1", ["createTimeStamp"], syntax: AdSyntaxes.StringGeneralizedTime);
 		public readonly static AttributeTypeDescription CreateWizardExt = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.812", ["createWizardExt"], syntax: AdSyntaxes.StringUnicode);
-		public readonly static AttributeTypeDescription CreationTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.26", ["creationTime"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription CreationWizard = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.498", ["creationWizard"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription Creator = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.679", ["creator"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription CRLObject = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.689", ["cRLObject"], syntax: AdSyntaxes.ObjectDsDn);
@@ -234,7 +247,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription DhcpSubnets = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.705", ["dhcpSubnets"], syntax: AdSyntaxes.StringPrintable);
 		public readonly static AttributeTypeDescription DhcpType = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.699", ["dhcpType"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription DhcpUniqueKey = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.698", ["dhcpUniqueKey"], syntax: AdSyntaxes.LargeInteger);
-		public readonly static AttributeTypeDescription DhcpUpdateTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.720", ["dhcpUpdateTime"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription DisplayName = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.2.13", ["displayName"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription DisplayNamePrintable = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.2.353", ["displayNamePrintable"], syntax: AdSyntaxes.StringPrintable);
 		public readonly static AttributeTypeDescription DITContentRules = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "2.5.21.2", ["dITContentRules"], syntax: AdSyntaxes.StringUnicode);
@@ -293,7 +305,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription FileExtPriority = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.816", ["fileExtPriority"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription Flags = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.38", ["flags"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription FlatName = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.511", ["flatName"], syntax: AdSyntaxes.StringUnicode);
-		public readonly static AttributeTypeDescription ForceLogoff = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.39", ["forceLogoff"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription ForeignIdentifier = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.356", ["foreignIdentifier"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription FriendlyNames = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.682", ["friendlyNames"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription FromEntry = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.910", ["fromEntry"], syntax: AdSyntaxes.Boolean);
@@ -401,13 +412,7 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription Keywords = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.48", ["keywords"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription KnowledgeInformation = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "2.5.4.2", ["knowledgeInformation"], syntax: AdSyntaxes.StringTeletex);
 		public readonly static AttributeTypeDescription LabeledURI = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.3.6.1.4.1.250.1.57", ["labeledURI"], syntax: AdSyntaxes.StringUnicode);
-		public readonly static AttributeTypeDescription LastBackupRestorationTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.519", ["lastBackupRestorationTime"], syntax: AdSyntaxes.LargeInteger);
-		public readonly static AttributeTypeDescription LastContentIndexed = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.50", ["lastContentIndexed"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription LastKnownParent = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.781", ["lastKnownParent"], syntax: AdSyntaxes.ObjectDsDn);
-		public readonly static AttributeTypeDescription LastLogoff = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.51", ["lastLogoff"], syntax: AdSyntaxes.LargeInteger);
-		public readonly static AttributeTypeDescription LastLogon = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.52", ["lastLogon"], syntax: AdSyntaxes.LargeInteger);
-		public readonly static AttributeTypeDescription LastLogonTimestamp = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.1696", ["lastLogonTimestamp"], syntax: AdSyntaxes.LargeInteger);
-		public readonly static AttributeTypeDescription LastSetTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.53", ["lastSetTime"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription LastUpdateSequence = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.330", ["lastUpdateSequence"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription LDAPAdminLimits = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.843", ["lDAPAdminLimits"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription LDAPDisplayName = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.2.460", ["lDAPDisplayName"], syntax: AdSyntaxes.StringUnicode);
@@ -426,7 +431,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription LockOutObservationWindow = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.61", ["lockOutObservationWindow"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription LockoutDuration = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.60", ["lockoutDuration"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription LockoutThreshold = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.73", ["lockoutThreshold"], syntax: AdSyntaxes.Integer);
-		public readonly static AttributeTypeDescription LockoutTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.662", ["lockoutTime"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription LoginShell = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.3.6.1.1.1.1.4", ["loginShell"], syntax: AdSyntaxes.StringIa5);
 		public readonly static AttributeTypeDescription ThumbnailLogo = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "2.16.840.1.113730.3.1.36", ["thumbnailLogo"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription LogonCount = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.169", ["logonCount"], syntax: AdSyntaxes.Integer);
@@ -1348,7 +1352,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription PublicKeyPolicy = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.420", ["publicKeyPolicy"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription PurportedSearch = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.886", ["purportedSearch"], syntax: AdSyntaxes.StringUnicode);
 		public readonly static AttributeTypeDescription PwdHistoryLength = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.95", ["pwdHistoryLength"], syntax: AdSyntaxes.Integer);
-		public readonly static AttributeTypeDescription PwdLastSet = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.96", ["pwdLastSet"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription PwdProperties = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.93", ["pwdProperties"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription QualityOfService = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.458", ["qualityOfService"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription QueryFilter = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.1355", ["queryFilter"], syntax: AdSyntaxes.StringUnicode);
