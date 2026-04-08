@@ -245,7 +245,7 @@ namespace Titanis.Msrpc.Mssamr
 			return new Sam(this, phServer.value);
 		}
 
-		internal async Task<SamDomain> OpenDomain(
+		internal async Task<RpcContextHandle> OpenDomain(
 			RpcContextHandle phServer,
 			RPC_SID pDomainSid,
 			SamDomainAccessRights access,
@@ -261,7 +261,7 @@ namespace Titanis.Msrpc.Mssamr
 				cancellationToken
 				).ConfigureAwait(false));
 
-			return new SamDomain(this, phDomain.value, pDomainSid.ToSid());
+			return phDomain.value;
 		}
 
 		internal async Task<SamGroup> OpenGroup(

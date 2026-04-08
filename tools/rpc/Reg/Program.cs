@@ -24,8 +24,6 @@ namespace Titanis.Msrpc.Msrrp.Cli
 
 	abstract class RegistryCommand : RpcCommand<RemoteRegistryClient>
 	{
-		protected override Type InterfaceType => typeof(winreg);
-
 		[Parameter]
 		[Description("Open with backup semantics")]
 		public SwitchParam BackupSemantics { get; set; }

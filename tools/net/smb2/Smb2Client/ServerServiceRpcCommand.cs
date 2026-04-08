@@ -8,8 +8,6 @@ namespace Titanis.Smb2.Cli
 {
 	public abstract class ServerServiceRpcCommand : RpcCommand<ServerServiceClient>
 	{
-		protected sealed override Type InterfaceType => typeof(srvsvc);
-
 		[Parameter]
 		[Description("Max size for response buffer")]
 		public int BufferSize { get; set; }

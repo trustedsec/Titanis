@@ -12,13 +12,15 @@ namespace Titanis.Msrpc.Mssamr
 	/// <seealso cref="Sam.OpenDomainAsync(string, SamDomainAccessRights, CancellationToken)"/>
 	public sealed class SamDomain : SamObject
 	{
-		internal SamDomain(SamClient samClient, RpcContextHandle handle, SecurityIdentifier sid)
+		internal SamDomain(SamClient samClient, RpcContextHandle handle, SecurityIdentifier sid, string? name)
 			: base(samClient, handle)
 		{
 			Sid = sid;
+			this.DomainName = name;
 		}
 
 		public SecurityIdentifier Sid { get; }
+		public string? DomainName { get; private set; }
 
 		/// <summary>
 		/// Looks up an entry in the domain by name.
@@ -72,8 +74,13 @@ namespace Titanis.Msrpc.Mssamr
 			=> this._samClient.QueryDomainPasswordInfo(this._handle, cancellationToken);
 		public Task<SamDomainLogoffInfo> QueryLogoffInfo(CancellationToken cancellationToken)
 			=> this._samClient.QueryDomainLogoffInfo(this._handle, cancellationToken);
-		public Task<string> QueryDomainName(CancellationToken cancellationToken)
-			=> this._samClient.QueryDomainNameInfo(this._handle, cancellationToken);
+		public async Task<string> QueryDomainName(CancellationToken cancellationToken)
+		{
+			var name = await _samClient.QueryDomainNameInfo(_handle, cancellationToken).ConfigureAwait(false);
+			this.DomainName = name;
+			return name;
+		}
+
 		public Task<string> QueryReplicaName(CancellationToken cancellationToken)
 			=> this._samClient.QueryDomainReplicaInfo(this._handle, cancellationToken);
 		public Task<DomainServerRole> QueryServerRole(CancellationToken cancellationToken)

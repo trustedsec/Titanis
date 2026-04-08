@@ -8,6 +8,4 @@ namespace Titanis.Cli.LsaTool;
 /// </summary>
 public abstract class LsaCommand : RpcCommand<LsaClient>
 {
-	/// <inheritdoc/>
-	protected sealed override Type InterfaceType => typeof(lsarpc);
 }

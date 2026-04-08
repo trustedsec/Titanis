@@ -15,8 +15,6 @@ namespace Dsrep;
 [OutputRecordType(typeof(DomainControllerInfo))]
 internal class DcinfoCommand : RpcCommand<DirectoryReplicationClient>
 {
-	protected override Type InterfaceType => typeof(drsuapi);
-
 	protected override async Task<int> RunAsync(DirectoryReplicationClient client, CancellationToken cancellationToken)
 	{
 		var dcinfos=await client.GetDcInfo(this.RpcParameters.Authentication.UserDomain, cancellationToken);

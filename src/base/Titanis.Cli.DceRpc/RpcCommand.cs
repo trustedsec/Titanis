@@ -17,12 +17,6 @@ namespace Titanis.Cli
 		[ParameterGroup(ParameterGroupOptions.Required)]
 		public RpcParameterGroup RpcParameters { get; set; }
 
-		/// <summary>
-		/// Gets the type of the RPC interface.
-		/// </summary>
-		protected abstract Type InterfaceType { get; }
-
-
 		private string _serverName;
 		[Parameter(0)]
 		[Mandatory]

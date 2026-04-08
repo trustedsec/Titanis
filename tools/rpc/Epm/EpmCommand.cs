@@ -14,8 +14,6 @@ public abstract class EpmCommand : RpcCommand<EpmClient>
 
 	const int DefaultPageSize = 32;
 
-	protected sealed override Type InterfaceType => typeof(epm.ept);
-
 	protected override void ValidateParameters(ParameterValidationContext context)
 	{
 		base.ValidateParameters(context);

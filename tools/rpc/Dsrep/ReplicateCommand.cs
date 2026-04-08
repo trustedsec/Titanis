@@ -38,8 +38,6 @@ internal class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 	[Mandatory]
 	public DsName[] ObjectName { get; set; }
 
-	protected override Type InterfaceType => typeof(drsuapi);
-
 	private string[] GetLdapAttributes(string[] fieldNames)
 	{
 		List<string> attrs = new(fieldNames.Length);

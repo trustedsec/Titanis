@@ -16,7 +16,7 @@ namespace Titanis.Msrpc.Mssamr
 
 		public SecurityIdentifier Sid { get; }
 
-		public Task<List<SamMemberInfo>> EnumMembersAsync(CancellationToken cancellationToken)
+		public Task<List<SamMemberInfo>> GetMembersAsync(CancellationToken cancellationToken)
 			=> this._samClient.EnumGroupMembers(this._handle, cancellationToken);
 
 		public Task<SamGroupGeneralInfo> QueryGeneralInfo(CancellationToken cancellationToken)

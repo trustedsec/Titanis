@@ -13,9 +13,6 @@ namespace Titanis.Cli.ScmTool
 {
 	public abstract class ScmCommand : RpcCommand<ScmClient>
 	{
-		/// <inheritdoc/>
-		protected sealed override Type InterfaceType => typeof(svcctl);
-
 		/// <summary>
 		/// Gets the access rights required to run the command.
 		/// </summary>

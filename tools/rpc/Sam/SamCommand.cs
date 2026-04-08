@@ -6,9 +6,6 @@ namespace Titanis.Cli.SamTool
 {
 	public abstract class SamCommand : RpcCommand<SamClient>
 	{
-		/// <inheritdoc/>
-		protected sealed override Type InterfaceType => typeof(samr);
-
 		/// <summary>
 		/// Gets the access rights required to run the command.
 		/// </summary>
