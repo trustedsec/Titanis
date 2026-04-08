@@ -4,29 +4,25 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.SamTool;
 
-public class UserInfo
+public class AliasInfo
 {
-	internal UserInfo(
+	internal AliasInfo(
 		SamEntry entry,
 		SecurityIdentifier sid,
 		string? domain,
-		SamUserGeneralInfo? general,
-		SamUserAccountInfo? accountInfo
+		SamAliasGeneralInfo? general
 		)
 	{
 		Entry = entry;
 		Sid = sid;
 		Domain = domain;
 		General = general;
-		AccountInfo = accountInfo;
 	}
 
 	[Browsable(false)]
 	public SamEntry Entry { get; }
 	[Browsable(false)]
-	public SamUserGeneralInfo? General { get; }
-	[Browsable(false)]
-	public SamUserAccountInfo? AccountInfo { get; }
+	public SamAliasGeneralInfo? General { get; }
 
 	public string AccountName => this.Entry.Name;
 	public string Domain { get; }
@@ -35,38 +31,32 @@ public class UserInfo
 	public SecurityIdentifier Sid { get; }
 
 	// General
-	public string? FullName => this.General?.FullName;
+	public int? MemberCount => this.General?.MemberCount;
 	public string? AdminComment => this.General?.AdminComment;
-
-	// Account
-	public DateTime? PasswordLastSet => this.AccountInfo?.PasswordLastSet;
-	public DateTime? LastLogon => this.AccountInfo?.LastLogon;
-	public int? BadPasswordCount => this.AccountInfo?.BadPasswordCount;
 }
 
-/// <task category="SAM;Enumeration">Enumerate user accounts in the Security Accounts Manager database</task>
-[Description("Enumerates user accounts")]
-[OutputRecordType(typeof(UserInfo))]
-[DetailedHelpText(@"{0} attempts to query the general and account info for the users returned by the server.")]
-[Example("Enumerate all accounts", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!")]
-internal sealed class EnumUsersCommand : SamDomainEnumCommand
+/// <task category="SAM;Enumeration">Enumerate aliases in the Security Accounts Manager database</task>
+[Description("Enumerates aliases")]
+[OutputRecordType(typeof(AliasInfo))]
+[DetailedHelpText(@"{0} attempts to query the general info and attributes for the groups returned by the server.")]
+[Example("Enumerate all aliases", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!")]
+internal sealed class EnumAliasesCommand : SamDomainEnumCommand
 {
 	protected sealed override SamDomainAccessRights RequiredDomainAccess => SamDomainAccessRights.ListAccounts | SamDomainAccessRights.Read | SamDomainAccessRights.Lookup;
 	protected override async Task RunAsync(SamDomain domain, SamEntry domainInfo, Sam sam, CancellationToken cancellationToken)
 	{
 		List<SamEntry> entries;
 
-		// Users
 		try
 		{
-			this.WriteDiagnostic($"Enumerating users in domain '{domainInfo.Name}' ({domainInfo.Id}).");
-			entries = await domain.EnumUsers(cancellationToken);
+			this.WriteDiagnostic($"Enumerating aliases in domain '{domainInfo.Name}' ({domainInfo.Id}).");
+			entries = await domain.EnumAliases(cancellationToken);
 		}
 		catch (Exception ex)
 		{
 			if (this.ContinueOnError.IsSet)
 			{
-				this.WriteError($"Failed to enumerate users in domain '{domainInfo.Name}' with error: {ex.Message}");
+				this.WriteError($"Failed to enumerate aliases in domain '{domainInfo.Name}' with error: {ex.Message}");
 				return;
 			}
 			else
@@ -75,43 +65,33 @@ internal sealed class EnumUsersCommand : SamDomainEnumCommand
 
 		foreach (var entry in entries)
 		{
-			SamUser user;
+			SamAlias alias;
 			try
 			{
-				user = await domain.OpenUserAsync(entry.Id, SamUserAccessRights.MaxAllowed, cancellationToken);
+				alias = await domain.OpenAliasAsync(entry.Id, SamAliasAccessRights.MaxAllowed, cancellationToken);
 			}
 			catch (Exception ex)
 			{
-				this.WriteError($"Failed to open user '{entry.Name}' with error: {ex.Message}");
+				this.WriteError($"Failed to open alias '{entry.Name}' with error: {ex.Message}");
 				continue;
 			}
 
-			using (user)
+			using (alias)
 			{
-				SamUserGeneralInfo? general = null;
-				SamUserAccountInfo? accountInfo = null;
+				SamAliasGeneralInfo? general = null;
 
 				try
 				{
-					general = await user.QueryGeneralInfo(cancellationToken);
+					general = await alias.QueryGeneralInfo(cancellationToken);
 				}
 				catch (Exception ex)
 				{
-					this.WriteError($"Failed to query general info for user '{entry.Name}' with error: {ex.Message}");
+					this.WriteError($"Failed to query general info for group '{entry.Name}' with error: {ex.Message}");
 				}
 
-				try
-				{
-					accountInfo = await user.QueryAccountInfo(cancellationToken);
-				}
-				catch (Exception ex)
-				{
-					this.WriteError($"Failed to query account info for user '{entry.Name}' with error: {ex.Message}");
-				}
+				var groupInfo = new AliasInfo(entry, alias.Sid, domainInfo.Name, general);
 
-				var userInfo = new UserInfo(entry, user.Sid, domainInfo.Name, general, accountInfo);
-
-				this.WriteRecord(userInfo);
+				this.WriteRecord(groupInfo);
 			}
 		}
 	}
