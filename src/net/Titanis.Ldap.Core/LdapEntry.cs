@@ -1,5 +1,4 @@
-﻿using Lightweight_Directory_Access_Protocol_V3;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -15,10 +14,10 @@ namespace Titanis.Ldap
 			this.EntryName = dn;
 			this.Attributes = attributes;
 
-			this._attrsByType = attributes.ToDictionary(r => r.AttributeType);
+			this._attrsByName = attributes.ToDictionary(r => r.AttributeType.Name, StringComparer.OrdinalIgnoreCase);
 		}
 
-		internal LdapEntry(
+		public LdapEntry(
 			LdapDistinguishedName? dn,
 			Dictionary<string, object> attributes)
 			: this(dn, AcceptAttributes(attributes))
@@ -37,7 +36,9 @@ namespace Titanis.Ldap
 
 				var attrType = LdapAttributeTypes.TryGetByNameOrOid(attrEntry.Key);
 				if (attrType is null)
-					throw new ArgumentException($"The attributes list contains attribute '{attrEntry.Key}' that cannot be found.", nameof(attributes));
+				{
+					attrType = new AttributeTypeDescription(default, attrEntry.Key);
+				}
 
 				if (attrEntry.Value is object[] multiValues)
 					;
@@ -49,11 +50,16 @@ namespace Titanis.Ldap
 				{
 					var multiValue = multiValues[iValue];
 
-					if (!attrType.Syntax.RuntimeType.IsAssignableFrom(multiValue.GetType()))
+					var syntax = attrType?.Syntax;
+					if (syntax != null && !syntax.RuntimeType.IsAssignableFrom(multiValue.GetType()))
 					{
 						if (multiValue is string text)
 						{
 							multiValue = attrType.Syntax.Parse(text);
+						}
+						else if (multiValue is BinaryString binary)
+						{
+							multiValue = attrType.Syntax.Decode(binary.Bytes);
 						}
 						else
 						{
@@ -74,7 +80,7 @@ namespace Titanis.Ldap
 		public LdapAttribute[] Attributes { get; }
 		public string? ObjectClass { get; }
 
-		private Dictionary<AttributeTypeDescription, LdapAttribute> _attrsByType;
+		private readonly Dictionary<string?, LdapAttribute> _attrsByName;
 
 		public sealed override string? ToString() => this.EntryName?.Text;
 
@@ -82,7 +88,16 @@ namespace Titanis.Ldap
 		{
 			get
 			{
-				this._attrsByType.TryGetValue(descr, out var attr);
+				this._attrsByName.TryGetValue(descr.Name, out var attr);
+				return attr;
+			}
+		}
+
+		public LdapAttribute? this[string name]
+		{
+			get
+			{
+				this._attrsByName.TryGetValue(name, out var attr);
 				return attr;
 			}
 		}
