@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,6 +46,16 @@ namespace Titanis
 				throw new TimeoutException();
 
 			return task.Result;
+		}
+		/// <summary>
+		/// Gets the untyped result of a <see cref="Task{TResult}"/>.
+		/// </summary>
+		/// <returns>If <paramref name="task"/> does not have a result, this method returns <see langword="null"/>.</returns>
+		public static object? GetUntypedResult(this Task task)
+		{
+			PropertyInfo property = task.GetType().GetProperty(nameof(Task<object>.Result));
+			var result = property?.GetValue(task);
+			return result;
 		}
 	}
 }
