@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis.Ldap.FilterExpressions;
 
 namespace Titanis.Ldap
 {
@@ -20,6 +21,11 @@ namespace Titanis.Ldap
 		internal LdapFilter(Filter struc)
 		{
 			this.struc = struc;
+		}
+
+		public static LdapFilter Parse(string filterExpression)
+		{
+			return FilterExpression.Parse(filterExpression).ToFilter();
 		}
 	}
 
