@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Titanis.Ldap
 {
@@ -65,8 +66,7 @@ namespace Titanis.Ldap
 		public static readonly NamedBitGroup SupportedEncryptionTypes = new NamedBitGroup("msDS-SupportedEncryptionTypes", typeof(SupportedEncryptionTypes), null);
 		public static readonly NamedBitGroup SamAccountType = new NamedBitGroup("samAccountType", typeof(SamAccountType), null);
 
-		public static readonly NamedBitGroup[] AllGroups = new NamedBitGroup[]
-		{
+		public static readonly ImmutableArray<NamedBitGroup> AllGroups = [
 			UserAccountControl,
 			UserAccountControlComputed,
 			SearchFlags,
@@ -77,7 +77,7 @@ namespace Titanis.Ldap
 			NtdsaOptions,
 			SupportedEncryptionTypes,
 			SamAccountType,
-		};
+		];
 
 		internal static readonly Dictionary<string, NamedBitGroup> GroupsByName = AllGroups.ToDictionary(r => r.AttributeName, StringComparer.OrdinalIgnoreCase);
 	}
