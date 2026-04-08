@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -1556,8 +1557,7 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription UserCertificate = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "2.5.4.36", ["userCertificate"], syntax: AdSyntaxes.StringOctet);
 		#endregion
 		#region All attributes
-		private static readonly AttributeTypeDescription[] allAttrs = new AttributeTypeDescription[]
-		{
+		private static readonly ImmutableArray<AttributeTypeDescription> allAttrs = [
 			#region rootDSE (not included in schema)
 			dsServiceName,
 			namingContexts,
@@ -3075,7 +3075,9 @@ namespace Titanis.Ldap
 			X500uniqueIdentifier,
 			UserCertificate,
 			#endregion
-		};
+		];
+
+		public static ImmutableArray<AttributeTypeDescription> GetAllAttributes() => allAttrs;
 		#endregion
 
 		private static readonly Dictionary<string, AttributeTypeDescription> attrsByNameOrOid = BuildIndex();
