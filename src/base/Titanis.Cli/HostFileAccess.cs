@@ -26,6 +26,12 @@ namespace Titanis.Cli
 			return File.ReadAllBytes(fileName);
 		}
 
+		public string ReadAllTextFrom(string fileName)
+		{
+			fileName = this.ResolveFsPath(fileName);
+			return File.ReadAllText(fileName);
+		}
+
 		public bool FileExists(string path) => File.Exists(this.ResolveFsPath(path));
 
 		public void WriteAllBytesTo(string fileName, byte[] contents)

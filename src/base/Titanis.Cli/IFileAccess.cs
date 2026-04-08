@@ -28,6 +28,13 @@ namespace Titanis.Cli
 		byte[] ReadAllBytesFrom(string fileName);
 
 		/// <summary>
+		/// Reads text from a file.
+		/// </summary>
+		/// <param name="fileName">Name of file</param>
+		/// <returns>The text read from <paramref name="fileName"/></returns>
+		string ReadAllTextFrom(string fileName);
+
+		/// <summary>
 		/// Determines whether a file exists.
 		/// </summary>
 		/// <param name="path">File name to check</param>

@@ -81,6 +81,20 @@ public class TestFileAccess : IFileAccess
 		return bytes;
 	}
 
+	public string ReadAllTextFrom(string fileName)
+	{
+		string resName = this.FileNameToResourceName(fileName);
+		var resStream = this._resourceAssembly.GetManifestResourceStream(resName);
+
+		if (resStream is null)
+			throw new FileNotFoundException($"No test file found with name: {fileName}");
+
+		StreamReader reader = new StreamReader(resStream);
+		string text = reader.ReadToEnd();
+		reader.Close();
+		return text;
+	}
+
 	private string FileNameToResourceName(string fileName)
 	{
 		if (fileName.StartsWith(TestFsPrefix))
