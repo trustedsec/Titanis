@@ -1045,6 +1045,9 @@ namespace Titanis.Cli
 			services.AddService(typeof(IClientCredentialService), this.CreateCredService);
 			services.AddService(typeof(IKerberosCallback), this.CreateKerberosCallback);
 			services.AddService(typeof(KerberosClient), (IServiceContainer container, Type serviceType) => this.TryCreateKerberosClient());
+
+			IParameterGroup? certGroup = this.CertificateParameters;
+			certGroup?.Initialize(services, this);
 		}
 
 		public IClientCredentialService? CreateCredService(IServiceContainer container, Type serviceType)

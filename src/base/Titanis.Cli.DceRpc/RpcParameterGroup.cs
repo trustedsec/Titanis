@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -16,7 +17,8 @@ using Titanis.Smb2;
 
 namespace Titanis.Cli
 {
-	public class RpcParameterGroup : ParameterGroupBase
+
+	public class RpcParameterGroup : ParameterGroupBase, IRpcBinder
 	{
 
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
@@ -55,6 +57,12 @@ namespace Titanis.Cli
 		[Parameter]
 		[Description("If the interface supports named pipes, attempt to connect over the named pipe instead of TCP")]
 		public SwitchParam PreferSmb { get; set; }
+
+		protected override void Initialize(IServiceContainer services)
+		{
+			base.Initialize(services);
+			services.AddService(typeof(IRpcBinder), this);
+		}
 
 		public void ValidateParameters(ParameterValidationContext context, RpcServiceClient svcClient, ref string? serverName)
 		{
@@ -112,8 +120,6 @@ namespace Titanis.Cli
 			var client = this.SmbParameters.CreateClient();
 			return client;
 		}
-
-		public record struct RpcBindInfo(Smb2Client? SmbClient);
 
 		public async Task<RpcBindInfo> BindServiceClient(
 			RpcServiceClient svcClient,
