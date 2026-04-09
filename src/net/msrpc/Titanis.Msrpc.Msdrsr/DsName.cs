@@ -1,18 +1,20 @@
 ﻿using ms_drsr;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Titanis.DceRpc;
+using Titanis.Ldap;
 using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msdrsr
 {
 	[TypeConverter(typeof(DsNameConverter))]
-	public class DsName
+	public sealed class DsName
 	{
 		public DsName(
 			Guid guid,
 			SecurityIdentifier? sid,
-			string? name)
+			LdapDistinguishedName? name)
 		{
 			if (sid != null)
 			{
@@ -27,15 +29,16 @@ namespace Titanis.Msrpc.Msdrsr
 
 		internal DsName(DSNAME dsname)
 		{
-			this.Sid = new SecurityIdentifier(dsname.Sid.Data);
+			if (dsname.SidLen > 0)
+				this.Sid = new SecurityIdentifier(dsname.Sid.Data);
 			this.Guid = dsname.Guid;
 			if (dsname.NameLen > 0)
-				this.Name = new string(dsname.StringName.Slice(0, (int)dsname.NameLen));
+				this.Name = new LdapDistinguishedName(new string(dsname.StringName.Slice(0, (int)dsname.NameLen)));
 		}
 
 		public SecurityIdentifier? Sid { get; }
 		public Guid Guid { get; set; }
-		public string? Name { get; set; }
+		public LdapDistinguishedName? Name { get; set; }
 
 		public static implicit operator DsName(SecurityIdentifier sid) => new DsName(Guid.Empty, sid, null);
 
@@ -56,17 +59,47 @@ namespace Titanis.Msrpc.Msdrsr
 					Array.Resize(ref sidBytes, 28);
 			}
 
+			var name = this.Name?.Text;
 			var dsname = new RpcPointer<ms_drsr.DSNAME>(new DSNAME
 			{
 				structLen = 62,
 				SidLen = (uint)sidLength,
 				Guid = this.Guid,
 				Sid = new ms_drsr.NT4SID { Data = sidBytes },
-				NameLen = (uint)(this.Name?.Length ?? 0),
-				StringName = (this.Name is null) ? new char[] { '\0' } : (this.Name + '\0').ToCharArray()
+				NameLen = (uint)(name?.Length ?? 0),
+				StringName = (this.Name is null) ? new char[] { '\0' } : (name + '\0').ToCharArray()
 			});
 
 			return dsname;
+		}
+
+		public static bool TryParse(string str, [NotNullWhen(true)] out DsName? dsName)
+		{
+			if (str.StartsWith("S-1-5-"))
+			{
+				dsName = new DsName(default, SecurityIdentifier.Parse(str), null);
+				return true;
+			}
+			else if (Guid.TryParse(str, out var guid))
+			{
+				dsName = new DsName(guid, null, null);
+				return true;
+			}
+			else if (str.StartsWith("CN="))
+			{
+				dsName = new DsName(default, null, new LdapDistinguishedName(str));
+				return true;
+			}
+
+			dsName = null;
+			return false;
+		}
+		public static DsName Parse(string str)
+		{
+			if (!TryParse(str, out var dsName))
+				throw new ArgumentException($"The string must be either a security identifier, an object GUID, or a distinguished name.", nameof(str));
+
+			return dsName;
 		}
 	}
 
@@ -85,18 +118,7 @@ namespace Titanis.Msrpc.Msdrsr
 		{
 			if (value is string str)
 			{
-				if (str.StartsWith("S-"))
-				{
-					return new DsName(default, SecurityIdentifier.Parse(str), null);
-				}
-				else if (Guid.TryParse(str, out var guid))
-				{
-					return new DsName(guid, null, null);
-				}
-				else if (str.Contains('='))
-				{
-					return new DsName(default, null, str);
-				}
+				return DsName.Parse(str);
 			}
 			else if (value is Guid guid)
 			{

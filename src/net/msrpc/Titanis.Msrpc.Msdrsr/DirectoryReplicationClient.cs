@@ -206,7 +206,7 @@ namespace Titanis.Msrpc.Msdrsr
 		{
 		}
 
-		public Task<DsObject> GetNcChanges(
+		public Task<DsObject[]> GetNcChanges(
 			DomainControllerInfo dcInfo,
 			DsName objectName,
 			string[] attributeOids,
@@ -331,7 +331,7 @@ namespace Titanis.Msrpc.Msdrsr
 			ReplSecrets = 7,
 		}
 
-		private async Task<DsObject> GetNcChanges(RpcContextHandle handle, ReplicateReq arg, CancellationToken cancellationToken)
+		private async Task<DsObject[]> GetNcChanges(RpcContextHandle handle, ReplicateReq arg, CancellationToken cancellationToken)
 		{
 			var dcInfo = arg.dcInfo;
 
@@ -383,25 +383,22 @@ namespace Titanis.Msrpc.Msdrsr
 						var prefixTable = DecodePrefixTable(rep6.PrefixTableSrc.pPrefixEntry.value);
 
 						var pObj = rep6.pObjects;
+						List<DsObject> objs = new List<DsObject>((int)pmsgOut.value.V6.cNumObjects);
 						while (pObj != null)
 						{
 							var name = new DsName(pObj.value.Entinf.pName.value);
 							var attrs = AttrsFromBlock(in pObj.value.Entinf.AttrBlock, prefixTable, sessionKey);
 
 							obj = new DsObject(name, attrs);
-							return obj;
+							objs.Add(obj);
 
-							break;
 							pObj = pObj.value.pNextEntInf;
 						}
+						return objs.ToArray();
 					}
-					break;
 				default:
-					break;
+					throw new NotSupportedException($"Server responded with unsupported message version {pdwOutVersion.value}.");
 			}
-
-
-			throw new NotImplementedException();
 		}
 
 		private static string[] DecodePrefixTable(PrefixTableEntry[] prefixTableSrc)

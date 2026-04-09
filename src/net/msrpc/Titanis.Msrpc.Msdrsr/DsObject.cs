@@ -1,4 +1,7 @@
-﻿namespace Titanis.Msrpc.Msdrsr
+﻿using Titanis.Ldap;
+using Titanis.Winterop.SamServer;
+
+namespace Titanis.Msrpc.Msdrsr
 {
 	public class DsObject
 	{
@@ -10,6 +13,53 @@
 
 		public DsName Name { get; }
 		public DsAttribute[] Attributes { get; }
+
+		public LdapEntry ToLdapEntry()
+		{
+			var obj = this;
+
+			List<LdapAttribute> returnedAttrs = new List<LdapAttribute>(obj.Attributes.Length);
+			for (int i = 0; i < obj.Attributes.Length; i++)
+			{
+				DsAttribute? attr = obj.Attributes[i];
+				var attrType = LdapAttributeTypes.TryGetByNameOrOid(attr.Oid);
+
+				var name = attrType?.Name;
+				object[] values;
+				if (attrType != null && attrType.Syntax != null)
+				{
+					values = Array.ConvertAll(attr.Values, r => attrType.Syntax.DecodeDsrep(r.Bytes));
+
+					if (attrType.Oid == LdapAttributeTypes.SupplementalCredentials.Oid && attr.Values.Length > 0)
+					{
+						var suppBytes = attr.Values[0];
+						try
+						{
+							var suppCreds = SamServer.DecodeSupplementalCredential(suppBytes.Bytes);
+							if (suppCreds.KerberosKeys.Length > 0)
+								returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "kerberosKeys"), suppCreds.KerberosKeys));
+							if (suppCreds.KerberosOldKeys.Length > 0)
+								returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "kerberosOldKeys"), suppCreds.KerberosOldKeys));
+							if (suppCreds.CleartextPassword != null)
+								returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "cleartextPassword"), [suppCreds.CleartextPassword]));
+						}
+						catch
+						{
+
+						}
+					}
+				}
+				else
+				{
+					values = Array.ConvertAll(attr.Values, r => r.Bytes);
+				}
+
+				returnedAttrs.Add(new LdapAttribute(attrType, values));
+			}
+			LdapEntry entry = new LdapEntry(obj.Name.Name, returnedAttrs.ToArray());
+
+			return entry;
+		}
 	}
 
 	public class DsAttribute
