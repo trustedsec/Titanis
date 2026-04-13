@@ -10,23 +10,23 @@ Smb2Client <subcommand>
 
 |Command|Description|
 |-|-|
-|[ls](#smb2client-ls)|Lists the contents of a directory (including named pipes).|
-|[get](#smb2client-get)|Gets the contents of a file.|
-|[put](#smb2client-put)|Sends a file to the server.|
-|[watch](#smb2client-watch)|Watches for modifications to a directory or subtree.|
 |[enumnics](#smb2client-enumnics)|Queries the server for a list of network interfaces.|
-|[mklink](#smb2client-mklink)|Creates a symbolic link.|
-|[mount](#smb2client-mount)|Creates a mount point or junction.|
-|[umount](#smb2client-umount)|Unmounts a mount point.|
-|[mkdir](#smb2client-mkdir)|Creates a directory.|
-|[rmdir](#smb2client-rmdir)|Deletes a directory.|
-|[rm](#smb2client-rm)|Deletes a file.|
-|[touch](#smb2client-touch)|Updates the timestamps or attributes of a file or directory on an SMB share.|
-|[enumshares](#smb2client-enumshares)|Lists shares on the server|
 |[enumopenfiles](#smb2client-enumopenfiles)|Lists files open on the server.|
 |[enumsessions](#smb2client-enumsessions)|Lists active sessions on the server.|
+|[enumshares](#smb2client-enumshares)|Lists shares on the server|
 |[enumsnapshots](#smb2client-enumsnapshots)|Lists the available snapshots for a file or directory.|
 |[enumstreams](#smb2client-enumstreams)|Lists the data streams of a file or directory.|
+|[get](#smb2client-get)|Gets the contents of a file.|
+|[ls](#smb2client-ls)|Lists the contents of a directory (including named pipes).|
+|[mkdir](#smb2client-mkdir)|Creates a directory.|
+|[mklink](#smb2client-mklink)|Creates a symbolic link.|
+|[mount](#smb2client-mount)|Creates a mount point or junction.|
+|[put](#smb2client-put)|Sends a file to the server.|
+|[rm](#smb2client-rm)|Deletes a file.|
+|[rmdir](#smb2client-rmdir)|Deletes a directory.|
+|[touch](#smb2client-touch)|Updates the timestamps or attributes of a file or directory on an SMB share.|
+|[umount](#smb2client-umount)|Unmounts a mount point.|
+|[watch](#smb2client-watch)|Watches for modifications to a directory or subtree.|
 
 
   For help on a subcommand, use `Smb2Client <subcommand> -h`
@@ -48,37 +48,9 @@ Smb2Client enumnics [options] <UncPath>
 ## Options
 
 
-### Connection
-
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -88,6 +60,7 @@ Smb2Client enumnics [options] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  InterfaceIndex|
@@ -97,33 +70,8 @@ Smb2Client enumnics [options] <UncPath>
 ||||  EndPoint|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -131,10 +79,10 @@ Smb2Client enumnics [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -143,14 +91,14 @@ Smb2Client enumnics [options] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -160,8 +108,62 @@ Smb2Client enumnics [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -205,11 +207,8 @@ Smb2Client enumopenfiles [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Level||&lt;OpenFileInfoLevel&gt;|Which level of detail to query|
-||||**Possible values:**|
-||||  Level2|
-||||  Level3|
-|    -OpenBy||&lt;String&gt;|Select files open by this user|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -BasePath||&lt;String&gt;|Select files starting with this path|
 |    -BufferSize||&lt;Int32&gt;|Max size for response buffer|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
@@ -221,6 +220,14 @@ Smb2Client enumopenfiles [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Level||&lt;OpenFileInfoLevel&gt;|Which level of detail to query|
+||||**Possible values:**|
+||||  Level2|
+||||  Level3|
+|    -OpenBy||&lt;String&gt;|Select files open by this user|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Id|
@@ -230,38 +237,10 @@ Smb2Client enumopenfiles [options] <ServerName>
 ||||  UserName|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -269,10 +248,10 @@ Smb2Client enumopenfiles [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -281,14 +260,14 @@ Smb2Client enumopenfiles [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -298,17 +277,22 @@ Smb2Client enumopenfiles [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -316,17 +300,37 @@ Smb2Client enumopenfiles [options] <ServerName>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -364,16 +368,11 @@ Smb2Client enumsessions [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Level||&lt;SessionInfoLevel&gt;|Which level of detail to query|
-||||**Possible values:**|
-||||  Level0|
-||||  Level1|
-||||  Level2|
-||||  Level10|
-||||  Level502|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|-B, -BufferSize||&lt;Int32&gt;|Max size for response buffer|
 |    -ClientComputer||&lt;String&gt;|Select sessions belonging to this user|
 |    -ClientUserName||&lt;String&gt;|Select sessions connected to by this computer|
-|-B, -BufferSize||&lt;Int32&gt;|Max size for response buffer|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -383,6 +382,16 @@ Smb2Client enumsessions [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Level||&lt;SessionInfoLevel&gt;|Which level of detail to query|
+||||**Possible values:**|
+||||  Level0|
+||||  Level1|
+||||  Level2|
+||||  Level10|
+||||  Level502|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  ClientName|
@@ -395,38 +404,10 @@ Smb2Client enumsessions [options] <ServerName>
 ||||  Transport|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -434,10 +415,10 @@ Smb2Client enumsessions [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -446,14 +427,14 @@ Smb2Client enumsessions [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -463,17 +444,22 @@ Smb2Client enumsessions [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -481,17 +467,37 @@ Smb2Client enumsessions [options] <ServerName>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -523,13 +529,8 @@ Smb2Client enumshares [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Level||&lt;ShareInfoLevel&gt;|Which level of detail to query|
-||||**Possible values:**|
-||||  Level1|
-||||  Level2|
-||||  Level501|
-||||  Level502|
-||||  Level503|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |-B, -BufferSize||&lt;Int32&gt;|Max size for response buffer|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -540,6 +541,17 @@ Smb2Client enumshares [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Level||&lt;ShareInfoLevel[]&gt;|Which level(s) of detail to query|
+||||**Possible values:**|
+||||  Level0|
+||||  Level1|
+||||  Level2|
+||||  Level501|
+||||  Level502|
+||||  Level503|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  ShareName|
@@ -550,42 +562,14 @@ Smb2Client enumshares [options] <ServerName>
 ||||  MaxUses|
 ||||  CurrentUses|
 ||||  Path|
-||||  SecurityDescriptorSddl|
+||||  SecurityDescriptor|
 ||||  Flags|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -593,10 +577,10 @@ Smb2Client enumshares [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -605,14 +589,14 @@ Smb2Client enumshares [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -622,17 +606,22 @@ Smb2Client enumshares [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -640,18 +629,71 @@ Smb2Client enumshares [options] <ServerName>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
+
+## Details
+
+  The Server service returns different levels of share information.  Anything
+  about Level1 requires administrator access.  By default, Smb2Client enumshares
+  attempts to query for Level502; if this fails, it falls back to Level1,
+  returning a subset of the available fields.  You may specify one or more levels
+  to override this default, or specify the desired fields.  In the latter case,
+  Smb2Client enumshares determines which levels to query to populate the
+  requested fields.
+  
+
+## Examples
+
+### Example 1 - List basic share info
+
+```
+Smb2Client enumshares LUMON-FS1 -UserName marks@LUMON -Password She's@live!! -Kdc LUMON-DC1
+```
+
+### Example 2 - List Level2
+
+```
+Smb2Client enumshares LUMON-FS1 -UserName milchick@LUMON -Password Br3@kr00m! -Kdc LUMON-DC1 -OutputFields ShareName, Type, Path
+```
+  Since Path requires Level2, the command attempts to query Level2, falling back
+  to Level1 if necessary
+
+### Example 3 - List security descriptors
+
+```
+Smb2Client enumshares LUMON-FS1 -UserName milchick@LUMON -Password Br3@kr00m! -Kdc LUMON-DC1 -OutputFields ShareName, Type, Path, SecurityDescriptor
+```
 # Smb2Client enumsnapshots
   Lists the available snapshots for a file or directory.
 
@@ -670,37 +712,9 @@ Smb2Client enumsnapshots [options] <UncPath>
 ## Options
 
 
-### Connection
-
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -710,39 +724,15 @@ Smb2Client enumsnapshots [options] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Token|
 ||||  Timestamp|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -750,10 +740,10 @@ Smb2Client enumsnapshots [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -762,14 +752,14 @@ Smb2Client enumsnapshots [options] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -779,8 +769,62 @@ Smb2Client enumsnapshots [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -822,37 +866,9 @@ Smb2Client enumstreams [options] <UncPath>
 ## Options
 
 
-### Connection
-
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -862,6 +878,7 @@ Smb2Client enumstreams [options] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Name|
@@ -869,33 +886,8 @@ Smb2Client enumstreams [options] <UncPath>
 ||||  AllocationSize|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -903,10 +895,10 @@ Smb2Client enumstreams [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -915,14 +907,14 @@ Smb2Client enumstreams [options] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -932,8 +924,62 @@ Smb2Client enumstreams [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -978,15 +1024,9 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ChunkSize||&lt;Int32&gt;|Size of chunks to copy|
-|    -Unbuffered||&lt;SwitchParam&gt;|Reads the data directly from storage|
 |    -Compress||&lt;SwitchParam&gt;|Requests the server compress the data|
-|    -Depth||&lt;Int32&gt;|Depth of directory tree to traverse (default = 0 [no recursion], -1 = no limit)|
-|-Q, -QueryBufferSize||&lt;Int32&gt;|Specifies the buffer size for querying the directory listing (for recursive operations).|
-|    -TreeOnly||&lt;SwitchParam&gt;|Only copies the directory structure, but not the files.|
-|    -Overwrite||&lt;SwitchParam&gt;|Overwrites existing local files|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continues copying after an error occurs|
-|    -TimeWarpToken||&lt;TimeWarpToken&gt;|Snapshot version, either as a date/time or a @GMT token|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -996,64 +1036,18 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continues copying after an error occurs|
+|    -Depth||&lt;Int32&gt;|Depth of directory tree to traverse (default = 0 [no recursion], -1 = no limit)|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -Overwrite||&lt;SwitchParam&gt;|Overwrites existing local files|
+|-Q, -QueryBufferSize||&lt;Int32&gt;|Specifies the buffer size for querying the directory listing (for recursive operations).|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -TimeWarpToken||&lt;TimeWarpToken&gt;|Snapshot version, either as a date/time or a @GMT token|
+|    -TreeOnly||&lt;SwitchParam&gt;|Only copies the directory structure, but not the files.|
+|    -Unbuffered||&lt;SwitchParam&gt;|Reads the data directly from storage|
 
 
 ### Authentication
@@ -1061,10 +1055,10 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1073,14 +1067,14 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1090,8 +1084,62 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -1192,9 +1240,7 @@ Smb2Client ls [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-Q, -QueryBufferSize||&lt;Int32&gt;|Specifies the buffer size for querying the directory listing.|
-|    -Depth||&lt;Int32&gt;|Sets the depth limit for a recursive listing (default = 0 [no recursion], -1 = no limit)|
-|    -TimeWarpToken||&lt;TimeWarpToken&gt;|Snapshot version, either as a date/time or a @GMT token|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1204,6 +1250,8 @@ Smb2Client ls [options] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -Depth||&lt;Int32&gt;|Sets the depth limit for a recursive listing (default = 0 [no recursion], -1 = no limit)|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  RelativePath|
@@ -1228,62 +1276,10 @@ Smb2Client ls [options] <UncPath>
 ||||  MaxAccess|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|-Q, -QueryBufferSize||&lt;Int32&gt;|Specifies the buffer size for querying the directory listing.|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -TimeWarpToken||&lt;TimeWarpToken&gt;|Snapshot version, either as a date/time or a @GMT token|
 
 
 ### Authentication
@@ -1291,10 +1287,10 @@ Smb2Client ls [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1303,14 +1299,14 @@ Smb2Client ls [options] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1320,8 +1316,62 @@ Smb2Client ls [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -1364,56 +1414,66 @@ Smb2Client ls [options] <UncPath>
 
 ## Examples
 
-### Example 1 - Listing the contents of a share
+### Example 1 - Listing the contents of a share (NTLM)
 
 ```
-Smb2Client ls \\SERVER\Share -u User -ud DOMAIN -p password
+Smb2Client ls \\LUMON-FS1\MDR -u milchick -p Br3@kr00m!
 ```
 
-### Example 2 - Listing named pipes
+### Example 2 - Listing named pipes as anonymous
 
 ```
-Smb2Client ls \\SERVER\IPC$ -u User -ud DOMAIN -p password
+Smb2Client ls \\LUMON-FS1\IPC$ -anon
 ```
 
-### Example 3 - Listing the contents of a share with an alternate host name
+### Example 3 - Listing named pipes
 
 ```
-Smb2Client ls \\SERVER\Share -ha fileserver.domain.local -u User -ud DOMAIN -p password
+Smb2Client ls \\LUMON-FS1\IPC$ -u milchick -p Br3@kr00m!
 ```
-  In this example, the command line specifies a host name differing from the
-  server name to resolve for connecting to the server.
 
-### Example 4 - Listing the contents of a share with an alternate host address
+### Example 4 - Using Kerberos with a password
 
 ```
-Smb2Client ls \\SERVER\Share -ha 10.0.0.1 -u User -ud DOMAIN -p password
-```
-  In this example, the command line specifies the host address explicitly so that
-  SERVER does not need to be resolved.
-
-### Example 5 - Passing the hash
-
-```
-Smb2Client ls \\SERVER\Share -u User -ud DOMAIN -NtlmHash 8846F7EAEE8FB117AD06BDD830B7586C
-```
-  This command line provides the password as an NTLM hash.
-
-### Example 6 - Customizing NTLM
-
-```
-Smb2Client ls \\SERVER\Share -u User -ud DOMAIN -p password -ntlmver 10.0.0.0 -w MYWORKSTATION
-```
-  This command line specifies a different NTLM version and workstation name to
-  send during authentication.
-
-### Example 7 - Using Kerberos with a password
-
-```
-Smb2Client ls \\SERVER\Share -u User -ud DOMAIN -p password -Kdc 10.0.0.10
+Smb2Client ls \\LUMON-DC1\sysvol -u milchick@LUMON -p Br3@kr00m! -Kdc LUMON-DC1
 ```
   This command line specifies credentials along with the -Kdc option specifying
   the KDC to request a ticket from.
+
+### Example 5 - Listing the contents of a share with an alternate host name
+
+```
+Smb2Client ls \\SERVER\MDR -ha 10.66.0.13 -u Administrator -p 9CorePrinciples
+```
+  In this example, the command line specifies a host name differing from the
+  server name to resolve for connecting to the server.  When connecting to the
+  target, the specified host address (10.66.0.13) is used.  Once the TCP
+  connection is established, the name 'SERVER' is used in the application
+  protocol.  In addition, the name SERVER is used as the SPN, both with NTLM and
+  Kerberos; if strict SPN checking is enabled, this results in
+  STATUS_ACCESS_DENIED.
+
+### Example 6 - Passing the hash
+
+```
+Smb2Client ls \\LUMON-FS1\MDR -u milchick -NtlmHash B406A01772D0AD225D7B1C67DD81496F
+```
+  This command line provides the credentials as an NTLM hash.
+
+### Example 7 - Listing all columns
+
+```
+Smb2Client ls \\LUMON-FS1\C$\Windows -u milchick -Password Br3@kr00m! -OutputFields *
+```
+  This command prints all file properties.
+
+### Example 8 - Customizing NTLM
+
+```
+Smb2Client ls \\LUMON-FS1\MDR -u milchick -p Br3@kr00m! -ntlmver 10.0.0.0 -w MILCHICK-WKS
+```
+  This command line specifies a different NTLM version and workstation name to
+  send during authentication.
 # Smb2Client mkdir
   Creates a directory.
 
@@ -1434,7 +1494,7 @@ Smb2Client mkdir [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Parents||&lt;SwitchParam&gt;|Create parent directories|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1444,64 +1504,12 @@ Smb2Client mkdir [options] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -Parents||&lt;SwitchParam&gt;|Create parent directories|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -1509,10 +1517,10 @@ Smb2Client mkdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1521,14 +1529,14 @@ Smb2Client mkdir [options] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1538,8 +1546,62 @@ Smb2Client mkdir [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -1595,9 +1657,7 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -PrintPath||&lt;String&gt;|The path to display to the user in directory listings (defaults to &lt;TargetPath&gt;)|
-|    -Directory||&lt;SwitchParam&gt;|Creates the symlink as a directory|
-|    -Relative||&lt;SwitchParam&gt;|Create the link as a relative path|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1607,64 +1667,14 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -Directory||&lt;SwitchParam&gt;|Creates the symlink as a directory|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -PrintPath||&lt;String&gt;|The path to display to the user in directory listings (defaults to &lt;TargetPath&gt;)|
+|    -Relative||&lt;SwitchParam&gt;|Create the link as a relative path|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -1672,10 +1682,10 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1684,14 +1694,14 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1701,8 +1711,62 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -1790,7 +1854,7 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -PrintPath||&lt;String&gt;|The path to display to the user in directory listings (defaults to &lt;TargetPath&gt;)|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1800,64 +1864,12 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -PrintPath||&lt;String&gt;|The path to display to the user in directory listings (defaults to &lt;TargetPath&gt;)|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -1865,10 +1877,10 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1877,14 +1889,14 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1894,8 +1906,62 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -1983,13 +2049,10 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -ChangeTimestamp||&lt;DateTime&gt;|Change time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -ChunkSize||&lt;Int32&gt;|Size of chunks to copy|
 ||||  Default: 32768|
-|    -TimestampsFrom||&lt;UncPath&gt;|UNC Path of remote file to copy Creation, LastAccess, LastWrite and Change Time from.|
-|    -CreateTimestamp||&lt;DateTime&gt;|Create time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
-|    -LastAccessTimestamp||&lt;DateTime&gt;|Last access time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
-|    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
-|    -ChangeTimestamp||&lt;DateTime&gt;|Change time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1999,64 +2062,15 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -CreateTimestamp||&lt;DateTime&gt;|Create time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
+|    -LastAccessTimestamp||&lt;DateTime&gt;|Last access time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
+|    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -TimestampsFrom||&lt;UncPath&gt;|UNC Path of remote file to copy Creation, LastAccess, LastWrite and Change Time from.|
 
 
 ### Authentication
@@ -2064,10 +2078,10 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -2076,14 +2090,14 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -2093,8 +2107,62 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -2148,37 +2216,9 @@ Smb2Client rm [options] <UncPath>
 ## Options
 
 
-### Connection
-
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -2188,35 +2228,11 @@ Smb2Client rm [options] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -2224,10 +2240,10 @@ Smb2Client rm [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -2236,14 +2252,14 @@ Smb2Client rm [options] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -2253,8 +2269,62 @@ Smb2Client rm [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -2296,37 +2366,9 @@ Smb2Client rmdir [options] <UncPath>
 ## Options
 
 
-### Connection
-
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -2336,35 +2378,11 @@ Smb2Client rmdir [options] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -2372,10 +2390,10 @@ Smb2Client rmdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -2384,14 +2402,14 @@ Smb2Client rmdir [options] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -2401,8 +2419,62 @@ Smb2Client rmdir [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -2446,14 +2518,8 @@ Smb2Client touch [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -CreateTimestamp||&lt;DateTime&gt;|Create time to set on the file (UTC)|
-|    -LastAccessTimestamp||&lt;DateTime&gt;|Last access time to set on the file (UTC)|
-|    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC)|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ChangeTimestamp||&lt;DateTime&gt;|Change time to set on the file (UTC)|
-|    -SetAttributes||&lt;FileAttributeSpec&gt;|File attributes to set on the file or directory. Accepts Formats: RHSATFMCOIEVX (string), 28312 (int), 0x80 (hex). See Detailed help for meaning|
-|    -UpdateAttributes||&lt;String&gt;|File attributes modifications|
-|    -TimestampsFrom||&lt;UncPath&gt;|UNC Path of remote file to copy timestamps from|
-|    -CopyFileAttributes||&lt;SwitchParam&gt;|If specified, also copy file attributes from TimestampsFrom|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -2463,6 +2529,11 @@ Smb2Client touch [options] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -CopyFileAttributes||&lt;SwitchParam&gt;|If specified, also copy file attributes from TimestampsFrom|
+|    -CreateTimestamp||&lt;DateTime&gt;|Create time to set on the file (UTC)|
+|    -LastAccessTimestamp||&lt;DateTime&gt;|Last access time to set on the file (UTC)|
+|    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC)|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  RelativePath|
@@ -2487,62 +2558,11 @@ Smb2Client touch [options] <UncPath>
 ||||  MaxAccess|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -SetAttributes||&lt;FileAttributeSpec&gt;|File attributes to set on the file or directory. Accepts Formats: RHSATFMCOIEVX (string), 28312 (int), 0x80 (hex). See Detailed help for meaning|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -TimestampsFrom||&lt;UncPath&gt;|UNC Path of remote file to copy timestamps from|
+|    -UpdateAttributes||&lt;String&gt;|File attributes modifications|
 
 
 ### Authentication
@@ -2550,10 +2570,10 @@ Smb2Client touch [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -2562,14 +2582,14 @@ Smb2Client touch [options] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -2579,8 +2599,62 @@ Smb2Client touch [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -2705,7 +2779,7 @@ Smb2Client umount [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -RemoveDirectory||&lt;SwitchParam&gt;|Deletes the directory after unmounting|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -2715,64 +2789,12 @@ Smb2Client umount [options] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -RemoveDirectory||&lt;SwitchParam&gt;|Deletes the directory after unmounting|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -2780,10 +2802,10 @@ Smb2Client umount [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -2792,14 +2814,14 @@ Smb2Client umount [options] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -2809,8 +2831,62 @@ Smb2Client umount [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-B, -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -2861,9 +2937,8 @@ Smb2Client watch [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Recursive||&lt;SwitchParam&gt;|Watches the entire subtree|
-|-B, -BufferSize||&lt;Int32&gt;|Buffer size (default = 2048)|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue watching for changes if an error occurs|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -BufferSize||&lt;Int32&gt;|Buffer size (default = 2048)|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -2873,6 +2948,8 @@ Smb2Client watch [options] <UncPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continue watching for changes if an error occurs|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Action|
@@ -2880,62 +2957,9 @@ Smb2Client watch [options] <UncPath>
 ||||  OldFileName|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -Recursive||&lt;SwitchParam&gt;|Watches the entire subtree|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-
-
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -UseBackupSemantics||&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -2943,10 +2967,10 @@ Smb2Client watch [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -2955,14 +2979,14 @@ Smb2Client watch [options] <UncPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -2972,8 +2996,62 @@ Smb2Client watch [options] <UncPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -BackupSemantics|-UseBackupSemantics|&lt;SwitchParam&gt;|Opens remote resource with backup semantics|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptShare||&lt;SwitchParam&gt;|Encrypts PDUs for the target share|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details

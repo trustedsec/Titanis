@@ -36,6 +36,16 @@ Sddl describe [options] <SddlOrHex>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
 |    -ObjectType||&lt;SecurityObjectType&gt;|Type of object|
 ||||**Possible values:**|
 ||||  File|
@@ -49,25 +59,25 @@ Sddl describe [options] <SddlOrHex>
 ||||  DirectoryObject|
 ||||  Scm|
 ||||  Service|
-|    -PrintHex||&lt;SwitchParam&gt;|Prints the binary form as a string of hex digits|
-|    -PrintSddl||&lt;SwitchParam&gt;|Prints the SDDL form|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
+|    -PrintHex||&lt;SwitchParam&gt;|Prints the binary form as a string of hex digits|
+|    -PrintSddl||&lt;SwitchParam&gt;|Prints the SDDL form|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -77,15 +87,7 @@ Sddl describe [options] <SddlOrHex>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
 ## Details
@@ -143,6 +145,7 @@ Sddl lookupguid [options] <Guid>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  EqualityContract|
@@ -157,6 +160,15 @@ Sddl lookupguid [options] <Guid>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -166,15 +178,7 @@ Sddl lookupguid [options] <Guid>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
 ## Examples
@@ -213,6 +217,7 @@ Sddl lookupwks [options] <SidOrWks>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  EqualityContract|
@@ -226,6 +231,15 @@ Sddl lookupwks [options] <SidOrWks>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -235,15 +249,7 @@ Sddl lookupwks [options] <SidOrWks>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
 ## Examples

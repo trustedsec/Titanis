@@ -10,14 +10,15 @@ Kerb <subcommand>
 
 |Command|Description|
 |-|-|
-|[getasinfo](#kerb-getasinfo)|Gets server time and encryption types (with salts) for a user account.|
 |[asreq](#kerb-asreq)|Requests a TGT from the KDC.|
-|[tgsreq](#kerb-tgsreq)|Requests a ticket from the KDC.|
-|[renew](#kerb-renew)|Renews a ticket|
-|[select](#kerb-select)|Selects and displays tickets from a file.|
 |[changepw](#kerb-changepw)|Changes an account password|
-|[setpw](#kerb-setpw)|Sets the password of (another) account|
+|[getasinfo](#kerb-getasinfo)|Gets server time and encryption types (with salts) for a user account.|
+|[keytab](#kerb-keytab)|Display and edit keytab files|
+|[renew](#kerb-renew)|Renews a ticket|
 |[s2k](#kerb-s2k)|Generates a protocol key from a string, such as a password|
+|[select](#kerb-select)|Selects and displays tickets from a file.|
+|[setpw](#kerb-setpw)|Sets the password of (another) account|
+|[tgsreq](#kerb-tgsreq)|Requests a ticket from the KDC.|
 
 
   For help on a subcommand, use `Kerb <subcommand> -h`
@@ -40,10 +41,31 @@ Kerb asreq [options] <UserName> <Kdc>
 ## Options
 
 
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Target||&lt;SecurityPrincipalName[]&gt;|SPNs to request ticket(s) for|
+|    -TicketComment||&lt;String&gt;|Comment to associate with ticket|
+
+
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES 128 key|
+|    -DesKey||&lt;HexString&gt;|DES key|
 |    -EncTypes||&lt;EType[]&gt;|Encryption types to request in response|
 ||||**Possible values:**|
 ||||  DesCbcMd5|
@@ -59,50 +81,46 @@ Kerb asreq [options] <UserName> <Kdc>
 ||||  Rsa|
 ||||  RsaesOaep|
 ||||  DesEde3Cbc|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-W, -Workstation||&lt;String&gt;|Name of client workstation|
-|    -Realm||&lt;String&gt;|Name of realm (domain)|
-|    -Password||&lt;String&gt;|Password|
-|-N, -NtlmHash||&lt;HexString&gt;|NTLM hash (hex-encoded, no colons)|
-|    -AesKey||&lt;HexString&gt;|AES 128 key|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|-F, -Forwardable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
-|    -Proxiable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
-|    -Postdate||&lt;DateTime&gt;|Requests a postdated ticket with the specified start date|
-|    -Renewable||&lt;SwitchParam&gt;|Requests a renewable ticket|
-|    -RenewTill||&lt;DateTime&gt;|Requests a ticket renewable until the specified time (implies -Renewable)|
 |    -EndTime||&lt;DateTime&gt;|End time|
+|-F, -Forwardable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
+|-N, -NtlmHash||&lt;HexString&gt;|NTLM hash (hex-encoded, no colons)|
+|    -Password||&lt;String&gt;|Password|
+|    -Postdate||&lt;DateTime&gt;|Requests a postdated ticket with the specified start date|
+|    -Proxiable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
+|    -Realm||&lt;String&gt;|Name of realm (domain)|
+|    -Renewable||&lt;SwitchParam&gt;|Requests a renewable ticket|
 |    -RenewableOk||&lt;SwitchParam&gt;|Accepts a renewable ticket if the end time is over the limit|
+|    -RenewTill||&lt;DateTime&gt;|Requests a ticket renewable until the specified time (implies -Renewable)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|-W, -Workstation||&lt;String&gt;|Name of client workstation|
 
+
+### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Target||&lt;SecurityPrincipalName[]&gt;|SPNs to request ticket(s) for|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -TicketComment||&lt;String&gt;|Comment to associate with ticket|
-|-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -OutputFileName||&lt;String&gt;|Name of file to write ticket to|
-|    -Overwrite||&lt;SwitchParam&gt;|Overwrites the output file, if it exists|
 |    -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -112,24 +130,9 @@ Kerb asreq [options] <UserName> <Kdc>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
+|    -OutputFileName||&lt;String&gt;|Name of file to write ticket to|
+|    -Overwrite||&lt;SwitchParam&gt;|Overwrites the output file, if it exists|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
 
 ## Details
@@ -163,37 +166,49 @@ Kerb asreq [options] <UserName> <Kdc>
 
 ## Examples
 
-### Example 1 - Requesting a TGT with a password
+### Example 1 - Requesting a TGT with a user name / password
 
 ```
-Kerb asreq -UserName milchick -Realm LUMON -Password Br3@kr00m! -Kdc 10.66.0.11 -v -OutputFileName milchick-tgt.kirbi -Overwrite
+Kerb asreq -UserName milchick -Realm LUMON -Password Br3@kr00m! -Kdc LUMON-DC1 -v -OutputFileName milchick-tgt.kirbi -Overwrite
 ```
 
-### Example 2 - Requesting a TGT with a password request Rc4Hmac
+### Example 2 - Requesting a TGT with a UPN / password
+
+```
+Kerb asreq -UserName milchick@LUMON.IND -Password Br3@kr00m! -Kdc LUMON-DC1 -v -OutputFileName milchick-tgt.kirbi -Overwrite
+```
+
+### Example 3 - Requesting a TGT with PKINIT
+
+```
+Kerb asreq -UserName milchick@LUMON.IND -UserCert milchick.pfx -UserKeyPassword password -Kdc LUMON-DC1 -v -OutputFileName milchick-tgt.kirbi -Overwrite
+```
+
+### Example 4 - Requesting a TGT with a password request Rc4Hmac
 
 ```
 Kerb asreq -UserName milchick -Realm LUMON -Password Br3@kr00m! -EncTypes Rc4Hmac -Kdc 10.66.0.11 -v -OutputFileName milchick-tgt.kirbi -Overwrite
 ```
 
-### Example 3 - Requesting a TGT with a password request AES 128 or AES 256
+### Example 5 - Requesting a TGT with a password request AES 128 or AES 256
 
 ```
 Kerb asreq -UserName milchick -Realm LUMON -Password Br3@kr00m! -EncTypes Aes128CtsHmacSha1_96, Aes256CtsHmacSha1_96 -Kdc 10.66.0.11 -v -OutputFileName milchick-tgt.kirbi -Overwrite
 ```
 
-### Example 4 - Requesting a TGT with an NTLM Hash
+### Example 6 - Requesting a TGT with an NTLM Hash
 
 ```
 Kerb asreq -UserName milchick -NtlmHash B406A01772D0AD225D7B1C67DD81496F -Kdc 10.66.0.11 -Realm LUMON -v -OutputFileName milchick-tgt.kirbi -Overwrite
 ```
 
-### Example 5 - Requesting a TGT with an AES 128 key
+### Example 7 - Requesting a TGT with an AES 128 key
 
 ```
 Kerb asreq -UserName milchick -AesKey c5673764957bc2839e367ba7b82f32e1 -Kdc 10.66.0.11 -Realm LUMON -v -OutputFileName milchick-tgt.kirbi -Overwrite
 ```
 
-### Example 6 - Requesting a TGT with an AES 256 key
+### Example 8 - Requesting a TGT with an AES 256 key
 
 ```
 Kerb asreq -UserName milchick -AesKey 76332deee4296dcb20200888630755268e605c8576e50ff38db2d8b92351f4e4 -Kdc 10.66.0.11 -Realm LUMON -v -OutputFileName milchick-tgt.kirbi -Overwrite
@@ -218,21 +233,6 @@ Kerb changepw [options] <UserName> <Kdc> <NewPassword>
 ## Options
 
 
-### Authentication (Kerberos)
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-W, -Workstation||&lt;String&gt;|Name of client workstation|
-|-R, -Realm||&lt;String&gt;|Name of realm (domain)|
-|-P, -Password||&lt;String&gt;|Password|
-|    -NtlmHash||&lt;HexString&gt;|NTLM hash (hex-encoded, no colons)|
-|-A, -AesKey||&lt;HexString&gt;|AES 128 key|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
-
-
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
@@ -244,15 +244,49 @@ Kerb changepw [options] <UserName> <Kdc> <NewPassword>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-A, -AesKey||&lt;HexString&gt;|AES 128 key|
+|    -DesKey||&lt;HexString&gt;|DES key|
+|    -NtlmHash||&lt;HexString&gt;|NTLM hash (hex-encoded, no colons)|
+|-P, -Password||&lt;String&gt;|Password|
+|-R, -Realm||&lt;String&gt;|Name of realm (domain)|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|-W, -Workstation||&lt;String&gt;|Name of client workstation|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -262,24 +296,7 @@ Kerb changepw [options] <UserName> <Kdc> <NewPassword>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
 
 ## Details
@@ -321,13 +338,6 @@ Kerb getasinfo [options] <UserName> <Kdc>
 ## Options
 
 
-### Authentication (Kerberos)
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-R, -Realm||&lt;String&gt;|Name of realm (domain)|
-
-
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
@@ -339,6 +349,7 @@ Kerb getasinfo [options] <UserName> <Kdc>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  EType|
@@ -349,10 +360,35 @@ Kerb getasinfo [options] <UserName> <Kdc>
 |-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 
 
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-R, -Realm||&lt;String&gt;|Name of realm (domain)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -362,24 +398,7 @@ Kerb getasinfo [options] <UserName> <Kdc>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-
-
-### Connection
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 
 
 ## Details
@@ -405,6 +424,22 @@ Kerb getasinfo [options] <UserName> <Kdc>
 ```
 Kerb getasinfo milchick@LUMON 10.66.0.11
 ```
+# Kerb keytab
+  Display and edit keytab files
+
+## Synopsis
+```
+Kerb keytab <subcommand>
+```
+
+### Subcommands
+
+|Command|Description|
+|-|-|
+|[list](#kerb-keytab-list)|Lists the entries in a keytab file|
+
+
+  For help on a subcommand, use `Kerb keytab <subcommand> -h`
 # Kerb renew
   Renews a ticket
 
@@ -424,49 +459,6 @@ Kerb renew [options] <Kdc> [ <TargetSpn> ]
 ## Options
 
 
-### Authentication (Kerberos)
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -Ticket||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-W, -Workstation||&lt;String&gt;|Name of client workstation|
-|-F, -Forwardable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
-|    -Proxiable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
-|    -Postdate||&lt;DateTime&gt;|Requests a postdated ticket with the specified start date|
-|    -Renewable||&lt;SwitchParam&gt;|Requests a renewable ticket|
-|    -RenewTill||&lt;DateTime&gt;|Requests a ticket renewable until the specified time (implies -Renewable)|
-|-E, -EndTime||&lt;DateTime&gt;|End time|
-|    -RenewableOk||&lt;SwitchParam&gt;|Accepts a renewable ticket if the end time is over the limit|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -OutputFileName||&lt;String&gt;|Name of file to write ticket to|
-|    -Overwrite||&lt;SwitchParam&gt;|Overwrites the output file, if it exists|
-|-A, -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-
-
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
@@ -478,10 +470,27 @@ Kerb renew [options] <Kdc> [ <TargetSpn> ]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -TicketComment||&lt;String&gt;|Comment to associate with ticket|
 |-S, -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -TicketComment||&lt;String&gt;|Comment to associate with ticket|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-E, -EndTime||&lt;DateTime&gt;|End time|
+|-F, -Forwardable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
+|    -Postdate||&lt;DateTime&gt;|Requests a postdated ticket with the specified start date|
+|    -Proxiable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
+|    -Renewable||&lt;SwitchParam&gt;|Requests a renewable ticket|
+|    -RenewableOk||&lt;SwitchParam&gt;|Accepts a renewable ticket if the end time is over the limit|
+|    -RenewTill||&lt;DateTime&gt;|Requests a ticket renewable until the specified time (implies -Renewable)|
+|    -Ticket||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-W, -Workstation||&lt;String&gt;|Name of client workstation|
 
 
 ### Connection
@@ -489,8 +498,36 @@ Kerb renew [options] <Kdc> [ <TargetSpn> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-A, -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -OutputFileName||&lt;String&gt;|Name of file to write ticket to|
+|    -Overwrite||&lt;SwitchParam&gt;|Overwrites the output file, if it exists|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -555,7 +592,17 @@ Kerb s2k [options] <Password> [ <Salt> ] [ <EncType> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-S, -Salt||&lt;String&gt;|Salt as a string|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
 |-E, -EncType||&lt;EType[]&gt;|Encryption types to generate for|
 ||||**Possible values:**|
 ||||  DesCbcMd5|
@@ -571,28 +618,28 @@ Kerb s2k [options] <Password> [ <Salt> ] [ <EncType> ]
 ||||  Rsa|
 ||||  RsaesOaep|
 ||||  DesEde3Cbc|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  EType|
 ||||  KeyText|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
+|-S, -Salt||&lt;String&gt;|Salt as a string|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -602,15 +649,7 @@ Kerb s2k [options] <Password> [ <Salt> ] [ <EncType> ]
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
 ## Details
@@ -641,19 +680,19 @@ Kerb s2k [options] <Password> [ <Salt> ] [ <EncType> ]
 ### Example 1 - Generate keys for milchick in domain LUMON.IND
 
 ```
-Kerb s2k LUMON.INDmilchick Br3@kr00m!
+Kerb s2k Br3@kr00m! LUMON.INDseth
 ```
 
 ### Example 2 - Generate AES keys for milchick in domain LUMON.IND
 
 ```
-Kerb s2k LUMON.INDmilchick Br3@kr00m! -EncTypes Aes128CtsHmacSha1_96, Aes256CtsHmacSha1_96
+Kerb s2k Br3@kr00m! LUMON.INDseth -EncType Aes128CtsHmacSha1_96, Aes256CtsHmacSha1_96
 ```
 
 ### Example 3 - Generate keys for computer ALLENTOWN$ in domain LUMON.IND
 
 ```
-Kerb s2k LUMON.INDhostallentown.lumon.ind password
+Kerb s2k password LUMON.INDhostallentown.lumon.ind
 ```
 # Kerb select
   Selects and displays tickets from a file.
@@ -673,90 +712,6 @@ Kerb select [options] [ <From> ]
 ## Options
 
 
-### Ticket Source
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -Overwrite||&lt;SwitchParam&gt;|Overwrites target file if it exists|
-|    -Into||&lt;String&gt;|Target file name|
-|-P, -PrintAuthData||&lt;SwitchParam&gt;|Prints ticket authorization data (if decrypted)|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-
-
-### Ticket Decryption
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -TicketKey||&lt;HexString[]&gt;|Key to decrypt the ticket|
-|    -ServicePassword||&lt;String[]&gt;|Password for service account|
-|    -ServiceSalt||&lt;String[]&gt;|Salt for service account|
-
-
-### Ticket Filter
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -Current||&lt;SwitchParam&gt;|Only select tickets currently valid|
-|    -MatchingClientName||&lt;String[]&gt;|Regex of client name to match|
-|    -MatchingSpn||&lt;String[]&gt;|Regex of SPN to match|
-|    -MatchingTicketEType||&lt;EType[]&gt;|Filter for ticket encryption type|
-||||**Possible values:**|
-||||  DesCbcMd5|
-||||  DesCbcCrc|
-||||  Rc4Hmac|
-||||  Rc4HmacExp|
-||||  Aes128CtsHmacSha1_96|
-||||  Aes256CtsHmacSha1_96|
-||||  DsaWithSha1|
-||||  Md5WithRsa|
-||||  Sha1WithRsa|
-||||  Rc2Cbc|
-||||  Rsa|
-||||  RsaesOaep|
-||||  DesEde3Cbc|
-|    -MatchingSessionEType||&lt;EType[]&gt;|Filter for session key encryption type|
-||||**Possible values:**|
-||||  DesCbcMd5|
-||||  DesCbcCrc|
-||||  Rc4Hmac|
-||||  Rc4HmacExp|
-||||  Aes128CtsHmacSha1_96|
-||||  Aes256CtsHmacSha1_96|
-||||  DsaWithSha1|
-||||  Md5WithRsa|
-||||  Sha1WithRsa|
-||||  Rc2Cbc|
-||||  Rsa|
-||||  RsaesOaep|
-||||  DesEde3Cbc|
-|    -SeqNbr||&lt;NumberOrRange[]&gt;|Seq. nbr. or range|
-|    -InvertMatch||&lt;SwitchParam&gt;|Invert match; select whatever doesn't match|
-
-
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
@@ -768,6 +723,7 @@ Kerb select [options] [ <From> ]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  SourceFileName|
@@ -800,6 +756,91 @@ Kerb select [options] [ <From> ]
 ||||  Default: True|
 
 
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Into||&lt;String&gt;|Target file name|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Overwrite||&lt;SwitchParam&gt;|Overwrites target file if it exists|
+|-P, -PrintAuthData||&lt;SwitchParam&gt;|Prints ticket authorization data (if decrypted)|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+
+
+### Ticket Decryption
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ServicePassword||&lt;String[]&gt;|Password for service account|
+|    -ServiceSalt||&lt;String[]&gt;|Salt for service account|
+|    -TicketKey||&lt;HexString[]&gt;|Key to decrypt the ticket|
+
+
+### Ticket Filter
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Current||&lt;SwitchParam&gt;|Only select tickets currently valid|
+|    -InvertMatch||&lt;SwitchParam&gt;|Invert match; select whatever doesn't match|
+|    -MatchingClientName||&lt;String[]&gt;|Regex of client name to match|
+|    -MatchingSessionEType||&lt;EType[]&gt;|Filter for session key encryption type|
+||||**Possible values:**|
+||||  DesCbcMd5|
+||||  DesCbcCrc|
+||||  Rc4Hmac|
+||||  Rc4HmacExp|
+||||  Aes128CtsHmacSha1_96|
+||||  Aes256CtsHmacSha1_96|
+||||  DsaWithSha1|
+||||  Md5WithRsa|
+||||  Sha1WithRsa|
+||||  Rc2Cbc|
+||||  Rsa|
+||||  RsaesOaep|
+||||  DesEde3Cbc|
+|    -MatchingSpn||&lt;String[]&gt;|Regex of SPN to match|
+|    -MatchingTicketEType||&lt;EType[]&gt;|Filter for ticket encryption type|
+||||**Possible values:**|
+||||  DesCbcMd5|
+||||  DesCbcCrc|
+||||  Rc4Hmac|
+||||  Rc4HmacExp|
+||||  Aes128CtsHmacSha1_96|
+||||  Aes256CtsHmacSha1_96|
+||||  DsaWithSha1|
+||||  Md5WithRsa|
+||||  Sha1WithRsa|
+||||  Rc2Cbc|
+||||  Rsa|
+||||  RsaesOaep|
+||||  DesEde3Cbc|
+|    -SeqNbr||&lt;NumberOrRange[]&gt;|Seq. nbr. or range|
+
+
+### Ticket Source
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+
+
 ## Details
 
   This command reads tickets from one or more files (.kirbi or .ccache),
@@ -822,16 +863,16 @@ Kerb select [options] [ <From> ]
 
 ## Examples
 
-### Example 1 - Print tickets from all mlichick*.kirbi files
+### Example 1 - Print tickets from all mlichick*.ccache files
 
 ```
-Kerb select -From milchick*.kirbi
+Kerb select -From milchick*.ccache
 ```
 
 ### Example 2 - Combine tickets from all mlichick*.kirbi files
 
 ```
-Kerb select -From milchick*.kirbi -Into all-milchick.kirbi
+Kerb select -From milchick*.ccache -Into all-milchick.ccache
 ```
 
 ### Example 3 - Print only current tickets from all mlichick*.kirbi files
@@ -884,6 +925,7 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -893,35 +935,11 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -929,10 +947,10 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -941,14 +959,14 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -958,8 +976,8 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -967,8 +985,33 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -1011,11 +1054,34 @@ Kerb tgsreq [options] <Kdc> <Target>
 ## Options
 
 
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -Forwarded||&lt;SwitchParam&gt;|Requests a forwarded ticket|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -Realm||&lt;String&gt;|Realm of the KDC|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service account with S4U2proxy|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -ServicePassword||&lt;String&gt;|Password for service account (for decrypting authorization data)|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -TicketComment||&lt;String&gt;|Comment to associate with ticket|
+|    -U2uTicket||&lt;String&gt;|Name of file containing U2U ticket|
+
+
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -EncTypes||&lt;EType[]&gt;|Encryption types to request in response|
 ||||**Possible values:**|
 ||||  DesCbcMd5|
@@ -1031,56 +1097,42 @@ Kerb tgsreq [options] <Kdc> <Target>
 ||||  Rsa|
 ||||  RsaesOaep|
 ||||  DesEde3Cbc|
+|    -EndTime||&lt;DateTime&gt;|End time|
+|    -Forwardable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
+|    -Postdate||&lt;DateTime&gt;|Requests a postdated ticket with the specified start date|
+|    -Proxiable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
+|    -Renewable||&lt;SwitchParam&gt;|Requests a renewable ticket|
+|    -RenewableOk||&lt;SwitchParam&gt;|Accepts a renewable ticket if the end time is over the limit|
+|    -RenewTill||&lt;DateTime&gt;|Requests a ticket renewable until the specified time (implies -Renewable)|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-W, -Workstation||&lt;String&gt;|Name of client workstation|
-|    -Forwardable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
-|    -Proxiable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
-|    -Postdate||&lt;DateTime&gt;|Requests a postdated ticket with the specified start date|
-|    -Renewable||&lt;SwitchParam&gt;|Requests a renewable ticket|
-|    -RenewTill||&lt;DateTime&gt;|Requests a ticket renewable until the specified time (implies -Renewable)|
-|    -EndTime||&lt;DateTime&gt;|End time|
-|    -RenewableOk||&lt;SwitchParam&gt;|Accepts a renewable ticket if the end time is over the limit|
 
+
+### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Forwarded||&lt;SwitchParam&gt;|Requests a forwarded ticket|
-|    -Realm||&lt;String&gt;|Realm of the KDC|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service account with S4U2proxy|
-|    -U2uTicket||&lt;String&gt;|Name of file containing U2U ticket|
-|    -ServicePassword||&lt;String&gt;|Password for service account (for decrypting authorization data)|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -TicketComment||&lt;String&gt;|Comment to associate with ticket|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Ticket Authorization Data (Kerberos)
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -ServiceSalt||&lt;String&gt;|Salt for service account (for decrypting authorization data)|
-|    -AsrepKey||&lt;HexString&gt;|Encryption key from AS-REP (for decryption NTLM hash)|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -OutputFileName||&lt;String&gt;|Name of file to write ticket to|
-|    -Overwrite||&lt;SwitchParam&gt;|Overwrites the output file, if it exists|
 |    -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -1090,24 +1142,17 @@ Kerb tgsreq [options] <Kdc> <Target>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
+|    -OutputFileName||&lt;String&gt;|Name of file to write ticket to|
+|    -Overwrite||&lt;SwitchParam&gt;|Overwrites the output file, if it exists|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
-### Connection
+### Ticket Authorization Data (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -AsrepKey||&lt;HexString&gt;|Encryption key from AS-REP (for decryption NTLM hash)|
+|    -ServiceSalt||&lt;String&gt;|Salt for service account (for decrypting authorization data)|
 
 
 ## Details
@@ -1159,3 +1204,67 @@ Kerb tgsreq -Kdc 10.66.0.11 -v -Tgt allentown-tgt.kirbi -Overwrite -U2u allentow
 ```
 Kerb tgsreq -Kdc 10.66.0.11 -v -Tgt allentown-tgt.kirbi -Overwrite -U2u allentown-tgt.kirbi -OutputFileName allentown-u2u.kirbi host/allentown -AsrepKey 82d4ab5873cbfda126e00c28edb5bd97b6451aa06a291d85173e6fc4ed4aacee
 ```
+# Kerb keytab list
+  Lists the entries in a keytab file
+
+## Synopsis
+```
+Kerb keytab list [options] <Keytab>
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;Keytab&gt;||&lt;String&gt;|Name of keytab file|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
+||||**Possible values:**|
+||||  Principal|
+||||  Kvno|
+||||  EType|
+||||  KeyText|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+

@@ -10,12 +10,182 @@ Sam <subcommand>
 
 |Command|Description|
 |-|-|
-|[enumusers](#sam-enumusers)|Enumerates user accounts|
-|[enumgroups](#sam-enumgroups)|Enumerates groups|
+|[aliasmembers](#sam-aliasmembers)|Gets the members of an alias|
 |[enumaliases](#sam-enumaliases)|Enumerates aliases|
+|[enumgroups](#sam-enumgroups)|Enumerates groups|
+|[enumusers](#sam-enumusers)|Enumerates user accounts|
 
 
   For help on a subcommand, use `Sam <subcommand> -h`
+# Sam aliasmembers
+  Gets the members of an alias
+
+## Synopsis
+```
+Sam aliasmembers [options] <ServerName> [ <AliasRidOrName> ]
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
+|    -AliasRidOrName||&lt;String[]&gt;|Name or RID of alias|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AliasRidOrName||&lt;String[]&gt;|Name or RID of alias|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
+||||  Default: True|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
+||||**Possible values:**|
+||||  DomainName|
+||||  DomainSid|
+||||  GroupName|
+||||  GroupRid|
+||||  MemberSid|
+||||  MemberName|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+
+
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
+|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+
+
+### Authentication (NTLM)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+
+
+## Details
+
+  You may specify an alias either as a name, decimal RID, or hex RID prefixed
+  with 0x.  You may specify multiple aliases.
+  
+
+## Examples
+
+### Example 1 - Look up administrators
+
+```
+LUMON-FS1 -UserName LUMON\milchick -Password Br3@kr00m! -EncryptRpc 544
+```
+
+### Example 2 - Look up multiple aliases
+
+```
+LUMON-FS1 -UserName LUMON\milchick -Password Br3@kr00m! -EncryptRpc Administrators, "Backup Operators"
+```
+
+### Example 3 - Look up bad alias
+
+```
+LUMON-FS1 -UserName LUMON\milchick -Password Br3@kr00m! -EncryptRpc Administrators, "Backup Operators"
+```
 # Sam enumaliases
   Enumerates aliases
 
@@ -36,8 +206,8 @@ Sam enumaliases [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-||||  Default: True|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -47,6 +217,11 @@ Sam enumaliases [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
+||||  Default: True|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  AccountName|
@@ -58,38 +233,10 @@ Sam enumaliases [options] <ServerName>
 ||||  AdminComment|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -97,10 +244,10 @@ Sam enumaliases [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -109,14 +256,14 @@ Sam enumaliases [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -126,17 +273,22 @@ Sam enumaliases [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -144,17 +296,37 @@ Sam enumaliases [options] <ServerName>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -168,7 +340,7 @@ Sam enumaliases [options] <ServerName>
 ### Example 1 - Enumerate all aliases
 
 ```
-Sam enumaliases LUMON-DC1 -UserName milchick -Password Br3@kr00m!
+Sam enumaliases LUMON-FS1 -UserName milchick -Password Br3@kr00m!
 ```
 # Sam enumgroups
   Enumerates groups
@@ -190,8 +362,8 @@ Sam enumgroups [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-||||  Default: True|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -201,6 +373,11 @@ Sam enumgroups [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
+||||  Default: True|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  AccountName|
@@ -213,38 +390,10 @@ Sam enumgroups [options] <ServerName>
 ||||  AdminComment|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -252,10 +401,10 @@ Sam enumgroups [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -264,14 +413,14 @@ Sam enumgroups [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -281,17 +430,22 @@ Sam enumgroups [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -299,17 +453,37 @@ Sam enumgroups [options] <ServerName>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -345,8 +519,8 @@ Sam enumusers [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-||||  Default: True|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -356,6 +530,11 @@ Sam enumusers [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
+||||  Default: True|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  AccountName|
@@ -370,38 +549,10 @@ Sam enumusers [options] <ServerName>
 ||||  BadPasswordCount|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -409,10 +560,10 @@ Sam enumusers [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -421,14 +572,14 @@ Sam enumusers [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -438,17 +589,22 @@ Sam enumusers [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -456,17 +612,37 @@ Sam enumusers [options] <ServerName>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details

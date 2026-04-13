@@ -34,21 +34,6 @@ Cert selfcert [options] -PfxFileName <String> <Subject>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-K, -KeySizeBits||&lt;Int32&gt;|Size of key, in bits|
-||||  Default: 2048|
-|    -HashAlgorithm||&lt;HashAlgorithm&gt;|Hash algorithm|
-||||**Possible values:**|
-||||  Md5|
-||||  Sha1|
-||||  Sha256|
-||||  Sha384|
-||||  Sha512|
-||||  Sha3_256|
-||||  Sha3_384|
-||||  Sha3_512|
-|-T, -TemplateFile||&lt;String&gt;|Name of file containing certificate to copy|
-|    -SubjectAltName||&lt;String&gt;|Subject alternate name|
-|-P, -PfxFileName||&lt;String&gt;|Name of .pfx file|
 |    -CertFileName||&lt;String&gt;|Name of certificate file (.pem or .cer)|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -59,14 +44,39 @@ Cert selfcert [options] -PfxFileName <String> <Subject>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -HashAlgorithm||&lt;HashAlgorithm&gt;|Hash algorithm|
+||||**Possible values:**|
+||||  Md5|
+||||  Sha1|
+||||  Sha256|
+||||  Sha384|
+||||  Sha512|
+||||  Sha3_256|
+||||  Sha3_384|
+||||  Sha3_512|
+|-K, -KeySizeBits||&lt;Int32&gt;|Size of key, in bits|
+||||  Default: 2048|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
+|-P, -PfxFileName||&lt;String&gt;|Name of .pfx file|
+|    -SubjectAltName||&lt;String&gt;|Subject alternate name|
+|-T, -TemplateFile||&lt;String&gt;|Name of file containing certificate to copy|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -76,13 +86,5 @@ Cert selfcert [options] -PfxFileName <String> <Subject>
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 

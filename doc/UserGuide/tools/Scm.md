@@ -11,10 +11,10 @@ Scm <subcommand>
 
 |Command|Description|
 |-|-|
-|[query](#scm-query)|Queries the status of a service|
-|[qtriggers](#scm-qtriggers)|Queries the status of a service|
 |[create](#scm-create)|Creates and optionally starts a new service|
 |[delete](#scm-delete)|Deletes a service|
+|[qtriggers](#scm-qtriggers)|Queries the status of a service|
+|[query](#scm-query)|Queries the status of a service|
 |[start](#scm-start)|Starts a service|
 |[stop](#scm-stop)|Stops a service|
 
@@ -42,39 +42,8 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ServiceType||&lt;ServiceTypes&gt;|Type of service|
-||||  Default: 16|
-||||**Possible values:**|
-||||  None|
-||||  KernelDriver|
-||||  FileSystemDriver|
-||||  OwnProcess|
-||||  SharedProcess|
-||||  All|
-|    -StartType||&lt;ServiceStartType&gt;|Service start type|
-||||  Default: 3|
-||||**Possible values:**|
-||||  Boot|
-||||  System|
-||||  Auto|
-||||  Demand|
-||||  Disabled|
-|    -ErrorControl||&lt;ServiceErrorControl&gt;|Error control|
-||||  Default: 1|
-||||**Possible values:**|
-||||  Ignore|
-||||  Normal|
-||||  Severe|
-||||  Critical|
-|    -LoadOrderGroup||&lt;String&gt;|Load order group|
-|    -Tag||&lt;Int32&gt;|Unique tag within the load order group|
-||||  Default: 0|
-|    -Dependencies|-deps|&lt;String[]&gt;|List of services this service depends on|
-|    -StartName||&lt;String&gt;|Name of user account to run service as|
-||||  Default: LocalSystem|
-|    -StartPassword||&lt;String&gt;|Password of service account|
-|    -DisplayName||&lt;String&gt;|Service display name|
-|    -Start||&lt;SwitchParam&gt;|Start the service once created|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -84,40 +53,48 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+||||  TreeTable|
+|    -Dependencies|-deps|&lt;String[]&gt;|List of services this service depends on|
+|    -DisplayName||&lt;String&gt;|Service display name|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -ErrorControl||&lt;ServiceErrorControl&gt;|Error control|
+||||  Default: 1|
 ||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
+||||  Ignore|
+||||  Normal|
+||||  Severe|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
+|    -LoadOrderGroup||&lt;String&gt;|Load order group|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -ServiceType||&lt;ServiceTypes&gt;|Type of service|
+||||  Default: 16|
 ||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+||||  None|
+||||  KernelDriver|
+||||  FileSystemDriver|
+||||  OwnProcess|
+||||  SharedProcess|
+||||  All|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Start||&lt;SwitchParam&gt;|Start the service once created|
+|    -StartName||&lt;String&gt;|Name of user account to run service as|
+||||  Default: LocalSystem|
+|    -StartPassword||&lt;String&gt;|Password of service account|
+|    -StartType||&lt;ServiceStartType&gt;|Service start type|
+||||  Default: 3|
+||||**Possible values:**|
+||||  Boot|
+||||  System|
+||||  Auto|
+||||  Demand|
+||||  Disabled|
+|    -Tag||&lt;Int32&gt;|Unique tag within the load order group|
+||||  Default: 0|
 
 
 ### Authentication
@@ -125,10 +102,10 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -137,14 +114,14 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -154,17 +131,22 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -172,17 +154,37 @@ Scm create [options] <ServerName> <ServiceName> [ <BinPath> ]
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -213,6 +215,8 @@ Scm delete [options] <ServerName> <ServiceName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -222,40 +226,15 @@ Scm delete [options] <ServerName> <ServiceName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+||||  TreeTable|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -263,10 +242,10 @@ Scm delete [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -275,14 +254,14 @@ Scm delete [options] <ServerName> <ServiceName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -292,17 +271,22 @@ Scm delete [options] <ServerName> <ServiceName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -310,17 +294,37 @@ Scm delete [options] <ServerName> <ServiceName>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -328,7 +332,7 @@ Scm delete [options] <ServerName> <ServiceName>
 ### Example 1 - Delete a service
 
 ```
-Scm delete LUMON-DC1 -UserName milchick -Password Br3@kr00m! -EncryptRpc myservice
+Scm delete LUMON-DC1 -UserName milchick -Password Br3@kr00m! myservice
 ```
 # Scm qtriggers
   Queries the status of a service
@@ -351,6 +355,8 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -360,6 +366,9 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  ServiceName|
@@ -369,38 +378,10 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 ||||  Data0|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -408,10 +389,10 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -420,14 +401,14 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -437,17 +418,22 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -455,17 +441,37 @@ Scm qtriggers [options] <ServerName> <ServiceName>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 # Scm query
   Queries the status of a service
@@ -487,20 +493,8 @@ Scm query [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Types||&lt;ServiceTypes[]&gt;|Filter by service type|
-||||**Possible values:**|
-||||  None|
-||||  KernelDriver|
-||||  FileSystemDriver|
-||||  OwnProcess|
-||||  SharedProcess|
-||||  All|
-|    -States||&lt;ServiceStates[]&gt;|Filter by service state|
-||||**Possible values:**|
-||||  None|
-||||  Active|
-||||  Inactive|
-||||  All|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -510,6 +504,9 @@ Scm query [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  ServiceName|
@@ -520,38 +517,24 @@ Scm query [options] <ServerName>
 ||||  SpecificExitCode|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -States||&lt;ServiceStates[]&gt;|Filter by service state|
 ||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
+||||  None|
+||||  Active|
+||||  Inactive|
+||||  All|
+|    -Types||&lt;ServiceTypes[]&gt;|Filter by service type|
 ||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+||||  None|
+||||  KernelDriver|
+||||  FileSystemDriver|
+||||  OwnProcess|
+||||  SharedProcess|
+||||  All|
 
 
 ### Authentication
@@ -559,10 +542,10 @@ Scm query [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -571,14 +554,14 @@ Scm query [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -588,17 +571,22 @@ Scm query [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -606,18 +594,52 @@ Scm query [options] <ServerName>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
+
+## Examples
+
+### Example 1 - Query all services (NTLM)
+
+```
+Scm query lumon-fs1 -UserName milchick@LUMON -Password Br3@kr00m!
+```
+
+### Example 2 - Query all services (Kerberos)
+
+```
+Scm query lumon-fs1 -UserName milchick@LUMON -Password Br3@kr00m! -Kdc LUMON-DC1
+```
 # Scm start
   Starts a service
 
@@ -640,6 +662,8 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -649,40 +673,15 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+||||  TreeTable|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -690,10 +689,10 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -702,14 +701,14 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -719,17 +718,22 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -737,17 +741,37 @@ Scm start [options] <ServerName> <ServiceName> [ <ServiceArgs> ]
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -784,6 +808,8 @@ Scm stop [options] <ServerName> <ServiceName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -793,40 +819,15 @@ Scm stop [options] <ServerName> <ServiceName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+||||  TreeTable|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -834,10 +835,10 @@ Scm stop [options] <ServerName> <ServiceName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -846,14 +847,14 @@ Scm stop [options] <ServerName> <ServiceName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -863,17 +864,22 @@ Scm stop [options] <ServerName> <ServiceName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
 ||||**Possible values:**|
 ||||  Smb2_0_2|
@@ -881,17 +887,37 @@ Scm stop [options] <ServerName> <ServiceName>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Examples

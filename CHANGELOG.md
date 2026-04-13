@@ -1,5 +1,25 @@
 Change Log
 
+# 2026-04-13
+
+This releases focuses on some architectural and usability enhancements.
+
+* `Dsrep`: support for [MS-DRSR] `dcinfo` and `replicate` secrets.
+* `Ldap lspart` shorthand to list partitions within a forest.
+* `Ldap` parses and displays dnsRecord data, enabling DNS enumeration.
+* `Kerb keytablist` to list keys in a keytab file.
+* `Dcom invoke` supports dotted-property syntax.
+* `-OutputStyle TreeTable` output for Smb2Client ls and Ldap commands.
+* `Smb2Client enumshares` revert to request lower levels if higher levels can't be retrieved.
+* Logging and log schema enhancements.
+
+## Bug fixes
+* `-Ticket`, `-TicketCache` work without `-Kdc` and `-UserName`.
+* Ldap converts timestamps both in queries and with standalone `timestamp` command
+* FIxed NTLM over LDAPS to not request encryption.
+* Dcom trims server name to just the host part, as sending activation request with FQDN fails.
+* Scm falls back to older API if the newer version isn't supported.
+
 # 2026-03-09
 
 * Kerberos

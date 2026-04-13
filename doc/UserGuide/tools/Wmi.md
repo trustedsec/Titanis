@@ -10,17 +10,17 @@ Wmi <subcommand>
 
 |Command|Description|
 |-|-|
-|[query](#wmi-query)|Executes a WMI query|
 |[backup](#wmi-backup)|Backs up the WMI repository|
-|[restore](#wmi-restore)|Restores the WMI repository|
-|[lsns](#wmi-lsns)|Lists the available namespaces within a namespace.|
-|[lsclass](#wmi-lsclass)|Lists the classes within a namespace.|
-|[lsprop](#wmi-lsprop)|Lists the properties of a class or object.|
-|[lsmethod](#wmi-lsmethod)|Lists the methods of a class or object.|
-|[get](#wmi-get)|Gets an object with a WMI path|
-|[exec](#wmi-exec)|Executes a command on a remote system via WMI|
-|[invoke](#wmi-invoke)|Invokes a method on a WMI class or object|
 |[delete](#wmi-delete)|Deletes a WMI object|
+|[exec](#wmi-exec)|Executes a command on a remote system via WMI|
+|[get](#wmi-get)|Gets an object with a WMI path|
+|[invoke](#wmi-invoke)|Invokes a method on a WMI class or object|
+|[lsclass](#wmi-lsclass)|Lists the classes within a namespace.|
+|[lsmethod](#wmi-lsmethod)|Lists the methods of a class or object.|
+|[lsns](#wmi-lsns)|Lists the available namespaces within a namespace.|
+|[lsprop](#wmi-lsprop)|Lists the properties of a class or object.|
+|[query](#wmi-query)|Executes a WMI query|
+|[restore](#wmi-restore)|Restores the WMI repository|
 
 
   For help on a subcommand, use `Wmi <subcommand> -h`
@@ -45,7 +45,7 @@ Wmi backup [options] <ServerName> <FileName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -55,35 +55,12 @@ Wmi backup [options] <ServerName> <FileName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -91,10 +68,10 @@ Wmi backup [options] <ServerName> <FileName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -103,14 +80,14 @@ Wmi backup [options] <ServerName> <FileName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -120,8 +97,8 @@ Wmi backup [options] <ServerName> <FileName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -129,8 +106,33 @@ Wmi backup [options] <ServerName> <FileName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -161,13 +163,7 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -177,35 +173,18 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Locale||&lt;String&gt;|Locale|
+||||  Default: en-US|
+|    -Namespace||&lt;String&gt;|Namespace to query|
+||||  Default: root\\cimv2|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
 
 ### Authentication
@@ -213,10 +192,10 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -225,14 +204,14 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -242,8 +221,8 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -251,8 +230,33 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -289,17 +293,11 @@ Wmi exec [options] <ServerName> <CommandLine>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -CaptureOutput||&lt;SwitchParam&gt;|Redirects STDOUR and STDERR to a file|
 ||||  Default: True|
-|    -WorkingDir||&lt;String&gt;|Sets the working directory for the new process|
 |    -CmdCall||&lt;SwitchParam&gt;|Prepends 'cmd /q /c' to the command|
 ||||  Default: True|
-|    -Wait||&lt;SwitchParam&gt;|Waits for the command to complete|
-||||  Default: True|
-|    -PollInterval||&lt;Duration&gt;|Polling interval|
-||||  Default: 1s|
-|    -EnvironmentVariables||&lt;String[]&gt;|Environment variables to pass to the command|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -309,35 +307,64 @@ Wmi exec [options] <ServerName> <CommandLine>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -EnvironmentVariables||&lt;String[]&gt;|Environment variables to pass to the command|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -PollInterval||&lt;Duration&gt;|Polling interval|
+||||  Default: 1s|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Wait||&lt;SwitchParam&gt;|Waits for the command to complete|
+||||  Default: True|
+|    -WorkingDir||&lt;String&gt;|Sets the working directory for the new process|
 
 
-### Output
+### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
+|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+
+
+### Authentication (NTLM)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
 
 
 ### Connection
@@ -351,58 +378,37 @@ Wmi exec [options] <ServerName> <CommandLine>
 ||||  Smb3_0|
 ||||  Smb3_0_2|
 ||||  Smb3_1_1|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
 |    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
 
-### Client Behavior
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-
-
-### Authentication
+### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-
-
-### Authentication (Kerberos)
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
-
-
-### Authentication (NTLM)
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -479,12 +485,7 @@ Wmi get [options] <ServerName> <ObjectPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -494,6 +495,12 @@ Wmi get [options] <ServerName> <ObjectPath>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Locale||&lt;String&gt;|Locale|
+||||  Default: en-US|
+|    -Namespace||&lt;String&gt;|Namespace to query|
+||||  Default: root\\cimv2|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  RelativePath|
@@ -501,33 +508,9 @@ Wmi get [options] <ServerName> <ObjectPath>
 ||||  ObjectType|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
 
 ### Authentication
@@ -535,10 +518,10 @@ Wmi get [options] <ServerName> <ObjectPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -547,14 +530,14 @@ Wmi get [options] <ServerName> <ObjectPath>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -564,8 +547,8 @@ Wmi get [options] <ServerName> <ObjectPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -573,8 +556,33 @@ Wmi get [options] <ServerName> <ObjectPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -622,14 +630,7 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -SkipParams||&lt;String[]&gt;|List of parameters to skip|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -639,35 +640,19 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Locale||&lt;String&gt;|Locale|
+||||  Default: en-US|
+|    -Namespace||&lt;String&gt;|Namespace to query|
+||||  Default: root\\cimv2|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -SkipParams||&lt;String[]&gt;|List of parameters to skip|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
 
 ### Authentication
@@ -675,10 +660,10 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -687,14 +672,14 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -704,8 +689,8 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -713,8 +698,33 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -774,14 +784,7 @@ Wmi lsclass [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
-||||  Default: 10|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -791,6 +794,12 @@ Wmi lsclass [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Locale||&lt;String&gt;|Locale|
+||||  Default: en-US|
+|    -Namespace||&lt;String&gt;|Namespace to query|
+||||  Default: root\\cimv2|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  RelativePath|
@@ -804,33 +813,11 @@ Wmi lsclass [options] <ServerName>
 ||||  ObjectType|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
+||||  Default: 10|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
 
 ### Authentication
@@ -838,10 +825,10 @@ Wmi lsclass [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -850,14 +837,14 @@ Wmi lsclass [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -867,8 +854,8 @@ Wmi lsclass [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -876,8 +863,33 @@ Wmi lsclass [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 # Wmi lsmethod
   Lists the methods of a class or object.
@@ -900,13 +912,7 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -916,6 +922,13 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Locale||&lt;String&gt;|Locale|
+||||  Default: en-US|
+|    -Namespace||&lt;String&gt;|Namespace to query|
+||||  Default: root\\cimv2|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Flags|
@@ -934,33 +947,9 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 ||||  IsInputParameter|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
 
 ### Authentication
@@ -968,10 +957,10 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -980,14 +969,14 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -997,8 +986,8 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -1006,8 +995,33 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -1062,14 +1076,7 @@ Wmi lsns [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
-||||  Default: 10|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1079,36 +1086,20 @@ Wmi lsns [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Locale||&lt;String&gt;|Locale|
+||||  Default: en-US|
+|    -Namespace||&lt;String&gt;|Namespace to query|
+||||  Default: root\\cimv2|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
+||||  Default: 10|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
 
 ### Authentication
@@ -1116,10 +1107,10 @@ Wmi lsns [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1128,14 +1119,14 @@ Wmi lsns [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1145,8 +1136,8 @@ Wmi lsns [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -1154,8 +1145,33 @@ Wmi lsns [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 # Wmi lsprop
   Lists the properties of a class or object.
@@ -1178,12 +1194,7 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1193,6 +1204,12 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Locale||&lt;String&gt;|Locale|
+||||  Default: en-US|
+|    -Namespace||&lt;String&gt;|Namespace to query|
+||||  Default: root\\cimv2|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  PropertyType|
@@ -1213,33 +1230,9 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 ||||  IsInputParameter|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
 
 ### Authentication
@@ -1247,10 +1240,10 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1259,14 +1252,14 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1276,8 +1269,8 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -1285,8 +1278,33 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -1336,14 +1354,7 @@ Wmi query [options] <ServerName> <Query>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
-||||  Default: 10|
-|    -Namespace||&lt;String&gt;|Namespace to query|
-||||  Default: root\\cimv2|
-|    -Locale||&lt;String&gt;|Locale|
-||||  Default: en-US|
-|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1353,35 +1364,19 @@ Wmi query [options] <ServerName> <Query>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Locale||&lt;String&gt;|Locale|
+||||  Default: en-US|
+|    -Namespace||&lt;String&gt;|Namespace to query|
+||||  Default: root\\cimv2|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
+||||  Default: 10|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
 
 ### Authentication
@@ -1389,10 +1384,10 @@ Wmi query [options] <ServerName> <Query>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1401,14 +1396,14 @@ Wmi query [options] <ServerName> <Query>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1418,8 +1413,8 @@ Wmi query [options] <ServerName> <Query>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -1427,8 +1422,33 @@ Wmi query [options] <ServerName> <Query>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -1465,8 +1485,7 @@ Wmi restore [options] <ServerName> <FileName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ForceShutdown||&lt;SwitchParam&gt;|Forces any active clients to shut down|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1476,35 +1495,13 @@ Wmi restore [options] <ServerName> <FileName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -ForceShutdown||&lt;SwitchParam&gt;|Forces any active clients to shut down|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -1512,10 +1509,10 @@ Wmi restore [options] <ServerName> <FileName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1524,14 +1521,14 @@ Wmi restore [options] <ServerName> <FileName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1541,8 +1538,8 @@ Wmi restore [options] <ServerName> <FileName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -1550,8 +1547,33 @@ Wmi restore [options] <ServerName> <FileName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Examples

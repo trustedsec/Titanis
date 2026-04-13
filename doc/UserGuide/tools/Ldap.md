@@ -10,18 +10,20 @@ Ldap <subcommand>
 
 |Command|Description|
 |-|-|
-|[search](#ldap-search)|Searches the directory by name|
-|[query](#ldap-query)|Queries the directory|
-|[watch](#ldap-watch)|Watches for changes to an object or subtree|
-|[schema](#ldap-schema)|Gets the schema|
-|[listsyntax](#ldap-listsyntax)|Lists AD syntaxes|
-|[namedbits](#ldap-namedbits)|Prints the bits with symbolic names|
 |[add](#ldap-add)|Adds an object to the directory|
+|[addcomputer](#ldap-addcomputer)|Adds a computer account to the directory|
 |[addou](#ldap-addou)|Adds a new organizational unit|
 |[adduser](#ldap-adduser)|Adds a new user|
-|[addcomputer](#ldap-addcomputer)|Adds a computer account to the directory|
+|[listsyntax](#ldap-listsyntax)|Lists AD syntaxes|
+|[lspart](#ldap-lspart)|Gets a list of partitions in the Active Directory forest|
 |[mod](#ldap-mod)|Modifies an object in the directory|
 |[moduser](#ldap-moduser)|Modifies a directory entry|
+|[namedbits](#ldap-namedbits)|Prints the bits with symbolic names|
+|[query](#ldap-query)|Queries the directory|
+|[schema](#ldap-schema)|Gets the schema|
+|[search](#ldap-search)|Searches the directory by name|
+|[timestamp](#ldap-timestamp)|Converts between the Active Directory timestamp value and a UTC date/time|
+|[watch](#ldap-watch)|Watches for changes to an object or subtree|
 |[whoami](#ldap-whoami)|Gets the name of the authenticated user|
 
 
@@ -48,14 +50,8 @@ Ldap add [options] -ObjectClass <String> -ObjectName <String[]> <ServerName> <Ob
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ObjectClass||&lt;String&gt;|Object class of object to add|
 |    -Attributes||&lt;AttributeChangeSpec[]&gt;|Attributes to set as name=value pars|
-|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
-|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -65,35 +61,18 @@ Ldap add [options] -ObjectClass <String> -ObjectName <String[]> <ServerName> <Ob
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -ObjectClass||&lt;String&gt;|Object class of object to add|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 
 
 ### Authentication
@@ -101,10 +80,10 @@ Ldap add [options] -ObjectClass <String> -ObjectName <String[]> <ServerName> <Ob
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -113,14 +92,14 @@ Ldap add [options] -ObjectClass <String> -ObjectName <String[]> <ServerName> <Ob
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -130,8 +109,8 @@ Ldap add [options] -ObjectClass <String> -ObjectName <String[]> <ServerName> <Ob
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -139,8 +118,33 @@ Ldap add [options] -ObjectClass <String> -ObjectName <String[]> <ServerName> <Ob
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 # Ldap addcomputer
   Adds a computer account to the directory
@@ -163,20 +167,8 @@ Ldap addcomputer [options] -ObjectName <String[]> <ServerName> <ObjectName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NewPassword||&lt;String&gt;|Password of new account|
-|    -LogonName||&lt;String&gt;|User name for auth requests|
-|    -DisplayName||&lt;String&gt;|Display name for user|
-|    -UserCerts||&lt;String[]&gt;|Names of files containing certificates to associate with the user|
-|    -Os||&lt;String&gt;|Name of installed operating system|
-|    -OsVersion||&lt;String&gt;|Version of installed operating system|
-|-M, -MemberOf||&lt;String[]&gt;|Groups to make the user a member of|
 |    -Attributes||&lt;AttributeChangeSpec[]&gt;|Attributes to set as name=value pars|
-|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
-|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -186,35 +178,24 @@ Ldap addcomputer [options] -ObjectName <String[]> <ServerName> <ObjectName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -DisplayName||&lt;String&gt;|Display name for user|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -LogonName||&lt;String&gt;|User name for auth requests|
+|-M, -MemberOf||&lt;String[]&gt;|Groups to make the user a member of|
+|    -NewPassword||&lt;String&gt;|Password of new account|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|    -Os||&lt;String&gt;|Name of installed operating system|
+|    -OsVersion||&lt;String&gt;|Version of installed operating system|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -UserCerts||&lt;String[]&gt;|Names of files containing certificates to associate with the user|
 
 
 ### Authentication
@@ -222,10 +203,10 @@ Ldap addcomputer [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -234,14 +215,14 @@ Ldap addcomputer [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -251,8 +232,8 @@ Ldap addcomputer [options] -ObjectName <String[]> <ServerName> <ObjectName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -260,8 +241,33 @@ Ldap addcomputer [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 # Ldap addou
   Adds a new organizational unit
@@ -285,12 +291,7 @@ Ldap addou [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Attributes||&lt;AttributeChangeSpec[]&gt;|Attributes to set as name=value pars|
-|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
-|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -300,35 +301,17 @@ Ldap addou [options] -ObjectName <String[]> <ServerName> <ObjectName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 
 
 ### Authentication
@@ -336,10 +319,10 @@ Ldap addou [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -348,14 +331,14 @@ Ldap addou [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -365,8 +348,8 @@ Ldap addou [options] -ObjectName <String[]> <ServerName> <ObjectName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -374,8 +357,33 @@ Ldap addou [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 # Ldap adduser
   Adds a new user
@@ -398,20 +406,8 @@ Ldap adduser [options] -ObjectName <String[]> <ServerName> <ObjectName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NewPassword||&lt;String&gt;|Password of new account|
-|    -LogonName||&lt;String&gt;|User name for auth requests|
-|    -GivenName||&lt;String&gt;|Given name (first name)|
-|    -Surname||&lt;String&gt;|Surname (last name)|
-|    -DisplayName||&lt;String&gt;|Display name for user|
-|    -UserCerts||&lt;String[]&gt;|Names of files containing certificates to associate with the user|
-|-M, -MemberOf||&lt;String[]&gt;|Groups to make the user a member of|
 |    -Attributes||&lt;AttributeChangeSpec[]&gt;|Attributes to set as name=value pars|
-|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
-|    -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -421,35 +417,24 @@ Ldap adduser [options] -ObjectName <String[]> <ServerName> <ObjectName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -DisplayName||&lt;String&gt;|Display name for user|
+|    -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -GivenName||&lt;String&gt;|Given name (first name)|
+|    -LogonName||&lt;String&gt;|User name for auth requests|
+|-M, -MemberOf||&lt;String[]&gt;|Groups to make the user a member of|
+|    -NewPassword||&lt;String&gt;|Password of new account|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -Surname||&lt;String&gt;|Surname (last name)|
+|    -UserCerts||&lt;String[]&gt;|Names of files containing certificates to associate with the user|
 
 
 ### Authentication
@@ -457,10 +442,10 @@ Ldap adduser [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -469,14 +454,14 @@ Ldap adduser [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -486,8 +471,8 @@ Ldap adduser [options] -ObjectName <String[]> <ServerName> <ObjectName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -495,8 +480,33 @@ Ldap adduser [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 # Ldap listsyntax
   Lists AD syntaxes
@@ -520,6 +530,7 @@ Ldap listsyntax [options]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  EqualityContract|
@@ -533,6 +544,15 @@ Ldap listsyntax [options]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -542,15 +562,7 @@ Ldap listsyntax [options]
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 
 ## Details
@@ -558,6 +570,138 @@ Ldap listsyntax [options]
   A syntax describes the format of data within an attribute value and specifies
   how the raw bytes are decoded into the logical value.
   
+# Ldap lspart
+  Gets a list of partitions in the Active Directory forest
+
+## Synopsis
+```
+Ldap lspart [options] <ServerName>
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
+||||  Default: 100|
+|-R, -RecordLimit||&lt;Int32&gt;|Max number of records to return|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+
+
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
+|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DesKey||&lt;HexString&gt;|DES key|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+
+
+### Authentication (NTLM)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+
+
+## Details
+
+  This command queries all crossRef objects in the CN=Partitions container within
+  the configuration NC.
+  
+
+## Examples
+
+### Example 1 - List all partitions
+
+```
+Ldap lspart LUMON-DC1 -UserName marks@LUMON -Password She's@live!! -Kdc LUMON-DC1
+```
 # Ldap mod
   Modifies an object in the directory
 
@@ -580,13 +724,8 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Changes||&lt;AttributeChangeSpec[]&gt;|Changes to make as name?=value|
-|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
-|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -596,35 +735,17 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 
 
 ### Authentication
@@ -632,10 +753,10 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -644,14 +765,14 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -661,8 +782,8 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -670,8 +791,33 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -713,15 +859,8 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -OldPassword||&lt;String&gt;|Old password (for password change)|
-|    -NewPassword||&lt;String&gt;|New password (for password change or reset)|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Changes||&lt;AttributeChangeSpec[]&gt;|Changes to make as name?=value|
-|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
-|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -731,35 +870,19 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -NewPassword||&lt;String&gt;|New password (for password change or reset)|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|    -OldPassword||&lt;String&gt;|Old password (for password change)|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 
 
 ### Authentication
@@ -767,10 +890,10 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -779,14 +902,14 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -796,8 +919,8 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -805,8 +928,33 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -880,6 +1028,7 @@ Ldap namedbits [options] [ <Attribute> ]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  EqualityContract|
@@ -895,6 +1044,15 @@ Ldap namedbits [options] [ <Attribute> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 |    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
 ||||**Possible values:**|
 ||||  Debug|
@@ -904,15 +1062,7 @@ Ldap namedbits [options] [ <Attribute> ]
 ||||  Warning|
 ||||  Error|
 ||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
 |    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|-D, -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
 
 # Ldap query
   Queries the directory
@@ -935,28 +1085,7 @@ Ldap query [options] <ServerName> [ <Filter> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Filter||&lt;String&gt;|LDAP query|
-|    -SearchBase||&lt;LdapDistinguishedName[]&gt;|DN of search root (default is domain root)|
-|    -Scope||&lt;LdapSearchScope&gt;|Scope of search|
-||||**Possible values:**|
-||||  BaseObject|
-||||  Base|
-||||  SingleLevel|
-||||  WholeSubtree|
-||||  Subtree|
-|    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
-||||  Default: 100|
-|    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
-|    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
-|    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
-|    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
-|-R, -RecordLimit||&lt;Int32&gt;|Max number of records to return|
-|    -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
-|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -966,35 +1095,33 @@ Ldap query [options] <ServerName> [ <Filter> ]
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
+|    -Filter||&lt;String&gt;|LDAP query|
+|    -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
+|    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
+|    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
+||||  Default: 100|
+|-R, -RecordLimit||&lt;Int32&gt;|Max number of records to return|
+|    -Scope||&lt;LdapSearchScope&gt;|Scope of search|
+||||**Possible values:**|
+||||  BaseObject|
+||||  Base|
+||||  SingleLevel|
+||||  WholeSubtree|
+||||  Subtree|
+|    -SearchBase||&lt;LdapDistinguishedName[]&gt;|DN of search root (default is domain root)|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 
 
 ### Authentication
@@ -1002,10 +1129,10 @@ Ldap query [options] <ServerName> [ <Filter> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1014,14 +1141,14 @@ Ldap query [options] <ServerName> [ <Filter> ]
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1031,8 +1158,8 @@ Ldap query [options] <ServerName> [ <Filter> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -1040,8 +1167,33 @@ Ldap query [options] <ServerName> [ <Filter> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -1157,11 +1309,7 @@ Ldap schema [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1171,36 +1319,17 @@ Ldap schema [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 
 
 ### Authentication
@@ -1208,10 +1337,10 @@ Ldap schema [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1220,14 +1349,14 @@ Ldap schema [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1237,8 +1366,8 @@ Ldap schema [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -1246,8 +1375,33 @@ Ldap schema [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 # Ldap search
   Searches the directory by name
@@ -1270,28 +1424,7 @@ Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -SearchName||&lt;String[]&gt;|Name to search for|
-|    -SearchBase||&lt;LdapDistinguishedName[]&gt;|DN of search root (default is domain root)|
-|    -Scope||&lt;LdapSearchScope&gt;|Scope of search|
-||||**Possible values:**|
-||||  BaseObject|
-||||  Base|
-||||  SingleLevel|
-||||  WholeSubtree|
-||||  Subtree|
-|    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
-||||  Default: 100|
-|    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
-|    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
-|    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
-|    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
-|-R, -RecordLimit||&lt;Int32&gt;|Max number of records to return|
-|-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
-|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1301,35 +1434,33 @@ Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
+|-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
+|    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
+|    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
+||||  Default: 100|
+|-R, -RecordLimit||&lt;Int32&gt;|Max number of records to return|
+|    -Scope||&lt;LdapSearchScope&gt;|Scope of search|
+||||**Possible values:**|
+||||  BaseObject|
+||||  Base|
+||||  SingleLevel|
+||||  WholeSubtree|
+||||  Subtree|
+|    -SearchBase||&lt;LdapDistinguishedName[]&gt;|DN of search root (default is domain root)|
+|    -SearchName||&lt;String[]&gt;|Name to search for|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 
 
 ### Authentication
@@ -1337,10 +1468,10 @@ Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1349,14 +1480,14 @@ Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1366,8 +1497,8 @@ Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -1375,8 +1506,33 @@ Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 
 ## Details
@@ -1407,6 +1563,125 @@ Ldap search admin
 ```
 Ldap search =milchick
 ```
+
+### Example 3 - Search using SSL (Kerberos)
+
+```
+Ldap search LUMON-DC1 -UserName marks@LUMON -Password She's@live!! -Kdc LUMON-DC1 -Ssl milchick
+```
+
+### Example 4 - Search using SSL (NTLM)
+
+```
+Ldap search LUMON-DC1 -UserName marks@LUMON -Password She's@live!! -Ssl milchick
+```
+# Ldap timestamp
+  Converts between the Active Directory timestamp value and a UTC date/time
+
+## Synopsis
+```
+Ldap timestamp [options] [ <TimestampOrDate> ]
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;TimestampOrDate&gt;||&lt;String[]&gt;|Date or timestamp (as an integer) to convert|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|-H, -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+
+
+## Details
+
+  If the input is a number, it is converted to a date.  The number may include
+  the thousands separator, since the Active Directory is likely printed this way.
+   The result is of the form 2026-03-17T17:38:42.2091265Z, which preserves the
+  precision of the timestamp value.
+  
+  If the input is a date, it is converted to a timestamp value, with the
+  thousands separator.  The date may be in any parsable format, such as
+  2026-03-17T17:38:42.2091265Z or 3/17/2026 5:38:42 PM, depending on your local
+  culture settings.  Note that some formats preserve more precision that others,
+  and the resulting timestamp value reflects this.
+  
+  You may specify multiple values.  Each output record prints both the numeric
+  value and the date/time so you know which record matches which input.
+  
+
+## Examples
+
+### Example 1 - Convert a timestamp from AD
+
+```
+134,182,427,222,091,265
+```
+  The value is converted to 2026-03-17T17:38:42.2091265Z
+
+### Example 2 - 
+
+```
+"3/17/2026 5:38:42 PM"
+```
+  The value is converted to 134,182,427,220,000,000.  Dates of this format lack
+  the precision of an Active Directory timestamp so the last several digits are
+  0.
+
+### Example 3 - 
+
+```
+2026-03-17T17:38:42.2091265Z
+```
+  The value is converted to 134,182,427,222,091,265
+
+### Example 4 - Multiple values
+
+```
+2026-03-17T17:38:42.2091265Z 134,182,427,220,000,000
+```
+  Prints two records corresponding to the two inputs
 # Ldap watch
   Watches for changes to an object or subtree
 
@@ -1427,27 +1702,7 @@ Ldap watch [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -SearchBase||&lt;LdapDistinguishedName[]&gt;|DN of search root (default is domain root)|
-|    -Scope||&lt;LdapSearchScope&gt;|Scope of search|
-||||**Possible values:**|
-||||  BaseObject|
-||||  Base|
-||||  SingleLevel|
-||||  WholeSubtree|
-||||  Subtree|
-|    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
-||||  Default: 100|
-|    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
-|    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
-|    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
-|    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
-|-R, -RecordLimit||&lt;Int32&gt;|Max number of records to return|
-|-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
-|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1457,36 +1712,33 @@ Ldap watch [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
+|-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
+|    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
+|    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
+||||  Default: 100|
+|-R, -RecordLimit||&lt;Int32&gt;|Max number of records to return|
+|    -Scope||&lt;LdapSearchScope&gt;|Scope of search|
+||||**Possible values:**|
+||||  BaseObject|
+||||  Base|
+||||  SingleLevel|
+||||  WholeSubtree|
+||||  Subtree|
+|    -SearchBase||&lt;LdapDistinguishedName[]&gt;|DN of search root (default is domain root)|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 
 
 ### Authentication
@@ -1494,10 +1746,10 @@ Ldap watch [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1506,14 +1758,14 @@ Ldap watch [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1523,8 +1775,8 @@ Ldap watch [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -1532,8 +1784,33 @@ Ldap watch [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
 # Ldap whoami
   Gets the name of the authenticated user
@@ -1555,11 +1832,7 @@ Ldap whoami [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
-|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
-|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
-|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
-|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1569,6 +1842,8 @@ Ldap whoami [options] <ServerName>
 ||||  Csv|
 ||||  Tsv|
 ||||  Json|
+||||  TreeTable|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  SaslString|
@@ -1576,33 +1851,12 @@ Ldap whoami [options] <ServerName>
 ||||  Kind|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-
-
-### Output
-
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
-||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
 
 
 ### Authentication
@@ -1610,10 +1864,10 @@ Ldap whoami [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
 |    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
@@ -1622,14 +1876,14 @@ Ldap whoami [options] <ServerName>
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -Tickets||&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
 |    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
 |    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
 |    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
@@ -1639,8 +1893,8 @@ Ldap whoami [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 |    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Connection
@@ -1648,6 +1902,31 @@ Ldap whoami [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
 
