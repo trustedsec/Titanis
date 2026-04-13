@@ -85,6 +85,7 @@ namespace Titanis.Cli
 
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
+		[Alias("Ticket")]
 		[Description("Name of file containing service tickets (.kirbi or ccache)")]
 		public string[]? Tickets { get; set; }
 
@@ -810,8 +811,6 @@ namespace Titanis.Cli
 					kdcLocator = new SimpleKdcLocator(this.Kdc);
 					this.Services?.AddService(typeof(IKdcLocator), kdcLocator);
 				}
-				else
-					return null;
 			}
 
 			var krb = this.Services?.CreateKerberosClient();
