@@ -26,8 +26,8 @@ namespace Titanis.Cli
 			if (implementingType is null) throw new ArgumentNullException(nameof(implementingType));
 			if (context is null) throw new ArgumentNullException(nameof(context));
 
-			if (!context.Resolver.ReflectType(typeof(Command)).IsAssignableFrom(implementingType))
-				throw new ArgumentException(Messages.Cli_NonCommandType, nameof(implementingType));
+			if (!context.Resolver.ReflectType(typeof(CommandBase)).IsAssignableFrom(implementingType))
+				throw new ArgumentException(Messages.Cli_NonCommandType + ": " + implementingType.FullName, nameof(implementingType));
 
 			this.ImplementingType = implementingType;
 			this.Description = context.Resolver.GetCustomAttribute<DescriptionAttribute>(implementingType, true)?.Description;
