@@ -310,6 +310,23 @@ namespace Titanis.Cli
 					this.SetMinLogLevel(LogMessageSeverity.Diagnostic);
 			}
 		}
+
+		/// <summary>
+		/// Gets a value indicating whether to print verbose messages.
+		/// </summary>
+		[Parameter]
+		[Alias("vvv")]
+		[Category(ParameterCategories.Output)]
+		[Description("Prints debug messages")]
+		public SwitchParam DebugLog
+		{
+			get => new SwitchParam((this.LogLevel <= LogMessageSeverity.Debug) ? SwitchParamFlags.Set : SwitchParamFlags.None);
+			set
+			{
+				if (value.IsSet)
+					this.SetMinLogLevel(LogMessageSeverity.Debug);
+			}
+		}
 		#endregion
 
 		/// <summary>
