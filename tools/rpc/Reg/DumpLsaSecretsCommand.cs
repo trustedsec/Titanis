@@ -25,8 +25,8 @@ namespace Titanis.Msrpc.Msrrp.Cli
 	[Command]
 	[Description("Dumps the LSA secrets of a remote system")]
 	[OutputRecordType(typeof(LsaSecret))]
-	[Example("Dump the LSA secrets using a backup operator", "{0} -UserName marks@LUMON -Kdc 10.66.0.11 -Password She'sAlive!! LUMON-FS1 -BackupSemantics")]
-	class DumpLsaSecretsCommand : RegistryCommand
+	[Example("Dump the LSA secrets using a backup operator", "{0} -UserName marks@LUMON -Kdc 10.66.0.11 -Password She's@live!! LUMON-FS1 -BackupSemantics", Tag = "marks_backup")]
+	public class DumpLsaSecretsCommand : RegistryCommand
 	{
 		protected override async Task<int> RunAsync(RemoteRegistryClient client, CancellationToken cancellationToken)
 		{

@@ -48,6 +48,9 @@ namespace Titanis.Winterop.Sam
 
 		public byte[] Decrypt(uint rid, in SamEncryptedBlob blob)
 		{
+			if (blob.IsEmpty)
+				throw new ArgumentException($"The encrypted blob is empty.");
+
 			var aes = this.VerifyAesKey();
 
 			DeriveUserKey(rid, out var k1, out var k2);

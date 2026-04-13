@@ -22,7 +22,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 			=> RunProgramAsync<Program>(args);
 	}
 
-	abstract class RegistryCommand : RpcCommand<RemoteRegistryClient>
+	public abstract class RegistryCommand : RpcCommand<RemoteRegistryClient>
 	{
 		[Parameter]
 		[Description("Open with backup semantics")]

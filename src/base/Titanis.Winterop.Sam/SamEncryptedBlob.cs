@@ -16,6 +16,7 @@ namespace Titanis.Winterop.Sam
 		}
 
 		public ReadOnlySpan<byte> Bytes { get; }
+		public bool IsEmpty => this.Bytes.Length == 0;
 
 		public int KeyId => BinaryPrimitives.ReadUInt16LittleEndian(this.Bytes.Slice(0, 2));
 		public int Revision => BinaryPrimitives.ReadUInt16LittleEndian(this.Bytes.Slice(2, 2));

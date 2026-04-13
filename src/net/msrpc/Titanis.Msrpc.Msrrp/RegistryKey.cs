@@ -190,7 +190,7 @@ namespace Titanis.Msrpc.Msrrp
 					(RegistryValueType)lpType.value,
 					(int)lpcbLen.value,
 					data,
-					TryDecodeValue((RegistryValueType)lpType.value, data)
+					TryDecodeValue((RegistryValueType)lpType.value, data, false)
 					);
 
 				index++;
@@ -302,10 +302,10 @@ namespace Titanis.Msrpc.Msrrp
 			byte[]? data = lpData.value.Array;
 			if (data != null && lpcbLen.value < data.Length)
 				Array.Resize(ref data, (int)lpcbLen.value);
-			return new RegistryValueInfo(name, (RegistryValueType)lpType.value, 0, data, null);
+			return new RegistryValueInfo(name, (RegistryValueType)lpType.value, 0, data, TryDecodeValue((RegistryValueType)lpType.value, data, false));
 		}
 
-		internal static object? TryDecodeValue(RegistryValueType valueType, byte[]? data)
+		public static object? TryDecodeValue(RegistryValueType valueType, byte[]? data, bool undecodedAsBytes)
 		{
 			if (data is null)
 				return null;
@@ -317,8 +317,8 @@ namespace Titanis.Msrpc.Msrrp
 				(RegistryValueType.DwordBE, 4) => BinaryPrimitives.ReadUInt32BigEndian(data),
 				(RegistryValueType.String, _) => TryDecodeUtf16String(data),
 				(RegistryValueType.MultiString, _) => TryDecodeUtf16MultiString(data),
-				(RegistryValueType.Binary, _) => null,
-				_ => null
+				// (RegistryValueType.Binary, _) => null,
+				_ => undecodedAsBytes ? data : null
 			};
 		}
 

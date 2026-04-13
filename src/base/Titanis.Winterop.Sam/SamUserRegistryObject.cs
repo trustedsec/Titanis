@@ -46,8 +46,8 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		public SamEncryptedBlob EncryptedLmHash => new SamEncryptedBlob(this.GetVariableUserAttribute(SamUserAttrIndex.EncryptedLmHash));
 		public SamEncryptedBlob EncryptedNtHash => new SamEncryptedBlob(this.GetVariableUserAttribute(SamUserAttrIndex.EncryptedNtHash));
 
-		public byte[] GetDecryptedLmHash() => this.Store.Decrypt(this.Rid, this.EncryptedLmHash);
-		public byte[] GetDecryptedNtHash() => this.Store.Decrypt(this.Rid, this.EncryptedNtHash);
+		public byte[]? GetDecryptedLmHash() => (this.EncryptedLmHash.IsEmpty) ? null : this.Store.Decrypt(this.Rid, this.EncryptedLmHash);
+		public byte[]? GetDecryptedNtHash() => (this.EncryptedNtHash.IsEmpty) ? null : this.Store.Decrypt(this.Rid, this.EncryptedNtHash);
 	}
 	/// <summary>
 	/// Specifies an attribute of a user object.

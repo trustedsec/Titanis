@@ -63,7 +63,10 @@ public abstract class TicketRequestCommand : KdcCommand
 		if (!string.IsNullOrEmpty(this.TicketCache))
 		{
 			string ticketCacheFile = this.ResolveFsPath(this.TicketCache);
-			krb.TicketCache = new TicketCacheFile(this.FileAccessService.ReadAllBytesFrom(ticketCacheFile), ticketCacheFile, krb);
+			var cacheBytes = this.FileAccessService.FileExists(ticketCacheFile)
+				? this.FileAccessService.ReadAllBytesFrom(ticketCacheFile)
+				: [];
+			krb.TicketCache = new TicketCacheFile(cacheBytes, ticketCacheFile, krb);
 		}
 
 		// Load tickets from file, if it exists

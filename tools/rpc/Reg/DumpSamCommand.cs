@@ -20,8 +20,8 @@ namespace Titanis.Msrpc.Msrrp.Cli
 	[Command]
 	[Description("Dumps the SAM of a remote system")]
 	[OutputRecordType(typeof(SamUserHash))]
-	[Example("Dump the SAM using a backup operator", "{0} -UserName marks@LUMON -Kdc 10.66.0.11 -Password She'sAlive!! LUMON-FS1 -BackupSemantics")]
-	class DumpSamCommand : RegistryCommand
+	[Example("Dump the SAM using a backup operator", "{0} -UserName marks@LUMON -Kdc LUMON-DC1 -Password She's@live!! LUMON-FS1 -BackupSemantics", Tag ="marks_backup")]
+	public class DumpSamCommand : RegistryCommand
 	{
 		protected override async Task<int> RunAsync(RemoteRegistryClient client, CancellationToken cancellationToken)
 		{

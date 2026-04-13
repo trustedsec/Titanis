@@ -319,6 +319,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Logging.SourceGener
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Cli.Dsrep.Test", "test\tools\Titanis.Cli.Dsrep.Test\Titanis.Cli.Dsrep.Test.csproj", "{E84A0020-4433-4ED4-AA7C-DB20FF5DC83A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Cli.Reg.Test", "test\tools\Titanis.Cli.Reg.Test\Titanis.Cli.Reg.Test.csproj", "{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1671,6 +1673,18 @@ Global
 		{E84A0020-4433-4ED4-AA7C-DB20FF5DC83A}.Release|x64.Build.0 = Release|Any CPU
 		{E84A0020-4433-4ED4-AA7C-DB20FF5DC83A}.Release|x86.ActiveCfg = Release|Any CPU
 		{E84A0020-4433-4ED4-AA7C-DB20FF5DC83A}.Release|x86.Build.0 = Release|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Debug|x64.Build.0 = Debug|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Debug|x86.Build.0 = Debug|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Release|x64.ActiveCfg = Release|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Release|x64.Build.0 = Release|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Release|x86.ActiveCfg = Release|Any CPU
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1811,6 +1825,7 @@ Global
 		{8B0A2A82-5FDF-4198-B6A4-482FB293925F} = {3FC5B551-B4DD-43A0-8FF6-DDF1FC596067}
 		{4231BEBE-34FC-4CD2-AC56-42CC15EF4205} = {DC60DB95-1194-4694-B016-9AC2384CEAB9}
 		{E84A0020-4433-4ED4-AA7C-DB20FF5DC83A} = {3FC5B551-B4DD-43A0-8FF6-DDF1FC596067}
+		{68FF2C72-0FBF-4EDF-9839-964C8504FE1D} = {3FC5B551-B4DD-43A0-8FF6-DDF1FC596067}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {02A3BCA8-C9C0-462E-8DF9-4B0B8DFD7BCB}

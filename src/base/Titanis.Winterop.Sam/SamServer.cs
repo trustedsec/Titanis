@@ -24,7 +24,7 @@ namespace Titanis.Winterop.SamServer
 		public string FullName => this._userObj.FullName;
 		public uint Rid => this._userObj.Rid;
 		[Browsable(false)]
-		public byte[] NtlmHash => this._userObj.GetDecryptedNtHash();
+		public byte[]? NtlmHash => this._userObj.GetDecryptedNtHash();
 		public string? NtlmHashText => this.NtlmHash?.ToHexString();
 	}
 
