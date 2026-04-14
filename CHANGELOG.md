@@ -7,7 +7,7 @@ This releases focuses on some architectural and usability enhancements.
 * `Dsrep`: support for [MS-DRSR] `dcinfo` and `replicate` secrets.
 * `Ldap lspart` shorthand to list partitions within a forest.
 * `Ldap` parses and displays dnsRecord data, enabling DNS enumeration.
-* `Kerb keytablist` to list keys in a keytab file.
+* `Kerb keytab list` to list keys in a keytab file.
 * `Dcom invoke` supports dotted-property syntax.
 * `-OutputStyle TreeTable` output for Smb2Client ls and Ldap commands.
 * `Smb2Client enumshares` revert to request lower levels if higher levels can't be retrieved.
@@ -16,7 +16,7 @@ This releases focuses on some architectural and usability enhancements.
 ## Bug fixes
 * `-Ticket`, `-TicketCache` work without `-Kdc` and `-UserName`.
 * Ldap converts timestamps both in queries and with standalone `timestamp` command
-* FIxed NTLM over LDAPS to not request encryption.
+* Fixed NTLM over LDAPS to not request encryption.
 * Dcom trims server name to just the host part, as sending activation request with FQDN fails.
 * Scm falls back to older API if the newer version isn't supported.
 

