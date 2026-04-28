@@ -42,14 +42,14 @@ namespace Titanis.Ldap
 	public enum UserAccountControlComputedFlags
 	{
 		LockedOut = (1 << 4),
-		PasswordExpired = (1 << 24),
+		PasswordExpired = (1 << 23),
 	}
 
 	[Flags]
 	public enum UserAccountControlComputedShortFlags
 	{
 		LO = (1 << 4),
-		PE = (1 << 24),
+		PE = (1 << 23),
 	}
 
 	public static class NamedBitGroups
