@@ -21,10 +21,12 @@
     <ProjectReference Include="..\..\..\..\src\base\Titanis.Cli.CommonParameters\Titanis.Cli.CommonParameters.csproj" />
     <ProjectReference Include="..\..\..\..\src\base\Titanis.Cli.DceRpc\Titanis.Cli.DceRpc.csproj" />
     <ProjectReference Include="..\..\..\..\src\base\Titanis.Cli\Titanis.Cli.csproj" />
+    <ProjectReference Include="..\..\..\..\src\base\Titanis.Linterop.Fuse\Titanis.Linterop.Fuse.csproj" />
     <ProjectReference Include="..\..\..\..\src\net\msrpc\Titanis.Msrpc.Mssrvs\Titanis.Msrpc.Mssrvs.csproj" />
     <ProjectReference Include="..\..\..\..\src\net\Titanis.DceRpc.Core\Titanis.DceRpc.Core.csproj" />
     <ProjectReference Include="..\..\..\..\src\net\Titanis.DceRpc.Epm\Titanis.DceRpc.Epm.csproj" />
     <ProjectReference Include="..\..\..\..\src\net\Titanis.DceRpc\Titanis.DceRpc.csproj" />
+    <ProjectReference Include="..\..\..\..\src\net\Titanis.Smb2.Fusion\Titanis.Smb2.Fusion.csproj" />
     <ProjectReference Include="..\..\..\..\src\net\Titanis.Smb2\Titanis.Smb2.csproj" />
     <ProjectReference Include="..\..\..\..\src\security\Titanis.Security.Kerberos\Titanis.Security.Kerberos.csproj" />
     <ProjectReference Include="..\..\..\..\src\security\Titanis.Security.Ntlm\Titanis.Security.Ntlm.csproj" />

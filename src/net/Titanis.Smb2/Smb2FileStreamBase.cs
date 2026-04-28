@@ -32,7 +32,7 @@ namespace Titanis.Smb2
 			{
 				if (this._ownsFile)
 				{
-					this._file.Dispose();
+					this._file.CloseAsync(Smb2CloseOptions.QueryAttributes, CancellationToken.None);
 				}
 			}
 			base.Dispose(disposing);
@@ -43,9 +43,8 @@ namespace Titanis.Smb2
 		{
 			if (this._ownsFile)
 			{
-				await this._file.DisposeAsync().ConfigureAwait(false);
+				await _file.CloseAsync(Smb2CloseOptions.QueryAttributes, CancellationToken.None).ConfigureAwait(false);
 			}
-			await base.DisposeAsync().ConfigureAwait(false);
 		}
 
 		/// <inheritdoc/>

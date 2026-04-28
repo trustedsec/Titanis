@@ -10,9 +10,9 @@ namespace Titanis.Msrpc.Mswkst
 		Device = 2,
 		Ipc = 3,
 
-		Hidden = 0x80000000,
+		TypeMask = 0x03,
 
-		//TypeMask = 0x3,
+		Hidden = 0x80000000,
 
 		Cluster = 0x02000000,
 		ScaleOutCluster = 0x04000000,

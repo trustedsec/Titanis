@@ -32,7 +32,14 @@ namespace Titanis.Smb2
 		// Captured from Notepad
 		DefaultCreateAccess = 0x0012019f,
 		// Also CMD agrees
-		DefaultOpenReadAccess = 0x00120089,
+
+		// cmd /c type xxx : 0x00120089
+		DefaultOpenReadAccess = Synchronize | ReadControl | ReadAttributes | ReadEa | ReadData,
+		// cmd /c echo > xxx : 0x00120196
+		DefaultOpenWriteAccess = Synchronize | ReadControl | WriteAttributes | ReadAttributes | WriteEa | AppendData | WriteData,
+
+		DefaultOpenReadWriteAccess = DefaultOpenReadAccess | DefaultOpenWriteAccess,
+		DefaultOpenAppendAccess = Synchronize | ReadControl | WriteAttributes | ReadAttributes | WriteEa | AppendData | WriteData,
 
 		// From command prompt
 		DefaultCreateDirAccess = 0x00100081,

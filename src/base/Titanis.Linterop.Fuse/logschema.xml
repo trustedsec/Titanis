@@ -1,0 +1,288 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<logSchema xmlns="xsd://titanis/LogSchema.xsd">
+	<source ns="Titanis.Linterop.Fuse" name="Fuse">
+		<message name="fuse_init" severity="Debug">
+			<param name="protoVersionMajor" type="uint"/>
+			<param name="protoVersionMinor" type="uint"/>
+			<param name="capabilities" type="FuseCaps"/>
+			<![CDATA[fuse_init called
+	Protocol version: {protoVersionMajor}.{protoVersionMinor}
+	Capabilities: {capabilities}]]>
+		</message>
+		<message name="fuse_destroy" severity="Debug">
+			<![CDATA[fuse_destroy called]]>
+		</message>
+
+		<message name="AllocInode" severity="Debug">
+			<param name="ino" type="ulong"/>
+			<param name="fileName" type="string"/>
+			<![CDATA[Inode ino={ino} allocated for '{fileName}'.]]>
+		</message>
+		<message name="IncRefInode" severity="Debug">
+			<param name="ino" type="ulong"/>
+			<param name="fileName" type="string"/>
+			<param name="count" type="ulong"/>
+			<!-- using 'ino=' below helps when grepping through logs -->
+			<![CDATA[Inode ino={ino} (file '{fileName}') reference count increased to {count}.]]>
+		</message>
+		<message name="DecRefInode" severity="Debug">
+			<param name="ino" type="ulong"/>
+			<param name="fileName" type="string"/>
+			<param name="delta" type="ulong"/>
+			<param name="count" type="long"/>
+			<!-- using 'ino=' below helps when grepping through logs -->
+			<![CDATA[Inode ino={ino} (file '{fileName}') reference count decreased by {delta} to {count}.]]>
+		</message>
+		<message name="CallSucceeded" severity="Debug">
+			<param name="req" type="ulong"/>
+			<![CDATA[The call (req={req:X}) succeeded]]>
+		</message>
+		<message name="CallFailed" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="err" type="LinuxErrorCode"/>
+			<![CDATA[The call (req={req:X}) failed with {err} ({err:D})]]>
+		</message>
+
+		<message name="fuse_lookup" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="parent" type="ulong"/>
+			<param name="name" type="string"/>
+			<![CDATA[fuse_lookup called (req={req:X}, parent={parent}, name={name})]]>
+		</message>
+		<message name="fuse_forget" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_forget called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_getattr" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_getattr called (req={req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_setattr" severity="Debug">
+			<param name="req" type="ulong"/>
+			<![CDATA[fuse_setattr called (req=0x{req:X})]]>
+		</message>
+		<message name="fuse_readlink" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_readlink called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_mknod" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="name" type="string"/>
+			<param name="mode" type="PosixFileMode"/>
+			<![CDATA[fuse_mknod called (req=0x{req:X}, ino={ino}, name={name}, mode={mode})]]>
+		</message>
+		<message name="fuse_mkdir" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="name" type="string"/>
+			<param name="mode" type="PosixFileMode"/>
+			<![CDATA[fuse_mkdir called (req=0x{req:X}, ino={ino}, name={name}, mode={mode})]]>
+		</message>
+		<message name="fuse_unlink" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="name" type="string"/>
+			<![CDATA[fuse_unlink called (req=0x{req:X}, ino={ino}, name={name})]]>
+		</message>
+		<message name="fuse_rmdir" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="name" type="string"/>
+			<![CDATA[fuse_rmdir called (req=0x{req:X}, ino={ino}, name={name})]]>
+		</message>
+		<message name="fuse_symlink" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="link" type="string"/>
+			<param name="ino" type="ulong"/>
+			<param name="name" type="string"/>
+			<![CDATA[fuse_symlink called (req=0x{req:X}, link={link}, ino={ino}, name={name})]]>
+		</message>
+		<message name="fuse_rename" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="name" type="string"/>
+			<param name="newParent" type="ulong"/>
+			<param name="newName" type="string"/>
+			<![CDATA[fuse_rename called (req=0x{req:X}, ino={ino}, name={name}, newParent={newParent}, newName={newName})]]>
+		</message>
+		<message name="fuse_link" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="newParent" type="ulong"/>
+			<param name="name" type="string"/>
+			<![CDATA[fuse_link called (req=0x{req:X}, ino={ino}, newParent={newParent}, name={name})]]>
+		</message>
+		<message name="fuse_open" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="openFlags" type="FuseOpenFlags"/>
+			<![CDATA[fuse_open called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_read" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="offset" type="long"/>
+			<param name="size" type="ulong"/>
+			<![CDATA[fuse_read called (req=0x{req:X}, ino={ino}, offset={offset}, size={size})]]>
+		</message>
+		<message name="fuse_write" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="offset" type="long"/>
+			<param name="size" type="long"/>
+			<![CDATA[fuse_write called (req=0x{req:X}, ino={ino}, offset={offset}, size={size})]]>
+		</message>
+		<message name="fuse_flush" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_flush called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_release" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_release called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_fsync" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_fsync called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_opendir" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_opendir called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_readdir" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="size" type="ulong"/>
+			<param name="offset" type="long"/>
+			<![CDATA[fuse_readdir called (req={req:X}, ino={ino}, size={size}, offset={offset})]]>
+		</message>
+		<message name="fuse_releasedir" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_releasedir called (req={req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_fsyncdir" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_fsyncdir called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_statfs" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_statfs called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_setxattr" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="attributeName" type="string"/>
+			<![CDATA[fuse_setxattr called (req=0x{req:X}, ino={ino}, attributeName={attributeName})]]>
+		</message>
+		<message name="fuse_getxattr" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="attributeName" type="string"/>
+			<param name="bufferSize" type="ulong"/>
+			<![CDATA[fuse_getxattr called (req={req:X}, ino={ino}, attributeName={attributeName}, bufferSize={bufferSize})]]>
+		</message>
+		<message name="fuse_listxattr" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="bufferSize" type="ulong"/>
+			<![CDATA[fuse_listxattr called (req={req:X}, ino={ino}, bufferSize={bufferSize})]]>
+		</message>
+		<message name="fuse_removexattr" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_removexattr called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_access" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="mask" type="PosixFileMode"/>
+			<![CDATA[fuse_access called (req={req:X}, ino={ino}, access={mask})]]>
+		</message>
+		<message name="fuse_create" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="name" type="string"/>
+			<param name="mode" type="PosixFileMode"/>
+			<param name="openFlags" type="FuseOpenFlags"/>
+			<![CDATA[fuse_create called (req=0x{req:X}, ino={ino}, name={name}, mode={mode}, openFlags={openFlags})]]>
+		</message>
+		<message name="fuse_getlk" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_getlk called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_setlk" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_setlk called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_bmap" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_bmap called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_ioctl" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<param name="cmd" type="uint"/>
+			<param name="arg" type="long"/>
+			<param name="flags" type="uint"/>
+			<![CDATA[fuse_ioctl called (req=0x{req:X}, ino={ino}, cmd={cmd}, arg={arg})]]>
+		</message>
+		<message name="fuse_poll" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_poll called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_write_buf" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_write_buf called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_retrieve_reply" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_retrieve_reply called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_forget_multi" severity="Debug">
+			<param name="req" type="ulong"/>
+			<![CDATA[fuse_forget_multi called (req=0x{req:X})]]>
+		</message>
+		<message name="fuse_flock" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_flock called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_fallocate" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_fallocate called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_readdirplus" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_readdirplus called (req=0x{req:X}, ino={ino})]]>
+		</message>
+		<message name="fuse_copy_file_range" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino_in" type="ulong"/>
+			<param name="ino_out" type="ulong"/>
+			<![CDATA[fuse_copy_file_range called (req=0x{req:X}, ino_in={ino_in}, ino_out={ino_out})]]>
+		</message>
+		<message name="fuse_lseek" severity="Debug">
+			<param name="req" type="ulong"/>
+			<param name="ino" type="ulong"/>
+			<![CDATA[fuse_lseek called (req=0x{req:X}, ino={ino})]]>
+		</message>
+	</source>
+</logSchema>

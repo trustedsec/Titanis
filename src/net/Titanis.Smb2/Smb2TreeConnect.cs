@@ -18,7 +18,7 @@ namespace Titanis.Smb2
 	/// A tree connect represents a connection to a share.
 	/// </remarks>
 	/// <seealso cref="Smb2Session.OpenTreeAsync(UncPath, bool, CancellationToken)"/>
-	public class Smb2TreeConnect : IDisposable, IAsyncDisposable
+	public class Smb2TreeConnect : IOpenSmbFile, IDisposable, IAsyncDisposable
 	{
 		internal Smb2TreeConnect(
 			string shareName,
@@ -115,16 +115,7 @@ namespace Titanis.Smb2
 		/// <returns>A <see cref="Smb2Directory"/> representing the directory</returns>
 		public Task<Smb2Directory> CreateDirectoryAsync(string dirName, CancellationToken cancellationToken)
 		{
-			return this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(dirName, new Smb2CreateInfo
-			{
-				Priority = Smb2Priority.CreateDir,
-				CreateDisposition = Smb2CreateDisposition.Create,
-				DesiredAccess = (uint)Smb2FileAccessRights.DefaultCreateDirAccess,
-				ShareAccess = Smb2ShareAccess.ReadWrite,
-				FileAttributes = Winterop.FileAttributes.Normal,
-				CreateOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.SynchronousIoNonalert,
-				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-			}, FileAccess.Read, cancellationToken);
+			return this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(dirName, Smb2CreateInfo.ForCreateDirectory(), FileAccess.Read, cancellationToken);
 		}
 		/// <summary>
 		/// Opens a directory.
@@ -135,26 +126,13 @@ namespace Titanis.Smb2
 		public Task<Smb2Directory> OpenDirectoryAsync(string dirName, CancellationToken cancellationToken)
 		{
 			bool lease = this.Session.Connection.SupportsDirectoryLeasing && this.PrefersDirectoryLeases;
-			return this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(dirName, new Smb2CreateInfo
-			{
-				CreateDisposition = Smb2CreateDisposition.Open,
-				Priority = Smb2Priority.OpenDir,
-				DesiredAccess = (uint)Smb2FileAccessRights.DefaultOpenDirAccess,
-				ShareAccess = Smb2ShareAccess.DefaultDirShare,
-				FileAttributes = Winterop.FileAttributes.None,
-				CreateOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.SynchronousIoNonalert,
-				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-				RequestMaximalAccess = true,
-				QueryOnDiskId = true,
-				OplockLevel = lease ? Smb2OplockLevel.Lease : Smb2OplockLevel.None,
-				LeaseInfo = lease
+			return this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(dirName, Smb2CreateInfo.ForOpenDirectory(oplockLevel: lease ? Smb2OplockLevel.Lease : Smb2OplockLevel.None, leaseInfo: lease
 					? new Smb2LeaseInfo()
 					{
 						LeaseState = Smb2LeaseState.ReadCaching | Smb2LeaseState.HandleCaching,
 						UseV2Struct = this.Session.Connection.Dialect >= Smb2Dialect.Smb3_0
 					}
-					: null
-			},
+					: null),
 			FileAccess.Read,
 			cancellationToken);
 		}
@@ -166,26 +144,13 @@ namespace Titanis.Smb2
 		public async Task RemoveDirectoryAsync(string dirName, CancellationToken cancellationToken)
 		{
 			bool lease = this.Session.Connection.SupportsDirectoryLeasing && this.PrefersDirectoryLeases;
-			await using (var dir = (await this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(dirName, new Smb2CreateInfo
-			{
-				CreateDisposition = Smb2CreateDisposition.Open,
-				Priority = 0,
-				DesiredAccess = (uint)Smb2FileAccessRights.DefaultRemoveDirAccess,
-				ShareAccess = Smb2ShareAccess.DefaultDirShare,
-				FileAttributes = Winterop.FileAttributes.None,
-				CreateOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.SynchronousIoNonalert | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.DeleteOnClose,
-				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-				RequestMaximalAccess = true,
-				QueryOnDiskId = true,
-				OplockLevel = lease ? Smb2OplockLevel.Lease : Smb2OplockLevel.None,
-				LeaseInfo = lease
+			await using (var dir = (await this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(dirName, Smb2CreateInfo.ForRemoveDirectory(oplockLevel: lease ? Smb2OplockLevel.Lease : Smb2OplockLevel.None, leaseInfo: lease
 					? new Smb2LeaseInfo()
 					{
 						LeaseState = Smb2LeaseState.ReadCaching | Smb2LeaseState.HandleCaching,
 						UseV2Struct = this.Session.Connection.Dialect >= Smb2Dialect.Smb3_0
 					}
-					: null
-			},
+					: null),
 			FileAccess.Read,
 			cancellationToken).ConfigureAwait(false)).ConfigureAwait(false))
 			{
@@ -200,68 +165,20 @@ namespace Titanis.Smb2
 		public async Task DeleteFileAsync(string fileName, CancellationToken cancellationToken)
 		{
 			bool lease = true;
-			await using (var dir = (await this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(fileName, new Smb2CreateInfo
-			{
-				CreateDisposition = Smb2CreateDisposition.Open,
-				Priority = 0,
-				DesiredAccess = (uint)Smb2FileAccessRights.DefaultDeleteFileAccess,
-				ShareAccess = Smb2ShareAccess.Delete,
-				FileAttributes = 0,
-				CreateOptions = Smb2FileCreateOptions.NonDirectory | Smb2FileCreateOptions.SynchronousIoNonalert | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.DeleteOnClose,
-				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-				RequestMaximalAccess = true,
-				QueryOnDiskId = true,
-				OplockLevel = Smb2OplockLevel.Lease,
-				LeaseInfo = lease
+			await using (var dir = (await this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(fileName, Smb2CreateInfo.ForDeleteFile(oplockLevel: lease ? Smb2OplockLevel.Lease : Smb2OplockLevel.None, leaseInfo: lease
 					? new Smb2LeaseInfo()
 					{
 						LeaseState = Smb2LeaseState.ReadCaching | Smb2LeaseState.HandleCaching,
 						UseV2Struct = this.Session.Connection.Dialect >= Smb2Dialect.Smb3_0
 					}
-					: null
-			},
+					: null),
 			FileAccess.Read,
 			cancellationToken).ConfigureAwait(false)).ConfigureAwait(false))
 			{
 				;
 			}
 		}
-		/// <summary>
-		/// Creates a file.
-		/// </summary>
-		/// <param name="fileName">File path, relative to the share</param>
-		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
-		/// <returns>A <see cref="Smb2OpenFile"/> representing the file.</returns>
-		public async Task<Smb2OpenFile> CreateFileAsync(string fileName, Winterop.FileAttributes attributes, CancellationToken cancellationToken)
-		{
-			return (Smb2OpenFile)await this.CreateFileAsync(fileName, new Smb2CreateInfo
-			{
-				CreateDisposition = Smb2CreateDisposition.Supersede,
-				DesiredAccess = (uint)Smb2FileAccessRights.DefaultCreateAccess,
-				ShareAccess = Smb2ShareAccess.ReadWrite,
-				FileAttributes = attributes,
-				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-				CreateOptions = Smb2FileCreateOptions.NonDirectory | Smb2FileCreateOptions.SynchronousIoNonalert
-			}, FileAccess.ReadWrite, cancellationToken).ConfigureAwait(false);
-		}
-		/// <summary>
-		/// Opens a file.
-		/// </summary>
-		/// <param name="fileName">File path, relative to the share</param>
-		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
-		/// <returns>A <see cref="Smb2OpenFile"/> representing the file.</returns>
-		public async Task<Smb2OpenFile> OpenFileReadAsync(string fileName, CancellationToken cancellationToken)
-		{
-			return (Smb2OpenFile)await this.CreateFileAsync(fileName, new Smb2CreateInfo
-			{
-				CreateDisposition = Smb2CreateDisposition.Open,
-				DesiredAccess = (uint)Smb2FileAccessRights.DefaultOpenReadAccess,
-				ShareAccess = Smb2ShareAccess.Read,
-				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-				CreateOptions = Smb2FileCreateOptions.NonDirectory | Smb2FileCreateOptions.SynchronousIoNonalert,
-				FileAttributes = Winterop.FileAttributes.Normal
-			}, FileAccess.Read, cancellationToken).ConfigureAwait(false);
-		}
+
 		/// <summary>
 		/// Opens a pipe.
 		/// </summary>
@@ -270,14 +187,7 @@ namespace Titanis.Smb2
 		/// <returns>A <see cref="Smb2Pipe"/> representing the pipe.</returns>
 		public Task<Smb2Pipe> OpenPipeAsync(string pipeName, CancellationToken cancellationToken)
 		{
-			return this.CreateFileAsync<Smb2Pipe, Smb2PipeFactory>(pipeName, new Smb2CreateInfo
-			{
-				CreateDisposition = Smb2CreateDisposition.Open,
-				ShareAccess = Smb2ShareAccess.ReadWriteDelete,
-				FileAttributes = 0,
-				DesiredAccess = (uint)0x0012019f,
-				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-			}, FileAccess.ReadWrite, cancellationToken);
+			return this.CreateFileAsync<Smb2Pipe, Smb2PipeFactory>(pipeName, Smb2CreateInfo.ForOpenPipe(), FileAccess.ReadWrite, cancellationToken);
 		}
 
 		private async Task<Pdus.Smb2CreateResponse> CreateFileAsyncCore(

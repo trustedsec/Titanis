@@ -13,15 +13,15 @@ namespace Titanis.Smb2
 	{
 		internal Smb2FileStream(Smb2OpenFile file, FileAccess access, bool ownsFile) : base(file, access, ownsFile)
 		{
-			this._file = file;
+			this.File = file;
 		}
 
-		private Smb2OpenFile _file;
+		public Smb2OpenFile File { get; }
 
 		/// <inheritdoc/>
 		public sealed override bool CanSeek => true;
 		/// <inheritdoc/>
-		public sealed override long Length => this._file.Length;
+		public sealed override long Length => this.File.Length;
 		/// <inheritdoc/>
 		public sealed override long Position { get; set; }
 
@@ -48,7 +48,7 @@ namespace Titanis.Smb2
 		/// <inheritdoc/>
 		public sealed override void SetLength(long value)
 		{
-			this._file.SetLengthAsync(value, CancellationToken.None).Wait();
+			this.File.SetLengthAsync(value, CancellationToken.None).Wait();
 		}
 	}
 }

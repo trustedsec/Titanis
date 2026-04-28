@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	  <LangVersion>13.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="logschema.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\build\Titanis.Logging.SourceGeneration\Titanis.Logging.SourceGeneration.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\Titanis.Core\Titanis.Core.csproj" />
+    <ProjectReference Include="..\Titanis.Winterop.ErrorCodes\Titanis.Winterop.ErrorCodes.csproj" />
+  </ItemGroup>
+
+</Project>

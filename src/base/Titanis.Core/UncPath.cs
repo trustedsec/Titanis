@@ -191,9 +191,28 @@ namespace Titanis
 				m.Groups["pa"].Value);
 		}
 
+		public static string Combine(string? path1, string? path2)
+		{
+			if (string.IsNullOrEmpty(path1))
+				return path2;
+			if (string.IsNullOrEmpty(path2))
+				return path1;
+
+			if (path2.StartsWith("/") || path2.StartsWith(@"\"))
+				throw new ArgumentException($"Cannot append an absolute path.", nameof(path2));
+
+			int extra = path1.EndsWith(@"\") ? 0 : 1;
+			StringBuilder sb = new StringBuilder(path1.Length + extra + path2.Length);
+			sb.Append(path1);
+			if (extra > 0)
+				sb.Append(@"\");
+			sb.Append(path2);
+			return sb.ToString();
+		}
+
 		public UncPath Append(string fileName)
 		{
-			return Parse(Path.Combine(ToString(), fileName));
+			return Parse(Combine(ToString(), fileName));
 		}
 	}
 

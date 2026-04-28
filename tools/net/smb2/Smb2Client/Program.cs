@@ -21,6 +21,7 @@ namespace Titanis.Smb2.Cli
 	[Subcommand("enumnics", typeof(Smb2EnumNicsCommand))]
 	[Subcommand("mklink", typeof(Smb2MklinkCommand))]
 	[Subcommand("mount", typeof(Smb2MountCommand))]
+	[Subcommand("mountfs", typeof(FuseCommand))]
 	[Subcommand("umount", typeof(Smb2UmountCommand))]
 	[Subcommand("mkdir", typeof(Smb2MkdirCommand))]
 	[Subcommand("rmdir", typeof(Smb2RmdirCommand))]
@@ -60,7 +61,7 @@ namespace Titanis.Smb2.Cli
 		[Placeholder("UNC path")]
 		[Description("The UNC path of the target")]
 		[Category(ParameterCategories.Connection)]
-		public UncPath? UncPath { get; set; }
+		public UncPath UncPath { get; set; }
 
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public AuthenticationParameters AuthenticationParameters { get; set; }

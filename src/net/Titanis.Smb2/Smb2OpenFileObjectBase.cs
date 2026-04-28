@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Text;
@@ -109,6 +110,18 @@ FileInfoClass.NetworkOpenInfo), DefaultMaxResponseSize)
 		public Smb2FileAccessRights MaximalAccessAllowed { get; internal set; }
 		public ulong FileId { get; internal set; }
 		public ulong VolumeId { get; internal set; }
+
+		public Smb2DirEntry GetDirectoryEntry() => new Smb2DirEntry
+		{
+			FileName = Path.GetFileName(this.ShareRelativePath),
+			CreationTime = this.CreationTime,
+			LastAccessTime = this.LastAccessTime,
+			LastWriteTime = this.LastWriteTime,
+			LastChangeTime = this.ChangeTime,
+			Size = (ulong)this.Length,
+			SizeOnDisk = (ulong)this.AllocationSize,
+			FileAttributes = this.FileAttributes,
+		};
 
 		public struct Smb2IoctlResult
 		{

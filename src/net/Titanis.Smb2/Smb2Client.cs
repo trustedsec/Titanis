@@ -23,7 +23,7 @@ namespace Titanis.Smb2
 	/// <summary>
 	/// Implements an SMB2 protocol client.
 	/// </summary>
-	public partial class Smb2Client
+	public partial class Smb2Client : IOpenSmbFile
 	{
 		/// <summary>
 		/// Initializes a new <see cref="Smb2Client"/>.
@@ -453,8 +453,57 @@ namespace Titanis.Smb2
 			return preferred;
 		}
 
-		public Task<Smb2Directory> OpenDirectoryAsync(string uncPath, CancellationToken cancellationToken)
-			=> OpenDirectoryAsync(UncPath.Parse(uncPath), cancellationToken);
+		#region Create/Open file
+
+		#region OpenFileReadAsync
+		public async Task<Smb2FileStream> OpenFileReadAsync(UncPath uncPath, CancellationToken cancellationToken)
+		{
+			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
+
+			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
+			return await share.OpenFileReadAsync(resolvedPath.ShareRelativePath, cancellationToken).ConfigureAwait(false);
+		}
+		#endregion
+
+		#region OpenFileAsync
+		public async Task<Smb2FileStream> OpenFileAsync(UncPath uncPath, FileAccess access, CancellationToken cancellationToken)
+		{
+			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
+
+			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
+			return await share.OpenFileReadAsync(resolvedPath.ShareRelativePath, cancellationToken).ConfigureAwait(false);
+		}
+		#endregion
+
+		#region CreateFileAsync
+		public async Task<Smb2FileStream> CreateFileAsync(UncPath uncPath, CancellationToken cancellationToken)
+		{
+			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
+
+			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
+			return await share.CreateFileAsync(resolvedPath.ShareRelativePath, cancellationToken).ConfigureAwait(false);
+		}
+		public Task<Smb2OpenFileObjectBase> CreateFileAsync(
+			string fileName,
+			Smb2CreateInfo createInfo,
+			FileAccess access,
+			CancellationToken cancellationToken) => this.CreateFileAsync(UncPath.Parse(fileName), createInfo, access, cancellationToken);
+		public async Task<Smb2OpenFileObjectBase> CreateFileAsync(
+			UncPath uncPath,
+			Smb2CreateInfo createInfo,
+			FileAccess access,
+			CancellationToken cancellationToken)
+		{
+			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
+
+			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
+			return await share.CreateFileAsync(resolvedPath.ShareRelativePath, createInfo, access, cancellationToken).ConfigureAwait(false);
+		}
+		#endregion
+
+		#endregion
+
+		public Task<Smb2Directory> OpenDirectoryAsync(string uncPath, CancellationToken cancellationToken) => OpenDirectoryAsync(UncPath.Parse(uncPath), cancellationToken);
 		public async Task<Smb2Directory> OpenDirectoryAsync(UncPath uncPath, CancellationToken cancellationToken)
 		{
 			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
@@ -471,39 +520,6 @@ namespace Titanis.Smb2
 
 			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
 			return await share.OpenPipeAsync(resolvedPath.ShareRelativePath, cancellationToken).ConfigureAwait(false);
-		}
-
-		public Task<Smb2OpenFile> OpenFileReadAsync(string uncPath, CancellationToken cancellationToken)
-			=> OpenFileReadAsync(UncPath.Parse(uncPath), cancellationToken);
-		public async Task<Smb2OpenFile> OpenFileReadAsync(UncPath uncPath, CancellationToken cancellationToken)
-		{
-			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
-
-			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
-			return await share.OpenFileReadAsync(resolvedPath.ShareRelativePath, cancellationToken).ConfigureAwait(false);
-		}
-
-		public Task<Smb2OpenFile> CreateFileAsync(string uncPath, CancellationToken cancellationToken)
-			=> CreateFileAsync(UncPath.Parse(uncPath), cancellationToken);
-		public Task<Smb2OpenFile> CreateFileAsync(UncPath uncPath, CancellationToken cancellationToken)
-			=> this.CreateFileAsync(uncPath, Winterop.FileAttributes.Normal, cancellationToken);
-		public async Task<Smb2OpenFile> CreateFileAsync(UncPath uncPath, Winterop.FileAttributes attributes, CancellationToken cancellationToken)
-		{
-			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
-
-			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
-			return await share.CreateFileAsync(resolvedPath.ShareRelativePath, attributes, cancellationToken).ConfigureAwait(false);
-		}
-		public async Task<Smb2OpenFileObjectBase> CreateFileAsync(
-			UncPath uncPath,
-			Smb2CreateInfo createInfo,
-			FileAccess access,
-			CancellationToken cancellationToken)
-		{
-			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
-
-			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
-			return await share.CreateFileAsync(resolvedPath.ShareRelativePath, createInfo, access, cancellationToken).ConfigureAwait(false);
 		}
 		public async Task<Smb2Directory> CreateDirectoryAsync(
 			UncPath uncPath,
@@ -542,6 +558,7 @@ namespace Titanis.Smb2
 		/// <param name="sourceFileName">Local path of the source file</param>
 		/// <param name="destinationFileName">Destination UNC path</param>
 		/// <param name="overwrite"><see langword="true"/> to overwrite the file at <paramref name="destinationFileName"/> if it exists</param>
+
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
 		/// <returns>
 		/// A <see cref="Smb2CreateAction"/> value indicating whether the file existed.
@@ -555,121 +572,12 @@ namespace Titanis.Smb2
 			UncPath destinationFileName,
 			bool overwrite,
 			CancellationToken cancellationToken,
-			int chunkSize = DefaultChunkSize)
+			int chunkSize = Smb2Client.DefaultChunkSize)
 		{
-			if (string.IsNullOrEmpty(sourceFileName)) throw new ArgumentException($"'{nameof(sourceFileName)}' cannot be null or empty.", nameof(sourceFileName));
-			ArgumentNullException.ThrowIfNull(destinationFileName);
+			if (destinationFileName is null) throw new ArgumentNullException(nameof(destinationFileName));
 
-			// Open the source file
-			using (var sourceStream = File.OpenRead(sourceFileName))
-			{
-				// Get source file attributes
-				Winterop.FileAttributes attrs = string.IsNullOrEmpty(sourceFileName)
-					? Winterop.FileAttributes.Normal
-					: (Winterop.FileAttributes)File.GetAttributes(sourceFileName);
-
-				// Check whether the remote target is a directory
-				bool isDestDir = false;
-				bool fileExists = false;
-				try
-				{
-					var file = await this.CreateFileAsync(destinationFileName, new Smb2CreateInfo
-					{
-						OplockLevel = Smb2OplockLevel.None,
-						ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-						DesiredAccess = (uint)Smb2FileAccessRights.ReadAttributes,
-						FileAttributes = 0,
-						ShareAccess = Smb2ShareAccess.ReadWriteDelete,
-						CreateDisposition = Smb2CreateDisposition.Open,
-						CreateOptions = Smb2FileCreateOptions.OpenReparsePoint,
-						RequestMaximalAccess = true,
-						QueryOnDiskId = true
-					}, FileAccess.Read, cancellationToken).ConfigureAwait(false);
-
-					await using (file)
-					{
-						isDestDir = file.IsDirectory;
-						if (isDestDir)
-						{
-							string sourceFilePart = Path.GetFileName(sourceFileName);
-							destinationFileName = destinationFileName.Append(Path.GetFileName(sourceFilePart));
-						}
-						else
-						{
-							fileExists = true;
-						}
-					}
-				}
-				catch { }
-
-				// Check whether remote target exists
-				// If the user-provided name is a directory, the previous step appended the path name
-				if (!fileExists && isDestDir)
-				{
-					try
-					{
-						var file = await CreateFileAsync(destinationFileName, new Smb2CreateInfo
-						{
-							OplockLevel = Smb2OplockLevel.None,
-							ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-							DesiredAccess = (uint)Smb2FileAccessRights.ReadAttributes,
-							FileAttributes = 0,
-							ShareAccess = Smb2ShareAccess.ReadWriteDelete,
-							CreateDisposition = Smb2CreateDisposition.Open,
-							CreateOptions = Smb2FileCreateOptions.OpenReparsePoint,
-							RequestMaximalAccess = true,
-							QueryOnDiskId = true
-						}, FileAccess.Read, cancellationToken).ConfigureAwait(false);
-						await using (file)
-						{
-							if (file.IsDirectory)
-								throw new IOException($"The target path `{destinationFileName}' is a directory, not a file.");
-
-							fileExists = true;
-						}
-					}
-					catch
-					{
-						// More of a courtesy, don't report error on this step
-					}
-				}
-
-				if (fileExists && !overwrite)
-					throw new IOException($"The file `{destinationFileName}' already exists.");
-
-				{
-					var file = await CreateFileAsync(destinationFileName, attrs, cancellationToken).ConfigureAwait(false);
-					var createAction = file.CreateAction;
-					await using (file)
-					{
-						if (sourceStream.CanSeek)
-						{
-							await file.SetLengthAsync(sourceStream.Length, cancellationToken).ConfigureAwait(false);
-						}
-
-						var destStream = file.GetStream(false);
-						await using (destStream)
-						{
-							await sourceStream.CopyToAsync2(destStream, chunkSize, cancellationToken).ConfigureAwait(false);
-						}
-
-						DateTime dateTime = File.GetLastWriteTimeUtc(sourceFileName);
-						await file.SetBasicInfoAsync(
-							null,
-							null,
-							dateTime,
-							dateTime,
-							(Winterop.FileAttributes)File.GetAttributes(sourceFileName),
-							cancellationToken
-							).ConfigureAwait(false);
-					}
-
-					if (isDestDir)
-						createAction |= Smb2CreateAction.IsDirectory;
-
-					return createAction;
-				}
-			}
+			(var share, var resolvedPath) = await this.ResolvePath(destinationFileName, cancellationToken).ConfigureAwait(false);
+			return await share.PutFileAsync(sourceFileName, resolvedPath.ShareRelativePath, overwrite, cancellationToken, chunkSize).ConfigureAwait(false);
 		}
 	}
 

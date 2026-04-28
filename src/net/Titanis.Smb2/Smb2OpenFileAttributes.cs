@@ -5,13 +5,13 @@ namespace Titanis.Smb2
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct Smb2OpenFileAttributes
 	{
-		internal long creationTime;
-		internal long lastAccessTime;
-		internal long lastWriteTime;
-		internal long changeTime;
-		internal long allocationSize;
-		internal long endOfFile;
+		public long creationTime;
+		public long lastAccessTime;
+		public long lastWriteTime;
+		public long changeTime;
+		public long allocationSize;
+		public long endOfFile;
 
-		internal Winterop.FileAttributes fileAttributes;
+		public Winterop.FileAttributes fileAttributes;
 	}
 }

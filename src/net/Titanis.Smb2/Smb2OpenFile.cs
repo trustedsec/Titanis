@@ -10,11 +10,9 @@ namespace Titanis.Smb2
 	/// <summary>
 	/// Represents a file open over an SMB2 share.
 	/// </summary>
-	/// <seealso cref="Smb2TreeConnect.OpenFileReadAsync(string, System.Threading.CancellationToken)"/>
+	/// <seealso cref="Smb2TreeConnect.CreateFileAsync(string, Smb2CreateInfo, FileAccess, CancellationToken)"/>
 	public sealed class Smb2OpenFile : Smb2OpenFileBase
 	{
-		private readonly FileAccess _access;
-
 		internal Smb2OpenFile(
 			Smb2TreeConnect tree,
 			string shareRelativePath,
@@ -25,6 +23,8 @@ namespace Titanis.Smb2
 		{
 			this._access = access;
 		}
+
+		private readonly FileAccess _access;
 
 		/// <summary>
 		/// Gets a stream to access the data within the file.
@@ -69,5 +69,10 @@ namespace Titanis.Smb2
 
 			var resp = (Pdus.Smb2SetInfoResponse)await this.Tree.SendSyncPduAsync(req, cancellationToken).ConfigureAwait(false);
 		}
-	}
+
+        internal void SetAttributes(Winterop.FileAttributes attrs)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
