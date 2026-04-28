@@ -112,13 +112,21 @@ namespace Titanis.Smb2
 			if (!this.CanWrite)
 				throw new NotSupportedException("The stream does not support writing.");
 
-			int cbWrite = await this._file.WriteAsync(
-				this.PosValue,
-				new Memory<byte>(buffer, offset, count),
-				Smb2WriteOptions.None,
-				cancellationToken).ConfigureAwait(false);
-			if (this.CanSeek)
-				this.Position += cbWrite;
+			int cbWritten = 0;
+			do
+			{
+				int cbChunk = await this._file.WriteAsync(
+					this.PosValue,
+					new Memory<byte>(buffer, offset + cbWritten, count - cbWritten),
+					Smb2WriteOptions.None,
+					cancellationToken).ConfigureAwait(false);
+				if (cbChunk == 0)
+					throw new PartialWriteException(cbWritten);
+				if (this.CanSeek)
+					this.Position += cbChunk;
+
+				cbWritten += cbChunk;
+			} while (count > 0);
 		}
 
 		#region ISecureChannel
