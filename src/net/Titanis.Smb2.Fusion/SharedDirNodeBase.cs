@@ -47,7 +47,7 @@ abstract class SharedDirNodeBase : SmbFileNodeBase, IFuseNodeSource<SmbFileNodeB
 
 	private readonly FuseNodeCache<SmbFileNodeBase, Smb2DirEntry> _nodeCache;
 
-	public sealed override async Task<IFuseNode> Lookup(string name, CancellationToken cancellationToken)
+	public sealed override async Task<IFuseNode?> Lookup(string name, CancellationToken cancellationToken)
 	{
 		var cached = this._nodeCache.TryGetNode(name);
 		if (cached != null)

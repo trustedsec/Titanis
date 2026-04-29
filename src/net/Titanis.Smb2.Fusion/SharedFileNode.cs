@@ -28,7 +28,7 @@ internal sealed class SharedFileNode : SmbFileNodeBase
 	public sealed override FileAttributes NtfsAttributes => (FileAttributes)this._dirEntry.FileAttributes;
 
 	/// <inheritdoc/>
-	public sealed override Task<IFuseNode> Lookup(string name, CancellationToken cancellationToken) => throw new NotSupportedException();
+	public sealed override Task<IFuseNode?> Lookup(string name, CancellationToken cancellationToken) => throw new NotSupportedException();
 
 	public override async Task<IFuseOpenFile> OpenFile(FuseOpenFlags openFlags, CancellationToken cancellationToken)
 	{

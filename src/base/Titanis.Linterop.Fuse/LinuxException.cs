@@ -59,6 +59,8 @@ namespace Titanis.Linterop.Fuse
 				return LinuxErrorCode.ENOENT;
 			else if (ex is SecurityException)
 				return LinuxErrorCode.EPERM;
+			else if (ex is NotImplementedException)
+				return LinuxErrorCode.ENOSYS;
 			else
 				return FromHresult((Hresult)ex.HResult);
 

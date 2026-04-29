@@ -77,7 +77,7 @@ namespace Titanis.Linterop.Fuse
 		/// <param name="name">Name of node</param>
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
 		/// <returns>Child node named by <paramref name="name"/></returns>
-		Task<IFuseNode> Lookup(string name, CancellationToken cancellationToken);
+		Task<IFuseNode?> Lookup(string name, CancellationToken cancellationToken);
 
 		Task<IFuseOpenFile> CreateFile(string name, FuseOpenFlags flags, CancellationToken cancellationToken);
 		Task<IFuseOpenFile> OpenFile(FuseOpenFlags openFlags, CancellationToken cancellationToken);

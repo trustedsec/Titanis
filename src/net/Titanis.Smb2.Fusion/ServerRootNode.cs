@@ -125,7 +125,7 @@ class ServerRootNode : IFuseNode, IFuseNodeSource<ShareNode, ShareInfo>
 	}
 
 	/// <inheritdoc/>
-	public async Task<IFuseNode> Lookup(string name, CancellationToken cancellationToken)
+	public async Task<IFuseNode?> Lookup(string name, CancellationToken cancellationToken)
 	{
 		var cached = this._nodeCache.TryGetNode(name);
 		if (cached != null)

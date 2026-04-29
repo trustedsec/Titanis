@@ -126,7 +126,7 @@ abstract class SmbFileNodeBase : IFuseNode
 	}
 
 	/// <inheritdoc/>
-	public abstract Task<IFuseNode> Lookup(string name, CancellationToken cancellationToken);
+	public abstract Task<IFuseNode?> Lookup(string name, CancellationToken cancellationToken);
 
 	public virtual Task<IFuseOpenFile> CreateFile(string name, FuseOpenFlags flags, CancellationToken cancellationToken)
 	{
