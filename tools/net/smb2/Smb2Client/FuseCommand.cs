@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Titanis.Cli;
+using Titanis.Cli.Fuse;
 using Titanis.DceRpc.Client;
 using Titanis.Linterop.Fuse;
 using Titanis.Msrpc.Mswkst;
@@ -23,29 +24,17 @@ Files within IPC$ are presented as sockets.
 ")]
 internal class FuseCommand : Smb2CommandBase
 {
-	[Parameter(After = nameof(UncPath))]
-	[Description("Path of mountpoint in local filesystem")]
-	public string Mountpoint { get; set; }
-
-	[Parameter]
-	[Description("UID of mount")]
-	public uint? Uid { get; set; }
-
-	[Parameter]
-	[Description("GID of mount")]
-	public uint? Gid { get; set; }
-
-	[Parameter]
-	[Description("Mount as read/write")]
-	public SwitchParam ReadWrite { get; set; }
+	[ParameterGroup(ParameterGroupOptions.Required)]
+	public FuseParameterGroup FuseParameters { get; set; }
 
 	protected override Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
 	{
+		var fuseParams = this.FuseParameters;
 		var rpcClient = this.CreateRpcClient();
 		var mountInfo = new SmbMountInfo()
 		{
-			uid = this.Uid ?? NativeMethods.geteuid(),
-			gid = this.Gid ?? NativeMethods.getegid(),
+			uid = fuseParams.Uid ?? NativeMethods.geteuid(),
+			gid = fuseParams.Gid ?? NativeMethods.getegid(),
 			defaultDirAccess = PosixFileMode.Mode777,
 			defaultFileAccess = PosixFileMode.Mode777,
 			smbClient = client
@@ -63,7 +52,7 @@ internal class FuseCommand : Smb2CommandBase
 				FileName = Path.GetFileName(uncPath.ShareRelativePath)
 			});
 
-		FuseMount.Mount(this.Mountpoint, rootNode, this.Log, this.ReadWrite.IsSet, cancellationToken, ["Smb2mount"]);
+		FuseMount.Mount(fuseParams.Mountpoint, rootNode, this.Log, fuseParams.ReadWrite.IsSet, cancellationToken, ["Smb2mount"]);
 		return Task.FromResult(0);
 	}
 }

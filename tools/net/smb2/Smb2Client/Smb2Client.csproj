@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\base\Titanis.Cli.CommonParameters\Titanis.Cli.CommonParameters.csproj" />
     <ProjectReference Include="..\..\..\..\src\base\Titanis.Cli.DceRpc\Titanis.Cli.DceRpc.csproj" />
+    <ProjectReference Include="..\..\..\..\src\base\Titanis.Cli.Fuse\Titanis.Cli.Fuse.csproj" />
     <ProjectReference Include="..\..\..\..\src\base\Titanis.Cli\Titanis.Cli.csproj" />
     <ProjectReference Include="..\..\..\..\src\base\Titanis.Linterop.Fuse\Titanis.Linterop.Fuse.csproj" />
     <ProjectReference Include="..\..\..\..\src\net\msrpc\Titanis.Msrpc.Mssrvs\Titanis.Msrpc.Mssrvs.csproj" />
