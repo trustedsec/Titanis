@@ -3,7 +3,7 @@ using Titanis.Smb2.Fusion;
 
 namespace Titanis.Smb2.Cli;
 
-internal partial class SmbOpenDir : IFuseOpenDirectory
+internal partial class SmbOpenDir : OpenDirBase
 {
 	internal SmbOpenDir(SharedDirNodeBase node, Smb2Directory dir)
 	{
@@ -14,35 +14,26 @@ internal partial class SmbOpenDir : IFuseOpenDirectory
 	private readonly SharedDirNodeBase _node;
 	private readonly Smb2Directory _dir;
 
-	private int _readIndex;
 	private List<Smb2DirEntry> _listing;
 
-	IFuseNode IFuseOpenObject.Node => this._node;
+	public override IFuseNode Node => this._node;
 
-	public long NextOffset => this._readIndex;
 
-	public async Task<IFuseNode?> ReadNextAsync(CancellationToken cancellationToken)
+	protected override async Task<IFuseNode?> ReadNextAsync(int index, CancellationToken cancellationToken)
 	{
-		if (this._readIndex == 0 || this._listing == null)
+		if (index == 0 || this._listing == null)
 		{
 			var listing = await _dir.QueryDirAsync(cancellationToken).ConfigureAwait(false);
 			this._listing = listing;
 		}
 
-		if (this._readIndex < this._listing.Count)
+		if (index < this._listing.Count)
 		{
-			var entry = this._listing[this._readIndex];
-			this._readIndex++;
-
+			var entry = this._listing[index];
 			return this._node.GetFileNode(entry);
 		}
 		else
 			return null;
-	}
-
-	public void Seek(long offset)
-	{
-		this._readIndex = (int)offset;
 	}
 }
 
@@ -72,7 +63,7 @@ partial class SmbOpenDir : IDisposable
 	//     Dispose(disposing: false);
 	// }
 
-	public void Dispose()
+	public override void Dispose()
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 		Dispose(disposing: true);

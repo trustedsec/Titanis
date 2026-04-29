@@ -68,14 +68,10 @@ namespace Titanis.Linterop.Fuse
 							forget = mount.fuse_forget,
 							getattr = mount.fuse_getattr,
 							setattr = writable ? mount.fuse_setattr : null,
-							readlink = mount.fuse_readlink,
 							mknod = writable ? mount.fuse_mknod : null,
 							mkdir = writable ? mount.fuse_mkdir : null,
 							unlink = writable ? mount.fuse_unlink : null,
 							rmdir = writable ? mount.fuse_rmdir : null,
-							symlink = writable ? mount.fuse_symlink : null,
-							rename = writable ? mount.fuse_rename : null,
-							link = writable ? mount.fuse_link : null,
 							open = mount.fuse_open,
 							read = mount.fuse_read,
 							write = writable ? mount.fuse_write : null,
@@ -85,20 +81,25 @@ namespace Titanis.Linterop.Fuse
 							opendir = mount.fuse_opendir,
 							readdir = mount.fuse_readdir,
 							releasedir = mount.fuse_releasedir,
-							fsyncdir = mount.fuse_fsyncdir,
-							statfs = null, //mount.fuse_statfs,
 							setxattr = writable ? mount.fuse_setxattr : null,
 							getxattr = mount.fuse_getxattr,
 							listxattr = mount.fuse_listxattr,
 							removexattr = writable ? mount.fuse_removexattr : null,
 							access = mount.fuse_access,
 							create = writable ? mount.fuse_create : null,
+							write_buf = writable ? mount.fuse_write_buf : null,
+#if DEBUG
+							symlink = writable ? mount.fuse_symlink : null,
+							rename = writable ? mount.fuse_rename : null,
+							link = writable ? mount.fuse_link : null,
+							statfs = mount.fuse_statfs,
+							readlink = mount.fuse_readlink,
+							fsyncdir = mount.fuse_fsyncdir,
 							getlk = mount.fuse_getlk,
 							setlk = mount.fuse_setlk,
 							bmap = mount.fuse_bmap,
 							ioctl = mount.fuse_ioctl,
 							poll = mount.fuse_poll,
-							write_buf = writable ? mount.fuse_write_buf : null,
 							retrieve_reply = mount.fuse_retrieve_reply,
 							forget_multi = mount.fuse_forget_multi,
 							flock = mount.fuse_flock,
@@ -106,6 +107,7 @@ namespace Titanis.Linterop.Fuse
 							readdirplus = mount.fuse_readdirplus,
 							copy_file_range = writable ? mount.fuse_copy_file_range : null,
 							lseek = mount.fuse_lseek,
+#endif
 						};
 						h = FuseNativeMethods.fuse_session_new(
 							fuseargs,
@@ -213,7 +215,9 @@ namespace Titanis.Linterop.Fuse
 				conn.capable
 				);
 
-			conn.want = FuseCaps.AsyncRead;
+			// Default: AsyncRead | RemoteLocking | OpenTruncate | SpliceRead | EmulateFlocks | IoctlDir | AutoInvalidateData | ReadDirPlus | ReadDirPlusAuto | AsyncDirectIo | ParallelDirOps | HandleKillPriv
+			conn.want = FuseCaps.AsyncRead | FuseCaps.ParallelDirOps;
+			//conn.want = FuseCaps.AsyncRead | FuseCaps.ReadDirPlus | FuseCaps.ReadDirPlusAuto | FuseCaps.ParallelDirOps;
 			this._connInfo = conn;
 		}
 
@@ -743,15 +747,27 @@ namespace Titanis.Linterop.Fuse
 					IFuseNode? child;
 					while ((child = await dir.ReadNextAsync(cancellationToken).ConfigureAwait(false)) != null)
 					{
-						string childPath = Path.Combine(nodeInfo.path, child.Name);
+						InodeInfo childNode;
+						string childName;
+						if (child == dir.Node)
+						{
+							childName = ".";
+							childNode = nodeInfo;
+						}
+						else
+						{
+							childName = child.Name;
+							string childPath = Path.Combine(nodeInfo.path, child.Name);
+							childNode = mount._inodemgr.AllocOrRefInodeFor(childPath, child);
+						}
 
-						var childNode = mount._inodemgr.AllocOrRefInodeFor(childPath, child);
 						var stat = GetAttributesOf(childNode, mount._writable);
-						if (!buf.TryAppend(stat, child.Name, dir.NextOffset))
+						if (!buf.TryAppend(stat, childName, dir.NextOffset))
 						{
 							mount._inodemgr.ForgetInode(childNode, 1);
 							break;
 						}
+						break;
 					}
 
 					FuseSetBuf(req, buf.AsSegment());
