@@ -18,7 +18,7 @@ namespace Titanis.Ldap
 
 		const uint MaxPduSize = 32 * 1024;
 
-		protected abstract void HandleMessage(LDAPMessage message);
+		protected abstract Task HandleMessage(LDAPMessage message);
 
 		protected abstract AuthContext? AuthContext { get; }
 

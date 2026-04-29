@@ -52,7 +52,7 @@ namespace Titanis.Ldap
 
 		private readonly LdapServer _server;
 
-		protected override async void HandleMessage(LDAPMessage message)
+		protected override async Task HandleMessage(LDAPMessage message)
 		{
 			CancellationTokenSource cancelSource = new CancellationTokenSource();
 

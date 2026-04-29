@@ -131,7 +131,7 @@ namespace Titanis.Ldap
 			return base.OnStopping();
 		}
 
-		protected override void HandleMessage(LDAPMessage message)
+		protected override Task HandleMessage(LDAPMessage message)
 		{
 			if (this._outstandingMessages.TryGetValue(message.messageID, out var resp))
 			{
@@ -158,6 +158,8 @@ namespace Titanis.Ldap
 			{
 				// TODO: Report spurious reply
 			}
+
+			return Task.CompletedTask;
 		}
 	}
 }
