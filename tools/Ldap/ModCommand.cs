@@ -13,23 +13,6 @@ internal class ModCommand : LdapObjectCommandBase
 	[Description("Changes to make as name?=value")]
 	public AttributeChangeSpec[]? Changes { get; set; }
 
-	protected override async Task<LdapDistinguishedName> ResolveObjectName(string simpleName, LdapClient ldap, CancellationToken cancellationToken)
-	{
-		var result = await ldap.SimpleSearch(simpleName, cancellationToken);
-		if (result.EntryCount == 1)
-			return result.Entries[0].EntryName;
-		else
-		{
-			this.WriteError($"The search for '{simpleName}' return multiple results:");
-			foreach (var entry in result.Entries)
-			{
-				this.WriteMessage($"DN: {entry.EntryName}");
-			}
-
-			throw new InvalidOperationException($"The name '{simpleName}' resolved to multiple objects.  Either specify a more restrictive search string or specify the DN of the desired object.");
-		}
-	}
-
 	protected virtual void GetAdditionalChanges(LdapModifyRequest modifyRequest)
 	{
 

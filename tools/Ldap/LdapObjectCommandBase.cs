@@ -2,14 +2,30 @@ using System.ComponentModel;
 using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
-internal abstract class LdapObjectCommandBase : LdapCommandBase
+
+public abstract class LdapObjectCommandBase : LdapCommandBase
 {
 	[Parameter(After = nameof(ServerName))]
 	[Mandatory]
 	[Description("Names or DNs of objects to create")]
 	public string[] ObjectName { get; set; }
 
-	protected abstract Task<LdapDistinguishedName> ResolveObjectName(string simpleName, LdapClient ldap, CancellationToken cancellationToken);
+	protected virtual async Task<LdapDistinguishedName> ResolveObjectName(string simpleName, LdapClient ldap, CancellationToken cancellationToken)
+	{
+		var result = await ldap.SimpleSearch(simpleName, cancellationToken);
+		if (result.EntryCount == 1)
+			return result.Entries[0].EntryName;
+		else
+		{
+			this.WriteError($"The search for '{simpleName}' return multiple results:");
+			foreach (var entry in result.Entries)
+			{
+				this.WriteMessage($"DN: {entry.EntryName}");
+			}
+
+			throw new InvalidOperationException($"The name '{simpleName}' resolved to multiple objects.  Either specify a more restrictive search string or specify the DN of the desired object.");
+		}
+	}
 
 	protected sealed override async Task<int> RunAsync(LdapClient ldap, CancellationToken cancellationToken)
 	{
