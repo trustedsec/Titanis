@@ -26,6 +26,8 @@ namespace Titanis.Msrpc.Mswmi
 		}
 
 		private WmiClient _wmi;
+		public WmiClient Client => this._wmi;
+
 		private IWbemServices _ns;
 
 		private static readonly RpcPointer<FLAGGED_WORD_BLOB> WqlString = DcomClient.MakeString("WQL");

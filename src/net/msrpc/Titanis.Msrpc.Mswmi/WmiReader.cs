@@ -57,7 +57,7 @@ namespace Titanis.Msrpc.Mswmi
 		// [MS-WMIO] § 2.2.71 - EncodedValue
 		internal static EncodedValue ReadEncodedValue(this IByteSource reader, CimType cimType)
 		{
-			if (0 != (cimType & CimType.Array)
+			if (cimType.IsArray()
 				|| (cimType is CimType.String or CimType.DateTime or CimType.Reference or CimType.Object))
 			{
 				// Read as a HeapRef

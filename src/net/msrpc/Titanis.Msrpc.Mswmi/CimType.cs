@@ -44,6 +44,10 @@ namespace Titanis.Msrpc.Mswmi
 
 	public static class CimTypeExtensions
 	{
+		public static bool IsArray(this CimType type) => 0 != (type & CimType.Array);
+		public static CimType ElementType(this CimType type) => (type & ~CimType.Array);
+		public static bool IsStringLike(this CimType type) => type is CimType.String or CimType.Reference or CimType.DateTime;
+
 		public static string AsCSharpType(this CimType type)
 		{
 			var baseType = (type & CimType.BaseTypeMask);
@@ -69,7 +73,7 @@ namespace Titanis.Msrpc.Mswmi
 				CimType.Object => "object",
 				_ => "object"
 			};
-			if (0 != (type & CimType.Array))
+			if (type.IsArray())
 				typeName += "[]";
 			return typeName;
 		}

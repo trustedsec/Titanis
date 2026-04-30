@@ -34,6 +34,15 @@ namespace Titanis.Msrpc.Mswmi
 					throw new ArgumentException("The default value does not match the property type.", nameof(DefaultValue));
 			}
 			this.DefaultValue = defaultValue;
+
+			if (qualifiers != null)
+			{
+				foreach (var qual in qualifiers)
+				{
+					if (qual.Name.Equals(QualifierNames.Key, StringComparison.OrdinalIgnoreCase) && (qual.Value as bool? ?? false))
+						this.IsKey = true;
+				}
+			}
 		}
 
 		// [MS-WMIO] § 2.2.32 - Inherited
@@ -80,9 +89,13 @@ namespace Titanis.Msrpc.Mswmi
 		public Type RuntimeType => GetRuntimeTypeFor(this.PropertyType, this.SubtypeCode);
 		public Type ElementType => GetRuntimeTypeFor(this.PropertyType & CimType.BaseTypeMask, this.SubtypeCode);
 
+		#region Qualifiers
+		public bool IsKey { get; }
+		#endregion
+
 		public static Type GetRuntimeTypeFor(CimType propType, CimSubtype subtype)
 		{
-			bool isArray = (propType & CimType.Array) != 0;
+			bool isArray = propType.IsArray();
 			propType &= CimType.BaseTypeMask;
 			var elemType = propType switch
 			{
@@ -122,7 +135,7 @@ namespace Titanis.Msrpc.Mswmi
 			// Just to be nice
 			propType &= ~PropertyInheritedFlag;
 
-			if (0 != (propType & CimType.Array))
+			if (propType.IsArray())
 			{
 				if (value is Array arr)
 				{
@@ -184,23 +197,7 @@ namespace Titanis.Msrpc.Mswmi
 			return sb.ToString();
 		}
 
-		internal void ToMof(StringBuilder sb, string? indent)
-		{
-			foreach (var qual in this.Qualifiers)
-			{
-				sb.Append(indent);
-				qual.ToMof(sb);
-				sb.AppendLine();
-			}
-
-			sb
-				.Append(indent)
-				.AppendCimType(this.PropertyType)
-				.Append(' ')
-				.Append(this.Name)
-				.Append(';')
-				.AppendLine();
-		}
+		internal void ToMof(StringBuilder sb, string? indent) => sb.AppendMofProperty(this, indent);
 
 		internal void WriteValue(byte[] valueTable, object? value, ByteWriter heapWriter)
 		{

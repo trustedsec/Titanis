@@ -60,34 +60,7 @@ namespace Titanis.Msrpc.Mswmi
 		public CimType QualifierType { get; }
 		public object? Value { get; }
 
-		internal void ToMof(StringBuilder sb)
-		{
-			sb.Append('[')
-				.Append(this.Name)
-				;
-			if (this.Value != null)
-			{
-				sb.Append('(');
-				// TODO: Proper MOF encode value
-				if (this.Value is object[] values)
-				{
-					bool first = true;
-					foreach (var value in values)
-					{
-						if (first)
-							first = false;
-						else
-							sb.Append(", ");
-
-						sb.AppendMofValue(value);
-					}
-				}
-				else
-					sb.AppendMofValue(this.Value);
-				sb.Append(')');
-			}
-			sb.Append(']');
-		}
+		internal void ToMof(StringBuilder sb) => sb.AppendMofQualifier(this);
 
 		// [MS-WMIO] § 2.2.60 - Qualifier
 		internal Qualifier Encode(ByteWriter heapWriter)

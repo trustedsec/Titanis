@@ -170,12 +170,15 @@ namespace Titanis.Msrpc.Mswmi
 				if (keyField == null || keyField.Value == null)
 					throw new InvalidOperationException("The object does not have a key property set.");
 
-				// TODO: Escape quotes and such
-				string value = keyField.Value?.ToString() ?? string.Empty;
-				value = value.Replace(@"\", @"\\");
-				value = value.Replace("\"", "\\\"");
-				string path = $"{this.WmiClass.Name}.{this.KeyProperty.ClassProperty.Name}=\"{value}\"";
-				return path;
+				StringBuilder sb = new StringBuilder();
+				sb.Append(this.WmiClass.Name)
+					.Append('.')
+					.Append(keyField.ClassProperty.Name)
+					.Append('=')
+					.AppendMofValue(keyField.Value)
+					;
+
+				return sb.ToString();
 			}
 		}
 		/// <summary>
@@ -187,7 +190,7 @@ namespace Titanis.Msrpc.Mswmi
 			{
 				foreach (var prop in this.Properties)
 				{
-					if (prop.ClassProperty.Qualifiers.Any(r => r is { Name: "key", Value: bool b and true }))
+					if (prop.ClassProperty.IsKey)
 						return prop;
 				}
 				return null;
@@ -199,13 +202,13 @@ namespace Titanis.Msrpc.Mswmi
 		/// </summary>
 		public object? Key => this.KeyProperty?.Value;
 
+
 		/// <inheritdoc/>
 		public sealed override string ToMof()
 		{
-			// TODO: Convert the instance to MOF
 			StringBuilder sb = new StringBuilder();
-			return null;
-			throw new NotImplementedException();
+			sb.AppendMofInstance(this);
+			return sb.ToString();
 		}
 
 		DynamicMetaObject IDynamicMetaObjectProvider.GetMetaObject(Expression parameter)

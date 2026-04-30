@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Titanis.Msrpc.Mswmi
 {
-	internal class QualifierNames
+	public class QualifierNames
 	{
 		public const string Abstract = "abstract";
 		public const string Subtype = "SUBTYPE";
@@ -20,6 +20,7 @@ namespace Titanis.Msrpc.Mswmi
 		public const string In = "In";
 		public const string Implemented = "Implemented";
 		public const string Key = "key";
+		public const string Singleton = "Singleton";
 	}
 
 	public static class QualifierFactory

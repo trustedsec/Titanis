@@ -53,6 +53,19 @@ namespace Titanis.Msrpc.Mswmi
 			this.Properties = properties;
 			this.Methods = methods;
 			this.NdValueTableLength = ndValueTableLength;
+
+			foreach (var qual in qualifiers)
+			{
+				if (qual.Name.Equals(QualifierNames.Singleton, StringComparison.OrdinalIgnoreCase))
+					this.IsSingleton = true;
+			}
+			foreach (var prop in this.Properties)
+			{
+				if (prop.IsKey)
+				{
+					this.KeyProperty = prop;
+				}
+			}
 		}
 
 		/// <inheritdoc/>
@@ -84,6 +97,7 @@ namespace Titanis.Msrpc.Mswmi
 		public string[] Superclasses { get; }
 		[Browsable(false)]
 		public sealed override WmiQualifier[] Qualifiers { get; }
+		public bool IsSingleton { get; }
 		internal int NdValueTableLength { get; }
 		internal int ValueTableLength => this.NdValueTableLength - NdTable.ComputeNdTableLength(this.Properties.Length);
 
@@ -108,6 +122,7 @@ namespace Titanis.Msrpc.Mswmi
 		#region Properties
 		[Browsable(false)]
 		public WmiProperty[] Properties { get; }
+
 		private Dictionary<string, WmiProperty>? _propsByName;
 		public WmiProperty? GetProperty(string propertyName)
 		{
@@ -122,6 +137,8 @@ namespace Titanis.Msrpc.Mswmi
 			else
 				return null;
 		}
+
+		public WmiProperty KeyProperty { get; }
 		#endregion
 
 		public WmiInstanceObject Instantiate(Dictionary<string, object>? propertyValues = null)
@@ -213,27 +230,7 @@ namespace Titanis.Msrpc.Mswmi
 		public sealed override string ToMof()
 		{
 			StringBuilder sb = new StringBuilder();
-			foreach (var qual in this.Qualifiers)
-			{
-				qual.ToMof(sb);
-				sb.AppendLine();
-			}
-
-			sb.Append("class ").Append(this.Name ?? "<anonymous>");
-			string? baseClassName = this.BaseClass?.Name;
-			if (baseClassName != null)
-				sb.Append(" : ").Append(baseClassName);
-
-			sb.AppendLine(" {");
-
-			foreach (var prop in this.Properties)
-			{
-				prop.ToMof(sb, "\t");
-				sb.AppendLine();
-			}
-
-			sb.AppendLine("}");
-
+			sb.AppendMofClass(this);
 			return sb.ToString();
 		}
 

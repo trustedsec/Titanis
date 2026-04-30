@@ -21,7 +21,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 
 		internal long rawValue;
 
-		public bool IsArray => 0 != (this.cimType & CimType.Array);
+		public bool IsArray => this.cimType.IsArray();
 
 		internal static EncodedValue EncodeValue(
 			CimType cimType,
@@ -37,7 +37,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 
 			if (value is Array arr)
 			{
-				var elemType = (cimType & ~CimType.Array);
+				var elemType = cimType.ElementType();
 				EncodedValue[] encValues = new EncodedValue[arr.Length];
 				for (int i = 0; i < arr.Length; i++)
 				{
@@ -87,7 +87,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		internal object? Resolve(Heap heap, WmiProperty? property, string? tag = null)
 		{
 			if (this.IsArray)
-				return this.ResolveArray(heap, this.cimType & ~CimType.Array);
+				return this.ResolveArray(heap, this.cimType.ElementType());
 			else
 			{
 				var subtype = property?.SubtypeCode ?? CimSubtype.Unspecified;
@@ -121,7 +121,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 
 		internal static int ValueTableSizeOf(CimType cimType)
 		{
-			if (0 != (cimType & CimType.Array))
+			if (cimType.IsArray())
 				return 4;
 			else
 			{

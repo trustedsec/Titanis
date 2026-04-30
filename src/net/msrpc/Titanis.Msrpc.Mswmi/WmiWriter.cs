@@ -265,7 +265,7 @@ namespace Titanis.Msrpc.Mswmi
 				case CimType.DateTime:
 				case CimType.Reference:
 				case CimType.Object:
-				case var k when (0 != (k & CimType.Array)):
+				case var k when k.IsArray():
 					writer.WriteHeapRef(new HeapRef((uint)value)); break;
 				default:
 					throw new NotImplementedException();
