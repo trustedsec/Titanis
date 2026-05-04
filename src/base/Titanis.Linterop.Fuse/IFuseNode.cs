@@ -36,7 +36,7 @@ namespace Titanis.Linterop.Fuse
 		/// <summary>
 		/// Gets the size of the file
 		/// </summary>
-		long FileSize { get; }
+		long FileSize { get; set; }
 		/// <summary>
 		/// Gets the block size.
 		/// </summary>
@@ -48,11 +48,11 @@ namespace Titanis.Linterop.Fuse
 		/// <summary>
 		/// Gets the time of the last access to the file.
 		/// </summary>
-		DateTime? LastAccessTime { get; }
+		DateTime? LastAccessTime { get; set; }
 		/// <summary>
 		/// Gets the time of the last write to the file.
 		/// </summary>
-		DateTime? LastWriteTime { get; }
+		DateTime? LastWriteTime { get; set; }
 		/// <summary>
 		/// Gets the time of the last change to the file.
 		/// </summary>

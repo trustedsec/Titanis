@@ -31,7 +31,7 @@ abstract class SharedDirNodeBase : SmbFileNodeBase, IFuseNodeSource<SmbFileNodeB
 	{
 		if (this._openDir == null)
 		{
-			var dir = await this.Client.OpenDirectoryAsync(this.SharedPath, cancellationToken).ConfigureAwait(false);
+			var dir = await this.Client.OpenDirectoryAsync(this.SharedPath, cancellationToken, extraOptions: this._mountInfo.extraCreateOptions).ConfigureAwait(false);
 			this._openDir = dir;
 		}
 
@@ -41,7 +41,7 @@ abstract class SharedDirNodeBase : SmbFileNodeBase, IFuseNodeSource<SmbFileNodeB
 	/// <inheritdoc/>
 	public sealed override async Task<IFuseOpenDirectory> OpenDirectory(CancellationToken cancellationToken)
 	{
-		var dir = await this.Client.OpenDirectoryAsync(this.SharedPath, cancellationToken).ConfigureAwait(false);
+		var dir = await this.Client.OpenDirectoryAsync(this.SharedPath, cancellationToken, extraOptions: this._mountInfo.extraCreateOptions).ConfigureAwait(false);
 		return new SmbOpenDir(this, dir);
 	}
 
@@ -67,7 +67,7 @@ abstract class SharedDirNodeBase : SmbFileNodeBase, IFuseNodeSource<SmbFileNodeB
 	{
 		var path = this.SharedPath.Append(name);
 
-		var file = await _mountInfo.smbClient.CreateFileAsync(path, cancellationToken).ConfigureAwait(false);
+		var file = await this.Client.CreateFileAsync(path, cancellationToken, this._mountInfo.extraCreateOptions).ConfigureAwait(false);
 		var node = (SharedFileNode)this._nodeCache.GetNode(name, file.File.GetDirectoryEntry());
 		return new SmbOpenFile(node, file, FileAccess.ReadWrite);
 	}
@@ -75,7 +75,7 @@ abstract class SharedDirNodeBase : SmbFileNodeBase, IFuseNodeSource<SmbFileNodeB
 	public override async Task<IFuseNode> CreateDirectory(string name, CancellationToken cancellationToken)
 	{
 		var path = this.SharedPath.Append(name);
-		var dir = await _mountInfo.smbClient.CreateDirectoryAsync(path, cancellationToken).ConfigureAwait(false);
+		var dir = await this.Client.CreateDirectoryAsync(path, cancellationToken, this._mountInfo.extraCreateOptions).ConfigureAwait(false);
 		var node = new SharedDirNode(this._mountInfo, path, dir.GetDirectoryEntry());
 		return node;
 	}
@@ -98,12 +98,12 @@ abstract class SharedDirNodeBase : SmbFileNodeBase, IFuseNodeSource<SmbFileNodeB
 	public override async Task DeleteDirectory(string name, CancellationToken cancellationToken)
 	{
 		var path = this.SharedPath.Append(name);
-		await _mountInfo.smbClient.RemoveDirectoryAsync(path, cancellationToken).ConfigureAwait(false);
+		await this.Client.RemoveDirectoryAsync(path, cancellationToken).ConfigureAwait(false);
 	}
 
 	public override async Task DeleteFile(string name, CancellationToken cancellationToken)
 	{
 		var path = this.SharedPath.Append(name);
-		await _mountInfo.smbClient.DeleteFileAsync(path, cancellationToken).ConfigureAwait(false);
+		await this.Client.DeleteFileAsync(path, cancellationToken).ConfigureAwait(false);
 	}
 }

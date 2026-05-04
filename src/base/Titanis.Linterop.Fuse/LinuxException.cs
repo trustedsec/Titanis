@@ -30,6 +30,12 @@ namespace Titanis.Linterop.Fuse
 			{
 				Ntstatus.STATUS_NO_SUCH_FILE => LinuxErrorCode.ENOENT,
 				Ntstatus.STATUS_ACCESS_DENIED => LinuxErrorCode.EACCES,
+				Ntstatus.STATUS_INVALID_PARAMETER => LinuxErrorCode.EINVAL,
+				Ntstatus.STATUS_OBJECT_NAME_NOT_FOUND => LinuxErrorCode.ENOENT,
+				Ntstatus.STATUS_OBJECT_PATH_NOT_FOUND => LinuxErrorCode.ENOENT,
+				Ntstatus.STATUS_NOT_IMPLEMENTED => LinuxErrorCode.ENOSYS,
+				Ntstatus.STATUS_NOT_SUPPORTED => LinuxErrorCode.ENOSYS,
+				Ntstatus.STATUS_TIMEOUT => LinuxErrorCode.ETIME,
 				_ => LinuxErrorCode.EIO
 			};
 		}
@@ -61,6 +67,8 @@ namespace Titanis.Linterop.Fuse
 				return LinuxErrorCode.EPERM;
 			else if (ex is NotImplementedException)
 				return LinuxErrorCode.ENOSYS;
+			else if (ex is TimeoutException)
+				return LinuxErrorCode.ETIME;
 			else
 				return FromHresult((Hresult)ex.HResult);
 

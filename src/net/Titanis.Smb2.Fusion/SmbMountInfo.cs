@@ -16,5 +16,6 @@ namespace Titanis.Smb2.Fusion
 
 		internal PosixFileMode defaultDirAccess = PosixFileMode.DefaultDirAccess;
 		internal PosixFileMode defaultFileAccess = PosixFileMode.DefaultDirAccess;
+		internal Smb2FileCreateOptions extraCreateOptions;
 	}
 }

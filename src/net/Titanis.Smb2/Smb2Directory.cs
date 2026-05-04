@@ -27,7 +27,7 @@ namespace Titanis.Smb2
 	/// <summary>
 	/// Represents a directory open over an SMB2 share.
 	/// </summary>
-	/// <seealso cref="Smb2TreeConnect.OpenDirectoryAsync(string, CancellationToken)"/>
+	/// <seealso cref="Smb2TreeConnect.OpenDirectoryAsync(string, CancellationToken, Smb2FileCreateOptions)"/>
 	public class Smb2Directory : Smb2OpenFileObjectBase
 	{
 		internal Smb2Directory(Smb2TreeConnect tree, string shareRelativePath, in Smb2FileOpenInfo fileInfo)

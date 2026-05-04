@@ -51,7 +51,7 @@ internal sealed class SharedFileNode : SmbFileNodeBase
 			FuseOpenFlags.Truncate => FileMode.Truncate,
 		};
 
-		var file = await this.Client.CreateFileAsync(this.SharedPath.ToString(), mode, fileAccess, FileShare.Read, cancellationToken).ConfigureAwait(false);
+		var file = await this.Client.CreateFileAsync(this.SharedPath.ToString(), mode, fileAccess, FileShare.Read, cancellationToken, this._mountInfo.extraCreateOptions).ConfigureAwait(false);
 		return new SmbOpenFile(this, file, fileAccess);
 	}
 

@@ -113,9 +113,9 @@ namespace Titanis.Smb2
 		/// <param name="dirName">Directory path, relative to the share</param>
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
 		/// <returns>A <see cref="Smb2Directory"/> representing the directory</returns>
-		public Task<Smb2Directory> CreateDirectoryAsync(string dirName, CancellationToken cancellationToken)
+		public Task<Smb2Directory> CreateDirectoryAsync(string dirName, CancellationToken cancellationToken, Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None)
 		{
-			return this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(dirName, Smb2CreateInfo.ForCreateDirectory(), FileAccess.Read, cancellationToken);
+			return this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(dirName, Smb2CreateInfo.ForCreateDirectory(extraOptions: extraOptions), FileAccess.Read, cancellationToken);
 		}
 		/// <summary>
 		/// Opens a directory.
@@ -123,10 +123,10 @@ namespace Titanis.Smb2
 		/// <param name="dirName">Directory path, relative to the share</param>
 		/// <param name="cancellationToken">Cancellation token that may be used to cancel the operation</param>
 		/// <returns>A <see cref="Smb2Directory"/> representing the directory</returns>
-		public Task<Smb2Directory> OpenDirectoryAsync(string dirName, CancellationToken cancellationToken)
+		public Task<Smb2Directory> OpenDirectoryAsync(string dirName, CancellationToken cancellationToken, Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None)
 		{
 			bool lease = this.Session.Connection.SupportsDirectoryLeasing && this.PrefersDirectoryLeases;
-			return this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(dirName, Smb2CreateInfo.ForOpenDirectory(oplockLevel: lease ? Smb2OplockLevel.Lease : Smb2OplockLevel.None, leaseInfo: lease
+			return this.CreateFileAsync<Smb2Directory, Smb2DirFactory>(dirName, Smb2CreateInfo.ForOpenDirectory(oplockLevel: lease ? Smb2OplockLevel.Lease : Smb2OplockLevel.None, extraOptions: extraOptions, leaseInfo: lease
 					? new Smb2LeaseInfo()
 					{
 						LeaseState = Smb2LeaseState.ReadCaching | Smb2LeaseState.HandleCaching,

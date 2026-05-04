@@ -424,21 +424,22 @@ namespace Titanis.Linterop.Fuse
 				var now = DateTime.UtcNow;
 				if (0 != (this.toSet & FuseAttrMask.ModifiedTime))
 				{
-					if (0 != (this.toSet & FuseAttrMask.ModifiedTimeNow))
-						attr.st_mtime = now.ToTimespec();
-					else
-						attr.st_mtime = this.attr.st_mtime;
+					nodeInfo.node.LastWriteTime =
+						(0 != (this.toSet & FuseAttrMask.ModifiedTimeNow)) ? now
+						: this.attr.st_mtime.ToDateTime();
 				}
 				if (0 != (this.toSet & FuseAttrMask.AccessTime))
 				{
-					if (0 != (this.toSet & FuseAttrMask.AccessTimeNow))
-						attr.st_atime = now.ToTimespec();
-					else
-						attr.st_atime = this.attr.st_atime;
+					nodeInfo.node.LastAccessTime =
+						(0 != (this.toSet & FuseAttrMask.AccessTimeNow)) ? now
+						: this.attr.st_atime.ToDateTime();
+				}
+				if (0 != (this.toSet & FuseAttrMask.Size))
+				{
+					nodeInfo.node.FileSize = this.attr.st_size;
 				}
 
-				// TODO: Set attributes
-
+				attr = GetAttributesOf(nodeInfo, mount._writable);
 				FuseNativeMethods.fuse_reply_attr(req, attr, 0);
 				return ValueTask.FromResult(false);
 			}
@@ -871,7 +872,7 @@ namespace Titanis.Linterop.Fuse
 			if (!writable)
 			{
 				var access = mode & PosixFileMode.Mode777;
-				mode = (mode & ~PosixFileMode.Mode777) | (access & PosixFileMode.Mode555);
+				mode = (mode & ~PosixFileMode.Mode777) | (access & PosixFileMode.ModeReadExecuteAll);
 			}
 			return mode;
 		}

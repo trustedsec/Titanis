@@ -680,6 +680,12 @@ struct timespec
 	}
 	public long sec;
 	public long nsec;
+
+	public DateTime ToDateTime()
+	{
+		var ticks = this.sec * 10_000_000 + (this.nsec / 100);
+		return DateTime.UnixEpoch + TimeSpan.FromTicks(ticks);
+	}
 }
 
 struct stat

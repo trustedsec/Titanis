@@ -40,17 +40,17 @@ abstract class SmbFileNodeBase : IFuseNode
 
 	public uint Gid => this._mountInfo.gid;
 
-	public virtual long FileSize => 0x1000;
+	public virtual long FileSize { get => 0x1000; set => throw new NotSupportedException(); }
 
 	public long BlockSize => 0x1000;
 
 	public long BlockCount => 8;
 
-	public virtual DateTime? LastAccessTime => null;
+	public virtual DateTime? LastAccessTime { get => null; set => throw new NotSupportedException(); }
 
-	public virtual DateTime? LastWriteTime => null;
+	public virtual DateTime? LastWriteTime { get => null; set => throw new NotSupportedException(); }
 
-	public virtual DateTime? LastChangeTime => null;
+	public virtual DateTime? LastChangeTime { get => null; set => throw new NotSupportedException(); }
 
 	public virtual FileAttributes NtfsAttributes => 0;
 
@@ -114,9 +114,10 @@ abstract class SmbFileNodeBase : IFuseNode
 	private Task<SecurityDescriptor?> GetSacl(CancellationToken cancellationToken) => this.GetSecurity(SecurityInfo.Sacl, Smb2FileAccessRights.AccessSystemSecurity | Smb2FileAccessRights.ReadAttributes | Smb2FileAccessRights.Synchronize, cancellationToken);
 	private async Task<SecurityDescriptor?> GetSecurity(SecurityInfo info, Smb2FileAccessRights access, CancellationToken cancellationToken)
 	{
-		var file = await _mountInfo.smbClient.CreateFileAsync(SharedPath, Smb2CreateInfo.ForCreateFile(
+		var file = await this.Client.CreateFileAsync(SharedPath, Smb2CreateInfo.ForCreateFile(
 			desiredAccess: access,
-			createDisposition: Smb2CreateDisposition.Open
+			createDisposition: Smb2CreateDisposition.Open,
+			extraOptions: this._mountInfo.extraCreateOptions
 			), FileAccess.Read, cancellationToken).ConfigureAwait(false);
 		await using (file)
 		{

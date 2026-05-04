@@ -27,6 +27,9 @@ internal class FuseCommand : Smb2CommandBase
 	[ParameterGroup(ParameterGroupOptions.Required)]
 	public FuseParameterGroup FuseParameters { get; set; }
 
+	[Parameter]
+	public SwitchParam BackupSemantics { get; set; }
+
 	protected override Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
 	{
 		var fuseParams = this.FuseParameters;
@@ -37,7 +40,8 @@ internal class FuseCommand : Smb2CommandBase
 			gid = fuseParams.Gid ?? NativeMethods.getegid(),
 			defaultDirAccess = PosixFileMode.Mode777,
 			defaultFileAccess = PosixFileMode.Mode777,
-			smbClient = client
+			smbClient = client,
+			extraCreateOptions = this.BackupSemantics.IsSet ? Smb2FileCreateOptions.OpenForBackupIntent : Smb2FileCreateOptions.None,
 		};
 
 		IFuseNode rootNode;

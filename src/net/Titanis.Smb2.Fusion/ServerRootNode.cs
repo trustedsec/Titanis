@@ -43,17 +43,17 @@ class ServerRootNode : IFuseNode, IFuseNodeSource<ShareNode, ShareInfo>
 
 	public uint Gid => this._mountInfo.gid;
 
-	public long FileSize => 0x1000;
+	public long FileSize { get => 0x1000; set => throw new NotSupportedException(); }
 
 	public long BlockSize => 0x1000;
 
 	public long BlockCount => 8;
 
-	public DateTime? LastAccessTime => this._mountTime;
+	public DateTime? LastAccessTime { get => this._mountTime; set => throw new NotSupportedException(); }
 
-	public DateTime? LastWriteTime => this._mountTime;
+	public DateTime? LastWriteTime { get => this._mountTime; set => throw new NotSupportedException(); }
 
-	public DateTime? LastChangeTime => this._mountTime;
+	public DateTime? LastChangeTime { get => this._mountTime; set => throw new NotSupportedException(); }
 
 	private async ValueTask<ServerServiceClient> GetSrvs(CancellationToken cancellationToken)
 	{

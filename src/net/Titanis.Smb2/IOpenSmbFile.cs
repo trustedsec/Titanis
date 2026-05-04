@@ -30,16 +30,16 @@ namespace Titanis.Smb2
 			return new Smb2FileStream((Smb2OpenFile)await source.CreateFileAsync(path, Smb2CreateInfo.ForCreateOrOpenFile(mode, access, FileShare.Read), access, cancellationToken).ConfigureAwait(false), access, true);
 		}
 
-		public static async Task<Smb2FileStream> CreateFileAsync(this IOpenSmbFile source, string path, FileMode mode, FileAccess access, FileShare share, CancellationToken cancellationToken)
+		public static async Task<Smb2FileStream> CreateFileAsync(this IOpenSmbFile source, string path, FileMode mode, FileAccess access, FileShare share, CancellationToken cancellationToken, Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None)
 		{
-			return new Smb2FileStream((Smb2OpenFile)await source.CreateFileAsync(path, Smb2CreateInfo.ForCreateOrOpenFile(mode, access, share), access, cancellationToken).ConfigureAwait(false), access, true);
+			return new Smb2FileStream((Smb2OpenFile)await source.CreateFileAsync(path, Smb2CreateInfo.ForCreateOrOpenFile(mode, access, share, extraOptions), access, cancellationToken).ConfigureAwait(false), access, true);
 		}
 
 
 
-		public static async Task<Smb2FileStream> CreateFileAsync(this IOpenSmbFile source, string path, CancellationToken cancellationToken)
+		public static async Task<Smb2FileStream> CreateFileAsync(this IOpenSmbFile source, string path, CancellationToken cancellationToken, Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None)
 		{
-			return new Smb2FileStream((Smb2OpenFile)await source.CreateFileAsync(path, Smb2CreateInfo.ForCreateOrOpenFile(FileMode.Create, FileAccess.ReadWrite, FileShare.None), FileAccess.ReadWrite, cancellationToken).ConfigureAwait(false), FileAccess.ReadWrite, true);
+			return new Smb2FileStream((Smb2OpenFile)await source.CreateFileAsync(path, Smb2CreateInfo.ForCreateOrOpenFile(FileMode.Create, FileAccess.ReadWrite, FileShare.None, extraOptions: extraOptions), FileAccess.ReadWrite, cancellationToken).ConfigureAwait(false), FileAccess.ReadWrite, true);
 		}
 
 		public static async Task<Smb2FileStream> OpenFileReadAsync(this IOpenSmbFile source, string path, CancellationToken cancellationToken)

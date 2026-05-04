@@ -476,12 +476,12 @@ namespace Titanis.Smb2
 		#endregion
 
 		#region CreateFileAsync
-		public async Task<Smb2FileStream> CreateFileAsync(UncPath uncPath, CancellationToken cancellationToken)
+		public async Task<Smb2FileStream> CreateFileAsync(UncPath uncPath, CancellationToken cancellationToken, Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None)
 		{
 			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
 
 			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
-			return await share.CreateFileAsync(resolvedPath.ShareRelativePath, cancellationToken).ConfigureAwait(false);
+			return await share.CreateFileAsync(resolvedPath.ShareRelativePath, cancellationToken, extraOptions).ConfigureAwait(false);
 		}
 		public Task<Smb2OpenFileObjectBase> CreateFileAsync(
 			string fileName,
@@ -503,13 +503,13 @@ namespace Titanis.Smb2
 
 		#endregion
 
-		public Task<Smb2Directory> OpenDirectoryAsync(string uncPath, CancellationToken cancellationToken) => OpenDirectoryAsync(UncPath.Parse(uncPath), cancellationToken);
-		public async Task<Smb2Directory> OpenDirectoryAsync(UncPath uncPath, CancellationToken cancellationToken)
+		public Task<Smb2Directory> OpenDirectoryAsync(string uncPath, CancellationToken cancellationToken, Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None) => OpenDirectoryAsync(UncPath.Parse(uncPath), cancellationToken, extraOptions: extraOptions);
+		public async Task<Smb2Directory> OpenDirectoryAsync(UncPath uncPath, CancellationToken cancellationToken, Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None)
 		{
 			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
 
 			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
-			return await share.OpenDirectoryAsync(resolvedPath.ShareRelativePath, cancellationToken).ConfigureAwait(false);
+			return await share.OpenDirectoryAsync(resolvedPath.ShareRelativePath, cancellationToken, extraOptions: extraOptions).ConfigureAwait(false);
 		}
 
 		public Task<Smb2Pipe> OpenPipeAsync(string uncPath, CancellationToken cancellationToken)
@@ -523,12 +523,13 @@ namespace Titanis.Smb2
 		}
 		public async Task<Smb2Directory> CreateDirectoryAsync(
 			UncPath uncPath,
-			CancellationToken cancellationToken)
+			CancellationToken cancellationToken,
+			Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None)
 		{
 			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
 
 			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
-			return await share.CreateDirectoryAsync(resolvedPath.ShareRelativePath, cancellationToken).ConfigureAwait(false);
+			return await share.CreateDirectoryAsync(resolvedPath.ShareRelativePath, cancellationToken, extraOptions).ConfigureAwait(false);
 		}
 		public async Task RemoveDirectoryAsync(
 			UncPath uncPath,

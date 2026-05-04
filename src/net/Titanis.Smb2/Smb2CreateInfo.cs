@@ -142,6 +142,7 @@ namespace Titanis.Smb2
 			Smb2ShareAccess shareAccess = Smb2ShareAccess.ReadWrite,
 			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.Create,
 			Smb2FileCreateOptions createOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.SynchronousIoNonalert,
+			Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None,
 			bool requestDurableHandle = false,
 			bool requestMaximalAccess = false,
 			bool queryOnDiskId = false,
@@ -161,7 +162,7 @@ namespace Titanis.Smb2
 				FileAttributes = fileAttributes,
 				ShareAccess = shareAccess,
 				CreateDisposition = createDisposition,
-				CreateOptions = createOptions,
+				CreateOptions = createOptions | extraOptions,
 				RequestDurableHandle = requestDurableHandle,
 				RequestMaximalAccess = requestMaximalAccess,
 				QueryOnDiskId = queryOnDiskId,
@@ -182,6 +183,7 @@ namespace Titanis.Smb2
 			Smb2ShareAccess shareAccess = Smb2ShareAccess.DefaultDirShare,
 			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.Open,
 			Smb2FileCreateOptions createOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.SynchronousIoNonalert,
+			Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None,
 			bool requestDurableHandle = false,
 			bool requestMaximalAccess = true,
 			bool queryOnDiskId = true,
@@ -201,7 +203,7 @@ namespace Titanis.Smb2
 				FileAttributes = fileAttributes,
 				ShareAccess = shareAccess,
 				CreateDisposition = createDisposition,
-				CreateOptions = createOptions,
+				CreateOptions = createOptions | extraOptions,
 				RequestDurableHandle = requestDurableHandle,
 				RequestMaximalAccess = requestMaximalAccess,
 				QueryOnDiskId = queryOnDiskId,
@@ -302,6 +304,7 @@ namespace Titanis.Smb2
 			Smb2ShareAccess shareAccess = Smb2ShareAccess.ReadWrite,
 			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.Supersede,
 			Smb2FileCreateOptions createOptions = Smb2FileCreateOptions.NonDirectory | Smb2FileCreateOptions.SynchronousIoNonalert,
+			Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None,
 			bool requestDurableHandle = false,
 			bool requestMaximalAccess = false,
 			bool queryOnDiskId = false,
@@ -321,7 +324,7 @@ namespace Titanis.Smb2
 				FileAttributes = fileAttributes,
 				ShareAccess = shareAccess,
 				CreateDisposition = createDisposition,
-				CreateOptions = createOptions,
+				CreateOptions = createOptions | extraOptions,
 				RequestDurableHandle = requestDurableHandle,
 				RequestMaximalAccess = requestMaximalAccess,
 				QueryOnDiskId = queryOnDiskId,
@@ -334,7 +337,7 @@ namespace Titanis.Smb2
 			};
 
 		#region FileStream-style
-		public static Smb2CreateInfo ForCreateOrOpenFile(FileMode mode, FileAccess access, FileShare share) => ForCreateFile(
+		public static Smb2CreateInfo ForCreateOrOpenFile(FileMode mode, FileAccess access, FileShare share, Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None) => ForCreateFile(
 			createDisposition: mode switch
 			{
 				FileMode.Append => Smb2CreateDisposition.OpenIf,
@@ -352,7 +355,8 @@ namespace Titanis.Smb2
 				FileAccess.Write => Smb2FileAccessRights.DefaultOpenWriteAccess,
 				FileAccess.ReadWrite => Smb2FileAccessRights.DefaultOpenReadWriteAccess,
 			},
-			shareAccess: (Smb2ShareAccess)share
+			shareAccess: (Smb2ShareAccess)share,
+			extraOptions: extraOptions
 			);
 		#endregion
 
