@@ -84,7 +84,7 @@ internal class InvokeCommand : WmiObjectCommandBase
 
 					this.WriteDiagnostic($"Parsing WMI method parameter '{inProp.Name}': {arg}");
 
-					if (0 != (inProp.PropertyType & CimType.Array))
+					if (inProp.PropertyType.IsArray())
 					{
 						List<object?> elems = new List<object?>();
 						if (arg != "[")

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Titanis.Msrpc.Mswmi
 {
-	static class MofExtensions
+	public static class MofExtensions
 	{
 		public static StringBuilder AppendMofClass(this StringBuilder sb, WmiClassObject obj)
 		{

@@ -37,6 +37,7 @@ namespace Titanis.Cli
 		protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 		{
 			RpcClient rpcClient = this.CreateRpcClient();
+			this.RpcParameters?.ApplyTo(rpcClient);
 
 			var svcClient = this._svcClient;
 			var bindInfo = await RpcParameters.BindServiceClient(

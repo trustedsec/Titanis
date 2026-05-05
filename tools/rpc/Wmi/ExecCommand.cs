@@ -68,7 +68,7 @@ internal class ExecCommand : WmiCommand
 	{
 		base.ValidateParameters(context);
 
-		this.SmbParameters?.Validate(context, this.Authentication);
+		this.SmbParameters?.Validate(context, this.RpcParameters.Authentication);
 
 		if (this.CaptureOutput.IsSet)
 		{

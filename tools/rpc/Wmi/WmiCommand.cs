@@ -8,17 +8,21 @@ using Titanis.Net;
 using Titanis.Security;
 
 namespace Titanis.Cli.WmiTool;
+
 internal abstract class WmiCommand : Command, IHaveServerName
 {
-	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
-	public AuthenticationParameters Authentication { get; set; }
+	//[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
+	//public AuthenticationParameters Authentication { get; set; }
+
+	//[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
+	//public NetworkParameters NetworkParameters { get; set; }
+
+	//[Parameter]
+	//[Description("Encrypts RPC messages")]
+	//public SwitchParam EncryptRpc { get; set; }
 
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
-	public NetworkParameters NetworkParameters { get; set; }
-
-	[Parameter]
-	[Description("Encrypts RPC messages")]
-	public SwitchParam EncryptRpc { get; set; }
+	public RpcParameterGroup? RpcParameters { get; set; }
 
 	[Parameter(0)]
 	[Mandatory]
@@ -30,10 +34,13 @@ internal abstract class WmiCommand : Command, IHaveServerName
 	{
 		base.ValidateParameters(context);
 
-		Authentication?.Validate(false, context);
+		var rpcParams = this.RpcParameters;
+		rpcParams.Authentication?.Validate(false, context);
 
-		if (this.NetworkParameters.HostAddress.IsNullOrEmpty())
-			this.NetworkParameters.HostAddress = new string[] { ServerName };
+		var netParams = rpcParams.NetParameters;
+
+		if (netParams.HostAddress.IsNullOrEmpty())
+			netParams.HostAddress = new string[] { ServerName };
 
 		if (ServerName.StartsWith(@"\\"))
 			ServerName = ServerName.Substring(2);
@@ -42,7 +49,9 @@ internal abstract class WmiCommand : Command, IHaveServerName
 
 	protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 	{
-		var remoteAddrs = await this.NetworkParameters.ResolveAsync(ServerName, cancellationToken).ConfigureAwait(false);
+		var rpcParams = this.RpcParameters;
+
+		var remoteAddrs = await rpcParams.NetParameters.ResolveAsync(ServerName, cancellationToken).ConfigureAwait(false);
 
 		if (remoteAddrs.IsNullOrEmpty())
 		{
@@ -54,7 +63,7 @@ internal abstract class WmiCommand : Command, IHaveServerName
 
 		SecurityCapabilities rpcRequiredCaps = SecurityCapabilities.DceStyle | SecurityCapabilities.Integrity;
 		RpcAuthLevel authLevel;
-		if (EncryptRpc.IsSet)
+		if (rpcParams.EncryptRpc.IsSet)
 		{
 			rpcRequiredCaps |= SecurityCapabilities.Confidentiality;
 			authLevel = RpcAuthLevel.PacketPrivacy;
@@ -65,13 +74,15 @@ internal abstract class WmiCommand : Command, IHaveServerName
 		var credService = this.RequireService<IClientCredentialService>();
 
 		var rpcClient = this.CreateRpcClient();
+		this.RpcParameters.ApplyTo(rpcClient);
+		//rpcClient.DefaultCallTimeout = TimeSpan.FromMinutes(1);
 		rpcClient.DefaultAuthLevel = authLevel;
 
 		// If the endpoint doesn't have a well-known port, use the EP mapper
 		IPEndPoint remoteEP = new IPEndPoint(remoteAddr, WmiClient.WellKnownTcpPort);
 
 		DcomClient dcom = await DcomClient.ConnectTo(this.ServerName, rpcClient, cancellationToken, callback: new DcomLogger(this.Log));
-		WmiClient wmi = await WmiClient.ConnectTo(this.Authentication.Workstation, Random.Shared.Next(1024, 65536) & ~0x03, dcom, cancellationToken);
+		WmiClient wmi = await WmiClient.ConnectTo(rpcParams.Authentication?.Workstation ?? string.Empty, Random.Shared.Next(1024, 65536) & ~0x03, dcom, cancellationToken);
 
 		return await RunAsync(wmi, cancellationToken).ConfigureAwait(false);
 	}

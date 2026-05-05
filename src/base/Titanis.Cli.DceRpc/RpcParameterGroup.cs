@@ -29,6 +29,12 @@ namespace Titanis.Cli
 		public SmbParameters SmbParameters { get; set; }
 
 		[Parameter]
+		public Duration? RpcConnectTimeout { get; set; }
+
+		[Parameter]
+		public Duration? RpcCallTimeout { get; set; }
+
+		[Parameter]
 		[Description("Uses SP-NEGO for authentication")]
 		public SwitchParam Spnego { get; set; }
 
@@ -80,6 +86,15 @@ namespace Titanis.Cli
 			this.SmbParameters.Validate(context, Authentication);
 		}
 
+		public void ApplyTo(RpcClient rpcClient)
+		{
+			ArgumentNullException.ThrowIfNull(rpcClient);
+
+			if (this.RpcConnectTimeout != null)
+				rpcClient.ConnectTimeout = this.RpcConnectTimeout.TimeSpan;
+			if (this.RpcCallTimeout != null)
+				rpcClient.DefaultCallTimeout = this.RpcCallTimeout.TimeSpan;
+		}
 
 		private Smb2Client CreateSmbClient()
 		{
