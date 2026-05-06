@@ -837,6 +837,11 @@ namespace Titanis.Ldap
 		}
 
 		public override object Parse(string text) => text;
+
+		public override object DecodeDsrep(byte[] bytes)
+		{
+			return Encoding.Unicode.GetString(bytes);
+		}
 	}
 
 	// [MS-ADTS] § 3.1.1.2.2.2.5

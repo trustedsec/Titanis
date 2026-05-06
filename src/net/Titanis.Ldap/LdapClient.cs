@@ -339,6 +339,12 @@ namespace Titanis.Ldap
 				return dn;
 		}
 
+		public async Task<LdapEntry?> Get(LdapDistinguishedName name, AttributeSpec[]? attributes, CancellationToken cancellationToken)
+		{
+			var result = (await this.Search(new LdapQuery(name, LdapSearchScope.Base, null, attributes), cancellationToken).ConfigureAwait(false)).Entries.FirstOrDefault();
+			return result;
+		}
+
 		/// <summary>
 		/// Executes a search request.
 		/// </summary>

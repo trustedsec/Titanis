@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ using Titanis.Cli;
 using Titanis.Ldap;
 using Titanis.Msrpc.Msdrsr;
 using Titanis.Net;
+using Titanis.Security;
+using Titanis.Security.Kerberos;
 using Titanis.Winterop.SamServer;
 using Titanis.Winterop.Security;
 
@@ -45,9 +48,13 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 	[Description("DN, GUID, or SID of object to retrieve")]
 	public DsobjSpec[]? ObjectName { get; set; }
 
+	[Parameter]
+	[Description("Name of keytab file to export to")]
+	public string? ExportKeytab { get; set; }
+
 	private string[] GetLdapAttributes(string[] fieldNames)
 	{
-		List<string> attrs = new(fieldNames.Length);
+		List<string> attrOids = new(fieldNames.Length);
 		HashSet<string> fieldsAdded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 		bool wantsSuppCreds = false;
 		foreach (var name in fieldNames)
@@ -56,7 +63,7 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 			{
 				var attr = LdapAttributeTypes.TryGetByNameOrOid(name);
 				if (attr != null)
-					attrs.Add(attr.Oid);
+					attrOids.Add(attr.Oid);
 				else if (Array.IndexOf(SupplementalCredetialAttributes, name.ToUpper()) >= 0)
 					wantsSuppCreds = true;
 				else
@@ -65,11 +72,19 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 		}
 
 		if (wantsSuppCreds)
-			attrs.Add(LdapAttributeTypes.SupplementalCredentials.Oid);
+			attrOids.Add(LdapAttributeTypes.SupplementalCredentials.Oid);
+		if (!string.IsNullOrEmpty(this.ExportKeytab))
+		{
+			attrOids.Add(LdapAttributeTypes.ServicePrincipalName.Oid);
+			attrOids.Add(LdapAttributeTypes.MsDSKeyVersionNumber.Oid);
+		}
 
-		return attrs.ToArray();
+		return attrOids.ToArray();
 	}
 
+	private const string CleartextPasswordName = "cleartextPassword";
+	private const string KerberosOldKeysName = "kerberosOldKeys";
+	private const string KerberosKeysName = "kerberosKeys";
 	private readonly static string[] SupplementalCredetialAttributes = [
 		"KERBEROSKEYS",
 		"KERBEROSOLDKEYS",
@@ -86,10 +101,12 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 		}
 		var dcInfo = dcInfos[0];
 
+		string? realm = dcInfo.DnsHostName.Contains('.') ? dcInfo.DnsHostName.Substring(dcInfo.DnsHostName.IndexOf('.') + 1).ToUpper() : null;
+
 		LdapClient? ldapClient = null;
 
 
-		
+
 		var outputAttrs = GetLdapAttributes(this.OutputFields);
 		var objSpecs = this.ObjectName;
 		if (objSpecs.IsNullOrEmpty())
@@ -97,12 +114,15 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 			objSpecs = [new DsobjSpec(LdapFilter.Parse("(objectClass=*)"))];
 		}
 
+		var kt = new KeytabFile();
+		List<KeytabEntry> keytabEntries = kt.Entries;
+
 		foreach (var objSpec in objSpecs)
 		{
 			var objName = objSpec.Dsname;
 			if (objName is not null)
 			{
-				await this.ReplicateObject(client, dcInfo, outputAttrs, objName, cancellationToken);
+				await this.ReplicateObjects(client, dcInfo, outputAttrs, objName, realm, keytabEntries, cancellationToken);
 			}
 			else
 			{
@@ -117,62 +137,83 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 				{
 					foreach (var entry in result.Entries)
 					{
-						await this.ReplicateObject(client, dcInfo, outputAttrs, new DsName(Guid.Empty, null, entry.EntryName), cancellationToken);
+						await this.ReplicateObjects(client, dcInfo, outputAttrs, new DsName(Guid.Empty, null, entry.EntryName), realm, keytabEntries, cancellationToken);
 					}
 				}
+			}
+		}
+
+		if (!string.IsNullOrEmpty(this.ExportKeytab))
+		{
+			if (kt.Entries.Count == 0)
+				this.WriteWarning($"No keys collected; will not export empty keytab file.");
+			else
+			{
+				var ktFile = this.FileAccessService.ResolveFsPath(this.ExportKeytab);
+				byte[] ktBytes = kt.ToBytes();
+				this.FileAccessService.WriteAllBytesTo(ktFile, ktBytes);
+				this.WriteVerbose($"Wrote {ktBytes.Length} to {ktFile}.");
 			}
 		}
 
 		return 0;
 	}
 
-	private async Task ReplicateObject(DirectoryReplicationClient client, DomainControllerInfo dcInfo, string[] outputAttrs, DsName objName, CancellationToken cancellationToken)
+	private async Task ReplicateObjects(DirectoryReplicationClient client, DomainControllerInfo dcInfo, string[] outputAttrs, DsName objName, string realm, List<KeytabEntry> keytabEntries, CancellationToken cancellationToken)
 	{
 		var objs = await client.GetNcChanges(dcInfo, objName, outputAttrs, 1, cancellationToken);
 		foreach (var obj in objs)
 		{
-			List<LdapAttribute> returnedAttrs = new List<LdapAttribute>(obj.Attributes.Length);
-			for (int i = 0; i < obj.Attributes.Length; i++)
-			{
-				DsAttribute? attr = obj.Attributes[i];
-				var attrType = LdapAttributeTypes.TryGetByNameOrOid(attr.Oid);
+			var entry = obj.ToLdapEntry();
 
-				var name = attrType?.Name;
-				object[] values;
-				if (attrType != null && attrType.Syntax != null)
-				{
-					values = Array.ConvertAll(attr.Values, r => attrType.Syntax.DecodeDsrep(r.Bytes));
-
-					if (attrType.Oid == LdapAttributeTypes.SupplementalCredentials.Oid && attr.Values.Length > 0)
-					{
-						var suppBytes = attr.Values[0];
-						try
-						{
-							var suppCreds = SamServer.DecodeSupplementalCredential(suppBytes.Bytes);
-							if (suppCreds.KerberosKeys.Length > 0)
-								returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "kerberosKeys"), suppCreds.KerberosKeys));
-							if (suppCreds.KerberosOldKeys.Length > 0)
-								returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "kerberosOldKeys"), suppCreds.KerberosOldKeys));
-							if (suppCreds.CleartextPassword != null)
-								returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "cleartextPassword"), [suppCreds.CleartextPassword]));
-						}
-						catch
-						{
-
-						}
-					}
-				}
-				else
-				{
-					values = Array.ConvertAll(attr.Values, r => r.Bytes);
-				}
-
-				returnedAttrs.Add(new LdapAttribute(attrType, values));
-			}
-			LdapEntry entry = new LdapEntry(obj.Name.Name, returnedAttrs.ToArray());
-
+			AddKeytabEntries(entry, realm, keytabEntries);
 			this.WriteRecord(entry);
 		}
+	}
+
+	private void AddKeytabEntries(LdapEntry entry, string realm, List<KeytabEntry> keytabEntries)
+	{
+		var userName = entry[LdapAttributeTypes.SAMAccountName]?.Value as string;
+		if (!string.IsNullOrEmpty(userName))
+		{
+			AddKeys(entry, new(userName), realm, keytabEntries);
+		}
+
+		var spns = entry[LdapAttributeTypes.ServicePrincipalName]?.Values;
+		if (spns != null)
+		{
+			foreach (string spn in spns)
+			{
+				AddKeys(entry, new(userName), realm, keytabEntries);
+			}
+		}
+	}
+
+	private static void AddKeys(LdapEntry entry, SimplePrincipalName upn, string realm, List<KeytabEntry> keytabEntries)
+	{
+		// Current key
+		{
+			var key = entry[KerberosKeysName]?.Value as KerberosKeyInfo;
+			if (key != null)
+			{
+				keytabEntries.Add(CreateKeytabEntry(realm, upn, key));
+			}
+		}
+		// Old (and older) keys
+		var oldKeys = entry[KerberosOldKeysName]?.Values;
+		if (oldKeys != null)
+		{
+			for (int i = 0; i < oldKeys.Length; i++)
+			{
+				var key = (KerberosKeyInfo)oldKeys[i];
+				keytabEntries.Add(CreateKeytabEntry(realm, upn, key));
+			}
+		}
+	}
+
+	private static KeytabEntry CreateKeytabEntry(string realm, SecurityPrincipalName spn, KerberosKeyInfo key)
+	{
+		return new KeytabEntry(spn, realm, 0, key.Kvno ?? 0, (EType)key.KeyType, key.Bytes);
 	}
 }
 

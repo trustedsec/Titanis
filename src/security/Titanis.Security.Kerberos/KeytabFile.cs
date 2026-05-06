@@ -78,7 +78,7 @@ namespace Titanis.Security.Kerberos
 					else
 						continue;
 
-					KeytabEntry entry = new KeytabEntry(spn, rec.keyVersion32, rec.encType, rec.keyContents);
+					KeytabEntry entry = new KeytabEntry(spn, rec.principal.realm.str, rec.timestamp, rec.keyVersion32, rec.encType, rec.keyContents);
 
 					kt.Entries.Add(entry);
 
@@ -93,7 +93,26 @@ namespace Titanis.Security.Kerberos
 
 		public byte[] ToBytes()
 		{
-			throw new NotImplementedException();
+			const int version = 2;
+
+			var writer = new ByteWriter();
+			writer.WriteByte(5);
+			writer.WriteByte(2);
+
+			foreach (var entry in this.Entries)
+			{
+				int offStart = writer.Position;
+				writer.WriteInt32BE(0);
+
+				writer.WritePduStruct(entry.ToRecord(version), PduByteOrder.BigEndian);
+
+				int offEnd = writer.Position;
+				writer.SetPosition(offStart);
+				writer.WriteInt32BE(offEnd - offStart - 4);
+				writer.SetPosition(offEnd);
+			}
+
+			return writer.GetData().ToArray();
 		}
 	}
 
@@ -102,33 +121,71 @@ namespace Titanis.Security.Kerberos
 	/// </summary>
 	public class KeytabEntry
 	{
-		internal KeytabEntry(
+		public KeytabEntry(
 			SecurityPrincipalName principal,
+			string realm,
+			uint timestamp,
 			int kvno,
 			EType encType,
 			byte[] keyBytes)
 		{
 			ArgumentNullException.ThrowIfNull(principal);
+			ArgumentException.ThrowIfNullOrEmpty(realm);
 			ArgumentNullException.ThrowIfNull(keyBytes);
-			Principal = principal;
-			KeyBytes = keyBytes;
+
+			this.Principal = principal;
+			this.Realm = realm;
+			this.Timestamp = timestamp;
+			this.KeyBytes = keyBytes;
 			this.EType = encType;
 			this.KeyBytes = keyBytes;
 		}
 
 		public SecurityPrincipalName Principal { get; }
+		public string Realm { get; }
+		public uint Timestamp { get; }
+
+		public int Kvno { get; }
 
 		[Browsable(false)]
 		public byte[] KeyBytes { get; }
-
-		public int Kvno { get; }
 
 		public EType EType { get; }
 
 		[DisplayName("Key")]
 		public string KeyText => this.KeyBytes.ToHexString();
+
+		internal KeytabEntryRecord ToRecord(int version)
+		{
+			return new KeytabEntryRecord
+			{
+				principal = this.Principal.ToKeytabStruct(this.Realm, version),
+				timestamp = this.Timestamp,
+				keyVersion32 = this.Kvno,
+				encType = this.EType,
+				keyLength = (ushort)this.KeyBytes.Length,
+				keyContents = this.KeyBytes
+			};
+		}
 	}
 
+	static class Extensions
+	{
+		internal static KeytabString ToKeytabStruct(this string? str)
+		{
+			return string.IsNullOrEmpty(str) ? new KeytabString() : new KeytabString { length = (ushort)str.Length, str = str };
+		}
+		internal static KeytabPrincipal ToKeytabStruct(this SecurityPrincipalName spn, string realm, int version)
+		{
+			return new KeytabPrincipal
+			{
+				count = (ushort)((version < 2) ? (1 + spn.NamePartCount) : spn.NamePartCount),
+				realm = realm.ToKeytabStruct(),
+				components = Array.ConvertAll(spn.GetNameParts(), r => r.ToKeytabStruct()),
+				nameType = spn.NameType
+			};
+		}
+	}
 	[PduStruct]
 	[PduByteOrder(PduByteOrder.BigEndian)]
 	partial struct KeytabEntryRecord
@@ -141,7 +198,7 @@ namespace Titanis.Security.Kerberos
 
 		private byte KeyVersion8
 		{
-			get => (byte)this._keyVersion;
+			get => (byte)Math.Min(byte.MaxValue, this._keyVersion);
 			set => this._keyVersion = value;
 		}
 

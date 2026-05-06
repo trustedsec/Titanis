@@ -18,6 +18,8 @@ namespace Titanis.Msrpc.Msdrsr
 		{
 			var obj = this;
 
+			byte[]? suppBytes = null;
+			int? kvno = null;
 			List<LdapAttribute> returnedAttrs = new List<LdapAttribute>(obj.Attributes.Length);
 			for (int i = 0; i < obj.Attributes.Length; i++)
 			{
@@ -31,23 +33,9 @@ namespace Titanis.Msrpc.Msdrsr
 					values = Array.ConvertAll(attr.Values, r => attrType.Syntax.DecodeDsrep(r.Bytes));
 
 					if (attrType.Oid == LdapAttributeTypes.SupplementalCredentials.Oid && attr.Values.Length > 0)
-					{
-						var suppBytes = attr.Values[0];
-						try
-						{
-							var suppCreds = SamServer.DecodeSupplementalCredential(suppBytes.Bytes);
-							if (suppCreds.KerberosKeys.Length > 0)
-								returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "kerberosKeys"), suppCreds.KerberosKeys));
-							if (suppCreds.KerberosOldKeys.Length > 0)
-								returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "kerberosOldKeys"), suppCreds.KerberosOldKeys));
-							if (suppCreds.CleartextPassword != null)
-								returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "cleartextPassword"), [suppCreds.CleartextPassword]));
-						}
-						catch
-						{
-
-						}
-					}
+						suppBytes = attr.Values[0]?.Bytes;
+					else if (attrType.Oid == LdapAttributeTypes.MsDSKeyVersionNumber.Oid && attr.Values.Length > 0)
+						kvno = values[0] as int?;
 				}
 				else
 				{
@@ -56,8 +44,25 @@ namespace Titanis.Msrpc.Msdrsr
 
 				returnedAttrs.Add(new LdapAttribute(attrType, values));
 			}
-			LdapEntry entry = new LdapEntry(obj.Name.Name, returnedAttrs.ToArray());
 
+			if (suppBytes != null)
+			{
+				try
+				{
+					var suppCreds = SamServer.DecodeSupplementalCredential(kvno, suppBytes);
+					if (suppCreds.KerberosKeys.Length > 0)
+						returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "kerberosKeys"), suppCreds.KerberosKeys));
+					if (suppCreds.KerberosOldKeys.Length > 0)
+						returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "kerberosOldKeys"), suppCreds.KerberosOldKeys));
+					if (suppCreds.CleartextPassword != null)
+						returnedAttrs.Add(new LdapAttribute(new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "cleartextPassword"), [suppCreds.CleartextPassword]));
+				}
+				catch
+				{
+				}
+			}
+
+			LdapEntry entry = new LdapEntry(obj.Name.Name, returnedAttrs.ToArray());
 			return entry;
 		}
 	}

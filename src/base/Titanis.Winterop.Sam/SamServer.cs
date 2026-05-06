@@ -31,7 +31,7 @@ namespace Titanis.Winterop.SamServer
 	public abstract class SamServer
 	{
 		// [MS-SAMR] § 2.2.10.1 USER_PROPERTIES
-		public static SupplementalCredentials DecodeSupplementalCredential(ReadOnlySpan<byte> bytes)
+		public static SupplementalCredentials DecodeSupplementalCredential(int? kvno, ReadOnlySpan<byte> bytes)
 		{
 			SupplementalCredentials creds = new SupplementalCredentials();
 
@@ -54,18 +54,18 @@ namespace Titanis.Winterop.SamServer
 					case "Primary:Kerberos":
 						{
 							var kerb = reader.ReadPduStruct<KERB_STORED_CREDENTIAL>();
-							ExtractKerberosKeysInto(propBytes, kerb.credentials, keys);
-							ExtractKerberosKeysInto(propBytes, kerb.oldCredentials, oldKeys);
+							ExtractKerberosKeysInto(kvno, propBytes, kerb.credentials, keys);
+							ExtractKerberosKeysInto(kvno - 1, propBytes, kerb.oldCredentials, oldKeys);
 							creds.KerberosSalt = propBytes.Slice(kerb.defaultSaltOffset, kerb.defaultSaltLength).ToArray();
 						}
 						break;
 					case "Primary:Kerberos-Newer-Keys":
 						{
 							var kerb = reader.ReadPduStruct<KERB_STORED_CREDENTIAL_NEW>();
-							ExtractKerberosKeysInto(propBytes, kerb.credentials, keys);
-							ExtractKerberosKeysInto(propBytes, kerb.serviceCredentials, keys);
-							ExtractKerberosKeysInto(propBytes, kerb.oldCredentials, oldKeys);
-							ExtractKerberosKeysInto(propBytes, kerb.olderCredentials, oldKeys);
+							ExtractKerberosKeysInto(kvno, propBytes, kerb.credentials, keys);
+							ExtractKerberosKeysInto(kvno, propBytes, kerb.serviceCredentials, keys);
+							ExtractKerberosKeysInto(kvno - 1, propBytes, kerb.oldCredentials, oldKeys);
+							ExtractKerberosKeysInto(kvno - 2, propBytes, kerb.olderCredentials, oldKeys);
 							creds.KerberosSalt = propBytes.Slice(kerb.defaultSaltOffset, kerb.defaultSaltLength).ToArray();
 						}
 						break;
@@ -92,25 +92,25 @@ namespace Titanis.Winterop.SamServer
 			return creds;
 		}
 
-		private static void ExtractKerberosKeysInto(byte[] propBytes, KERB_KEY_DATA[]? keyData, List<KerberosKeyInfo> keys)
+		private static void ExtractKerberosKeysInto(int? kvno, byte[] propBytes, KERB_KEY_DATA[]? keyData, List<KerberosKeyInfo> keys)
 		{
 			if (keyData != null)
 			{
 				foreach (var key in keyData)
 				{
-					var keyInfo = new KerberosKeyInfo(key.keyType, propBytes.Slice(key.keyOffset, key.keyLength).ToArray());
+					var keyInfo = new KerberosKeyInfo(kvno, key.keyType, propBytes.Slice(key.keyOffset, key.keyLength).ToArray());
 					keys.Add(keyInfo);
 				}
 			}
 		}
 
-		private static void ExtractKerberosKeysInto(byte[] propBytes, KERB_KEY_DATA_NEW[]? keyData, List<KerberosKeyInfo> keys)
+		private static void ExtractKerberosKeysInto(int? kvno, byte[] propBytes, KERB_KEY_DATA_NEW[]? keyData, List<KerberosKeyInfo> keys)
 		{
 			if (keyData != null)
 			{
 				foreach (var key in keyData)
 				{
-					var keyInfo = new KerberosKeyInfo(key.keyType, propBytes.Slice(key.keyOffset, key.keyLength).ToArray(), key.iterationCount);
+					var keyInfo = new KerberosKeyInfo(kvno, key.keyType, propBytes.Slice(key.keyOffset, key.keyLength).ToArray(), key.iterationCount);
 					keys.Add(keyInfo);
 				}
 			}
@@ -138,12 +138,14 @@ namespace Titanis.Winterop.SamServer
 			this._log = log;
 		}
 
-		public static async Task<SamRegistryServer> Open(byte[] systemKey, IRegistryStore registry, RegistryKeyOptions options, ILog? log, CancellationToken cancellationToken)
+		public static Task<SamRegistryServer> Open(byte[] systemKey, IRegistryStore registry, RegistryKeyOptions options, ILog? log, CancellationToken cancellationToken)
 		{
 			ArgumentNullException.ThrowIfNull(systemKey);
 			ArgumentNullException.ThrowIfNull(registry);
 
-			return new SamRegistryServer(systemKey, registry, options, log);
+			// TODO: Make this async
+
+			return Task.FromResult(new SamRegistryServer(systemKey, registry, options, log));
 		}
 
 		public async Task<SamUserHash[]> DumpUserHashes(CancellationToken cancellationToken)

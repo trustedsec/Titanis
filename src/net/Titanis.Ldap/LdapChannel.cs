@@ -38,6 +38,9 @@ namespace Titanis.Ldap
 				Memory<byte> messageBytes;
 				do
 				{
+					if (cbMin > buf.Length)
+						Array.Resize(ref buf, cbMin);
+
 					var cbRead = (cbRecvBuf < cbMin) ? await stream.ReadAtLeastAsync(buf.AsMemory(cbRecvBuf), (cbMin - cbRecvBuf), false, cancellationToken).ConfigureAwait(false) : 0;
 
 					cbRecvBuf += cbRead;

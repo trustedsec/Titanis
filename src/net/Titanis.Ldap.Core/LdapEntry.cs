@@ -15,6 +15,7 @@ namespace Titanis.Ldap
 			this.Attributes = attributes;
 
 			this._attrsByName = attributes.ToDictionary(r => r.AttributeType.Name, StringComparer.OrdinalIgnoreCase);
+			this.ObjectClass = this[LdapAttributeTypes.ObjectClass]?.Values?.LastOrDefault() as string;
 		}
 
 		public LdapEntry(
