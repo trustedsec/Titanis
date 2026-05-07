@@ -118,7 +118,7 @@ public abstract class LdapGenericSearchCommandBase : LdapCommandBase, ILdapClien
 	protected readonly ConcurrentQueue<string> referralQueue = new ConcurrentQueue<string>();
 	void ILdapClientSearchCallback.OnReference(string reference)
 	{
-		this.WriteMessage($"Received reference to " + reference);
+		this.WriteVerbose($"Received reference to " + reference);
 		this.referralQueue.Enqueue(reference);
 	}
 
