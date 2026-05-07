@@ -111,6 +111,16 @@ namespace Titanis.Ldap.FilterExpressions
 				return new FormatException($"The LDAP filter is not in the expected format.  Expected '{expected}' at position {position} but found '{actual}'.");
 			}
 
+			private readonly FormatException CreateFormatException(string error, char actual, int position)
+			{
+				return new FormatException($"The LDAP filter is not in the expected format.  Character '{actual}' at position {position}: {error}");
+			}
+
+			private readonly FormatException CreateFormatException(string error, int position)
+			{
+				return new FormatException($"The LDAP filter is not in the expected format.  At position {position}: {error}");
+			}
+
 			private FilterClause? TryReadFilter()
 			{
 				return this.PeekNextChar() == '(' ? this.ReadFilter() : null;
@@ -141,7 +151,7 @@ namespace Titanis.Ldap.FilterExpressions
 							}
 
 							if (clauses.Count == 0)
-								throw new FormatException($"Expected one or more filter clauses after '{c}' at position {this.readIndex}.");
+								throw CreateFormatException($"Expected one or more filter clauses introduced by '('", this.readIndex);
 
 							var comps = clauses.ToArray();
 							filter = c switch
@@ -186,6 +196,23 @@ namespace Titanis.Ldap.FilterExpressions
 								}
 							}
 							var filterType = this.ReadFilterType();
+							string? extoid = null;
+							if (filterType is FilterType.Extensible)
+							{
+								StringBuilder sbOid = new StringBuilder();
+								char cx;
+								// TODO: Allow symbolic names?
+								static bool IsOidChar(char c) => c == '.' || char.IsDigit(c);
+								while (IsOidChar(cx = this.ReadNextChar()))
+								{
+									sbOid.Append(cx);
+								}
+								if (cx != ':')
+									throw CreateFormatException("Expected an OID of the form n.n followed by ':='.", cx, this.readIndex);
+
+								this.ReadExpected('=');
+								extoid = sbOid.ToString();
+							}
 
 							AssertionValue assertionValue;
 							var assertionValueStr = this.ReadAssertionValue();
@@ -239,6 +266,9 @@ namespace Titanis.Ldap.FilterExpressions
 								case FilterType.Transitive:
 									filter = new ExtensibleMatchExpression(attrDesc, FilterFactory.LDAP_MATCHING_RULE_TRANSITIVE_EVAL, assertionValue);
 									break;
+								case FilterType.Extensible:
+									filter = ExtensibleMatch(attrDesc, extoid, assertionValue);
+									break;
 								default: throw new NotImplementedException($"Unknown filter {filterType}.");
 							}
 						}
@@ -275,6 +305,7 @@ namespace Titanis.Ldap.FilterExpressions
 				AllBits = '&',
 				AnyBits = '|',
 				Transitive = '*',
+				Extensible = ':',
 			}
 
 			private FilterType ReadFilterType()
@@ -288,6 +319,8 @@ namespace Titanis.Ldap.FilterExpressions
 					var c2 = this.ReadExpected('=');
 					return (FilterType)c1;
 				}
+				else if (c1 is ':')
+					return FilterType.Extensible;
 				else
 				{
 					throw new FormatException($"Unknown filter type '{c1}' at position {pos}.");
