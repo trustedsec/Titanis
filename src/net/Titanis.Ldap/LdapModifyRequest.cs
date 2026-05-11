@@ -85,9 +85,10 @@ namespace Titanis.Ldap
 		public LdapDistinguishedName DistinguishedName { get; }
 
 		internal readonly List<LdapAttributeChange> _changes = new List<LdapAttributeChange>();
+		public IReadOnlyList<LdapAttributeChange> Changes => this._changes;
 
 		public void AddChange(string attributeName, object[] values, LdapChangeType changeType)
-			=> this.AddChange(new LdapAttributeChange(attributeName,values, changeType));
+			=> this.AddChange(new LdapAttributeChange(attributeName, values, changeType));
 
 		public LdapModifyRequest AddChange(LdapAttributeChange change)
 		{

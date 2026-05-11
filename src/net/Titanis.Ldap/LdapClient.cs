@@ -643,9 +643,18 @@ namespace Titanis.Ldap
 			LdapClientChannel.CheckAndThrow(resp.message.protocolOp.ModifyResponse);
 		}
 
+		public Task Delete(LdapDistinguishedName dn, CancellationToken cancellationToken)
+		{
+			ArgumentNullException.ThrowIfNull(dn);
+			return this._channel.SendRequest(new LDAPMessage_ProtocolOp()
+			{
+				DelRequest = Encoding.UTF8.GetBytes(dn.Text)
+			}, cancellationToken);
+		}
+
 		public async Task Move(LdapDistinguishedName oldName, LdapDistinguishedName newName)
 		{
-			await Task.Yield();
+			// TODO: Implement LDAP Move
 			throw new NotImplementedException();
 		}
 	}
