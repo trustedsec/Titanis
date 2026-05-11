@@ -3,11 +3,12 @@ using System.Text;
 
 namespace Titanis.Ldap.FilterExpressions
 {
+
 	public abstract partial class FilterClause
 	{
-		internal abstract Filter ToFilterAsn1(FilterExpressionContext context);
-
 		public virtual FilterClause Not() => new NotExpression(this);
+
+		public abstract T Accept<T>(IFilterVisitor<T> visitor);
 	}
 
 	public sealed class NotExpression : FilterClause
@@ -19,7 +20,7 @@ namespace Titanis.Ldap.FilterExpressions
 
 		public FilterClause Operand { get; }
 
-		internal override Filter ToFilterAsn1(FilterExpressionContext context) => new Filter { Not = this.Operand.ToFilterAsn1(context) };
+		public sealed override T Accept<T>(IFilterVisitor<T> visitor) => visitor.Visit(this);
 	}
 
 	public sealed class AndExpression : FilterClause
@@ -30,7 +31,7 @@ namespace Titanis.Ldap.FilterExpressions
 		}
 		public FilterClause[] Clauses { get; }
 
-		internal override Filter ToFilterAsn1(FilterExpressionContext context) => new Filter { And = Array.ConvertAll(this.Clauses, r => r.ToFilterAsn1(context)) };
+		public sealed override T Accept<T>(IFilterVisitor<T> visitor) => visitor.Visit(this);
 	}
 
 	public sealed class OrExpression : FilterClause
@@ -41,7 +42,7 @@ namespace Titanis.Ldap.FilterExpressions
 		}
 		public FilterClause[] Clauses { get; }
 
-		internal override Filter ToFilterAsn1(FilterExpressionContext context) => new Filter { Or = Array.ConvertAll(this.Clauses, r => r.ToFilterAsn1(context)) };
+		public sealed override T Accept<T>(IFilterVisitor<T> visitor) => visitor.Visit(this);
 	}
 
 	public sealed class PresentExpression : FilterClause
@@ -53,7 +54,7 @@ namespace Titanis.Ldap.FilterExpressions
 
 		public string AttributeDescription { get; }
 
-		internal override Filter ToFilterAsn1(FilterExpressionContext context) => new Filter() { Present = Encoding.UTF8.GetBytes(this.AttributeDescription) };
+		public sealed override T Accept<T>(IFilterVisitor<T> visitor) => visitor.Visit(this);
 	}
 
 	public abstract class AssertionExpression : FilterClause
@@ -67,10 +68,20 @@ namespace Titanis.Ldap.FilterExpressions
 		public string AttributeDescription { get; }
 		public AssertionValue AssertionValue { get; }
 
-		private protected AttributeValueAssertion ToAssertion(FilterExpressionContext context)
+		internal AttributeValueAssertion ToAssertion(FilterExpressionContext context)
 		{
 			string value = this.AssertionValue.Resolve(context);
-			return new AttributeValueAssertion(Encoding.UTF8.GetBytes(this.AttributeDescription), Encoding.UTF8.GetBytes(value));
+			var attrSyntax = LdapAttributeTypes.TryGetByNameOrOid(this.AttributeDescription)?.Syntax;
+			byte[] encodedValue;
+			if (attrSyntax != null)
+			{
+				encodedValue = attrSyntax.ParseAndEncode(value);
+			}
+			else
+			{
+				encodedValue = Encoding.UTF8.GetBytes(value);
+			}
+			return new AttributeValueAssertion(Encoding.UTF8.GetBytes(this.AttributeDescription), encodedValue);
 		}
 	}
 	public sealed class EqualsExpression : AssertionExpression
@@ -80,15 +91,10 @@ namespace Titanis.Ldap.FilterExpressions
 		{
 		}
 
-		internal override Filter ToFilterAsn1(FilterExpressionContext context) => new Filter() { EqualityMatch = this.ToAssertion(context) };
+		public sealed override T Accept<T>(IFilterVisitor<T> visitor) => visitor.Visit(this);
 	}
 	public sealed class SubstringMatchExpression : FilterClause
 	{
-		private readonly string attributeDescription;
-		private readonly string? initial;
-		private readonly string[]? any;
-		private readonly string? final;
-
 		internal SubstringMatchExpression(string attributeDescription, string? initial, string[]? any, string? final)
 		{
 			this.attributeDescription = attributeDescription;
@@ -97,27 +103,12 @@ namespace Titanis.Ldap.FilterExpressions
 			this.final = final;
 		}
 
-		internal override Filter ToFilterAsn1(FilterExpressionContext context)
-		{
-			List<SubstringFilter_Substrings_Element> elems = new List<SubstringFilter_Substrings_Element>();
-			if (!string.IsNullOrEmpty(this.initial))
-				elems.Add(new SubstringFilter_Substrings_Element() { Initial = Encoding.UTF8.GetBytes(this.initial) });
-			if (!any.IsNullOrEmpty())
-			{
-				foreach (var any in this.any)
-				{
-					elems.Add(new SubstringFilter_Substrings_Element() { Any = Encoding.UTF8.GetBytes(any) });
-				}
-			}
+		internal readonly string attributeDescription;
+		internal readonly string? initial;
+		internal readonly string[]? any;
+		internal readonly string? final;
 
-			if (!string.IsNullOrEmpty(this.final))
-				elems.Add(new SubstringFilter_Substrings_Element() { Final = Encoding.UTF8.GetBytes(this.final) });
-
-			return new Filter()
-			{
-				Substrings = new SubstringFilter(Encoding.UTF8.GetBytes(this.attributeDescription), elems.ToArray())
-			};
-		}
+		public sealed override T Accept<T>(IFilterVisitor<T> visitor) => visitor.Visit(this);
 	}
 	public sealed class GreaterOrEqualExpression : AssertionExpression
 	{
@@ -126,7 +117,7 @@ namespace Titanis.Ldap.FilterExpressions
 		{
 		}
 
-		internal override Filter ToFilterAsn1(FilterExpressionContext context) => new Filter() { GreaterOrEqual = this.ToAssertion(context) };
+		public sealed override T Accept<T>(IFilterVisitor<T> visitor) => visitor.Visit(this);
 	}
 	public sealed class LessOrEqualExpression : AssertionExpression
 	{
@@ -135,7 +126,7 @@ namespace Titanis.Ldap.FilterExpressions
 		{
 		}
 
-		internal override Filter ToFilterAsn1(FilterExpressionContext context) => new Filter() { LessOrEqual = this.ToAssertion(context) };
+		public sealed override T Accept<T>(IFilterVisitor<T> visitor) => visitor.Visit(this);
 	}
 	public sealed class ApproxEqualExpression : AssertionExpression
 	{
@@ -144,7 +135,7 @@ namespace Titanis.Ldap.FilterExpressions
 		{
 		}
 
-		internal override Filter ToFilterAsn1(FilterExpressionContext context) => new Filter() { ApproxMatch = this.ToAssertion(context) };
+		public sealed override T Accept<T>(IFilterVisitor<T> visitor) => visitor.Visit(this);
 	}
 	public sealed class ExtensibleMatchExpression : AssertionExpression
 	{
@@ -156,6 +147,6 @@ namespace Titanis.Ldap.FilterExpressions
 
 		public string Extension { get; }
 
-		internal override Filter ToFilterAsn1(FilterExpressionContext context) => new Filter() { ExtensibleMatch = new MatchingRuleAssertion(Encoding.UTF8.GetBytes(this.AssertionValue.Resolve(context)), Encoding.UTF8.GetBytes(this.Extension), Encoding.UTF8.GetBytes(this.AttributeDescription)) };
+		public sealed override T Accept<T>(IFilterVisitor<T> visitor) => visitor.Visit(this);
 	}
 }

@@ -27,7 +27,7 @@ namespace Titanis.Ldap
 		public static readonly LdapSyntax Enumeration = new EnumerationSyntax();
 		public static readonly LdapSyntax Integer = new IntegerSyntax();
 		public static readonly LdapSyntax LargeInteger = new LargeIntegerSyntax();
-		public static readonly LdapSyntax LargeInteger_Timestamp = new LargeIntegerSyntax();
+		public static readonly LdapSyntax LargeInteger_Timestamp = new LargeIntegerTimestampSyntax();
 		public static readonly LdapSyntax ObjectAccessPoint = new ObjectAccessPointSyntax();
 		public static readonly LdapSyntax ObjectDnString = new ObjectDnStringSyntax();
 		public static readonly LdapSyntax ObjectOrName = new ObjectOrNameSyntax();
@@ -296,6 +296,7 @@ namespace Titanis.Ldap
 
 		public override string ToString() => $"{this.Value:N0} ({this.AsDateTimeUtc():O})";
 
+		private static Regex rgxRelative = new Regex(@"^((?<t>today)|(?<n>now))\s*((?<s>\+|-)\s*(?<d>.*))?$", RegexOptions.IgnoreCase);
 		public static AdTimestamp Parse(string text)
 		{
 			if (long.TryParse(text, NumberStyles.AllowThousands, null, out var n))
@@ -308,6 +309,24 @@ namespace Titanis.Ldap
 			}
 			else
 			{
+				var m = rgxRelative.Match(text);
+				if (m.Success)
+				{
+					dt = m.Groups["t"].Success ? DateTime.UtcNow.Date : DateTime.UtcNow;
+					Group signGroup = m.Groups["s"];
+					if (signGroup.Success)
+					{
+						var sign = signGroup.Value[0];
+						var duration = Duration.Parse(m.Groups["d"].Value).TimeSpan;
+						dt = sign switch
+						{
+							'-' => dt - duration,
+							'+' => dt + duration
+						};
+					}
+					return new AdTimestamp(dt);
+				}
+
 				throw new ArgumentException($"Could not parse timestamp as either a numeric value or date/time.");
 			}
 		}

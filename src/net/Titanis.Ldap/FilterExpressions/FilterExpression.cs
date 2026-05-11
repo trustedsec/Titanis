@@ -33,11 +33,6 @@ namespace Titanis.Ldap.FilterExpressions
 		public FilterClause RootClause { get; }
 		public ImmutableArray<FilterParameterUsage> ParameterUsages { get; }
 
-		public LdapFilter ToFilter()
-		{
-			return new LdapFilter(this.RootClause.ToFilterAsn1(NullFilterContext.Instance));
-		}
-
 		class NullFilterContext : FilterExpressionContext
 		{
 			internal static readonly NullFilterContext Instance = new NullFilterContext();
@@ -48,9 +43,11 @@ namespace Titanis.Ldap.FilterExpressions
 			}
 		}
 
-		public LdapFilter ToFilter(FilterExpressionContext context)
+		public LdapFilter ToFilter(FilterExpressionContext? context = null)
 		{
-			return new LdapFilter(this.RootClause.ToFilterAsn1(context));
+			context ??= NullFilterContext.Instance;
+			Asn1FilterBuilder b = new Asn1FilterBuilder(context);
+			return new LdapFilter(this.RootClause.Accept(b));
 		}
 
 		// [RFC 4515]
