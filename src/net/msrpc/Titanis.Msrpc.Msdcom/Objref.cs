@@ -40,6 +40,8 @@ namespace Titanis.Msrpc.Msdcom
 	[PduStruct]
 	partial struct OBJREF_CUSTOM
 	{
+		public const int HeaderSize = 24;
+
 		internal Guid clsid;
 		internal int cbExtension;
 		internal int reserved;
@@ -372,17 +374,22 @@ namespace Titanis.Msrpc.Msdcom
 		protected abstract void WriteObjectData(ByteWriter writer);
 		protected sealed override void WriteTo(ByteWriter writer)
 		{
+			var offStart = writer.Position;
+			writer.Advance(OBJREF_CUSTOM.HeaderSize);
+
+			this.WriteObjectData(writer);
+			int offEnd = writer.Position;
+			int cbObj = offEnd - offStart;
+			writer.SetPosition(offStart);
+
 			writer.WritePduStruct(new OBJREF_CUSTOM
 			{
 				clsid = this.MarshalClsid,
 				cbExtension = 0,
-				reserved = 752,
+				reserved = cbObj - OBJREF_CUSTOM.HeaderSize,
 			});
 
-			// HACK: mofcomp sends 0xDB for this byte
-			// reserved
-
-			this.WriteObjectData(writer);
+			writer.SetPosition(offEnd);
 		}
 
 		protected sealed override void ReadFrom(ByteMemoryReader reader)

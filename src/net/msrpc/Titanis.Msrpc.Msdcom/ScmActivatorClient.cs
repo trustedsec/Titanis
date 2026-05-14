@@ -28,11 +28,11 @@ namespace Titanis.Msrpc.Msdcom
 			this.ServerName = serverName;
 		}
 
-        public string ServerName { get; }
+		public string ServerName { get; }
 
-        // [MS-DCOM] § 1.9
-        /// <inheritdoc/>
-        public sealed override bool SupportsDynamicTcp => true;
+		// [MS-DCOM] § 1.9
+		/// <inheritdoc/>
+		public sealed override bool SupportsDynamicTcp => true;
 		// [MS-DCOM] § 1.9
 		/// <inheritdoc/>
 		public sealed override int WellKnownTcpPort => 135;
@@ -70,7 +70,7 @@ namespace Titanis.Msrpc.Msdcom
 					dwDefaultAuthnLvl = (int)RpcAuthLevel.PacketIntegrity,
 					guidPartition = Guid.Empty,
 					dwPRTFlags = 0,
-					dwOrigClsctx = CLSCTX_REMOTE_SERVER,
+					dwOrigClsctx = 0,
 					// Sent by Windows
 					dwFlags = 2,
 				},
@@ -122,7 +122,8 @@ namespace Titanis.Msrpc.Msdcom
 						cRequestedProtseqs = 1,
 						pRequestedProtseqs = new RpcPointer<ushort[]>(new ushort[]
 						{
-							(ushort)ProtocolId.Tcp4
+							(ushort)ProtocolId.Tcp4,
+							//(ushort)31, // Send by Windows sometimes
 						})
 					})
 				}
@@ -169,7 +170,7 @@ namespace Titanis.Msrpc.Msdcom
 		public Guid Clsid { get; }
 		public abstract void WriteTo(RpcEncoder encoder);
 
-		public static ActProperty_Struct<T> CreateFixed<T>(Guid clsid, ref readonly T struc)
+		public static ActProperty_Struct<T> CreateFixed<T>(Guid clsid, in T struc)
 			where T : struct, IRpcFixedStruct
 		{
 			return new Msdcom.ActProperty_Struct<T>(clsid, struc);
