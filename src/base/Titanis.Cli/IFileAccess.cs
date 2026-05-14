@@ -9,6 +9,12 @@ namespace Titanis.Cli
 	/// </summary>
 	public interface IFileAccess
 	{
+		/// <summary>
+		/// Gets a list of files in a directory that match a search pattern.
+		/// </summary>
+		/// <param name="directory">Path of directory to search</param>
+		/// <param name="searchPattern">Search pattern</param>
+		/// <returns>A list of file names relative to <paramref name="directory"/></returns>
 		string[] GetFiles(string directory, string searchPattern);
 		/// <summary>
 		/// Converts a relative file path to an absolute path.
