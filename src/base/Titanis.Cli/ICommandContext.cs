@@ -37,6 +37,7 @@ namespace Titanis.Cli
 
 
 		void FlushOutput();
+		void OnCommandComplete();
 
 		/// <summary>
 		/// Indicates whether a field is selected to be printed in the output.

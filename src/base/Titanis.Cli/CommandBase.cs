@@ -79,6 +79,7 @@ namespace Titanis.Cli
 			}
 			finally
 			{
+				context.OnCommandComplete();
 				this.Context = null;
 			}
 		}
@@ -224,11 +225,11 @@ namespace Titanis.Cli
 
 				if (this._logLevel >= LogMessageSeverity.Diagnostic)
 				{
-				Console.Error.WriteLine(ex);
+					Console.Error.WriteLine(ex);
 				}
 				else
 				{
-				Console.Error.WriteLine(ex.Message);
+					Console.Error.WriteLine(ex.Message);
 				}
 
 				Console.Error.WriteLine($"Tool execution failed with exit code {ex.HResult} (0x{ex.HResult:X8})");

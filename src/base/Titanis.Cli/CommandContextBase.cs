@@ -99,6 +99,22 @@ namespace Titanis.Cli
 		// Tree stuff
 		private TreeHandler? _treeHandler;
 
+		public virtual void OnCommandComplete()
+		{
+			if (this._recordsExpected)
+			{
+				if (this._recordsWritten == 0)
+				{
+					this.Log.WriteMessage(new LogMessage(LogMessageSeverity.Info, null, "Command completed but no records written"));
+				}
+				else
+				{
+					this.Log.WriteMessage(new LogMessage(LogMessageSeverity.Verbose, null, $"{this._recordsWritten} record(s) written"));
+				}
+				this._recordsExpected = false;
+				this._recordsWritten = 0;
+			}
+		}
 		public virtual void FlushOutput()
 		{
 			if (this._treeHandler != null)
@@ -133,21 +149,6 @@ namespace Titanis.Cli
 				if (this._outputStyle is OutputStyle.Json)
 					this.WriteOutput("]");
 			}
-
-			if (this._recordsExpected)
-			{
-				if (this._recordsWritten == 0)
-				{
-					this.Log.WriteMessage(new LogMessage(LogMessageSeverity.Info, null, "Command completed but no records written"));
-				}
-				else
-				{
-					this.Log.WriteMessage(new LogMessage(LogMessageSeverity.Verbose, null, $"{this._recordsWritten} record(s) written"));
-				}
-				this._recordsExpected = false;
-				this._recordsWritten = 0;
-			}
-
 		}
 
 
