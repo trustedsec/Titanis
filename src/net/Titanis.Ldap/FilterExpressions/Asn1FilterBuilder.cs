@@ -26,7 +26,7 @@ namespace Titanis.Ldap.FilterExpressions
 
 		private readonly FilterExpressionContext context;
 
-		public Filter Visit(NotExpression expression) => new Filter { Not = expression.Accept(this) };
+		public Filter Visit(NotExpression expression) => new Filter { Not = expression.Operand.Accept(this) };
 		public Filter Visit(AndExpression expression) => new Filter { And = Array.ConvertAll(expression.Clauses, r => r.Accept(this)) };
 		public Filter Visit(OrExpression expression) => new Filter { Or = Array.ConvertAll(expression.Clauses, r => r.Accept(this)) };
 		public Filter Visit(PresentExpression expression) => new Filter() { Present = Encoding.UTF8.GetBytes(expression.AttributeDescription) };
