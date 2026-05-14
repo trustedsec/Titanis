@@ -61,22 +61,11 @@ internal abstract class WmiCommand : Command, IHaveServerName
 
 		var remoteAddr = remoteAddrs[0];
 
-		SecurityCapabilities rpcRequiredCaps = SecurityCapabilities.DceStyle | SecurityCapabilities.Integrity;
-		RpcAuthLevel authLevel;
-		if (rpcParams.EncryptRpc.IsSet)
-		{
-			rpcRequiredCaps |= SecurityCapabilities.Confidentiality;
-			authLevel = RpcAuthLevel.PacketPrivacy;
-		}
-		else
-			authLevel = RpcAuthLevel.PacketIntegrity;
-
 		var credService = this.RequireService<IClientCredentialService>();
 
 		var rpcClient = this.CreateRpcClient();
-		this.RpcParameters.ApplyTo(rpcClient);
+		this.RpcParameters.ApplyTo(rpcClient, RpcAuthLevel.PacketIntegrity);
 		//rpcClient.DefaultCallTimeout = TimeSpan.FromMinutes(1);
-		rpcClient.DefaultAuthLevel = authLevel;
 
 		// If the endpoint doesn't have a well-known port, use the EP mapper
 		IPEndPoint remoteEP = new IPEndPoint(remoteAddr, WmiClient.WellKnownTcpPort);

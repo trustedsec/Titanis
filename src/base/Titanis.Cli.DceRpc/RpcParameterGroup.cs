@@ -86,7 +86,7 @@ namespace Titanis.Cli
 			this.SmbParameters.Validate(context, Authentication);
 		}
 
-		public void ApplyTo(RpcClient rpcClient)
+		public void ApplyTo(RpcClient rpcClient, RpcAuthLevel minAuthLevel = RpcAuthLevel.Connect)
 		{
 			ArgumentNullException.ThrowIfNull(rpcClient);
 
@@ -94,6 +94,14 @@ namespace Titanis.Cli
 				rpcClient.ConnectTimeout = this.RpcConnectTimeout.TimeSpan;
 			if (this.RpcCallTimeout != null)
 				rpcClient.DefaultCallTimeout = this.RpcCallTimeout.TimeSpan;
+
+			RpcAuthLevel authLevel;
+			if (this.EncryptRpc.IsSet)
+				authLevel = RpcAuthLevel.PacketPrivacy;
+			else
+				authLevel = minAuthLevel;
+
+			rpcClient.DefaultAuthLevel = authLevel;
 		}
 
 		private Smb2Client CreateSmbClient()
@@ -147,7 +155,7 @@ namespace Titanis.Cli
 						rpcAuthOptions |= AuthOptions.PreferSpnego;
 
 					RpcAuthLevel authLevel = (svcClient.RequiresEncryptionOverTcp || EncryptRpc.IsSet) ? RpcAuthLevel.PacketPrivacy : this.Authentication.HasAuthInfo ? RpcAuthLevel.PacketIntegrity : RpcAuthLevel.None;
-					rpcClient.DefaultAuthLevel = authLevel;
+					rpcClient.DefaultAuthLevel = (RpcAuthLevel)Math.Max((int)rpcClient.DefaultAuthLevel, (int)authLevel);
 
 					await rpcClient.ConnectTcp(svcClient.Proxy, remoteEP, spn, cancellationToken).ConfigureAwait(false);
 					return new RpcBindInfo();
