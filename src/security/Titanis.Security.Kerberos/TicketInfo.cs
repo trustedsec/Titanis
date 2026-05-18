@@ -242,7 +242,7 @@ namespace Titanis.Security.Kerberos
 		public PA_DATA[]? Padata { get; }
 
 		[Browsable(false)]
-		public SessionKey? AsrepKey { get; }
+		public SessionKey? AsrepKey { get; private set; }
 		public string? AsrepKeyText => this.AsrepKey?.KeyBytes?.ToHexString();
 
 		[Browsable(false)]

@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Titanis.IO;
 
 namespace Titanis.Security.Kerberos
 {
 	static class KerberosReader
 	{
-		internal static unsafe ref AuthChecksumToken ReadAuthChecksum(Span<byte> buffer)
+		internal static AuthChecksumToken ReadAuthChecksum(Span<byte> buffer)
 		{
-			if (buffer.Length < AuthChecksumToken.StructSize)
-				throw new ArgumentOutOfRangeException(nameof(buffer));
-
-			fixed (byte* pBuf = buffer)
-			{
-				return ref *(AuthChecksumToken*)pBuf;
-			}
+			ByteMemoryReader reader = new ByteMemoryReader(buffer.ToArray());
+			return reader.ReadPduStruct<AuthChecksumToken>();
 		}
 
 		internal static unsafe ref readonly WrapToken ReadWrapToken(ReadOnlySpan<byte> buffer)

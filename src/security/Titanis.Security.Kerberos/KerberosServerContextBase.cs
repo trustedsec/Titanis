@@ -140,9 +140,7 @@ namespace Titanis.Security.Kerberos
 			if (auth.cksum.cksumtype != AuthChecksumToken.ChecksumType)
 				throw new NotImplementedException();
 
-			AuthChecksumToken authChecksum = new AuthChecksumToken();
-			// TODO: Check size
-			auth.cksum.checksum.CopyTo(authChecksum.AsSpan());
+			AuthChecksumToken authChecksum = KerberosReader.ReadAuthChecksum(auth.cksum.checksum);
 
 			this._negcap = authChecksum.capabilities;
 

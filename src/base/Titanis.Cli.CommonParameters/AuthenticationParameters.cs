@@ -95,6 +95,20 @@ namespace Titanis.Cli
 		public string? TicketCache { get; set; }
 
 		[Parameter]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		[Description("Sends the TGT (and key) to the target for delegation")]
+		public SwitchParam DelegateTgt { get; set; }
+
+		[Parameter]
+		[Description("Requests delegation")]
+		public SwitchParam Delegate { get; set; }
+
+		[Parameter]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		[Description("Sends the tickets (and keys) to the target for delegation")]
+		public string[]? DelegateTicket { get; set; }
+
+		[Parameter]
 		[Description("NTLM version number (a.b.c.d)")]
 		[Category(ParameterCategories.AuthenticationNtlm)]
 		public Version? NtlmVersion { get; set; }
@@ -734,7 +748,34 @@ namespace Titanis.Cli
 
 			KerberosClientCred? clientCred;
 			if (serviceTicket is not null)
+			{
 				clientCred = serviceTicket;
+				if (this.DelegateTgt.IsSet || !this.DelegateTicket.IsNullOrEmpty())
+				{
+					List<TicketInfo> delegateTickets = new List<TicketInfo>();
+					if (this.DelegateTgt.IsSet && (krb.TicketCache.HomeTgt != null))
+					{
+						// TODO: Warn if no TGT
+						delegateTickets.Add(krb.TicketCache.HomeTgt);
+					}
+					if (!this.DelegateTicket.IsNullOrEmpty())
+					{
+						foreach (var fileName in this.DelegateTicket)
+						{
+							var ticketCache = LoadTicketFile(fileName, krb, log);
+							delegateTickets.AddRange(ticketCache.GetAllTickets());
+						}
+					}
+
+					if (delegateTickets.Count > 0)
+					{
+						requiredCaps |= SecurityCapabilities.Delegation;
+						clientCred.ForwardedTickets = delegateTickets;
+					}
+				}
+				else if (this.Delegate.IsSet)
+					requiredCaps |= SecurityCapabilities.Delegation;
+			}
 			else if (u2UserName is not null)
 			{
 				if (tgt is null && cred is not null)

@@ -31,6 +31,7 @@ namespace Titanis.Security.Kerberos
 		public TicketInfo? Ticket { get; private set; }
 		public TicketInfo Tgt { get; }
 		public UserPrincipalName? U2UserName { get; }
+		public IReadOnlyList<TicketInfo>? ForwardedTickets { get; set; }
 
 		public static implicit operator KerberosClientCred(TicketInfo ticket) => new KerberosClientCred(ticket);
 	}
@@ -189,6 +190,20 @@ namespace Titanis.Security.Kerberos
 				if (this._clientCred.U2UserName != null)
 					options |= APOptions.UseSessionKey;
 				var gssFlags = this.RequiredCapabilities;
+
+				DelegationToken? delgToken;
+				if (this._clientCred.ForwardedTickets != null)
+				{
+					delgToken = new DelegationToken()
+					{
+						Bytes = KerberosClient.ExportKirbi(this._clientCred.ForwardedTickets)
+					};
+				}
+				else
+				{
+					delgToken = null;
+				}
+
 				var apreq = KerberosClient.CreateAPReq(
 					ticket,
 					this.TargetSpn,
@@ -197,7 +212,8 @@ namespace Titanis.Security.Kerberos
 					sendSeqNbr,
 					options,
 					gssFlags,
-					this.ChannelBinding
+					this.ChannelBinding,
+					delgToken
 					);
 
 				var encoder = Asn1DerEncoding.CreateDerEncoder();

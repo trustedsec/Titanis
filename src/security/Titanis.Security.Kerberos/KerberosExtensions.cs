@@ -43,8 +43,8 @@ namespace KerberosV5Spec2
 							// This is probably a U2U
 							try
 							{
-								var code = decoder.DecodeTaggedValue(new Asn1Tag(0xA0000000), d => decoder.DecodeIntegerTlvAsInt32());
-								if (code is -128)
+								var typedData = decoder.DecodeValue<TYPED_DATA_Element>();
+								if (typedData.data_type is -128)
 								{
 									return CreateNtstatusKerberosException((KerberosErrorCode)this.error_code, Ntstatus.STATUS_USER2USER_REQUIRED);
 								}

@@ -952,7 +952,8 @@ namespace Titanis.Security.Kerberos
 			int initialSeqNbr,
 			APOptions options,
 			SecurityCapabilities caps,
-			ChannelBinding? channelBinding
+			ChannelBinding? channelBinding,
+			DelegationToken? delegationToken
 			)
 		{
 			// Use from ticket instead of credentials
@@ -978,8 +979,9 @@ namespace Titanis.Security.Kerberos
 					{
 						bindLength = 0x10,
 						channelBind = channelBind,
-						capabilities = caps
-					}.AsSpan().ToArray()
+						capabilities = caps,
+						DelegationToken = delegationToken
+					}.ToBytes()
 				),
 				now,
 				initialSeqNbr,
@@ -1215,7 +1217,7 @@ namespace Titanis.Security.Kerberos
 			ArgumentNullException.ThrowIfNull(ticket);
 			this.TicketCache.AddTicket(ticket);
 		}
-		public byte[] ExportTickets(IList<TicketInfo> tickets, KerberosFileFormat format)
+		public byte[] ExportTickets(IReadOnlyList<TicketInfo> tickets, KerberosFileFormat format)
 		{
 			ArgumentNullException.ThrowIfNull(tickets);
 
@@ -1226,7 +1228,7 @@ namespace Titanis.Security.Kerberos
 			};
 		}
 
-		internal static byte[] ExportKirbi(IList<TicketInfo> tickets)
+		internal static byte[] ExportKirbi(IReadOnlyList<TicketInfo> tickets)
 		{
 			Ticket_Tagged1[] asnTickets = new Ticket_Tagged1[tickets.Count];
 			KrbCredInfo[] encParts = new KrbCredInfo[tickets.Count];
@@ -1267,7 +1269,7 @@ namespace Titanis.Security.Kerberos
 			return krbcredBytes;
 		}
 
-		private byte[] ExportCcacheBytes(IList<TicketInfo> tickets)
+		private byte[] ExportCcacheBytes(IReadOnlyList<TicketInfo> tickets)
 		{
 			List<CCacheCredential> creds = new List<CCacheCredential>(tickets.Count);
 			foreach (var ticket in tickets)
@@ -1622,10 +1624,10 @@ namespace Titanis.Security.Kerberos
 			SecurityCapabilities gssFlags = SecurityCapabilities.None;
 			if (
 				apreq_auth.Value.cksum.cksumtype == AuthChecksumToken.ChecksumType
-				&& apreq_auth.Value.cksum.checksum.Length >= AuthChecksumToken.StructSize
 				)
 			{
-				ref var token = ref MemoryMarshal.AsRef<AuthChecksumToken>(apreq_auth.Value.cksum.checksum);
+				ByteMemoryReader reader = new ByteMemoryReader(apreq_auth.Value.cksum.checksum);
+				var token = reader.ReadPduStruct<AuthChecksumToken>();
 				gssFlags = token.capabilities;
 			}
 
