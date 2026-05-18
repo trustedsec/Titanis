@@ -560,13 +560,9 @@ namespace Titanis.Cli
 			// Check for a ticket matching the target SPN and user name (if specified)
 			if ((serviceTicket is null) && this.Tickets != null)
 			{
-				foreach (var ticketFileName_ in this.Tickets)
+				foreach (var ticketFileName in this.Tickets)
 				{
-					string ticketFileName = this.ResolveFsPath(ticketFileName_);
-					// TODO: Resolve file name
-					log?.WriteVerbose($"Loading tickets from {ticketFileName}");
-					var fileCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(ticketFileName), ticketFileName, krb);
-					log?.WriteVerbose($"Loaded {fileCache.TicketCount} tickets from {ticketFileName}");
+					TicketCacheFile fileCache = LoadTicketFile(ticketFileName, krb, log);
 
 					string? userDomain = this.UserDomain;
 					var fileTickets = fileCache.GetAllTickets();
@@ -797,6 +793,16 @@ namespace Titanis.Cli
 
 			extraContext = null;
 			return null;
+		}
+
+		private TicketCacheFile LoadTicketFile(string ticketFileName, KerberosClient krb, ILog? log)
+		{
+			ticketFileName = this.ResolveFsPath(ticketFileName);
+			// TODO: Resolve file name
+			log?.WriteVerbose($"Loading tickets from {ticketFileName}");
+			var fileCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(ticketFileName), ticketFileName, krb);
+			log?.WriteVerbose($"Loaded {fileCache.TicketCount} tickets from {ticketFileName}");
+			return fileCache;
 		}
 
 		private KerberosClient? TryGetKerberosClient() => this._kerberosClient ??= this.Services?.GetService<KerberosClient>();

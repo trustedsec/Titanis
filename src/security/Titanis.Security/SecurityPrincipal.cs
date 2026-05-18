@@ -31,7 +31,7 @@ namespace Titanis.Security
 			{
 				(_, 2) => new ServicePrincipalName(nameType, nameParts[0], nameParts[1]),
 				(_, 3) => new ServicePrincipalName(nameType, nameParts[0], nameParts[1..]),
-				(PrincipalNameType.Principal, 1)=>new SimplePrincipalName(nameParts[0]),
+				(PrincipalNameType.Principal, 1) => new SimplePrincipalName(nameParts[0]),
 				_ => new GenericPrincipalName(nameType, nameParts)
 			};
 			return name;
@@ -62,7 +62,8 @@ namespace Titanis.Security
 		public bool Equals(SecurityPrincipalName? other)
 		{
 			return other is not null &&
-				   NameType == other.NameType &&
+					// UNDORE: Ignore name type.  It doesn't matter, and Impacket codes SPNs as NT_PRINCIPAL
+				   //NameType == other.NameType &&
 				   NamePartCount == other.NamePartCount &&
 				   NamesMatch(other);
 		}
