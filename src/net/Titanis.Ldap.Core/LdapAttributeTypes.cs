@@ -40,6 +40,7 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription LastSetTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.53", ["lastSetTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
 		public readonly static AttributeTypeDescription LockoutTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.662", ["lockoutTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
 		public readonly static AttributeTypeDescription PwdLastSet = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.96", ["pwdLastSet"], syntax: AdSyntaxes.LargeInteger_Timestamp);
+		public readonly static AttributeTypeDescription MsDSUserPasswordExpiryTimeComputed = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.1996", ["msDS-UserPasswordExpiryTimeComputed"], syntax: AdSyntaxes.LargeInteger_Timestamp);
 
 		#endregion
 
@@ -866,7 +867,6 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription MsDSUserAllowedToAuthenticateTo = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.2277", ["msDS-UserAllowedToAuthenticateTo"], syntax: AdSyntaxes.StringOctet);
 		public readonly static AttributeTypeDescription MsDSUserAuthNPolicy = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.2289", ["msDS-UserAuthNPolicy"], syntax: AdSyntaxes.ObjectDsDn);
 		public readonly static AttributeTypeDescription MsDSUserAuthNPolicyBL = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.2290", ["msDS-UserAuthNPolicyBL"], syntax: AdSyntaxes.ObjectDsDn);
-		public readonly static AttributeTypeDescription MsDSUserPasswordExpiryTimeComputed = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.1996", ["msDS-UserPasswordExpiryTimeComputed"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription MsDSUserTGTLifetime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.2279", ["msDS-UserTGTLifetime"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription MsDSUSNLastSyncSuccess = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.2055", ["msDS-USNLastSyncSuccess"], syntax: AdSyntaxes.LargeInteger);
 		public readonly static AttributeTypeDescription MsDSValueTypeReference = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.2187", ["msDS-ValueTypeReference"], syntax: AdSyntaxes.ObjectDsDn);
