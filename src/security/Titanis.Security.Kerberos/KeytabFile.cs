@@ -217,7 +217,6 @@ namespace Titanis.Security.Kerberos
 			}
 		}
 
-		[PduIgnore]
 		public int keyVersion32
 		{
 			get => this._keyVersion;

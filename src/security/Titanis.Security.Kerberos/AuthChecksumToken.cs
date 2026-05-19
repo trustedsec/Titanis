@@ -34,7 +34,6 @@ namespace Titanis.Security.Kerberos
 		[PduConditional(nameof(HasDelegation))]
 		private DelegationToken? _delegationToken;
 
-		[PduIgnore]
 		public DelegationToken? DelegationToken
 		{
 			get => this._delegationToken;

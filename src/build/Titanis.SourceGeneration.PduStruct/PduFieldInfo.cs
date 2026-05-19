@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using Titanis.CodeGen;
 using Titanis.PduStruct;
@@ -31,6 +32,7 @@ namespace Titanis.SourceGen
 			this.Condition = attrConditional.GetArgument<string>(0);
 
 			this.Alignment = member.GetAttribute(typeof(PduAlignmentAttribute))?.GetArgument<int>(0);
+			this.DeclaredByteOrder = SyntaxHelpers.GetDeclaredByteOrder(member);
 
 			this.CustomReadMethod = fieldAttr.GetArgument<string>(nameof(PduFieldAttribute.ReadMethod));
 			this.CustomWriteMethod = fieldAttr.GetArgument<string>(nameof(PduFieldAttribute.WriteMethod));
@@ -40,7 +42,14 @@ namespace Titanis.SourceGen
 				this.SpecialKind = SpecialPduFieldKind.Position;
 			}
 
-			this.StringLength = member.GetAttribute(typeof(PduStringAttribute));
+			this.StringLengthAttribute = member.GetAttribute(typeof(PduStringAttribute));
+			this.StringLength = this.StringLengthAttribute?.GetArgument<object>(1);
+			this.StringCharSet = this.StringLengthAttribute?.GetArgument<CharSet>(0);
+
+			this.ArraySizeAttribute = member.GetAttribute(typeof(PduArraySizeAttribute));
+			this.ArrayElementCount = this.ArraySizeAttribute?.GetArgument<object>(0);
+
+			this.ArgumentsAttribute = member.GetAttribute(typeof(PduArgumentsAttribute));
 		}
 
 		public sealed override string ToString() => this.Name;
@@ -55,9 +64,15 @@ namespace Titanis.SourceGen
 
 		public AttrArg<string>? Condition { get; }
 		public AttrArg<int>? Alignment { get; }
+		public PduByteOrder? DeclaredByteOrder { get; }
 		public AttrArg<string>? CustomReadMethod { get; }
 		public AttrArg<string>? CustomWriteMethod { get; }
-		public AttributeData? StringLength { get; }
+		public AttributeData? StringLengthAttribute { get; }
+		public AttrArg<object>? StringLength { get; }
+		public AttrArg<CharSet>? StringCharSet { get; }
+		public AttributeData? ArraySizeAttribute { get; }
+		public AttrArg<object>? ArrayElementCount { get; }
+		public AttributeData? ArgumentsAttribute { get; }
 
 		internal static int GetSizeOf(ITypeSymbol type)
 		{

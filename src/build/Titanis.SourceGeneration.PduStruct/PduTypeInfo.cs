@@ -30,6 +30,7 @@ namespace Titanis.SourceGen
 			this.ByteOrder = SyntaxHelpers.GetByteOrder(TypeSymbol);
 
 			this.Parameters = GetPduParameters(typeSymbol);
+			this.Size = PduFieldInfo.GetSizeOf(typeSymbol);
 		}
 
 		public sealed override string ToString() => this.TypeSymbol.Name;
@@ -41,7 +42,7 @@ namespace Titanis.SourceGen
 		public ImmutableArray<ISymbol> Members { get; }
 		public TypeDeclarationSyntax Declaration { get; }
 		public ImmutableArray<PduParamInfo> Parameters { get; }
-
+		public int Size { get; }
 		public PduByteOrder? ByteOrder { get; }
 
 		public ImmutableArray<PduFieldInfo> GetFields(in PduTypeContext ctx)
@@ -49,8 +50,9 @@ namespace Titanis.SourceGen
 			if (!this._fields.HasValue)
 			{
 				var fields = ImmutableArray.CreateBuilder<PduFieldInfo>(this.Members.Length);
-				foreach (var member in this.Members)
+				foreach (var member_ in this.Members)
 				{
+					var member = member_;
 					ctx.cancellationToken.ThrowIfCancellationRequested();
 
 					if (
@@ -62,30 +64,49 @@ namespace Titanis.SourceGen
 
 					var attrPduField = member.GetAttribute(typeof(PduFieldAttribute));
 
-					ITypeSymbol fieldType;
-					SyntaxToken declarator;
+					ITypeSymbol? fieldType = null;
+					SyntaxToken declarator = default;
+					bool isBackingField = false;
+					if (member.Kind == SymbolKind.Field)
+					{
+						var field = (IFieldSymbol)member;
+						if (field.AssociatedSymbol != null)
+						{
+							// This is a backing field, use the property
+							member = field.AssociatedSymbol;
+							isBackingField = true;
+						}
+						else
+						{
+							declarator = ((VariableDeclaratorSyntax)member.DeclaringSyntaxReferences[0].GetSyntax(ctx.cancellationToken)).Identifier;
+							fieldType = field.Type;
+						}
+					}
+					if (member.Kind == SymbolKind.Property)
+					{
+						if (attrPduField != null || isBackingField)
+						{
+							var prop = (IPropertySymbol)member;
+
+							declarator = ((PropertyDeclarationSyntax)prop.DeclaringSyntaxReferences[0].GetSyntax(ctx.cancellationToken)).Identifier;
+							fieldType = prop.Type;
+						}
+						else
+							continue;
+					}
+
+					if (fieldType is null)
+						continue;
+
 					switch (member.Kind)
 					{
 						case SymbolKind.Field:
 							{
-								var field = (IFieldSymbol)member;
-								if (field.AssociatedSymbol != null)
-									// This is a backing field
-									continue;
-
-								declarator = ((VariableDeclaratorSyntax)field.DeclaringSyntaxReferences[0].GetSyntax(ctx.cancellationToken)).Identifier;
-								fieldType = field.Type;
 							}
 							break;
 
 						case SymbolKind.Property:
 							{
-								if (attrPduField == null)
-									continue;
-
-								var prop = (IPropertySymbol)member;
-								declarator = ((PropertyDeclarationSyntax)prop.DeclaringSyntaxReferences[0].GetSyntax(ctx.cancellationToken)).Identifier;
-								fieldType = prop.Type;
 							}
 							break;
 

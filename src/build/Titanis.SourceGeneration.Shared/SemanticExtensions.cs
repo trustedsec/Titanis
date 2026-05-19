@@ -263,13 +263,13 @@ namespace Titanis.CodeGen
 			}
 		}
 		#endregion
-
+		#region Declarations
 		public static bool HasModifier(this MemberDeclarationSyntax? memberDecl, SyntaxKind kind)
 			=> memberDecl?.Modifiers.Any(r => r.IsKind(kind)) ?? false;
 
 		public static bool IsPartial(this MemberDeclarationSyntax? memberDecl)
 			=> memberDecl.HasModifier(SyntaxKind.PartialKeyword);
-
+		#endregion
 		#region Typing
 		/// <summary>
 		/// Tests whether a <see cref="ITypeSymbol"/> matches a <see cref="Type"/>.

@@ -190,8 +190,6 @@ namespace Titanis.SourceGen
 				implementedBaseTypes = [pduInterfaceTypeRef];
 			}
 
-			int size = PduFieldInfo.GetSizeOf(structType);
-
 			// Generate ReadFrom and WriteTo methods
 			var readerTypeRef = model.Compilation.GetTypeByMetadataName(PduStructNames.ByteSourceName);
 			var byteOrderTypeRef = model.Compilation.GetTypeByMetadataName(typeof(PduByteOrder).FullName);
@@ -376,8 +374,8 @@ namespace Titanis.SourceGen
 			}
 
 
-			if (size >= 0)
-				members.Add(Code.DeclareProperty(PduStructNames.PduStructSizeName, Code.TypeRef(typeof(int)), Accessibility.Public, InheritModifier.Static, Code.Primitive(size)));
+			if (pduType.Size >= 0)
+				members.Add(Code.DeclareProperty(PduStructNames.PduStructSizeName, Code.TypeRef(typeof(int)), Accessibility.Public, InheritModifier.Static, Code.Primitive(pduType.Size)));
 
 			var genType = Code.DeclareType(
 				structType.DeclarationKind(),
@@ -554,7 +552,7 @@ namespace Titanis.SourceGen
 						context.ReportDiagnostic(Diagnostic.Create(
 							PduDiagnostics.PduConditionalMissing_2,
 							declarator.GetLocation(),
-							pduType.TypeSymbol.FullName(), member.Name
+							pduType.TypeSymbol.FullName(), field.Name
 							));
 					}
 					else
@@ -571,13 +569,13 @@ namespace Titanis.SourceGen
 
 				if (fieldType.SpecialType == SpecialType.System_String)
 				{
-					var stringAttr = field.StringLength;
+					var stringAttr = field.StringLengthAttribute;
 					//context.ReportDiagnostic(PduStringOnNonString_2.Create(stringAttr.ApplicationSyntaxReference.GetLocation(), member.Name, pduType.typeSymbol.Name));
 					ExpressionSyntax? lengthRef = null;
 					ExpressionSyntax? encodingRef = null;
 					if (stringAttr != null)
 					{
-						var charset = stringAttr.GetArgument<CharSet>(0);
+						var charset = field.StringCharSet;
 
 						switch (charset?.Value ?? CharSet.None)
 						{
@@ -595,7 +593,7 @@ namespace Titanis.SourceGen
 
 
 						{
-							var stringLengthArg = stringAttr.GetArgument<object>(1);
+							var stringLengthArg = field.StringLength;
 							if (stringLengthArg?.Value is int n)
 								lengthRef = Code.Primitive(n);
 							else
@@ -621,7 +619,7 @@ namespace Titanis.SourceGen
 					else
 					{
 						// TODO: More accurate/precise error message
-						context.ReportDiagnostic(PduDiagnostics.PduStringMissingOnString_Type_Member.Create(declarator.GetLocation(), pduType.TypeSymbol.FullName(), member.Name));
+						context.ReportDiagnostic(PduDiagnostics.PduStringMissingOnString_Type_Member.Create(declarator.GetLocation(), pduType.TypeSymbol.FullName(), field.Name));
 					}
 				}
 				else if (field.IsPosition)
@@ -629,7 +627,7 @@ namespace Titanis.SourceGen
 					// Check the type
 					if (fieldType.SpecialType != SpecialType.System_Int64)
 					{
-						context.ReportDiagnostic(PduDiagnostics.PduPositionNotLong_Type_Field.Create(member.DeclaringSyntaxReferences[0].GetLocation(), pduType.TypeSymbol.FullName(), member.Name));
+						context.ReportDiagnostic(PduDiagnostics.PduPositionNotLong_Type_Field.Create(field.Declarator.GetLocation(), pduType.TypeSymbol.FullName(), field.Name));
 					}
 
 					readStatements.Assign(fieldReadRef, readerArg.FieldOf(PduStructNames.PositionName));
@@ -649,27 +647,25 @@ namespace Titanis.SourceGen
 					if (elementType.TypeKind == TypeKind.Array)
 					{
 						// Get array size
-						var attrArraySize = member.GetAttribute(typeof(PduArraySizeAttribute));
+						var attrArraySize = field.ArraySizeAttribute;
 						if (attrArraySize == null)
 						{
 							context.ReportDiagnostic(Diagnostic.Create(
 								PduDiagnostics.MissingCountAttribute_Type_Member,
 								declarator.GetLocation(),
-								pduType.TypeSymbol.FullName(), member.Name
+								pduType.TypeSymbol.FullName(), field.Name
 								));
 						}
 						else
 						{
-							var countArg = attrArraySize.GetArgument<object>(0);
-							var countValue = countArg?.Value;
-
-							if (countValue is int n && n >= 0)
+							var countValue = field.ArrayElementCount;
+							if (countValue?.Value is int n && n >= 0)
 							{
 								arraySizeExpr = Code.Primitive(n);
 							}
-							else if (countValue is string str)
+							else if (countValue?.Value is string str)
 							{
-								var countSym = countArg.TryResolveMemberName(member, context);
+								var countSym = countValue.TryResolveMemberName(member, context);
 								if (countSym != null)
 								{
 									if (countSym.Kind is SymbolKind.Method)
@@ -688,7 +684,7 @@ namespace Titanis.SourceGen
 								context.ReportDiagnostic(Diagnostic.Create(
 									PduDiagnostics.BadCountAttribute_Type_Member,
 									attrArraySize.ApplicationSyntaxReference.GetLocation(),
-									pduType.TypeSymbol.FullName(), member.Name
+									pduType.TypeSymbol.FullName(), field.Name
 									));
 							}
 						}
@@ -748,7 +744,7 @@ namespace Titanis.SourceGen
 					//	memberByteOrder = PduByteOrder.LittleEndian;
 					//}
 
-					var memberByteOrder = SyntaxHelpers.GetDeclaredByteOrder(member);
+					var memberByteOrder = field.DeclaredByteOrder;
 
 					if (readMethodName_LE != readMethodName_BE
 						|| writeMethodName_LE != writeMethodName_BE
@@ -835,7 +831,7 @@ namespace Titanis.SourceGen
 							memberByteOrder.HasValue ? Code.EnumField(memberByteOrder.Value)
 							: byteOrderArg;
 
-						var attrArgs = member.GetAttribute(typeof(PduArgumentsAttribute));
+						var attrArgs = field.ArgumentsAttribute;
 						ISymbol?[] args;
 						if (attrArgs != null && attrArgs.ConstructorArguments.Length == 1)
 						{
@@ -849,7 +845,7 @@ namespace Titanis.SourceGen
 								{
 									context.ReportDiagnostic(Diagnostics.UndefinedMemberRef_Type_Member_AttrType_AttributeArg_Member.Create(
 										attrArgs.ApplicationSyntaxReference.GetLocation(),
-										pduType.TypeSymbol.Name, member.Name, nameof(PduArgumentsAttribute), "[0]", argName
+										pduType.TypeSymbol.Name, field.Name, nameof(PduArgumentsAttribute), "[0]", argName
 										));
 								}
 								args[i] = argSym;
@@ -864,8 +860,8 @@ namespace Titanis.SourceGen
 						if (fieldParameters.Length != args.Length)
 						{
 							context.ReportDiagnostic(PduDiagnostics.PduArgCountMismatch_Type_Member_NestedType.Create(
-								member.DeclaringSyntaxReferences[0].GetLocation(),
-								pduType.TypeSymbol.Name, member.Name, fieldType.Name
+								field.Declarator.GetLocation(),
+								pduType.TypeSymbol.Name, field.Name, fieldType.Name
 								));
 							return false;
 						}
@@ -895,7 +891,7 @@ namespace Titanis.SourceGen
 									context.ReportDiagnostic(PduDiagnostics.PduArgTypeMismatch_Type_Member_ArgIndex_ArgMember_ParamType.Create(
 										attrArgs.ApplicationSyntaxReference.GetLocation(),
 										pduType.TypeSymbol.Name,
-										member.Name,
+										field.Name,
 										i,
 										argSym.DataType().Name,
 										param.FieldType.Name
@@ -926,7 +922,7 @@ namespace Titanis.SourceGen
 						context.ReportDiagnostic(Diagnostic.Create(
 							PduDiagnostics.CantSerializeError_Type_Member_FieldType,
 							Location.Create(declarator.SyntaxTree, declarator.Span),
-							pduType.TypeSymbol.FullName(), member.Name, fieldType.FullName()
+							pduType.TypeSymbol.FullName(), field.Name, fieldType.FullName()
 							));
 					}
 

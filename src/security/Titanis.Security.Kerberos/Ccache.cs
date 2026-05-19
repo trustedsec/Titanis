@@ -154,10 +154,10 @@ namespace Titanis.Security.Kerberos
 	[PduByteOrder(PduByteOrder.BigEndian)]
 	partial class CCacheCredential
 	{
-        internal const string ConfigRealm = "X-CACHECONF:";
-        internal const string ConfigClass = "krb5_ccache_conf_data";
+		internal const string ConfigRealm = "X-CACHECONF:";
+		internal const string ConfigClass = "krb5_ccache_conf_data";
 
-        [PduParameter]
+		[PduParameter]
 		internal byte version;
 
 		[PduArguments(nameof(version))]
@@ -185,13 +185,13 @@ namespace Titanis.Security.Kerberos
 			this.authDataCount = this.authData?.Length ?? 0;
 		}
 
-		[PduIgnore]
+		[field: PduIgnore]
 		public bool IsConfigurationEntry { get; private set; }
-		[PduIgnore]
+		[field: PduIgnore]
 		public string? ConfigurationKey { get; set; }
-		[PduIgnore]
+		[field: PduIgnore]
 		public string? ConfigurationValue { get; set; }
-		[PduIgnore]
+		[field: PduIgnore]
 		public string? ConfigurationClientName { get; set; }
 
 		partial void OnAfterReadPdu(Titanis.IO.IByteSource writer)

@@ -14,7 +14,7 @@ namespace Titanis.DceRpc
 
 		/// <inheritdoc/>
 		public override string ToString()
-			=>$"{this.if_uuid} v{this.if_version}";
+			=> $"{this.if_uuid} v{this.if_version}";
 
 		public SyntaxId(Guid uuid, RpcVersion version)
 		{
