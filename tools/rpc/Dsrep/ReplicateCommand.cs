@@ -34,7 +34,9 @@ namespace Dsrep;
 	nameof(LdapAttributeTypes.UnicodePwd),
 	nameof(LdapAttributeTypes.LmPwdHistory),
 	nameof(LdapAttributeTypes.NtPwdHistory),
-	nameof(LdapAttributeTypes.SupplementalCredentials),
+	"cleartextPassword",
+	"kerberosKeys",
+	"kerberosOldKeys",
 	])]
 [DetailedHelpText(@"This command uses [MS-DRSR] to query attributes of an object by SID, GUID, distinguished name, LDAP query, or object name.
 
