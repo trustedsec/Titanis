@@ -91,7 +91,9 @@ namespace Titanis.Logging.SourceGeneration
 
 				foreach (var message in logSource.Messages)
 				{
-					sb.Append($"\tinternal static readonly LogMessageType {message.Name} = new LogMessageType(LogMessageSeverity.{message.Severity}, {logSource.Name}Name, \"{message.Name}\", (int){logSource.Name}MessageId.{message.Name}, \"{message.Format.Escape(false)}\"");
+					var format = message.Format ?? string.Empty;
+
+					sb.Append($"\tinternal static readonly LogMessageType {message.Name} = new LogMessageType(LogMessageSeverity.{message.Severity}, {logSource.Name}Name, \"{message.Name}\", (int){logSource.Name}MessageId.{message.Name}, \"{format.Escape(false)}\"");
 
 					if (message.Parameters != null)
 					{
@@ -112,7 +114,7 @@ namespace Titanis.Logging.SourceGeneration
 						}
 					}
 					sb.AppendLine(") {")
-						.Append($"\t\t\tlog.WriteMessage({message.Name}.CreateWithText($\"{message.Format.Escape(true)}\"");
+						.Append($"\t\t\tlog.WriteMessage({message.Name}.CreateWithText($\"{format.Escape(true)}\"");
 					if (message.Parameters != null)
 					{
 						foreach (var param in message.Parameters)
