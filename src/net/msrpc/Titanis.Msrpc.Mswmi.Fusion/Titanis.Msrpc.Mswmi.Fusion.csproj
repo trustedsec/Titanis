@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\base\Titanis.Linterop.Fuse\Titanis.Linterop.Fuse.csproj" />
+    <ProjectReference Include="..\Titanis.Msrpc.Mswmi\Titanis.Msrpc.Mswmi.csproj" />
+  </ItemGroup>
+
+</Project>

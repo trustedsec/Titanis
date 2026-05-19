@@ -14,6 +14,7 @@ namespace Titanis.Cli.WmiTool;
 [Subcommand("exec", typeof(ExecCommand))]
 [Subcommand("invoke", typeof(InvokeCommand))]
 [Subcommand("delete", typeof(DeleteCommand))]
+[Subcommand("mountfs", typeof(FuseCommand))]
 internal class Program : MultiCommand
 {
 	static void Main(string[] args)
