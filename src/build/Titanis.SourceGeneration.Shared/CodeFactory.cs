@@ -23,6 +23,23 @@ namespace Titanis.CodeGen
 		SealedOverride
 	}
 
+	public struct CodeType
+	{
+		public CodeType(TypeSyntax type)
+		{
+			this.Syntax = type;
+		}
+		public CodeType(ITypeSymbol type)
+		{
+			this.Syntax = Code.TypeRef(type);
+		}
+
+		public TypeSyntax Syntax { get; }
+
+		public static implicit operator CodeType(TypeSyntax type) => new CodeType(type);
+		public static implicit operator CodeType(Type type) => new CodeType(Code.TypeRef(type));
+	}
+
 	public static class Code
 	{
 		#region Syntax lists
@@ -60,6 +77,24 @@ namespace Titanis.CodeGen
 				default,
 				SyntaxFactory.Token(SyntaxKind.SemicolonToken)
 				);
+		public static MethodDeclarationSyntax DeclarePartialMethod(
+			string name,
+			string[] typeParams,
+			TypeParameterConstraintClauseSyntax[] constraints,
+			params ParameterSyntax[] parameters
+			)
+			=> SyntaxFactory.MethodDeclaration(
+				default,
+				new SyntaxTokenList(SyntaxFactory.Token(SyntaxKind.PartialKeyword)),
+				TypeRef(typeof(void)),
+				null,
+				SyntaxFactory.Identifier(name),
+				Code.DeclareGenericParamList(typeParams),
+				SyntaxFactory.ParameterList(SeparatedList(parameters)),
+				List(constraints),
+				default,
+				SyntaxFactory.Token(SyntaxKind.SemicolonToken)
+				);
 
 		public static AttributeSyntax GeneratedCode()
 			=> SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(GeneratedCodeAttribute).FullName), SyntaxFactory.AttributeArgumentList(SeparatedList(Primitive("Titanis.SourceGeneration.PduStruct").AsAttributeArg(), Primitive("0.9.0").AsAttributeArg())));
@@ -74,7 +109,7 @@ namespace Titanis.CodeGen
 
 		public static MethodDeclarationSyntax DeclareMethod(
 			string name,
-			TypeSyntax returnType,
+			CodeType returnType,
 			Accessibility access,
 			InheritModifier inherit,
 			ParameterSyntax[] parameters,
@@ -83,7 +118,7 @@ namespace Titanis.CodeGen
 			=> SyntaxFactory.MethodDeclaration(
 				AttributeList(GeneratedCode()),
 				GetModsFor(access, inherit),
-				returnType,
+				returnType.Syntax,
 				null,
 				SyntaxFactory.Identifier(name),
 				null,
@@ -93,9 +128,45 @@ namespace Titanis.CodeGen
 				new SyntaxToken()
 				);
 
+		private static TypeParameterListSyntax? DeclareGenericParamList(string[]? names)
+		{
+			if (names is null || names.Length == 0)
+				return null;
+
+			return SyntaxFactory.TypeParameterList(Code.SeparatedList<TypeParameterSyntax>(Array.ConvertAll(names, r => SyntaxFactory.TypeParameter(r))));
+		}
+
+		public static ClassOrStructConstraintSyntax ClassConstraint() => SyntaxFactory.ClassOrStructConstraint(SyntaxKind.ClassConstraint);
+		public static ClassOrStructConstraintSyntax StructConstraint() => SyntaxFactory.ClassOrStructConstraint(SyntaxKind.StructConstraint);
+		public static TypeConstraintSyntax TypeConstraint(string name) => SyntaxFactory.TypeConstraint(SyntaxFactory.IdentifierName(name));
+		public static TypeParameterConstraintClauseSyntax Constraint(string name, params TypeParameterConstraintSyntax[] constraints) => SyntaxFactory.TypeParameterConstraintClause(SyntaxFactory.IdentifierName(name), Code.SeparatedList<TypeParameterConstraintSyntax>(constraints));
+
 		public static MethodDeclarationSyntax DeclareMethod(
 			string name,
-			TypeSyntax returnType,
+			string[] genericParams,
+			TypeParameterConstraintClauseSyntax[] constraints,
+			CodeType returnType,
+			Accessibility access,
+			InheritModifier inherit,
+			ParameterSyntax[] parameters,
+			BlockSyntax body
+			)
+			=> SyntaxFactory.MethodDeclaration(
+				AttributeList(GeneratedCode()),
+				GetModsFor(access, inherit),
+				returnType.Syntax,
+				null,
+				SyntaxFactory.Identifier(name),
+				DeclareGenericParamList(genericParams),
+				SyntaxFactory.ParameterList(SeparatedList(parameters)),
+				Code.List(constraints),
+				body,
+				new SyntaxToken()
+				);
+
+		public static MethodDeclarationSyntax DeclareMethod(
+			string name,
+			CodeType returnType,
 			Accessibility access,
 			InheritModifier inherit,
 			ParameterSyntax[] parameters,
@@ -104,7 +175,7 @@ namespace Titanis.CodeGen
 			=> SyntaxFactory.MethodDeclaration(
 				AttributeList(GeneratedCode()),
 				GetModsFor(access, inherit),
-				returnType,
+				returnType.Syntax,
 				null,
 				SyntaxFactory.Identifier(name),
 				null,
@@ -115,14 +186,8 @@ namespace Titanis.CodeGen
 				SyntaxFactory.Token(SyntaxKind.SemicolonToken)
 				);
 
-		public static ParameterSyntax DeclareParameter(string name, TypeSyntax type)
-			=> SyntaxFactory.Parameter(default, default, type, SyntaxFactory.Identifier(name), default);
-
-		public static ParameterSyntax DeclareParameter(string name, ITypeSymbol type)
-			=> SyntaxFactory.Parameter(default, default, TypeRef(type), SyntaxFactory.Identifier(name), default);
-
-		public static ParameterSyntax DeclareParameter(string name, Type type)
-			=> SyntaxFactory.Parameter(default, default, TypeRef(type), SyntaxFactory.Identifier(name), default);
+		public static ParameterSyntax DeclareParameter(string name, CodeType type, SyntaxTokenList modifiers = default)
+			=> SyntaxFactory.Parameter(default, modifiers, type.Syntax, SyntaxFactory.Identifier(name), default);
 
 		private static SyntaxTokenList GetModsFor(Accessibility access, InheritModifier inherit)
 		{
@@ -186,7 +251,7 @@ namespace Titanis.CodeGen
 				List(members));
 		public static FieldDeclarationSyntax DeclareField(
 			string name,
-			TypeSyntax propertyType,
+			CodeType propertyType,
 			Accessibility access,
 			InheritModifier inherit
 			)
@@ -194,20 +259,20 @@ namespace Titanis.CodeGen
 				AttributeList(GeneratedCode()),
 				GetModsFor(access, inherit),
 				DeclareVariable(
-					propertyType,
+					propertyType.Syntax,
 					name),
 				SyntaxFactory.Token(SyntaxKind.SemicolonToken)
 				);
 		public static PropertyDeclarationSyntax DeclareProperty(
 			string name,
-			TypeSyntax propertyType,
+			CodeType propertyType,
 			Accessibility access,
 			InheritModifier inherit,
 			ExpressionSyntax value)
 			=> SyntaxFactory.PropertyDeclaration(
 				AttributeList(GeneratedCode()),
 				GetModsFor(access, inherit),
-				propertyType,
+				propertyType.Syntax,
 				null,
 				SyntaxFactory.Identifier(name),
 				null,
@@ -499,8 +564,8 @@ namespace Titanis.CodeGen
 			where TEnum : struct, Enum
 			=> TypeRef(typeof(TEnum)).FieldOf(Enum.GetName(typeof(TEnum), value));
 
-		public static CastExpressionSyntax Cast(this ExpressionSyntax expression, TypeSyntax toType)
-			=> SyntaxFactory.CastExpression(toType, expression);
+		public static CastExpressionSyntax Cast(this ExpressionSyntax expression, CodeType toType)
+			=> SyntaxFactory.CastExpression(toType.Syntax, expression);
 		public static CastExpressionSyntax Cast(this ExpressionSyntax expression, ITypeSymbol toType)
 			=> SyntaxFactory.CastExpression(TypeRef(toType), expression);
 
@@ -649,21 +714,21 @@ namespace Titanis.CodeGen
 		public static LocalDeclarationStatementSyntax AsLocal(this VariableDeclarationSyntax decl)
 			=> SyntaxFactory.LocalDeclarationStatement(decl);
 		public static VariableDeclarationSyntax DeclareVariable(
-			TypeSyntax type,
+			CodeType type,
 			string variableName,
 			ExpressionSyntax? value)
 			=> SyntaxFactory.VariableDeclaration(
-				type,
+				type.Syntax,
 				SeparatedList(
 					SyntaxFactory.VariableDeclarator(SyntaxFactory.Identifier(variableName), null, SyntaxFactory.EqualsValueClause(value))
 				)
 				);
 		public static VariableDeclarationSyntax DeclareVariable(
-			TypeSyntax type,
+			CodeType type,
 			string variableName
 			)
 			=> SyntaxFactory.VariableDeclaration(
-				type,
+				type.Syntax,
 				SeparatedList(
 					SyntaxFactory.VariableDeclarator(SyntaxFactory.Identifier(variableName), null, null)
 				));
@@ -686,7 +751,7 @@ namespace Titanis.CodeGen
 		}
 
 		public static TList DeclareVariable<TList>(this TList statements,
-			TypeSyntax type,
+			CodeType type,
 			string variableName
 			)
 			where TList : IList<StatementSyntax>

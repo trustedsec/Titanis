@@ -191,7 +191,8 @@ namespace Titanis.SourceGen
 			}
 
 			// Generate ReadFrom and WriteTo methods
-			var readerTypeRef = model.Compilation.GetTypeByMetadataName(PduStructNames.ByteSourceName);
+			TypeSyntax readerTypeRef = SyntaxFactory.IdentifierName("TSource");
+			//var readerTypeRef = model.Compilation.GetTypeByMetadataName(PduStructNames.ByteSourceName);
 			var byteOrderTypeRef = model.Compilation.GetTypeByMetadataName(typeof(PduByteOrder).FullName);
 			var writerTypeRef = model.Compilation.GetTypeByMetadataName(PduStructNames.ByteWriterName);
 
@@ -204,13 +205,14 @@ namespace Titanis.SourceGen
 			//List<StatementSyntax> writeStatements_BE = new List<StatementSyntax>();
 
 			InheritModifier inherit = InheritModifier.Instance;
+			bool isChained = false;
 			if (structType.TypeKind is TypeKind.Class)
 			{
 				// TODO: Mixed byte order
 				//List<ExpressionSyntax> readBaseArgList = new List<ExpressionSyntax>() { readerArg, byteOrderArg };
 				//List<ExpressionSyntax> writeBaseArgList = new List<ExpressionSyntax>() { writerArg, byteOrderArg };
-				List<ExpressionSyntax> readBaseArgList = new List<ExpressionSyntax>() { readerArg, byteOrderArg };
-				List<ExpressionSyntax> writeBaseArgList = new List<ExpressionSyntax>() { writerArg, byteOrderArg };
+				List<ExpressionSyntax> readBaseArgList = new List<ExpressionSyntax>() { readerArg };
+				List<ExpressionSyntax> writeBaseArgList = new List<ExpressionSyntax>() { writerArg };
 				foreach (var baseParam in pduType.Parameters)
 				{
 					if (baseParam.IsLocal)
@@ -230,6 +232,7 @@ namespace Titanis.SourceGen
 				inherit = structType.DetermineInherit();
 				if (inherit != InheritModifier.Virtual)
 				{
+					isChained = true;
 					// base.ReadFrom(...)
 					readStatements.Do(Code.Base.MethodOf(PduStructNames.ReadFromName).Call(readBaseArgs));
 					// base.WriteTo(...)
@@ -264,12 +267,12 @@ namespace Titanis.SourceGen
 			List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>(8);
 
 			// OnBeforeRead
-			members.Add(Code.DeclarePartialMethod(PduStructNames.OnBeforeReadPdu,
-				Code.DeclareParameter(PduStructNames.WriterParamName, Code.TypeRef(readerTypeRef))
+			members.Add(Code.DeclarePartialMethod(PduStructNames.OnBeforeReadPdu, ["TSource"], [Code.Constraint("TSource", [Code.ClassConstraint(), Code.TypeConstraint("IByteSource")])],
+				Code.DeclareParameter(PduStructNames.WriterParamName, readerTypeRef)
 			));
 			// OnAfterRead
-			members.Add(Code.DeclarePartialMethod(PduStructNames.OnAfterReadPdu,
-				Code.DeclareParameter(PduStructNames.WriterParamName, Code.TypeRef(readerTypeRef))
+			members.Add(Code.DeclarePartialMethod(PduStructNames.OnAfterReadPdu, ["TSource"], [Code.Constraint("TSource", [Code.ClassConstraint(), Code.TypeConstraint("IByteSource")])],
+				Code.DeclareParameter(PduStructNames.WriterParamName, readerTypeRef, [SyntaxFactory.Token(SyntaxKind.RefKeyword)])
 			));
 			// OnBeforeWrite
 			members.Add(Code.DeclarePartialMethod(PduStructNames.OnBeforeWritePdu,
@@ -299,9 +302,9 @@ namespace Titanis.SourceGen
 				readStatements.Do(Code.This.MethodOf(PduStructNames.OnAfterReadPdu).Call(readerArg));
 
 				// void ReadFrom(IByteSource source, ByteOrder byteOrder, ...)
-				members.Add(Code.DeclareMethod(PduStructNames.ReadFromName, Code.TypeRef(typeof(void)), Accessibility.Public, inherit,
+				members.Add(Code.DeclareMethod(PduStructNames.ReadFromName, new string[] { "TSource" }, isChained ? default : [Code.Constraint("TSource", [Code.ClassConstraint(), Code.TypeConstraint("IByteSource")])], Code.TypeRef(typeof(void)), Accessibility.Public, inherit,
 					BuildParamsList(pduType,
-						Code.DeclareParameter(PduStructNames.ReaderParamName, readerTypeRef.AsTypeRef())
+						Code.DeclareParameter(PduStructNames.ReaderParamName, readerTypeRef, [SyntaxFactory.Token(SyntaxKind.RefKeyword)])
 					//Code.DeclareParameter(PduStructNames.ByteOrderParamName, byteOrderTypeRef.AsTypeRef())
 					),
 					readStatements.AsBlock()));
@@ -419,7 +422,7 @@ namespace Titanis.SourceGen
 
 				foreach (var param in pduType.Parameters)
 				{
-					parmsList.Add(Code.DeclareParameter(param.Member.Name, param.FieldType));
+					parmsList.Add(Code.DeclareParameter(param.Member.Name, Code.TypeRef(param.FieldType)));
 				}
 
 				var parms = parmsList.ToArray();
@@ -429,6 +432,7 @@ namespace Titanis.SourceGen
 				return prefixParams;
 		}
 
+		// Used for mixed byte order; don't remove
 		private static ExpressionSyntax[] BuildArgList(
 			PduTypeInfo pduType,
 			params ExpressionSyntax[] prefixArgs

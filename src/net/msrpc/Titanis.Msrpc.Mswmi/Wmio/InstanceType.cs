@@ -72,7 +72,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		// [MS-WMIO] § 2.2.58 - InstanceHeap
 		internal Heap instanceHeap;
 
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			// Even though the spec requires 0, some objects have 1
 			Debug.Assert(this.instanceFlags is 0 or 1);

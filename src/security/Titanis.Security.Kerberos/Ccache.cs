@@ -194,7 +194,7 @@ namespace Titanis.Security.Kerberos
 		[field: PduIgnore]
 		public string? ConfigurationClientName { get; set; }
 
-		partial void OnAfterReadPdu(Titanis.IO.IByteSource writer)
+		partial void OnAfterReadPdu<TSource>(TSource writer) where TSource : class, IByteSource
 		{
 			var server = this.server;
 			bool isConfig = (server != null)
@@ -224,7 +224,7 @@ namespace Titanis.Security.Kerberos
 
 		internal CCacheCredential[] credentials;
 
-		public void ReadFrom(IByteSource reader, byte version)
+		public void ReadFrom<TSource>(TSource reader, byte version) where TSource : class, IByteSource
 		{
 			List<CCacheCredential> creds = new List<CCacheCredential>();
 			while (reader.RemainingLength() > 0)

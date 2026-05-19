@@ -222,11 +222,6 @@ namespace Titanis.IO
 			where TStruct : IPduStruct
 			=> struc.WriteTo(this);
 
-		[Obsolete("Don't specify byte order.", true)]
-		public void WritePduStruct<TStruct>(TStruct struc, PduByteOrder byteOrder)
-			where TStruct : IPduStruct
-			=> struc.WriteTo(this);
-
 		public void WritePduStruct<TStruct, T>(TStruct struc, T arg)
 			where TStruct : IPduStruct<T>
 			=> struc.WriteTo(this, arg);

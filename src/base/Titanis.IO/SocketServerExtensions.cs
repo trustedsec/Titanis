@@ -44,7 +44,7 @@ namespace Titanis.IO
 					var recvResult = await socket.ReceiveFromAsync(
 						new ArraySegment<byte>(recvBuffer, 0, bufferSize),
 						SocketFlags.None,
-						new IPEndPoint(IPAddress.Any, 0));
+						new IPEndPoint(IPAddress.Any, 0)).ConfigureAwait(false);
 					handler(
 						socket,
 						new UdpReceiveResult

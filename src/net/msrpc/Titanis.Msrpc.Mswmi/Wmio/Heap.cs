@@ -57,7 +57,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		{
 			this.length = (uint)this.bytes.Length | 0x8000_0000U;
 		}
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			Debug.Assert(0 != (this.length & 0x8000_0000));
 		}
@@ -164,26 +164,16 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 			return str;
 		}
 
-		public void ReadFrom(IByteSource reader)
+		public void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource
 		{
 			var struc = reader.ReadPduStruct<HeapStruc>();
 			this.Init(struc.bytes);
-		}
-
-		public void ReadFrom(IByteSource reader, PduByteOrder byteOrder)
-		{
-			this.ReadFrom(reader);
 		}
 
 		public void WriteTo(ByteWriter writer)
 		{
 			// TODO: Remove ToArray
 			writer.WritePduStruct(new HeapStruc(this.Bytes.ToArray()));
-		}
-
-		public void WriteTo(ByteWriter writer, PduByteOrder byteOrder)
-		{
-			this.WriteTo(writer);
 		}
 	}
 
@@ -223,7 +213,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 			: $"Heap offset = {this.Value} (0x{this.Value:X})";
 
 		#region IPduStruct
-		void IPduStruct.ReadFrom(IByteSource reader)
+		void IPduStruct.ReadFrom<TSource>(TSource reader)
 		{
 			this._value = NormalizeValue(reader.ReadUInt32LE());
 		}

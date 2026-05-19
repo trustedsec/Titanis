@@ -84,22 +84,22 @@ namespace PduStructSample
 		// Customized read/write
 		[PduField(ReadMethod = nameof(ReadCustom), WriteMethod = nameof(WriteCustom))]
 		internal NonPduClass customField;
-		private NonPduClass ReadCustom(IByteSource source, PduByteOrder byteOrder)
+		private NonPduClass ReadCustom(IByteSource source)
 		{
 			Console.WriteLine("ReadCustom called");
 			return new NonPduClass();
 		}
-		private void WriteCustom(ByteWriter writer, NonPduClass value, PduByteOrder byteOrder)
+		private void WriteCustom(ByteWriter writer, NonPduClass value)
 		{
 			Console.WriteLine("WriteCustom called");
 		}
 
 		// The struct may implement callbacks
-		partial void OnBeforeReadPdu(IByteSource writer)
+		partial void OnBeforeReadPdu<TSource>(TSource writer) where TSource : class, IByteSource
 		{
 			Console.WriteLine("OnBeforeReadPdu called");
 		}
-		partial void OnAfterReadPdu(IByteSource writer)
+		partial void OnAfterReadPdu<TSource>(TSource writer) where TSource : class, IByteSource
 		{
 			Console.WriteLine("OnAfterReadPdu called");
 		}
@@ -193,12 +193,12 @@ namespace PduStructSample
 		[PduField(ReadMethod = nameof(ReadCustom), WriteMethod = nameof(WriteCustom))]
 		[PduAlignment(2)]
 		internal string customField;
-		private string ReadCustom(IByteSource source, PduByteOrder byteOrder)
+		private string ReadCustom(IByteSource source)
 		{
 			Console.WriteLine("ReadCustom called");
 			return "";
 		}
-		private void WriteCustom(ByteWriter writer, string value, PduByteOrder byteOrder)
+		private void WriteCustom(ByteWriter writer, string value)
 		{
 			Console.WriteLine("WriteCustom called");
 		}

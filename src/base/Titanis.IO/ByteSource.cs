@@ -68,10 +68,12 @@ namespace Titanis.IO
 		/// </summary>
 		long Position { get; set; }
 
-		bool SupportsNested { get; }
-		public IByteSource CreateNested(long startPosition, long length);
-		public IByteSource CreateNested(long length);
+		// UNDONE: Not used and not supported by span context
+		//bool SupportsNested { get; }
+		//public IByteSource CreateNested(long startPosition, long length);
+		//public IByteSource CreateNested(long length);
 	}
+
 	/// <summary>
 	/// Implements extension methods for <see cref="IByteSource"/>.
 	/// </summary>
@@ -93,16 +95,16 @@ namespace Titanis.IO
 				: (align - mod);
 		}
 
-		public static int Align<TStruc>(this ref TStruc ctx, int align, int bias = 0)
-			where TStruc : struct, IByteSource
+		public static int Align<TSource>(this ref TSource ctx, int align, int bias = 0)
+			where TSource : struct, IByteSource
 		{
 			var pad = CalculateAlignPadding(ctx.Position, align, bias);
 			if (pad != 0)
 				ctx.Advance(pad);
 			return pad;
 		}
-		public static int Align<TStruc>(this TStruc ctx, int align, int bias = 0)
-			where TStruc : IByteSource
+		public static int Align<TSource>(this TSource ctx, int align, int bias = 0)
+			where TSource : class, IByteSource
 		{
 			var pad = CalculateAlignPadding(ctx.Position, align, bias);
 			if (pad != 0)
@@ -110,9 +112,6 @@ namespace Titanis.IO
 			return pad;
 		}
 
-		[Obsolete("Use ReadBytes instead", true)]
-		public static byte[] ReadData(this IByteSource ctx, int size)
-			=> ReadBytes(ctx, size);
 		public static byte[] ReadBytes(this IByteSource ctx, int size)
 			=> ctx.Consume(size).ToArray();
 		public static long RemainingLength(this IByteSource ctx)
@@ -127,36 +126,11 @@ namespace Titanis.IO
 			struc.ReadFrom(source);
 			return struc;
 		}
-		// TODO: Delete
-		[Obsolete("Don't specify byte order.", true)]
-		public static TStruct ReadPduStruct<TStruct>(this IByteSource source, PduByteOrder byteOrder)
-			where TStruct : IPduStruct, new()
-		{
-			TStruct struc = new TStruct();
-			struc.ReadFrom(source);
-			return struc;
-		}
 		public static TStruct ReadPduStruct<TStruct, T>(this IByteSource source, T arg)
 			where TStruct : IPduStruct<T>, new()
 		{
 			TStruct struc = new TStruct();
 			struc.ReadFrom(source, arg);
-			return struc;
-		}
-		[Obsolete("Don't specify byte order.", true)]
-		public static TStruct ReadPduStruct<TStruct, T>(this IByteSource source, PduByteOrder byteOrder, T arg)
-			where TStruct : IPduStruct<T>, new()
-		{
-			TStruct struc = new TStruct();
-			struc.ReadFrom(source, arg);
-			return struc;
-		}
-		[Obsolete("Don't specify byte order.", true)]
-		public static TStruct ReadPduStruct<TStruct, T1, T2>(this IByteSource source, T1 arg1, T2 arg2)
-			where TStruct : IPduStruct<T1, T2>, new()
-		{
-			TStruct struc = new TStruct();
-			struc.ReadFrom(source, arg1, arg2);
 			return struc;
 		}
 

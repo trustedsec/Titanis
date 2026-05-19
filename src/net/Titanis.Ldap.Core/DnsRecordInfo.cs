@@ -82,7 +82,7 @@ namespace Titanis.Ldap
 	{
 		public string Name { get; private set; }
 
-		public void ReadFrom(IByteSource reader)
+		public void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource
 		{
 			// First octet is the total name length, including the terminating null
 			var cbName = reader.ReadByte();
@@ -111,14 +111,7 @@ namespace Titanis.Ldap
 			this.Name = sb.ToString();
 		}
 
-		public void ReadFrom(IByteSource reader, PduByteOrder byteOrder) => ReadFrom(reader);
-
 		public void WriteTo(ByteWriter writer)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void WriteTo(ByteWriter writer, PduByteOrder byteOrder)
 		{
 			throw new NotImplementedException();
 		}

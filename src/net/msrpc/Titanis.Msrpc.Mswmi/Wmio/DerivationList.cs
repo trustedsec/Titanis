@@ -15,9 +15,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 
 		public string[] classNames;
 
-		public void ReadFrom(IByteSource reader)
-			=> this.ReadFrom(reader, PduByteOrder.LittleEndian);
-		public void ReadFrom(IByteSource reader, PduByteOrder byteOrder)
+		public void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource
 		{
 			List<string> derivationList = new List<string>();
 			var offDerList = reader.Position;
@@ -36,9 +34,6 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		}
 
 		public void WriteTo(ByteWriter writer)
-			=> this.WriteTo(writer, PduByteOrder.LittleEndian);
-
-		public void WriteTo(ByteWriter writer, PduByteOrder byteOrder)
 		{
 			var offDerList = writer.ReserveEncodingLength();
 

@@ -30,7 +30,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		// [MS-WMIO] § 2.2.28 - NdTableValueTableLength
 		internal uint ndValueTableLength;
 
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			// UNDONE: Yeah the spec says it should be zero, but it usually isn't
 			//Debug.Assert(this.reserved == 0);
@@ -96,7 +96,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		[PduIgnore]
 		internal byte[] bytes;
 
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			source.Position = this.position;
 			var cbClass = this.header.encodingLength;

@@ -50,6 +50,8 @@ namespace Titanis.SourceGen
 			if (!this._fields.HasValue)
 			{
 				var fields = ImmutableArray.CreateBuilder<PduFieldInfo>(this.Members.Length);
+				HashSet<string> includedProps = new HashSet<string>();
+
 				foreach (var member_ in this.Members)
 				{
 					var member = member_;
@@ -87,6 +89,8 @@ namespace Titanis.SourceGen
 						if (attrPduField != null || isBackingField)
 						{
 							var prop = (IPropertySymbol)member;
+							if (!includedProps.Add(prop.Name))
+								continue;
 
 							declarator = ((PropertyDeclarationSyntax)prop.DeclaringSyntaxReferences[0].GetSyntax(ctx.cancellationToken)).Identifier;
 							fieldType = prop.Type;
@@ -97,22 +101,6 @@ namespace Titanis.SourceGen
 
 					if (fieldType is null)
 						continue;
-
-					switch (member.Kind)
-					{
-						case SymbolKind.Field:
-							{
-							}
-							break;
-
-						case SymbolKind.Property:
-							{
-							}
-							break;
-
-						default:
-							continue;
-					}
 
 					fields.Add(new PduFieldInfo(member, declarator, fieldType, attrPduField));
 				}

@@ -16,7 +16,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		public string value;
 		public override string ToString()
 			=> this.value;
-		public void ReadFrom(IByteSource reader)
+		public void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource
 		{
 			var flag = (EncodedStringFlag)reader.ReadByte();
 			StringBuilder sb = new StringBuilder();
@@ -46,9 +46,6 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 			this.value = sb.ToString();
 		}
 
-		public void ReadFrom(IByteSource reader, PduByteOrder byteOrder)
-			=> this.ReadFrom(reader);
-
 		public void WriteTo(ByteWriter writer)
 		{
 			string str = this.value ?? string.Empty;
@@ -72,8 +69,5 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 				writer.WriteUInt16LE(0);
 			}
 		}
-
-		public void WriteTo(ByteWriter writer, PduByteOrder byteOrder)
-			=> this.WriteTo(writer);
 	}
 }

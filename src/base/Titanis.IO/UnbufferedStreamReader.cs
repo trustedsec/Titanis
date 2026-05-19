@@ -79,7 +79,7 @@ namespace Titanis.IO
 			{
 				if (!this.HasPeekByte)
 				{
-					int byteRead = await ReadByteFromStreamAsync(cancellationToken);
+					int byteRead = await ReadByteFromStreamAsync(cancellationToken).ConfigureAwait(false);
 					this._peekByte = byteRead;
 				}
 
@@ -90,7 +90,7 @@ namespace Titanis.IO
 		private async Task<int> ReadByteFromStreamAsync(CancellationToken cancellationToken)
 		{
 			byte[] peekBuf = (this._peekBuf ??= new byte[1]);
-			int cb = await this._stream.ReadAsync(peekBuf, 0, 1, cancellationToken);
+			int cb = await this._stream.ReadAsync(peekBuf, 0, 1, cancellationToken).ConfigureAwait(false);
 			int byteRead;
 			if (cb < 1)
 			{
@@ -137,7 +137,7 @@ namespace Titanis.IO
 				return NoPeekValue;
 			else
 			{
-				int b = await this.ReadByteFromStreamAsync(cancellationToken);
+				int b = await ReadByteFromStreamAsync(cancellationToken).ConfigureAwait(false);
 				if (b < 0)
 					this._eof = true;
 
@@ -183,7 +183,7 @@ namespace Titanis.IO
 			}
 
 			byte[] bytes = new byte[count];
-			int cbRead = await this._stream.ReadAsync(bytes, 0, count, cancellationToken);
+			int cbRead = await this._stream.ReadAsync(bytes, 0, count, cancellationToken).ConfigureAwait(false);
 			cbRead = Encoding.UTF8.GetChars(bytes, 0, cbRead, buffer, index);
 			if (peeked)
 				cbRead++;
@@ -193,14 +193,14 @@ namespace Titanis.IO
 
 		public sealed override async Task<string?> ReadLineAsync()
 		{
-			return await this.ReadLineAsync(CancellationToken.None);
+			return await this.ReadLineAsync(CancellationToken.None).ConfigureAwait(false);
 		}
 		public override async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
 		{
 			StringBuilder sb = new StringBuilder();
 			do
 			{
-				int c = await ReadAsync(cancellationToken);
+				int c = await this.ReadAsync(cancellationToken).ConfigureAwait(false);
 				if (c == -1) break;
 				if (c == '\r' || c == '\n')
 				{

@@ -19,7 +19,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 
 		internal Qualifier[] qualifiers;
 
-		public void ReadFrom(IByteSource reader)
+		public void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource
 		{
 			var offStart = reader.Position;
 			var cbSet = reader.ReadEncodingLength();
@@ -39,9 +39,6 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 			this.qualifiers = qualifiers.ToArray();
 		}
 
-		public void ReadFrom(IByteSource reader, PduByteOrder byteOrder)
-			=> this.ReadFrom(reader);
-
 		public void WriteTo(ByteWriter writer)
 		{
 			if (this.qualifiers.IsNullOrEmpty())
@@ -59,9 +56,6 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 				writer.WriteEncodingLengthAt(offStart);
 			}
 		}
-
-		public void WriteTo(ByteWriter writer, PduByteOrder byteOrder)
-			=> this.WriteTo(writer);
 
 		public static QualifierSet Encode(WmiQualifier[]? qualifiers, ByteWriter heapWriter)
 		{

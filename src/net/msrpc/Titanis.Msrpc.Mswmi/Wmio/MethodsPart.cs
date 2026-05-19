@@ -30,7 +30,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		[PduIgnore]
 		internal byte[] bytes;
 
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			var offMethodsPartEnd = (int)this.position + this.encodingLength;
 			Debug.Assert(source.Position <= offMethodsPartEnd);

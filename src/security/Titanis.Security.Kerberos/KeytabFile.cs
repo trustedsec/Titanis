@@ -207,7 +207,7 @@ namespace Titanis.Security.Kerberos
 		[PduArraySize(nameof(keyLength))]
 		public byte[] keyContents;
 
-		partial void OnAfterReadPdu(Titanis.IO.IByteSource writer)
+		partial void OnAfterReadPdu<TSource>(TSource writer) where TSource : class, IByteSource
 		{
 			if (writer.RemainingLength() >= 4)
 			{

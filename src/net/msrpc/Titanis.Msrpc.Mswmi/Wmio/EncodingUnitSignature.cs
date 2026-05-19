@@ -16,7 +16,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		{
 			this.value = ValidValue;
 		}
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			if (this.value != ValidValue)
 				throw new InvalidDataException("The data is not a valid WMI EncodingUnit.");

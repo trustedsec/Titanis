@@ -117,7 +117,7 @@ namespace Titanis.IO
 		{
 			int cbTotalRead = 0;
 			int cbChunkRead;
-			while (!cancellationToken.IsCancellationRequested && (cbTotalRead < count) && (0 != (cbChunkRead = await stream.ReadAsync(buffer, startIndex + cbTotalRead, count - cbTotalRead, cancellationToken))))
+			while (!cancellationToken.IsCancellationRequested && (cbTotalRead < count) && (0 != (cbChunkRead = await stream.ReadAsync(buffer, startIndex + cbTotalRead, count - cbTotalRead, cancellationToken).ConfigureAwait(false))))
 			{
 				cbTotalRead += cbChunkRead;
 			}
@@ -143,7 +143,7 @@ namespace Titanis.IO
 			int totalBytesRead = 0;
 			do
 			{
-				int bytesRead = await stream.ReadAsync(buffer, startIndex + totalBytesRead, maxCount - totalBytesRead, cancellationToken);
+				int bytesRead = await stream.ReadAsync(buffer, startIndex + totalBytesRead, maxCount - totalBytesRead, cancellationToken).ConfigureAwait(false);
 				if (bytesRead == 0)
 					throw new StreamUnderflowException(totalBytesRead);
 

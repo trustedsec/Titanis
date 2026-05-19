@@ -22,7 +22,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		// [MS-WMIO] § 2.2.5 - ObjectBlock
 		internal ObjectBlock objectBlock;
 
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			if (this.objectLength > int.MaxValue)
 				throw new NotSupportedException("The object is too large and cannot be read by this implementation.");

@@ -6,17 +6,17 @@ namespace Titanis.IO
 {
 	public interface IPduStruct
 	{
-		void ReadFrom(IByteSource reader);
+		void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource;
 		void WriteTo(ByteWriter writer);
 	}
 	public interface IPduStruct<T>
 	{
-		void ReadFrom(IByteSource reader, T arg);
+		void ReadFrom<TSource>(TSource reader, T arg) where TSource : class, IByteSource;
 		void WriteTo(ByteWriter writer, T arg);
 	}
 	public interface IPduStruct<T1, T2>
 	{
-		void ReadFrom(IByteSource reader, T1 arg1, T2 arg2);
+		void ReadFrom<TSource>(TSource reader, T1 arg1, T2 arg2) where TSource : class, IByteSource;
 		void WriteTo(ByteWriter writer, T1 arg1, T2 arg2);
 	}
 

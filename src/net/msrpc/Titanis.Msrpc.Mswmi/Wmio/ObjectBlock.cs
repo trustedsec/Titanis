@@ -14,7 +14,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 			this.obj = obj;
 		}
 
-		partial void OnBeforeReadPdu(IByteSource source)
+		partial void OnBeforeReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 		}
 
@@ -66,7 +66,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 			else
 				this.flags &= ~WmiObjectFlags.HasDecoration;
 		}
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			Debug.Assert(((int)flags & 0x03) != 0);
 		}

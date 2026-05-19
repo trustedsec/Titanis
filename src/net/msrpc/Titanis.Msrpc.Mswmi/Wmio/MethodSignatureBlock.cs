@@ -23,7 +23,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		[PduConditional(nameof(HasObject))]
 		internal ObjectBlock? obj;
 
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			int offObjEnd = (int)(this.position + cbObj);
 			Debug.Assert(source.Position <= offObjEnd);

@@ -73,34 +73,14 @@ namespace Titanis.Smb2.Pdus
 			this.Time = DateTime.FromFileTimeUtc(reader.ReadInt64LE());
 		}
 
-		public void ReadFrom(IByteSource reader, PduByteOrder byteOrder)
+		public void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource
 		{
-			this.Time = DateTime.FromFileTimeUtc(byteOrder switch
-			{
-				PduByteOrder.BigEndian => reader.ReadInt64BE(),
-				PduByteOrder.LittleEndian => reader.ReadInt64LE(),
-				_ => throw new ArgumentOutOfRangeException(nameof(byteOrder))
-			});
+			this.Time = DateTime.FromFileTimeUtc(reader.ReadInt64LE());
 		}
 
 		public void WriteTo(ByteWriter writer)
 		{
 			writer.WriteInt64LE(this.Time.ToFileTimeUtc());
-		}
-
-		public void WriteTo(ByteWriter writer, PduByteOrder byteOrder)
-		{
-			switch (byteOrder)
-			{
-				case PduByteOrder.LittleEndian:
-					writer.WriteInt64LE(this.Time.ToFileTimeUtc());
-					break;
-				case PduByteOrder.BigEndian:
-					writer.WriteInt64BE(this.Time.ToFileTimeUtc());
-					break;
-				default:
-					throw new ArgumentOutOfRangeException(nameof(byteOrder));
-			}
 		}
 	}
 

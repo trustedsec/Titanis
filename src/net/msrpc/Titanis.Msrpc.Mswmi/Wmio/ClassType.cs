@@ -23,7 +23,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		internal ClassAndMethodsPart currentClass;
 		private WmiClassObject _cls;
 
-		public void ReadFrom(IByteSource reader)
+		public void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource
 		{
 			// [MS-WMIO] § 2.2.12 - ParentClass
 			ClassAndMethodsPart parentClassStruc = reader.ReadPduStruct<ClassAndMethodsPart>();
@@ -39,15 +39,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 			this._cls = cls;
 		}
 
-		public void ReadFrom(IByteSource reader, PduByteOrder byteOrder)
-			=> this.ReadFrom(reader);
-
 		public void WriteTo(ByteWriter writer)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void WriteTo(ByteWriter writer, PduByteOrder byteOrder)
 		{
 			throw new NotImplementedException();
 		}

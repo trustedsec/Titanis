@@ -95,17 +95,17 @@ namespace Titanis.IO
 		}
 
 		/// <inheritdoc cref="IByteSource.Consume(int)"/>
-		public ReadOnlySpan<byte> Consume(int size)
+		public ReadOnlySpan<byte> Consume(int count)
 		{
-			byte[] buf = new byte[size];
+			byte[] buf = new byte[count];
 			if (this.HasPeekByte)
 			{
 				buf[0] = (byte)this._peekByte;
 				this.ClearPeek();
-				this._stream.ReadAll(buf, 1, size - 1);
+				this._stream.ReadAll(buf, 1, count - 1);
 			}
 			else
-				this._stream.ReadAll(buf, 0, size);
+				this._stream.ReadAll(buf, 0, count);
 
 			return buf;
 		}

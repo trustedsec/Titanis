@@ -200,7 +200,7 @@ namespace Titanis.IO
 					this._streamBuffer,
 					this._cbStreamBuf,
 					cbToRead,
-					cancellationToken);
+					cancellationToken).ConfigureAwait(false);
 				if (cbRead == 0)
 					this._eof = true;
 				else
@@ -270,7 +270,7 @@ namespace Titanis.IO
 		{
 			if (
 				(this._cchValid > 0)
-				|| (await this.FillBufferAsync(cancellationToken))
+				|| (await this.FillBufferAsync(cancellationToken).ConfigureAwait(false))
 				)
 			{
 				return this._textBuffer[this._readIndex];
@@ -328,7 +328,7 @@ namespace Titanis.IO
 				return this.ReadChar();
 			else
 			{
-				if (await this.FillBufferAsync(cancellationToken))
+				if (await this.FillBufferAsync(cancellationToken).ConfigureAwait(false))
 					return this.ReadChar();
 			}
 
@@ -375,7 +375,7 @@ namespace Titanis.IO
 			}
 			else
 			{
-				await this.FillBufferAsync(cancellationToken);
+				await this.FillBufferAsync(cancellationToken).ConfigureAwait(false);
 				count = Math.Min(count, this._cchValid);
 
 				return this.ReadChars(buffer, index, count);
@@ -385,7 +385,7 @@ namespace Titanis.IO
 		/// <inheritdoc/>
 		public sealed override async Task<string?> ReadLineAsync()
 		{
-			return await this.ReadLineAsync(CancellationToken.None);
+			return await this.ReadLineAsync(CancellationToken.None).ConfigureAwait(false);
 		}
 		/// <inheritdoc/>
 		public override async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
@@ -393,7 +393,7 @@ namespace Titanis.IO
 			StringBuilder sb = new StringBuilder();
 			do
 			{
-				int c = await ReadAsync(cancellationToken);
+				int c = await this.ReadAsync(cancellationToken).ConfigureAwait(false);
 				if (c == -1) break;
 				if (c == '\r' || c == '\n')
 				{

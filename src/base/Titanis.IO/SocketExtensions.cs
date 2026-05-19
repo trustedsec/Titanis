@@ -35,7 +35,7 @@ namespace Titanis.IO
 					buffer.Slice(cbTotalRecv),
 					SocketFlags.None,
 					cancellationToken
-					);
+					).ConfigureAwait(false);
 				if (cbRecv == 0)
 					throw new EndOfStreamException();
 
@@ -68,7 +68,7 @@ namespace Titanis.IO
 					buffer.Slice(cbTotalRecv),
 					SocketFlags.None,
 					cancellationToken
-					);
+					).ConfigureAwait(false);
 				if (cbRecv == 0)
 					throw new EndOfStreamException();
 

@@ -125,14 +125,14 @@ namespace Titanis.IO
 
 		public sealed override async Task<string?> ReadLineAsync()
 		{
-			return await this.ReadLineAsync(CancellationToken.None);
+			return await this.ReadLineAsync(CancellationToken.None).ConfigureAwait(false);
 		}
 		public override async ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken)
 		{
 			StringBuilder sb = new StringBuilder();
 			do
 			{
-				int c = await ReadAsync(cancellationToken);
+				int c = await this.ReadAsync(cancellationToken).ConfigureAwait(false);
 				if (c == -1) break;
 				if (c == '\r' || c == '\n')
 				{

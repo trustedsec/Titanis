@@ -18,19 +18,9 @@ namespace Titanis.IO
 		/// <seealso cref="PeekAsync"/>
 		public const int NoPeekValue = -1;
 
-		public sealed override async Task<int> ReadAsync(char[] buffer, int index, int count)
-		{
-			return await this.ReadAsync(buffer, index, count, CancellationToken.None);
-		}
-
-		public ValueTask<int> ReadAsync()
-		{
-			return this.ReadAsync(CancellationToken.None);
-		}
 		public abstract ValueTask<int> ReadAsync(CancellationToken cancellationToken);
 
 		public abstract ValueTask<int> ReadAsync(char[] buffer, int index, int count, CancellationToken cancellationToken);
-		public abstract ValueTask<string?> ReadLineAsync(CancellationToken cancellationToken);
 
 		public abstract ValueTask<int> PeekAsync(CancellationToken cancellationToken);
 	}

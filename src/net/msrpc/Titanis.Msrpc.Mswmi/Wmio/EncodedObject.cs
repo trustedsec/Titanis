@@ -18,7 +18,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		internal long position;
 		internal ObjectBlock objBlock;
 
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			var offEnd = this.position + this.encodingLength;
 			Debug.Assert(source.Position <= offEnd);

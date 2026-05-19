@@ -19,7 +19,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 
 		internal EncodedString name;
 
-		partial void OnAfterReadPdu(IByteSource source)
+		partial void OnAfterReadPdu<TSource>(TSource source) where TSource : class, IByteSource
 		{
 			var offEnd = source.Position;
 			var length = source.ReadUInt32LE();

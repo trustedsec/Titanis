@@ -86,15 +86,12 @@ namespace Titanis.Socks.Pdus
 		public Socks5Address Address { get; private set; }
 		public ushort Port { get; private set; }
 
-		public void ReadFrom(IByteSource reader)
+		public void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource
 		{
 			this.AddressType = (Socks5AddressType)reader.ReadByte();
 			this.Address.ReadFrom(reader);
 			this.Port = reader.ReadUInt16BE();
 		}
-
-		public void ReadFrom(IByteSource reader, PduByteOrder byteOrder)
-			=> this.ReadFrom(reader);
 
 		public void WriteTo(ByteWriter writer)
 		{
@@ -102,9 +99,6 @@ namespace Titanis.Socks.Pdus
 			this.Address.WriteTo(writer);
 			writer.WriteUInt16BE(this.Port);
 		}
-
-		public void WriteTo(ByteWriter writer, PduByteOrder byteOrder)
-			=> this.WriteTo(writer);
 
 		public EndPoint ToSocketEndpoint()
 			=> this.Address.ToEndPoint(this.Port);
@@ -124,15 +118,9 @@ namespace Titanis.Socks.Pdus
 	{
 		public abstract Socks5AddressType AddressType { get; }
 
-		public abstract void ReadFrom(IByteSource reader);
-
-		public void ReadFrom(IByteSource reader, PduByteOrder byteOrder)
-			=> this.ReadFrom(reader);
-
+		public abstract void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource;
 		public abstract void WriteTo(ByteWriter writer);
 
-		public void WriteTo(ByteWriter writer, PduByteOrder byteOrder)
-			=> this.WriteTo(writer);
 		public abstract EndPoint ToEndPoint(ushort port);
 	}
 
@@ -154,7 +142,7 @@ namespace Titanis.Socks.Pdus
 		public sealed override EndPoint ToEndPoint(ushort port)
 			=> new IPEndPoint(this.Address, port);
 
-		public sealed override void ReadFrom(IByteSource reader)
+		public sealed override void ReadFrom<TSource>(TSource reader)
 		{
 			var value = reader.ReadBytes(4);
 			this.Address = new IPAddress(value);
@@ -189,7 +177,7 @@ namespace Titanis.Socks.Pdus
 		public sealed override EndPoint ToEndPoint(ushort port)
 			=> new IPEndPoint(this.Address, port);
 
-		public sealed override void ReadFrom(IByteSource reader)
+		public sealed override void ReadFrom<TSource>(TSource reader)
 		{
 			var value = reader.ReadBytes(16);
 			this.Address = new IPAddress(value);
@@ -224,7 +212,7 @@ namespace Titanis.Socks.Pdus
 		public sealed override EndPoint ToEndPoint(ushort port)
 			=> new DnsEndPoint(this.HostName, port);
 
-		public override void ReadFrom(IByteSource reader)
+		public override void ReadFrom<TSource>(TSource reader)
 		{
 			var cbName = reader.ReadByte();
 			var bytes = reader.Consume(cbName);
