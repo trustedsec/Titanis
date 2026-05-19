@@ -12,7 +12,7 @@
     <ProjectReference Include="..\..\..\base\Titanis.Winterop.ErrorCodes\Titanis.Winterop.ErrorCodes.csproj" />
     <ProjectReference Include="..\..\..\base\Titanis.Winterop.Sam\Titanis.Winterop.Sam.csproj" />
     <ProjectReference Include="..\..\..\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
-    <ProjectReference Include="..\..\..\build\Titanis.SourceGen\Titanis.SourceGen.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\..\build\Titanis.SourceGeneration.PduStruct\Titanis.SourceGeneration.PduStruct.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\..\crypto\Titanis.Crypto.Md5\Titanis.Crypto.Md5.csproj" />
     <ProjectReference Include="..\..\..\crypto\Titanis.Crypto.Rc4\Titanis.Crypto.Rc4.csproj" />
     <ProjectReference Include="..\..\Titanis.DceRpc.Core\Titanis.DceRpc.Core.csproj" />

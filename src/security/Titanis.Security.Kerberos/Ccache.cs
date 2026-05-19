@@ -225,14 +225,11 @@ namespace Titanis.Security.Kerberos
 		internal CCacheCredential[] credentials;
 
 		public void ReadFrom(IByteSource reader, byte version)
-			=> this.ReadFrom(reader, PduByteOrder.BigEndian, version);
-
-		public void ReadFrom(IByteSource reader, PduByteOrder byteOrder, byte version)
 		{
 			List<CCacheCredential> creds = new List<CCacheCredential>();
 			while (reader.RemainingLength() > 0)
 			{
-				var cred = reader.ReadPduStruct<CCacheCredential, byte>(byteOrder, version);
+				var cred = reader.ReadPduStruct<CCacheCredential, byte>(version);
 				creds.Add(cred);
 			}
 
@@ -240,15 +237,12 @@ namespace Titanis.Security.Kerberos
 		}
 
 		public void WriteTo(ByteWriter writer, byte version)
-			=> this.WriteTo(writer, PduByteOrder.BigEndian, version);
-
-		public void WriteTo(ByteWriter writer, PduByteOrder byteOrder, byte version)
 		{
 			if (this.credentials != null)
 			{
 				foreach (var cred in this.credentials)
 				{
-					writer.WritePduStruct(cred, byteOrder, version);
+					writer.WritePduStruct(cred, version);
 				}
 			}
 		}

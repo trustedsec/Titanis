@@ -13,9 +13,9 @@ namespace Titanis.SourceGen
 
 		public static PduByteOrder? GetDeclaredByteOrder(ISymbol sym)
 		{
-			var orderAtr = sym.TryGetAttribute(typeof(PduByteOrderAttribute));
-			var value = orderAtr?.ConstructorArg(0) as int?;
-			return (value.HasValue ? (PduByteOrder)value.Value : null);
+			var orderAtr = sym.GetAttribute(typeof(PduByteOrderAttribute));
+			var arg = orderAtr?.GetArgument<PduByteOrder>(0);
+			return arg?.Value;
 		}
 
 		public static PduByteOrder? GetByteOrder(ISymbol symbol)

@@ -228,17 +228,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 			this._value = NormalizeValue(reader.ReadUInt32LE());
 		}
 
-		void IPduStruct.ReadFrom(IByteSource reader, PduByteOrder byteOrder)
-		{
-			this._value = NormalizeValue(reader.ReadUInt32LE());
-		}
-
 		void IPduStruct.WriteTo(ByteWriter writer)
-		{
-			writer.WriteInt32LE(this.Value);
-		}
-
-		void IPduStruct.WriteTo(ByteWriter writer, PduByteOrder byteOrder)
 		{
 			writer.WriteInt32LE(this.Value);
 		}

@@ -10,7 +10,7 @@
     <ProjectReference Include="..\..\base\Titanis.Core\Titanis.Core.csproj" />
     <ProjectReference Include="..\..\base\Titanis.IO\Titanis.IO.csproj" />
     <ProjectReference Include="..\..\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
-    <ProjectReference Include="..\..\build\Titanis.SourceGen\Titanis.SourceGen.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\build\Titanis.SourceGeneration.PduStruct\Titanis.SourceGeneration.PduStruct.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\formats\Titanis.Asn1\Titanis.Asn1.csproj" />
     <ProjectReference Include="..\..\security\Titanis.Certificates\Titanis.Certificates.csproj" />
     <ProjectReference Include="..\Titanis.Ldap.Core\Titanis.Ldap.Core.csproj" />

@@ -22,9 +22,9 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		// [MS-WMIO] § 2.2.71 - EncodedValue
 		[PduField(ReadMethod = nameof(ReadValue), WriteMethod = nameof(WriteValue))]
 		public EncodedValue value;
-		private EncodedValue ReadValue(IByteSource source, PduByteOrder byteOrder)
+		private EncodedValue ReadValue(IByteSource source)
 			=> source.ReadEncodedValue(this.qualifierType);
-		private void WriteValue(ByteWriter writer, EncodedValue value, PduByteOrder byteOrder)
+		private void WriteValue(ByteWriter writer, EncodedValue value)
 		{
 			writer.WriteEncodedValue(value);
 		}

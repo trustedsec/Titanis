@@ -164,7 +164,7 @@ namespace PduStructSample
 		internal bool IncludeField3 => 0 != (this.includedFields & 4);
 		internal const int StringLength = 42;
 		[PduConditional(nameof(IncludeField3))]
-		[PduString(CharSet.Ansi, nameof(StringLength))]
+		[PduString(CharSet.Ansi, StringLength)]
 		internal string? field3;
 	}
 

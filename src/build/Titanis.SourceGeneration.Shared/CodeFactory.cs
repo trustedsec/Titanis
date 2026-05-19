@@ -30,7 +30,7 @@ namespace Titanis.CodeGen
 			where T : SyntaxNode
 			=> SyntaxFactory.List(elements ?? Array.Empty<T>());
 
-		public static SeparatedSyntaxList<T> SeparatedList<T>(params T[]? elements)
+		public static SeparatedSyntaxList<T> SeparatedList<T>(params IEnumerable<T> elements)
 			where T : SyntaxNode
 			=> SyntaxFactory.SeparatedList(elements);
 
@@ -62,7 +62,7 @@ namespace Titanis.CodeGen
 				);
 
 		public static AttributeSyntax GeneratedCode()
-			=> SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(GeneratedCodeAttribute).FullName), SyntaxFactory.AttributeArgumentList(SeparatedList(Primitive("Titanis.SourceGen").AsAttributeArg(), Primitive("0.9.0").AsAttributeArg())));
+			=> SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(typeof(GeneratedCodeAttribute).FullName), SyntaxFactory.AttributeArgumentList(SeparatedList(Primitive("Titanis.SourceGeneration.PduStruct").AsAttributeArg(), Primitive("0.9.0").AsAttributeArg())));
 
 		public static AttributeSyntax Attribute(NameSyntax type, params ExpressionSyntax[] arguments)
 			=> SyntaxFactory.Attribute(type, SyntaxFactory.AttributeArgumentList(SeparatedList(Array.ConvertAll(arguments, r => r.AsAttributeArg()))));

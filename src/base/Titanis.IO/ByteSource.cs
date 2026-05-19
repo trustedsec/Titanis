@@ -127,25 +127,36 @@ namespace Titanis.IO
 			struc.ReadFrom(source);
 			return struc;
 		}
+		// TODO: Delete
+		[Obsolete("Don't specify byte order.", true)]
 		public static TStruct ReadPduStruct<TStruct>(this IByteSource source, PduByteOrder byteOrder)
 			where TStruct : IPduStruct, new()
 		{
 			TStruct struc = new TStruct();
-			struc.ReadFrom(source, byteOrder);
+			struc.ReadFrom(source);
 			return struc;
 		}
+		public static TStruct ReadPduStruct<TStruct, T>(this IByteSource source, T arg)
+			where TStruct : IPduStruct<T>, new()
+		{
+			TStruct struc = new TStruct();
+			struc.ReadFrom(source, arg);
+			return struc;
+		}
+		[Obsolete("Don't specify byte order.", true)]
 		public static TStruct ReadPduStruct<TStruct, T>(this IByteSource source, PduByteOrder byteOrder, T arg)
 			where TStruct : IPduStruct<T>, new()
 		{
 			TStruct struc = new TStruct();
-			struc.ReadFrom(source, byteOrder, arg);
+			struc.ReadFrom(source, arg);
 			return struc;
 		}
-		public static TStruct ReadPduStruct<TStruct, T1, T2>(this IByteSource source, PduByteOrder byteOrder, T1 arg1, T2 arg2)
+		[Obsolete("Don't specify byte order.", true)]
+		public static TStruct ReadPduStruct<TStruct, T1, T2>(this IByteSource source, T1 arg1, T2 arg2)
 			where TStruct : IPduStruct<T1, T2>, new()
 		{
 			TStruct struc = new TStruct();
-			struc.ReadFrom(source, byteOrder, arg1, arg2);
+			struc.ReadFrom(source, arg1, arg2);
 			return struc;
 		}
 

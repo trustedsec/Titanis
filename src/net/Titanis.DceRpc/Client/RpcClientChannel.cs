@@ -181,7 +181,7 @@ namespace Titanis.DceRpc.Client
 				assoc_group_id = assocGroupId
 			};
 
-			bindPdu.WriteTo(writer, PduByteOrder.LittleEndian);
+			writer.WritePduStruct(bindPdu);
 			int authLength;
 			if (!existingAuthContext && bindAuthContext != null)
 				authLength = WriteBindAuthToken(bindAuthContext, writer);
@@ -661,7 +661,7 @@ namespace Titanis.DceRpc.Client
 				assoc_group_id = bindContext.assocGroup.GroupId
 			};
 
-			bindPdu.WriteTo(writer, PduByteOrder.LittleEndian);
+			writer.WritePduStruct(bindPdu);
 			lock (this._pendingBinds)
 				this._pendingBinds.Add(bindreq.callId, bindreq);
 

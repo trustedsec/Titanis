@@ -19,11 +19,11 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		internal ClassPart classPart;
 		[PduIgnore]
 		internal byte[]? classPartBytes;
-		private ClassPart ReadClassPart(IByteSource source, PduByteOrder byteOrder)
+		private ClassPart ReadClassPart(IByteSource source)
 		{
 			return source.ReadPduStruct<ClassPart>();
 		}
-		private void WriteClassPart(ByteWriter writer, ClassPart value, PduByteOrder byteOrder)
+		private void WriteClassPart(ByteWriter writer, ClassPart value)
 		{
 			if (this.classPartBytes != null)
 				writer.WriteBytes(this.classPartBytes);
@@ -42,11 +42,11 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 
 		[PduField(ReadMethod = nameof(ReadNdTable), WriteMethod = nameof(WriteNdTable))]
 		internal NdTable ndTable;
-		private NdTable ReadNdTable(IByteSource source, PduByteOrder byteOrder)
+		private NdTable ReadNdTable(IByteSource source)
 		{
 			return source.ReadNdTable(this.classPart.propertyLookup.properties.Length);
 		}
-		private void WriteNdTable(ByteWriter byteWriter, NdTable value, PduByteOrder byteOrder)
+		private void WriteNdTable(ByteWriter byteWriter, NdTable value)
 		{
 			byteWriter.WriteBytes(value.Bytes);
 		}

@@ -313,9 +313,9 @@ namespace Titanis.Msrpc.Msdcom
 		[PduField(ReadMethod = nameof(ReadStd), WriteMethod = nameof(WriteStd))]
 		internal STDOBJREF std;
 
-		private STDOBJREF ReadStd(IByteSource source, PduByteOrder byteOrder)
+		private STDOBJREF ReadStd(IByteSource source)
 			=> source.ReadStdObjref();
-		private void WriteStd(ByteWriter writer, STDOBJREF value, PduByteOrder byteOrder)
+		private void WriteStd(ByteWriter writer, STDOBJREF value)
 			=> throw new NotImplementedException();
 	}
 

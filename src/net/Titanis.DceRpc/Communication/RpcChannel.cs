@@ -297,8 +297,7 @@ namespace Titanis.DceRpc.Communication
 			CancellationToken cancellationToken)
 		{
 			ByteMemoryReader reader = new ByteMemoryReader(message);
-			BindPdu bind = new BindPdu();
-			bind.ReadFrom(reader, PduByteOrder.LittleEndian);
+			BindPdu bind = reader.ReadPduStruct<BindPdu>();
 			AuthVerifier? authVerifier = null;
 			if (header.authLength > 0)
 			{

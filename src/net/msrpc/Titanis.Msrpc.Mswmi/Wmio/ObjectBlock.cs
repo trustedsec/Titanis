@@ -30,7 +30,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		// [MS-WMIO] § 2.2.10 - Encoding
 		[PduField(ReadMethod = nameof(ReadEncoding), WriteMethod = nameof(WriteEncoding))]
 		internal WmiObject? obj;
-		private WmiObject? ReadEncoding(IByteSource source, PduByteOrder byteOrder)
+		private WmiObject? ReadEncoding(IByteSource source)
 		{
 			var reader = (ByteMemoryReader)source;
 
@@ -52,7 +52,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 				throw new InvalidDataException("The data did not indicate whether the object is a class or instance.");
 			}
 		}
-		private void WriteEncoding(ByteWriter writer, WmiObject? obj, PduByteOrder byteOrder)
+		private void WriteEncoding(ByteWriter writer, WmiObject? obj)
 		{
 			obj.EncodeObjectBlockTo(writer);
 		}

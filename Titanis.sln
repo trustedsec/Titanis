@@ -138,7 +138,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Msrpc.Mswmi.Test", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Winterop.Security", "src\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj", "{77B624A6-E29C-7C4C-3345-432C043982F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.SourceGen", "src\build\Titanis.SourceGen\Titanis.SourceGen.csproj", "{62E682C2-3037-4890-8B46-40A1326C3862}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.SourceGeneration.PduStruct", "src\build\Titanis.SourceGeneration.PduStruct\Titanis.SourceGeneration.PduStruct.csproj", "{62E682C2-3037-4890-8B46-40A1326C3862}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Titanis.PduStruct", "src\base\Titanis.PduStruct\Titanis.PduStruct.shproj", "{4CE43AEC-A0A0-42FE-96BC-08EC122DAF01}"
 EndProject
@@ -174,7 +174,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WmiRegistry", "samples\wmi\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Winterop.ErrorCodes", "src\base\Titanis.Winterop.ErrorCodes\Titanis.Winterop.ErrorCodes.csproj", "{4A70C661-2F42-495B-8E78-6FAC5ABB2AE6}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Titanis.CodeGen.Roslyn", "src\build\Titanis.CodeGen.Roslyn\Titanis.CodeGen.Roslyn.shproj", "{EA19A0F7-ADDB-44CC-A4A9-873D8AFCBFA9}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Titanis.SourceGeneration.Shared", "src\build\Titanis.SourceGeneration.Shared\Titanis.SourceGeneration.Shared.shproj", "{EA19A0F7-ADDB-44CC-A4A9-873D8AFCBFA9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Msrpc.Msefsr", "src\net\msrpc\Titanis.Msrpc.Msefsr\Titanis.Msrpc.Msefsr.csproj", "{F304C94C-6C92-48AF-9CCF-FBAA274EB50F}"
 EndProject

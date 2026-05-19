@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\base\Titanis.IO\Titanis.IO.csproj" />
-    <ProjectReference Include="..\..\build\Titanis.SourceGen\Titanis.SourceGen.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\build\Titanis.SourceGeneration.PduStruct\Titanis.SourceGeneration.PduStruct.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
 	  <ProjectReference Include="..\..\build\Titanis.Logging.SourceGeneration\Titanis.Logging.SourceGeneration.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
 	  <ProjectReference Include="..\..\crypto\Titanis.Crypto.Des\Titanis.Crypto.Des.csproj" />
     <ProjectReference Include="..\..\crypto\Titanis.Crypto.DiffieHellman\Titanis.Crypto.DiffieHellman.csproj" />

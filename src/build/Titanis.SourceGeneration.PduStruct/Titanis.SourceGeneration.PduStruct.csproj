@@ -8,8 +8,10 @@
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<LangVersion>13.0</LangVersion>
 		<!--<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>-->
 	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
 	</ItemGroup>
@@ -19,6 +21,6 @@
 	  </Reference>
 	</ItemGroup>
 	<Import Project="..\..\base\Titanis.PduStruct\Titanis.PduStruct.projitems" Label="Shared" />
-	<Import Project="..\Titanis.CodeGen.Roslyn\Titanis.CodeGen.Roslyn.projitems" Label="Shared" />
+	<Import Project="..\Titanis.SourceGeneration.Shared\Titanis.SourceGeneration.Shared.projitems" Label="Shared" />
 
 </Project>

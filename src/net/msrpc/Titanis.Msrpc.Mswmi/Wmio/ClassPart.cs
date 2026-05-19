@@ -64,7 +64,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 		// [MS-WMIO] § 2.2.26 - NdTable
 		[PduField(ReadMethod = nameof(ReadNdTable), WriteMethod = nameof(WriteNdTable))]
 		internal NdTable ndTable;
-		private NdTable ReadNdTable(IByteSource source, PduByteOrder byteOrder)
+		private NdTable ReadNdTable(IByteSource source)
 		{
 			var propCount = this.propertyLookup.properties.Length;
 			if (propCount > 0 && this.header.ndValueTableLength > 0)
@@ -77,7 +77,7 @@ namespace Titanis.Msrpc.Mswmi.Wmio
 				return default;
 			}
 		}
-		private void WriteNdTable(ByteWriter writer, NdTable value, PduByteOrder byteOrder)
+		private void WriteNdTable(ByteWriter writer, NdTable value)
 		{
 			writer.WriteBytes(this.ndTable.Bytes);
 		}

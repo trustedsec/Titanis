@@ -43,7 +43,7 @@ namespace Titanis.Security.Kerberos
 				{
 					var entryBytes = bytes.AsMemory(pos, length);
 					ByteMemoryReader reader = new ByteMemoryReader(entryBytes);
-					var rec = reader.ReadPduStruct<KeytabEntryRecord>(PduByteOrder.BigEndian);
+					var rec = reader.ReadPduStruct<KeytabEntryRecord>();
 
 					SecurityPrincipalName spn;
 					if (rec.principal.components.Length == 1)
@@ -104,7 +104,7 @@ namespace Titanis.Security.Kerberos
 				int offStart = writer.Position;
 				writer.WriteInt32BE(0);
 
-				writer.WritePduStruct(entry.ToRecord(version), PduByteOrder.BigEndian);
+				writer.WritePduStruct(entry.ToRecord(version));
 
 				int offEnd = writer.Position;
 				writer.SetPosition(offStart);
