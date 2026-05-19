@@ -207,10 +207,11 @@ namespace Titanis.Msrpc.Msdcom
 		/// <returns>An <see cref="OleAutomationObject"/> representing the activated object</returns>
 		public async Task<OleAutomationObject> Activate(
 			Guid clsid,
-			CancellationToken cancellationToken
+			CancellationToken cancellationToken,
+			string? fileName = null
 			)
 		{
-			var obj = await this.Activate<IDispatch>(clsid, cancellationToken).ConfigureAwait(false);
+			var obj = await this.Activate<IDispatch>(clsid, cancellationToken, fileName: fileName).ConfigureAwait(false);
 			return new OleAutomationObject(obj, this);
 		}
 		/// <summary>
@@ -222,7 +223,8 @@ namespace Titanis.Msrpc.Msdcom
 		/// <returns>An <see cref="OleAutomationObject"/> representing the activated object</returns>
 		public async Task<TInterface> Activate<TInterface>(
 			Guid clsid,
-			CancellationToken cancellationToken
+			CancellationToken cancellationToken,
+			string? fileName = null
 			)
 			where TInterface : class, IRpcObject
 		{
@@ -253,7 +255,9 @@ namespace Titanis.Msrpc.Msdcom
 						new Guid[] { iid },
 						protseqs,
 						correlationId,
-						cancellationToken).ConfigureAwait(false);
+						cancellationToken,
+						fileName: fileName
+						).ConfigureAwait(false);
 				}
 				else
 				{

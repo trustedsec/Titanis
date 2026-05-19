@@ -28,13 +28,10 @@ public class InvokeCommand : Command, IHaveServerName
 	[Description("Name of the server to connect to")]
 	public string ServerName { get => _serverName; set => _serverName = value; }
 
+	[ParameterGroup(ParameterGroupOptions.Required)]
+	public ActivationParameterGroup ActivationParameters { get; set; }
 
-	[Parameter(After = nameof(ServerName))]
-	[Mandatory]
-	[Description("CLSID of object to activate")]
-	public Guid Clsid { get; set; }
-
-	[Parameter(After = nameof(Clsid))]
+	[Parameter(After = nameof(ActivationParameterGroup.Clsid))]
 	[Mandatory]
 	[Description("Name of method to invoke")]
 	public string MethodName { get; set; }
@@ -62,7 +59,7 @@ public class InvokeCommand : Command, IHaveServerName
 
 		DcomClient dcom = await DcomClient.ConnectTo(this.ServerName, rpcClient, cancellationToken, callback: new DcomLogger(this.Log));
 
-		var obj = await dcom.Activate(this.Clsid, cancellationToken);
+		var obj = await dcom.Activate(this.ActivationParameters.Clsid, cancellationToken, fileName: this.ActivationParameters.FileName);
 		string methodName = this.MethodName;
 		int isep = methodName.LastIndexOf('.');
 		if (isep != -1)

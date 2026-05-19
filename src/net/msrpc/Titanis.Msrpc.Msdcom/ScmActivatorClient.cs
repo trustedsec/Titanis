@@ -51,7 +51,8 @@ namespace Titanis.Msrpc.Msdcom
 			Guid[] interfaceIDs,
 			ushort[] protseqs,
 			Guid correlationId,
-			System.Threading.CancellationToken cancellationToken)
+			System.Threading.CancellationToken cancellationToken,
+			string? fileName = null)
 		{
 			// TODO: Parameterize session ID
 			// TODO: Parameterize console flag
@@ -109,7 +110,6 @@ namespace Titanis.Msrpc.Msdcom
 				// [MS-DCOM] § 2.2.22.2.6
 				LocationInfoData = new LocationInfoData
 				{
-
 				},
 				// [MS-DCOM] § 2.2.22.2.4
 				ScmRequestInfoData = new ScmRequestInfoData
@@ -128,6 +128,18 @@ namespace Titanis.Msrpc.Msdcom
 					})
 				}
 			};
+
+			if (!string.IsNullOrEmpty(fileName))
+			{
+				actIn.InstanceInfoData = new InstanceInfoData()
+				{
+					fileName = new RpcPointer<string>(fileName),
+					mode = (uint)(StorageMode.Create | StorageMode.ReadWrite | StorageMode.ShareDenyNone),
+					//ifdROT = new RpcPointer<MInterfacePointer>(new MInterfacePointer { abData = [] }),
+				};
+
+			}
+
 			var classRef = this._dcom.Wrap<IRpcObject>(actIn);
 
 			RpcPointer<ms_dcom.ORPCTHAT> pThat = new();
@@ -345,15 +357,22 @@ namespace Titanis.Msrpc.Msdcom
 
 		protected override ActProperty[] GetActivationProperties()
 		{
-			return new ActProperty[]
+			var props = new List<ActProperty>(7)
 			{
 				ActProperty.CreateFixed(DcomIds.CLSID_SpecialSystemProperties, this.SpecialPropertiesData),
 				ActProperty.CreateFixed(DcomIds.CLSID_InstantiationInfo, this.InstantiationInfoData),
 				ActProperty.CreateFixed(DcomIds.CLSID_ActivationContextInfo, this.ActivationContextInfoData),
 				ActProperty.CreateFixed(DcomIds.CLSID_SecurityInfo, this.SecurityInfoData),
-				ActProperty.CreateFixed(DcomIds.CLSID_ServerLocationInfo, this.LocationInfoData),
-				ActProperty.CreateFixed(DcomIds.CLSID_ScmRequestInfo, this.ScmRequestInfoData),
+				ActProperty.CreateFixed(DcomIds.CLSID_ServerLocationInfo, this.LocationInfoData)
 			};
+
+			var fileName = this.InstanceInfoData.fileName;
+			if (fileName != null)
+				props.Add(ActProperty.CreateFixed(DcomIds.CLSID_InstanceInfo, this.InstanceInfoData));
+
+			props.Add(ActProperty.CreateFixed(DcomIds.CLSID_ScmRequestInfo, this.ScmRequestInfoData));
+
+			return props.ToArray();
 		}
 	}
 

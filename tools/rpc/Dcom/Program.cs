@@ -3,6 +3,7 @@
 namespace Titanis.Cli.DcomTool;
 
 [Description("Utility for working with DCOM")]
+[Subcommand("activate", typeof(ActivateCommand))]
 [Subcommand("invoke", typeof(InvokeCommand))]
 internal class Program : MultiCommand
 {
