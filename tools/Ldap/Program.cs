@@ -18,6 +18,7 @@ namespace Titanis.Cli.LdapTool
 	[Subcommand("whoami", typeof(WhoamiCommand))]
 	[Subcommand("lspart", typeof(ListPartitionsCommand))]
 	[Subcommand("timestamp", typeof(TimestampCommand))]
+	[Subcommand("mountfs", typeof(FuseCommand))]
 	[Subcommand("rm", typeof(DeleteCommand))]
 	internal partial class Program : MultiCommand
 	{

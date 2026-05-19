@@ -11,9 +11,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\base\Titanis.Cli.CommonParameters\Titanis.Cli.CommonParameters.csproj" />
+    <ProjectReference Include="..\..\src\base\Titanis.Cli.Fuse\Titanis.Cli.Fuse.csproj" />
     <ProjectReference Include="..\..\src\base\Titanis.Cli\Titanis.Cli.csproj" />
     <ProjectReference Include="..\..\src\base\Titanis.Core\Titanis.Core.csproj" />
     <ProjectReference Include="..\..\src\base\Titanis.IO\Titanis.IO.csproj" />
+    <ProjectReference Include="..\..\src\net\Titanis.Ldap.Fusion\Titanis.Ldap.Fusion.csproj" />
     <ProjectReference Include="..\..\src\net\Titanis.Ldap\Titanis.Ldap.csproj" />
     <ProjectReference Include="..\..\src\security\Titanis.Certificates\Titanis.Certificates.csproj" />
   </ItemGroup>
