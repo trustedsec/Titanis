@@ -10,10 +10,12 @@ public abstract class LdapObjectCommandBase : LdapCommandBase
 	[Description("Names or DNs of objects to create")]
 	public string[] ObjectName { get; set; }
 
-	protected virtual async Task<LdapDistinguishedName> ResolveObjectName(string simpleName, LdapClient ldap, CancellationToken cancellationToken)
+	protected virtual async Task<LdapDistinguishedName?> ResolveObjectName(string simpleName, LdapClient ldap, CancellationToken cancellationToken)
 	{
 		var result = await ldap.SimpleSearch(simpleName, cancellationToken);
-		if (result.EntryCount == 1)
+		if (result.EntryCount == 0)
+			return null;
+		else if (result.EntryCount == 1)
 			return result.Entries[0].EntryName;
 		else
 		{
@@ -29,21 +31,31 @@ public abstract class LdapObjectCommandBase : LdapCommandBase
 
 	protected sealed override async Task<int> RunAsync(LdapClient ldap, CancellationToken cancellationToken)
 	{
+		bool hasMatch = false;
 		foreach (var name in this.ObjectName)
 		{
 			LdapDistinguishedName dn;
 			if (!name.Contains('='))
+			{
 				// This is a simple namee
 				dn = await this.ResolveObjectName(name, ldap, cancellationToken);
+				if (dn is null)
+				{
+					this.WriteWarning($"No object found matching '{name}'");
+					continue;
+				}
+			}
 			else
 			{
 				var fullName = name;
+
 				// This is relative to the domain root
 				if (!name.Contains(",DC="))
 					fullName += "," + ldap.DomainRoot;
 				dn = new LdapDistinguishedName(fullName);
 			}
 
+			hasMatch = true;
 			await RunAsync(ldap, dn, cancellationToken);
 		}
 
