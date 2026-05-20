@@ -829,7 +829,7 @@ namespace Titanis.Smb2
 			}
 
 			ByteMemoryReader reader = new ByteMemoryReader(pduBytes);
-			ref readonly Smb2PduSyncHeader hdr = ref reader.ReadSmb2PduSyncHeader();
+			Smb2PduSyncHeader hdr = reader.ReadPduStruct<Smb2PduSyncHeader>();
 
 			int size = BinaryPrimitives.ReadUInt16LittleEndian(reader.PeekBytes(2));
 			Smb2Pdu? pdu = CreatePdu(hdr, size);

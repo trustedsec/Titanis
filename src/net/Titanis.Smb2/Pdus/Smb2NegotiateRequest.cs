@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Titanis.IO;
+using Titanis.PduStruct;
 
 namespace Titanis.Smb2.Pdus
 {
@@ -396,8 +397,10 @@ namespace Titanis.Smb2.Pdus
 		SigningCaps = 8,
 	}
 
+	[PduStruct]
+	[PduAlignment(8)]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2NegotiateContextHeader
+	partial struct Smb2NegotiateContextHeader
 	{
 		public unsafe static int StructSize => sizeof(Smb2NegotiateContextHeader);
 

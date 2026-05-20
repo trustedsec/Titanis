@@ -10,15 +10,6 @@ namespace Titanis.Smb2.Pdus
 {
 	static class Smb2Reader
 	{
-		internal static ref readonly Smb2PduSyncHeader ReadSmb2PduSyncHeader(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2PduSyncHeader>(reader.Consume(Smb2PduSyncHeader.StructSize))[0];
-
-		internal static ref readonly Smb2NegotiateResponseBody ReadNegRespHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2NegotiateResponseBody>(reader.Consume(Smb2NegotiateResponseBody.StructSize))[0];
-
-		internal static ref readonly Smb2NegotiateContextHeader ReadNegCtxHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2NegotiateContextHeader>(reader.Consume(Smb2NegotiateContextHeader.StructSize))[0];
-
 		internal static ref readonly Smb2ErrorResponseBody ReadErrorRespBody(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2ErrorResponseBody>(reader.Consume(Smb2ErrorResponseBody.StructSize))[0];
 

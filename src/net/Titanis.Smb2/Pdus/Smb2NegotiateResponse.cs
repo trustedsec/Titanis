@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using Titanis.IO;
@@ -33,7 +34,7 @@ namespace Titanis.Smb2.Pdus
 			int offPdu = reader.Position - Smb2PduSyncHeader.StructSize;
 
 			ref Smb2NegotiateResponseBody body = ref this.body;
-			body = reader.ReadNegRespHdr();
+			body = reader.ReadPduStruct<Smb2NegotiateResponseBody>();
 			if (body.secBufferLength > 0)
 			{
 				reader.Position = (offPdu + body.secBufferOffset);
@@ -47,9 +48,7 @@ namespace Titanis.Smb2.Pdus
 					Smb2NegotiateContext[] negCtxList = new Smb2NegotiateContext[body.negotiateContextCount];
 					for (int i = 0; i < body.negotiateContextCount; i++)
 					{
-						reader.Align(8, offPdu);
-
-						ref readonly Smb2NegotiateContextHeader negHdr = ref reader.ReadNegCtxHdr();
+						Smb2NegotiateContextHeader negHdr = reader.ReadPduStruct<Smb2NegotiateContextHeader>();
 						Smb2NegotiateContext ctx;
 
 						int offContext = reader.Position;
@@ -105,8 +104,9 @@ namespace Titanis.Smb2.Pdus
 		}
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2NegotiateResponseBody : ISmb2PduStruct
+	partial struct Smb2NegotiateResponseBody : ISmb2PduStruct
 	{
 		public unsafe static short StructSize => (short)sizeof(Smb2NegotiateResponseBody);
 

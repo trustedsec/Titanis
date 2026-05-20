@@ -16,9 +16,11 @@ namespace Titanis.Smb2.Pdus
 		internal Smb2PduAsyncHeader async;
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Explicit)]
-	struct Smb2Signature
+	partial struct Smb2Signature
 	{
+		[PduIgnore]
 		[FieldOffset(0)]
 		internal Guid value;
 		[FieldOffset(0)]
@@ -28,8 +30,9 @@ namespace Titanis.Smb2.Pdus
 	}
 
 	// [MS-SMB2] § 2.2.1.2 - SMB2 Packet Header - SYNC
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2PduSyncHeader
+	partial struct Smb2PduSyncHeader
 	{
 		public unsafe static short StructSize => (short)sizeof(Smb2PduSyncHeader);
 		public const uint ProcessId = 0xFEFF;
