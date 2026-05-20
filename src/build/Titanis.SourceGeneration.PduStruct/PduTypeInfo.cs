@@ -29,7 +29,7 @@ namespace Titanis.SourceGen
 
 			this.ByteOrder = SyntaxHelpers.GetByteOrder(TypeSymbol);
 
-			this.Parameters = GetPduParameters(typeSymbol);
+			this.Parameters = GetPduParameters(typeSymbol, out this._switchMember);
 			this.Size = PduFieldInfo.GetSizeOf(typeSymbol);
 		}
 
@@ -38,12 +38,21 @@ namespace Titanis.SourceGen
 		private ImmutableArray<PduFieldInfo>? _fields;
 		internal readonly SemanticModel model;
 
+		private ISymbol? _switchMember;
+		public ISymbol? SwitchMember => this._switchMember;
+
 		public INamedTypeSymbol TypeSymbol { get; }
 		public ImmutableArray<ISymbol> Members { get; }
 		public TypeDeclarationSyntax Declaration { get; }
 		public ImmutableArray<PduParamInfo> Parameters { get; }
 		public int Size { get; }
 		public PduByteOrder? ByteOrder { get; }
+
+		private static bool ShouldIgnore(ISymbol member) => (
+			member.IsStatic
+			|| member.IsDefined(typeof(PduIgnoreAttribute))
+			|| member.IsDefined(typeof(PduParameterAttribute))
+			);
 
 		public ImmutableArray<PduFieldInfo> GetFields(in PduTypeContext ctx)
 		{
@@ -72,6 +81,9 @@ namespace Titanis.SourceGen
 					if (member.Kind == SymbolKind.Field)
 					{
 						var field = (IFieldSymbol)member;
+						if (ShouldIgnore(member))
+							continue;
+
 						if (field.AssociatedSymbol != null)
 						{
 							// This is a backing field, use the property
@@ -88,6 +100,10 @@ namespace Titanis.SourceGen
 					{
 						if (attrPduField != null || isBackingField)
 						{
+							if (ShouldIgnore(member))
+								// Check again, since this may be a property associated with a field.
+								continue;
+
 							var prop = (IPropertySymbol)member;
 							if (!includedProps.Add(prop.Name))
 								continue;
@@ -109,19 +125,21 @@ namespace Titanis.SourceGen
 			return this._fields.Value;
 		}
 
-		internal static ImmutableArray<PduParamInfo> GetPduParameters(ITypeSymbol typeSymbol)
+		internal static ImmutableArray<PduParamInfo> GetPduParameters(ITypeSymbol typeSymbol, out ISymbol? switchMember)
 		{
+			switchMember = null;
+
 			var parameters = ImmutableArray.CreateBuilder<PduParamInfo>();
-			GetPduParametersInto(typeSymbol, parameters, true);
+			GetPduParametersInto(typeSymbol, parameters, true, ref switchMember);
 			return parameters.ToImmutable();
 		}
 
-		private static void GetPduParametersInto(ITypeSymbol typesym, IList<PduParamInfo> parameters, bool local)
+		private static void GetPduParametersInto(ITypeSymbol typesym, IList<PduParamInfo> parameters, bool local, ref ISymbol? switchMember)
 		{
 			if (typesym.TypeKind is TypeKind.Class)
 			{
 				if (typesym.BaseType != null)
-					GetPduParametersInto(typesym.BaseType, parameters, false);
+					GetPduParametersInto(typesym.BaseType, parameters, false, ref switchMember);
 			}
 
 			var members = typesym.GetMembers();
@@ -132,6 +150,8 @@ namespace Titanis.SourceGen
 					var type = member.DataType();
 					parameters.Add(new PduParamInfo(member, local, type));
 				}
+				if (member.IsDefined(typeof(PduSwitchAttribute)))
+					switchMember = member;
 			}
 		}
 	}

@@ -42,6 +42,10 @@ namespace Titanis.SourceGen
 				this.SpecialKind = SpecialPduFieldKind.Position;
 			}
 
+			// Union stuff
+			var caseAttr = member.GetAttribute(typeof(PduCaseAttribute));
+			this.Case = caseAttr?.GetArgument<object>(0);
+
 			this.StringLengthAttribute = member.GetAttribute(typeof(PduStringAttribute));
 			this.StringLength = this.StringLengthAttribute?.GetArgument<object>(1);
 			this.StringCharSet = this.StringLengthAttribute?.GetArgument<CharSet>(0);
@@ -67,6 +71,7 @@ namespace Titanis.SourceGen
 		public PduByteOrder? DeclaredByteOrder { get; }
 		public AttrArg<string>? CustomReadMethod { get; }
 		public AttrArg<string>? CustomWriteMethod { get; }
+		public AttrArg<object>? Case { get; }
 		public AttributeData? StringLengthAttribute { get; }
 		public AttrArg<object>? StringLength { get; }
 		public AttrArg<CharSet>? StringCharSet { get; }

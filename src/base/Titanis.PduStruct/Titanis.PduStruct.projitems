@@ -21,5 +21,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)PduPositionAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PduStringAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PduStructAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduUnionAttribute.cs" />
   </ItemGroup>
 </Project>

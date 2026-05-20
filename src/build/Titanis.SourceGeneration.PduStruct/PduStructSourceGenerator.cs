@@ -543,7 +543,7 @@ namespace Titanis.SourceGen
 				var condReadBlock = readStatements;
 				var condWriteBlock = writeStatements;
 
-				if (field.Condition is not null)
+				if (field.Condition is not null || field.Case != null)
 				{
 					readStatements = new List<StatementSyntax>();
 					writeStatements = new List<StatementSyntax>();
@@ -828,7 +828,7 @@ namespace Titanis.SourceGen
 					}
 					else if (elementType.IsPduStruct())
 					{
-						var fieldParameters = PduTypeInfo.GetPduParameters(elementType);
+						var fieldParameters = PduTypeInfo.GetPduParameters(elementType, out _);
 
 						// Check for an embedded PDU struct
 						ExpressionSyntax byteOrderValue =
@@ -997,23 +997,34 @@ namespace Titanis.SourceGen
 					}
 				}
 
-				if (field.Condition is not null)
+				if (field.Condition is not null || field.Case is not null)
 				{
-					var condSymbol = field.Condition.TryResolveMemberName(member, context);
-					if (condSymbol == null)
-						return false;
+					ExpressionSyntax? condExpr = null;
+					if (field.Condition != null)
+					{
+						var condSymbol = field.Condition.TryResolveMemberName(member, context);
+						if (condSymbol == null)
+							return false;
+
+						condExpr = Code.VarRef(condSymbol.Name);
+					}
+
+					if (field.Case != null)
+					{
+						var caseExpr = Code.VarRef("object").MethodOf("Equals").Call(Code.VarRef(pduType.SwitchMember?.Name ?? "missingSwitch"), field.Case.ArgumentSyntax.Expression);
+						condExpr =
+							(condExpr is null) ? caseExpr
+							: condExpr.BooleanAnd(caseExpr);
+					}
 
 					// Read condition
 					{
-						ExpressionSyntax condReadRef = Code.VarRef(condSymbol.Name);
-						if (condSymbol.Kind == SymbolKind.Method)
-							condReadRef = condReadRef.Call();
-						condReadBlock.IfThen(condReadRef, SyntaxFactory.Block(readStatements));
+						condReadBlock.IfThen(condExpr, SyntaxFactory.Block(readStatements));
 					}
 
 					// Write condition
 					{
-						ExpressionSyntax condWriteRef = Code.VarRef(condSymbol.Name);
+						ExpressionSyntax condWriteRef = condExpr;
 						//ExpressionSyntax condWriteRef =
 						//	(isNullableRef) ? fieldRef.IsNotNull()
 						//	: (isNullableValue) ? fieldRef.Member(nameof(Nullable<int>.HasValue))
