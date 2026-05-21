@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Titanis.PduStruct
 {
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Struct | AttributeTargets.Class)]
 	public sealed class PduAlignmentAttribute : Attribute
 	{
 		public PduAlignmentAttribute(int alignment)
