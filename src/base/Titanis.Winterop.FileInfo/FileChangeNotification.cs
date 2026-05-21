@@ -22,8 +22,9 @@ namespace Titanis.Winterop
 	}
 
 	// [MS-FSCC] § 2.7.1. FILE_NOTIFY_INFORMATION
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	public struct FileNotifyInfoHeader
+	public partial struct FileNotifyInfoHeader
 	{
 		public unsafe static int StructSize => sizeof(FileNotifyInfoHeader);
 

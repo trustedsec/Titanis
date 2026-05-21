@@ -96,14 +96,6 @@ namespace Titanis.Smb2.Pdus
 			}
 		}
 
-		internal static unsafe void WriteChangeNotifyReqHdr(this ByteWriter writer, in Smb2ChangeNotifyRequestHeader hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2ChangeNotifyRequestHeader.StructSize))
-			{
-				*(Smb2ChangeNotifyRequestHeader*)pStruc = hdr;
-			}
-		}
-
 		internal static unsafe void WriteFileNotifyInfoReqHdr(this ByteWriter writer, in FileNotifyInfoHeader hdr)
 		{
 			fixed (byte* pStruc = writer.Consume(FileNotifyInfoHeader.StructSize))
@@ -146,27 +138,11 @@ namespace Titanis.Smb2.Pdus
 			}
 		}
 
-		internal static unsafe void WriteCloseReqHdr(this ByteWriter writer, in Smb2CloseRequestBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2CloseRequestBody.StructSize))
-			{
-				*(Smb2CloseRequestBody*)pStruc = hdr;
-			}
-		}
-
 		internal static unsafe void WriteCloseRespHdr(this ByteWriter writer, in Smb2CloseResponseBody hdr)
 		{
 			fixed (byte* pStruc = writer.Consume(Smb2CloseResponseBody.StructSize))
 			{
 				*(Smb2CloseResponseBody*)pStruc = hdr;
-			}
-		}
-
-		internal static unsafe void WriteReadReqHdr(this ByteWriter writer, in Smb2ReadRequestBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2ReadRequestBody.StructSize))
-			{
-				*(Smb2ReadRequestBody*)pStruc = hdr;
 			}
 		}
 

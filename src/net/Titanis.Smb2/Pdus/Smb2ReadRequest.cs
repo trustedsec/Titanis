@@ -29,14 +29,15 @@ namespace Titanis.Smb2.Pdus
 		/// <inheritdoc/>
 		internal sealed override void WriteTo(ByteWriter writer, ref Smb2ReadRequestBody body)
 		{
-			writer.WriteReadReqHdr(body);
+			writer.WritePduStruct(body);
 			// HACK: Sent by Windows, without it STATUS_INVALID_PARAMETER
 			writer.Consume(1);
 		}
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2ReadRequestBody : ISmb2PduStruct
+	partial struct Smb2ReadRequestBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2ReadRequestBody);
 

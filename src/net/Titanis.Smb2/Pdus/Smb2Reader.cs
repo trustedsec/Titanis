@@ -46,12 +46,6 @@ namespace Titanis.Smb2.Pdus
 		internal static ref readonly Smb2ChangeNotifyRequestHeader ReadChangeNotifyReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2ChangeNotifyRequestHeader>(reader.Consume(Smb2ChangeNotifyRequestHeader.StructSize))[0];
 
-		internal static ref readonly Smb2ChangeNotifyResponseHeader ReadChangeNotifyRespHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2ChangeNotifyResponseHeader>(reader.Consume(Smb2ChangeNotifyResponseHeader.StructSize))[0];
-
-		internal static ref readonly FileNotifyInfoHeader ReadFileNotifyInfoHeader(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, FileNotifyInfoHeader>(reader.Consume(FileNotifyInfoHeader.StructSize))[0];
-
 		internal static ref readonly Smb2CloseRequestBody ReadCloseReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2CloseRequestBody>(reader.Consume(Smb2CloseRequestBody.StructSize))[0];
 

@@ -22,7 +22,7 @@ namespace Titanis.Smb2.Pdus
 		{
 			int offPdu = reader.Position - Smb2PduSyncHeader.StructSize;
 
-			ref readonly Smb2ChangeNotifyResponseHeader body = ref reader.ReadChangeNotifyRespHdr();
+			var body = reader.ReadPduStruct<Smb2ChangeNotifyResponseHeader>();
 			this.body = body;
 
 			if (body.outputBufferLength > 0)
@@ -34,7 +34,7 @@ namespace Titanis.Smb2.Pdus
 				{
 					reader.Position = nextOffset;
 
-					ref readonly FileNotifyInfoHeader notifyHdr = ref reader.ReadFileNotifyInfoHeader();
+					var notifyHdr = reader.ReadPduStruct<FileNotifyInfoHeader>();
 					string fileName = reader.ReadStringUni(notifyHdr.fileNameLength);
 					if (notifyHdr.action == FileNotifyAction.RenamedOldName)
 						oldName = fileName;
@@ -103,8 +103,9 @@ namespace Titanis.Smb2.Pdus
 		}
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2ChangeNotifyResponseHeader : ISmb2PduStruct
+	partial struct Smb2ChangeNotifyResponseHeader : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2ChangeNotifyResponseHeader);
 		public ushort StructureSize { get => this.structureSize; set => this.structureSize = value; }

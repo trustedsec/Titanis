@@ -28,7 +28,7 @@ namespace Titanis.Smb2.Pdus
 		/// <inheritdoc/>
 		internal sealed override void WriteTo(ByteWriter writer, ref Smb2ChangeNotifyRequestHeader hdr)
 		{
-			writer.WriteChangeNotifyReqHdr(this.body);
+			writer.WritePduStruct(this.body);
 		}
 	}
 
@@ -40,8 +40,9 @@ namespace Titanis.Smb2.Pdus
 		WatchTree = 1,
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2ChangeNotifyRequestHeader : ISmb2PduStruct
+	partial struct Smb2ChangeNotifyRequestHeader : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2ChangeNotifyRequestHeader);
 		public ushort StructureSize { get => this.headerSize; set => this.headerSize = value; }
