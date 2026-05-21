@@ -2,6 +2,7 @@
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -62,6 +63,17 @@ namespace Titanis.Winterop.Security
 				this.Entries = list;
 			else
 				this.Entries = [.. entries];
+
+			int rev = 2;
+			foreach (var entry in entries)
+			{
+				if (entry.AceType is AccessControlEntryType.AccessAllowedObject or AccessControlEntryType.AccessDeniedObject or AccessControlEntryType.SystemAuditObject or AccessControlEntryType.SystemAlarmObject or AccessControlEntryType.MandatoryLabel)
+				{
+					rev = 4;
+					break;
+				}
+			}
+			this.Revision = rev;
 		}
 
 		public List<AccessControlEntry> Entries { get; }
@@ -108,6 +120,8 @@ namespace Titanis.Winterop.Security
 
 				off = SecurityDescriptor.Align4(off);
 			}
+
+			Debug.Assert(off == aclSize);
 		}
 
 		[Flags]

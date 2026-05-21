@@ -334,7 +334,7 @@ namespace Titanis.Winterop.Security
 			var sd = new SecurityDescriptor(control, owner, group, dacl, sacl);
 			return sd;
 		}
-		private static AccessControlList? ParseAclSddl(ref SddlParseContext ctx, bool isDacl, SecurityIdentifier? domainSid, out SecurityDescriptorControl controlFlags)
+		private static AccessControlList? ParseAclSddl(ref SddlParseContext ctx, bool isSacl, SecurityIdentifier? domainSid, out SecurityDescriptorControl controlFlags)
 		{
 			var aclFlags = AccessControlList.ParseAclFlags(ref ctx);
 			if (aclFlags == AclFlags.NoAcl)
@@ -344,7 +344,7 @@ namespace Titanis.Winterop.Security
 			}
 
 			SecurityDescriptorControl flags = SecurityDescriptorControl.None;
-			if (!isDacl)
+			if (isSacl)
 			{
 				if (0 != (aclFlags & AclFlags.ReqAutoInherit))
 					flags |= SecurityDescriptorControl.SaclRequiredAutoInherit;
