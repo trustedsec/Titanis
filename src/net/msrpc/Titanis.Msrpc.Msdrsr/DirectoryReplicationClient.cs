@@ -9,8 +9,11 @@ using Titanis.Crypto;
 using Titanis.DceRpc;
 using Titanis.DceRpc.Client;
 using Titanis.IO;
+using Titanis.Ldap;
 using Titanis.Winterop;
+using Titanis.Winterop.Sam;
 using Titanis.Winterop.SamServer;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msdrsr
 {
@@ -80,6 +83,11 @@ namespace Titanis.Msrpc.Msdrsr
 
 		private const int DrsExtSize = (12 * 4 + 4);
 		private const string SupplementalCredentialsOid = "1.2.840.113556.1.4.125";
+		private const string ObjectSidOid = "1.2.840.113556.1.4.146";
+		private const string UnicodePwdOid = "1.2.840.113556.1.4.90";
+		private const string NtPwdHistoryOid = "1.2.840.113556.1.4.94";
+		private const string LmPwdHistoryOid = "1.2.840.113556.1.4.160";
+		private const string DbcsPwdOid = "1.2.840.113556.1.4.55";
 
 		// [MS-DRSR] 5.138 NTSAPI_CLIENT_GUID
 		private static readonly Guid NtdsapiClientGuid = new Guid("e24d201a-4fd6-11d1-a3da-0000f875ae0d");
@@ -439,8 +447,11 @@ namespace Titanis.Msrpc.Msdrsr
 
 		private static DsAttribute[] AttrsFromBlock(in ATTRBLOCK attrBlock, string[] prefixTable, byte[] sessionKey)
 		{
+			uint userRid = 0;
+
 			var attrSrcs = attrBlock.pAttr.value;
-			var attrs = new List<DsAttribute>(attrSrcs.Length);
+			string[] oids = new string[attrSrcs.Length];
+			var attrTypes = new AttributeTypeDescription?[attrSrcs.Length];
 			for (int iAttr = 0; iAttr < attrSrcs.Length; iAttr++)
 			{
 				ATTR attrSrc = attrSrcs[iAttr];
@@ -449,9 +460,27 @@ namespace Titanis.Msrpc.Msdrsr
 				var rid = attrSrc.attrTyp & ushort.MaxValue;
 
 				var oid = prefixTable[prefixIndex] + '.' + rid;
+				oids[iAttr] = oid;
+				attrTypes[iAttr] = LdapAttributeTypes.TryGetByNameOrOid(oid);
+				if (oid == ObjectSidOid)
+				{
+					var sidBytes = attrSrc.AttrVal.pAVal.value?.FirstOrDefault().pVal?.value;
+					if (sidBytes != null)
+					{
+						SecurityIdentifier sid = new SecurityIdentifier(sidBytes);
+						userRid = sid.Rid;
+					}
+				}
+			}
+
+			var attrs = new List<DsAttribute>(attrSrcs.Length);
+			for (int iAttr = 0; iAttr < attrSrcs.Length; iAttr++)
+			{
+				var oid = oids[iAttr];
+				ATTR attrSrc = attrSrcs[iAttr];
 
 				ATTRVAL[]? pAttrVal = attrSrc.AttrVal.pAVal?.value;
-				var values = (pAttrVal == null) ? null : Array.ConvertAll(pAttrVal, r => new DsAttributeValue(DecryptIfNeeded(oid, r.pVal.value, sessionKey)));
+				var values = (pAttrVal == null) ? null : Array.ConvertAll(pAttrVal, r => new DsAttributeValue(DecryptIfNeeded(oid, r.pVal.value, sessionKey, userRid)));
 
 				DsAttribute dsattr = new DsAttribute(oid, values ?? []);
 				attrs.Add(dsattr);
@@ -474,7 +503,7 @@ namespace Titanis.Msrpc.Msdrsr
 		}
 
 		// [MS-DRSR] § 4.1.10.5.11 - EncryptValuesIfNecessary
-		private static byte[] DecryptIfNeeded(string attrOid, byte[] value, ReadOnlySpan<byte> sessionKey)
+		private static byte[] DecryptIfNeeded(string attrOid, byte[] value, ReadOnlySpan<byte> sessionKey, uint userRid)
 		{
 			if (value != null && IsSecretAttribute(attrOid))
 			{
@@ -484,7 +513,18 @@ namespace Titanis.Msrpc.Msdrsr
 				rc4.Transform(value.Slice(16), value.Slice(16));
 
 				// TODO: Verify CRC
-				return value.Slice(16 + 4).ToArray();
+				var decrypted = value.Slice(16 + 4).ToArray();
+
+				if (attrOid is UnicodePwdOid or NtPwdHistoryOid or DbcsPwdOid or LmPwdHistoryOid)
+				{
+					var blocks = decrypted.Length / 16;
+					for (int n = 0; n < blocks; n++)
+					{
+						SamStore.DecryptUserData(userRid, decrypted.Slice(n * 16, 16));
+					}
+				}
+
+				return decrypted;
 			}
 			else
 				return value;
@@ -493,16 +533,16 @@ namespace Titanis.Msrpc.Msdrsr
 		// [MS-DRSR] § 4.1.10.3.11 - IsSecretAttribute
 		private static readonly string[] SecretAttributeList = [
 			"CURRENTVALUE", "1.2.840.113556.1.4.27",
-			"DBCSPWD", "1.2.840.113556.1.4.55",
+			"DBCSPWD", DbcsPwdOid,
 			"INITIALAUTHINCOMING", "1.2.840.113556.1.4.539",
 			"INITIALAUTHOUTGOING", "1.2.840.113556.1.4.540",
-			"LMPWDHISTORY", "1.2.840.113556.1.4.160",
-			"NTPWDHISTORY", "1.2.840.113556.1.4.94",
+			"LMPWDHISTORY", LmPwdHistoryOid,
+			"NTPWDHISTORY", NtPwdHistoryOid,
 			"PRIORVALUE", "1.2.840.113556.1.4.100",
 			"SUPPLEMENTALCREDENTIALS", SupplementalCredentialsOid,
 			"TRUSTAUTHINCOMING", "1.2.840.113556.1.4.129",
 			"TRUSTAUTHOUTGOING", "1.2.840.113556.1.4.135",
-			"UNICODEPWD", "1.2.840.113556.1.4.90",
+			"UNICODEPWD", UnicodePwdOid,
 			];
 		// [MS-DRSR] § 4.1.10.3.11 - IsSecretAttribute
 		public static bool IsSecretAttribute(string attributeNameOrOid)

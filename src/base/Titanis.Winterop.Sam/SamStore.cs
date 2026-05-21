@@ -46,16 +46,23 @@ namespace Titanis.Winterop.Sam
 			key2_56 = ((((((((((((((ulong)b1) << 8) | b0) << 8) | b3) << 8) | b2) << 8) | b1) << 8) | b0) << 8) | b3);
 		}
 
+		public static void DecryptUserData(uint userRid, Span<byte> bytes)
+		{
+			DeriveUserKey(userRid, out var k1, out var k2);
+			k1 = DesPrimitives.ExpandKey(k1);
+			k2 = DesPrimitives.ExpandKey(k2);
+			ref ulong b1 = ref MemoryMarshal.AsRef<ulong>(bytes.Slice(0, 8));
+			ref ulong b2 = ref MemoryMarshal.AsRef<ulong>(bytes.Slice(8, 8));
+			b1 = DesPrimitives.DecryptBlock(k1, b1);
+			b2 = DesPrimitives.DecryptBlock(k2, b2);
+		}
+
 		public byte[] Decrypt(uint rid, in SamEncryptedBlob blob)
 		{
 			if (blob.IsEmpty)
 				throw new ArgumentException($"The encrypted blob is empty.");
 
 			var aes = this.VerifyAesKey();
-
-			DeriveUserKey(rid, out var k1, out var k2);
-			k1 = DesPrimitives.ExpandKey(k1);
-			k2 = DesPrimitives.ExpandKey(k2);
 
 			if (blob.Revision == 2)
 			{
@@ -65,10 +72,7 @@ namespace Titanis.Winterop.Sam
 
 				var decrypted = aes.DecryptCbc(encData, blob.Salt);
 
-				ref ulong b1 = ref MemoryMarshal.AsRef<ulong>(decrypted.AsSpan(0, 8));
-				ref ulong b2 = ref MemoryMarshal.AsRef<ulong>(decrypted.AsSpan(8, 8));
-				b1 = DesPrimitives.DecryptBlock(k1, b1);
-				b2 = DesPrimitives.DecryptBlock(k2, b2);
+				DecryptUserData(rid, decrypted.AsSpan(0, 16));
 
 				return decrypted;
 			}
