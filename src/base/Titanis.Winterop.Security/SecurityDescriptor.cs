@@ -61,6 +61,11 @@ namespace Titanis.Winterop.Security
 		ResourceManagerControlValid = 0x4000,
 		// SR
 		SelfRelative = 0x8000,
+
+		OwnerMask = OwnerDefaulted,
+		GroupMask = GroupDefaulted,
+		DaclMask = DaclPresent | DaclDefaulted | DaclTrusted | DaclRequiredAutoInherit | DaclProtected,
+		SaclMask = SaclPresent | SaclDefaulted | SaclRequiredAutoInherit | SaclProtected,
 	}
 
 	/// <summary>
@@ -193,7 +198,8 @@ namespace Titanis.Winterop.Security
 			}
 		}
 
-		public byte[] ToByteArray()
+		public byte[] ToByteArray() => this.ToByteArray(SecurityInfo.Owner | SecurityInfo.Group | SecurityInfo.Dacl | SecurityInfo.Sacl);
+		public byte[] ToByteArray(SecurityInfo sections)
 		{
 			int off = 20;
 
@@ -202,24 +208,24 @@ namespace Titanis.Winterop.Security
 			int offDacl = 0;
 			int offSacl = 0;
 
-			if (this.Owner != null)
+			if (0 != (sections & SecurityInfo.Owner) && this.Owner != null)
 			{
 				offOwner = off;
 				off += this.Owner.BinaryLength;
 			}
-			if (this.Group != null)
+			if (0 != (sections & SecurityInfo.Group) && this.Group != null)
 			{
 				off = Align4(off);
 				offGroup = off;
 				off += this.Group.BinaryLength;
 			}
-			if (this.Sacl != null)
+			if (0 != (sections & SecurityInfo.Sacl) && this.Sacl != null)
 			{
 				off = Align4(off);
 				offSacl = off;
 				off += this.Sacl.BinaryLength;
 			}
-			if (this.Dacl != null)
+			if (0 != (sections & SecurityInfo.Dacl) && this.Dacl != null)
 			{
 				off = Align4(off);
 				offDacl = off;
@@ -228,16 +234,20 @@ namespace Titanis.Winterop.Security
 
 			byte[] buf = new byte[off];
 			buf[0] = 1;
-			BinaryPrimitives.WriteUInt16LittleEndian(buf.AsSpan().Slice(2, 2), (ushort)this._control);
+			BinaryPrimitives.WriteUInt16LittleEndian(buf.AsSpan().Slice(2, 2), (ushort)(this._control | SecurityDescriptorControl.SelfRelative));
 			BinaryPrimitives.WriteInt32LittleEndian(buf.AsSpan().Slice(4, 4), offOwner);
 			BinaryPrimitives.WriteInt32LittleEndian(buf.AsSpan().Slice(8, 4), offGroup);
 			BinaryPrimitives.WriteInt32LittleEndian(buf.AsSpan().Slice(12, 4), offSacl);
 			BinaryPrimitives.WriteInt32LittleEndian(buf.AsSpan().Slice(16, 4), offDacl);
 
-			this.Owner?.GetBytes(buf.AsSpan().Slice(offOwner));
-			this.Group?.GetBytes(buf.AsSpan().Slice(offGroup));
-			this.Sacl?.GetBytes(buf.AsSpan().Slice(offSacl));
-			this.Dacl?.GetBytes(buf.AsSpan().Slice(offDacl));
+			if (0 != (sections & SecurityInfo.Owner))
+				this.Owner?.GetBytes(buf.AsSpan().Slice(offOwner));
+			if (0 != (sections & SecurityInfo.Group))
+				this.Group?.GetBytes(buf.AsSpan().Slice(offGroup));
+			if (0 != (sections & SecurityInfo.Sacl))
+				this.Sacl?.GetBytes(buf.AsSpan().Slice(offSacl));
+			if (0 != (sections & SecurityInfo.Dacl))
+				this.Dacl?.GetBytes(buf.AsSpan().Slice(offDacl));
 
 			return buf;
 		}
