@@ -6,7 +6,7 @@ namespace Titanis.Smb2
 	public class PartialWriteException : Exception
 	{
 		public PartialWriteException(int bytesWritten)
-			: base($"Not all of the data was written to the stream. (bytesWritten = {bytesWritten}")
+			: base($"Not all of the data was written to the stream. (bytesWritten = {bytesWritten})")
 		{
 			this.BytesWritten = bytesWritten;
 		}
