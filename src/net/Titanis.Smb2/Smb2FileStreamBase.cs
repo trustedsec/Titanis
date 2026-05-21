@@ -126,7 +126,7 @@ namespace Titanis.Smb2
 					this.Position += cbChunk;
 
 				cbWritten += cbChunk;
-			} while (count > 0);
+			} while (count > cbWritten);
 		}
 
 		#region ISecureChannel
