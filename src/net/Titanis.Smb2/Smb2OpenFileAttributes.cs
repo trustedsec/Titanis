@@ -2,8 +2,9 @@
 
 namespace Titanis.Smb2
 {
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	public struct Smb2OpenFileAttributes
+	public partial struct Smb2OpenFileAttributes
 	{
 		public long creationTime;
 		public long lastAccessTime;

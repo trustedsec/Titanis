@@ -12,7 +12,7 @@ namespace Titanis.Smb2.Pdus
 
 		internal override void ReadFrom(ByteMemoryReader reader, ref readonly Smb2PduSyncHeader pduHdr)
 		{
-			this.body = reader.ReadWriteRespBody();
+			this.body = reader.ReadPduStruct<Smb2WriteResponseBody>();
 		}
 
 		protected override ushort ValidBodySize => 17;
@@ -22,8 +22,9 @@ namespace Titanis.Smb2.Pdus
 		}
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2WriteResponseBody : ISmb2PduStruct
+	partial struct Smb2WriteResponseBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2WriteResponseBody);
 

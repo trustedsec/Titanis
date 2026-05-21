@@ -67,7 +67,7 @@ namespace Titanis.Smb2.Pdus
 				body.outputOffset = body.inputOffset;
 			}
 
-			writer.WriteIoctlReqHdr(body);
+			writer.WritePduStruct(body);
 
 			if (this.inputBuffer.Length > 0)
 				writer.WriteBytes(this.inputBuffer.Span);
@@ -85,8 +85,9 @@ namespace Titanis.Smb2.Pdus
 		IsFsctl = 1
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2IoctlRequestBody : ISmb2PduStruct
+	partial struct Smb2IoctlRequestBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2IoctlRequestBody);
 

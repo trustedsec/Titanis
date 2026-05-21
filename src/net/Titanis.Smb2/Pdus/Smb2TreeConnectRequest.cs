@@ -19,8 +19,8 @@ namespace Titanis.Smb2.Pdus
 
 			// TODO: Validate header values
 
-			ref readonly Smb2TreeConnectRequestBody body = ref reader.ReadTreeConnectReqHdr();
-			this.body = base.body;
+			var body = reader.ReadPduStruct<Smb2TreeConnectRequestBody>();
+			this.body = body;
 			if (body.pathLength > 0)
 			{
 				reader.Position = offPdu + body.pathOffset;
@@ -42,7 +42,7 @@ namespace Titanis.Smb2.Pdus
 				body.pathLength = 0;
 			}
 
-			writer.WriteTreeConnectReqBody(body);
+			writer.WritePduStruct(body);
 			if (this.path != null)
 				writer.WriteStringUni(this.path);
 		}
@@ -58,8 +58,9 @@ namespace Titanis.Smb2.Pdus
 		ExtensionsPresent = 4,
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2TreeConnectRequestBody : ISmb2PduStruct
+	partial struct Smb2TreeConnectRequestBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2TreeConnectRequestBody);
 

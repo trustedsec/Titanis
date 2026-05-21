@@ -7,29 +7,29 @@ using System.Text;
 
 namespace Titanis.Smb2
 {
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct SockaddrStorage
+	partial struct SockaddrStorage
 	{
-		internal static unsafe int StructSize => sizeof(SockaddrStorage);
-
 		internal ushort family;
-		internal unsafe fixed byte data[126];
+		[PduArraySize(126)]
+		internal byte[] data;
 
 		public AddressFamily Family => (AddressFamily)family;
 
-		internal unsafe ref SockaddrIpv4 AsIpv4()
+		internal unsafe SockaddrIpv4 AsIpv4()
 		{
 			fixed (byte* pData = this.data)
 			{
-				return ref *(SockaddrIpv4*)pData;
+				return *(SockaddrIpv4*)pData;
 			}
 		}
 
-		internal unsafe ref SockaddrIpv6 AsIpv6()
+		internal unsafe SockaddrIpv6 AsIpv6()
 		{
 			fixed (byte* pData = this.data)
 			{
-				return ref *(SockaddrIpv6*)pData;
+				return *(SockaddrIpv6*)pData;
 			}
 		}
 
@@ -94,8 +94,9 @@ namespace Titanis.Smb2
 		RdmaCapable = 2,
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2NicInfoStruct
+	partial struct Smb2NicInfoStruct
 	{
 		internal static unsafe int StructSize => sizeof(Smb2NicInfoStruct);
 

@@ -25,12 +25,13 @@ namespace Titanis.Smb2.Pdus
 		/// <inheritdoc/>
 		internal sealed override void WriteTo(ByteWriter writer, ref Smb2CloseRequestBody body)
 		{
-			writer.WriteCloseReqHdr(body);
+			writer.WritePduStruct(body);
 		}
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2CloseRequestBody: ISmb2PduStruct
+	partial struct Smb2CloseRequestBody: ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2CloseRequestBody);
 		public ushort StructureSize { get => this.structureSize; set => this.structureSize = value; }

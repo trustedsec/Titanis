@@ -698,6 +698,9 @@ namespace Titanis.Smb2
 			bool encrypt)
 		{
 			ByteWriter writer = new ByteWriter();
+			// For proper alignment
+			writer.Advance(4);
+			int offFrame = writer.Position;
 			int offPduSize = writer.AllocDSHeader();
 
 			int offXform = writer.Position;
@@ -756,7 +759,7 @@ namespace Titanis.Smb2
 				// Nothing special for CANCEL
 			}
 
-			writer.Write(hdr);
+			writer.WritePduStruct(hdr);
 			pdu.WriteTo(writer);
 
 			var frameBytes = writer.GetData();
@@ -790,12 +793,12 @@ namespace Titanis.Smb2
 #endif
 			writer.SetPosition(offPduSize);
 			writer.WriteInt32LE(BinaryPrimitives.ReverseEndianness(offEnd - offXform));
-			var pduBytes = frameBytes[4..];
+			var pduBytes = frameBytes[offPdu..];
 
 			return new PduInfo
 			{
 				messageId = hdr.messageId,
-				frameBytes = frameBytes,
+				frameBytes = frameBytes.Slice(offFrame),
 				pduBytes = pduBytes,
 				sigBytes = pduBytes.Slice(Smb2PduSyncHeader.StructSize - Smb2PduSyncHeader.SigSize, Smb2PduSyncHeader.SigSize)
 			};

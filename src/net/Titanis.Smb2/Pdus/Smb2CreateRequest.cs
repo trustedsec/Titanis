@@ -115,7 +115,7 @@ namespace Titanis.Smb2.Pdus
 			}
 
 			int offHdr = writer.Position;
-			writer.WriteCreateReqHdr(this.body);
+			writer.WritePduStruct(this.body);
 			if (this.path != null)
 				writer.WriteStringUni(this.path);
 
@@ -198,8 +198,9 @@ namespace Titanis.Smb2.Pdus
 	}
 
 	// [MS-SMB2] § 2.2.13 - SMB2 CREATE Request
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2CreateRequestBody
+	partial struct Smb2CreateRequestBody
 	{
 		public unsafe static int StructSize => sizeof(Smb2CreateRequestBody);
 
@@ -223,8 +224,9 @@ namespace Titanis.Smb2.Pdus
 	}
 
 	// [MS-SMB2] § 2.2.13.2 - SMB2_CREATE_CONTEXT Request Values
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2CreateContextHeader
+	partial struct Smb2CreateContextHeader
 	{
 		internal static unsafe int StructSize => sizeof(Smb2CreateContextHeader);
 

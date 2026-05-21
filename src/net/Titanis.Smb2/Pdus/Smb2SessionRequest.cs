@@ -44,7 +44,7 @@ namespace Titanis.Smb2.Pdus
 			// TODO: Validate header values
 
 
-			ref readonly Smb2SessionRequestBody hdr = ref reader.ReadSessionReqHdr();
+			var hdr = reader.ReadPduStruct<Smb2SessionRequestBody>();
 			this.body = hdr;
 			if (hdr.secBufferLength > 0)
 			{
@@ -67,7 +67,7 @@ namespace Titanis.Smb2.Pdus
 				body.secBufferLength = 0;
 			}
 
-			writer.WriteSessionReqHdr(body);
+			writer.WritePduStruct(body);
 			if (this.secToken != null)
 				writer.WriteBytes(this.secToken);
 		}
@@ -89,8 +89,9 @@ namespace Titanis.Smb2.Pdus
 		Dfs = 1,
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2SessionRequestBody : ISmb2PduStruct
+	partial struct Smb2SessionRequestBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2SessionRequestBody);
 

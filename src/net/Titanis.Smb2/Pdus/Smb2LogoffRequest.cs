@@ -19,18 +19,19 @@ namespace Titanis.Smb2.Pdus
 		/// <inheritdoc/>
 		internal sealed override void ReadFrom(ByteMemoryReader reader, ref readonly Smb2PduSyncHeader pduHdr)
 		{
-			this.body = reader.ReadLogoffReqHdr();
+			this.body = reader.ReadPduStruct<Smb2LogoffRequestBody>();
 		}
 
 		/// <inheritdoc/>
 		internal sealed override void WriteTo(ByteWriter writer, ref Smb2LogoffRequestBody body)
 		{
-			writer.WriteLogoffReqHdr(body);
+			writer.WritePduStruct<Smb2LogoffRequestBody>(body);
 		}
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2LogoffRequestBody : ISmb2PduStruct
+	partial struct Smb2LogoffRequestBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2LogoffRequestBody);
 

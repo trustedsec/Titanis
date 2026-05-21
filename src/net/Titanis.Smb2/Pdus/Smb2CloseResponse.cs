@@ -20,7 +20,7 @@ namespace Titanis.Smb2.Pdus
 		/// <inheritdoc/>
 		internal sealed override void ReadFrom(ByteMemoryReader reader, ref readonly Smb2PduSyncHeader pduHdr)
 		{
-			this.body = reader.ReadCloseRespHdr();
+			this.body = reader.ReadPduStruct<Smb2CloseResponseBody>();
 		}
 
 		/// <inheritdoc/>
@@ -30,8 +30,9 @@ namespace Titanis.Smb2.Pdus
 		}
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2CloseResponseBody: ISmb2PduStruct
+	partial struct Smb2CloseResponseBody: ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2CloseResponseBody);
 		public ushort StructureSize { get => this.structureSize; set => this.structureSize = value; }

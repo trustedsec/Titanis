@@ -55,7 +55,7 @@ namespace Titanis.Smb2.Pdus
 
 					int savePos = writer.Position;
 					writer.SetPosition(offCtxHdr);
-					writer.WriteNegContextHdr(new Smb2NegotiateContextHeader
+					writer.WritePduStruct(new Smb2NegotiateContextHeader
 					{
 						contextType = context.ContextType,
 						dataLength = (short)(savePos - offContextData)
@@ -67,7 +67,7 @@ namespace Titanis.Smb2.Pdus
 			{
 				int savePos = writer.Position;
 				writer.SetPosition(offHdr);
-				writer.WriteNegReqHdr(hdr);
+				writer.WritePduStruct(hdr);
 				writer.SetPosition(savePos);
 			}
 		}
@@ -81,8 +81,9 @@ namespace Titanis.Smb2.Pdus
 
 	// REF: [MS-SMB2] § 2.2.3 SMB2 NEGOTIATE Request
 	// https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2/e14db7ff-763a-4263-8b10-0c3944f52fc5
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2NegotiateRequestBody : ISmb2PduStruct
+	partial struct Smb2NegotiateRequestBody : ISmb2PduStruct
 	{
 		public unsafe static ushort StructSize => (ushort)sizeof(Smb2NegotiateRequestBody);
 		public ushort StructureSize { get => this.structureSize; set => this.structureSize = value; }

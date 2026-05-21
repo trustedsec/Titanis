@@ -18,7 +18,7 @@ namespace Titanis.Smb2.Pdus
 
 			// TODO: Validate header values
 
-			this.body = reader.ReadTreeConnectRespHdr();
+			this.body = reader.ReadPduStruct<Smb2TreeConnectResponseBody>();
 		}
 
 		protected override ushort ValidBodySize => 16;
@@ -30,8 +30,9 @@ namespace Titanis.Smb2.Pdus
 		}
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2ShareInfo
+	partial struct Smb2ShareInfo
 	{
 		internal Smb2ShareType shareType;
 		internal byte reserved;
@@ -40,8 +41,9 @@ namespace Titanis.Smb2.Pdus
 		internal uint maximalAccess;
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2TreeConnectResponseBody : ISmb2PduStruct
+	partial struct Smb2TreeConnectResponseBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2TreeConnectResponseBody);
 

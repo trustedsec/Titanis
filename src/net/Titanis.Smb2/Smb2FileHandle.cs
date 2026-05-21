@@ -3,8 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace Titanis.Smb2
 {
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	public record struct Smb2FileHandle
+	public partial struct Smb2FileHandle : IEquatable<Smb2FileHandle>
 	{
 		internal static unsafe int StructSize => sizeof(Smb2FileHandle);
 		internal static Smb2FileHandle Invalid => new Smb2FileHandle(0xFFFFFFFF_FFFFFFFF, 0xFFFFFFFF_FFFFFFFF);
@@ -24,6 +25,32 @@ namespace Titanis.Smb2
 			{
 				return new Span<byte>((byte*)pStruc, StructSize);
 			}
+		}
+
+		public override bool Equals(object? obj)
+		{
+			return obj is Smb2FileHandle handle && Equals(handle);
+		}
+
+		public bool Equals(Smb2FileHandle other)
+		{
+			return low == other.low &&
+				   high == other.high;
+		}
+
+		public override int GetHashCode()
+		{
+			return System.HashCode.Combine(low, high);
+		}
+
+		public static bool operator ==(Smb2FileHandle left, Smb2FileHandle right)
+		{
+			return left.Equals(right);
+		}
+
+		public static bool operator !=(Smb2FileHandle left, Smb2FileHandle right)
+		{
+			return !(left == right);
 		}
 	}
 }

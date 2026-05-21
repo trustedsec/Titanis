@@ -10,38 +10,11 @@ namespace Titanis.Smb2.Pdus
 {
 	static class Smb2Reader
 	{
-		internal static ref readonly Smb2ErrorResponseBody ReadErrorRespBody(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2ErrorResponseBody>(reader.Consume(Smb2ErrorResponseBody.StructSize))[0];
-
 		internal static ref readonly Smb2ErrorContextHeader ReadErrorCtxHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2ErrorContextHeader>(reader.Consume(Smb2ErrorContextHeader.StructSize))[0];
 
-		internal static ref readonly Smb2SessionRequestBody ReadSessionReqHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2SessionRequestBody>(reader.Consume(Smb2SessionRequestBody.StructSize))[0];
-
-		internal static ref readonly Smb2LogoffRequestBody ReadLogoffReqHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2LogoffRequestBody>(reader.Consume(Smb2LogoffRequestBody.StructSize))[0];
-
-		internal static ref readonly Smb2LogoffResponseBody ReadLogoffRespHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2LogoffResponseBody>(reader.Consume(Smb2LogoffResponseBody.StructSize))[0];
-
-		internal static ref readonly Smb2SessionResponseBody ReadSessionRespBody(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2SessionResponseBody>(reader.Consume(Smb2SessionResponseBody.StructSize))[0];
-
-		internal static ref readonly Smb2TreeConnectRequestBody ReadTreeConnectReqHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2TreeConnectRequestBody>(reader.Consume(Smb2TreeConnectRequestBody.StructSize))[0];
-
-		internal static ref readonly Smb2TreeConnectResponseBody ReadTreeConnectRespHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2TreeConnectResponseBody>(reader.Consume(Smb2TreeConnectResponseBody.StructSize))[0];
-
 		internal static ref readonly Smb2CreateRequestBody ReadCreateReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2CreateRequestBody>(reader.Consume(Smb2CreateRequestBody.StructSize))[0];
-
-		internal static ref readonly Smb2CreateResponseBody ReadCreateRespHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2CreateResponseBody>(reader.Consume(Smb2CreateResponseBody.StructSize))[0];
-
-		internal static ref readonly Smb2CreateContextHeader ReadCreateContextHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2CreateContextHeader>(reader.Consume(Smb2CreateContextHeader.StructSize))[0];
 
 		internal static ref readonly Smb2IoctlRequestBody ReadIoctlReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2IoctlRequestBody>(reader.Consume(Smb2IoctlRequestBody.StructSize))[0];
@@ -57,9 +30,6 @@ namespace Titanis.Smb2.Pdus
 
 		internal static ref readonly Smb2QueryDirRequestBody ReadQueryDirReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2QueryDirRequestBody>(reader.Consume(Smb2QueryDirRequestBody.StructSize))[0];
-
-		internal static ref readonly Smb2QueryDirResponseBody ReadQueryDirRespHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2QueryDirResponseBody>(reader.Consume(Smb2QueryDirResponseBody.StructSize))[0];
 
 		internal static ref readonly Smb2FlushRequestBody ReadFlushReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2FlushRequestBody>(reader.Consume(Smb2FlushRequestBody.StructSize))[0];
@@ -88,9 +58,6 @@ namespace Titanis.Smb2.Pdus
 		internal static ref readonly Smb2CancelRequestBody ReadCancelReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2CancelRequestBody>(reader.Consume(Smb2CancelRequestBody.StructSize))[0];
 
-		internal static ref readonly Smb2CloseResponseBody ReadCloseRespHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2CloseResponseBody>(reader.Consume(Smb2CloseResponseBody.StructSize))[0];
-
 		internal static ref readonly Smb2ReadRequestBody ReadReadReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2ReadRequestBody>(reader.Consume(Smb2ReadRequestBody.StructSize))[0];
 
@@ -99,12 +66,6 @@ namespace Titanis.Smb2.Pdus
 
 		internal static ref readonly Smb2WriteRequestBody ReadWriteReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2WriteRequestBody>(reader.Consume(Smb2WriteRequestBody.StructSize))[0];
-
-		internal static ref readonly Smb2WriteResponseBody ReadWriteRespBody(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2WriteResponseBody>(reader.Consume(Smb2WriteResponseBody.StructSize))[0];
-
-		internal static ref readonly Smb2NicInfoStruct ReadNicInfo(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2NicInfoStruct>(reader.Consume(Smb2NicInfoStruct.StructSize))[0];
 
 		internal static ref readonly Smb2QueryInfoResponseBody ReadQueryInfoResponseBody(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2QueryInfoResponseBody>(reader.Consume(Smb2QueryInfoResponseBody.StructSize))[0];
@@ -121,7 +82,7 @@ namespace Titanis.Smb2.Pdus
 			{
 				offStruc += next;
 				reader.Position = offStruc;
-				ref readonly Smb2NicInfoStruct struc = ref reader.ReadNicInfo();
+				var struc = reader.ReadPduStruct<Smb2NicInfoStruct>();
 				list.Add(new Smb2NicInfo { info = struc });
 				next = struc.next;
 			} while (next > 0);

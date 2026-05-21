@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using Titanis.IO;
 
@@ -26,7 +27,7 @@ namespace Titanis.Smb2.Pdus
 
 			// TODO: Validate header values
 
-			this.body = reader.ReadCreateRespHdr();
+			this.body = reader.ReadPduStruct<Smb2CreateResponseBody>();
 
 			bool hasDurableHandle = false;
 			Smb2FileAccessRights maxAccess = 0;
@@ -41,7 +42,7 @@ namespace Titanis.Smb2.Pdus
 				{
 					offCtx += next;
 					reader.Position = offCtx;
-					ref readonly var ctxhdr = ref reader.ReadCreateContextHdr();
+					var ctxhdr = reader.ReadPduStruct< Smb2CreateContextHeader>();
 					next = ctxhdr.next;
 
 					reader.Position = offCtx + ctxhdr.nameOffset;
@@ -133,8 +134,9 @@ namespace Titanis.Smb2.Pdus
 		IsDirectory = 0x8000_0000
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2FileOpenInfo
+	partial struct Smb2FileOpenInfo
 	{
 		internal Smb2OplockLevel oplockLevel;
 		internal Smb2CreateResponseFlags flags;
@@ -146,8 +148,9 @@ namespace Titanis.Smb2.Pdus
 		internal Smb2FileHandle fileId;
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2CreateResponseBody : ISmb2PduStruct
+	partial struct Smb2CreateResponseBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2CreateResponseBody);
 		public ushort StructureSize { get => this.structureSize; set => this.structureSize = value; }

@@ -23,7 +23,7 @@ namespace Titanis.Smb2.Pdus
 
 			// TODO: Validate header values
 
-			ref readonly Smb2QueryDirResponseBody body = ref reader.ReadQueryDirRespHdr();
+			var body = reader.ReadPduStruct<Smb2QueryDirResponseBody>();
 			this.body = body;
 			if (body.outputBufferLength > 0)
 			{
@@ -52,8 +52,9 @@ namespace Titanis.Smb2.Pdus
 		}
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2QueryDirResponseBody : ISmb2PduStruct
+	partial struct Smb2QueryDirResponseBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2QueryDirResponseBody);
 

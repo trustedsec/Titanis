@@ -13,13 +13,13 @@ namespace Titanis.Smb2.Pdus
 
 		internal override void ReadFrom(ByteMemoryReader reader, ref readonly Smb2PduSyncHeader pduHdr)
 		{
-			this.body = reader.ReadLogoffReqHdr();
+			this.body = reader.ReadPduStruct<Smb2LogoffRequestBody>();
 		}
 
 		protected override ushort ValidBodySize => 4;
 		internal override void WriteTo(ByteWriter writer, ref Smb2LogoffRequestBody body)
 		{
-			writer.WriteLogoffReqHdr(body);
+			writer.WritePduStruct<Smb2LogoffRequestBody>(body);
 		}
 	}
 }

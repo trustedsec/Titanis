@@ -41,7 +41,7 @@ namespace Titanis.Smb2.Pdus
 			body.fileInfoClass = info.InfoClass;
 
 			int offHeader = writer.Position;
-			writer.Write(body);
+			writer.WritePduStruct(body);
 
 			int offInfo = writer.Position;
 			info.WriteTo(writer);
@@ -61,8 +61,9 @@ namespace Titanis.Smb2.Pdus
 		Quota = 4,
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2SetInfoRequestBody : ISmb2PduStruct
+	partial struct Smb2SetInfoRequestBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2SetInfoRequestBody);
 

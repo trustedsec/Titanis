@@ -25,7 +25,7 @@ namespace Titanis.Smb2.Pdus
 
 			// TODO: Validate header values
 
-			ref readonly Smb2QueryDirRequestBody body = ref reader.ReadQueryDirReqHdr();
+			var body = reader.ReadPduStruct<Smb2QueryDirRequestBody>();
 			this.body = body;
 			if (body.fileNameLength > 0)
 			{
@@ -48,7 +48,7 @@ namespace Titanis.Smb2.Pdus
 				body.fileNameLength = 0;
 			}
 
-			writer.WriteQueryDirReqHdr(body);
+			writer.WritePduStruct(body);
 			if (this.searchPattern != null)
 				writer.WriteStringUni(this.searchPattern);
 		}
@@ -75,8 +75,9 @@ namespace Titanis.Smb2.Pdus
 		Reopen = 0x10
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2QueryDirRequestBody : ISmb2PduStruct
+	partial struct Smb2QueryDirRequestBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2QueryDirRequestBody);
 

@@ -35,15 +35,16 @@ namespace Titanis.Smb2.Pdus
 				body.dataOffset = (ushort)(Smb2PduAsyncHeader.StructSize + Smb2WriteRequestBody.StructSize);
 				body.dataLength = (uint)this.buffer.Length;
 			}
-			writer.WriteWriteReqHdr(body);
+			writer.WritePduStruct(body);
 
 			if (this.buffer.Length > 0)
 				writer.WriteBytes(this.buffer.Span);
 		}
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2WriteRequestBody : ISmb2PduStruct
+	partial struct Smb2WriteRequestBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2WriteRequestBody);
 

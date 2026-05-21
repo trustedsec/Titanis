@@ -21,7 +21,7 @@ namespace Titanis.Smb2.Pdus
 
 			// TODO: Validate header values
 
-			ref readonly Smb2SessionResponseBody body = ref reader.ReadSessionRespBody();
+			var body = reader.ReadPduStruct<Smb2SessionResponseBody>();
 			this.body = body;
 			if (body.secBufferLength > 0)
 			{
@@ -60,8 +60,9 @@ namespace Titanis.Smb2.Pdus
 		EncryptData = 4
 	}
 
+	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	struct Smb2SessionResponseBody:ISmb2PduStruct
+	partial struct Smb2SessionResponseBody : ISmb2PduStruct
 	{
 		public unsafe static int StructSize => sizeof(Smb2SessionResponseBody);
 

@@ -17,64 +17,17 @@ namespace Titanis.Smb2.Pdus
 		internal static unsafe int AllocDSHeader(this ByteWriter writer)
 			=> writer.Alloc(sizeof(int));
 
-		internal static unsafe void Write(this ByteWriter writer, in Smb2PduSyncHeader hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2PduSyncHeader.StructSize))
-			{
-				*(Smb2PduSyncHeader*)pStruc = hdr;
-			}
-		}
-		internal static unsafe void Write(this ByteWriter writer, in Smb2PduAsyncHeader hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2PduAsyncHeader.StructSize))
-			{
-				*(Smb2PduAsyncHeader*)pStruc = hdr;
-			}
-		}
-
-		internal static unsafe void Write(this ByteWriter writer, in Smb2NegotiateRequestBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2NegotiateRequestBody.StructSize))
-			{
-				*(Smb2NegotiateRequestBody*)pStruc = hdr;
-			}
-		}
-
 		internal static unsafe int AllocNegReqHdr(this ByteWriter writer)
 			=> writer.Alloc(Smb2NegotiateRequestBody.StructSize);
 
-		internal static unsafe void WriteNegReqHdr(this ByteWriter writer, in Smb2NegotiateRequestBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2NegotiateRequestBody.StructSize))
-			{
-				*(Smb2NegotiateRequestBody*)pStruc = hdr;
-			}
-		}
-
 		internal static unsafe int AllocNegContextHdr(this ByteWriter writer)
 			=> writer.Alloc(Smb2NegotiateContextHeader.StructSize);
-
-		internal static unsafe void WriteNegContextHdr(this ByteWriter writer, in Smb2NegotiateContextHeader hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2NegotiateContextHeader.StructSize))
-			{
-				*(Smb2NegotiateContextHeader*)pStruc = hdr;
-			}
-		}
 
 		internal static unsafe void WriteErrorRespHdr(this ByteWriter writer, in Smb2ErrorResponseBody hdr)
 		{
 			fixed (byte* pStruc = writer.Consume(Smb2ErrorResponseBody.StructSize))
 			{
 				*(Smb2ErrorResponseBody*)pStruc = hdr;
-			}
-		}
-
-		internal static unsafe void WriteSessionReqHdr(this ByteWriter writer, in Smb2SessionRequestBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2SessionRequestBody.StructSize))
-			{
-				*(Smb2SessionRequestBody*)pStruc = hdr;
 			}
 		}
 
@@ -86,27 +39,11 @@ namespace Titanis.Smb2.Pdus
 			}
 		}
 
-		internal static unsafe void WriteLogoffReqHdr(this ByteWriter writer, in Smb2LogoffRequestBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2LogoffRequestBody.StructSize))
-			{
-				*(Smb2LogoffRequestBody*)pStruc = hdr;
-			}
-		}
-
 		internal static unsafe void WriteLogoffRespHdr(this ByteWriter writer, in Smb2LogoffResponseBody hdr)
 		{
 			fixed (byte* pStruc = writer.Consume(Smb2LogoffResponseBody.StructSize))
 			{
 				*(Smb2LogoffResponseBody*)pStruc = hdr;
-			}
-		}
-
-		internal static unsafe void WriteTreeConnectReqBody(this ByteWriter writer, in Smb2TreeConnectRequestBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2TreeConnectRequestBody.StructSize))
-			{
-				*(Smb2TreeConnectRequestBody*)pStruc = hdr;
 			}
 		}
 
@@ -132,14 +69,6 @@ namespace Titanis.Smb2.Pdus
 			fixed (byte* pStruc = writer.Consume(Smb2CreateResponseBody.StructSize))
 			{
 				*(Smb2CreateResponseBody*)pStruc = hdr;
-			}
-		}
-
-		internal static unsafe void WriteIoctlReqHdr(this ByteWriter writer, in Smb2IoctlRequestBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2IoctlRequestBody.StructSize))
-			{
-				*(Smb2IoctlRequestBody*)pStruc = hdr;
 			}
 		}
 
@@ -190,14 +119,6 @@ namespace Titanis.Smb2.Pdus
 				ref Smb2ChangeNotifyResponseHeader pHdr = ref *(Smb2ChangeNotifyResponseHeader*)pStruc;
 				pHdr = hdr;
 				return ref pHdr;
-			}
-		}
-
-		internal static unsafe void WriteQueryDirReqHdr(this ByteWriter writer, in Smb2QueryDirRequestBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2QueryDirRequestBody.StructSize))
-			{
-				*(Smb2QueryDirRequestBody*)pStruc = hdr;
 			}
 		}
 
@@ -257,14 +178,6 @@ namespace Titanis.Smb2.Pdus
 			}
 		}
 
-		internal static unsafe void WriteWriteReqHdr(this ByteWriter writer, in Smb2WriteRequestBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2WriteRequestBody.StructSize))
-			{
-				*(Smb2WriteRequestBody*)pStruc = hdr;
-			}
-		}
-
 		internal static unsafe void WriteWriteRespHdr(this ByteWriter writer, in Smb2WriteResponseBody hdr)
 		{
 			fixed (byte* pStruc = writer.Consume(Smb2WriteResponseBody.StructSize))
@@ -284,9 +197,6 @@ namespace Titanis.Smb2.Pdus
 
 		internal static void Write(this ByteWriter writer, in Smb2OplockBreakAckHeader hdr)
 			=> MemoryMarshal.Cast<byte, Smb2OplockBreakAckHeader>(writer.Consume(Smb2OplockBreakAckHeader.StructSize))[0] = hdr;
-
-		internal static void Write(this ByteWriter writer, in Smb2SetInfoRequestBody hdr)
-			=> MemoryMarshal.Cast<byte, Smb2SetInfoRequestBody>(writer.Consume(Smb2SetInfoRequestBody.StructSize))[0] = hdr;
 
 		internal static void Write(this ByteWriter writer, in Smb2CancelRequestBody hdr)
 			=> MemoryMarshal.Cast<byte, Smb2CancelRequestBody>(writer.Consume(Smb2CancelRequestBody.StructSize))[0] = hdr;
