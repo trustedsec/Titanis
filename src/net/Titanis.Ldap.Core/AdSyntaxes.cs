@@ -925,8 +925,7 @@ namespace Titanis.Ldap
 
 		public override object Parse(string text)
 		{
-			// TODO: Parse SecurityDescriptor
-			throw new NotImplementedException();
+			return SecurityDescriptor.ParseSddl(text, null);
 		}
 	}
 

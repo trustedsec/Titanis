@@ -14,6 +14,7 @@ using Titanis.Asn1.Serialization;
 using Titanis.Certificates;
 using Titanis.Net;
 using Titanis.Security;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Ldap
 {
@@ -390,6 +391,9 @@ namespace Titanis.Ldap
 					byte[] dirsync = Asn1DerEncoder.EncodeTlv(new DirSyncRequestValue(DirSyncFlags.IncrementalValues, cookie: query.DirSyncCookie)).ToArray();
 					controls.Add(new Control(Encoding.UTF8.GetBytes(AdExtensions.DirSyncOid), true, dirsync));
 				}
+
+				if (query.SdFlags.HasValue)
+				controls.Add(CreateSdFlagControl(query.SdFlags.Value));
 			}
 
 			SearchRequest_Tagged3 asn1Search = new(
@@ -493,7 +497,7 @@ namespace Titanis.Ldap
 		public Task<LdapSearchResult> SimpleSearch(string name, AttributeSpec[]? attributes, CancellationToken cancellationToken)
 		{
 			ArgumentException.ThrowIfNullOrEmpty(name);
-			return this.SimpleSearch(this.DomainRoot, LdapSearchScope.WholeSubtree, name, null, cancellationToken);
+			return this.SimpleSearch(this.DomainRoot, LdapSearchScope.WholeSubtree, name, attributes, cancellationToken);
 		}
 		#endregion
 
@@ -635,12 +639,23 @@ namespace Titanis.Ldap
 				}
 			}
 
+			List<Control>? controls = null;
+			if (request.SecuritySections.HasValue)
+			{
+				(controls ??= new List<Control>()).Add(CreateSdFlagControl(request.SecuritySections.Value));
+			}
+
 			var dn = request.DistinguishedName;
 			var resp = await _channel.SendRequest(new LDAPMessage_ProtocolOp()
 			{
-				ModifyRequest = new ModifyRequest_Tagged6(Encoding.UTF8.GetBytes(dn.Text), attrs.ToArray())
-			}, cancellationToken).ConfigureAwait(false);
+				ModifyRequest = new ModifyRequest_Tagged6(Encoding.UTF8.GetBytes(dn.Text), attrs.ToArray()),
+			}, cancellationToken, controls: controls?.ToArray()).ConfigureAwait(false);
 			LdapClientChannel.CheckAndThrow(resp.message.protocolOp.ModifyResponse);
+		}
+
+		private static Control CreateSdFlagControl(SecurityInfo sections)
+		{
+			return new Control(Encoding.UTF8.GetBytes(AdExtensions.SdFlagsOid), true, Asn1DerEncoder.EncodeTlv(new SdFlagsControl(sections)).ToArray());
 		}
 
 		public Task Delete(LdapDistinguishedName dn, CancellationToken cancellationToken)

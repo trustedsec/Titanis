@@ -75,14 +75,12 @@ namespace Titanis.Winterop.Security
 	[TypeConverter(typeof(SecurityDescriptorConverter))]
 	public class SecurityDescriptor
 	{
-		private SecurityDescriptorControl _control;
-
 		public SecurityDescriptor(
 			SecurityDescriptorControl control,
 			SecurityIdentifier? owner
 			)
 		{
-			this._control = control;
+			this.Control = control;
 
 			this.Owner = owner;
 		}
@@ -95,7 +93,7 @@ namespace Titanis.Winterop.Security
 			if (rev != 1)
 				throw new InvalidDataException("The buffer does not appear to contain a valid security descriptor.");
 			var control = (SecurityDescriptorControl)BinaryPrimitives.ReadUInt16LittleEndian(bytes.Slice(2, 2));
-			this._control = control;
+			this.Control = control;
 
 			if (0 == (control & SecurityDescriptorControl.SelfRelative))
 				throw new NotSupportedException("The security descriptor is not self-relative.  Absolute security descriptors are not supported.");
@@ -141,11 +139,12 @@ namespace Titanis.Winterop.Security
 			if (sacl != null)
 				control |= SecurityDescriptorControl.SaclPresent;
 
-			this._control = control;
+			this.Control = control;
 		}
 
-		public SecurityIdentifier? Owner { get; }
-		public SecurityIdentifier? Group { get; }
+		public SecurityDescriptorControl Control { get; set; }
+		public SecurityIdentifier? Owner { get; set; }
+		public SecurityIdentifier? Group { get; set; }
 		public AccessControlList? Sacl { get; }
 		public AccessControlList? Dacl { get; }
 
@@ -178,15 +177,15 @@ namespace Titanis.Winterop.Security
 		{
 			if (isSacl)
 			{
-				if (0 != (this._control & SecurityDescriptorControl.SaclProtected)) sb.Append('P');
-				if (0 != (this._control & SecurityDescriptorControl.SaclRequiredAutoInherit)) sb.Append("AR");
-				if (0 != (this._control & SecurityDescriptorControl.SaclAutoInherited)) sb.Append("AI");
+				if (0 != (this.Control & SecurityDescriptorControl.SaclProtected)) sb.Append('P');
+				if (0 != (this.Control & SecurityDescriptorControl.SaclRequiredAutoInherit)) sb.Append("AR");
+				if (0 != (this.Control & SecurityDescriptorControl.SaclAutoInherited)) sb.Append("AI");
 			}
 			else
 			{
-				if (0 != (this._control & SecurityDescriptorControl.DaclProtected)) sb.Append('P');
-				if (0 != (this._control & SecurityDescriptorControl.DaclRequiredAutoInherit)) sb.Append("AR");
-				if (0 != (this._control & SecurityDescriptorControl.DaclAutoInherited)) sb.Append("AI");
+				if (0 != (this.Control & SecurityDescriptorControl.DaclProtected)) sb.Append('P');
+				if (0 != (this.Control & SecurityDescriptorControl.DaclRequiredAutoInherit)) sb.Append("AR");
+				if (0 != (this.Control & SecurityDescriptorControl.DaclAutoInherited)) sb.Append("AI");
 			}
 			// TODO: NO_ACCESS_CONTROL / SDDL_NULL_ACL
 
@@ -234,7 +233,7 @@ namespace Titanis.Winterop.Security
 
 			byte[] buf = new byte[off];
 			buf[0] = 1;
-			BinaryPrimitives.WriteUInt16LittleEndian(buf.AsSpan().Slice(2, 2), (ushort)(this._control | SecurityDescriptorControl.SelfRelative));
+			BinaryPrimitives.WriteUInt16LittleEndian(buf.AsSpan().Slice(2, 2), (ushort)(this.Control | SecurityDescriptorControl.SelfRelative));
 			BinaryPrimitives.WriteInt32LittleEndian(buf.AsSpan().Slice(4, 4), offOwner);
 			BinaryPrimitives.WriteInt32LittleEndian(buf.AsSpan().Slice(8, 4), offGroup);
 			BinaryPrimitives.WriteInt32LittleEndian(buf.AsSpan().Slice(12, 4), offSacl);

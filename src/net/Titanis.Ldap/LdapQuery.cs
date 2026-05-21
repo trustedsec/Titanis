@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Ldap
 {
@@ -111,5 +112,10 @@ namespace Titanis.Ldap
 		/// The dirsync cookie is returned in <see cref="LdapSearchResult.DirsyncCookie"/>.
 		/// </remarks>
 		public byte[]? DirSyncCookie { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value that specifies which sections of a security descriptor to return.
+		/// </summary>
+		public SecurityInfo? SdFlags { get; set; }
 	}
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Ldap
 {
@@ -83,6 +84,7 @@ namespace Titanis.Ldap
 		}
 
 		public LdapDistinguishedName DistinguishedName { get; }
+		public SecurityInfo? SecuritySections { get; set; }
 
 		internal readonly List<LdapAttributeChange> _changes = new List<LdapAttributeChange>();
 		public IReadOnlyList<LdapAttributeChange> Changes => this._changes;

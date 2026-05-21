@@ -2,6 +2,7 @@ using System.ComponentModel;
 using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
+
 internal abstract class AddCommandBase : LdapObjectCommandBase
 {
 	protected abstract string RdnName { get; }
@@ -25,7 +26,7 @@ internal abstract class AddCommandBase : LdapObjectCommandBase
 		}
 	}
 
-	protected override Task<LdapDistinguishedName> ResolveObjectName(string simpleName, LdapClient ldap, CancellationToken cancellationToken)
+	protected override Task<LdapEntry> ResolveObjectName(string simpleName, LdapClient ldap, AttributeSpec[] attributes, CancellationToken cancellationToken)
 	{
 		var dn = this.RdnName + "=" + LdapRelativeDistinguishedName.Escape(simpleName);
 		var container = this.DefaultContainer;
@@ -34,7 +35,7 @@ internal abstract class AddCommandBase : LdapObjectCommandBase
 
 		dn += "," + ldap.DomainRoot;
 
-		return Task.FromResult(new LdapDistinguishedName(dn));
+		return Task.FromResult(new LdapEntry(new LdapDistinguishedName(dn), Array.Empty<LdapAttribute>()));
 	}
 	protected abstract string NewObjectClass { get; }
 
@@ -49,7 +50,7 @@ internal abstract class AddCommandBase : LdapObjectCommandBase
 		}
 	}
 
-	protected override async Task RunAsync(LdapClient ldap, LdapDistinguishedName objName, CancellationToken cancellationToken)
+	protected override async Task RunAsync(LdapClient ldap, LdapDistinguishedName objName, LdapEntry? existingEntry, CancellationToken cancellationToken)
 	{
 
 		var addreq = new LdapAddRequest();
@@ -59,10 +60,10 @@ internal abstract class AddCommandBase : LdapObjectCommandBase
 			ctx.ProcessArgs(this.Attributes, addreq);
 		}
 
-		var attributes = addreq.attrValues;
-		attributes.Add("objectClass", this.NewObjectClass);
+		var newAttrs = addreq.attrValues;
+		newAttrs.Add("objectClass", this.NewObjectClass);
 
-		await this.GetAttributesFor(objName, attributes, ldap, cancellationToken);
-		await ldap.Add(objName, attributes, cancellationToken);
+		await this.GetAttributesFor(objName, newAttrs, ldap, cancellationToken);
+		await ldap.Add(objName, newAttrs, cancellationToken);
 	}
 }

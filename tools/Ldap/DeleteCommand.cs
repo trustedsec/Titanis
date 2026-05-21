@@ -12,7 +12,7 @@ namespace Titanis.Cli.LdapTool;
 [Description("Deletes an object from the directory")]
 public class DeleteCommand : LdapObjectCommandBase
 {
-	protected override async Task RunAsync(LdapClient ldap, LdapDistinguishedName objName, CancellationToken cancellationToken)
+	protected override async Task RunAsync(LdapClient ldap, LdapDistinguishedName objName, LdapEntry? existingEntry, CancellationToken cancellationToken)
 	{
 		await ldap.Delete(objName, cancellationToken).ConfigureAwait(false);
 	}

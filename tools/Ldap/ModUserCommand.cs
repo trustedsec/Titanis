@@ -45,9 +45,9 @@ internal class ModUserCommand : ModCommand
 	[Description("New password (for password change or reset)")]
 	public string? NewPassword { get; set; }
 
-	protected override void GetAdditionalChanges(LdapModifyRequest modifyRequest)
+	protected override void GetAdditionalChanges(LdapModifyRequest modifyRequest, LdapEntry? existingEntry)
 	{
-		base.GetAdditionalChanges(modifyRequest);
+		base.GetAdditionalChanges(modifyRequest, existingEntry);
 
 		if (this.NewPassword != null)
 		{
