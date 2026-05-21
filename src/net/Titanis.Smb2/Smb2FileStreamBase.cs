@@ -69,11 +69,7 @@ namespace Titanis.Smb2
 		private long PosValue => (this.CanSeek ? this.Position : 0);
 
 		/// <inheritdoc/>
-		public sealed override async Task<int> ReadAsync(
-			byte[] buffer,
-			int offset,
-			int count,
-			CancellationToken cancellationToken)
+		public sealed override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
 		{
 			if (!this.CanRead)
 				throw new NotSupportedException("The stream does not support reading.");
@@ -82,8 +78,8 @@ namespace Titanis.Smb2
 			{
 				int cbRead = await this._file.ReadAsync(
 					this.PosValue,
-					new Memory<byte>(buffer, offset, count),
-					1,
+					buffer,
+					Math.Min(1, buffer.Length),
 					this.ReadOptions,
 					cancellationToken).ConfigureAwait(false);
 				if (this.CanSeek)
