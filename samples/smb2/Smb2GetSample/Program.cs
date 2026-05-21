@@ -56,8 +56,7 @@ namespace Smb2GetSample
 				);
 
 			// Open the file
-			using var file = await client.OpenFileReadAsync($@"\\{serverName}\{shareName}\{shareRelativePath}", cancellationToken);
-			using var stream = file.GetStream(false);
+			using var stream = await client.OpenFileReadAsync($@"\\{serverName}\{shareName}\{shareRelativePath}", cancellationToken);
 
 			// Open the target file
 			using var outStream = File.Create(outputPath);
