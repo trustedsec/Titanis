@@ -31,6 +31,9 @@ namespace Titanis.SourceGen
 
 			this.Parameters = GetPduParameters(typeSymbol, out this._switchMember);
 			this.Size = PduFieldInfo.GetSizeOf(typeSymbol);
+
+			var atrAlign = typeSymbol.GetAttribute(typeof(PduAlignmentAttribute));
+			this.Alignment = atrAlign?.GetArgument<int>(0)?.Value;
 		}
 
 		public sealed override string ToString() => this.TypeSymbol.Name;
@@ -47,6 +50,7 @@ namespace Titanis.SourceGen
 		public ImmutableArray<PduParamInfo> Parameters { get; }
 		public int Size { get; }
 		public PduByteOrder? ByteOrder { get; }
+		public int? Alignment { get; set; }
 
 		private static bool ShouldIgnore(ISymbol member) => (
 			member.IsStatic

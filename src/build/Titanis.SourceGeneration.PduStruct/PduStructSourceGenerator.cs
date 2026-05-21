@@ -243,6 +243,14 @@ namespace Titanis.SourceGen
 					inherit = InheritModifier.Virtual;
 			}
 
+			// Alignment
+			if (pduType.Alignment != null)
+			{
+				var align = pduType.Alignment.Value;
+				writeStatements.Do(writerArg.MethodOf(PduStructNames.Align).Call(Code.Primitive(align)));
+				readStatements.Do(readerArg.MethodOf(PduStructNames.Align).Call(Code.Primitive(align)));
+			}
+
 			// this.OnBeforeReadPdu()
 			readStatements.Do(Code.This.MethodOf(PduStructNames.OnBeforeReadPdu).Call(readerArg));
 			// this.OnBeforeWritePdu()
@@ -549,6 +557,7 @@ namespace Titanis.SourceGen
 					writeStatements = new List<StatementSyntax>();
 				}
 
+				// Nullable conditional
 				if ((isNullableRef || isNullableValue))
 				{
 					if (field.Condition is null)
@@ -571,6 +580,7 @@ namespace Titanis.SourceGen
 					}
 				}
 
+				// String
 				if (fieldType.SpecialType == SpecialType.System_String)
 				{
 					var stringAttr = field.StringLengthAttribute;
@@ -639,7 +649,6 @@ namespace Titanis.SourceGen
 				}
 				else
 				{
-
 					var arrayReadBlock = readStatements;
 					var arrayWriteBlock = writeStatements;
 
