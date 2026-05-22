@@ -87,7 +87,7 @@ namespace Titanis.Ldap
 		}
 
 		private static readonly char[] escapeChars = [
-			'"', '+', ',', ';', '<', '>', '\\', '\0'
+			'"', '+', ',', ';', '<', '>', '\\', '\0', '\n', '\r'
 			];
 		/// <summary>
 		/// Determines whether a string contains characters that must be escaped.
@@ -150,9 +150,15 @@ namespace Titanis.Ldap
 				{
 					leading = false;
 
-					if (Array.IndexOf(escapeChars, c) >= 0)
+					if (c is ',')
+					{
 						sb.Append('\\');
-					sb.Append(c);
+						sb.Append(c);
+					}
+					else if (Array.IndexOf(escapeChars, c) >= 0)
+						sb.Append($"\\{(byte)c:X2}");
+					else
+						sb.Append(c);
 				}
 			}
 
