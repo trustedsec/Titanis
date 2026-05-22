@@ -19,6 +19,7 @@ public class DistinguishedNameTests
 	[DataRow(@"CN=na me", 1, "CN", 1, "na me", DisplayName = "RDN with embedded space")]
 	[DataRow(@"CN=na\,me", 1, "CN", 1, "na,me", DisplayName = "RDN with embedded comma")]
 	[DataRow(@"CN=na\00me", 1, "CN", 1, "na\0me", DisplayName = "RDN with embedded null")]
+	[DataRow(@"CN=line\0Abreak", 1, "CN", 1, "line\nbreak", DisplayName = "RDN with line break")]
 	[DataRow("CN=name,DC=lumon,DC=ind", 3, "CN", 1, "name", DisplayName = "Multiple RDNs")]
 	[DataRow("CN=name1+name2", 1, "CN", 2, "name1", DisplayName = "Multi-valued CN")]
 	public void ParseNames(string name, int partCount, string part1Type, int part1ValueCount, string part1Value1)
