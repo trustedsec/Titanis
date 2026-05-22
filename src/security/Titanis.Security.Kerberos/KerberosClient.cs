@@ -1434,6 +1434,9 @@ namespace Titanis.Security.Kerberos
 			ByteMemoryReader reader = new ByteMemoryReader(ccacheBytes);
 			var ccache = reader.ReadPduStruct<CCache>();
 
+			if (ccache.credList.credentials == null)
+				return [];
+
 			List<TicketInfo> tickets = new List<TicketInfo>(ccache.credList.credentials.Length);
 
 			// Configuration entries are attached to the preceeding tickt
