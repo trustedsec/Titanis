@@ -180,20 +180,24 @@ namespace Titanis.IO
 			if (!destination.CanWrite)
 				throw new ArgumentException("Destination stream not writable.", nameof(source));
 
+			var pos = source.CanSeek ? source.Position : 0;
+			var cbRemaining = source.CanSeek ? (source.Length - pos) : long.MaxValue;
 
 			byte[] buffer = new byte[bufferSize];
 			byte[] buffer2 = new byte[bufferSize];
 
 			long cbTotalCopied = 0;
 			int cbRead;
-			ValueTask<int> readTask = source.ReadAsync(buffer, cancellationToken);
+			ValueTask<int> readTask = source.ReadAsync(buffer.AsMemory(0, unchecked((int)Math.Min(buffer.Length, cbRemaining))), cancellationToken);
 			while (0 != (cbRead = await readTask.ConfigureAwait(false)))
 			{
-				readTask = source.ReadAsync(buffer2, cancellationToken);
-				await destination.WriteAsync(buffer.AsMemory().Slice(0, cbRead), cancellationToken).ConfigureAwait(false);
+				cbRemaining -= cbRead;
+				readTask = source.ReadAsync(buffer2.AsMemory(0, unchecked((int)Math.Min(buffer.Length, cbRemaining))), cancellationToken);
+				await destination.WriteAsync(buffer.AsMemory(0, cbRead), cancellationToken).ConfigureAwait(false);
 
 				cbTotalCopied += cbRead;
 
+				// Swap buffers
 				(buffer, buffer2) = (buffer2, buffer);
 			}
 
