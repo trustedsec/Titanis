@@ -8,6 +8,7 @@ using Titanis.Security;
 
 namespace Titanis.Cli.DcomTool;
 
+/// <task category="DCOM;Lateral Movement">Invoke a method on a COM object on a remote computer</task>
 [Command]
 [Description("Invokes a method on an OLE automation object over DCOM")]
 [DetailedHelpText(@"{0} activates the object with the specified CLSID and attempts to invoke the specified method.  The arguments are not parsed locally and are all passed as strings.  It is up to the server to coerce them to the correct type.  Most implementations rely on OLE automation to do this.

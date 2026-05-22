@@ -3,13 +3,13 @@ using Titanis.Msrpc.Mslsar;
 
 namespace Titanis.Cli.LsaTool;
 
+	/// <task category="LSA;Enumeration">Enumerate accounts that are granted a privilege</task>
 [Command]
 [OutputRecordType(typeof(LsaAccountInfo))]
 [Description("Enumerates accounts that have a specific privilege or user right")]
 [Example("Enumerate accounts with SeInteractiveLogonRight", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m! -Privilege SeInteractiveLogonRight")]
 internal class EnumPrivAccountsCommand : LsaPolicyCommand
 {
-	/// <task category="LSA;Enumeration">Enumerate accounts that are granted a privilege</task>
 	[Parameter]
 	[Mandatory]
 	[Description("Name of privilege or user right to check for")]

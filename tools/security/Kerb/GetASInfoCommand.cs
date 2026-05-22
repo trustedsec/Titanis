@@ -5,8 +5,8 @@ using Titanis.Security.Kerberos;
 
 namespace Titanis.Cli.Kerb
 {
-	/// <task category="Kerberos">Check whether a user account requires pre-authentication</task>
-	/// <task category="Kerberos">Check the encryption types supported for a user account</task>
+	/// <task category="Kerberos;Enumeration">Check whether a user account requires pre-authentication</task>
+	/// <task category="Kerberos;Enumeration">Check the encryption types supported for a user account</task>
 	/// <task category="Enumeration">Check whether a user name is valid</task>
 	[Command]
 	[OutputRecordType(typeof(KdcEncryptionTypeInfo))]

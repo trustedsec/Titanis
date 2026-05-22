@@ -9,6 +9,7 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP">Convert between date/times and LDAP timestamps</task>
 [Command]
 [Description("Converts between the Active Directory timestamp value and a UTC date/time")]
 [Example("Convert a timestamp from AD", "134,182,427,222,091,265", "The value is converted to 2026-03-17T17:38:42.2091265Z")]

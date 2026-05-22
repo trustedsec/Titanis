@@ -3,10 +3,9 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
-record class SyntaxItem(string syntaxKey, string memberName)
-{
+record class SyntaxItem(string syntaxKey, string memberName);
 
-}
+/// <task category="LDAP">List syntaxes used by LDAP (offline)</task>
 [Command]
 [Description("Lists AD syntaxes")]
 [OutputRecordType(typeof(SyntaxItem), DefaultOutputStyle = OutputStyle.Csv)]

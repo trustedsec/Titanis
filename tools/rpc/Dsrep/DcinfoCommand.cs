@@ -10,6 +10,7 @@ using Titanis.Msrpc.Msdrsr;
 
 namespace Dsrep;
 
+/// <task category="RPC;Enumeration">Get info on domain controllers</task>
 [Command]
 [Description("Gets information on domain controllers")]
 [OutputRecordType(typeof(DomainControllerInfo))]

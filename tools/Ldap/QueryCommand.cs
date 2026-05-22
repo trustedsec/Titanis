@@ -4,6 +4,7 @@ using Titanis.Ldap.FilterExpressions;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP;Enumeration">Query objects in Active Directory</task>
 [Command]
 [Description("Queries the directory")]
 [DetailedHelpText(@"{0} issues a query to an LDAP server.  Use -OutputFields to specify the names of the attributes to retrieve; by default, only the DN of the entries is printed.

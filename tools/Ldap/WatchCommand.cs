@@ -3,6 +3,7 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP">Watch for changes to Active Directory</task>
 [Command]
 [Description("Watches for changes to an object or subtree")]
 [OutputRecordType(typeof(LdapEntry), DefaultOutputStyle = OutputStyle.List)]

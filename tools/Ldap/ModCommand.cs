@@ -4,6 +4,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP;Expanding Access">Modify an object in Active Directory</task>
 [Command]
 [Description("Modifies an object in the directory")]
 [Example("Add a certificate to an account", "{0} LUMON-DC1 -UserName milchick@LUMON -Password Br3@kr00m! ALLENTOWN$  userCertificate:file+=allentown.cer", "This command authenticates as milchick, loads the certificate from the file allentown.cer, and associates it with the ALLENTOWN$ account.")]

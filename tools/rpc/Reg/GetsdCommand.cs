@@ -10,6 +10,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {
+	/// <task category="Registry">Get a security descriptor of a registry key</task>
 	[Command]
 	[Description("Gets the security descriptor of a registry key")]
 	[DetailedHelpText(@"By default, this command requests the DACL, owner, and group.  If any of the switches are specified, then only those components specified are included.")]

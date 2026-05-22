@@ -17,6 +17,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {
+	/// <task category="Registry;Enumeration">Get user hashes from the SAM</task>
 	[Command]
 	[Description("Dumps the SAM of a remote system")]
 	[OutputRecordType(typeof(SamUserHash))]

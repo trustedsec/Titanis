@@ -3,6 +3,7 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP">Get your current user name</task>
 [Command]
 [Description("Gets the name of the authenticated user")]
 [OutputRecordType(typeof(SaslIdentity), DefaultOutputStyle = OutputStyle.Freeform)]

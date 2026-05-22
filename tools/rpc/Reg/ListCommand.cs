@@ -52,6 +52,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		public string? BytesAsHexString => (this.Bytes != null) ? this.Bytes.ToHexString() : null;
 	}
 
+	/// <task category="Registry">List the contents of a registry key</task>
 	[Command]
 	[Description("Lists the contents of a key")]
 	[OutputRecordType(typeof(RegistryItem))]

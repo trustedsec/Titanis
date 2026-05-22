@@ -8,6 +8,9 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP">Delete an object from Active Directory</task>
+/// <task category="LDAP">Delete a user account</task>
+/// <task category="LDAP">Delete a computer account</task>
 [Command]
 [Description("Deletes an object from the directory")]
 public class DeleteCommand : LdapObjectCommandBase

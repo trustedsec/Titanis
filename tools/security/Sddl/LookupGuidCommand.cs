@@ -10,6 +10,9 @@ using Titanis.Winterop.Security;
 namespace Titanis.Cli.SddlTool;
 
 
+/// <task category="Security;SDDL">Look up a property by GUID (offline)</task>
+/// <task category="Security;SDDL">Look up a property set by GUID (offline)</task>
+/// <task category="Security;SDDL">Look up an extended right by GUID (offline)</task>
 [Command]
 [Description("Looks up a GUID representing an AD extended right, property, or property set")]
 [OutputRecordType(typeof(GuidLookupResult))]

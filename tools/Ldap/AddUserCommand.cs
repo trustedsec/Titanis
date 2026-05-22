@@ -5,6 +5,7 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP;Expanding Access">Create a user account</task>
 [Command]
 [Description("Adds a new user")]
 internal class AddUserCommand : AddCommandBase

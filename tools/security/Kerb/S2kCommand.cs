@@ -3,7 +3,7 @@ using Titanis.Security.Kerberos;
 
 namespace Titanis.Cli.Kerb;
 
-/// <task category="Kerberos">Generate protocol key from password</task>
+/// <task category="Kerberos">Generate protocol key from password (offline)</task>
 [Command]
 [Description("Generates a protocol key from a string, such as a password")]
 [DetailedHelpText(@"When authenticating with a password, Kerberos internally generates a protocol key from the password and the accompanying salt using the String-to-key function defined for each encryption profile.  For Windows domains, the salt for a user account is usually the FQDN of the domain in uppercase followed by the account name.  Specifically, the salt is composed of the domain and SAM account name at the time of the last password is changed.  Therefore, if an account has been renamed, the salt retains the old account name until the user changes the password again.

@@ -10,6 +10,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {
+	/// <task category="Registry">Get information on a registry key</task>
 	[Command]
 	[Description("Gets key info")]
 	[OutputRecordType(typeof(RegistryKeyInfo), DefaultOutputStyle = OutputStyle.List)]

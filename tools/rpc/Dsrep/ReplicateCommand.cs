@@ -22,6 +22,8 @@ using Titanis.Winterop.Security;
 
 namespace Dsrep;
 
+/// <task category="Directory Replication;Enumeration">Replicate secret attributes from a domain controller (DCSync)</task>
+/// <task category="Directory Replication;Enumeration">Export Kerberos keys for domain accounts to a .keytab file</task>
 [Command]
 [Description("Requests replica changes")]
 [OutputRecordType(typeof(LdapEntry), DefaultOutputStyle = OutputStyle.List, DefaultFields = [

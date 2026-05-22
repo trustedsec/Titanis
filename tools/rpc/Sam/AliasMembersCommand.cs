@@ -11,6 +11,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.SamTool;
 
+/// <task category="SAM;Enumeration">Get the members of an alias (group)</task>
 [Command]
 [Description("Gets the members of an alias")]
 [DetailedHelpText("You may specify an alias either as a name, decimal RID, or hex RID prefixed with 0x.  You may specify multiple aliases.")]

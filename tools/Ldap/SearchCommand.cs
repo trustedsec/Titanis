@@ -7,6 +7,7 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP;Enumeration">Search for objects by name in Active Directory</task>
 [Command]
 [Description("Searches the directory by name")]
 [DetailedHelpText(@"{0} uses the ANR feature of Active Directory to find objects where any designated name-like field begins with a search string.

@@ -3,6 +3,9 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP;Expanding Access">Create a computer account</task>
+/// <task category="LDAP;Expanding Access">Create a user account</task>
+/// <task category="LDAP;Expanding Access">Add an object to Active Directory</task>
 [Command]
 [Description("Adds an object to the directory")]
 internal class AddCommand : AddCommandBase

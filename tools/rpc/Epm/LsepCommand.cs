@@ -6,7 +6,7 @@ using Titanis.DceRpc.Epm;
 
 namespace Titanis.Cli.EpmTool
 {
-	/// <task category="RPC">Enumerate dynamic RPC endpoints</task>
+	/// <task category="RPC;Enumeration">Enumerate dynamic RPC endpoints</task>
 	[Command]
 	[Description("Lists the dynamic RPC endpoints registered with the endpoint mapper")]
 	[OutputRecordType(typeof(EndpointEntry))]

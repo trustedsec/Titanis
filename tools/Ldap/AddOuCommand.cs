@@ -3,6 +3,7 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP">Create an organizational unit (OU)</task>
 [Command]
 [Description("Adds a new organizational unit")]
 internal class AddOuCommand : AddCommandBase

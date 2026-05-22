@@ -16,6 +16,8 @@ using Titanis.Winterop.Security;
 namespace Titanis.Msrpc.Msrrp.Cli
 {
 
+	/// <task category="Registry">Set a value in a registry key</task>
+	/// <task category="Registry">Create a registry key</task>
 	[Command]
 	[Description("Sets one or more values in a registry key")]
 	[DetailedHelpText(@"This command accepts one or more key/value specifications, allowing multiple keys to be created and multiple values to be set.  When a key name is encountered, the key is created, and subsequent values are set in this key.  Once the next key name is encountered, the previous key is closed, and the new one created.  Specifying the same key name multiple times causes the key to be closed and reopened.

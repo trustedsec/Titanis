@@ -6,13 +6,13 @@ using Titanis.Security.Kerberos;
 
 namespace Titanis.Cli.Kerb
 {
-	/// <task category="Kerberos">Describe a Kerberos ticket</task>
-	/// <task category="Kerberos">Print the contents of a .kirbi file</task>
-	/// <task category="Kerberos">Print the contents of a .ccache file</task>
-	/// <task category="Kerberos">Convert between a .ccache file and a .kirbi file</task>
-	/// <task category="Kerberos">Query tickets within a .ccache file or .kirbi file</task>
-	/// <task category="Kerberos">Decrypt tickets</task>
-	/// <task category="Kerberos">Print ticket authorization data</task>
+	/// <task category="Kerberos">Describe a Kerberos ticket (offline)</task>
+	/// <task category="Kerberos">Print the contents of a .kirbi file (offline)</task>
+	/// <task category="Kerberos">Print the contents of a .ccache file (offline)</task>
+	/// <task category="Kerberos">Convert between a .ccache file and a .kirbi file (offline)</task>
+	/// <task category="Kerberos">Query tickets within a .ccache file or .kirbi file (offline)</task>
+	/// <task category="Kerberos">Decrypt tickets (offline)</task>
+	/// <task category="Kerberos">Print ticket authorization data (offline)</task>
 	[Command]
 	[OutputRecordType(typeof(TicketInfo), DefaultOutputStyle = OutputStyle.Table, DefaultFields = new string[]
 	{

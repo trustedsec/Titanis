@@ -4,6 +4,7 @@ using Titanis.Security;
 
 namespace Titanis.Cli.LsaTool;
 
+/// <task category="LSA">Get the name of the current user account</task>
 [Command]
 [OutputRecordType(typeof(UserPrincipalName), DefaultOutputStyle = OutputStyle.Freeform)]
 [Description("Gets the name and domain of the connected user")]

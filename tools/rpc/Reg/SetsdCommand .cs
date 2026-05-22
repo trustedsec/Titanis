@@ -10,6 +10,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {
+	/// <task category="Registry;Expanding Access">Set the security descriptor on a registry key</task>
 	[Command]
 	[Description("Sets the security descriptor of a registry key")]
 	[Example("Set DACL", "LUMON-FS1 -username marks@LUMON -password She's@live!!  -Kdc  lumon-dc1 -BackupSemantics HKCU\\Software\\Microsoft D:AI(A;CIID;0x20019;;;BU)(A;CIID;0xF003F;;;BA)(A;CIID;0xF003F;;;SY)(A;CIIOID;0xF003F;;;CO)")]

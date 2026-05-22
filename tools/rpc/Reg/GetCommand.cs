@@ -8,6 +8,7 @@ using Titanis.Cli;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {
+	/// <task category="Registry;Enumeration">Get user hashes from the SAM</task>
 	[Command]
 	[Description("Gets one or more values")]
 	internal class GetCommand

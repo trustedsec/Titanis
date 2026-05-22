@@ -29,9 +29,11 @@ namespace Titanis.Cli
 		public SmbParameters SmbParameters { get; set; }
 
 		[Parameter]
+		[Description("Time to wait for RPC connections")]
 		public Duration? RpcConnectTimeout { get; set; }
 
 		[Parameter]
+		[Description("Time to wait for RPC calls")]
 		public Duration? RpcCallTimeout { get; set; }
 
 		[Parameter]

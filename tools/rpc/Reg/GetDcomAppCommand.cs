@@ -27,6 +27,7 @@ public class DcomAppInfo
 
 }
 
+	/// <task category="Registry;Enumeration">Get a list of registered DCOM applications</task>
 [Command]
 [Description("Gets information about a DCOM application")]
 [OutputRecordType(typeof(DcomAppInfo))]

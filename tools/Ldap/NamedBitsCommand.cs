@@ -4,6 +4,7 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP">List named bit flags used by LDAP attributes (offline)</task>
 [Command]
 [Description("Prints the bits with symbolic names")]
 [OutputRecordType(typeof(NamedBit))]

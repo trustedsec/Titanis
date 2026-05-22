@@ -11,6 +11,7 @@ using Titanis.Winterop.Security;
 namespace Titanis.Cli.SamTool;
 
 
+/// <task category="SAM;Enumeration">Get the members of a group</task>
 [Command]
 [Description("Gets the members of a group")]
 [DetailedHelpText("You may specify a group either as a name, decimal RID, or hex RID prefixed with 0x.  You may specify multiple groups.")]

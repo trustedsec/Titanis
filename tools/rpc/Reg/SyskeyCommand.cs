@@ -15,6 +15,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {
+	/// <task category="Registry;Enumeration">Get the system key</task>
 	[Command]
 	[Description("Prints the system key of a remote system")]
 	[OutputRecordType(typeof(string), DefaultOutputStyle = OutputStyle.Freeform)]

@@ -4,6 +4,7 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP;Expanding Access">Modify a user account in Active Directory</task>
 [Command]
 [Description("Modifies a directory entry")]
 [DetailedHelpText(@"Specify attribute changes as a series of name?=value pairs where ?= is:

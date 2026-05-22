@@ -6,6 +6,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.SddlTool;
 
+/// <task category="Security;SDDL">Describe a security descriptor (SDDL or hex) (offline)</task>
 [Command]
 [Description("Describes a security descriptor")]
 [DetailedHelpText(@"This command accepts one or more security descriptors.  Each security descriptor may be specified either in the SDDL form, or in the binary form as a series of hex digits.  The -ObjectType specifies how the bits are translated to specific permissions.  If no object type is specified, it is assumed to be for a file.

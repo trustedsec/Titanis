@@ -10,6 +10,7 @@ using Titanis.Winterop.Security;
 namespace Titanis.Cli.SddlTool;
 
 
+/// <task category="Security;SDDL">Look up a well-known SID (offline)</task>
 [Command]
 [Description("Looks up a well-known SID")]
 [OutputRecordType(typeof(LookupWksResult))]

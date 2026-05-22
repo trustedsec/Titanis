@@ -10,6 +10,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {
+	/// <task category="Registry">Saves a registry key to a file on the remote host</task>
 	[Command]
 	[Description("Saves a key to a file")]
 	[OutputRecordType(typeof(RegistryItem))]

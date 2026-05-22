@@ -6,6 +6,7 @@ using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP;Expanding Access">Create a computer account</task>
 [Command]
 [Description("Adds a computer account to the directory")]
 internal class AddComputerCommand : AddCommandBase

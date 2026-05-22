@@ -9,6 +9,7 @@ using Titanis.Security;
 
 namespace Titanis.Cli.DcomTool;
 
+/// <task category="DCOM;Lateral Movement">Activate a COM object on a remote computer</task>
 [Command]
 [Description("Activates an object over DCOM")]
 public class ActivateCommand : Command, IHaveServerName

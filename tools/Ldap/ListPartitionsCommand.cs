@@ -9,6 +9,7 @@ using Titanis.Ldap.FilterExpressions;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP;Enumeration">List partitions (naming contexts) within an Active Directory forest</task>
 [Command]
 [Description("Gets a list of partitions in the Active Directory forest")]
 [OutputRecordType(typeof(LdapEntry), DefaultFields = [nameof(LdapAttributeTypes.DistinguishedName), nameof(LdapAttributeTypes.NCName), nameof(LdapAttributeTypes.NETBIOSName), nameof(LdapAttributeTypes.DnsRoot)])]
