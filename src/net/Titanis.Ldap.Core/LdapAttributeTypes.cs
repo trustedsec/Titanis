@@ -25,13 +25,13 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription SchemaIDGUID = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.148", ["schemaIDGUID"], syntax: AdSyntaxes.StringOctetGuid);
 		public readonly static AttributeTypeDescription DnsRecord = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.2.840.113556.1.4.382", ["dnsRecord"], syntax: AdSyntaxes.DnsRecord);
 		#endregion
+		public readonly static AttributeTypeDescription ForceLogoff = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.39", ["forceLogoff"], syntax: AdSyntaxes.LargeInteger);
 		#region Date/time
 		public readonly static AttributeTypeDescription AccountExpires = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.159", ["accountExpires"], syntax: AdSyntaxes.LargeInteger_Timestamp);
 		public readonly static AttributeTypeDescription BadPasswordTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.49", ["badPasswordTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
 		public readonly static AttributeTypeDescription BuiltinCreationTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.13", ["builtinCreationTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
 		public readonly static AttributeTypeDescription CreationTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.26", ["creationTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
 		public readonly static AttributeTypeDescription DhcpUpdateTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.720", ["dhcpUpdateTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
-		public readonly static AttributeTypeDescription ForceLogoff = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.39", ["forceLogoff"], syntax: AdSyntaxes.LargeInteger_Timestamp);
 		public readonly static AttributeTypeDescription LastBackupRestorationTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.519", ["lastBackupRestorationTime"], syntax: AdSyntaxes.LargeInteger_Timestamp);
 		public readonly static AttributeTypeDescription LastContentIndexed = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.50", ["lastContentIndexed"], syntax: AdSyntaxes.LargeInteger_Timestamp);
 		public readonly static AttributeTypeDescription LastLogoff = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.51", ["lastLogoff"], syntax: AdSyntaxes.LargeInteger_Timestamp);
