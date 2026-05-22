@@ -12,13 +12,14 @@ using Titanis.Linterop.Fuse;
 namespace Titanis.Cli.LdapTool;
 
 /// <task category="LDAP;Enumeration">Mount an LDAP directory as a file system</task>
+[Description("Mounts a directory as a file system")]
 internal class FuseCommand : LdapCommandBase
 {
 	[ParameterGroup(ParameterGroupOptions.Required)]
 	public FuseParameterGroup FuseParameters { get; set; }
 
 	[Parameter]
-	[Description("")]
+	[Description("Name of root entry in directory to mount")]
 	public LdapDistinguishedName? SearchBase { get; set; }
 
 	protected override async Task<int> RunAsync(LdapClient ldap, CancellationToken cancellationToken)
