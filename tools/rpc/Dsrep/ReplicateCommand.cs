@@ -1,15 +1,6 @@
-﻿using ms_drsr;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using Titanis;
 using Titanis.Cli;
 using Titanis.Ldap;
@@ -18,7 +9,6 @@ using Titanis.Net;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
 using Titanis.Winterop.SamServer;
-using Titanis.Winterop.Security;
 
 namespace Dsrep;
 
@@ -46,7 +36,7 @@ In addition to the standard attributes defined by Active Directory, you may quer
 [Example("Query for all objects with all attributes", "{0} -UserName milchick@LUMON -Password Br3@kr00m! LUMON-DC1", Tag = "milchick_all")]
 [Example("Query credentials for krbtgt and milchick", "{0} -UserName milchick@LUMON -Password Br3@kr00m! LUMON-DC1 krbtgt, \"CN=Seth Milchick,OU=Severed Floor,OU=Kier\\, PE,DC=lumon,DC=ind\" -OutputFields samAccountName, objectSid,  kerberosKeys, kerberosOldKeys, cleartextPassword, unicodePwd, lmPwdHistory, ntPwdHistory", Tag = "milchick_name_dn")]
 [Example("Query credentials for all administrators", "{0} -UserName milchick@LUMON -Password Br3@kr00m! LUMON-DC1 (memberOf*=<SID=S-1-5-32-544>) -OutputFields samAccountName, objectSid,  kerberosKeys, kerberosOldKeys, cleartextPassword, unicodePwd, lmPwdHistory, ntPwdHistory", Tag = "milchick_LdapQuery")]
-public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
+public class ReplicateCommand : DsbindCommand, IDrsChangeCallback
 {
 	[Parameter(After = nameof(RpcCommand.ServerName))]
 	[Description("DN, GUID, or SID of object to retrieve")]
@@ -55,6 +45,11 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 	[Parameter]
 	[Description("Name of keytab file to export to")]
 	public string? ExportKeytab { get; set; }
+
+	[Parameter]
+	[DefaultValue(1)]
+	[Description("Number of parallel requests")]
+	public int Parallelize { get; set; }
 
 	private string[] GetLdapAttributes(string[] fieldNames)
 	{
@@ -94,10 +89,12 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 		"KERBEROSOLDKEYS",
 		"CLEARTEXTPASSWORD",
 		];
+	private List<KeytabEntry> _keytabEntries;
+	private string? _realm;
 
-	protected override async Task<int> RunAsync(DirectoryReplicationClient client, CancellationToken cancellationToken)
+	protected override async Task<int> RunAsync(DirectoryReplicationClient client, DsBinding dsbind, CancellationToken cancellationToken)
 	{
-		var dcInfos = await client.GetDcInfo(this.RpcParameters.Authentication.UserDomain, cancellationToken);
+		var dcInfos = await dsbind.GetDcInfo(this.RpcParameters.Authentication.UserDomain, cancellationToken);
 		if (dcInfos.Length == 0)
 		{
 			this.WriteError($"Unable to find any DCs.");
@@ -105,47 +102,17 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 		}
 		var dcInfo = dcInfos[0];
 
-		string? realm = dcInfo.DnsHostName.Contains('.') ? dcInfo.DnsHostName.Substring(dcInfo.DnsHostName.IndexOf('.') + 1).ToUpper() : null;
+		this._realm = dcInfo.DnsHostName.Contains('.') ? dcInfo.DnsHostName.Substring(dcInfo.DnsHostName.IndexOf('.') + 1).ToUpper() : null;
 
-		LdapClient? ldapClient = null;
 
 
 
 		var outputAttrs = GetLdapAttributes(this.OutputFields);
-		var objSpecs = this.ObjectName;
-		if (objSpecs.IsNullOrEmpty())
-		{
-			objSpecs = [new DsobjSpec(LdapFilter.Parse("(objectClass=*)"))];
-		}
 
 		var kt = new KeytabFile();
-		List<KeytabEntry> keytabEntries = kt.Entries;
+		this._keytabEntries = kt.Entries;
 
-		foreach (var objSpec in objSpecs)
-		{
-			var objName = objSpec.Dsname;
-			if (objName is not null)
-			{
-				await this.ReplicateObjects(client, dcInfo, outputAttrs, objName, realm, keytabEntries, cancellationToken);
-			}
-			else
-			{
-				ldapClient ??= await LdapClient.Connect(new DnsEndPoint(this.ServerName, 389), null, this.RequireService<ISocketService>(), this.RequireService<IClientCredentialService>(), cancellationToken);
-
-				LdapSearchResult? result;
-				var filter = objSpec.Filter ?? LdapFilter.Parse($"(anr={objSpec.Name})");
-				result = await ldapClient.Search(new LdapQuery(ldapClient.DomainRoot, LdapSearchScope.Subtree, filter, []), cancellationToken);
-				if (result.Entries.Length == 0)
-					this.WriteWarning($"The LDAP query with filter '{objSpec.Filter.ToString()}' did not return any results");
-				else
-				{
-					foreach (var entry in result.Entries)
-					{
-						await this.ReplicateObjects(client, dcInfo, outputAttrs, new DsName(Guid.Empty, null, entry.EntryName), realm, keytabEntries, cancellationToken);
-					}
-				}
-			}
-		}
+		await dsbind.GetNcChanges(dcInfo, this.GetObjectNames(cancellationToken), outputAttrs, 1, this, this.Parallelize, cancellationToken);
 
 		if (!string.IsNullOrEmpty(this.ExportKeytab))
 		{
@@ -163,15 +130,56 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 		return 0;
 	}
 
-	private async Task ReplicateObjects(DirectoryReplicationClient client, DomainControllerInfo dcInfo, string[] outputAttrs, DsName objName, string realm, List<KeytabEntry> keytabEntries, CancellationToken cancellationToken)
+	private async IAsyncEnumerable<DsName> GetObjectNames(CancellationToken cancellationToken)
 	{
-		var objs = await client.GetNcChanges(dcInfo, objName, outputAttrs, 1, cancellationToken);
-		foreach (var obj in objs)
+		LdapClient? ldapClient = null;
+		var objSpecs = this.ObjectName;
+		if (objSpecs.IsNullOrEmpty())
 		{
-			var entry = obj.ToLdapEntry();
+			objSpecs = [new DsobjSpec(LdapFilter.Parse("(objectClass=*)"))];
+		}
+		foreach (var objSpec in objSpecs)
+		{
+			var objName = objSpec.Dsname;
+			if (objName is not null)
+			{
+				yield return objName;
+			}
+			else
+			{
+				ldapClient ??= await LdapClient.Connect(new DnsEndPoint(this.ServerName, 389), null, this.RequireService<ISocketService>(), this.RequireService<IClientCredentialService>(), cancellationToken);
 
-			AddKeytabEntries(entry, realm, keytabEntries);
-			this.WriteRecord(entry);
+				var filter = objSpec.Filter ?? LdapFilter.Parse($"(anr={objSpec.Name})");
+				LdapQuery query = new(ldapClient.DomainRoot, LdapSearchScope.Subtree, filter, [])
+				{
+					PageSize = 20
+				};
+
+				bool pageHasResults = false;
+				bool hasAnyMatches = false;
+				do
+				{
+					pageHasResults = false;
+					var results = await ldapClient.Search(query, cancellationToken);
+					if (results.Entries.Length > 0)
+					{
+						query.PagingBookmark = results.Bookmark;
+						query.DirSyncCookie = results.DirsyncCookie;
+						pageHasResults = true;
+						hasAnyMatches = true;
+
+						foreach (var entry in results.Entries)
+						{
+							yield return new DsName(Guid.Empty, null, entry.EntryName);
+						}
+					}
+					else
+						break;
+				} while ((!query.PagingBookmark.IsNullOrEmpty() || !query.DirSyncCookie.IsNullOrEmpty()) && pageHasResults && !cancellationToken.IsCancellationRequested);
+
+				if (!hasAnyMatches)
+					this.WriteWarning($"The LDAP query with filter '{objSpec.Filter.ToString()}' did not return any results");
+			}
 		}
 	}
 
@@ -218,6 +226,36 @@ public class ReplicateCommand : RpcCommand<DirectoryReplicationClient>
 	private static KeytabEntry CreateKeytabEntry(string realm, SecurityPrincipalName spn, KerberosKeyInfo key)
 	{
 		return new KeytabEntry(spn, realm, 0, key.Kvno ?? 0, (EType)key.KeyType, key.Bytes);
+	}
+
+	private SemaphoreSlim _outputLock = new SemaphoreSlim(1, 1);
+	async Task IDrsChangeCallback.OnObjectReplicated(DsObject obj)
+	{
+		await this._outputLock.WaitAsync();
+		try
+		{
+			var entry = obj.ToLdapEntry();
+
+			AddKeytabEntries(entry, this._realm, this._keytabEntries);
+			this.WriteRecord(entry);
+		}
+		finally
+		{
+			this._outputLock.Release();
+		}
+	}
+
+	async Task IDrsChangeCallback.OnError(DsName objectName, Exception exception)
+	{
+		await this._outputLock.WaitAsync();
+		try
+		{
+			this.WriteError($"Error retrieving {objectName}: {exception.Message}");
+		}
+		finally
+		{
+			this._outputLock.Release();
+		}
 	}
 }
 

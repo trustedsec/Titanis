@@ -36,6 +36,11 @@ namespace Titanis.Msrpc.Msdrsr
 				this.Name = new LdapDistinguishedName(new string(dsname.StringName.Slice(0, (int)dsname.NameLen)));
 		}
 
+		public sealed override string ToString()
+		{
+			return this.Name?.ToString() ?? this.Sid?.ToString() ?? this.Guid.ToString();
+		}
+
 		public SecurityIdentifier? Sid { get; }
 		public Guid Guid { get; set; }
 		public LdapDistinguishedName? Name { get; set; }
