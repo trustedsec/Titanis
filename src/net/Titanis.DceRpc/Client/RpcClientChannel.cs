@@ -252,6 +252,8 @@ namespace Titanis.DceRpc.Client
 			}
 		}
 
+		private SemaphoreSlim _xmitLock = new SemaphoreSlim(1, 1);
+
 		internal async Task<RpcDecoder> SendRequestAsync(
 			RpcRequestBuilder stubData,
 			RpcBindContext context,
@@ -274,37 +276,43 @@ namespace Titanis.DceRpc.Client
 
 			var buffer = stubData.Complete(context);
 
-			var callId = this.GetNextCallId();
-			PendingRequest pendingRequest = new PendingRequest(
-				callId,
-				context.encoding,
-				stubData.callContext,
-				context);
-			lock (this._pendingRequests)
-				this._pendingRequests.Add(callId, pendingRequest);
+			await _xmitLock.WaitAsync().ConfigureAwait(false);
+			try
+			{
+				var callId = this.GetNextCallId();
+				PendingRequest pendingRequest = new PendingRequest(
+					callId,
+					context.encoding,
+					stubData.callContext,
+					context);
+				lock (this._pendingRequests)
+					this._pendingRequests.Add(callId, pendingRequest);
 
-			int authLength = (context.authContext != null)
-				? context.authContext.GetMessageAuthTokenSize()
-				: 0;
-			PfcFlags flags = (stubData.HasObjectId)
-				? PfcFlags.ObjectUuid
-				: PfcFlags.None
-				;
+				int authLength = (context.authContext != null)
+					? context.authContext.GetMessageAuthTokenSize()
+					: 0;
+				PfcFlags flags = (stubData.HasObjectId)
+					? PfcFlags.ObjectUuid
+					: PfcFlags.None
+					;
 
-			pendingRequest.callCancel = new CancellationTokenSource(this.CallTimeout);
-			pendingRequest.callCancel.Token.Register(() => this.CancelRequest(pendingRequest, cancellationToken).Wait());
-			pendingRequest.cancelCallback = cancellationToken.Register(() => pendingRequest.callCancel.Cancel());
-
-			await this.SendPduAsync(
-				PduType.Request,
-				flags,
-				callId,
-				buffer,
-				authLength,
-				pendingRequest.callCancel.Token,
-				context.authContext).ConfigureAwait(false);
-
-			return await pendingRequest._taskSource.Task.ConfigureAwait(false);
+				pendingRequest.callCancel = new CancellationTokenSource(this.CallTimeout);
+				pendingRequest.callCancel.Token.Register(() => this.CancelRequest(pendingRequest, cancellationToken).Wait());
+				pendingRequest.cancelCallback = cancellationToken.Register(() => pendingRequest.callCancel.Cancel());
+				await this.SendPduAsync(
+					PduType.Request,
+					flags,
+					callId,
+					buffer,
+					authLength,
+					pendingRequest.callCancel.Token,
+					context.authContext).ConfigureAwait(false);
+				return await pendingRequest._taskSource.Task.ConfigureAwait(false);
+			}
+			finally
+			{
+				this._xmitLock.Release();
+			}
 		}
 
 		private async Task CancelRequest(
