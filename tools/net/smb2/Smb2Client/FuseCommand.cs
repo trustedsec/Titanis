@@ -28,6 +28,7 @@ internal class FuseCommand : Smb2CommandBase
 	public FuseParameterGroup FuseParameters { get; set; }
 
 	[Parameter]
+	[Description("Mount the file system using backup semantics")]
 	public SwitchParam BackupSemantics { get; set; }
 
 	protected override Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
