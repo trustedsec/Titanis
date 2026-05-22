@@ -46,10 +46,9 @@ public abstract class LdapObjectCommandBase : LdapCommandBase
 		bool hasReqAttrs = false;
 		var reqAttrs = this.GetRequiredObjAttributes();
 		if (reqAttrs is null)
-		{
-			hasReqAttrs = true;
 			reqAttrs = [LdapAttributeTypes.DistinguishedName];
-		}
+		else
+			hasReqAttrs = true;
 
 		await this.OnBeforeProcessObjects(ldap, cancellationToken);
 		foreach (var name in this.ObjectName)
@@ -76,7 +75,7 @@ public abstract class LdapObjectCommandBase : LdapCommandBase
 					fullName += "," + ldap.DomainRoot;
 				dn = new LdapDistinguishedName(fullName);
 
-				if (reqAttrs is not null)
+				if (hasReqAttrs)
 					entry = await ldap.Get(dn, reqAttrs, cancellationToken);
 			}
 
