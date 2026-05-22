@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,14 @@ using Titanis.Linterop.Fuse;
 
 namespace Titanis.Cli.LdapTool;
 
+/// <task category="LDAP;Enumeration">Mount an LDAP directory as a file system</task>
 internal class FuseCommand : LdapCommandBase
 {
 	[ParameterGroup(ParameterGroupOptions.Required)]
 	public FuseParameterGroup FuseParameters { get; set; }
 
 	[Parameter]
+	[Description("")]
 	public LdapDistinguishedName? SearchBase { get; set; }
 
 	protected override async Task<int> RunAsync(LdapClient ldap, CancellationToken cancellationToken)
