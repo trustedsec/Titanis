@@ -95,12 +95,7 @@ namespace Titanis.Cli
 		public string? TicketCache { get; set; }
 
 		[Parameter]
-		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("Sends the TGT (and key) to the target for delegation")]
-		public SwitchParam DelegateTgt { get; set; }
-
-		[Parameter]
-		[Description("Requests delegation")]
+		[Description("Requests delegation (sends TGT and key for Kerberos)")]
 		public SwitchParam Delegate { get; set; }
 
 		[Parameter]
@@ -749,14 +744,15 @@ namespace Titanis.Cli
 			KerberosClientCred? clientCred;
 			if (serviceTicket is not null)
 			{
+				bool delegating = this.Delegate.IsSet || !this.DelegateTicket.IsNullOrEmpty();
 				clientCred = serviceTicket;
-				if (this.DelegateTgt.IsSet || !this.DelegateTicket.IsNullOrEmpty())
+				if (delegating)
 				{
 					List<TicketInfo> delegateTickets = new List<TicketInfo>();
-					if (this.DelegateTgt.IsSet && (krb.TicketCache.HomeTgt != null))
+					var homeTgt = krb.TicketCache.HomeTgt;
+					if (this.Delegate.IsSet && (homeTgt != null))
 					{
-						// TODO: Warn if no TGT
-						delegateTickets.Add(krb.TicketCache.HomeTgt);
+						delegateTickets.Add(homeTgt);
 					}
 					if (!this.DelegateTicket.IsNullOrEmpty())
 					{
@@ -769,12 +765,14 @@ namespace Titanis.Cli
 
 					if (delegateTickets.Count > 0)
 					{
-						requiredCaps |= SecurityCapabilities.Delegation;
 						clientCred.ForwardedTickets = delegateTickets;
+						requiredCaps |= SecurityCapabilities.Delegation;
+					}
+					else
+					{
+						this.Log?.WriteWarning($"Delegation specified, but there are no Kerberos tickets to delegate.  Kerberos will not use delegation");
 					}
 				}
-				else if (this.Delegate.IsSet)
-					requiredCaps |= SecurityCapabilities.Delegation;
 			}
 			else if (u2UserName is not null)
 			{
