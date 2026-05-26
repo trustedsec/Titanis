@@ -19,7 +19,7 @@ namespace Titanis.Smb2.Cli
 	/// </summary>
 	[Description("Watches for modifications to a directory or subtree.")]
 	[DetailedHelpResource(typeof(Messages), nameof(Messages.Smb2Client_watch_Detailed), Placement = DocumentationPlacement.BeforeBase)]
-	[OutputRecordType(typeof(FileChangeNotification))]
+	[OutputRecordType(typeof(FileChangeNotification), DefaultOutputStyle = OutputStyle.List)]
 	sealed class Smb2WatchCommand : Smb2TreeCommand
 	{
 		[Parameter]
