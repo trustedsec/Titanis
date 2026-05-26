@@ -105,7 +105,7 @@ namespace Titanis.Smb2.Pdus
 		internal abstract Smb2NegotiateContextType ContextType { get; }
 
 		internal abstract void ApplyTo(Smb2NegotiateResponse neg);
-		internal abstract void ReadFrom(ByteMemoryReader reader, short dataLength);
+		internal abstract void ReadFrom(IByteSource reader, short dataLength);
 		internal abstract void WriteTo(ByteWriter writer);
 	}
 
@@ -137,7 +137,7 @@ namespace Titanis.Smb2.Pdus
 			neg.preauthSalt = this.Salt;
 		}
 
-		internal override void ReadFrom(ByteMemoryReader reader, short dataLength)
+		internal override void ReadFrom(IByteSource reader, short dataLength)
 		{
 			int cAlgs = reader.ReadUInt16();
 			int cbSalt = reader.ReadUInt16();
@@ -185,7 +185,7 @@ namespace Titanis.Smb2.Pdus
 			neg.signingAlgs = this.Algorithms;
 		}
 
-		internal override void ReadFrom(ByteMemoryReader reader, short dataLength)
+		internal override void ReadFrom(IByteSource reader, short dataLength)
 		{
 			int cAlg = reader.ReadUInt16();
 			this.Algorithms = MemoryMarshal.Cast<byte, SigningAlgorithm>(reader.Consume(2 * cAlg)).ToArray();
@@ -228,7 +228,7 @@ namespace Titanis.Smb2.Pdus
 			neg.cipherAlgs = this.Ciphers;
 		}
 
-		internal override void ReadFrom(ByteMemoryReader reader, short dataLength)
+		internal override void ReadFrom(IByteSource reader, short dataLength)
 		{
 			int cAlg = reader.ReadUInt16();
 			this.Ciphers = MemoryMarshal.Cast<byte, Cipher>(reader.Consume(2 * cAlg)).ToArray();
@@ -276,7 +276,7 @@ namespace Titanis.Smb2.Pdus
 			neg.compressionAlgs = this.Algorithms;
 		}
 
-		internal override void ReadFrom(ByteMemoryReader reader, short dataLength)
+		internal override void ReadFrom(IByteSource reader, short dataLength)
 		{
 			int cAlgs = reader.ReadUInt16();
 			reader.Advance(2);
@@ -312,7 +312,7 @@ namespace Titanis.Smb2.Pdus
 			neg.serverNetName = this.NetName;
 		}
 
-		internal override void ReadFrom(ByteMemoryReader reader, short dataLength)
+		internal override void ReadFrom(IByteSource reader, short dataLength)
 		{
 			this.NetName = Encoding.Unicode.GetString(reader.Consume(dataLength));
 		}
@@ -344,7 +344,7 @@ namespace Titanis.Smb2.Pdus
 			neg.TransportCapabilities = this.Capabilities;
 		}
 
-		internal override void ReadFrom(ByteMemoryReader reader, short dataLength)
+		internal override void ReadFrom(IByteSource reader, short dataLength)
 		{
 			this.Capabilities = (TransportCaps)reader.ReadUInt32();
 		}
@@ -372,7 +372,7 @@ namespace Titanis.Smb2.Pdus
 			neg.rdmaTransforms = this.Transforms;
 		}
 
-		internal override void ReadFrom(ByteMemoryReader reader, short dataLength)
+		internal override void ReadFrom(IByteSource reader, short dataLength)
 		{
 			int cAlgs = reader.ReadUInt16();
 			reader.Advance(6);

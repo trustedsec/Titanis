@@ -11,6 +11,8 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)PduAlignmentAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PduArgumentsAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduOffsetAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PduListAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PduArraySizeAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PduByteOrder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PduByteOrderAttribute.cs" />

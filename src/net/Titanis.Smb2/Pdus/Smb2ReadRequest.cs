@@ -7,39 +7,24 @@ using Titanis.IO;
 namespace Titanis.Smb2.Pdus
 {
 	// [MS-SMB2] § 2.2.19 SMB2 READ Request
-	sealed class Smb2ReadRequest : Smb2Pdu<Smb2ReadRequestBody>
+	sealed class Smb2ReadRequest : Smb2PduStructBase<Smb2ReadRequestBody>
 	{
-		/// <inheritdoc/>
-		internal sealed override Smb2Command Command => Smb2Command.Read;
-		/// <inheritdoc/>
-		protected sealed override ushort ValidBodySize => 49;
 		/// <inheritdoc/>
 		internal sealed override Smb2Priority Priority => Smb2Priority.Read;
 		/// <inheritdoc/>
 		internal sealed override int ResponsePayloadSize => this.body.length;
 
 		internal Memory<byte> receiveBuffer;
-
-		/// <inheritdoc/>
-		internal sealed override void ReadFrom(ByteMemoryReader reader, ref readonly Smb2PduSyncHeader pduHdr)
-		{
-			this.body = reader.ReadReadReqHdr();
-		}
-
-		/// <inheritdoc/>
-		internal sealed override void WriteTo(ByteWriter writer, ref Smb2ReadRequestBody body)
-		{
-			writer.WritePduStruct(body);
-			// HACK: Sent by Windows, without it STATUS_INVALID_PARAMETER
-			writer.Consume(1);
-		}
 	}
 
 	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	partial struct Smb2ReadRequestBody : ISmb2PduStruct
+	partial struct Smb2ReadRequestBody : ISmb2PduStruct2
 	{
-		public unsafe static int StructSize => sizeof(Smb2ReadRequestBody);
+		/// <inheritdoc/>
+		public static Smb2Command Command => Smb2Command.Read;
+		/// <inheritdoc/>
+		public static ushort ValidSmbSize => 49;
 
 		public ushort StructureSize { get => this.structureSize; set => this.structureSize = value; }
 		internal ushort structureSize;
@@ -54,5 +39,7 @@ namespace Titanis.Smb2.Pdus
 		internal int remainingBytes;
 		internal ushort readChannelInfoOffset;
 		internal ushort readChannelInfoLength;
+		// HACK: Sent by Windows, without it STATUS_INVALID_PARAMETER
+		private byte dummy;
 	}
 }

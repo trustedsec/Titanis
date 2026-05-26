@@ -63,6 +63,13 @@ namespace Titanis.Smb2.Pdus
 		/// </remarks>
 		ushort StructureSize { get; set; }
 	}
+
+	internal interface ISmb2PduStruct2 : ISmb2PduStruct
+	{
+		static abstract Smb2Command Command { get; }
+		static abstract ushort ValidSmbSize { get; }
+	}
+
 	abstract class Smb2Pdu<TBody> : Smb2Pdu
 		where TBody : struct, ISmb2PduStruct
 	{

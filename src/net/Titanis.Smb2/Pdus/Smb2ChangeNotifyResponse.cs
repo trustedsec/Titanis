@@ -22,8 +22,8 @@ namespace Titanis.Smb2.Pdus
 		{
 			int offPdu = reader.Position - Smb2PduSyncHeader.StructSize;
 
-			var body = reader.ReadPduStruct<Smb2ChangeNotifyResponseHeader>();
-			this.body = body;
+			this.body = reader.ReadPduStruct<Smb2ChangeNotifyResponseHeader>();
+			ref var body = ref this.body;
 
 			if (body.outputBufferLength > 0)
 			{

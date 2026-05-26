@@ -524,6 +524,10 @@ namespace Titanis.CodeGen
 		#region Binary
 		public static ExpressionSyntax EqualTo(this ExpressionSyntax expr, ExpressionSyntax other)
 			=> SyntaxFactory.BinaryExpression(SyntaxKind.EqualsExpression, expr, other);
+		public static ExpressionSyntax Add(this ExpressionSyntax expr, ExpressionSyntax other)
+			=> SyntaxFactory.BinaryExpression(SyntaxKind.AddExpression, expr, other);
+		public static ExpressionSyntax Subtract(this ExpressionSyntax expr, ExpressionSyntax other)
+			=> SyntaxFactory.BinaryExpression(SyntaxKind.SubtractExpression, expr, other);
 		public static ExpressionSyntax BooleanAnd(this ExpressionSyntax expr, ExpressionSyntax other)
 			=> SyntaxFactory.BinaryExpression(SyntaxKind.LogicalAndExpression, expr, other);
 		#endregion

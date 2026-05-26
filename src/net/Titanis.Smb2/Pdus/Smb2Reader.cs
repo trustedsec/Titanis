@@ -19,9 +19,6 @@ namespace Titanis.Smb2.Pdus
 		internal static ref readonly Smb2IoctlRequestBody ReadIoctlReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2IoctlRequestBody>(reader.Consume(Smb2IoctlRequestBody.StructSize))[0];
 
-		internal static ref readonly Smb2IoctlResponseBody ReadIoctlRespHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2IoctlResponseBody>(reader.Consume(Smb2IoctlResponseBody.StructSize))[0];
-
 		internal static ref readonly Smb2EchoRequestBody ReadEchoReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2EchoRequestBody>(reader.Consume(Smb2EchoRequestBody.StructSize))[0];
 
@@ -43,20 +40,8 @@ namespace Titanis.Smb2.Pdus
 		internal static ref readonly Smb2FlushResponseBody ReadFlushRespHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2FlushResponseBody>(reader.Consume(Smb2FlushResponseBody.StructSize))[0];
 
-		internal static ref readonly Smb2ChangeNotifyRequestHeader ReadChangeNotifyReqHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2ChangeNotifyRequestHeader>(reader.Consume(Smb2ChangeNotifyRequestHeader.StructSize))[0];
-
 		internal static ref readonly Smb2CloseRequestBody ReadCloseReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2CloseRequestBody>(reader.Consume(Smb2CloseRequestBody.StructSize))[0];
-
-		internal static ref readonly Smb2CancelRequestBody ReadCancelReqHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2CancelRequestBody>(reader.Consume(Smb2CancelRequestBody.StructSize))[0];
-
-		internal static ref readonly Smb2ReadRequestBody ReadReadReqHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2ReadRequestBody>(reader.Consume(Smb2ReadRequestBody.StructSize))[0];
-
-		internal static ref readonly Smb2ReadResponseBody ReadReadRespHdr(this ByteMemoryReader reader)
-			=> ref MemoryMarshal.Cast<byte, Smb2ReadResponseBody>(reader.Consume(Smb2ReadResponseBody.StructSize))[0];
 
 		internal static ref readonly Smb2WriteRequestBody ReadWriteReqHdr(this ByteMemoryReader reader)
 			=> ref MemoryMarshal.Cast<byte, Smb2WriteRequestBody>(reader.Consume(Smb2WriteRequestBody.StructSize))[0];

@@ -149,6 +149,7 @@ namespace Titanis.SourceGen
 		}
 		#endregion
 
+		private const string StartOffsetVariable = "__offStart";
 
 		private string? GeneratePduStruct(PduTypeInfo pduType, SourceProductionContext context)
 		{
@@ -255,6 +256,8 @@ namespace Titanis.SourceGen
 			readStatements.Do(Code.This.MethodOf(PduStructNames.OnBeforeReadPdu).Call(readerArg));
 			// this.OnBeforeWritePdu()
 			writeStatements.Do(Code.This.MethodOf(PduStructNames.OnBeforeWritePdu).Call(writerArg));
+
+			readStatements.DeclareVariable(StartOffsetVariable, readerArg.MethodOf("Position"));
 
 			bool isByteOrderInvariant = true;
 			var fields = pduType.GetFields(new PduTypeContext(context.CancellationToken));
@@ -507,12 +510,18 @@ namespace Titanis.SourceGen
 			ExpressionSyntax fieldRef = _code_this.FieldOf(field.Name);
 			var member = field.Member;
 
-
 			if (field.Alignment != null)
 			{
 				writeStatements.Do(writerArg.MethodOf(PduStructNames.Align).Call(Code.Primitive(field.Alignment.Value)));
 				readStatements.Do(readerArg.MethodOf(PduStructNames.Align).Call(Code.Primitive(field.Alignment.Value)));
 			}
+
+			if (field.OffsetAttribute != null)
+			{
+				var offsetSymbol = field.OffsetAttribute.GetArgument<string>(0)?.TryResolveMemberName(member, context);
+				readStatements.Assign(readerArg.PropertyOf("Position"), Code.VarRef(StartOffsetVariable).Add(Code.VarRef(offsetSymbol.Name)));
+			}
+
 
 			// Determine how to read/write the field
 			var customReadMethod = field.CustomReadMethod.TryResolveMemberName(member, context);
@@ -657,63 +666,97 @@ namespace Titanis.SourceGen
 					bool isByteArray = false;
 					ExpressionSyntax? arraySizeExpr = null;
 					bool encodeAsArray = false;
-					if (elementType.TypeKind == TypeKind.Array)
+					if ((elementType.TypeKind == TypeKind.Array) || (field.ListAttribute != null))
 					{
-						// Get array size
-						var attrArraySize = field.ArraySizeAttribute;
-						if (attrArraySize == null)
+						if (elementType.TypeKind == TypeKind.Array)
 						{
-							context.ReportDiagnostic(Diagnostic.Create(
-								PduDiagnostics.MissingCountAttribute_Type_Member,
-								declarator.GetLocation(),
-								pduType.TypeSymbol.FullName(), field.Name
-								));
-						}
-						else
-						{
-							var countValue = field.ArrayElementCount;
-							if (countValue?.Value is int n && n >= 0)
-							{
-								arraySizeExpr = Code.Primitive(n);
-							}
-							else if (countValue?.Value is string str)
-							{
-								var countSym = countValue.TryResolveMemberName(member, context);
-								if (countSym != null)
-								{
-									if (countSym.Kind is SymbolKind.Method)
-									{
-										arraySizeExpr = Code.VarRef(str).Call();
-									}
-									else if (countSym.Kind is SymbolKind.Field or SymbolKind.Property)
-									{
-										arraySizeExpr = Code.VarRef(str);
-									}
-								}
-							}
-
-							if (arraySizeExpr == null)
+							// Get array size
+							var attrArraySize = field.ArraySizeAttribute;
+							if (attrArraySize == null)
 							{
 								context.ReportDiagnostic(Diagnostic.Create(
-									PduDiagnostics.BadCountAttribute_Type_Member,
-									attrArraySize.ApplicationSyntaxReference.GetLocation(),
+									PduDiagnostics.MissingCountAttribute_Type_Member,
+									declarator.GetLocation(),
 									pduType.TypeSymbol.FullName(), field.Name
 									));
 							}
+							else
+							{
+								var countValue = field.ArrayElementCount;
+								if (countValue?.Value is int n && n >= 0)
+								{
+									arraySizeExpr = Code.Primitive(n);
+								}
+								else if (countValue?.Value is string str)
+								{
+									var countSym = countValue.TryResolveMemberName(member, context);
+									if (countSym != null)
+									{
+										if (countSym.Kind is SymbolKind.Method)
+										{
+											arraySizeExpr = Code.VarRef(str).Call();
+										}
+										else if (countSym.Kind is SymbolKind.Field or SymbolKind.Property)
+										{
+											arraySizeExpr = Code.VarRef(str);
+										}
+									}
+								}
+
+								if (arraySizeExpr == null)
+								{
+									context.ReportDiagnostic(Diagnostic.Create(
+										PduDiagnostics.BadCountAttribute_Type_Member,
+										attrArraySize.ApplicationSyntaxReference.GetLocation(),
+										pduType.TypeSymbol.FullName(), field.Name
+										));
+								}
+							}
+
+							if (((IArrayTypeSymbol)elementType).ElementType.SpecialType == SpecialType.System_Byte)
+								isByteArray = true;
+							else
+							{
+								encodeAsArray = true;
+								elementType = ((IArrayTypeSymbol)elementType).ElementType;
+							}
+						}
+						else if (field.ListAttribute != null)
+						{
+							var predicateSym = field.ListAttribute.GetArgument<string>(nameof(PduListAttribute.PredicateMember))?.TryResolveMemberName(member, context);
+							var sizeSym = field.ListAttribute.GetArgument<string>(nameof(PduListAttribute.SizeMember))?.TryResolveMemberName(member, context);
+
+							string startPosVarName = $"__offListStart_{field.Name}";
+							string endPosVarName = $"__offListEnd_{field.Name}";
+							MemberAccessExpressionSyntax readerPos = readerArg.PropertyOf("Position");
+							if (predicateSym != null)
+								readStatements.DeclareVariable(startPosVarName, readerPos);
+							if (sizeSym != null)
+								readStatements.DeclareVariable(endPosVarName, readerPos.Add(Code.VarRef(sizeSym.Name)));
+
+							var listPosExpr = readerPos.Subtract(Code.VarRef(startPosVarName));
+
+							ExpressionSyntax? predicateExpr;
+							if (predicateSym != null)
+							{
+								predicateExpr = Code.VarRef(predicateSym.Name).Call(readerArg, listPosExpr);
+							}
+							else if (sizeSym != null)
+							{
+								predicateExpr = listPosExpr.LessThan(Code.VarRef(endPosVarName));
+							}
+
+							elementType = ((IArrayTypeSymbol)elementType).ElementType;
+
+							encodeAsArray = true;
 						}
 
-						if (((IArrayTypeSymbol)elementType).ElementType.SpecialType == SpecialType.System_Byte)
-							isByteArray = true;
-						else
+						if (encodeAsArray)
 						{
-							encodeAsArray = true;
-
 							fieldReadRef = fieldWriteRef = Code.VarRef(PduStructNames.ElementVarName);
 
 							readStatements = new List<StatementSyntax>();
 							writeStatements = new List<StatementSyntax>();
-
-							elementType = ((IArrayTypeSymbol)elementType).ElementType;
 
 							readStatements.DeclareVariable(Code.TypeRef(elementType), PduStructNames.ElementVarName);
 
@@ -947,33 +990,7 @@ namespace Titanis.SourceGen
 						if (arraySizeExpr != null)
 						{
 							// Read block
-							void GenerateReadBlock(
-								List<StatementSyntax> readStatements,
-								List<StatementSyntax> topReadBlock
-								)
-							{
-								List<StatementSyntax> arrayBlock = new List<StatementSyntax>();
-								arrayBlock.DeclareVariable(PduStructNames.LimitVarName, arraySizeExpr);
-
-								// var array = new TElement[count];
-								arrayBlock.DeclareVariable(
-									PduStructNames.ArrayVarName,
-									Code.TypeRef(elementType).NewArray(Code.VarRef(PduStructNames.LimitVarName))
-									);
-								// prop = array;
-								arrayBlock.Assign(origFieldRef, Code.VarRef(PduStructNames.ArrayVarName));
-
-								// array[i] = elem
-								readStatements.Assign(
-									Code.VarRef(PduStructNames.ArrayVarName).Indexer(Code.VarRef(PduStructNames.LoopVarName)),
-									Code.VarRef(PduStructNames.ElementVarName)
-									);
-
-								arrayBlock.Add(Code.For(PduStructNames.LoopVarName, Code.VarRef(PduStructNames.LimitVarName), readStatements.AsBlock()));
-
-								topReadBlock.Add(arrayBlock.AsBlock());
-							}
-							GenerateReadBlock(readStatements, arrayReadBlock);
+							GenerateReadBlock(readStatements, arrayReadBlock, elementType, arraySizeExpr, origFieldRef);
 
 							// Write block
 							void GenerateWriteBlock(
@@ -1045,6 +1062,36 @@ namespace Titanis.SourceGen
 			}
 
 			return true;
+		}
+
+		private static void GenerateReadBlock(
+			List<StatementSyntax> readStatements,
+			List<StatementSyntax> topReadBlock,
+			ITypeSymbol elementType,
+			ExpressionSyntax arraySizeExpr,
+			ExpressionSyntax origFieldRef
+			)
+		{
+			List<StatementSyntax> arrayBlock = new List<StatementSyntax>();
+			arrayBlock.DeclareVariable(PduStructNames.LimitVarName, arraySizeExpr);
+
+			// var array = new TElement[count];
+			arrayBlock.DeclareVariable(
+				PduStructNames.ArrayVarName,
+				Code.TypeRef(elementType).NewArray(Code.VarRef(PduStructNames.LimitVarName))
+				);
+			// prop = array;
+			arrayBlock.Assign(origFieldRef, Code.VarRef(PduStructNames.ArrayVarName));
+
+			// array[i] = elem
+			readStatements.Assign(
+				Code.VarRef(PduStructNames.ArrayVarName).Indexer(Code.VarRef(PduStructNames.LoopVarName)),
+				Code.VarRef(PduStructNames.ElementVarName)
+				);
+
+			arrayBlock.Add(Code.For(PduStructNames.LoopVarName, Code.VarRef(PduStructNames.LimitVarName), readStatements.AsBlock()));
+
+			topReadBlock.Add(arrayBlock.AsBlock());
 		}
 	}
 }

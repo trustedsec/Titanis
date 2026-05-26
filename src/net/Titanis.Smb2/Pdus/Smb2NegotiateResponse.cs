@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using Titanis.IO;
+using Titanis.PduStruct;
 
 namespace Titanis.Smb2.Pdus
 {
 	// [MS-SMB2] § 2.2.4 SMB2 NEGOTIATE Response
 	sealed class Smb2NegotiateResponse : Smb2Pdu<Smb2NegotiateResponseBody>
 	{
-		internal byte[] secToken;
+		internal byte[] secToken => this.body.secToken;
 		internal PreauthHashAlgorithm[]? hashAlgs;
 		internal byte[]? preauthSalt;
 		internal SigningAlgorithm[]? signingAlgs;
@@ -31,68 +33,13 @@ namespace Titanis.Smb2.Pdus
 		/// <inheritdoc/>
 		internal sealed override void ReadFrom(ByteMemoryReader reader, ref readonly Smb2PduSyncHeader hdr)
 		{
-			int offPdu = reader.Position - Smb2PduSyncHeader.StructSize;
-
 			ref Smb2NegotiateResponseBody body = ref this.body;
 			body = reader.ReadPduStruct<Smb2NegotiateResponseBody>();
-			if (body.secBufferLength > 0)
+			if (body.dialect >= Smb2Dialect.Smb3_1_1 && body.negCtxList != null)
 			{
-				reader.Position = (offPdu + body.secBufferOffset);
-				this.secToken = reader.ReadBytes(body.secBufferLength);
-			}
-
-			if (body.dialect >= Smb2Dialect.Smb3_1_1)
-			{
-				if (body.negotiateContextCount > 0)
+				foreach (var ctx in body.negCtxList)
 				{
-					Smb2NegotiateContext[] negCtxList = new Smb2NegotiateContext[body.negotiateContextCount];
-					for (int i = 0; i < body.negotiateContextCount; i++)
-					{
-						Smb2NegotiateContextHeader negHdr = reader.ReadPduStruct<Smb2NegotiateContextHeader>();
-						Smb2NegotiateContext ctx;
-
-						int offContext = reader.Position;
-						switch (negHdr.contextType)
-						{
-							case Smb2NegotiateContextType.PreauthIntegrityCaps:
-								ctx = new PreauthIntegrityCapsContext();
-								break;
-							case Smb2NegotiateContextType.EncryptionCaps:
-								ctx = new CipherCapsContext();
-								break;
-							case Smb2NegotiateContextType.SigningCaps:
-								ctx = new SigningCapsContext();
-								break;
-							case Smb2NegotiateContextType.CompressionCaps:
-								ctx = new CompressionCapsContext();
-								break;
-							case Smb2NegotiateContextType.NetName:
-								ctx = new NetNameContext();
-								break;
-							case Smb2NegotiateContextType.TransportCaps:
-								ctx = new TransportCapsContext();
-								break;
-							case Smb2NegotiateContextType.RdmaTransformCaps:
-								ctx = new RdmaTransformCapsContext();
-								break;
-							default:
-								ctx = null;
-								break;
-						}
-						if (ctx == null)
-						{
-							// TODO: Alert on unknown context
-						}
-						else
-						{
-							ctx.ReadFrom(reader, negHdr.dataLength);
-
-							ctx.ApplyTo(this);
-							negCtxList[i] = ctx;
-						}
-
-						reader.Position = offContext + negHdr.dataLength;
-					}
+					ctx.ctx.ApplyTo(this);
 				}
 			}
 		}
@@ -123,7 +70,84 @@ namespace Titanis.Smb2.Pdus
 		internal long systemTime;
 		internal ulong serverStartTime;
 		internal ushort secBufferOffset;
+		private long secBufferOffset2 => this.secBufferOffset - Smb2PduSyncHeader.StructSize;
 		internal ushort secBufferLength;
+
 		internal uint negotiateContextOffset;
+		private long negotiateContextOffset2 => this.negotiateContextOffset - Smb2PduSyncHeader.StructSize;
+
+		private readonly bool HasContexts => this.negotiateContextCount > 0;
+
+		[PduOffset(nameof(secBufferOffset2))]
+		[PduArraySize(nameof(secBufferLength))]
+		internal byte[] secToken;
+
+		// TODO: Only try deserializing if HasContexts (PduStruct limitation)
+		//[PduConditional(nameof(HasContexts))]
+		[PduArraySize(nameof(negotiateContextCount))]
+		[PduOffset(nameof(negotiateContextOffset2))]
+		internal Smb2NegotiateContextStruc[] negCtxList;
+	}
+
+	[PduStruct]
+	[PduAlignment(8)]
+	partial struct Smb2NegotiateContextStruc
+	{
+		internal Smb2NegotiateContextType contextType;
+		internal short dataLength;
+		internal int reserved;
+
+		[PduField(ReadMethod = nameof(ReadContext), WriteMethod = nameof(WriteContext))]
+		internal Smb2NegotiateContext ctx;
+
+		private void WriteContext(ByteWriter writer, Smb2NegotiateContext ctx)
+		{
+			throw new NotImplementedException();
+		}
+
+		private Smb2NegotiateContext ReadContext(IByteSource source)
+		{
+			Smb2NegotiateContext ctx;
+
+			var offContext = source.Position;
+			switch (this.contextType)
+			{
+				case Smb2NegotiateContextType.PreauthIntegrityCaps:
+					ctx = new PreauthIntegrityCapsContext();
+					break;
+				case Smb2NegotiateContextType.EncryptionCaps:
+					ctx = new CipherCapsContext();
+					break;
+				case Smb2NegotiateContextType.SigningCaps:
+					ctx = new SigningCapsContext();
+					break;
+				case Smb2NegotiateContextType.CompressionCaps:
+					ctx = new CompressionCapsContext();
+					break;
+				case Smb2NegotiateContextType.NetName:
+					ctx = new NetNameContext();
+					break;
+				case Smb2NegotiateContextType.TransportCaps:
+					ctx = new TransportCapsContext();
+					break;
+				case Smb2NegotiateContextType.RdmaTransformCaps:
+					ctx = new RdmaTransformCapsContext();
+					break;
+				default:
+					ctx = null;
+					break;
+			}
+			if (ctx == null)
+			{
+				// TODO: Alert on unknown context
+			}
+			else
+			{
+				ctx.ReadFrom(source, this.dataLength);
+			}
+
+			source.Position = offContext + this.dataLength;
+			return ctx;
+		}
 	}
 }

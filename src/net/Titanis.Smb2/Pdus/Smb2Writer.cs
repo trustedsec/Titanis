@@ -138,14 +138,6 @@ namespace Titanis.Smb2.Pdus
 			}
 		}
 
-		internal static unsafe void WriteCloseRespHdr(this ByteWriter writer, in Smb2CloseResponseBody hdr)
-		{
-			fixed (byte* pStruc = writer.Consume(Smb2CloseResponseBody.StructSize))
-			{
-				*(Smb2CloseResponseBody*)pStruc = hdr;
-			}
-		}
-
 		internal static unsafe void WriteReadRespHdr(this ByteWriter writer, in Smb2ReadResponseBody hdr)
 		{
 			fixed (byte* pStruc = writer.Consume(Smb2ReadResponseBody.StructSize))
