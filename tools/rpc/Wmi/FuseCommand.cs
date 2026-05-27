@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using Titanis.Msrpc.Mswmi.Fusion;
 
 namespace Titanis.Cli.WmiTool;
 
+[Description("Mounts a WMI namespace as a file system")]
 internal class FuseCommand : WmiNamespaceCommandBase
 {
 	[ParameterGroup(ParameterGroupOptions.Required)]
