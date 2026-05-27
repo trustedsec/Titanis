@@ -3,7 +3,7 @@
   <PropertyGroup>
 	  <ArtifactsPath>$(ArtifactsBasePath)build\</ArtifactsPath>
 	  
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
