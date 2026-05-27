@@ -22,7 +22,7 @@ internal abstract class WmiCommand : Command, IHaveServerName
 	//public SwitchParam EncryptRpc { get; set; }
 
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
-	public RpcParameterGroup? RpcParameters { get; set; }
+	public RpcParameterGroup RpcParameters { get; set; }
 
 	[Parameter(0)]
 	[Mandatory]

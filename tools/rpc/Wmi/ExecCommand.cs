@@ -28,9 +28,6 @@ Use Ctrl+C to terminate the remote process.  When -CmdCall is enabled, the first
 [Example("Specifying a polling interval", @"{0} -UserName milchick -Password Br3@kr00m! LUMON-DC1 -PollInterval 100ms -Verbose ""PING -t localhost""")]
 internal class ExecCommand : WmiCommand
 {
-	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
-	public SmbParameters SmbParameters { get; set; }
-
 	[Parameter(10)]
 	[Mandatory]
 	[Description("Command line to execute")]
@@ -68,7 +65,7 @@ internal class ExecCommand : WmiCommand
 	{
 		base.ValidateParameters(context);
 
-		this.SmbParameters?.Validate(context, this.RpcParameters.Authentication);
+		this.RpcParameters.SmbParameters.Validate(context, this.RpcParameters.Authentication);
 
 		if (this.CaptureOutput.IsSet)
 		{
@@ -149,7 +146,7 @@ internal class ExecCommand : WmiCommand
 
 			cmdLine += " 2>&1 >C:\\WINDOWS\\TEMP\\" + tempFileName;
 
-			smbClient = this.SmbParameters.CreateClient();
+			smbClient = this.RpcParameters.SmbParameters.CreateClient();
 
 			tempFilePath = new UncPath(this.ServerName, 445, "ADMIN$", $"Temp\\{tempFileName}");
 			outFile = (Smb2OpenFile)await smbClient.CreateFileAsync(tempFilePath, new Smb2CreateInfo
