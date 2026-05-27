@@ -8,7 +8,6 @@
 		<!-- BUILD_BINARIESDIRECTORY won't be set if running tests manually -->
 		<BUILD_BINARIESDIRECTORY Condition="'$(BUILD_BINARIESDIRECTORY)'==''">$(SolutionDir)artifacts</BUILD_BINARIESDIRECTORY>
 		<ArtifactsPath Condition="'$(ArtifactsPath)'==''">$(BUILD_BINARIESDIRECTORY)\</ArtifactsPath>
-		<ArtifactsPath>$(ArtifactsPath)artifacts</ArtifactsPath>
 		
 		<ArtifactsPath>$(ArtifactsPath)\test\</ArtifactsPath>
 		<TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>

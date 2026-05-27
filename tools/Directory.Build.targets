@@ -13,4 +13,27 @@
 		<Message Text="Building documentation" Importance="high" />
 		<BuildToolDocTask Condition="'$(ArtifactsBasePath)'!=''" AssemblyFile="$(OutputPath)$(AssemblyName)$(TargetExt)" DocFile="$(SolutionDir)doc\UserGuide\tools\$(AssemblyName).md" />
 	</Target>
+
+	<Target Name="PublishAll" AfterTargets="Build" Condition="'$(Publishing)'=='' and '$(Configuration)'=='Release'" >
+		<ItemGroup>
+			<RuntimeIdentifierToPublish Include="$(RuntimeIdentifiers)"/>
+
+			<ProjectToPublish Include="@(RuntimeIdentifierToPublish->'$(MSBuildProjectFullPath)')">
+				<AdditionalProperties>RuntimeIdentifier=%(RuntimeIdentifierToPublish.Identity)</AdditionalProperties>
+				<RuntimeIdentifier>%(RuntimeIdentifierToPublish.Identity)</RuntimeIdentifier>
+			</ProjectToPublish>
+		</ItemGroup>
+
+		<MSBuild Projects="@(ProjectToPublish)"
+				 Targets="Publish"
+				 BuildInParallel="true"
+				 Properties="Publishing=true;SelfContained=true;PublishDir=$(ArtifactsBasePath)publish/sc/tools/%(ProjectToPublish.RuntimeIdentifier)/"
+				 />
+
+		<MSBuild Projects="@(ProjectToPublish)"
+				 Targets="Publish"
+				 BuildInParallel="true"
+				 Properties="Publishing=true;SelfContained=false;PublishDir=$(ArtifactsBasePath)publish/net8/tools/%(ProjectToPublish.RuntimeIdentifier)/"
+				 />
+	</Target>
 </Project>

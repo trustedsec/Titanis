@@ -4,7 +4,7 @@
 		<UseArtifactsOutput>true</UseArtifactsOutput>
 		<BUILD_BINARIESDIRECTORY Condition="'$(BUILD_BINARIESDIRECTORY)'==''">$(SolutionDir)artifacts</BUILD_BINARIESDIRECTORY>
 		<ArtifactsPath>$(BUILD_BINARIESDIRECTORY)\</ArtifactsPath>
-		<ArtifactsPath Condition="'$(OS)'!='Windows_NT'">$(ArtifactsPath)$(OS)\</ArtifactsPath>
+		<!--<ArtifactsPath Condition="'$(OS)'!='Windows_NT'">$(ArtifactsPath)$(OS)\</ArtifactsPath>-->
 
 		<ArtifactsBasePath>$(ArtifactsPath)</ArtifactsBasePath>
 
