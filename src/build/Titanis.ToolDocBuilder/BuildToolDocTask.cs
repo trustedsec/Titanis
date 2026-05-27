@@ -128,9 +128,9 @@ namespace Titanis.ToolDocBuilder
 
 					if (commandType.IsAssignableFrom(type))
 					{
-						var md = Command.GetCommandMetadata(commandInfo.CommandType, mdContext);
+						var md = Command.GetCommandMetadata(type, mdContext);
 						if (string.IsNullOrEmpty(md.Description))
-							buildEngine.LogErrorEvent(MakeMissingDescError(commandName));
+							buildEngine.LogErrorEvent(MakeMissingDescError(type.FullName));
 						foreach (var param in md.Parameters)
 						{
 							if (string.IsNullOrEmpty(param.Description))
@@ -143,7 +143,7 @@ namespace Titanis.ToolDocBuilder
 					{
 						var desc = mdResolver.GetCustomAttribute<DescriptionAttribute>(type, true)?.Description;
 						if (string.IsNullOrEmpty(desc))
-							buildEngine.LogErrorEvent(MakeMissingDescError(commandName));
+							buildEngine.LogErrorEvent(MakeMissingDescError(type.FullName));
 
 						MultiCommand.BuildCommandHelpText(type.GetTypeInfo(), docWriter, commandName, mdContext);
 
@@ -162,12 +162,12 @@ namespace Titanis.ToolDocBuilder
 
 		private static BuildErrorEventArgs MakeMissingDescError(string commandName, string paramName)
 		{
-			return new BuildErrorEventArgs("Documentation", "DOC0002", commandName, 0, 0, 0, 0, $"Parameter {paramName} of command {commandName} does not have a description.", null, "DocBuilder");
+			return new BuildErrorEventArgs("Documentation", "DOC0002", commandName, 0, 0, 0, 0, $"Parameter {paramName} of command class {commandName} does not have a description.", null, "DocBuilder");
 		}
 
 		private static BuildErrorEventArgs MakeMissingDescError(string commandName)
 		{
-			return new BuildErrorEventArgs("Documentation", "DOC0001", commandName, 0, 0, 0, 0, $"The command {commandName} does not have a description.", null, "DocBuilder");
+			return new BuildErrorEventArgs("Documentation", "DOC0001", commandName, 0, 0, 0, 0, $"The command class {commandName} does not have a description.", null, "DocBuilder");
 		}
 
 		class DirAssemblyResolver : MetadataAssemblyResolver
@@ -289,7 +289,36 @@ namespace Titanis.ToolDocBuilder
 
 		private Attribute? TryInstantiateAttr(CustomAttributeData attrDatum)
 		{
-			Type type = this.GetRuntimeType(attrDatum.AttributeType);
+			return ReflectAttribute(attrDatum);
+		}
+		private Attribute? ReflectAttribute(CustomAttributeData attrDatum)
+		{
+			Type? type = attrDatum.AttributeType.FullName switch
+			{
+				"System.ComponentModel.BrowsableAttribute" => typeof(BrowsableAttribute),
+				"System.ComponentModel.DefaultValueAttribute" => typeof(DefaultValueAttribute),
+				"System.ComponentModel.DescriptionAttribute" => typeof(DescriptionAttribute),
+				"System.ComponentModel.DisplayNameAttribute" => typeof(DisplayNameAttribute),
+				"System.ComponentModel.CategoryAttribute" => typeof(CategoryAttribute),
+				"System.Runtime.CompilerServices.NullableAttribute" => typeof(NullableAttribute),
+				"Titanis.Cli.AliasAttribute" => typeof(AliasAttribute),
+				"Titanis.Cli.ComponentAttribute" => typeof(ComponentAttribute),
+				"Titanis.Cli.DefaultPortAttribute" => typeof(DefaultPortAttribute),
+				"Titanis.Cli.DetailedHelpResourceAttribute" => typeof(DetailedHelpResourceAttribute),
+				"Titanis.Cli.DetailedHelpTextAttribute" => typeof(DetailedHelpTextAttribute),
+				"Titanis.Cli.ExampleAttribute" => typeof(ExampleAttribute),
+				"Titanis.Cli.MandatoryAttribute" => typeof(MandatoryAttribute),
+				"Titanis.Cli.OutputRecordTypeAttribute" => typeof(OutputRecordTypeAttribute),
+				"Titanis.Cli.ParameterAttribute" => typeof(ParameterAttribute),
+				"Titanis.Cli.ParameterGroupAttribute" => typeof(ParameterGroupAttribute),
+				"Titanis.Cli.PlaceholderAttribute" => typeof(PlaceholderAttribute),
+				"Titanis.Cli.SubcommandAttribute" => typeof(SubcommandAttribute),
+				"Titanis.Cli.ValueListProviderAttribute" => typeof(ValueListProviderAttribute),
+				"Titanis.DisplayAlignmentAttribute" => typeof(DisplayAlignmentAttribute),
+				"Titanis.DisplayFormatStringAttribute" => typeof(DisplayFormatStringAttribute),
+				"Titanis.FileSizeAttribute" => typeof(FileSizeAttribute),
+				_ => this.GetRuntimeType(attrDatum.AttributeType)
+			};
 			if (type is null)
 				return null;
 
@@ -329,5 +358,19 @@ namespace Titanis.ToolDocBuilder
 			else
 				return typedValue.Value;
 		}
+	}
+
+	internal class NullableAttribute : Attribute
+	{
+		public NullableAttribute(byte flag)
+		{
+			Flags = [flag];
+		}
+		public NullableAttribute(byte[] flags)
+		{
+			Flags = flags;
+		}
+
+		public byte[] Flags { get; }
 	}
 }
