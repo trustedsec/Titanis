@@ -277,7 +277,7 @@ namespace Titanis.Cli
 			{
 				writer.AppendLine().WriteHeading("Options").AppendLine();
 
-				var groups = namedParams.GroupBy(r => r.Category).OrderBy(r=>r.Key);
+				var groups = namedParams.GroupBy(r => r.Category).OrderBy(r => r.Key);
 				foreach (var group in groups)
 				{
 					if (!string.IsNullOrEmpty(group.Key))
@@ -489,6 +489,7 @@ namespace Titanis.Cli
 				}
 			}
 
+			var fileAccess = this.Services.GetService<IFileAccess>();
 			bool isFinalPos = false;
 			bool endOfOptions = false;
 
@@ -508,10 +509,15 @@ namespace Titanis.Cli
 
 				ParameterMetadata parameter;
 				bool isLastParam = false;
+				bool isFileInsertion = false;
 				string? argText;
 				if ((tokenText.Length > 0) && (token.OriginalText.StartsWith("-")))
 				{
 					// This is a named parameter
+
+					isFileInsertion = tokenText.EndsWith("^");
+					if (isFileInsertion)
+						tokenText = tokenText.Substring(0, tokenText.Length - 1);
 
 					string paramName;
 
@@ -611,8 +617,26 @@ namespace Titanis.Cli
 							try
 							{
 								converterContext.Parameter = parameter;
-								argValue = parameter.ConvertValue(argText, converterContext);
-								listArgs.Add(argValue);
+
+								if (isFileInsertion)
+								{
+									if (fileAccess is null)
+										throw new ParameterSyntaxException(parameter.Name, $"Parameter {parameter.Name} received file expansion argument, but the command does not have file system access.");
+
+									foreach (var line in fileAccess.ReadLinesFrom(argText))
+									{
+										if (string.IsNullOrEmpty(line))
+											continue;
+
+										argValue = parameter.ConvertValue(line, converterContext);
+										listArgs.Add(argValue);
+									}
+								}
+								else
+								{
+									argValue = parameter.ConvertValue(argText, converterContext);
+									listArgs.Add(argValue);
+								}
 							}
 							catch (Exception ex)
 							{
