@@ -7,6 +7,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -136,6 +137,12 @@ namespace Titanis.Cli
 			{
 				string helpText = this.GetHelpText(command, context.MetadataContext);
 				this.WriteMessage(helpText);
+				return Task.FromResult(0);
+			}
+			else if (args.Length > startIndex && IsZshCompletionRequest(args[startIndex].Text))
+			{
+				string rc = this.GetZshCompletionScript(command, context.MetadataContext);
+				Console.WriteLine(rc);
 				return Task.FromResult(0);
 			}
 			else
@@ -318,6 +325,63 @@ namespace Titanis.Cli
 						writer.WriteBodyTextLine(example.Explanation!.Replace("{0}", commandName));
 				}
 			}
+		}
+
+		public override void GetZshCompletionScript(TextWriter writer, string commandName, string prefix, CommandMetadataContext context)
+		{
+			writer.WriteLine(@$"
+{prefix}() {{
+  _arguments \");
+
+			var md = GetCommandMetadata(this.GetType(), context);
+			var parameters = md.Parameters;
+
+			var groups = parameters.OrderBy(r => r.Name).GroupBy(r => r.IsPositional ? null : r.Category);
+			foreach (var group in groups.OrderBy(r => r.Key))
+			{
+				if (!string.IsNullOrEmpty(group.Key))
+					writer.WriteLine($"  + '{group.Key}' \\");
+
+				foreach (var param in parameters)
+				{
+					string action = "";
+					if (param.HasValueList)
+					{
+						StringBuilder sb = new StringBuilder(":(");
+						if (param.HasValueList)
+						{
+							var values = param.GetValueList(this, context);
+							if (values.Length > 0)
+							{
+								System.Collections.IList list = values;
+								for (int i = 0; i < list.Count; i++)
+								{
+									object? value = list[i];
+									if (i > 0)
+										sb.Append(' ');
+									sb.Append(value);
+								}
+								sb.Append(')');
+
+								action = sb.ToString();
+							}
+						}
+					}
+
+					string optSpec = param.IsPositional
+						? string.Empty
+						: $"-{param.Name}[{param.Description.Replace("[", @"\[").Replace("]", @"\]")}]";
+
+					string ph = param.Placeholder;
+					if (param.IsPositional)
+						ph = $@"{param.Name}\:{ph}";
+
+					writer.WriteLine($@"  ""{optSpec}:{ph}{action}"" \");
+				}
+			}
+
+			writer.WriteLine();
+			writer.WriteLine('}');
 		}
 
 		private static IList<ExampleAttribute> GetExamples(Type commandType, CommandMetadataContext context)

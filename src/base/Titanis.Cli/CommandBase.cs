@@ -33,6 +33,14 @@ namespace Titanis.Cli
 			=> candidate is "-?" or "-h" or "--help";
 
 		/// <summary>
+		/// Determines whether a token indicates the user is requesting a zsh completion script.
+		/// </summary>
+		/// <param name="candidate">Token to check</param>
+		/// <returns><see langword="true"/></returns>
+		protected static bool IsZshCompletionRequest(string candidate)
+			=> candidate is "--zcomprc";
+
+		/// <summary>
 		/// Invokes the command.
 		/// </summary>
 		/// <param name="args">Arguments to the command</param>
@@ -471,6 +479,25 @@ namespace Titanis.Cli
 			StringDocWriter writer = new StringDocWriter(ConsoleWidth, Indent);
 			this.GetHelpText(writer, commandName, context);
 			return writer.ToString();
+		}
+
+		public abstract void GetZshCompletionScript(TextWriter writer, string commandName, string prefix, CommandMetadataContext context);
+		public string GetZshCompletionScript(string command, CommandMetadataContext context)
+		{
+			var writer = new StringWriter()
+			{
+				NewLine = "\n"
+			};
+			writer.WriteLine($"#compdef {command}");
+			writer.WriteLine();
+
+			this.GetZshCompletionScript(writer, command, $"_{command}", context);
+
+			var rc = writer.ToString();
+			rc = rc.Replace("\r\n", "\n")
+				.Replace('\r', '\n');
+
+			return rc;
 		}
 
 		internal static string GetDetailedHelp(Type commandType, CommandMetadataContext context)
