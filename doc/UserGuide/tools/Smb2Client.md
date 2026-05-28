@@ -21,6 +21,7 @@ Smb2Client <subcommand>
 |[mkdir](#smb2client-mkdir)|Creates a directory.|
 |[mklink](#smb2client-mklink)|Creates a symbolic link.|
 |[mount](#smb2client-mount)|Creates a mount point or junction.|
+|[mountfs](#smb2client-mountfs)|Mounts an SMB2 server or share to the local file system.|
 |[put](#smb2client-put)|Sends a file to the server.|
 |[rm](#smb2client-rm)|Deletes a file.|
 |[rmdir](#smb2client-rmdir)|Deletes a directory.|
@@ -61,6 +62,7 @@ Smb2Client enumnics [options] <UncPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  InterfaceIndex|
@@ -90,6 +92,7 @@ Smb2Client enumnics [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -221,6 +224,7 @@ Smb2Client enumopenfiles [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -Level||&lt;OpenFileInfoLevel&gt;|Which level of detail to query|
@@ -238,6 +242,8 @@ Smb2Client enumopenfiles [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -259,6 +265,7 @@ Smb2Client enumopenfiles [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -383,6 +390,7 @@ Smb2Client enumsessions [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -Level||&lt;SessionInfoLevel&gt;|Which level of detail to query|
@@ -405,6 +413,8 @@ Smb2Client enumsessions [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -426,6 +436,7 @@ Smb2Client enumsessions [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -542,6 +553,7 @@ Smb2Client enumshares [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -Level||&lt;ShareInfoLevel[]&gt;|Which level(s) of detail to query|
@@ -567,6 +579,8 @@ Smb2Client enumshares [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -588,6 +602,7 @@ Smb2Client enumshares [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -725,6 +740,7 @@ Smb2Client enumsnapshots [options] <UncPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Token|
@@ -751,6 +767,7 @@ Smb2Client enumsnapshots [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -879,6 +896,7 @@ Smb2Client enumstreams [options] <UncPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Name|
@@ -906,6 +924,7 @@ Smb2Client enumstreams [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1038,6 +1057,7 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 ||||  Json|
 ||||  TreeTable|
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continues copying after an error occurs|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -Depth||&lt;Int32&gt;|Depth of directory tree to traverse (default = 0 [no recursion], -1 = no limit)|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
@@ -1066,6 +1086,7 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1251,6 +1272,7 @@ Smb2Client ls [options] <UncPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -Depth||&lt;Int32&gt;|Sets the depth limit for a recursive listing (default = 0 [no recursion], -1 = no limit)|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
@@ -1298,6 +1320,7 @@ Smb2Client ls [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1505,6 +1528,7 @@ Smb2Client mkdir [options] <UncPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -Parents||&lt;SwitchParam&gt;|Create parent directories|
@@ -1528,6 +1552,7 @@ Smb2Client mkdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1668,6 +1693,7 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -Directory||&lt;SwitchParam&gt;|Creates the symlink as a directory|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
@@ -1693,6 +1719,7 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1865,6 +1892,7 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PrintPath||&lt;String&gt;|The path to display to the user in directory listings (defaults to &lt;TargetPath&gt;)|
@@ -1888,6 +1916,7 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -2028,6 +2057,158 @@ Smb2Client mount \\SERVER\Share\Junction \??\C:\WINDOWS -PrintName "Not Windows"
 ```
   Creates a junction at \\SERVER\Share\Junction that points to C:\WINDOWS on the
   remote system, but prints the link as Not Windows in a directory listing.
+# Smb2Client mountfs
+  Mounts an SMB2 server or share to the local file system.
+
+## Synopsis
+```
+Smb2Client mountfs [options] <UncPath> [ <Mountpoint> ]
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;UncPath&gt;||&lt;UNC path&gt;|The UNC path of the target|
+|&lt;Mountpoint&gt;||&lt;String&gt;|Path of mountpoint in local filesystem|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|-B, -BackupSemantics||&lt;SwitchParam&gt;|Mount the file system using backup semantics|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|-G, -Gid||&lt;UInt32&gt;|GID of mount|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -ReadWrite||&lt;SwitchParam&gt;|Mount as read/write|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Uid||&lt;UInt32&gt;|UID of mount|
+
+
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
+|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
+|    -DesKey||&lt;HexString&gt;|DES key|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+
+
+### Authentication (NTLM)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|-E, -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+
+
+## Details
+
+  The UNC path may either be a server, a share, or a path within a share.  If the
+  UNC path is a server, the directory listing enumerates shares on the server.
+  
+  The filesystem is mounted as read-only unless -ReadWrite is specified.
+  
+  The directory listings use the UID and GID of the current user (obtained using
+  getuid() and getegid()) and a mode of r-xr-xr-x or rwxr-xr-x, dependening on
+  whether -ReadWrite is specified.  To retrieve the actual owner and DACL, print
+  the extended attributes titanis.smb2.file.ownersid and
+  titanis.smb2.file.dacltext.  For example:
+  
+  	getfattr -n titanis.smb2.file.ownersid smbmount
+  
+  Files within IPC$ are presented as sockets.
+  
+  
 # Smb2Client put
   Sends a file to the server.
 
@@ -2064,6 +2245,7 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 ||||  Json|
 ||||  TreeTable|
 |    -CreateTimestamp||&lt;DateTime&gt;|Create time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -LastAccessTimestamp||&lt;DateTime&gt;|Last access time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC).  If specified, overrides any timestamps copied from source or remote file.|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
@@ -2089,6 +2271,7 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -2229,6 +2412,7 @@ Smb2Client rm [options] <UncPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
@@ -2251,6 +2435,7 @@ Smb2Client rm [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -2379,6 +2564,7 @@ Smb2Client rmdir [options] <UncPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
@@ -2401,6 +2587,7 @@ Smb2Client rmdir [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -2532,6 +2719,7 @@ Smb2Client touch [options] <UncPath>
 ||||  TreeTable|
 |    -CopyFileAttributes||&lt;SwitchParam&gt;|If specified, also copy file attributes from TimestampsFrom|
 |    -CreateTimestamp||&lt;DateTime&gt;|Create time to set on the file (UTC)|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -LastAccessTimestamp||&lt;DateTime&gt;|Last access time to set on the file (UTC)|
 |    -LastWriteTimestamp||&lt;DateTime&gt;|Last write time to set on the file (UTC)|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -2581,6 +2769,7 @@ Smb2Client touch [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -2790,6 +2979,7 @@ Smb2Client umount [options] <UncPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -RemoveDirectory||&lt;SwitchParam&gt;|Deletes the directory after unmounting|
@@ -2813,6 +3003,7 @@ Smb2Client umount [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -2950,6 +3141,7 @@ Smb2Client watch [options] <UncPath>
 ||||  Json|
 ||||  TreeTable|
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continue watching for changes if an error occurs|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Action|
@@ -2978,6 +3170,7 @@ Smb2Client watch [options] <UncPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|

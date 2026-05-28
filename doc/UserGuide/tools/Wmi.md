@@ -19,6 +19,7 @@ Wmi <subcommand>
 |[lsmethod](#wmi-lsmethod)|Lists the methods of a class or object.|
 |[lsns](#wmi-lsns)|Lists the available namespaces within a namespace.|
 |[lsprop](#wmi-lsprop)|Lists the properties of a class or object.|
+|[mountfs](#wmi-mountfs)|Mounts a WMI namespace as a file system|
 |[query](#wmi-query)|Executes a WMI query|
 |[restore](#wmi-restore)|Restores the WMI repository|
 
@@ -45,6 +46,7 @@ Wmi backup [options] <ServerName> <FileName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -56,10 +58,16 @@ Wmi backup [options] <ServerName> <FileName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
@@ -79,6 +87,7 @@ Wmi backup [options] <ServerName> <FileName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -101,11 +110,29 @@ Wmi backup [options] <ServerName> <FileName>
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
@@ -163,6 +190,7 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -175,14 +203,20 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 ||||  Json|
 ||||  TreeTable|
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -Locale||&lt;String&gt;|Locale|
 ||||  Default: en-US|
 |    -Namespace||&lt;String&gt;|Namespace to query|
 ||||  Default: root\\cimv2|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 |    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
@@ -203,6 +237,7 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -225,11 +260,29 @@ Wmi delete [options] <ServerName> <ObjectPathOrWqlQuery>
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
@@ -293,6 +346,7 @@ Wmi exec [options] <ServerName> <CommandLine>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -CaptureOutput||&lt;SwitchParam&gt;|Redirects STDOUR and STDERR to a file|
 ||||  Default: True|
@@ -308,13 +362,19 @@ Wmi exec [options] <ServerName> <CommandLine>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -EnvironmentVariables||&lt;String[]&gt;|Environment variables to pass to the command|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PollInterval||&lt;Duration&gt;|Polling interval|
 ||||  Default: 1s|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 |    -Wait||&lt;SwitchParam&gt;|Waits for the command to complete|
 ||||  Default: True|
@@ -337,6 +397,7 @@ Wmi exec [options] <ServerName> <CommandLine>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -485,6 +546,7 @@ Wmi get [options] <ServerName> <ObjectPath>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -496,7 +558,9 @@ Wmi get [options] <ServerName> <ObjectPath>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -Locale||&lt;String&gt;|Locale|
 ||||  Default: en-US|
 |    -Namespace||&lt;String&gt;|Namespace to query|
@@ -508,7 +572,11 @@ Wmi get [options] <ServerName> <ObjectPath>
 ||||  ObjectType|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 |    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
@@ -529,6 +597,7 @@ Wmi get [options] <ServerName> <ObjectPath>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -551,11 +620,29 @@ Wmi get [options] <ServerName> <ObjectPath>
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
@@ -630,6 +717,7 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -642,15 +730,21 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 ||||  Json|
 ||||  TreeTable|
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -Locale||&lt;String&gt;|Locale|
 ||||  Default: en-US|
 |    -Namespace||&lt;String&gt;|Namespace to query|
 ||||  Default: root\\cimv2|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -SkipParams||&lt;String[]&gt;|List of parameters to skip|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 |    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
@@ -671,6 +765,7 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -693,11 +788,29 @@ Wmi invoke [options] <ServerName> <ObjectPathOrWqlQuery> <Method> [ <Arguments> 
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
@@ -784,6 +897,7 @@ Wmi lsclass [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -795,7 +909,9 @@ Wmi lsclass [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -Locale||&lt;String&gt;|Locale|
 ||||  Default: en-US|
 |    -Namespace||&lt;String&gt;|Namespace to query|
@@ -808,14 +924,20 @@ Wmi lsclass [options] <ServerName>
 ||||  ObjectFlags|
 ||||  Name|
 ||||  BaseClassName|
+||||  IsSingleton|
 ||||  NdValueTableLength|
 ||||  ValueTableLength|
+||||  KeyProperty|
 ||||  ObjectType|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
 ||||  Default: 10|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 |    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
@@ -836,6 +958,7 @@ Wmi lsclass [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -858,11 +981,29 @@ Wmi lsclass [options] <ServerName>
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
@@ -912,6 +1053,7 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -924,7 +1066,9 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 ||||  Json|
 ||||  TreeTable|
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -Locale||&lt;String&gt;|Locale|
 ||||  Default: en-US|
 |    -Namespace||&lt;String&gt;|Namespace to query|
@@ -947,7 +1091,11 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 ||||  IsInputParameter|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 |    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
@@ -968,6 +1116,7 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -990,11 +1139,29 @@ Wmi lsmethod [options] <ServerName> <ObjectPathOrWqlQuery>
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1076,6 +1243,7 @@ Wmi lsns [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -1087,7 +1255,9 @@ Wmi lsns [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -Locale||&lt;String&gt;|Locale|
 ||||  Default: en-US|
 |    -Namespace||&lt;String&gt;|Namespace to query|
@@ -1097,7 +1267,11 @@ Wmi lsns [options] <ServerName>
 ||||  Default: True|
 |    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
 ||||  Default: 10|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 |    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
@@ -1118,6 +1292,7 @@ Wmi lsns [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1140,11 +1315,29 @@ Wmi lsns [options] <ServerName>
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1194,6 +1387,7 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -1205,7 +1399,9 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -Locale||&lt;String&gt;|Locale|
 ||||  Default: en-US|
 |    -Namespace||&lt;String&gt;|Namespace to query|
@@ -1216,6 +1412,7 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 ||||  DefaultValue|
 ||||  RuntimeType|
 ||||  ElementType|
+||||  IsKey|
 ||||  Name|
 ||||  ClassOfOrigin|
 ||||  QualifiersText|
@@ -1230,7 +1427,11 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 ||||  IsInputParameter|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 |    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
@@ -1251,6 +1452,7 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1273,11 +1475,29 @@ Wmi lsprop [options] <ServerName> [ <ObjectPath> ]
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1333,12 +1553,12 @@ Wmi lsprop -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-F
 ```
 Wmi lsprop -namespace root\cimv2 -UserName milchick -Password Br3@kr00m! LUMON-FS1 -WithQualifiers Privileges=SeDebugPrivilege Win32_Process
 ```
-# Wmi query
-  Executes a WMI query
+# Wmi mountfs
+  Mounts a WMI namespace as a file system
 
 ## Synopsis
 ```
-Wmi query [options] <ServerName> <Query>
+Wmi mountfs [options] <ServerName> [ <Mountpoint> ]
 ```
 
 ## Parameters
@@ -1346,7 +1566,7 @@ Wmi query [options] <ServerName> <Query>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
-|&lt;Query&gt;||&lt;String&gt;|WQL query to execute|
+|&lt;Mountpoint&gt;||&lt;String&gt;|Path of mountpoint in local filesystem|
 
 
 ## Options
@@ -1354,6 +1574,7 @@ Wmi query [options] <ServerName> <Query>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -1365,17 +1586,24 @@ Wmi query [options] <ServerName> <Query>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|-G, -Gid||&lt;UInt32&gt;|GID of mount|
 |    -Locale||&lt;String&gt;|Locale|
 ||||  Default: en-US|
 |    -Namespace||&lt;String&gt;|Namespace to query|
 ||||  Default: root\\cimv2|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
-|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
-||||  Default: 10|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -ReadWrite||&lt;SwitchParam&gt;|Mount as read/write|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Uid||&lt;UInt32&gt;|UID of mount|
 |    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
 
 
@@ -1395,6 +1623,7 @@ Wmi query [options] <ServerName> <Query>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1417,11 +1646,172 @@ Wmi query [options] <ServerName> <Query>
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+
+# Wmi query
+  Executes a WMI query
+
+## Synopsis
+```
+Wmi query [options] <ServerName> <Query>
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of the server to connect to|
+|&lt;Query&gt;||&lt;String&gt;|WQL query to execute|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Locale||&lt;String&gt;|Locale|
+||||  Default: en-US|
+|    -Namespace||&lt;String&gt;|Namespace to query|
+||||  Default: root\\cimv2|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
+||||  Default: 10|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -WithQualifiers||&lt;String[]&gt;|Filter qualifiers|
+
+
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
+|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
+|    -DesKey||&lt;HexString&gt;|DES key|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+
+
+### Authentication (NTLM)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1485,6 +1875,7 @@ Wmi restore [options] <ServerName> <FileName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
@@ -1496,11 +1887,17 @@ Wmi restore [options] <ServerName> <FileName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
-|-E, -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
+|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ForceShutdown||&lt;SwitchParam&gt;|Forces any active clients to shut down|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
+|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
 
 
@@ -1520,6 +1917,7 @@ Wmi restore [options] <ServerName> <FileName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1542,11 +1940,29 @@ Wmi restore [options] <ServerName> <FileName>
 |    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
 
 
+### Client Behavior
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+|    -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+
+
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
+||||**Possible values:**|
+||||  Smb2_0_2|
+||||  Smb2_1|
+||||  Smb3_0|
+||||  Smb3_0_2|
+||||  Smb3_1_1|
+|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
 |    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
+|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
 |    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
 |    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
 

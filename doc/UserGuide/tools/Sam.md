@@ -53,6 +53,7 @@ Sam aliasmembers [options] <ServerName> [ <AliasRidOrName> ]
 ||||  TreeTable|
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
 ||||  Default: True|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -66,6 +67,8 @@ Sam aliasmembers [options] <ServerName> [ <AliasRidOrName> ]
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -87,6 +90,7 @@ Sam aliasmembers [options] <ServerName> [ <AliasRidOrName> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -220,6 +224,7 @@ Sam enumaliases [options] <ServerName>
 ||||  TreeTable|
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
 ||||  Default: True|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -234,6 +239,8 @@ Sam enumaliases [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -255,6 +262,7 @@ Sam enumaliases [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -376,6 +384,7 @@ Sam enumgroups [options] <ServerName>
 ||||  TreeTable|
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
 ||||  Default: True|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -391,6 +400,8 @@ Sam enumgroups [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -412,6 +423,7 @@ Sam enumgroups [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -533,6 +545,7 @@ Sam enumusers [options] <ServerName>
 ||||  TreeTable|
 |    -ContinueOnError||&lt;SwitchParam&gt;|Continue even if errors occur|
 ||||  Default: True|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -550,6 +563,8 @@ Sam enumusers [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -571,6 +586,7 @@ Sam enumusers [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|

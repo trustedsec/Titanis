@@ -47,6 +47,7 @@ Epm lsep [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -ExactVersion||&lt;RpcVersion&gt;|Filter for exact version|
@@ -62,6 +63,8 @@ Epm lsep [options] <ServerName>
 ||||  Default: True|
 |    -PageSize||&lt;Int32&gt;|Number of results to fetch at a time|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -84,6 +87,7 @@ Epm lsep [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|

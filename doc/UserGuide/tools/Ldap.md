@@ -18,8 +18,10 @@ Ldap <subcommand>
 |[lspart](#ldap-lspart)|Gets a list of partitions in the Active Directory forest|
 |[mod](#ldap-mod)|Modifies an object in the directory|
 |[moduser](#ldap-moduser)|Modifies a directory entry|
+|[mountfs](#ldap-mountfs)|Mounts a directory as a file system|
 |[namedbits](#ldap-namedbits)|Prints the bits with symbolic names|
 |[query](#ldap-query)|Queries the directory|
+|[rm](#ldap-rm)|Deletes an object from the directory|
 |[schema](#ldap-schema)|Gets the schema|
 |[search](#ldap-search)|Searches the directory by name|
 |[timestamp](#ldap-timestamp)|Converts between the Active Directory timestamp value and a UTC date/time|
@@ -62,6 +64,7 @@ Ldap add [options] -ObjectClass <String> -ObjectName <String[]> <ServerName> <Ob
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -ObjectClass||&lt;String&gt;|Object class of object to add|
 |    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
@@ -91,6 +94,7 @@ Ldap add [options] -ObjectClass <String> -ObjectName <String[]> <ServerName> <Ob
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -179,6 +183,7 @@ Ldap addcomputer [options] -ObjectName <String[]> <ServerName> <ObjectName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -DisplayName||&lt;String&gt;|Display name for user|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -LogonName||&lt;String&gt;|User name for auth requests|
@@ -214,6 +219,7 @@ Ldap addcomputer [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -302,6 +308,7 @@ Ldap addou [options] -ObjectName <String[]> <ServerName> <ObjectName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
@@ -330,6 +337,7 @@ Ldap addou [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -418,6 +426,7 @@ Ldap adduser [options] -ObjectName <String[]> <ServerName> <ObjectName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -DisplayName||&lt;String&gt;|Display name for user|
 |    -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -GivenName||&lt;String&gt;|Given name (first name)|
@@ -453,6 +462,7 @@ Ldap adduser [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -601,6 +611,7 @@ Ldap lspart [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -633,6 +644,7 @@ Ldap lspart [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -724,6 +736,7 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AllowAltIdentity||&lt;String[]&gt;|Account name to add to msDS-AllowedToActOnBehalfOfOtherIdentity|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Changes||&lt;AttributeChangeSpec[]&gt;|Changes to make as name?=value|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
@@ -736,6 +749,7 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
@@ -764,6 +778,7 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -859,6 +874,7 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -AllowAltIdentity||&lt;String[]&gt;|Account name to add to msDS-AllowedToActOnBehalfOfOtherIdentity|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Changes||&lt;AttributeChangeSpec[]&gt;|Changes to make as name?=value|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
@@ -871,6 +887,7 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -NewPassword||&lt;String&gt;|New password (for password change or reset)|
 |    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
@@ -901,6 +918,7 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -999,6 +1017,126 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
   
   
   
+# Ldap mountfs
+  Mounts a directory as a file system
+
+## Synopsis
+```
+Ldap mountfs [options] <ServerName> [ <Mountpoint> ]
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+|&lt;Mountpoint&gt;||&lt;String&gt;|Path of mountpoint in local filesystem|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -Gid||&lt;UInt32&gt;|GID of mount|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|-R, -ReadWrite||&lt;SwitchParam&gt;|Mount as read/write|
+|    -SearchBase||&lt;LdapDistinguishedName&gt;|Name of root entry in directory to mount|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+|    -Uid||&lt;UInt32&gt;|UID of mount|
+
+
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
+|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
+|    -DesKey||&lt;HexString&gt;|DES key|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+
+
+### Authentication (NTLM)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+
 # Ldap namedbits
   Prints the bits with symbolic names
 
@@ -1096,6 +1234,7 @@ Ldap query [options] <ServerName> [ <Filter> ]
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
 |    -Filter||&lt;String&gt;|LDAP query|
 |    -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
@@ -1140,6 +1279,7 @@ Ldap query [options] <ServerName> [ <Filter> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1289,6 +1429,123 @@ Ldap query LUMON-DC1 -OutputFields * "(userAccountControl|=TrustedForS4U2self)"
 ```
 Ldap query LUMON-DC1 -OutputFields * "(msDS-AllowedToDelegateTo=*)"
 ```
+# Ldap rm
+  Deletes an object from the directory
+
+## Synopsis
+```
+Ldap rm [options] -ObjectName <String[]> <ServerName> <ObjectName>
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;ServerName&gt;||&lt;String&gt;|Name of LDAP server|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
+|    -ObjectName||&lt;String[]&gt;|Names or DNs of objects to create|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
+|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    -Ssl||&lt;SwitchParam&gt;|Use SSL|
+|    -SslCert||&lt;String&gt;|Name of PEM or PFX certificate file|
+|    -SslKeyFile||&lt;String&gt;|Name of PFX file for SSL authentication|
+|    -SslKeyPassword||&lt;String&gt;|Password for -SslCert or -SslKeyFile|
+
+
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
+|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
+|    -Password|-p|&lt;String&gt;|Password to authenticate with|
+|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
+|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
+|    -DesKey||&lt;HexString&gt;|DES key|
+|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
+|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
+|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
+|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
+|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
+|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+
+
+### Authentication (NTLM)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
+|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+
+
+### Connection
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
+|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
+|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+
 # Ldap schema
   Gets the schema
 
@@ -1320,6 +1577,7 @@ Ldap schema [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
@@ -1348,6 +1606,7 @@ Ldap schema [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1435,6 +1694,7 @@ Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
 |-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
@@ -1479,6 +1739,7 @@ Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1713,6 +1974,7 @@ Ldap watch [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
 |-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
@@ -1757,6 +2019,7 @@ Ldap watch [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1843,6 +2106,7 @@ Ldap whoami [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
@@ -1875,6 +2139,7 @@ Ldap whoami [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|

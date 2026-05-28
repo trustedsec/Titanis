@@ -936,6 +936,7 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
@@ -958,6 +959,7 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1237,6 +1239,8 @@ Kerb keytab list [options] <Keytab>
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  Principal|
+||||  Realm|
+||||  Timestamp|
 ||||  Kvno|
 ||||  EType|
 ||||  KeyText|

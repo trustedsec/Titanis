@@ -95,11 +95,14 @@ Lsa addpriv [options] <ServerName> <Privileges>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -121,6 +124,7 @@ Lsa addpriv [options] <ServerName> <Privileges>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -253,11 +257,14 @@ Lsa createaccount [options] <ServerName> <Sid>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -279,6 +286,7 @@ Lsa createaccount [options] <ServerName> <Sid>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -392,6 +400,7 @@ Lsa enumaccounts [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -402,6 +411,8 @@ Lsa enumaccounts [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -423,6 +434,7 @@ Lsa enumaccounts [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -549,6 +561,7 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -606,6 +619,8 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 ||||  SeDenyServiceLogonRight|
 ||||  SeRemoteInteractiveLogonRight|
 ||||  SeDenyRemoteInteractiveLogonRight|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -627,6 +642,7 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -742,6 +758,7 @@ Lsa getprivs [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -752,6 +769,8 @@ Lsa getprivs [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -773,6 +792,7 @@ Lsa getprivs [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -909,6 +929,7 @@ Lsa getrights [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -917,6 +938,8 @@ Lsa getrights [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -938,6 +961,7 @@ Lsa getrights [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1059,6 +1083,7 @@ Lsa getsysaccess [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -1067,6 +1092,8 @@ Lsa getsysaccess [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -1088,6 +1115,7 @@ Lsa getsysaccess [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1208,6 +1236,7 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -1221,6 +1250,8 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -1242,6 +1273,7 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1361,6 +1393,7 @@ Lsa lookupsid [options] <ServerName> <Sids>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -1374,6 +1407,8 @@ Lsa lookupsid [options] <ServerName> <Sids>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -1395,6 +1430,7 @@ Lsa lookupsid [options] <ServerName> <Sids>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1562,11 +1598,14 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -1588,6 +1627,7 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1744,6 +1784,7 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -1753,6 +1794,8 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
 |    -Reset||&lt;SwitchParam&gt;|Clears any rights already set on the account|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -1774,6 +1817,7 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
@@ -1901,6 +1945,7 @@ Lsa whoami [options] <ServerName>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
 |    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
@@ -1914,6 +1959,8 @@ Lsa whoami [options] <ServerName>
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
+|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
+|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
 |    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
 |    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
 |    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
@@ -1935,6 +1982,7 @@ Lsa whoami [options] <ServerName>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
+|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
