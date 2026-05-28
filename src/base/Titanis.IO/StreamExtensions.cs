@@ -192,7 +192,7 @@ namespace Titanis.IO
 			while (0 != (cbRead = await readTask.ConfigureAwait(false)))
 			{
 				cbRemaining -= cbRead;
-				readTask = source.ReadAsync(buffer2.AsMemory(0, unchecked((int)Math.Min(buffer.Length, cbRemaining))), cancellationToken);
+				readTask = (cbRemaining > 0) ? source.ReadAsync(buffer2.AsMemory(0, unchecked((int)Math.Min(buffer.Length, cbRemaining))), cancellationToken) : ValueTask.FromResult(0);
 				await destination.WriteAsync(buffer.AsMemory(0, cbRead), cancellationToken).ConfigureAwait(false);
 
 				cbTotalCopied += cbRead;
