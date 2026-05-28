@@ -83,6 +83,14 @@ public class TestFileAccess : IFileAccess
 
 	public string ReadAllTextFrom(string fileName)
 	{
+		StreamReader reader = this.OpenTextFile(fileName);
+		string text = reader.ReadToEnd();
+		reader.Close();
+		return text;
+	}
+
+	private StreamReader OpenTextFile(string fileName)
+	{
 		string resName = this.FileNameToResourceName(fileName);
 		var resStream = this._resourceAssembly.GetManifestResourceStream(resName);
 
@@ -90,9 +98,16 @@ public class TestFileAccess : IFileAccess
 			throw new FileNotFoundException($"No test file found with name: {fileName}");
 
 		StreamReader reader = new StreamReader(resStream);
-		string text = reader.ReadToEnd();
-		reader.Close();
-		return text;
+		return reader;
+	}
+
+	public IEnumerable<string> ReadLinesFrom(string fileName)
+	{
+		StreamReader reader = this.OpenTextFile(fileName);
+		while (reader.Peek() >= 0)
+		{
+			yield return reader.ReadLine();
+		}
 	}
 
 	private string FileNameToResourceName(string fileName)

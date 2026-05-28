@@ -39,5 +39,11 @@ namespace Titanis.Cli
 			fileName = this.ResolveFsPath(fileName);
 			File.WriteAllBytes(fileName, contents);
 		}
+
+		public IEnumerable<string> ReadLinesFrom(string fileName)
+		{
+			fileName = this.ResolveFsPath(fileName);
+			return File.ReadLines(fileName);
+		}
 	}
 }

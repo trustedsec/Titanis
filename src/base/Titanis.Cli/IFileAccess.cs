@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Text;
 
 namespace Titanis.Cli
@@ -39,6 +41,13 @@ namespace Titanis.Cli
 		/// <param name="fileName">Name of file</param>
 		/// <returns>The text read from <paramref name="fileName"/></returns>
 		string ReadAllTextFrom(string fileName);
+
+		/// <summary>
+		/// Reads lines of text from a file.
+		/// </summary>
+		/// <param name="fileName">Name of file</param>
+		/// <returns>An <see cref="IEnumerable{T}"/> returning the lines from the file</returns>
+		IEnumerable<string> ReadLinesFrom(string fileName);
 
 		/// <summary>
 		/// Determines whether a file exists.
