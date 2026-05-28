@@ -446,6 +446,8 @@ namespace Titanis.Winterop.Security
 			this.chars = chars;
 		}
 
+		internal bool domainSpecific;
+
 		private ReadOnlySpan<char> chars;
 		private int offset;
 

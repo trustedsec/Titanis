@@ -252,6 +252,7 @@ namespace Titanis.Winterop.Security
 		public static SecurityIdentifier Parse(ReadOnlySpan<char> text, SecurityIdentifier? domainSid)
 		{
 			bool isPlaceholder = false;
+			bool hasDomainPlaceholder = false;
 			if (text.StartsWith(DomainPlaceholderPrefix))
 			{
 				string sub = "S-1-5-21-1-1-1-";
@@ -259,12 +260,13 @@ namespace Titanis.Winterop.Security
 				sub.AsSpan().CopyTo(revised);
 				text.Slice(DomainPlaceholderPrefix.Length).CopyTo(revised.Slice(sub.Length));
 				text = sub;
+				hasDomainPlaceholder = true;
 			}
 
 			var ctx = new SddlParseContext(text);
 
 			var sid = Parse(ref ctx, domainSid);
-			sid.IsDomainPlaceholder = true;
+			sid.IsDomainPlaceholder = ctx.domainSpecific && hasDomainPlaceholder;
 			if (ctx.LengthRemaining > 0)
 				throw new FormatException("The provided text contained trailing characters that could not be parsed as a valid SID.");
 
@@ -309,6 +311,7 @@ namespace Titanis.Winterop.Security
 					BinaryPrimitives.WriteUInt32LittleEndian(buf.AsSpan().Slice(8 + 4 * i), subauth);
 				}
 
+				ctx.domainSpecific = false;
 				return new SecurityIdentifier(buf, 0);
 			}
 			else
@@ -319,6 +322,7 @@ namespace Titanis.Winterop.Security
 
 				ctx.Advance(2);
 
+				ctx.domainSpecific = true;
 				var sid = mapping.BuildSid(domainSid);
 
 				return sid;

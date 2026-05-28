@@ -1,5 +1,6 @@
 ﻿using Titanis.Cli.Kerb.Test;
 using Titanis.Smb2.Cli;
+using Titanis.Winterop;
 
 namespace Titanis.Cli.Smb2Client.Test;
 
@@ -24,6 +25,13 @@ public sealed class LsTests : CliCommandTest<Smb2LsCommand>
 	[CliTest("Milchick_ListPipes", "Milchick_AltHostAddress", "MilchickNtlmHash", "MilchickNtlm_WorkstationVersion", "MilchickKerberos", "MilchickNtlm_AllFields")]
 	public async Task MilchickTests(Token[] tokens)
 	{
-		var results = await TestCommand(tokens);
+		try
+		{
+			var results = await TestCommand(tokens);
+		}
+		catch (NtstatusException ex) when (ex.StatusCode == Ntstatus.STATUS_ACCESS_DENIED)
+		{
+			// The lab is configured with strict SPN checking
+		}
 	}
 }

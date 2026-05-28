@@ -6,8 +6,9 @@ namespace Titanis.Cli.LsaTool;
 
 /// <task category="LSA;Expanding Access">Create an LSA policy account</task>
 [Description("Creates an account")]
-[Example("Create an account", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m! S-1-5-32-646")]
-internal class CreateAccountCommand : LsaPolicyCommand
+[Example("Create a policy account", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m! S-1-5-32-646")]
+[Example("Create a policy account for a domain SID", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m! S-1-5-21-1752138614-393460150-3098146133-1103", Tag ="milchick")]
+public class CreateAccountCommand : LsaPolicyCommand
 {
 	protected sealed override LsaPolicyAccess RequiredPolicyAccess => LsaPolicyAccess.CreateAccount;
 

@@ -58,6 +58,7 @@ namespace Titanis.Cli.Test
 			cmdContext.Expect(r => r.MetadataContext).Return(mdContext);
 			cmdContext.Expect(r => r.Log).Return(log);
 			cmdContext.Expect(r => r.FlushOutput());
+			cmdContext.Expect(r => r.OnCommandComplete());
 
 			var result = cmd.InvokeAsync(cmdContext.Object, "cmd", tokens, 0, CancellationToken.None).Result;
 			return cmd;
