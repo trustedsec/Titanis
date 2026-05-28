@@ -145,7 +145,7 @@
     <value>Description not provided</value>
   </data>
   <data name="Cli_NonCommandType" xml:space="preserve">
-    <value>commandType does not specify a type derived from Command.</value>
+    <value>The type '{0}' does not specify a type derived from Command.</value>
   </data>
   <data name="Cli_ParamParseNotSupported" xml:space="preserve">
     <value>The parameter does not support parsing.</value>

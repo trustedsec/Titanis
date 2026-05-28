@@ -11,6 +11,8 @@ namespace Titanis.ToolDocBuilder
 {
 	public class BuildToolDocTask : ITask
 	{
+		public const string SenderName = "Titanis.ToolDocBuilder";
+
 		public IBuildEngine? BuildEngine { get; set; }
 		public ITaskHost? HostObject { get; set; }
 
@@ -58,16 +60,18 @@ namespace Titanis.ToolDocBuilder
 			else
 				netInstallBase = null;
 
+			buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Using .NET install base {netInstallBase}", null, SenderName, MessageImportance.Low));
+
 			if (!string.IsNullOrEmpty(netInstallBase))
 			{
 				netInstallBase = Path.Combine(netInstallBase, @"shared/Microsoft.NETCore.App");
-				buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Search dotnet install base: {netInstallBase}", null, "Titanis.ToolDocBuilder", MessageImportance.Low));
+				buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Search dotnet install base: {netInstallBase}", null, SenderName, MessageImportance.Low));
 				try
 				{
 					var runtimes = Directory.GetDirectories(netInstallBase, "8.*");
 					if (runtimes.Length == 0)
 					{
-						buildEngine.LogErrorEvent(new BuildErrorEventArgs("doc", "sdk", null, 0, 0, 0, 0, $"No .NET 8 files found.  Install the .NET 8 SDK", null, "Titanis.ToolDocBuilder"));
+						buildEngine.LogErrorEvent(new BuildErrorEventArgs("doc", "sdk", null, 0, 0, 0, 0, $"No .NET 8 files found.  Install the .NET 8 SDK", null, SenderName));
 					}
 
 					Array.Sort(runtimes, (x, y) =>
@@ -81,7 +85,7 @@ namespace Titanis.ToolDocBuilder
 					});
 					foreach (var item in runtimes)
 					{
-						buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Found runtime: {item}", null, "Titanis.ToolDocBuilder", MessageImportance.Low));
+						buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Found runtime: {item}", null, SenderName, MessageImportance.Low));
 						Console.WriteLine($"Found runtime: {item}");
 					}
 					searchDirs.AddRange(runtimes);
@@ -95,7 +99,7 @@ namespace Titanis.ToolDocBuilder
 			var asmResolver = new DirAssemblyResolver(searchDirs.ToArray());
 			var loadContext = new MetadataLoadContext(asmResolver, "System.Private.CoreLib");
 
-			var mdResolver = new ContextResolver(loadContext);
+			var mdResolver = new ContextResolver(loadContext, buildEngine);
 			mdResolver.RuntimeSearchDirectories.Add(Path.GetDirectoryName(assemblyFile));
 			var asmNetStandard = loadContext.LoadFromAssemblyName("netstandard");
 			//var asmNetStandard = Assembly.LoadFrom(@"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\netstandard\v4.0_2.0.0.0__cc7b13ffcd2ddd51\netstandard.dll");
@@ -128,6 +132,8 @@ namespace Titanis.ToolDocBuilder
 
 					if (commandType.IsAssignableFrom(type))
 					{
+						buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Processing command type {commandType.FullName}", null, SenderName, MessageImportance.Low));
+
 						var md = Command.GetCommandMetadata(type, mdContext);
 						if (string.IsNullOrEmpty(md.Description))
 							buildEngine.LogErrorEvent(MakeMissingDescError(type.FullName));
@@ -141,6 +147,8 @@ namespace Titanis.ToolDocBuilder
 					}
 					else if (multiCommandType.IsAssignableFrom(type))
 					{
+						buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Processing multi-command type {commandType.FullName}", null, SenderName, MessageImportance.Low));
+
 						var desc = mdResolver.GetCustomAttribute<DescriptionAttribute>(type, true)?.Description;
 						if (string.IsNullOrEmpty(desc))
 							buildEngine.LogErrorEvent(MakeMissingDescError(type.FullName));
@@ -204,10 +212,12 @@ namespace Titanis.ToolDocBuilder
 	class ContextResolver : MetadataResolver
 	{
 		private readonly MetadataLoadContext context;
+		private readonly IBuildEngine buildEngine;
 
-		public ContextResolver(MetadataLoadContext context)
+		public ContextResolver(MetadataLoadContext context, IBuildEngine buildEngine)
 		{
 			this.context = context;
+			this.buildEngine = buildEngine;
 		}
 
 		class EnumValue
@@ -323,7 +333,16 @@ namespace Titanis.ToolDocBuilder
 				return null;
 
 			var args = attrDatum.ConstructorArguments.Select(r => ConvertCtorArg(r)).ToArray();
-			var attr = (Attribute)Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, args, null);
+			Attribute? attr;
+			try
+			{
+				attr = (Attribute)Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, args, null);
+			}
+			catch (Exception ex)
+			{
+				buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Error instantiating attribute {type.FullName} with arguments ({string.Join(", ", args.Select(r => (r is null) ? "<null>" : $"[{r.GetType().FullName}]{r}"))}): {ex}", null, BuildToolDocTask.SenderName, MessageImportance.High));
+				throw;
+			}
 			foreach (var namedArg in attrDatum.NamedArguments)
 			{
 				var member = type.GetMember(namedArg.MemberName)[0];

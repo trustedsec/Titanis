@@ -32,6 +32,18 @@ namespace Titanis.Cli
 		}
 
 		/// <summary>
+		/// Initializes a new <see cref="ParameterAttribute"/>
+		/// </summary>
+		/// <param name="options"><see cref="ParameterGroupOptions"/> specifying the behavior of this group.</param>
+		/// <remarks>
+		/// This constructor is used by the documentation builder.
+		/// </remarks>
+		public ParameterGroupAttribute(int options)
+		{
+			this.Options = (ParameterGroupOptions)options;
+		}
+
+		/// <summary>
 		/// Gets a <see cref="ParameterGroupOptions"/> specifying the behavior of this group.
 		/// </summary>
 		public ParameterGroupOptions Options { get; }

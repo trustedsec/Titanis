@@ -27,7 +27,7 @@ namespace Titanis.Cli
 			if (context is null) throw new ArgumentNullException(nameof(context));
 
 			if (!context.Resolver.ReflectType(typeof(CommandBase)).IsAssignableFrom(implementingType))
-				throw new ArgumentException(Messages.Cli_NonCommandType + ": " + implementingType.FullName, nameof(implementingType));
+				throw new ArgumentException(string.Format(Messages.Cli_NonCommandType, implementingType.FullName), nameof(implementingType));
 
 			this.ImplementingType = implementingType;
 			this.Description = context.Resolver.GetCustomAttribute<DescriptionAttribute>(implementingType, true)?.Description;
@@ -46,6 +46,10 @@ namespace Titanis.Cli
 				SortedList<int, ParameterMetadata> positional = new SortedList<int, ParameterMetadata>();
 				List<ParamInfo> relposParams = new List<ParamInfo>();
 
+				HashSet<Type> paramGroupTypes = new HashSet<Type>()
+				{
+					implementingType
+				};
 				Queue<ParameterGroupInfo> groupQueue = new Queue<ParameterGroupInfo>();
 				List<ParameterGroupInfo> groups = new List<ParameterGroupInfo>();
 				groupQueue.Enqueue(new ParameterGroupInfo(implementingType, ParameterGroupOptions.None));
@@ -75,6 +79,8 @@ namespace Titanis.Cli
 							if (ctor is null)
 								throw new MetadataException("A parameter group class must have a parameterless constructor.", prop.Name);
 
+							if (paramGroupTypes.Add(propType))
+							{
 							ParameterGroupInfo subgroup = new ParameterGroupInfo(
 								propType,
 								group,
@@ -84,6 +90,11 @@ namespace Titanis.Cli
 								groupAttr.Options
 								);
 							groupQueue.Enqueue(subgroup);
+						}
+							else
+							{
+								throw new InvalidOperationException($"Parameter group '{propType.FullName}' is included more than once.  Property={prop.ComponentType.FullName}.{prop.Name}");
+							}
 						}
 
 						if (attr is null)

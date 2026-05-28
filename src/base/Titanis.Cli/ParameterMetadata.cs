@@ -42,6 +42,7 @@ namespace Titanis.Cli
 	/// <summary>
 	/// Specifies behavior for a parameter group.
 	/// </summary>
+	[Flags]
 	public enum ParameterGroupOptions
 	{
 		None = 0,
