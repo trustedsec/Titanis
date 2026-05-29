@@ -133,6 +133,11 @@ namespace Titanis.Cli
 		[TypeConverter(typeof(EndPointConverter))]
 		public EndPoint? Kdc { get; set; }
 
+		[Parameter(EnvironmentVariable = "KRB5_CLIENT_KTNAME")]
+		[Description("Name of keytab file")]
+		[Category(ParameterCategories.AuthenticationKerberos)]
+		public string? Keytab { get; set; }
+
 		[Parameter]
 		[Description("Name of user to impersonate with S4U")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
@@ -178,6 +183,7 @@ namespace Titanis.Cli
 		public bool HasAuthInfo => this.HasKerberosInfo | this.HasNtlmInfo | this.HasAuthProxy;
 
 		private bool _validated;
+		private List<KeytabEntry>? _clientKeytabEntries;
 
 		/// <summary>
 		/// Validates authentication parameters.
@@ -208,6 +214,22 @@ namespace Titanis.Cli
 				}
 			}
 
+			bool clientKeySupplied = (this.Password != null)
+						|| (this.NtlmHash != null)
+						|| (this.AesKey != null)
+						|| (this.DesKey != null);
+			if (this.Keytab != null)
+			{
+				if (clientKeySupplied)
+					this.Log?.WriteWarning($"User password/key already specified; Keytab file '{this.Keytab}' will not be used.");
+				else if (this.UserName == null)
+					this.Log?.WriteWarning($"No user name specified; keytab file '{this.Keytab}' will not be used.");
+				else
+				{
+					this._clientKeytabEntries = LoadKeytab(this.Keytab, this.UserName, this.UserDomain, this.RequireFileAccess(), this.Log);
+				}
+			}
+
 			// Check for Kerberos credentials
 			bool hasKerbCred =
 				// A ticket
@@ -222,11 +244,9 @@ namespace Titanis.Cli
 					(this.UserName is not null)
 					&& !string.IsNullOrEmpty(this.UserDomain)
 					&& (
-						(this.Password != null)
-						|| (this.NtlmHash != null)
-						|| (this.AesKey != null)
-						|| (this.DesKey != null)
+						clientKeySupplied
 						|| (this._userCert != null)
+						|| (!this._clientKeytabEntries.IsNullOrEmpty())
 						)
 				);
 			this.HasKerberosInfo = hasKerbCred;
@@ -280,6 +300,47 @@ namespace Titanis.Cli
 			}
 
 			this._validated = true;
+		}
+
+		public static List<KeytabEntry>? LoadKeytab(string keytabFileName, SecurityPrincipalName userName, string? userDomain, IFileAccess fileAccess, ILog? log)
+		{
+			log?.WriteDiagnostic($"Loading keytab file {keytabFileName}");
+			var kt = KeytabFile.LoadFrom(fileAccess.ReadAllBytesFrom(keytabFileName));
+
+			List<KeytabEntry>? keys = null;
+			// First, search for a match on user name and realm
+			if (userDomain != null)
+			{
+				keys = kt.Entries.FindAll(r => r.Principal.Equals(userName) && r.Realm.Equals(userDomain, StringComparison.OrdinalIgnoreCase));
+			}
+			if (keys.IsNullOrEmpty())
+			{
+				// Match on principal name
+				keys = kt.Entries.FindAll(r => r.Principal.Equals(userName));
+			}
+
+			if (keys.IsNullOrEmpty())
+				log?.WriteWarning($"No keys found in keytab file '{keytabFileName}' matching user '{userName}'");
+			else
+			{
+				var kvno = keys.Max(r => r.Kvno);
+				log?.WriteDiagnostic($"  Using kvno {kvno}");
+				keys = keys.FindAll(r => r.Kvno == kvno);
+				if (keys.Count > 1)
+				{
+					// Check for duplicates
+					var dups = keys.GroupBy(r => r.EType, resultSelector: (e, r) => new { etype = e, count = r.Count() }).Where(r => r.count > 1).ToArray();
+
+					if (dups.Length > 0)
+					{
+						log?.WriteError($"The keytab contains keys with the same kvno and EType; cannot determine which key to use.");
+						keys = null;
+					}
+				}
+				return keys;
+			}
+
+			return null;
 		}
 
 		public static bool LoadCertificateAndKey(
@@ -918,6 +979,8 @@ namespace Titanis.Cli
 					cred = new KerberosKeyCredential(authUser, EType.DesCbcMd5, this.DesKey.Bytes);
 				else if (this._userCert != null)
 					cred = new KerberosPkinitCredential(authUser, this._userCert);
+				else if (!this._clientKeytabEntries.IsNullOrEmpty())
+					cred = new KerberosKeyCredential(authUser, this._clientKeytabEntries.Select(r => r.ToEncryptionKey()));
 			}
 
 			return cred;

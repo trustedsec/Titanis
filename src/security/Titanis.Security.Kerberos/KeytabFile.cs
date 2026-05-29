@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,6 +24,12 @@ namespace Titanis.Security.Kerberos
 			ArgumentException.ThrowIfNullOrEmpty(fileName);
 
 			byte[] bytes = File.ReadAllBytes(fileName);
+			return LoadFrom(bytes);
+		}
+		public static KeytabFile LoadFrom(byte[] bytes)
+		{
+			ArgumentNullException.ThrowIfNull(bytes);
+
 			bool isValid = (bytes.Length > 2) && (bytes[0] == 5) && (bytes[1] == 2);
 			if (!isValid)
 				throw new InvalidDataException("The file is not a valid keytab file.");
@@ -136,6 +143,7 @@ namespace Titanis.Security.Kerberos
 			this.Principal = principal;
 			this.Realm = realm;
 			this.Timestamp = timestamp;
+			this.Kvno = kvno;
 			this.KeyBytes = keyBytes;
 			this.EType = encType;
 			this.KeyBytes = keyBytes;
@@ -167,6 +175,8 @@ namespace Titanis.Security.Kerberos
 				keyContents = this.KeyBytes
 			};
 		}
+
+		public EncryptionKey ToEncryptionKey() => new EncryptionKey((int)this.EType, this.KeyBytes);
 	}
 
 	static class Extensions
@@ -196,6 +206,7 @@ namespace Titanis.Security.Kerberos
 		[PduIgnore]
 		private int _keyVersion;
 
+		[PduField]
 		private byte KeyVersion8
 		{
 			get => (byte)Math.Min(byte.MaxValue, this._keyVersion);

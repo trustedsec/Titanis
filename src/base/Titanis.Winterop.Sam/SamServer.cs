@@ -33,12 +33,16 @@ namespace Titanis.Winterop.SamServer
 		// [MS-SAMR] § 2.2.10.1 USER_PROPERTIES
 		public static SupplementalCredentials DecodeSupplementalCredential(int? kvno, ReadOnlySpan<byte> bytes)
 		{
+			// This allows keys to be sorted in the keytab
+			kvno ??= 3;
+
 			SupplementalCredentials creds = new SupplementalCredentials();
 
 			var reader = new ByteMemoryReader(bytes.ToArray());
 			var userProps = reader.ReadPduStruct<USER_PROPERTIES>();
 			List<KerberosKeyInfo> keys = new List<KerberosKeyInfo>();
 			List<KerberosKeyInfo> oldKeys = new List<KerberosKeyInfo>();
+			bool hasKerbNew = false;
 			foreach (var prop in userProps.properties)
 			{
 				var propBytes = BinaryHelper.ParseHexString(prop.valueBytes);
@@ -52,6 +56,7 @@ namespace Titanis.Winterop.SamServer
 						}
 						break;
 					case "Primary:Kerberos":
+						if (!hasKerbNew)
 						{
 							var kerb = reader.ReadPduStruct<KERB_STORED_CREDENTIAL>();
 							ExtractKerberosKeysInto(kvno, propBytes, kerb.credentials, keys);
@@ -61,12 +66,18 @@ namespace Titanis.Winterop.SamServer
 						break;
 					case "Primary:Kerberos-Newer-Keys":
 						{
+							// Clear old-style Primary:Kerberos
+							keys.Clear();
+							oldKeys.Clear();
+
 							var kerb = reader.ReadPduStruct<KERB_STORED_CREDENTIAL_NEW>();
 							ExtractKerberosKeysInto(kvno, propBytes, kerb.credentials, keys);
 							ExtractKerberosKeysInto(kvno, propBytes, kerb.serviceCredentials, keys);
 							ExtractKerberosKeysInto(kvno - 1, propBytes, kerb.oldCredentials, oldKeys);
 							ExtractKerberosKeysInto(kvno - 2, propBytes, kerb.olderCredentials, oldKeys);
 							creds.KerberosSalt = propBytes.Slice(kerb.defaultSaltOffset, kerb.defaultSaltLength).ToArray();
+
+							hasKerbNew = true;
 						}
 						break;
 					case "Primary:CLEARTEXT":
@@ -87,7 +98,7 @@ namespace Titanis.Winterop.SamServer
 			}
 
 			creds.KerberosKeys = keys.ToArray();
-			creds.KerberosOldKeys = keys.ToArray();
+			creds.KerberosOldKeys = oldKeys.ToArray();
 
 			return creds;
 		}

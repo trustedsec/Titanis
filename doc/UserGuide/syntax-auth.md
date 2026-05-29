@@ -50,6 +50,7 @@ report as your workstation during authentication (NTLM and Kerberos).
 | &nbsp; ...NTLM hash | `-NtlmHash` &lt;hex-encoded hash&gt; |NTLM, Kerberos (RC4 HMAC only)|Use just the NTLM hash; no colons.|
 | &nbsp; ...AES 128 key | `-AesKey` &lt;hex-encoded hash&gt; |Kerberos (AES128)|AES 128 and AES 256 are distinguished by the size of the key.|
 | &nbsp; ...AES 256 key | `-AesKey` &lt;hex-encoded hash&gt; |Kerberos (AES256)||
+| &nbsp; ...keytab file | `-Keytab` &lt;keytab file&gt; |Kerberos|All keys with newest kvno used|
 |Ticket-granting ticket and KDC| `-Tgt` &lt;TGT file name&gt; `-Kdc` &lt;endpoint&gt;|Kerberos|Titanis requests the necessary service tickets from the KDC.|
 || `-TicketCache` &lt;TGT file name&gt; `-Kdc` &lt;endpoint&gt;|Kerberos|Titanis requests the necessary service tickets from the KDC.|
 |Service ticket| `-Ticket` &lt;ticket file name&gt;|Kerberos|The SPN of the ticket must match what the command requires.|

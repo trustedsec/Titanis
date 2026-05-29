@@ -49,6 +49,11 @@ public class InitialAuthParameterGroup : ParameterGroupBase
 	[Description("DES key")]
 	public HexString? DesKey { get; set; }
 
+	[Parameter(EnvironmentVariable = "KRB5_CLIENT_KTNAME")]
+	[Description("Name of keytab file")]
+	[Category(ParameterCategories.AuthenticationKerberos)]
+	public string? Keytab { get; set; }
+
 	private X509Certificate2? _userCert;
 
 	internal void Validate(ParameterValidationContext context)
@@ -65,8 +70,10 @@ public class InitialAuthParameterGroup : ParameterGroupBase
 		if (this.AesKey != null) credCount++;
 		if (this.DesKey != null) credCount++;
 		if (this._userCert != null) credCount++;
+		if (this.Keytab != null) credCount++;
 
 		if (credCount != 1)
+			// TODO: Now that KerberosKeyCredential supports multiple keys, remove this constraint
 			context.LogError(new ParameterValidationError(null, "The command line must specify exactly one (1) credential."));
 
 	}
@@ -104,6 +111,15 @@ public class InitialAuthParameterGroup : ParameterGroupBase
 				_ => throw new ArgumentException("The AES key is not the correct size for AES 128 or AES 256.")
 			}), this.AesKey.Bytes)
 			: (this.DesKey != null) ? new KerberosKeyCredential(userName, EType.DesCbcMd5, this.DesKey.Bytes)
+			: (this.Keytab != null) ? (this.LoadKeytab() ?? throw new InvalidOperationException("Unable to load credentials from keytab"))
 			: throw new SyntaxException("No credential provided");
+	}
+
+	private KerberosKeyCredential? LoadKeytab()
+	{
+		var keys = AuthenticationParameters.LoadKeytab(this.Keytab, this.UserName, this.Realm, this.RequireFileAccess(), this.Log);
+		if (keys.IsNullOrEmpty())
+			return null;
+		return new KerberosKeyCredential(this.UserName, keys.Select(r => r.ToEncryptionKey()));
 	}
 }

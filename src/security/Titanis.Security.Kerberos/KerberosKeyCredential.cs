@@ -1,5 +1,7 @@
-﻿using System;
+﻿using KerberosV5Spec2;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Titanis.Security.Kerberos
@@ -22,30 +24,37 @@ namespace Titanis.Security.Kerberos
 			if (keyBytes is null)
 				throw new ArgumentNullException(nameof(keyBytes));
 
-			this.KeyBytes = keyBytes;
-			this.EType = etype;
+			this._keys = new Dictionary<EType, EncryptionKey>(1) {
+				{ etype, new EncryptionKey((int)etype, keyBytes) }
+			};
+		}
+		/// <summary>
+		/// Initializes a new <see cref="KerberosKeyCredential"/>.
+		/// </summary>
+		/// <param name="userName">User name</param>
+		/// <param name="key">Encryption key</param>
+		/// <exception cref="ArgumentNullException"></exception>
+		public KerberosKeyCredential(UserPrincipalName userName, IEnumerable<EncryptionKey> key)
+			: base(userName)
+		{
+			ArgumentNullException.ThrowIfNull(key);
+
+			this._keys = key.ToDictionary(r => (EType)r.keytype);
 		}
 
-		/// <summary>
-		/// Gets the bytes of the hash or key.
-		/// </summary>
-		public byte[] KeyBytes { get; }
-		/// <summary>
-		/// Gets the encryption type of the key.
-		/// </summary>
-		internal EType EType { get; }
+		private Dictionary<EType, EncryptionKey> _keys;
 
 		/// <inheritdoc/>
 		internal sealed override bool SupportsPreauthType(PadataType preauthType)
 			=> preauthType is PadataType.EncTimestamp;
 		/// <inheritdoc/>
-		public sealed override bool SupportsProfile(EType etype) => (etype == this.EType);
+		public sealed override bool SupportsProfile(EType etype) => this._keys.ContainsKey(etype);
 		/// <inheritdoc/>
 		public override SessionKey DeriveProtocolKeyFor(EncProfile profile, byte[]? salt)
 		{
-			if (profile.EType == this.EType)
+			if (this._keys.TryGetValue(profile.EType, out var key))
 			{
-				return new SessionKey(profile, this.KeyBytes);
+				return new SessionKey(profile, key);
 			}
 			else
 			{
