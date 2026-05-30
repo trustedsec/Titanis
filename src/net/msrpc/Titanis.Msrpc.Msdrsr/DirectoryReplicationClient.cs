@@ -1,7 +1,8 @@
-﻿using ms_drsr;
+using ms_drsr;
 using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Text;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
@@ -387,7 +388,8 @@ namespace Titanis.Msrpc.Msdrsr
 						while (pObj != null)
 						{
 							var name = new DsName(pObj.value.Entinf.pName.value);
-							var attrs = AttrsFromBlock(in pObj.value.Entinf.AttrBlock, prefixTable, sessionKey);
+							var objectRid = GetObjectRid(name.Sid);
+							var attrs = AttrsFromBlock(in pObj.value.Entinf.AttrBlock, prefixTable, sessionKey, objectRid);
 
 							obj = new DsObject(name, attrs);
 							objs.Add(obj);
@@ -437,7 +439,7 @@ namespace Titanis.Msrpc.Msdrsr
 			return prefixes;
 		}
 
-		private static DsAttribute[] AttrsFromBlock(in ATTRBLOCK attrBlock, string[] prefixTable, byte[] sessionKey)
+		private static DsAttribute[] AttrsFromBlock(in ATTRBLOCK attrBlock, string[] prefixTable, byte[] sessionKey, uint objectRid = 0)
 		{
 			var attrSrcs = attrBlock.pAttr.value;
 			var attrs = new List<DsAttribute>(attrSrcs.Length);
@@ -451,7 +453,7 @@ namespace Titanis.Msrpc.Msdrsr
 				var oid = prefixTable[prefixIndex] + '.' + rid;
 
 				ATTRVAL[]? pAttrVal = attrSrc.AttrVal.pAVal?.value;
-				var values = (pAttrVal == null) ? null : Array.ConvertAll(pAttrVal, r => new DsAttributeValue(DecryptIfNeeded(oid, r.pVal.value, sessionKey)));
+				var values = (pAttrVal == null) ? null : Array.ConvertAll(pAttrVal, r => new DsAttributeValue(DecryptIfNeeded(oid, r.pVal.value, sessionKey, objectRid)));
 
 				DsAttribute dsattr = new DsAttribute(oid, values ?? []);
 				attrs.Add(dsattr);
@@ -474,7 +476,7 @@ namespace Titanis.Msrpc.Msdrsr
 		}
 
 		// [MS-DRSR] § 4.1.10.5.11 - EncryptValuesIfNecessary
-		private static byte[] DecryptIfNeeded(string attrOid, byte[] value, ReadOnlySpan<byte> sessionKey)
+		private static byte[] DecryptIfNeeded(string attrOid, byte[] value, ReadOnlySpan<byte> sessionKey, uint objectRid = 0)
 		{
 			if (value != null && IsSecretAttribute(attrOid))
 			{
@@ -484,7 +486,16 @@ namespace Titanis.Msrpc.Msdrsr
 				rc4.Transform(value.Slice(16), value.Slice(16));
 
 				// TODO: Verify CRC
-				return value.Slice(16 + 4).ToArray();
+				byte[] result = value.Slice(16 + 4).ToArray();
+
+				// [MS-DRSR] §2.2.11.1.3 - hash attributes carry an additional DES layer keyed by the object's RID
+				if (objectRid != 0 && IsHashAttribute(attrOid))
+				{
+					for (int i = 0; i + 16 <= result.Length; i += 16)
+						RemoveDesLayer(result, i, objectRid);
+				}
+
+				return result;
 			}
 			else
 				return value;
@@ -507,5 +518,61 @@ namespace Titanis.Msrpc.Msdrsr
 		// [MS-DRSR] § 4.1.10.3.11 - IsSecretAttribute
 		public static bool IsSecretAttribute(string attributeNameOrOid)
 			=> Array.IndexOf(SecretAttributeList, (attributeNameOrOid ?? throw new ArgumentNullException(nameof(attributeNameOrOid))).ToUpper()) >= 0;
+
+		// [MS-DRSR] §2.2.11.1.3 - attributes requiring inner DES layer removal after RC4
+		private static readonly string[] HashAttributeList = [
+			"UNICODEPWD", "1.2.840.113556.1.4.90",
+			"DBCSPWD", "1.2.840.113556.1.4.55",
+			"NTPWDHISTORY", "1.2.840.113556.1.4.94",
+			"LMPWDHISTORY", "1.2.840.113556.1.4.160",
+		];
+
+		private static bool IsHashAttribute(string attrOid)
+			=> Array.IndexOf(HashAttributeList, attrOid.ToUpper()) >= 0;
+
+		// Extract RID (last sub-authority) from a SecurityIdentifier
+		private static uint GetObjectRid(System.Security.Principal.SecurityIdentifier? sid)
+		{
+			if (sid == null) return 0;
+			byte[] bytes = new byte[sid.BinaryLength];
+			sid.GetBinaryForm(bytes, 0);
+			int subAuthorityCount = bytes[1];
+			if (subAuthorityCount == 0) return 0;
+			return BitConverter.ToUInt32(bytes, 8 + (subAuthorityCount - 1) * 4);
+		}
+
+		// [MS-DRSR] §2.2.11.1.3 - transform 7-byte segment into 8-byte DES key with parity
+		private static byte[] TransformDesKey(byte[] k)
+		{
+			var o = new byte[8];
+			o[0] = (byte)(k[0] >> 1);
+			o[1] = (byte)(((k[0] & 0x01) << 6) | (k[1] >> 2));
+			o[2] = (byte)(((k[1] & 0x03) << 5) | (k[2] >> 3));
+			o[3] = (byte)(((k[2] & 0x07) << 4) | (k[3] >> 4));
+			o[4] = (byte)(((k[3] & 0x0F) << 3) | (k[4] >> 5));
+			o[5] = (byte)(((k[4] & 0x1F) << 2) | (k[5] >> 6));
+			o[6] = (byte)(((k[5] & 0x3F) << 1) | (k[6] >> 7));
+			o[7] = (byte)(k[6] & 0x7F);
+			for (int i = 0; i < 8; i++) o[i] = (byte)((o[i] << 1) & 0xFE);
+			return o;
+		}
+
+		// Remove inner DES layer from a 16-byte hash chunk in-place per MS-DRSR §2.2.11.1.3
+		private static void RemoveDesLayer(byte[] data, int offset, uint rid)
+		{
+			byte[] r = BitConverter.GetBytes(rid);
+			byte[] key1 = TransformDesKey([r[0], r[1], r[2], r[3], r[0], r[1], r[2]]);
+			byte[] key2 = TransformDesKey([r[3], r[0], r[1], r[2], r[3], r[0], r[1]]);
+
+			using var des = DES.Create();
+			des.Mode = CipherMode.ECB;
+			des.Padding = PaddingMode.None;
+
+			des.Key = key1;
+			des.CreateDecryptor().TransformBlock(data, offset, 8, data, offset);
+
+			des.Key = key2;
+			des.CreateDecryptor().TransformBlock(data, offset + 8, 8, data, offset + 8);
+		}
 	}
 }
