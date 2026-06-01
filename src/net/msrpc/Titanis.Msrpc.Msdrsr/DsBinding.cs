@@ -174,17 +174,8 @@ namespace Titanis.Msrpc.Msdrsr
 			ArgumentNullException.ThrowIfNull(dcInfo);
 			ArgumentNullException.ThrowIfNull(objectNames);
 
-			//return this.WithBind(GetNcChanges, new ReplicateReq(
-			//	dcInfo,
-			//	objectName,
-			//	count,
-			//	prefixes.ToArray(),
-			//	attrTags.ToArray()
-			//), cancellationToken);
-
 			var sessionKey = this.owner.proxy.BoundAuthContext.AuthContext.GetSessionKey().ToArray();
 
-			//await foreach(var objectName in objectNames.WithCancellation(cancellationToken))
 			await Parallel.ForEachAsync(objectNames, new ParallelOptions() { CancellationToken = cancellationToken, MaxDegreeOfParallelism = Math.Max(1, parallelDegree) }, async (objectName, cancellationToken) =>
 			{
 				RpcPointer<DRS_MSG_GETCHGREPLY> pmsgOut = new();
@@ -244,7 +235,7 @@ namespace Titanis.Msrpc.Msdrsr
 							while (pObj != null)
 							{
 								var name = new DsName(pObj.value.Entinf.pName.value);
-								var attrs = DirectoryReplicationClient.AttrsFromBlock(in pObj.value.Entinf.AttrBlock, prefixTable, sessionKey);
+								var attrs = DirectoryReplicationClient.AttrsFromBlock(in pObj.value.Entinf.AttrBlock, name.Sid?.Rid ?? 0, prefixTable, sessionKey);
 
 								obj = new DsObject(name, attrs);
 

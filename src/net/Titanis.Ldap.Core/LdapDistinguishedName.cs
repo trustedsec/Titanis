@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -222,7 +223,6 @@ namespace Titanis.Ldap
 		{
 			ArgumentNullException.ThrowIfNull(rdns);
 			this._rdns = rdns.ToArray();
-			this.Rdns = new ReadOnlyCollection<LdapRelativeDistinguishedName>(this._rdns);
 		}
 		/// <summary>
 		/// Initializes a new <see cref="LdapDistinguishedName"/>.
@@ -231,7 +231,6 @@ namespace Titanis.Ldap
 		public LdapDistinguishedName(ReadOnlySpan<LdapRelativeDistinguishedName> rdns)
 		{
 			this._rdns = rdns.ToArray();
-			this.Rdns = new ReadOnlyCollection<LdapRelativeDistinguishedName>(this._rdns);
 		}
 
 		/// <summary>
@@ -240,9 +239,27 @@ namespace Titanis.Ldap
 		/// <param name="dn">DN as text</param>
 		public LdapDistinguishedName(ReadOnlySpan<char> dn)
 		{
+			if (!TryParse(dn, out this._rdns, out var errorInd, out var ex))
+				throw ex;
+		}
+
+		private LdapDistinguishedName(LdapRelativeDistinguishedName[] rdns)
+		{
+			this._rdns = rdns;
+		}
+
+		private static LdapDistinguishedName? _empty;
+		public static LdapDistinguishedName Empty => (_empty ??= new LdapDistinguishedName(Array.Empty<LdapRelativeDistinguishedName>()));
+
+		private static bool TryParse(ReadOnlySpan<char> dn, [NotNullWhen(true)] out LdapRelativeDistinguishedName[]? parsed, out int errorIndex, out Exception? parseException)
+		{
+			errorIndex = -1;
+			parseException = null;
+
 			if (dn.Length == 0)
 			{
-				this.Rdns = Array.Empty<LdapRelativeDistinguishedName>();
+				parsed = [];
+				return true;
 			}
 			else
 			{
@@ -254,12 +271,20 @@ namespace Titanis.Ldap
 				string? attrName = null;
 				List<string> values = new List<string>(1);
 				List<LdapRelativeDistinguishedName> rdns = new List<LdapRelativeDistinguishedName>();
-				for (int i = 0; i < dn.Length; i++)
+				for (int i = 0; i <= dn.Length; i++)
 				{
-					var c = dn[i];
+					var c = (i < dn.Length) ? dn[i] : '\0';
 
 					if (escaped > 0)
 					{
+						if (c=='\0')
+						{
+							parsed = null;
+							errorIndex = i;
+							parseException = new FormatException("The DN ended with an incomplete escape.");
+							return false;
+						}
+
 						if (escaped == 1)
 						{
 							if (char.IsAsciiHexDigit(c))
@@ -278,7 +303,12 @@ namespace Titanis.Ldap
 						{
 							// Must be second hex digit
 							if (!char.IsAsciiHexDigit(c))
-								throw new ArgumentException($"Expected second hex digit at character {i}.", nameof(dn));
+							{
+								errorIndex = i;
+								parsed = null;
+								parseException = new ArgumentException($"Expected second hex digit at character {i}.", nameof(dn));
+								return false;
+							}
 
 							charValue |= BinaryHelper.ParseHexChar(c);
 							sb.Append((char)charValue);
@@ -299,7 +329,12 @@ namespace Titanis.Ldap
 							offValue = i + 1;
 						}
 						else if (c == ',')
-							throw new ArgumentException($"RDN starting at {offStart} isn't of the form name=value.", nameof(dn));
+						{
+							errorIndex = i;
+							parsed = null;
+							parseException = new ArgumentException($"RDN starting at {offStart} isn't of the form name=value.", nameof(dn));
+							return false;
+						}
 						else
 							sb.Append(c);
 					}
@@ -309,7 +344,7 @@ namespace Titanis.Ldap
 						sb.Clear();
 						offValue = i + 1;
 					}
-					else if (c == ',')
+					else if (c is ',' or '\0')
 					{
 						values.Add(sb.ToString());
 						sb.Clear();
@@ -321,25 +356,46 @@ namespace Titanis.Ldap
 						sb.Append(c);
 				}
 
-				// Add final
-				{
-					values.Add(sb.ToString());
-					sb.Clear();
-					rdns.Add(new LdapRelativeDistinguishedName(attrName, values.ToArray()));
-					values.Clear();
-				}
-
-				this._rdns = rdns.ToArray();
-				this.Rdns = new ReadOnlyCollection<LdapRelativeDistinguishedName>(this._rdns);
+				parsed = rdns.ToArray();
+				return true;
 			}
-
+		}
+		public static LdapDistinguishedName Parse(ReadOnlySpan<char> text)
+		{
+			if (TryParse(text, out LdapDistinguishedName dn, out int errorIndex, out var ex))
+			{
+				return dn;
+			}
+			else
+				throw ex;
+		}
+		public static bool TryParse(ReadOnlySpan<char> text, [NotNullWhen(true)] out LdapDistinguishedName? dn, out int errorIndex, out Exception? parseException)
+		{
+			if (text.Length == 0)
+			{
+				errorIndex = -1;
+				parseException = null;
+				dn = Empty;
+				return true;
+			}
+			else if (TryParse(text, out LdapRelativeDistinguishedName[] rdns, out errorIndex, out parseException))
+			{
+				dn = new LdapDistinguishedName(rdns);
+				return true;
+			}
+			else
+			{
+				dn = null;
+				return false;
+			}
 		}
 
 		private readonly LdapRelativeDistinguishedName[] _rdns;
+		private IReadOnlyList<LdapRelativeDistinguishedName>? _rdnList;
 		/// <summary>
 		/// Gets the RDNs that make up the distinguished name.
 		/// </summary>
-		public IReadOnlyList<LdapRelativeDistinguishedName> Rdns { get; }
+		public IReadOnlyList<LdapRelativeDistinguishedName> Rdns => (this._rdnList ??= new ReadOnlyCollection<LdapRelativeDistinguishedName>(this._rdns));
 
 		private string? _text;
 		/// <summary>

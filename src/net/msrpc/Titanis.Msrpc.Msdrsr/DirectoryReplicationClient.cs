@@ -204,10 +204,8 @@ namespace Titanis.Msrpc.Msdrsr
 			return prefixes;
 		}
 
-		internal static DsAttribute[] AttrsFromBlock(in ATTRBLOCK attrBlock, string[] prefixTable, byte[] sessionKey)
+		internal static DsAttribute[] AttrsFromBlock(in ATTRBLOCK attrBlock, uint userRid, string[] prefixTable, byte[] sessionKey)
 		{
-			uint userRid = 0;
-
 			var attrSrcs = attrBlock.pAttr.value;
 			string[] oids = new string[attrSrcs.Length];
 			var attrTypes = new AttributeTypeDescription?[attrSrcs.Length];
@@ -221,15 +219,6 @@ namespace Titanis.Msrpc.Msdrsr
 				var oid = prefixTable[prefixIndex] + '.' + rid;
 				oids[iAttr] = oid;
 				attrTypes[iAttr] = LdapAttributeTypes.TryGetByNameOrOid(oid);
-				if (oid == ObjectSidOid)
-				{
-					var sidBytes = attrSrc.AttrVal.pAVal.value?.FirstOrDefault().pVal?.value;
-					if (sidBytes != null)
-					{
-						SecurityIdentifier sid = new SecurityIdentifier(sidBytes);
-						userRid = sid.Rid;
-					}
-				}
 			}
 
 			var attrs = new List<DsAttribute>(attrSrcs.Length);

@@ -90,9 +90,9 @@ namespace Titanis.Msrpc.Msdrsr
 				dsName = new DsName(guid, null, null);
 				return true;
 			}
-			else if (str.StartsWith("CN="))
+			else if (LdapDistinguishedName.TryParse(str, out var dn, out _, out _) && dn.Rdns.LastOrDefault()?.Type == "DC")
 			{
-				dsName = new DsName(default, null, new LdapDistinguishedName(str));
+				dsName = new DsName(default, null, dn);
 				return true;
 			}
 
