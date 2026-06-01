@@ -9,7 +9,7 @@ using Titanis.Cli.LdapTool;
 namespace Titanis.Cli.Ldap.Test;
 
 [TestClass]
-public class SearchCommandTest:CliCommandTest<SearchCommand>
+public class SearchCommandTest : CliCommandTest<SearchCommand>
 {
 	[TestMethod]
 	[CliTest("milchickKerb_ldaps_ChannelBinding", "milchickNtlm_ldaps_ChannelBinding")]
