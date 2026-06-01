@@ -69,7 +69,7 @@ namespace Titanis.Smb2.Cli
 			string searchPattern = "*";
 			if (dirPath.ShareRelativePath.Length > 0)
 			{
-				string fileSpec = Path.GetFileName(dirPath.ShareRelativePath);
+				string fileSpec = dirPath.GetFileName();
 				bool hasWildcards = fileSpec.IndexOfAny(WildcardChars) >= 0;
 				if (hasWildcards)
 				{

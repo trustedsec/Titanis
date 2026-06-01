@@ -112,13 +112,39 @@ namespace Titanis
 		public UncPath GetDirectoryPath()
 			=> string.IsNullOrEmpty(ShareRelativePath) ? this : new UncPath(ServerName, Port, ShareName, GetDirectoryName());
 
+		private static void SplitPath(string path, out string? directoryName, out string? fileName)
+		{
+			int isep = path.LastIndexOf('\\');
+			if (isep < 0)
+			{
+				directoryName = null;
+				fileName = path;
+			}
+			else if (isep == 0)
+			{
+				directoryName = "\\";
+				fileName = path.Substring(1);
+			}
+			else if (path.EndsWith("\\"))
+			{
+				directoryName = path.TrimEnd('\\');
+				fileName = null;
+			}
+			else
+			{
+				directoryName = path.Substring(0, isep);
+				fileName = path.Substring(isep + 1);
+			}
+		}
+
 		/// <summary>
 		/// Gets the directory name portion of the path.
 		/// </summary>
 		/// <returns>The directory name without the file.</returns>
 		public string? GetDirectoryName()
 		{
-			return Path.GetDirectoryName(ShareRelativePath);
+			SplitPath(this.ShareRelativePath, out var dirName, out _);
+			return dirName;
 		}
 
 		/// <summary>
@@ -126,7 +152,13 @@ namespace Titanis
 		/// </summary>
 		/// <returns>The file name without the directory.</returns>
 		public string? GetFileName()
-			=> string.IsNullOrEmpty(ShareRelativePath) ? null : Path.GetFileName(ShareRelativePath);
+		{
+			if (string.IsNullOrEmpty(ShareRelativePath))
+				return null;
+
+			SplitPath(this.ShareRelativePath, out _, out var fileName);
+			return fileName;
+		}
 
 		private static readonly Regex uncPattern = new Regex(@"^\\(\\)?(?<h>(\w|\.|\-)*)(:(?<p>\d+))?(\\(?<s>[^\\]*)(\\(?<pa>.*))?)?$");
 
