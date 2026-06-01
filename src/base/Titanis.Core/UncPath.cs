@@ -112,12 +112,19 @@ namespace Titanis
 		public UncPath GetDirectoryPath()
 			=> string.IsNullOrEmpty(ShareRelativePath) ? this : new UncPath(ServerName, Port, ShareName, GetDirectoryName());
 
-		private static void SplitPath(string path, out string? directoryName, out string? fileName)
+		private static void SplitPath(string? path, out string directoryName, out string fileName)
 		{
+			if (string.IsNullOrEmpty(path))
+			{
+				directoryName = string.Empty;
+				fileName = string.Empty;
+				return;
+			}
+
 			int isep = path.LastIndexOf('\\');
 			if (isep < 0)
 			{
-				directoryName = null;
+				directoryName = string.Empty;
 				fileName = path;
 			}
 			else if (isep == 0)
@@ -128,7 +135,7 @@ namespace Titanis
 			else if (path.EndsWith("\\"))
 			{
 				directoryName = path.TrimEnd('\\');
-				fileName = null;
+				fileName = string.Empty;
 			}
 			else
 			{
@@ -141,7 +148,7 @@ namespace Titanis
 		/// Gets the directory name portion of the path.
 		/// </summary>
 		/// <returns>The directory name without the file.</returns>
-		public string? GetDirectoryName()
+		public string GetDirectoryName()
 		{
 			SplitPath(this.ShareRelativePath, out var dirName, out _);
 			return dirName;

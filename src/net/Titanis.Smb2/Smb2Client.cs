@@ -531,6 +531,52 @@ namespace Titanis.Smb2
 			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
 			return await share.CreateDirectoryAsync(resolvedPath.ShareRelativePath, cancellationToken, extraOptions).ConfigureAwait(false);
 		}
+		public async Task<bool> FileExists(
+			UncPath uncPath,
+			CancellationToken cancellationToken,
+			Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None)
+		{
+			var attrs = await TryGetAttributes(uncPath, cancellationToken, extraOptions).ConfigureAwait(false);
+			return attrs.HasValue && (0 == (attrs.Value & Winterop.FileAttributes.Directory));
+		}
+		public async Task<bool> DirectoryExists(
+			UncPath uncPath,
+			CancellationToken cancellationToken,
+			Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None)
+		{
+			var attrs = await TryGetAttributes(uncPath, cancellationToken, extraOptions).ConfigureAwait(false);
+			return attrs.HasValue && (0 != (attrs.Value & Winterop.FileAttributes.Directory));
+		}
+		public async Task<Winterop.FileAttributes?> TryGetAttributes(
+			UncPath uncPath,
+			CancellationToken cancellationToken,
+			Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None)
+		{
+			if (uncPath is null) throw new ArgumentNullException(nameof(uncPath));
+
+			(var share, var resolvedPath) = await this.ResolvePath(uncPath, cancellationToken).ConfigureAwait(false);
+			try
+			{
+				var file = await share.CreateFileAsync(resolvedPath.ShareRelativePath, new Smb2CreateInfo()
+				{
+					OplockLevel = Smb2OplockLevel.None,
+					ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
+					DesiredAccess = (uint)Smb2FileAccessRights.ReadAttributes,
+					FileAttributes = 0,
+					ShareAccess = Smb2ShareAccess.ReadWriteDelete,
+					CreateDisposition = Smb2CreateDisposition.Open,
+					CreateOptions = Smb2FileCreateOptions.OpenReparsePoint | extraOptions,
+					RequestMaximalAccess = true,
+					QueryOnDiskId = true,
+				}, FileAccess.Read, cancellationToken).ConfigureAwait(false);
+				return file.FileAttributes;
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
 		public async Task RemoveDirectoryAsync(
 			UncPath uncPath,
 			CancellationToken cancellationToken)

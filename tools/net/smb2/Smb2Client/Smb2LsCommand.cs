@@ -67,15 +67,40 @@ namespace Titanis.Smb2.Cli
 			// If the last part of the path contains * or ?, treat it as a seacrh pattern
 			var dirPath = this.UncPath;
 			string searchPattern = "*";
+			bool isDir;
 			if (dirPath.ShareRelativePath.Length > 0)
 			{
-				string fileSpec = dirPath.GetFileName();
-				bool hasWildcards = fileSpec.IndexOfAny(WildcardChars) >= 0;
-				if (hasWildcards)
+				var fileSpec = dirPath.GetFileName();
+				if (string.IsNullOrEmpty(fileSpec))
 				{
-					searchPattern = fileSpec;
-					dirPath = dirPath.GetDirectoryPath();
+					// The path ends with a backslash, asserting it as a directory
+					isDir = true;
 				}
+				else
+				{
+					bool hasWildcards = fileSpec.IndexOfAny(WildcardChars) >= 0;
+					if (hasWildcards)
+					{
+						searchPattern = fileSpec;
+						dirPath = dirPath.GetDirectoryPath();
+						isDir = true;
+					}
+					else
+					{
+						// Check whether it is a directory
+						isDir = await client.DirectoryExists(dirPath, cancellationToken, this.GetCreateOptions(0));
+
+						if (!isDir)
+						{
+							searchPattern = fileSpec;
+							dirPath = dirPath.GetDirectoryPath();
+						}
+					}
+				}
+			}
+			else
+			{
+				isDir = true;
 			}
 
 			// Compute which parts (if any) of the security descriptor to retrieve
@@ -98,6 +123,7 @@ namespace Titanis.Smb2.Cli
 			if (this.IsFieldInOutput(nameof(Smb2DirEntry.MaxAccess)))
 				options |= Smb2Directory.Smb2DirQueryOptions.QueryMaxAccessAllowed;
 
+			// This is known to be a directory
 			var stats = new TraversalStats();
 			if (this.Depth == 0)
 			{
