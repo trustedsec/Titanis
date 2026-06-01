@@ -149,7 +149,7 @@ public class ReplicateCommand : DsbindCommand, IDrsChangeCallback
 			{
 				ldapClient ??= await LdapClient.Connect(new DnsEndPoint(this.ServerName, 389), null, this.RequireService<ISocketService>(), this.RequireService<IClientCredentialService>(), cancellationToken);
 
-				var filter = objSpec.Filter ?? LdapFilter.Parse($"(anr={objSpec.Name})");
+				var filter = objSpec.Filter ?? LdapFilter.Parse($"(samAccountName={objSpec.Name})");
 				LdapQuery query = new(ldapClient.DomainRoot, LdapSearchScope.Subtree, filter, [])
 				{
 					PageSize = 20
