@@ -33,9 +33,17 @@ public abstract class LdapSearchCommandBase : LdapGenericSearchCommandBase
 	[Description("Only return changes since [cookie]")]
 	public HexString? DirSync { get; set; }
 
-    protected override void SetQueryProperties(LdapQuery query)
-    {
-        base.SetQueryProperties(query);
+	[Parameter]
+	[Description("Request extended DNs")]
+	public SwitchParam ExtendedDN { get; set; }
+
+	[Parameter]
+	[Description("Request link TTLs")]
+	public SwitchParam LinkTtl { get; set; }
+
+	protected override void SetQueryProperties(LdapQuery query)
+	{
+		base.SetQueryProperties(query);
 
 		var searchBase = query.SearchBase;
 		var isRootDse = ((searchBase != null) && (searchBase.Rdns.Count == 0));
@@ -44,6 +52,8 @@ public abstract class LdapSearchCommandBase : LdapGenericSearchCommandBase
 		query.IncludeRecycled = this.IncludeRecycled.IsSet;
 		query.IncludeDeletedLinks = this.IncludeDeletedLinks.IsSet;
 		query.Scope = this.Scope ?? (isRootDse ? LdapSearchScope.BaseObject : LdapSearchScope.WholeSubtree);
+		query.IncludeExtendedDNs = this.ExtendedDN.IsSet;
+		query.IncludeLinkTtl = this.LinkTtl.IsSet;
 		query.DirSyncCookie = this.DirSync?.Bytes;
-    }
+	}
 }

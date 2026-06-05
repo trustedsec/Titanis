@@ -346,6 +346,11 @@ namespace Titanis.Ldap
 			return result;
 		}
 
+		public async Task<LdapEntry?> SearchSingle(LdapQuery query, CancellationToken cancellationToken)
+		{
+			var results = await Search(query, cancellationToken).ConfigureAwait(false);
+			return results.Entries.FirstOrDefault();
+		}
 		/// <summary>
 		/// Executes a search request.
 		/// </summary>
@@ -384,6 +389,10 @@ namespace Titanis.Ldap
 					controls.Add(new Control(Encoding.UTF8.GetBytes(AdExtensions.ShowRecycledOid), false, null));
 				if (query.IncludeDeletedLinks)
 					controls.Add(new Control(Encoding.UTF8.GetBytes(AdExtensions.ShowDeactivatedLinkOid), false, null));
+				if (query.IncludeExtendedDNs)
+					controls.Add(new Control(Encoding.UTF8.GetBytes(AdExtensions.ExtendedDN), false, null));
+				if (query.IncludeLinkTtl)
+					controls.Add(new Control(Encoding.UTF8.GetBytes(AdExtensions.LinkTtl), false, null));
 				if (query.DirSyncCookie != null)
 				{
 					// [MS-ADTS] § 3.1.1.3.4.1.3 LDAP_SERVER_DIRSYNC_OID
@@ -393,7 +402,7 @@ namespace Titanis.Ldap
 				}
 
 				if (query.SdFlags.HasValue)
-				controls.Add(CreateSdFlagControl(query.SdFlags.Value));
+					controls.Add(CreateSdFlagControl(query.SdFlags.Value));
 			}
 
 			SearchRequest_Tagged3 asn1Search = new(

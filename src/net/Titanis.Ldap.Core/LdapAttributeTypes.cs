@@ -382,7 +382,7 @@ namespace Titanis.Ldap
 		public readonly static AttributeTypeDescription InterSiteTopologyGenerator = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.1246", ["interSiteTopologyGenerator"], syntax: AdSyntaxes.ObjectDsDn);
 		public readonly static AttributeTypeDescription InterSiteTopologyRenew = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.4.1247", ["interSiteTopologyRenew"], syntax: AdSyntaxes.Integer);
 		public readonly static AttributeTypeDescription InternationalISDNNumber = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "2.5.4.25", ["internationalISDNNumber"], syntax: AdSyntaxes.StringNumeric);
-		public readonly static AttributeTypeDescription InvocationId = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.2.115", ["invocationId"], syntax: AdSyntaxes.StringOctet);
+		public readonly static AttributeTypeDescription InvocationId = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.2.840.113556.1.2.115", ["invocationId"], syntax: AdSyntaxes.StringOctetGuid);
 		public readonly static AttributeTypeDescription IpHostNumber = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "1.3.6.1.1.1.1.19", ["ipHostNumber"], syntax: AdSyntaxes.StringIa5);
 		public readonly static AttributeTypeDescription IpNetmaskNumber = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.3.6.1.1.1.1.21", ["ipNetmaskNumber"], syntax: AdSyntaxes.StringIa5);
 		public readonly static AttributeTypeDescription IpNetworkNumber = new AttributeTypeDescription(AttributeTypeDescriptionFlags.SingleValue, "1.3.6.1.1.1.1.20", ["ipNetworkNumber"], syntax: AdSyntaxes.StringIa5);

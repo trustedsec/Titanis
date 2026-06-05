@@ -79,6 +79,12 @@ namespace Titanis.Ldap
 		/// <returns>Decode value</returns>
 		public virtual object DecodeDsrep(byte[] bytes) => this.Decode(bytes);
 		/// <summary>
+		/// Encodes a value to [MS-DRSR] using this syntax.
+		/// </summary>
+		/// <param name="obj">Value</param>
+		/// <returns>Encoded value</returns>
+		public virtual byte[] EncodeDsrep(object obj) => this.Encode(obj);
+		/// <summary>
 		/// Encodes a value using this syntax.
 		/// </summary>
 		/// <param name="value">Value to encode</param>

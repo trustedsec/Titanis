@@ -104,6 +104,8 @@ namespace Titanis.Ldap
 		/// </summary>
 		public bool IncludeRecycled { get; set; }
 		public bool IncludeDeletedLinks { get; set; }
+		public bool IncludeExtendedDNs { get; set; }
+		public bool IncludeLinkTtl { get; set; }
 		/// <summary>
 		/// Gets or sets the dirsync cookie to retrieve changes after a certain point.
 		/// </summary>

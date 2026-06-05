@@ -232,6 +232,14 @@ namespace Titanis.Ldap
 
 			return BinaryPrimitives.ReadInt32LittleEndian(bytes);
 		}
+		// [MS-DRSR] § 5.16.1.1
+		/// <inheritdoc/>
+		public override byte[] EncodeDsrep(object obj)
+		{
+			byte[] bytes = new byte[4];
+			BinaryPrimitives.WriteInt32LittleEndian(bytes, (int)obj);
+			return bytes;
+		}
 	}
 
 	// [RFC 4517] § 3.3.16
@@ -276,6 +284,14 @@ namespace Titanis.Ldap
 				throw new FormatException($"The encoded value must be exactly 8 bytes.");
 
 			return BinaryPrimitives.ReadInt64LittleEndian(bytes);
+		}
+		// [MS-DRSR] § 5.16.1.1
+		/// <inheritdoc/>
+		public override byte[] EncodeDsrep(object obj)
+		{
+			byte[] bytes = new byte[8];
+			BinaryPrimitives.WriteInt64LittleEndian(bytes, (long)obj);
+			return bytes;
 		}
 	}
 
@@ -374,6 +390,14 @@ namespace Titanis.Ldap
 				throw new FormatException($"The encoded value must be exactly 8 bytes.");
 
 			return new AdTimestamp(BinaryPrimitives.ReadInt64LittleEndian(bytes));
+		}
+		// [MS-DRSR] § 5.16.1.1
+		/// <inheritdoc/>
+		public override byte[] EncodeDsrep(object obj)
+		{
+			byte[] bytes = new byte[8];
+			BinaryPrimitives.WriteInt64LittleEndian(bytes, ((AdTimestamp)obj).Value);
+			return bytes;
 		}
 	}
 
@@ -860,6 +884,10 @@ namespace Titanis.Ldap
 		public override object DecodeDsrep(byte[] bytes)
 		{
 			return Encoding.Unicode.GetString(bytes);
+		}
+		public override byte[] EncodeDsrep(object obj)
+		{
+			return Encoding.Unicode.GetBytes((string)obj);
 		}
 	}
 

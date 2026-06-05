@@ -10,9 +10,19 @@ using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Ldap
 {
+	[Flags]
+	public enum LdapDistinguishedNameOptions
+	{
+		None = 0,
+		GuidAsText = 1,
+		SidAsText = 2,
+		WellKnownGuidAsText = 4,
+	}
+
 	/// <summary>
 	/// Represents a relative distinguished name within LDAP.
 	/// </summary>
@@ -239,22 +249,92 @@ namespace Titanis.Ldap
 		/// <param name="dn">DN as text</param>
 		public LdapDistinguishedName(ReadOnlySpan<char> dn)
 		{
-			if (!TryParse(dn, out this._rdns, out var errorInd, out var ex))
+			if (!TryParse(dn, out this._rdns, out var guid, out var sid, out var wkguid, out var wkDN
+				, out var ttl, out var ttlDN, out var options, out var errorInd, out var ex))
 				throw ex;
+
+			this.ObjectGuid = guid;
+			this.ObjectSid = sid;
+			this.WellKnownGuid = wkguid;
+			this.WellKnownDN = wkDN;
+			this.Ttl = ttl;
+			this.TtlDN = ttlDN;
+			this.Options = options;
 		}
 
-		private LdapDistinguishedName(LdapRelativeDistinguishedName[] rdns)
+		private LdapDistinguishedName(
+			LdapRelativeDistinguishedName[] rdns,
+			Guid? guid = default,
+			SecurityIdentifier? sid = default,
+			Guid? wkguid = default,
+			LdapDistinguishedName? wkDN = default,
+			int? ttl = default,
+			LdapDistinguishedName? ttlDN = default,
+			LdapDistinguishedNameOptions options = default)
 		{
 			this._rdns = rdns;
+			this.ObjectGuid = guid;
+			this.ObjectSid = sid;
+			this.WellKnownGuid = wkguid;
+			this.WellKnownDN = wkDN;
+			this.Ttl = ttl;
+			this.TtlDN = ttlDN;
+			this.Options = options;
 		}
 
 		private static LdapDistinguishedName? _empty;
 		public static LdapDistinguishedName Empty => (_empty ??= new LdapDistinguishedName(Array.Empty<LdapRelativeDistinguishedName>()));
 
-		private static bool TryParse(ReadOnlySpan<char> dn, [NotNullWhen(true)] out LdapRelativeDistinguishedName[]? parsed, out int errorIndex, out Exception? parseException)
+		private static bool TryParseDirectoryGuid(ReadOnlySpan<char> text, out Guid guid, out int errorIndex, out LdapDistinguishedNameOptions options)
+		{
+			// TODO: Parse as span instead of string
+			errorIndex = 0;
+			if (text.IndexOf('-') > 0)
+			{
+				options = LdapDistinguishedNameOptions.GuidAsText;
+				return Guid.TryParse(text, out guid);
+			}
+			else
+			{
+				options = LdapDistinguishedNameOptions.None;
+				if (BinaryHelper.TryParseHexString(text, out var bytes, out errorIndex))
+				{
+					guid = new Guid(bytes);
+					return true;
+				}
+				else
+				{
+					guid = default;
+					return false;
+				}
+			}
+		}
+
+		private static bool TryParse(
+			ReadOnlySpan<char> dn,
+			[NotNullWhen(true)] out LdapRelativeDistinguishedName[]? parsed,
+			out Guid? guid,
+			out SecurityIdentifier? sid,
+			out Guid? wkguid,
+			out LdapDistinguishedName? wkdn,
+			out int? ttl,
+			out LdapDistinguishedName? ttldn,
+			out LdapDistinguishedNameOptions options,
+			out int errorIndex,
+			out Exception? parseException)
 		{
 			errorIndex = -1;
 			parseException = null;
+			guid = null;
+			sid = null;
+			wkguid = null;
+			wkdn = null;
+			ttl = default;
+			ttldn = default;
+			options = LdapDistinguishedNameOptions.None;
+
+			bool bracketed = false;
+			parsed = null;
 
 			if (dn.Length == 0)
 			{
@@ -263,10 +343,11 @@ namespace Titanis.Ldap
 			}
 			else
 			{
-				int offStart = 0;
+				int offName = 0;
 				int offValue = -1;
 				int escaped = 0;
 				int charValue = 0;
+				int offSep = -1;
 				StringBuilder sb = new StringBuilder(dn.Length);
 				string? attrName = null;
 				List<string> values = new List<string>(1);
@@ -277,9 +358,8 @@ namespace Titanis.Ldap
 
 					if (escaped > 0)
 					{
-						if (c=='\0')
+						if (c == '\0')
 						{
-							parsed = null;
 							errorIndex = i;
 							parseException = new FormatException("The DN ended with an incomplete escape.");
 							return false;
@@ -305,7 +385,6 @@ namespace Titanis.Ldap
 							if (!char.IsAsciiHexDigit(c))
 							{
 								errorIndex = i;
-								parsed = null;
 								parseException = new ArgumentException($"Expected second hex digit at character {i}.", nameof(dn));
 								return false;
 							}
@@ -328,12 +407,28 @@ namespace Titanis.Ldap
 							sb.Clear();
 							offValue = i + 1;
 						}
+						else if (c == ';' && sb.Length == 0)
+						{
+							// Probably post >, ignore it
+							offName = i + 1;
+						}
+						else if (!bracketed && c == '<' && (sb.Length == 0))
+						{
+							bracketed = true;
+						}
 						else if (c == ',')
 						{
-							errorIndex = i;
-							parsed = null;
-							parseException = new ArgumentException($"RDN starting at {offStart} isn't of the form name=value.", nameof(dn));
-							return false;
+							if (sb.Length > 0)
+							{
+								errorIndex = i;
+								parseException = new ArgumentException($"RDN starting at {offName} isn't of the form name=value.", nameof(dn));
+								return false;
+							}
+							else
+							{
+								// Allow empty RDNs; this occurs with <TTL=nn>,...
+								offName = i + 1;
+							}
 						}
 						else
 							sb.Append(c);
@@ -344,16 +439,119 @@ namespace Titanis.Ldap
 						sb.Clear();
 						offValue = i + 1;
 					}
-					else if (c is ',' or '\0')
+					else if ((!bracketed && (c is ',' or '\0')) || (bracketed && c is '>'))
 					{
-						values.Add(sb.ToString());
-						sb.Clear();
-						rdns.Add(new LdapRelativeDistinguishedName(attrName, values.ToArray()));
-						attrName = null;
-						values.Clear();
+						// [MS-ADTS] § 3.1.1.3.1.2.4 Alternative Forms of DNs 
+						if (bracketed)
+						{
+							var valueText = dn[offValue..i];
+							if ("SID".Equals(attrName, StringComparison.OrdinalIgnoreCase))
+							{
+								// TODO: TryParse
+								if (valueText.StartsWith("S-"))
+								{
+									options |= LdapDistinguishedNameOptions.SidAsText;
+									sid = SecurityIdentifier.Parse(valueText);
+								}
+								else
+								{
+									if (BinaryHelper.TryParseHexString(valueText, out var bytes, out var charIndex))
+									{
+										sid = new SecurityIdentifier(bytes);
+									}
+									else
+									{
+										errorIndex = i;
+										parseException = new FormatException($"Unable to parse SID as hex digits.");
+										return false;
+									}
+								}
+							}
+							else if ("GUID".Equals(attrName, StringComparison.OrdinalIgnoreCase))
+							{
+								if (!TryParseDirectoryGuid(valueText, out var guid_, out _, out var guidOptions))
+								{
+									errorIndex = i;
+									parseException = new FormatException($"Unable to parse GUID.");
+									return false;
+								}
+								options |= guidOptions;
+								guid = guid_;
+							}
+							else if ("WKGUID".Equals(attrName, StringComparison.OrdinalIgnoreCase))
+							{
+								if (!TryParseDirectoryGuid(dn[offValue..offSep], out var guid_, out _, out var guidOptions))
+								{
+									errorIndex = i;
+									parseException = new FormatException($"Unable to parse WKGUID.");
+									return false;
+								}
+								wkguid = guid_;
+								if (guidOptions == LdapDistinguishedNameOptions.GuidAsText)
+									options |= LdapDistinguishedNameOptions.WellKnownGuidAsText;
+
+								if (!TryParse(dn[(offSep + 1)..i], out wkdn, out _, out _))
+								{
+									errorIndex = i;
+									parseException = new FormatException($"Unable to parse WKDN.");
+									return false;
+								}
+							}
+							else if ("TTL".Equals(attrName, StringComparison.OrdinalIgnoreCase))
+							{
+								if (!int.TryParse(((offSep >= 0) ? dn[offValue..offSep] : valueText), out var ttl_))
+								{
+									errorIndex = i;
+									parseException = new FormatException($"Unable to parse TTL.");
+									return false;
+								}
+								ttl = ttl_;
+
+								if (offSep >= 0)
+								{
+									if (!TryParse(dn[(offSep + 1)..i], out ttldn, out _, out _))
+									{
+										errorIndex = i;
+										parseException = new FormatException($"Unable to parse TTL-DN.");
+										return false;
+									}
+								}
+							}
+							else
+							{
+								parsed = null;
+								errorIndex = i;
+								parseException = new FormatException($"Unknown extended DN name: {attrName}");
+								return false;
+							}
+
+							attrName = null;
+							bracketed = false;
+							offSep = -1;
+						}
+						else
+						{
+							string valueText = sb.ToString();
+							sb.Clear();
+
+							values.Add(valueText);
+							rdns.Add(new LdapRelativeDistinguishedName(attrName, values.ToArray()));
+							attrName = null;
+							values.Clear();
+						}
 					}
 					else
-						sb.Append(c);
+					{
+						if (!bracketed)
+						{
+							sb.Append(c);
+						}
+						else
+						{
+							if (c == ',' && offSep < 0)
+								offSep = i;
+						}
+					}
 				}
 
 				parsed = rdns.ToArray();
@@ -378,9 +576,9 @@ namespace Titanis.Ldap
 				dn = Empty;
 				return true;
 			}
-			else if (TryParse(text, out LdapRelativeDistinguishedName[] rdns, out errorIndex, out parseException))
+			else if (TryParse(text, out LdapRelativeDistinguishedName[] rdns, out Guid? guid, out SecurityIdentifier? sid, out Guid? wkguid, out LdapDistinguishedName? wkdn, out var ttl, out var ttlDN, out var options, out errorIndex, out parseException))
 			{
-				dn = new LdapDistinguishedName(rdns);
+				dn = new LdapDistinguishedName(rdns, guid, sid, wkguid, wkdn, ttl, ttlDN, options);
 				return true;
 			}
 			else
@@ -391,6 +589,15 @@ namespace Titanis.Ldap
 		}
 
 		private readonly LdapRelativeDistinguishedName[] _rdns;
+
+		public Guid? ObjectGuid { get; }
+		public SecurityIdentifier? ObjectSid { get; }
+		public Guid? WellKnownGuid { get; }
+		public LdapDistinguishedName? WellKnownDN { get; }
+		public int? Ttl { get; }
+		public LdapDistinguishedName? TtlDN { get; }
+		public LdapDistinguishedNameOptions Options { get; }
+
 		private IReadOnlyList<LdapRelativeDistinguishedName>? _rdnList;
 		/// <summary>
 		/// Gets the RDNs that make up the distinguished name.
@@ -407,18 +614,71 @@ namespace Titanis.Ldap
 
 		private string BuildText()
 		{
-			if (this._rdns.IsNullOrEmpty())
-				return string.Empty;
-
 			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < this._rdns.Length; i++)
+			char sep = '\0';
+			if (this.Ttl != null)
 			{
-				var part = this._rdns[i];
+				sb.Append("<TTL=")
+					.Append(this.Ttl);
+				if (this.TtlDN != null)
+				{
+					sb.Append(',')
+					.Append(this.TtlDN);
+				}
+				sb.Append('>');
+				sep = ',';
+			}
+			if (this.ObjectGuid.HasValue)
+			{
+				if (sep != '\0')
+					sb.Append(sep);
 
-				if (i > 0)
-					sb.Append(',');
+				var guid = this.ObjectGuid.Value;
+				sb.Append("<GUID=")
+					// TODO: ToString("n") doesn't print the raw binary form
+					.Append((0 != (this.Options & LdapDistinguishedNameOptions.GuidAsText)) ? guid.ToString() : guid.ToByteArray().ToHexString())
+					.Append('>');
+				sep = ';';
+			}
+			if (this.WellKnownGuid.HasValue)
+			{
+				if (sep != '\0')
+					sb.Append(sep);
 
-				part.BuildTextInto(sb);
+				var guid = this.WellKnownGuid.Value;
+				sb.Append("<WKGUID=")
+					// TODO: ToString("n") doesn't print the raw binary form
+					.Append((0 != (this.Options & LdapDistinguishedNameOptions.WellKnownGuidAsText)) ? guid.ToString() : guid.ToByteArray().ToHexString())
+					.Append(',')
+					.Append(this.WellKnownDN)
+					.Append('>');
+				sep = ';';
+			}
+			if (this.ObjectSid != null)
+			{
+				if (sep != '\0')
+					sb.Append(sep);
+
+				sb.Append("<SID=")
+					.Append((0 != (this.Options & LdapDistinguishedNameOptions.SidAsText)) ? this.ObjectSid.ToString() : this.ObjectSid.GetBytes().ToHexString())
+					.Append('>');
+				sep = ';';
+			}
+
+			if (this._rdns.Length > 0)
+			{
+				if (sep != '\0')
+					sb.Append(sep);
+
+				for (int i = 0; i < this._rdns.Length; i++)
+				{
+					var part = this._rdns[i];
+
+					if (i > 0)
+						sb.Append(',');
+
+					part.BuildTextInto(sb);
+				}
 			}
 			return sb.ToString();
 		}

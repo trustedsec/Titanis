@@ -157,6 +157,43 @@ namespace Titanis
 		public static int ParseHexByte(char high, char low)
 			=> (ParseHexChar(high) << 4) | ParseHexChar(low);
 
+		public static bool TryParseHexString(ReadOnlySpan<char> chars, out byte[]? bytes, out int invalidCharIndex)
+		{
+			if (chars.Length % 2 != 0)
+			{
+				invalidCharIndex = -1;
+				bytes = null;
+				return false;
+			}
+
+			int byteCount = chars.Length / 2;
+			bytes = new byte[byteCount];
+			for (int i = 0; i < byteCount; i++)
+			{
+				char c = chars[i * 2];
+				int b = (ParseHexChar(c) << 4);
+				if (b < 0)
+				{
+					invalidCharIndex = i * 2;
+					return false;
+				}
+
+				c = chars[i * 2 + 1];
+				int b2 = (byte)ParseHexChar(c);
+				if (b2 < 0)
+				{
+					invalidCharIndex = i * 2 + 1;
+					return false;
+				}
+				b |= b2;
+
+				bytes[i] = (byte)b;
+			}
+
+			invalidCharIndex = -1;
+			return true;
+		}
+
 		/// <summary>
 		/// Parses a string of hexadecimal digits into bytes.
 		/// </summary>
@@ -172,19 +209,10 @@ namespace Titanis
 			if (chars.Length % 2 != 0)
 				throw new ArgumentException(Messages.HexParse_InvalidSize, nameof(chars));
 
-			int byteCount = chars.Length / 2;
-			byte[] bytes = new byte[byteCount];
-			for (int i = 0; i < byteCount; i++)
-			{
-				char c = chars[i * 2];
-				byte b = (byte)(ParseHexChar(c) << 4);
-				c = chars[i * 2 + 1];
-				b |= (byte)ParseHexChar(c);
-
-				bytes[i] = b;
-			}
-
-			return bytes;
+			if (TryParseHexString(chars, out var bytes, out var invalidCharIndex))
+				return bytes;
+			else
+				throw new ArgumentException(Messages.HexParse_InvalidHexDigit);
 		}
 
 		public static byte[] ParseBase64(ReadOnlySpan<char> chars, out int validCharCount)
