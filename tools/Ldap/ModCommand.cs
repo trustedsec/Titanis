@@ -19,11 +19,11 @@ internal class ModCommand : LdapObjectCommandBase
 
 	[Parameter]
 	[Description("Account name to add to msDS-AllowedToActOnBehalfOfOtherIdentity")]
-	public string[]? AllowAltIdentity { get; set; }
+	public string[]? AllowOnBehalfOf { get; set; }
 
 	protected override AttributeSpec[]? GetRequiredObjAttributes()
 	{
-		if (this.AllowAltIdentity != null)
+		if (this.AllowOnBehalfOf != null)
 			return [LdapAttributeTypes.MsDSAllowedToActOnBehalfOfOtherIdentity];
 		else
 			return base.GetRequiredObjAttributes();
@@ -33,11 +33,11 @@ internal class ModCommand : LdapObjectCommandBase
 	{
 		base.OnBeforeProcessObjects(ldap, cancellationToken);
 
-		if (this.AllowAltIdentity != null)
+		if (this.AllowOnBehalfOf != null)
 		{
 			var users = new List<SecurityIdentifier>();
 			// TODO: This should support SIDs, DNs, and samAccountNames
-			foreach (var name in this.AllowAltIdentity)
+			foreach (var name in this.AllowOnBehalfOf)
 			{
 				var results = await ldap.SimpleSearch(name, [LdapAttributeTypes.ObjectSid], cancellationToken);
 				var entry = results.Entries.FirstOrDefault();

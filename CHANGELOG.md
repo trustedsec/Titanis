@@ -1,5 +1,41 @@
 Change Log
 
+# 2026-06-09
+
+## Enhancements
+
+* (experimental) libfuse-based mounting for
+	* Smb2Client
+	* Ldap
+	* Wmi
+* Dsrep
+	* performs additional DES decryption to unicodePwd and other secrets
+	* Export all keys to a .keytab
+* Kerberos
+	* All tools accept `-Keytab` for Kerberos authentication
+	* Delegation with `-Delegate` and `-DelegateTicket`
+* Dcom
+	* Standalone activation accepting filenames
+* LDAP
+	* -ExtendedDN
+	* TTL-DNs for expiring group memberships (Privileged Access Management)
+	* `rm` to delete entries
+	* Accepts standard extensible match syntax
+	* Relative date filter syntax (e.g. `(attr<=Today-5d)`)
+	* `-AllowOnBehalfOf`
+
+## Minor Enhancements and Fixes
+
+* `-RpcCallTimeout` and `-RpcConnectTimeout` parameters to configure RPC timeouts
+* Accepts forged tickets from Impacket with improper nametype encoding
+* Smb2Client handles larger files (the chunking had issues)
+* DACL serialization fixed
+* LDAP handles DNs with a line break (e.g. conflict DNs)
+* Concurrent RPC calls (for Dsrep -Parallelize)
+* Smb2Client `watch` defaults to List style output.
+* Dcom serialization fix (fixes FQDNs)
+* Accept `-Param^ filename` syntax to import arguments from file contents
+
 # 2026-04-13
 
 This releases focuses on some architectural and usability enhancements.

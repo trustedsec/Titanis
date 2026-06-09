@@ -741,7 +741,7 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AllowAltIdentity||&lt;String[]&gt;|Account name to add to msDS-AllowedToActOnBehalfOfOtherIdentity|
+|    -AllowOnBehalfOf||&lt;String[]&gt;|Account name to add to msDS-AllowedToActOnBehalfOfOtherIdentity|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Changes||&lt;AttributeChangeSpec[]&gt;|Changes to make as name?=value|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
@@ -880,7 +880,7 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AllowAltIdentity||&lt;String[]&gt;|Account name to add to msDS-AllowedToActOnBehalfOfOtherIdentity|
+|    -AllowOnBehalfOf||&lt;String[]&gt;|Account name to add to msDS-AllowedToActOnBehalfOfOtherIdentity|
 |    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
 |    -Changes||&lt;AttributeChangeSpec[]&gt;|Changes to make as name?=value|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
