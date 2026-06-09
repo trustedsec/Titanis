@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Titanis
@@ -52,7 +53,14 @@ namespace Titanis
 				{
 					//asm = Assembly.Load("netstandard, Version=2.0.0.0");
 
-					asm = Assembly.LoadFrom(@"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\netstandard\v4.0_2.0.0.0__cc7b13ffcd2ddd51\netstandard.dll");
+					if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+					{
+						asm = Assembly.LoadFrom(@"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\netstandard\v4.0_2.0.0.0__cc7b13ffcd2ddd51\netstandard.dll");
+					}
+					else
+					{
+						asm = Assembly.LoadFrom(@"/usr/lib/dotnet/sdk/8.0.127/ref/netstandard.dll");
+					}
 				}
 				_assemblyCache.TryAdd(asmName.Name, asm);
 			}
