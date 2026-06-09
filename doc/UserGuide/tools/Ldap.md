@@ -96,7 +96,8 @@ Ldap add [options] -ObjectClass <String> -ObjectName <String[]> <ServerName> <Ob
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -221,7 +222,8 @@ Ldap addcomputer [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -339,7 +341,8 @@ Ldap addou [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -464,7 +467,8 @@ Ldap adduser [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -646,7 +650,8 @@ Ldap lspart [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -780,7 +785,8 @@ Ldap mod [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Changes> 
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -920,7 +926,8 @@ Ldap moduser [options] -ObjectName <String[]> <ServerName> <ObjectName> [ <Chang
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1083,7 +1090,8 @@ Ldap mountfs [options] <ServerName> [ <Mountpoint> ]
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1236,12 +1244,14 @@ Ldap query [options] <ServerName> [ <Filter> ]
 ||||  TreeTable|
 |    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
+|-E, -ExtendedDN||&lt;SwitchParam&gt;|Request extended DNs|
 |    -Filter||&lt;String&gt;|LDAP query|
 |    -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
 |    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
 |    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
+|    -LinkTtl||&lt;SwitchParam&gt;|Request link TTLs|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
@@ -1281,7 +1291,8 @@ Ldap query [options] <ServerName> [ <Filter> ]
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1492,7 +1503,8 @@ Ldap rm [options] -ObjectName <String[]> <ServerName> <ObjectName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1608,7 +1620,8 @@ Ldap schema [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1696,11 +1709,13 @@ Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 ||||  TreeTable|
 |    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
+|-E, -ExtendedDN||&lt;SwitchParam&gt;|Request extended DNs|
 |-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
 |    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
 |    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
+|    -LinkTtl||&lt;SwitchParam&gt;|Request link TTLs|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    -PageSize||&lt;Int32&gt;|Number of results to fetch per page|
@@ -1741,7 +1756,8 @@ Ldap search [options] -SearchName <String[]> <ServerName> <SearchName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1976,11 +1992,13 @@ Ldap watch [options] <ServerName>
 ||||  TreeTable|
 |    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    -DirSync||&lt;HexString&gt;|Only return changes since [cookie]|
+|-E, -ExtendedDN||&lt;SwitchParam&gt;|Request extended DNs|
 |-F, -FollowReferrals||&lt;SwitchParam&gt;|Follows referrals|
 |-G, -Gc||&lt;SwitchParam&gt;|Global Catalog server|
 |    -IncludeDeleted||&lt;SwitchParam&gt;|Includes delete items (but not recycled)|
 |    -IncludeDeletedLinks||&lt;SwitchParam&gt;|Includes links to deleted items|
 |    -IncludeRecycled||&lt;SwitchParam&gt;|Includes deleted and recycled items|
+|    -LinkTtl||&lt;SwitchParam&gt;|Request link TTLs|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 |    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
@@ -2021,7 +2039,8 @@ Ldap watch [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -2141,7 +2160,8 @@ Ldap whoami [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|

@@ -95,7 +95,8 @@ Reg dumplsasecrets [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -245,7 +246,8 @@ Reg dumpsam [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -403,7 +405,8 @@ Reg getdcomapp [options] -AppId <Guid[]> <ServerName> <AppId>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -548,6 +551,7 @@ Reg getsd [options] <ServerName> <KeyPath>
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -722,6 +726,7 @@ Reg keyinfo [options] <ServerName> <KeyPath>
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -873,6 +878,7 @@ Reg list [options] <ServerName> <KeyPath>
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1032,6 +1038,7 @@ Reg save [options] <ServerName> <KeyPath> <FileName>
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1169,7 +1176,8 @@ Reg set [options] <ServerName> [ <Items> ]
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1435,6 +1443,7 @@ Reg setsd [options] -SecurityDescriptor <SecurityDescriptor> <ServerName> <KeyPa
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
 |    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1582,7 +1591,8 @@ Reg syskey [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|

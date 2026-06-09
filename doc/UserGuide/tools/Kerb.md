@@ -83,6 +83,7 @@ Kerb asreq [options] <UserName> <Kdc>
 ||||  DesEde3Cbc|
 |    -EndTime||&lt;DateTime&gt;|End time|
 |-F, -Forwardable||&lt;SwitchParam&gt;|Requests a forwardable ticket|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |-N, -NtlmHash||&lt;HexString&gt;|NTLM hash (hex-encoded, no colons)|
 |    -Password||&lt;String&gt;|Password|
 |    -Postdate||&lt;DateTime&gt;|Requests a postdated ticket with the specified start date|
@@ -256,6 +257,7 @@ Kerb changepw [options] <UserName> <Kdc> <NewPassword>
 |-|-|-|-|
 |-A, -AesKey||&lt;HexString&gt;|AES 128 key|
 |    -DesKey||&lt;HexString&gt;|DES key|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -NtlmHash||&lt;HexString&gt;|NTLM hash (hex-encoded, no colons)|
 |-P, -Password||&lt;String&gt;|Password|
 |-R, -Realm||&lt;String&gt;|Name of realm (domain)|
@@ -961,7 +963,8 @@ Kerb setpw [options] <TargetAccount> <NewPassword>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|

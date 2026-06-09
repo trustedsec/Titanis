@@ -94,7 +94,8 @@ Smb2Client enumnics [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -267,7 +268,8 @@ Smb2Client enumopenfiles [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -438,7 +440,8 @@ Smb2Client enumsessions [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -604,7 +607,8 @@ Smb2Client enumshares [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -769,7 +773,8 @@ Smb2Client enumsnapshots [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -926,7 +931,8 @@ Smb2Client enumstreams [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1088,7 +1094,8 @@ Smb2Client get [options] <UncPath> [ <DestinationFileName> ]
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1322,7 +1329,8 @@ Smb2Client ls [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1466,7 +1474,7 @@ Smb2Client ls \\LUMON-DC1\sysvol -u milchick@LUMON -p Br3@kr00m! -Kdc LUMON-DC1
 ### Example 5 - Listing the contents of a share with an alternate host name
 
 ```
-Smb2Client ls \\SERVER\MDR -ha 10.66.0.13 -u Administrator -p 9CorePrinciples
+Smb2Client ls \\SERVER\MDR -ha 10.66.0.13 -u milchick -p Br3@kr00m!
 ```
   In this example, the command line specifies a host name differing from the
   server name to resolve for connecting to the server.  When connecting to the
@@ -1554,7 +1562,8 @@ Smb2Client mkdir [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1721,7 +1730,8 @@ Smb2Client mklink [options] <UncPath> <TargetPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1918,7 +1928,8 @@ Smb2Client mount [options] <UncPath> <TargetPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -2118,7 +2129,8 @@ Smb2Client mountfs [options] <UncPath> [ <Mountpoint> ]
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -2273,7 +2285,8 @@ Smb2Client put [options] [ <SourceFileName> ] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -2437,7 +2450,8 @@ Smb2Client rm [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -2589,7 +2603,8 @@ Smb2Client rmdir [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -2771,7 +2786,8 @@ Smb2Client touch [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -3005,7 +3021,8 @@ Smb2Client umount [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -3172,7 +3189,8 @@ Smb2Client watch [options] <UncPath>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|

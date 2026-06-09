@@ -126,7 +126,8 @@ Lsa addpriv [options] <ServerName> <Privileges>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -288,7 +289,8 @@ Lsa createaccount [options] <ServerName> <Sid>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -363,10 +365,16 @@ Lsa createaccount [options] <ServerName> <Sid>
 
 ## Examples
 
-### Example 1 - Create an account
+### Example 1 - Create a policy account
 
 ```
 Lsa createaccount LUMON-FS1 -UserName milchick -Password Br3@kr00m! S-1-5-32-646
+```
+
+### Example 2 - Create a policy account for a domain SID
+
+```
+Lsa createaccount LUMON-FS1 -UserName milchick -Password Br3@kr00m! S-1-5-21-1752138614-393460150-3098146133-1103
 ```
 # Lsa enumaccounts
   Enumerates accounts
@@ -436,7 +444,8 @@ Lsa enumaccounts [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -644,7 +653,8 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -794,7 +804,8 @@ Lsa getprivs [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -963,7 +974,8 @@ Lsa getrights [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1117,7 +1129,8 @@ Lsa getsysaccess [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1275,7 +1288,8 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1432,7 +1446,8 @@ Lsa lookupsid [options] <ServerName> <Sids>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1629,7 +1644,8 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1819,7 +1835,8 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
@@ -1984,7 +2001,8 @@ Lsa whoami [options] <ServerName>
 |    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
 |    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
 |    -DesKey||&lt;HexString&gt;|DES key|
-|-K, -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
+|    -Keytab||&lt;String&gt;|Name of keytab file|
 |    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
