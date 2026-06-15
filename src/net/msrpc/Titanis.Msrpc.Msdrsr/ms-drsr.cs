@@ -2480,6 +2480,7 @@ namespace ms_drsr
 
 		public void Decode(IRpcDecoder decoder)
 		{
+			this.unionSwitch = decoder.ReadUInt32();
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -4803,7 +4804,7 @@ namespace ms_drsr
 		{
 			encoder.WriteFixedStruct(this.uuidDsaObjDest, NdrAlignment._4Byte);
 			encoder.WriteFixedStruct(this.uuidInvocIdSrc, NdrAlignment._4Byte);
-			encoder.WriteConformantStruct(this.pNC.value, NdrAlignment._4Byte);
+			encoder.WritePointer(this.pNC);
 			encoder.WriteFixedStruct(this.usnvecFrom, NdrAlignment._8Byte);
 			encoder.WritePointer(this.pUpToDateVecDestV1);
 			encoder.WriteValue(this.ulFlags);
@@ -4818,8 +4819,7 @@ namespace ms_drsr
 		{
 			this.uuidDsaObjDest = decoder.ReadUuid();
 			this.uuidInvocIdSrc = decoder.ReadUuid();
-			this.pNC = new RpcPointer<DSNAME>();
-			decoder.ReadConformantStructBody<DSNAME>(ref this.pNC.value, NdrAlignment._4Byte);
+			this.pNC = decoder.ReadUniquePointer<DSNAME>();
 			this.usnvecFrom = decoder.ReadFixedStruct<USN_VECTOR>(NdrAlignment._8Byte);
 			this.pUpToDateVecDestV1 = decoder.ReadUniquePointer<UPTODATE_VECTOR_V1_EXT>();
 			this.ulFlags = decoder.ReadUInt32();
@@ -4834,6 +4834,7 @@ namespace ms_drsr
 		{
 			encoder.WriteStructDeferral(this.uuidDsaObjDest);
 			encoder.WriteStructDeferral(this.uuidInvocIdSrc);
+			encoder.WriteConformantStruct(this.pNC.value, NdrAlignment._4Byte);
 			encoder.WriteStructDeferral(this.pNC.value);
 			encoder.WriteStructDeferral(this.usnvecFrom);
 			if (this.pUpToDateVecDestV1 is not null)
@@ -4850,6 +4851,7 @@ namespace ms_drsr
 		{
 			decoder.ReadUuidDeferral(ref this.uuidDsaObjDest);
 			decoder.ReadUuidDeferral(ref this.uuidInvocIdSrc);
+			decoder.ReadConformantStructBody<DSNAME>(ref this.pNC.value, NdrAlignment._4Byte);
 			decoder.ReadStructDeferral<DSNAME>(ref this.pNC.value);
 			decoder.ReadStructDeferral<USN_VECTOR>(ref this.usnvecFrom);
 			if (this.pUpToDateVecDestV1 is not null)
@@ -4997,7 +4999,7 @@ namespace ms_drsr
 		{
 			encoder.WriteFixedStruct(this.uuidDsaObjDest, NdrAlignment._4Byte);
 			encoder.WriteFixedStruct(this.uuidInvocIdSrc, NdrAlignment._4Byte);
-			encoder.WriteConformantStruct(this.pNC.value, NdrAlignment._4Byte);
+			encoder.WritePointer(this.pNC);
 			encoder.WriteFixedStruct(this.usnvecFrom, NdrAlignment._8Byte);
 			encoder.WritePointer(this.pUpToDateVecDest);
 			encoder.WriteValue(this.ulFlags);
@@ -5016,8 +5018,7 @@ namespace ms_drsr
 		{
 			this.uuidDsaObjDest = decoder.ReadUuid();
 			this.uuidInvocIdSrc = decoder.ReadUuid();
-			this.pNC = new RpcPointer<DSNAME>();
-			decoder.ReadConformantStructBody<DSNAME>(ref this.pNC.value, NdrAlignment._4Byte);
+			this.pNC = decoder.ReadUniquePointer<DSNAME>();
 			this.usnvecFrom = decoder.ReadFixedStruct<USN_VECTOR>(NdrAlignment._8Byte);
 			this.pUpToDateVecDest = decoder.ReadUniquePointer<UPTODATE_VECTOR_V1_EXT>();
 			this.ulFlags = decoder.ReadUInt32();
@@ -5036,6 +5037,7 @@ namespace ms_drsr
 		{
 			encoder.WriteStructDeferral(this.uuidDsaObjDest);
 			encoder.WriteStructDeferral(this.uuidInvocIdSrc);
+			encoder.WriteConformantStruct(this.pNC.value, NdrAlignment._4Byte);
 			encoder.WriteStructDeferral(this.pNC.value);
 			encoder.WriteStructDeferral(this.usnvecFrom);
 			if (this.pUpToDateVecDest is not null)
@@ -5065,6 +5067,7 @@ namespace ms_drsr
 		{
 			decoder.ReadUuidDeferral(ref this.uuidDsaObjDest);
 			decoder.ReadUuidDeferral(ref this.uuidInvocIdSrc);
+			decoder.ReadConformantStructBody<DSNAME>(ref this.pNC.value, NdrAlignment._4Byte);
 			decoder.ReadStructDeferral<DSNAME>(ref this.pNC.value);
 			decoder.ReadStructDeferral<USN_VECTOR>(ref this.usnvecFrom);
 			if (this.pUpToDateVecDest is not null)
@@ -5181,7 +5184,7 @@ namespace ms_drsr
 		{
 			encoder.WriteFixedStruct(this.uuidDsaObjDest, NdrAlignment._4Byte);
 			encoder.WriteFixedStruct(this.uuidInvocIdSrc, NdrAlignment._4Byte);
-			encoder.WriteConformantStruct(this.pNC.value, NdrAlignment._4Byte);
+			encoder.WritePointer(this.pNC);
 			encoder.WriteFixedStruct(this.usnvecFrom, NdrAlignment._8Byte);
 			encoder.WritePointer(this.pUpToDateVecDest);
 			encoder.WriteValue(this.ulFlags);
@@ -5195,6 +5198,7 @@ namespace ms_drsr
 			encoder.WriteValue(this.ulMoreFlags);
 			encoder.WriteValue(this.correlationID);
 			encoder.WritePointer(this.pReservedBuffer);
+			encoder.WriteConformantStruct(this.pNC.value, NdrAlignment._4Byte);
 		}
 
 		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
@@ -5202,8 +5206,7 @@ namespace ms_drsr
 		{
 			this.uuidDsaObjDest = decoder.ReadUuid();
 			this.uuidInvocIdSrc = decoder.ReadUuid();
-			this.pNC = new RpcPointer<DSNAME>();
-			decoder.ReadConformantStructBody<DSNAME>(ref this.pNC.value, NdrAlignment._4Byte);
+			this.pNC = decoder.ReadUniquePointer<DSNAME>();
 			this.usnvecFrom = decoder.ReadFixedStruct<USN_VECTOR>(NdrAlignment._8Byte);
 			this.pUpToDateVecDest = decoder.ReadUniquePointer<UPTODATE_VECTOR_V1_EXT>();
 			this.ulFlags = decoder.ReadUInt32();
@@ -5217,6 +5220,7 @@ namespace ms_drsr
 			this.ulMoreFlags = decoder.ReadUInt32();
 			this.correlationID = decoder.ReadUuid();
 			this.pReservedBuffer = decoder.ReadUniquePointer<VAR_SIZE_BUFFER_WITH_VERSION>();
+			this.pNC.value = decoder.ReadConformantStruct<DSNAME>(NdrAlignment._4Byte);
 		}
 
 		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
@@ -5326,6 +5330,7 @@ namespace ms_drsr
 
 		public void Decode(IRpcDecoder decoder)
 		{
+			this.unionSwitch = decoder.ReadUInt32();
 			switch (this.unionSwitch)
 			{
 				case 4U:
@@ -9052,6 +9057,7 @@ namespace ms_drsr
 		public DRS_MSG_ADDENTRYREQ_V3 V3;
 		public void Encode(IRpcEncoder encoder)
 		{
+			encoder.WriteValue(this.unionSwitch);
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -9346,6 +9352,7 @@ namespace ms_drsr
 
 		public void Decode(IRpcDecoder decoder)
 		{
+			this.unionSwitch = decoder.ReadUInt32();
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -9495,6 +9502,7 @@ namespace ms_drsr
 
 		public void Decode(IRpcDecoder decoder)
 		{
+			this.unionSwitch = decoder.ReadUInt32();
 			switch (this.unionSwitch)
 			{
 				case 1U:

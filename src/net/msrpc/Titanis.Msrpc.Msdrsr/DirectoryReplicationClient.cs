@@ -17,60 +17,6 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msdrsr
 {
-	// [MS-DRSR] § 5.39 DRS_EXTENSIONS_INT
-	[Flags]
-	enum DrsBindFlags : uint
-	{
-		None = 0,
-
-		Base = 1,
-		AsyncRepl = 2,
-		RemoveApi = 4,
-		MoveReqV2 = 8,
-		GetChgDeflate = 0x10,
-		DcinfoV1 = 0x20,
-		RestoreUsnOptimization = 0x40,
-		AddEntry = 0x80,
-		KccExecute = 0x100,
-		AddEntryV2 = 0x200,
-		LinkedValueReplication = 0x400,
-		DcinfoV2 = 0x800,
-		InstanceTypeNotRequiredOnMod = 0x1000,
-		CryptoBind = 0x2000,
-		GetReplInfo = 0x4000,
-		StrongEncryption = 0x8000,
-		DcinfoVF = 0x1_0000,
-		TransitiveMembership = 0x2_0000,
-		AddSidHistory = 0x4_0000,
-		PostBeta3 = 0x8_0000,
-		GetChgReqV5 = 0x10_0000,
-		GetMemberships2 = 0x20_0000,
-		GetChgReqV6 = 0x40_0000,
-		NondomainNcs = 0x80_0000,
-		GetChgReqV8 = 0x100_0000,
-		GetChgReplyV5 = 0x200_0000,
-		GetChgReplyV6 = 0x400_0000,
-		WhistlerBeta3 = 0x800_0000,
-		W2K3Deflate = 0x1000_0000,
-		GetChgReqV10 = 0x2000_0000,
-		Res1 = 0x4000_0000,
-		Res2 = 0x8000_0000,
-	}
-
-	// [MS-DRSR] § 5.39 DRS_EXTENSIONS_INT
-	[PduStruct]
-	[PduByteOrder(PduByteOrder.LittleEndian)]
-	partial struct DRS_EXTENSIONS_INT
-	{
-		public DrsBindFlags BindFlags { get; set; }
-		public Guid SiteObjGuid { get; set; }
-		public int Pid { get; set; }
-		public int ReplEpoch { get; set; }
-		public uint MoreFlags { get; set; }
-		public Guid ConfigObjGuid { get; set; }
-		public int ExtCaps { get; set; }
-	}
-
 	public class DirectoryReplicationClient : RpcServiceClient<ms_drsr.drsuapiClientProxy>
 	{
 		public DirectoryReplicationClient()
@@ -91,44 +37,67 @@ namespace Titanis.Msrpc.Msdrsr
 		private const string LmPwdHistoryOid = "1.2.840.113556.1.4.160";
 		private const string DbcsPwdOid = "1.2.840.113556.1.4.55";
 
-		// [MS-DRSR] 5.138 NTSAPI_CLIENT_GUID
-		private static readonly Guid NtdsapiClientGuid = new Guid("e24d201a-4fd6-11d1-a3da-0000f875ae0d");
+		// [MS-DRSR] 5.138 NTSAPI_CLIENT_GUID [sic]
+		public static readonly Guid NtdsapiClientGuid = new Guid("e24d201a-4fd6-11d1-a3da-0000f875ae0d");
 
 		internal Task Unbind(RpcContextHandle hbind, CancellationToken cancellationToken)
 		{
 			return this._proxy.IDL_DRSUnbind(new RpcPointer<RpcContextHandle>(hbind), cancellationToken);
 		}
 
-		public async Task<DsBinding> Dsbind(CancellationToken cancellationToken)
+		// Windows 2025 dcpromo
+		public const DrsBindFlags Windows2025BindFlags = 0 // (DrsBindFlags)0x3ffffb7f;
+			| DrsBindFlags.Base
+			| DrsBindFlags.AsyncRepl
+			| DrsBindFlags.RemoveApi
+			| DrsBindFlags.MoveReqV2
+			| DrsBindFlags.GetChgDeflate
+			| DrsBindFlags.DcinfoV1
+			| DrsBindFlags.RestoreUsnOptimization
+			| DrsBindFlags.KccExecute
+			| DrsBindFlags.AddEntryV2
+			| DrsBindFlags.DcinfoV2
+			| DrsBindFlags.InstanceTypeNotRequiredOnMod
+			| DrsBindFlags.CryptoBind
+			| DrsBindFlags.GetReplInfo
+			| DrsBindFlags.StrongEncryption
+			| DrsBindFlags.DcinfoVF
+			| DrsBindFlags.TransitiveMembership
+			| DrsBindFlags.AddSidHistory
+			| DrsBindFlags.PostBeta3
+			| DrsBindFlags.GetChgReqV5
+			| DrsBindFlags.GetMemberships2
+			| DrsBindFlags.GetChgReqV6
+			| DrsBindFlags.NondomainNcs
+			| DrsBindFlags.GetChgReqV8
+			| DrsBindFlags.GetChgReplyV5
+			| DrsBindFlags.GetChgReplyV6
+			| DrsBindFlags.WhistlerBeta3
+			| DrsBindFlags.W2K3Deflate
+			| DrsBindFlags.GetChgReqV10
+			;
+
+
+		public Task<DsBinding> Dsbind(CancellationToken cancellationToken)
+			=> Dsbind(NtdsapiClientGuid, Guid.Empty, 1116, cancellationToken, Windows2025BindFlags);
+		public async Task<DsBinding> Dsbind(Guid clientGuid, Guid siteGuid, int pid, CancellationToken cancellationToken, DrsBindFlags flags = Windows2025BindFlags)
 		{
 			DceRpc.RpcPointer<DceRpc.RpcContextHandle> phDrs = new();
-			Guid dsaGuid = NtdsapiClientGuid;
-			Guid siteGuid = new Guid();
-
-			DrsBindFlags flags = 0
-				// Required
-				| DrsBindFlags.Base
-				| DrsBindFlags.RestoreUsnOptimization
-				| DrsBindFlags.InstanceTypeNotRequiredOnMod
-				| DrsBindFlags.PostBeta3
-				| DrsBindFlags.GetChgReplyV5
-
-				| DrsBindFlags.CryptoBind
-
-				| DrsBindFlags.GetChgReqV6
-				| DrsBindFlags.GetChgReplyV6
-				| DrsBindFlags.GetChgReqV8
-				| DrsBindFlags.StrongEncryption
-				| DrsBindFlags.NondomainNcs;
-			flags = (DrsBindFlags)0x05C08000;
 
 			// [MS-DRSR] § 5.39 DRS_EXTENSIONS_INT
 			ByteWriter writer = new ByteWriter();
-			writer.WritePduStruct(new DRS_EXTENSIONS_INT
+			writer.WritePduStruct(new DRS_EXTENSIONS_INT2
 			{
-				BindFlags = flags,
-				SiteObjGuid = siteGuid,
-				ExtCaps = 0x7
+				ext1 = new DRS_EXTENSIONS_INT
+				{
+					BindFlags = flags,
+					SiteObjGuid = siteGuid,
+					Pid = pid,
+					ReplEpoch = 0,
+					MoreFlags = (DrsBindMoreFlags)0x0000080e,
+					ConfigObjGuid = default,
+				},
+				ExtCaps = 0x00001fff
 			});
 
 			DceRpc.RpcPointer<ms_drsr.DRS_EXTENSIONS> pextClient = new(new ms_drsr.DRS_EXTENSIONS
@@ -136,15 +105,9 @@ namespace Titanis.Msrpc.Msdrsr
 				cb = (uint)writer.Length,
 				rgb = writer.GetData().ToArray()
 			});
-			pextClient = new DceRpc.RpcPointer<ms_drsr.DRS_EXTENSIONS>(new ms_drsr.DRS_EXTENSIONS()
-			{
-				cb = (uint)writer.Length,
-				rgb = writer.GetData().ToArray()
-			});
-			dsaGuid = NtdsapiClientGuid;
 			DceRpc.RpcPointer<DceRpc.RpcPointer<ms_drsr.DRS_EXTENSIONS>> ppextServer = new();
 			var res = (Win32ErrorCode)await this._proxy.IDL_DRSBind(
-				new DceRpc.RpcPointer<Guid>(dsaGuid),
+				new DceRpc.RpcPointer<Guid>(clientGuid),
 				pextClient,
 				ppextServer,
 				phDrs,
@@ -153,9 +116,22 @@ namespace Titanis.Msrpc.Msdrsr
 			res.CheckAndThrow();
 
 			//if ((ppextServer.value?.value.cb ?? 0) >= DRS_EXTENSIONS_INT.PduStructSize)
-			var serverExt = new ByteMemoryReader(ppextServer.value.value.rgb).ReadPduStruct<DRS_EXTENSIONS_INT>();
+			var reader = new ByteMemoryReader(ppextServer.value.value.rgb);
+			DRS_EXTENSIONS_INT2 serverExt;
+			if (reader.Length >= DRS_EXTENSIONS_INT2.PduStructSize)
+			{
+				serverExt = reader.ReadPduStruct<DRS_EXTENSIONS_INT2>();
+			}
+			else
+			{
+				serverExt = new DRS_EXTENSIONS_INT2
+				{
+					ext1 = reader.ReadPduStruct<DRS_EXTENSIONS_INT>(),
+					ExtCaps = 0
+				};
+			}
 
-			return new DsBinding(phDrs.value, this);
+			return new DsBinding(phDrs.value, this, serverExt);
 		}
 
 		record class ReplicateReq(

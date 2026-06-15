@@ -1,12 +1,20 @@
 ﻿using ms_drsr;
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
+using Titanis.Compression;
 using Titanis.DceRpc;
+using Titanis.IO;
+using Titanis.Ldap;
 using Titanis.Winterop;
 
 namespace Titanis.Msrpc.Msdrsr
@@ -19,15 +27,16 @@ namespace Titanis.Msrpc.Msdrsr
 
 	public class DsBinding : IDisposable, IAsyncDisposable
 	{
-		internal DsBinding(RpcContextHandle hbind, DirectoryReplicationClient owner)
+		internal DsBinding(RpcContextHandle hbind, DirectoryReplicationClient owner, DRS_EXTENSIONS_INT2 serverExt)
 		{
 			this.hbind = hbind;
 			this.owner = owner;
+			this.serverExt = serverExt;
 		}
 
 		private readonly RpcContextHandle hbind;
 		private readonly DirectoryReplicationClient owner;
-
+		private readonly DRS_EXTENSIONS_INT2 serverExt;
 		private bool _isDisposed;
 
 		protected virtual void Dispose(bool disposing)
@@ -105,14 +114,145 @@ namespace Titanis.Msrpc.Msdrsr
 			return dcInfos;
 		}
 
-		public async Task GetNcChanges(
+		// [MS-DRSR] § 5.16.4 ATTRTYP-to-OID Conversion
+		private static readonly Dictionary<string, int> defaultPrefixLookup = new Dictionary<string, int>()
+		{
+			{ "2.5.4", 0 },
+			{ "2.5.6", 1 },
+			{ "1.2.840.113556.1.2", 2 },
+			{ "1.2.840.113556.1.3", 3 },
+			{ "2.16.840.1.101.2.2.1", 4 },
+			{ "2.16.840.1.101.2.2.3", 5 },
+			{ "2.16.840.1.101.2.1.5", 6 },
+			{ "2.16.840.1.101.2.1.4", 7 },
+			{ "2.5.5", 8 },
+			{ "1.2.840.113556.1.4", 9 },
+			{ "1.2.840.113556.1.5", 10 },
+			{ "0.9.2342.19200300.100", 19 },
+			{ "2.16.840.1.113730.3", 20 },
+			{ "0.9.2342.19200300.100.1", 21 },
+			{ "2.16.840.1.113730.3.1", 22 },
+			{ "1.2.840.113556.1.5.7000", 23 },
+			{ "2.5.21", 24 },
+			{ "2.5.18", 25 },
+			{ "2.5.20", 26 },
+
+		};
+		public async Task Add(DsName name, IReadOnlyList<LdapAttribute> attributes, CancellationToken cancellationToken)
+		{
+			RpcPointer<uint> pdwOutVersion = new();
+			RpcPointer<DRS_MSG_ADDENTRYREPLY> pmsgOut = new();
+			var res = await owner.proxy.IDL_DRSAddEntry(
+				hbind,
+				2,
+				new DRS_MSG_ADDENTRYREQ
+				{
+					unionSwitch = 2,
+					V2 = new DRS_MSG_ADDENTRYREQ_V2
+					{
+						EntInfList = new ENTINFLIST
+						{
+							Entinf = new ENTINF
+							{
+								pName = name.ToRpcDsName(),
+								ulFlags = 0,
+								AttrBlock = CreateAttrBlock(attributes, defaultPrefixLookup, null)
+							}
+						}
+					}
+				},
+				pdwOutVersion,
+				pmsgOut,
+				cancellationToken
+				).ConfigureAwait(false);
+		}
+
+		private static ATTRBLOCK CreateAttrBlock(
+			IReadOnlyList<LdapAttribute> attributes,
+			Dictionary<string, int> prefixLookup,
+			List<PrefixTableEntry>? prefixList
+			)
+		{
+			ATTR[] attrs = new ATTR[attributes.Count];
+			for (int i = 0; i < attributes.Count; i++)
+			{
+				LdapAttribute? attribute = attributes[i];
+
+				ATTR attr = new ATTR
+				{
+					attrTyp = OidToAttrtyp(attribute.AttributeType.Oid, prefixLookup, prefixList),
+					AttrVal = new ATTRVALBLOCK
+					{
+						valCount = (uint)attribute.Values.Length,
+						pAVal = new RpcPointer<ATTRVAL[]>(Array.ConvertAll(attribute.Values, r =>
+						{
+							var bytes = attribute.AttributeType.Syntax.EncodeDsrep(r);
+							return new ATTRVAL { valLen = (uint)bytes.Length, pVal = new RpcPointer<byte[]>(bytes) };
+						}))
+					}
+				};
+				attrs[i] = attr;
+			}
+			return new ATTRBLOCK { attrCount = (uint)attrs.Length, pAttr = new RpcPointer<ATTR[]>(attrs) };
+		}
+
+		private static uint OidToAttrtyp(
+			string attrOid,
+			Dictionary<string, int> prefixLookup,
+			List<PrefixTableEntry>? prefixList
+			)
+		{
+			if (attrOid is null)
+				return 0;
+
+			//var m = rgxOid.Match(attrOid);
+
+			int isep = attrOid.LastIndexOf('.');
+			bool isValid;
+			int prefixIndex;
+			if (isep > 0)
+			{
+				try
+				{
+					ushort last = ushort.Parse(attrOid.Substring(isep + 1));
+					string prefix = attrOid.Substring(0, isep);
+					if (!prefixLookup.TryGetValue(prefix, out prefixIndex))
+					{
+						var oid = new Asn1Oid(prefix);
+						var bytes = Asn1DerEncoder.EncodeValue(oid).ToArray();
+						prefixIndex = prefixList.Count;
+						prefixList.Add(new PrefixTableEntry { ndx = (uint)prefixIndex, prefix = new OID_t { length = (uint)bytes.Length, elements = new RpcPointer<byte[]>(bytes) } });
+						prefixLookup.Add(prefix, prefixIndex);
+
+						isValid = true;
+					}
+					else
+						isValid = true;
+
+					var tag = (uint)(prefixIndex << 16) | last;
+					return tag;
+				}
+				catch
+				{
+					isValid = false;
+				}
+			}
+
+			throw new ArgumentException($"Attribute OID '{attrOid}' is invalid.", nameof(attrOid));
+		}
+
+		public async Task<UsnVector> GetNcChanges(
 			DomainControllerInfo dcInfo,
 			IAsyncEnumerable<DsName> objectNames,
 			string[] attributeOids,
-			int count,
+			int maxObjCount,
+			int maxByteCount,
+			UsnVector usnvecFrom_,
 			IDrsChangeCallback callback,
 			int parallelDegree,
-			CancellationToken cancellationToken)
+			ExtendedOpRequest exop,
+			CancellationToken cancellationToken
+			)
 		{
 			ArgumentNullException.ThrowIfNull(attributeOids);
 			ArgumentNullException.ThrowIfNull(callback);
@@ -125,46 +265,11 @@ namespace Titanis.Msrpc.Msdrsr
 				List<uint> attrTagsList = new List<uint>(attributeOids.Length);
 				foreach (var attrOid in attributeOids)
 				{
-					if (attrOid is null)
+					var tag = OidToAttrtyp(attrOid, prefixLookup, prefixList);
+					if (tag == 0)
 						continue;
 
-					//var m = rgxOid.Match(attrOid);
-
-					int isep = attrOid.LastIndexOf('.');
-					bool isValid;
-					int prefixIndex;
-					if (isep > 0)
-					{
-						try
-						{
-							ushort last = ushort.Parse(attrOid.Substring(isep + 1));
-							string prefix = attrOid.Substring(0, isep);
-							if (!prefixLookup.TryGetValue(prefix, out prefixIndex))
-							{
-								var oid = new Asn1Oid(prefix);
-								var bytes = Asn1DerEncoder.EncodeValue(oid).ToArray();
-								prefixIndex = prefixList.Count;
-								prefixList.Add(new PrefixTableEntry { ndx = (uint)prefixIndex, prefix = new OID_t { length = (uint)bytes.Length, elements = new RpcPointer<byte[]>(bytes) } });
-								prefixLookup.Add(prefix, prefixIndex);
-
-								isValid = true;
-							}
-							else
-								isValid = true;
-
-							var tag = (uint)(prefixIndex << 16) | last;
-							attrTagsList.Add(tag);
-						}
-						catch
-						{
-							isValid = false;
-						}
-					}
-					else
-						isValid = true;
-
-					if (!isValid)
-						throw new ArgumentException($"Attribute OID '{attrOid}' is invalid.", nameof(attributeOids));
+					attrTagsList.Add(tag);
 				}
 
 				attrTags = attrTagsList.ToArray();
@@ -174,140 +279,289 @@ namespace Titanis.Msrpc.Msdrsr
 			ArgumentNullException.ThrowIfNull(dcInfo);
 			ArgumentNullException.ThrowIfNull(objectNames);
 
+			// Replication parameters
+			Guid clientGuid = dcInfo.NtdsDsaObjectGuid;
+			Guid invocIdSrc = dcInfo.NtdsDsaObjectGuid;
+			DrsOptions options = DrsOptions.WriteRep | DrsOptions.InitSync | DrsOptions.PeriodicSync | DrsOptions.GetNcSize | DrsOptions.NeverSynced | DrsOptions.UseCompression | DrsOptions.GetAllGroupMembership;
+
 			var sessionKey = this.owner.proxy.BoundAuthContext.AuthContext.GetSessionKey().ToArray();
 
 			await Parallel.ForEachAsync(objectNames, new ParallelOptions() { CancellationToken = cancellationToken, MaxDegreeOfParallelism = Math.Max(1, parallelDegree) }, async (objectName, cancellationToken) =>
 			{
-				RpcPointer<DRS_MSG_GETCHGREPLY> pmsgOut = new();
-				RpcPointer<uint> pdwOutVersion = new();
-				var res = (Win32ErrorCode)await owner.proxy.IDL_DRSGetNCChanges(
-					hbind,
-					8,
-					new DRS_MSG_GETCHGREQ()
+				bool more;
+				USN_VECTOR usnvecFrom = usnvecFrom_.vec;
+				Task? prevOutputTask = null;
+
+				do
+				{
+					RpcPointer<DRS_MSG_GETCHGREPLY> pmsgOut = new();
+					RpcPointer<uint> pdwOutVersion = new();
+					DRS_MSG_GETCHGREQ getchgreq;
+
+					//// V11
+					//if (0 != (this.serverExt.ext1.MoreFlags & DrsBindMoreFlags.RpcCorrelationId1))
+					//{
+					//	throw new NotImplementedException();
+					//}
+					// V10
+					if (0 != (this.serverExt.ext1.BindFlags & DrsBindFlags.GetChgReqV10))
 					{
-						unionSwitch = 8,
-						V8 = new DRS_MSG_GETCHGREQ_V8()
+						getchgreq = new()
 						{
-							uuidDsaObjDest = dcInfo.NtdsDsaObjectGuid,
-							uuidInvocIdSrc = dcInfo.NtdsDsaObjectGuid,
-							pNC = objectName.ToRpcDsName(),
-							usnvecFrom = default,
-							pUpToDateVecDest = null,
-							ulFlags = (uint)(DrsOptions.InitSync | DrsOptions.WriteRep),
-							cMaxObjects = (uint)count,
-							cMaxBytes = 0,
-							ulExtendedOp = (uint)ExtendedOpRequest.ReplObject,
-							pPartialAttrSet = new RpcPointer<PARTIAL_ATTR_VECTOR_V1_EXT>(new PARTIAL_ATTR_VECTOR_V1_EXT()
+							unionSwitch = 10,
+							V10 = new DRS_MSG_GETCHGREQ_V10()
 							{
-								dwVersion = 1,
-								cAttrs = (uint)attrTags.Length,
-								rgPartialAttr = attrTags,
-							}),
-							PrefixTableDest = new SCHEMA_PREFIX_TABLE
-							{
-								PrefixCount = (uint)prefixes.Length,
-								pPrefixEntry = new RpcPointer<PrefixTableEntry[]>(prefixes)
+								uuidDsaObjDest = clientGuid,
+								uuidInvocIdSrc = invocIdSrc,
+								pNC = objectName.ToRpcDsName(),
+								usnvecFrom = usnvecFrom,
+								pUpToDateVecDest = null,
+								ulFlags = (uint)options,
+								cMaxObjects = (uint)maxObjCount,
+								cMaxBytes = (uint)maxByteCount,
+								ulExtendedOp = (uint)exop,
+								liFsmoInfo = default,
+								pPartialAttrSet = new RpcPointer<PARTIAL_ATTR_VECTOR_V1_EXT>(new PARTIAL_ATTR_VECTOR_V1_EXT()
+								{
+									dwVersion = 1,
+									cAttrs = (uint)attrTags.Length,
+									rgPartialAttr = attrTags,
+								}),
+								PrefixTableDest = new SCHEMA_PREFIX_TABLE
+								{
+									PrefixCount = (uint)prefixes.Length,
+									pPrefixEntry = new RpcPointer<PrefixTableEntry[]>(prefixes)
+								},
+								// TODO: More options
+								ulMoreFlags = 0
 							}
-						}
-					},
-					pdwOutVersion,
-					pmsgOut,
-					cancellationToken).ConfigureAwait(false);
-				try
-				{
-					res.CheckAndThrow();
-				}
-				catch (Exception ex)
-				{
-					await callback.OnError(objectName, ex).ConfigureAwait(false);
-					return;
-				}
-
-				DsObject obj;
-				switch (pdwOutVersion.value)
-				{
-					case 6:
+						};
+					}
+					// V8
+					else if (0 != (this.serverExt.ext1.BindFlags & DrsBindFlags.GetChgReqV8))
+					{
+						getchgreq = new()
 						{
-							var rep6 = pmsgOut.value.V6;
-							var prefixTable = DirectoryReplicationClient.DecodePrefixTable(rep6.PrefixTableSrc.pPrefixEntry.value);
-
-							var pObj = rep6.pObjects;
-							while (pObj != null)
+							unionSwitch = 8,
+							V8 = new DRS_MSG_GETCHGREQ_V8()
 							{
-								var name = new DsName(pObj.value.Entinf.pName.value);
-								var attrs = DirectoryReplicationClient.AttrsFromBlock(in pObj.value.Entinf.AttrBlock, name.Sid?.Rid ?? 0, prefixTable, sessionKey);
-
-								obj = new DsObject(name, attrs);
-
-								await callback.OnObjectReplicated(obj).ConfigureAwait(false);
-
-								pObj = pObj.value.pNextEntInf;
+								uuidDsaObjDest = clientGuid,
+								uuidInvocIdSrc = invocIdSrc,
+								pNC = objectName.ToRpcDsName(),
+								usnvecFrom = usnvecFrom,
+								pUpToDateVecDest = null,
+								ulFlags = (uint)options,
+								cMaxObjects = (uint)maxObjCount,
+								cMaxBytes = (uint)maxByteCount,
+								ulExtendedOp = (uint)exop,
+								liFsmoInfo = default,
+								pPartialAttrSet = new RpcPointer<PARTIAL_ATTR_VECTOR_V1_EXT>(new PARTIAL_ATTR_VECTOR_V1_EXT()
+								{
+									dwVersion = 1,
+									cAttrs = (uint)attrTags.Length,
+									rgPartialAttr = attrTags,
+								}),
+								pPartialAttrSetEx = null,
+								PrefixTableDest = new SCHEMA_PREFIX_TABLE
+								{
+									PrefixCount = (uint)prefixes.Length,
+									pPrefixEntry = new RpcPointer<PrefixTableEntry[]>(prefixes)
+								}
 							}
-						}
-						break;
-					default:
-						await callback.OnError(objectName, new NotSupportedException($"Server responded with unsupported message version {pdwOutVersion.value}.")).ConfigureAwait(false);
-						break;
-				}
+						};
+					}
+					// V7 - Not used
+					// V6 - Not used
+					// V5
+					else if (0 != (this.serverExt.ext1.BindFlags & DrsBindFlags.GetChgReqV5))
+					{
+						getchgreq = new()
+						{
+							unionSwitch = 5,
+							V5 = new DRS_MSG_GETCHGREQ_V5()
+							{
+								uuidDsaObjDest = clientGuid,
+								uuidInvocIdSrc = invocIdSrc,
+								pNC = objectName.ToRpcDsName(),
+								usnvecFrom = usnvecFrom,
+								pUpToDateVecDestV1 = null,
+								ulFlags = (uint)options,
+								cMaxObjects = (uint)maxObjCount,
+								cMaxBytes = (uint)maxByteCount,
+								ulExtendedOp = (uint)exop,
+								liFsmoInfo = default,
+							}
+						};
+					}
+					else
+					{
+						getchgreq = new DRS_MSG_GETCHGREQ()
+						{
+							unionSwitch = 4,
+							V4 = new DRS_MSG_GETCHGREQ_V4()
+							{
+								uuidTransportObj = default,
+								pmtxReturnAddress = new RpcPointer<MTX_ADDR>(new MTX_ADDR { mtx_name = [], mtx_namelen = 0 }),
+								V3 = new DRS_MSG_GETCHGREQ_V3
+								{
+									uuidDsaObjDest = clientGuid,
+									uuidInvocIdSrc = invocIdSrc,
+									pNC = objectName.ToRpcDsName(),
+									usnvecFrom = usnvecFrom,
+									pUpToDateVecDestV1 = null,
+									ulExtendedOp = (uint)exop,
+								}
+							}
+						};
+					}
+
+					var res = (Win32ErrorCode)await owner.proxy.IDL_DRSGetNCChanges(
+						hbind,
+						getchgreq.unionSwitch,
+						getchgreq,
+						pdwOutVersion,
+						pmsgOut,
+						cancellationToken).ConfigureAwait(false);
+					try
+					{
+						res.CheckAndThrow();
+					}
+					catch (Exception ex)
+					{
+						await callback.OnError(objectName, ex).ConfigureAwait(false);
+						return;
+					}
+
+					if (prevOutputTask != null)
+						await prevOutputTask.ConfigureAwait(false);
+
+					ReplicateResult repres;
+					switch (pdwOutVersion.value)
+					{
+						case 7:
+							repres = HandleV7Reply(callback, sessionKey, pmsgOut.value.V7);
+							break;
+						case 6:
+							repres = HandleV6Reply(callback, sessionKey, pmsgOut.value.V6);
+							break;
+						default:
+							await callback.OnError(objectName, new NotSupportedException($"Server responded with unsupported message version {pdwOutVersion.value}.")).ConfigureAwait(false);
+							return;
+					}
+
+					prevOutputTask = repres.outputTask;
+					more = repres.more;
+					usnvecFrom = repres.usnvec;
+					usnvecFrom_ = new UsnVector(usnvecFrom);
+				} while (more);
+
+				if (prevOutputTask != null)
+					await prevOutputTask.ConfigureAwait(false);
 			}).ConfigureAwait(false);
+
+			return usnvecFrom_;
 		}
 
-		// [MS-DRSR] § 5.41 DRS_OPTIONS
-		[Flags]
-		enum DrsOptions : uint
+		record struct ReplicateResult(bool more, USN_VECTOR usnvec, Task outputTask);
+
+		private static ReplicateResult HandleV7Reply(IDrsChangeCallback callback, byte[] sessionKey, DRS_MSG_GETCHGREPLY_V7 v7)
 		{
-			None,
-			Async = 1,
-			GetChgCheck = 2,
-			UpdateNotification = 2,
-			AddRef = 4,
-			SyncAll = 8,
-			DelRef = 8,
-			WriteRep = 0x10,
-			InitSync = 0x20,
-			PeriodicSync = 0x40,
-			MailRep = 0x80,
-			AsyncRep = 0x100,
-			IgnoreErrors = 0x100,
-			TwoWaySync = 0x200,
-			CriticalOnly = 0x400,
-			GetAncestors = 0x800,
-			GetNcSize = 0x1000,
-			LocalOnly = 0x1000,
-			NongcReadOnlyReplica = 0x2000,
-			SyncByName = 0x4000,
-			RefOk = 0x4000,
-			FullSyncNow = 0x8000,
-			NoSource = 0x8000,
-			FullSyncInProgress = 0x1_0000,
-			FullSyncPacket = 0x2_0000,
-			SyncRequeue = 0x4_0000,
-			Urgent = 0x8_0000,
-			GcSpn = 0x10_0000,
-			NoDiscard = 0x10_0000,
-			NeverSynced = 0x20_0000,
-			SpecialSecretProcessing = 0x40_0000,
-			InitSyncNow = 0x80_0000,
-			Preempted = 0x100_0000,
-			SyncForced = 0x200_0000,
-			DisableAutoSync = 0x400_0000,
-			DisablePeriodicSync = 0x800_0000,
-			UseCompression = 0x1000_0000,
-			NeverNotify = 0x2000_0000,
-			SyncPartial = 0x4000_0000,
-			GetAllGroupMembership = 0x8000_0000,
+			var compData = v7.CompressedAny.pbCompressedData.value;
+
+			byte[] message = new byte[v7.CompressedAny.cbUncompressedSize];
+			DecompressMessage((DRS_COMP_ALG_TYPE)v7.CompressionAlg, compData, message, 0);
+
+			var decoder = MsrpcNdrEncoding.MsrpcNdr.CreateDecoder(new IO.ByteMemoryReader(message), new RpcCallContext(null));
+			var v6 = decoder.DeserializeType1<DRS_MSG_GETCHGREPLY_V6>(d =>
+			{
+				var v6 = d.ReadFixedStruct<DRS_MSG_GETCHGREPLY_V6>(NdrAlignment.NativePtr);
+				v6.DecodeDeferrals(d);
+				return v6;
+			});
+			return HandleV6Reply(callback, sessionKey, v6);
 		}
 
-		// [MS-DRSR] § 4.1.10.2.22 EXOP_REQ Codes
-		enum ExtendedOpRequest
+		private static ReplicateResult HandleV6Reply(IDrsChangeCallback callback, byte[] sessionKey, DRS_MSG_GETCHGREPLY_V6 rep6)
 		{
-			FsmoReqRole = 1,
-			FsmoReqRidAlloc = 2,
-			FsmoRidReqRole = 3,
-			FsmoReqPdf = 4,
-			FsmoAbandonRole = 5,
-			ReplObject = 6,
-			ReplSecrets = 7,
+			var prefixTable = DirectoryReplicationClient.DecodePrefixTable(rep6.PrefixTableSrc.pPrefixEntry.value);
+
+			var pObj = rep6.pObjects;
+			Task outputTask = Task.Factory.StartNew(async () =>
+			{
+				while (pObj != null)
+				{
+					var name = new DsName(pObj.value.Entinf.pName.value);
+					var attrs = DirectoryReplicationClient.AttrsFromBlock(in pObj.value.Entinf.AttrBlock, name.Sid?.Rid ?? 0, prefixTable, sessionKey);
+
+					var obj = new DsObject(name, attrs);
+					await callback.OnObjectReplicated(obj).ConfigureAwait(false);
+
+					pObj = pObj.value.pNextEntInf;
+				}
+			}).Unwrap();
+
+			return new ReplicateResult(rep6.fMoreData != 0, rep6.usnvecTo, outputTask);
+		}
+
+		// [MS-DRSR] § 4.1.10.6.19 DecompressMessage
+		public static void DecompressMessage(
+			DRS_COMP_ALG_TYPE algorithm,
+			ReadOnlySpan<byte> compressed,
+			Span<byte> uncompressed,
+			int uncompPosition
+			)
+		{
+			if (compressed.Length == uncompressed.Length)
+			{
+				compressed.CopyTo(uncompressed);
+				return;
+			}
+
+			int cbInputProcessed = 0;
+			int cbDecomp = 0;
+			while (cbInputProcessed < compressed.Length)
+			{
+				var cbChunkDecompSize = BinaryPrimitives.ReadInt32LittleEndian(compressed.Slice(cbInputProcessed, 4));
+				cbInputProcessed += 4;
+				var cbChunkCompSize = BinaryPrimitives.ReadInt32LittleEndian(compressed.Slice(cbInputProcessed, 4));
+				cbInputProcessed += 4;
+
+				var compChunk = compressed.Slice(cbInputProcessed, cbChunkCompSize);
+
+				if (cbChunkDecompSize == cbChunkCompSize)
+				{
+					compChunk.CopyTo(uncompressed.Slice(cbDecomp, cbChunkDecompSize));
+				}
+				else
+				{
+					switch (algorithm)
+					{
+						case DRS_COMP_ALG_TYPE.DRS_COMP_ALG_WIN2K3:
+							Lz77.Decompress(compChunk, uncompressed.Slice(cbDecomp, cbChunkDecompSize), 0);
+							break;
+						case DRS_COMP_ALG_TYPE.DRS_COMP_ALG_MSZIP:
+							{
+								int cbDecomped = Mszip.Decompress(compChunk, uncompressed.Slice(0, cbDecomp + cbChunkDecompSize), cbDecomp);
+								Debug.Assert(cbDecomped == (cbDecomp + cbChunkDecompSize));
+							}
+							break;
+						case DRS_COMP_ALG_TYPE.DRS_COMP_ALG_NONE:
+						case DRS_COMP_ALG_TYPE.DRS_COMP_ALG_UNUSED:
+						default:
+							throw new NotImplementedException($"Unsupported compression algorithm: {algorithm}");
+							break;
+					}
+
+					cbInputProcessed += compChunk.Length;
+					cbDecomp += cbChunkDecompSize;
+				}
+
+				// Round up
+				cbInputProcessed = (cbInputProcessed + 3) & ~3;
+			}
+
+			Debug.Assert(cbInputProcessed == ((compressed.Length + 3) & ~3));
+			Debug.Assert(cbDecomp == uncompressed.Length);
 		}
 	}
 }

@@ -9,6 +9,10 @@ Titanis is a library of protocol implementations and command line utilities, wri
 * MSRPC ([MS-RPCE](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-RPCE/%5bMS-RPCE%5d.pdf))
 	* Endpoint mapper
 	* DCOM ([MS-DCOM](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-DCOM/%5bMS-DCOM%5d.pdf))
+	* Directory Replication ([MS-DRSR](https://winprotocoldoc.z19.web.core.windows.net/MS-DRSR/%5bMS-DRSR%5d.pdf))
+		* Tested with Windows Server 2008 and Windows Server 2025
+		* Supports both MS-ZIP and Xpress compression
+		* Supports replication of individual objects or entire partitions
 	* EFS ([MS-EFSR](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-EFSR/%5bMS-EFSR%5d.pdf))
 	* LSA ([MS-LSAD](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-LSAD/%5bMS-LSAD%5d.pdf) and [MS-LSAT](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-LSAT/%5bMS-LSAT%5d.pdf))
 	* Remote Registry ([MS-RRP](https://winprotocoldoc.z19.web.core.windows.net/MS-RRP/%5bMS-RRP%5d.pdf))
@@ -63,7 +67,6 @@ If you are a developer, see the [Developer Guide](doc/DevGuide/index.md) for inf
 
 # Planned Enhancements
 * Task Scheduler support ([MS-TSCH](https://winprotocoldoc.z19.web.core.windows.net/MS-TSCH/[MS-TSCH].pdf))
-* Simplified credential management
 * Integrated SOCKS 4a
 
 # Project Organization

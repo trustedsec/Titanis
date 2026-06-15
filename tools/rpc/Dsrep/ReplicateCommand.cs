@@ -10,13 +10,12 @@ using Titanis.Security;
 using Titanis.Security.Kerberos;
 using Titanis.Winterop.SamServer;
 
-namespace Dsrep;
+namespace Titanis.Cli.Dsrep;
 
 /// <task category="Directory Replication;Enumeration">Replicate secret attributes from a domain controller (DCSync)</task>
 /// <task category="Directory Replication;Enumeration">Export Kerberos keys for domain accounts to a .keytab file</task>
-[Command]
-[Description("Requests replica changes")]
 [OutputRecordType(typeof(LdapEntry), DefaultOutputStyle = OutputStyle.List, DefaultFields = [
+	nameof(LdapEntry.EntryName),
 	nameof(LdapAttributeTypes.SAMAccountName),
 	nameof(LdapAttributeTypes.GivenName),
 	nameof(LdapAttributeTypes.UserPrincipalName),
@@ -36,20 +35,27 @@ In addition to the standard attributes defined by Active Directory, you may quer
 [Example("Query for all objects with all attributes", "{0} -UserName milchick@LUMON -Password Br3@kr00m! LUMON-DC1", Tag = "milchick_all")]
 [Example("Query credentials for krbtgt and milchick", "{0} -UserName milchick@LUMON -Password Br3@kr00m! LUMON-DC1 krbtgt, \"CN=Seth Milchick,OU=Severed Floor,OU=Kier\\, PE,DC=lumon,DC=ind\" -OutputFields samAccountName, objectSid,  kerberosKeys, kerberosOldKeys, cleartextPassword, unicodePwd, lmPwdHistory, ntPwdHistory", Tag = "milchick_name_dn")]
 [Example("Query credentials for all administrators", "{0} -UserName milchick@LUMON -Password Br3@kr00m! LUMON-DC1 (memberOf*=<SID=S-1-5-32-544>) -OutputFields samAccountName, objectSid,  kerberosKeys, kerberosOldKeys, cleartextPassword, unicodePwd, lmPwdHistory, ntPwdHistory", Tag = "milchick_LdapQuery")]
-public class ReplicateCommand : DsbindCommand, IDrsChangeCallback
+public abstract class ReplicateCommand : DsbindCommand, IDrsChangeCallback, IHaveServerName
 {
-	[Parameter(After = nameof(RpcCommand.ServerName))]
-	[Description("DN, GUID, or SID of object to retrieve")]
-	public DsobjSpec[]? ObjectName { get; set; }
-
 	[Parameter]
 	[Description("Name of keytab file to export to")]
 	public string? ExportKeytab { get; set; }
 
 	[Parameter]
-	[DefaultValue(1)]
-	[Description("Number of parallel requests")]
-	public int Parallelize { get; set; }
+	[Description("Starting USN vector (as 48 hex bytes)")]
+	public UsnVector FromUsnvec { get; set; }
+
+	[Parameter]
+	[Description("Max number of objects per chunk (approx.)")]
+	[DefaultValue(1000)]
+	public int ChunkObjectLimit { get; set; }
+
+	[Parameter]
+	[Description("Max bytes per chunk (approx.)")]
+	[DefaultValue(10 << 20)]
+	public int ChunkSizeLimit { get; set; }
+
+	protected virtual int GetDegreeOfParallelism() => 1;
 
 	private string[] GetLdapAttributes(string[] fieldNames)
 	{
@@ -58,6 +64,9 @@ public class ReplicateCommand : DsbindCommand, IDrsChangeCallback
 		bool wantsSuppCreds = false;
 		foreach (var name in fieldNames)
 		{
+			if (nameof(LdapEntry.EntryName).Equals(name, StringComparison.OrdinalIgnoreCase))
+				// Ignore
+				continue;
 			if (fieldsAdded.Add(name))
 			{
 				var attr = LdapAttributeTypes.TryGetByNameOrOid(name);
@@ -92,6 +101,8 @@ public class ReplicateCommand : DsbindCommand, IDrsChangeCallback
 	private List<KeytabEntry> _keytabEntries;
 	private string? _realm;
 
+	protected abstract ExtendedOpRequest GetExop();
+
 	protected override async Task<int> RunAsync(DirectoryReplicationClient client, DsBinding dsbind, CancellationToken cancellationToken)
 	{
 		var dcInfos = await dsbind.GetDcInfo(this.RpcParameters.Authentication.UserDomain, cancellationToken);
@@ -112,7 +123,23 @@ public class ReplicateCommand : DsbindCommand, IDrsChangeCallback
 		var kt = new KeytabFile();
 		this._keytabEntries = kt.Entries;
 
-		await dsbind.GetNcChanges(dcInfo, this.GetObjectNames(cancellationToken), outputAttrs, 1, this, this.Parallelize, cancellationToken);
+		int maxParallel = this.GetDegreeOfParallelism();
+		if (maxParallel < 1)
+			maxParallel = 1;
+		var usnvec = await dsbind.GetNcChanges(
+			dcInfo,
+			this.GetObjectNames(cancellationToken),
+			outputAttrs,
+			this.ChunkObjectLimit,
+			this.ChunkSizeLimit,
+			this.FromUsnvec,
+			this,
+			maxParallel,
+			this.GetExop(),
+			cancellationToken);
+
+		if (maxParallel == 1)
+			this.WriteMessage($"Up-to-date USN vector: {usnvec.ToBytes().ToHexString()}");
 
 		if (!string.IsNullOrEmpty(this.ExportKeytab))
 		{
@@ -130,58 +157,7 @@ public class ReplicateCommand : DsbindCommand, IDrsChangeCallback
 		return 0;
 	}
 
-	private async IAsyncEnumerable<DsName> GetObjectNames(CancellationToken cancellationToken)
-	{
-		LdapClient? ldapClient = null;
-		var objSpecs = this.ObjectName;
-		if (objSpecs.IsNullOrEmpty())
-		{
-			objSpecs = [new DsobjSpec(LdapFilter.Parse("(objectClass=*)"))];
-		}
-		foreach (var objSpec in objSpecs)
-		{
-			var objName = objSpec.Dsname;
-			if (objName is not null)
-			{
-				yield return objName;
-			}
-			else
-			{
-				ldapClient ??= await LdapClient.Connect(new DnsEndPoint(this.ServerName, 389), null, this.RequireService<ISocketService>(), this.RequireService<IClientCredentialService>(), cancellationToken);
-
-				var filter = objSpec.Filter ?? LdapFilter.Parse($"(samAccountName={objSpec.Name})");
-				LdapQuery query = new(ldapClient.DomainRoot, LdapSearchScope.Subtree, filter, [])
-				{
-					PageSize = 20
-				};
-
-				bool pageHasResults = false;
-				bool hasAnyMatches = false;
-				do
-				{
-					pageHasResults = false;
-					var results = await ldapClient.Search(query, cancellationToken);
-					if (results.Entries.Length > 0)
-					{
-						query.PagingBookmark = results.Bookmark;
-						query.DirSyncCookie = results.DirsyncCookie;
-						pageHasResults = true;
-						hasAnyMatches = true;
-
-						foreach (var entry in results.Entries)
-						{
-							yield return new DsName(Guid.Empty, null, entry.EntryName);
-						}
-					}
-					else
-						break;
-				} while ((!query.PagingBookmark.IsNullOrEmpty() || !query.DirSyncCookie.IsNullOrEmpty()) && pageHasResults && !cancellationToken.IsCancellationRequested);
-
-				if (!hasAnyMatches)
-					this.WriteWarning($"The LDAP query with filter '{objSpec.Filter.ToString()}' did not return any results");
-			}
-		}
-	}
+	protected abstract IAsyncEnumerable<DsName> GetObjectNames(CancellationToken cancellationToken);
 
 	private void AddKeytabEntries(LdapEntry entry, string realm, List<KeytabEntry> keytabEntries)
 	{

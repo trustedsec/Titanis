@@ -1,0 +1,3 @@
+﻿[MS-XCA] - Xpress
+[MS-MCI] - MS-ZIP
+[RFC 1951] - Deflate

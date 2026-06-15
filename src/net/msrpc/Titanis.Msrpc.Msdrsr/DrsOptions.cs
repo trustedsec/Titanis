@@ -1,0 +1,48 @@
+﻿namespace Titanis.Msrpc.Msdrsr
+{
+	// [MS-DRSR] § 5.41 DRS_OPTIONS
+	[Flags]
+	public enum DrsOptions : uint
+	{
+		None,
+		Async = 1,
+		GetChgCheck = 2,
+		UpdateNotification = 2,
+		AddRef = 4,
+		SyncAll = 8,
+		DelRef = 8,
+		WriteRep = 0x10,
+		InitSync = 0x20,
+		PeriodicSync = 0x40,
+		MailRep = 0x80,
+		AsyncRep = 0x100,
+		IgnoreErrors = 0x100,
+		TwoWaySync = 0x200,
+		CriticalOnly = 0x400,
+		GetAncestors = 0x800,
+		GetNcSize = 0x1000,
+		LocalOnly = 0x1000,
+		NongcReadOnlyReplica = 0x2000,
+		SyncByName = 0x4000,
+		RefOk = 0x4000,
+		FullSyncNow = 0x8000,
+		NoSource = 0x8000,
+		FullSyncInProgress = 0x1_0000,
+		FullSyncPacket = 0x2_0000,
+		SyncRequeue = 0x4_0000,
+		Urgent = 0x8_0000,
+		GcSpn = 0x10_0000,
+		NoDiscard = 0x10_0000,
+		NeverSynced = 0x20_0000,
+		SpecialSecretProcessing = 0x40_0000,
+		InitSyncNow = 0x80_0000,
+		Preempted = 0x100_0000,
+		SyncForced = 0x200_0000,
+		DisableAutoSync = 0x400_0000,
+		DisablePeriodicSync = 0x800_0000,
+		UseCompression = 0x1000_0000,
+		NeverNotify = 0x2000_0000,
+		SyncPartial = 0x4000_0000,
+		GetAllGroupMembership = 0x8000_0000,
+	}
+}

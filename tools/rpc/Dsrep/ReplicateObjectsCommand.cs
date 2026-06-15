@@ -1,0 +1,78 @@
+﻿using System.ComponentModel;
+using System.Net;
+using Titanis.Ldap;
+using Titanis.Msrpc.Msdrsr;
+using Titanis.Net;
+
+namespace Titanis.Cli.Dsrep;
+
+[Command]
+[Description("Requests replica changes")]
+public class ReplicateObjectsCommand : ReplicateCommand
+{
+	[Parameter(After = nameof(RpcCommand.ServerName))]
+	[Description("DN, GUID, or SID of object to retrieve")]
+	public DsobjSpec[]? ObjectName { get; set; }
+
+	[Parameter]
+	[DefaultValue(1)]
+	[Description("Number of parallel requests")]
+	public int Parallelize { get; set; }
+
+	protected override int GetDegreeOfParallelism() => this.Parallelize;
+
+	protected sealed override ExtendedOpRequest GetExop() => ExtendedOpRequest.ReplObject;
+
+	protected override async IAsyncEnumerable<DsName> GetObjectNames(CancellationToken cancellationToken)
+	{
+		LdapClient? ldapClient = null;
+		var objSpecs = this.ObjectName;
+		if (objSpecs.IsNullOrEmpty())
+		{
+			objSpecs = [new DsobjSpec(LdapFilter.Parse("(objectClass=*)"))];
+		}
+		foreach (var objSpec in objSpecs)
+		{
+			var objName = objSpec.Dsname;
+			if (objName is not null)
+			{
+				yield return objName;
+			}
+			else
+			{
+				ldapClient ??= await LdapClient.Connect(new DnsEndPoint(this.ServerName, 389), null, this.RequireService<ISocketService>(), this.RequireService<IClientCredentialService>(), cancellationToken);
+
+				var filter = objSpec.Filter ?? LdapFilter.Parse($"(samAccountName={objSpec.Name})");
+				LdapQuery query = new(ldapClient.DomainRoot, LdapSearchScope.Subtree, filter, [])
+				{
+					PageSize = 20
+				};
+
+				bool pageHasResults = false;
+				bool hasAnyMatches = false;
+				do
+				{
+					pageHasResults = false;
+					var results = await ldapClient.Search(query, cancellationToken);
+					if (results.Entries.Length > 0)
+					{
+						query.PagingBookmark = results.Bookmark;
+						query.DirSyncCookie = results.DirsyncCookie;
+						pageHasResults = true;
+						hasAnyMatches = true;
+
+						foreach (var entry in results.Entries)
+						{
+							yield return new DsName(Guid.Empty, null, entry.EntryName);
+						}
+					}
+					else
+						break;
+				} while ((!query.PagingBookmark.IsNullOrEmpty() || !query.DirSyncCookie.IsNullOrEmpty()) && pageHasResults && !cancellationToken.IsCancellationRequested);
+
+				if (!hasAnyMatches)
+					this.WriteWarning($"The LDAP query with filter '{objSpec.Filter.ToString()}' did not return any results");
+			}
+		}
+	}
+}

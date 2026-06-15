@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel;
 using Titanis.Cli;
 
-namespace Dsrep;
+namespace Titanis.Cli.Dsrep;
 
 [Subcommand("dcinfo", typeof(DcinfoCommand))]
-[Subcommand("rep", typeof(ReplicateCommand))]
+[Subcommand("rep", typeof(ReplicateObjectsCommand))]
+[Subcommand("repnc", typeof(ReplicateNcCommand))]
 [Description("Interacts with Directory Replication Service")]
 internal class Program : MultiCommand
 {
