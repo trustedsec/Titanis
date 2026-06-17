@@ -1,4 +1,5 @@
-﻿using System.Buffers.Binary;
+﻿using ms_dtyp;
+using System.Buffers.Binary;
 using System.Numerics;
 using System.Text;
 using System.Threading;
@@ -26,6 +27,8 @@ namespace Titanis.Msrpc.Msrrp
 
 		public string KeyName { get; }
 		public string KeyPath { get; }
+
+		public override string ToString() => this.KeyPath;
 
 
 		public async Task<RegistryKey> CreateSubkey(string subkeyPath, RegistryAccessRights access, RegistryKeyOptions options, CancellationToken cancellationToken)
@@ -302,6 +305,30 @@ namespace Titanis.Msrpc.Msrrp
 			if (data != null && lpcbLen.value < data.Length)
 				Array.Resize(ref data, (int)lpcbLen.value);
 			return new RegistryValueInfo(name, (RegistryValueType)lpType.value, 0, data, TryDecodeValue((RegistryValueType)lpType.value, data, false));
+		}
+
+		public async Task DeleteKey(string subkeyPath, CancellationToken cancellationToken)
+		{
+			var result = (Win32ErrorCode)await this._owner.proxy.BaseRegDeleteKey(
+				this._hkey,
+				(subkeyPath + '\0').ToRpcUnicodeString(),
+				cancellationToken ).ConfigureAwait(false);
+			result.CheckAndThrow();
+		}
+
+		public async Task DeleteValue(string? valueName, CancellationToken cancellationToken)
+		{
+			RPC_UNICODE_STRING lpValueName = string.IsNullOrEmpty(valueName) ? new RPC_UNICODE_STRING
+			{
+				Buffer = new RpcPointer<ArraySegment<char>>(new char[1]),
+				Length = 2,
+				MaximumLength = 2,
+			} : (valueName + '\0').ToRpcUnicodeString();
+			var result = (Win32ErrorCode)await this._owner.proxy.BaseRegDeleteValue(
+				this._hkey,
+				lpValueName,
+				cancellationToken).ConfigureAwait(false);
+			result.CheckAndThrow();
 		}
 
 		public static object? TryDecodeValue(RegistryValueType valueType, byte[]? data, bool undecodedAsBytes)

@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Titanis.Cli;
+﻿using Titanis.Cli;
 
-namespace Wmi
+namespace Titanis.Cli.Registry
 {
-	/// <summary>
-	/// Formats registry value names, converting empty names to "(default)".
-	/// </summary>
-	public sealed class ValueNameFormatter : IOutputFormatter
+	public sealed class RegistryItemNameFormatter : IOutputFormatter
 	{
 		/// <summary>
 		/// Placeholder for the default value in a key.
@@ -18,7 +10,7 @@ namespace Wmi
 		private const string DefaultValueName = "(Default)";
 
 		// In order for the formatter to get called, a string type must pass a non-null formatString, otherwise the formatterType specified won't be called in OutputField.FormatValue
-		public const string DefaultIfEmptyFormat = "ValueNameFormatter";
+		public const string DefaultIfEmptyFormat = "RegistryItemNameFormatter";
 
 		public static string? FormatValue(object? value)
 		{
@@ -34,3 +26,4 @@ namespace Wmi
 			=> FormatValue(value);
 	}
 }
+

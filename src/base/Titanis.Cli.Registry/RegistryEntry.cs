@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Titanis.Winterop.Registry;
 
-namespace Wmi.Registry
+namespace Titanis.Cli.Registry
 {
 	/// <summary>
 	/// Represents an entry in the Windows registry, including its path, security descriptor, and associated data.
@@ -53,7 +53,7 @@ namespace Wmi.Registry
 		}
 
 		[DisplayName("Type")]
-		public RegistryValueKind Kind => Data?.Kind ?? RegistryValueKind.REG_NONE;
+		public RegistryValueType Kind => Data?.Kind ?? RegistryValueType.None;
 
 		//reg.exe export does "valuename"=hex(optional type number if not REG_BINARY):BB,
 		//splits are made just before 80 characters.  First line with valuename can be longer and will include first byte + , prior to \\\n

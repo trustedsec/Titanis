@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,13 +28,15 @@ namespace Titanis.Winterop.Registry
 	public abstract class RegistryData : IFormattable
 	{
 		/// <summary>
-		/// Gets a <see cref="RegistryValueKind"/> value specifying the kind of data.
+		/// Gets a <see cref="RegistryValueType"/> value specifying the kind of data.
 		/// </summary>
-		public abstract RegistryValueKind Kind { get; }
+		public abstract RegistryValueType Kind { get; }
 		/// <summary>
 		/// Gets the data associated with the registry entry.
 		/// </summary>
 		public abstract object UntypedValue { get; }
+
+		public abstract RegistryValueInfo AsRegistryValueInfo(string name);
 
 		/// <summary>
 		/// Determines whether the data matches a filter.
@@ -47,11 +52,14 @@ namespace Titanis.Winterop.Registry
 		/// <remarks>This method splits the input string into an array of substrings based on the specified separator.</remarks>
 		/// <param name="multiString">Array of strings to use as multisz value.</param>
 		public static RegistryData CreateRegMultiString(string[] multiString) => new RegistryMultiString(multiString);
+		public static RegistryData CreateRegMultiString(ImmutableArray<string> multiString) => new RegistryMultiString(multiString);
+		public static RegistryData CreateRegMultiString(byte[] multiStringBuffer) =>
+			CreateRegMultiString(Encoding.Unicode.GetString(multiStringBuffer).Split('\0', StringSplitOptions.RemoveEmptyEntries));
 
 		/// <summary>
 		/// Creates a <see cref="RegistryData"/> instance representing a REG_BINARY registry value.
 		/// </summary>
-		public static RegistryData CreateBinary(byte[] data) => new RegistryBinary(data, RegistryValueKind.REG_BINARY);
+		public static RegistryData CreateBinary(byte[] data) => new RegistryBinary(data, RegistryValueType.Binary);
 		/// <summary>
 		/// Creates a <see cref="RegistryData"/> instance representing a REG_SZ registry value.
 		/// </summary>
@@ -67,7 +75,31 @@ namespace Titanis.Winterop.Registry
 		/// <summary>
 		/// Creates a new <see cref="RegistryData"/> instance representing a REG_QWORD registry value.
 		/// </summary>
-		public static RegistryData CreateDword(ulong data) => new RegistryQword(data);
+		public static RegistryData CreateQword(ulong data) => new RegistryQword(data);
+
+		public static RegistryData CreateOther(byte[] data, RegistryValueType kind) => new RegistryBinary(data, kind);
+
+		/// <summary>
+		/// Creates a typed registry object based on raw input <see cref="RegistryValueInfo"/>
+		/// Uses the object that was already decoded by the RegistryKey provider that populated this type
+		/// </summary>
+		/// <param name="value">RegistryValueInfo as returned by <see cref="IRegistryKey.GetValue(string?, CancellationToken)"/></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static RegistryData CreateRegValue(RegistryValueInfo value)
+		{
+			return value.ValueType switch
+			{
+				RegistryValueType.String => CreateString((string?)value.TypedValue ?? string.Empty),
+				RegistryValueType.ExpandString => CreateExpandableString((string?)value.TypedValue ?? string.Empty),
+				RegistryValueType.Binary => CreateBinary(value.Bytes ?? Array.Empty<byte>()),
+				RegistryValueType.DwordLE => CreateDword((uint?)value.TypedValue ?? 0u),
+				RegistryValueType.DwordBE => CreateDword((uint?)value.TypedValue ?? 0u),
+				RegistryValueType.MultiString => (value.TypedValue is string[] strs) ? CreateRegMultiString(strs) : CreateRegMultiString((ImmutableArray<string>?)value.TypedValue ?? ImmutableArray<string>.Empty),
+				RegistryValueType.Qword => CreateQword((ulong?)value.TypedValue ?? 0ul),
+				_ => CreateOther(value.Bytes ?? Array.Empty<byte>(), value.ValueType)
+			};
+		}
 		#endregion
 
 		#region Export
@@ -85,7 +117,7 @@ namespace Titanis.Winterop.Registry
 		/// <paramref name="lineOffset"/> is used to determine when to wrap lines.
 		/// This method writes a line break after the value.
 		/// </remarks>
-		protected static void ExportAsHexTo(TextWriter writer, RegistryValueKind kind, ReadOnlySpan<byte> bytes, int lineOffset)
+		protected static void ExportAsHexTo(TextWriter writer, RegistryValueType kind, ReadOnlySpan<byte> bytes, int lineOffset)
 		{
 			{
 				string hexTypeString = GetExportTagForKind(kind);
@@ -119,11 +151,11 @@ namespace Titanis.Winterop.Registry
 			writer.WriteLine();
 		}
 
-		private static string GetExportTagForKind(RegistryValueKind kind)
+		private static string GetExportTagForKind(RegistryValueType kind)
 		{
 			return kind switch
 			{
-				RegistryValueKind.REG_BINARY => "hex:",
+				RegistryValueType.Binary => "hex:",
 				_ => $"hex({(int)kind:x}):"
 			};
 		}
@@ -143,7 +175,7 @@ namespace Titanis.Winterop.Registry
 	}
 
 	/// <summary>
-	/// Represents a <see cref="RegistryValueKind.REG_QWORD"/> value.
+	/// Represents a <see cref="RegistryValueType.Qword"/> value.
 	/// </summary>
 	public sealed class RegistryQword : RegistryData, IHaveUInt64Value
 	{
@@ -157,7 +189,7 @@ namespace Titanis.Winterop.Registry
 		}
 
 		/// <inheritdoc/>
-		public sealed override RegistryValueKind Kind => RegistryValueKind.REG_QWORD;
+		public sealed override RegistryValueType Kind => RegistryValueType.Qword;
 
 		private ulong _value;
 		/// <summary>
@@ -182,9 +214,16 @@ namespace Titanis.Winterop.Registry
 			var bytes = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref _value, 1));
 			ExportAsHexTo(writer, Kind, bytes, lineOffset);
 		}
+
+		public override RegistryValueInfo AsRegistryValueInfo(string name)
+		{
+			byte[] rawData = new byte[8];
+			BinaryPrimitives.WriteUInt64LittleEndian(rawData, _value);
+			return new RegistryValueInfo(name, Kind, 8, rawData, _value);
+		}
 	}
 	/// <summary>
-	/// Represents a <see cref="RegistryValueKind.REG_DWORD"/> value.
+	/// Represents a <see cref="RegistryValueType.DwordLE"/> value.
 	/// </summary>
 	public sealed class RegistryDword : RegistryData, IHaveUInt64Value
 	{
@@ -198,7 +237,7 @@ namespace Titanis.Winterop.Registry
 		}
 
 		/// <inheritdoc/>
-		public sealed override RegistryValueKind Kind => RegistryValueKind.REG_DWORD;
+		public sealed override RegistryValueType Kind => RegistryValueType.DwordLE;
 
 		/// <summary>
 		/// Gets the value as a <see langword="ulong"/>.
@@ -219,9 +258,16 @@ namespace Titanis.Winterop.Registry
 		{
 			writer.WriteLine($"dword:{Value:x8}");
 		}
+
+		public override RegistryValueInfo AsRegistryValueInfo(string name)
+		{
+			byte[] rawData = new byte[4];
+			BinaryPrimitives.WriteUInt32LittleEndian(rawData, Value);
+			return new RegistryValueInfo(name, Kind, 4, rawData, Value);
+		}
 	}
 	/// <summary>
-	/// Represents a <see cref="RegistryValueKind.REG_DWORD"/> value.
+	/// Represents a <see cref="RegistryValueType.String"/> value.
 	/// </summary>
 	public sealed class RegistryString : RegistryData
 	{
@@ -235,7 +281,7 @@ namespace Titanis.Winterop.Registry
 		}
 
 		/// <inheritdoc/>
-		public sealed override RegistryValueKind Kind => RegistryValueKind.REG_SZ;
+		public sealed override RegistryValueType Kind => RegistryValueType.String;
 
 		/// <summary>
 		/// Gets the value as a <see langword="ulong"/>.
@@ -255,9 +301,15 @@ namespace Titanis.Winterop.Registry
 		{
 			writer.WriteLine($"\"{Value}\"");
 		}
+
+		public override RegistryValueInfo AsRegistryValueInfo(string name)
+		{
+			var rawData = Encoding.Unicode.GetBytes(Value);
+			return new RegistryValueInfo(name, Kind, rawData.Length, rawData, Value);
+		}
 	}
 	/// <summary>
-	/// Represents a <see cref="RegistryValueKind.REG_DWORD"/> value.
+	/// Represents a <see cref="RegistryValueType.ExpandString"/> value.
 	/// </summary>
 	public sealed class RegistryExpandableString : RegistryData
 	{
@@ -271,7 +323,7 @@ namespace Titanis.Winterop.Registry
 		}
 
 		/// <inheritdoc/>
-		public sealed override RegistryValueKind Kind => RegistryValueKind.REG_EXPAND_SZ;
+		public sealed override RegistryValueType Kind => RegistryValueType.ExpandString;
 
 		/// <summary>
 		/// Gets the value as a <see langword="ulong"/>.
@@ -293,9 +345,15 @@ namespace Titanis.Winterop.Registry
 			var bytes = Encoding.Unicode.GetBytes(Value + '\0');
 			ExportAsHexTo(writer, Kind, bytes, lineOffset);
 		}
+
+		public override RegistryValueInfo AsRegistryValueInfo(string name)
+		{
+			var rawData = Encoding.Unicode.GetBytes(Value);
+			return new RegistryValueInfo(name, Kind, rawData.Length, rawData, Value);
+		}
 	}
 	/// <summary>
-	/// Represents a <see cref="RegistryValueKind.REG_MULTI_SZ"/> value.
+	/// Represents a <see cref="RegistryValueType.MultiString"/> value.
 	/// </summary>
 	public sealed class RegistryMultiString : RegistryData
 	{
@@ -308,8 +366,13 @@ namespace Titanis.Winterop.Registry
 			Strings = ImmutableArray.Create(values);
 		}
 
+		public RegistryMultiString(ImmutableArray<string> values)
+		{
+			Strings = values;
+		}
+
 		/// <inheritdoc/>
-		public sealed override RegistryValueKind Kind => RegistryValueKind.REG_MULTI_SZ;
+		public sealed override RegistryValueType Kind => RegistryValueType.MultiString;
 
 		/// <summary>
 		/// Gets the value as a <see langword="ulong"/>.
@@ -331,12 +394,39 @@ namespace Titanis.Winterop.Registry
 			byte[] bytes = Encoding.Unicode.GetBytes(stringval);
 			ExportAsHexTo(writer, Kind, bytes, lineOffset);
 		}
+
+		public override RegistryValueInfo AsRegistryValueInfo(string name)
+		{
+			using (var ms = new MemoryStream())
+			{
+				using (var bw = new BinaryWriter(ms))
+				{
+					for (int i = 0; i < Strings.Length; i++)
+					{
+						if (i > 0)
+						{
+							bw.Write((short)0);
+						}
+						var rawString = Encoding.Unicode.GetBytes(Strings[i]);
+						var length = rawString.Length;
+						while (length > 0 && rawString[length - 1] == '\0') //A string shouldn't have multiple nulls at the end, but it could
+						{
+							length--;
+						}
+						bw.Write(rawString, 0, length);
+					}
+					bw.Write((uint)0);
+					var rawData = ms.ToArray();
+					return new RegistryValueInfo(name, Kind, rawData.Length, rawData, Strings);
+				}
+			}
+		}
 	}
 	/// <summary>
 	/// Represents registry data as raw bytes value.
 	/// </summary>
 	/// <remarks>
-	/// This class supports <see cref="RegistryValueKind.REG_BINARY"/> as well data of undefined types or invalid values.
+	/// This class supports <see cref="RegistryValueType.Binary"/> as well data of undefined types or invalid values.
 	/// </remarks>
 	public sealed class RegistryBinary : RegistryData
 	{
@@ -345,14 +435,14 @@ namespace Titanis.Winterop.Registry
 		/// </summary>
 		/// <param name="bytes">Value</param>
 		/// <param name="kind">Kind of value</param>
-		public RegistryBinary(byte[] bytes, RegistryValueKind kind)
+		public RegistryBinary(byte[] bytes, RegistryValueType kind)
 		{
 			Bytes = bytes;
 			Kind = kind;
 		}
 
 		/// <inheritdoc/>
-		public sealed override RegistryValueKind Kind { get; }
+		public sealed override RegistryValueType Kind { get; }
 
 		/// <summary>
 		/// Gets the value as a <see langword="ulong"/>.
@@ -371,6 +461,11 @@ namespace Titanis.Winterop.Registry
 		public override void ExportTo(TextWriter writer, int lineOffset)
 		{
 			ExportAsHexTo(writer, Kind, Bytes, lineOffset);
+		}
+
+		public override RegistryValueInfo AsRegistryValueInfo(string name)
+		{
+			return new RegistryValueInfo(name, Kind, Bytes.Length, Bytes, Bytes);
 		}
 	}
 }

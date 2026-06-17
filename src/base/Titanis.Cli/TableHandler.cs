@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Immutable;
 using System.Collections.Generic;
 using System.Text;
 
@@ -51,12 +53,12 @@ namespace Titanis.Cli
 						var value = field.GetValue(record);
 						string? formatted;
 
-						if (value is Array arr)
+						if ((value is IList arr))
 						{
-							maxArrayLength = Math.Max(maxArrayLength, arr.Length);
-							if (arrayIndex < arr.Length)
+							maxArrayLength = Math.Max(maxArrayLength, arr.Count);
+							if (arrayIndex < arr.Count)
 							{
-								value = arr.GetValue(arrayIndex);
+								value = arr[arrayIndex];
 								formatted = field.FormatValue(value, this._outputStyle);
 							}
 							else

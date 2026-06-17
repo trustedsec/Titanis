@@ -36,6 +36,8 @@ namespace Titanis.Winterop.Registry
 
 		public string KeyName { get; }
 		public string? ClassName { get; }
+
+		public override string ToString() => this.KeyName;
 	}
 	// [MS-RRP] § 3.1.1.5 Values
 	public enum RegistryValueType
@@ -99,6 +101,10 @@ namespace Titanis.Winterop.Registry
 		Task<IRegistryKey> OpenSubkey(string subkeyPath, RegistryAccessRights access, RegistryKeyOptions options, CancellationToken cancellationToken);
 		Task<RegistryKeyInfo> QueryInfo(CancellationToken cancellationToken);
 		Task<RegistryValueInfo> GetValue(string? name, CancellationToken cancellationToken);
+
+		IAsyncEnumerable<RegistryValueInfo> GetValues(bool includeData, CancellationToken cancellationToken);
 		IAsyncEnumerable<RegistrySubkeyInfo> GetSubkeyNames(CancellationToken cancellationToken);
+		string KeyName { get; }
+		string KeyPath { get; }
 	}
 }

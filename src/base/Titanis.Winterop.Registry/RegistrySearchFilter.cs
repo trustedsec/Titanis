@@ -15,7 +15,7 @@ namespace Titanis.Winterop.Registry
 		SearchData = 4,
 		SearchTargetMask = SearchKeyNames | SearchValueNames | SearchData,
 
-		IsRecursive = 8,
+		//IsRecursive = 8,  Recursion is controlled by MaxDepth
 		IgnoreCase = 0x10,
 		MatchWholeName = 0x20,
 		MatchPattern = 0x40,
@@ -25,14 +25,16 @@ namespace Titanis.Winterop.Registry
 	{
 		public RegistrySearchFilter(
 			ImmutableArray<string> valueNameFilters,
-			ImmutableArray<RegistryValueKind> typeFilter,
+			ImmutableArray<RegistryValueType> typeFilter,
 			ImmutableArray<string> searchTexts,
-			RegistrySearchOptions options
+			RegistrySearchOptions options,
+			int maxDepth
 			)
 		{
 			ValueNames = valueNameFilters;
 			Options = options;
 			TypeFilters = typeFilter;
+			MaxDepth = maxDepth;
 
 			if (!searchTexts.IsDefaultOrEmpty)
 			{
@@ -46,6 +48,12 @@ namespace Titanis.Winterop.Registry
 					for (int i = 0; i < searchTexts.Length; i++)
 					{
 						string? searchText = searchTexts[i];
+						if (ulong.TryParse(searchText, out var ui64)
+							|| searchText.StartsWith("0x") && ulong.TryParse(searchText.Substring(2), System.Globalization.NumberStyles.AllowHexSpecifier, null, out ui64))
+						{
+							(intFilters ??= new List<ulong>()).Add(ui64);
+						}
+
 						if (0 == (options & RegistrySearchOptions.MatchWholeName))
 						{
 							if (!searchText.StartsWith('*'))
@@ -53,15 +61,6 @@ namespace Titanis.Winterop.Registry
 							if (!searchText.EndsWith('*'))
 								searchText += '*';
 						}
-						else
-						{
-							if (ulong.TryParse(searchText, out var ui64)
-								|| searchText.StartsWith("0x") && ulong.TryParse(searchText.Substring(2), out ui64))
-							{
-								(intFilters ??= new List<ulong>()).Add(ui64);
-							}
-						}
-
 						patterns.Add(new WildcardPattern(searchText));
 					}
 
@@ -81,9 +80,9 @@ namespace Titanis.Winterop.Registry
 		#endregion
 
 		#region Type filter
-		public ImmutableArray<RegistryValueKind> TypeFilters { get; set; }
+		public ImmutableArray<RegistryValueType> TypeFilters { get; set; }
 		public bool HasTypeFilter => !TypeFilters.IsDefaultOrEmpty;
-		public bool MatchesType(RegistryValueKind kind)
+		public bool MatchesType(RegistryValueType kind)
 		{
 			return !HasTypeFilter || TypeFilters.Contains(kind);
 		}
@@ -95,27 +94,28 @@ namespace Titanis.Winterop.Registry
 		private ImmutableArray<WildcardPattern> _patterns;
 		private ulong[]? _integerValues;
 
+		public int MaxDepth { get; }
 
 		public RegistrySearchOptions Options { get; set; }
 		public bool SearchKeyNames => 0 != (Options & RegistrySearchOptions.SearchKeyNames);
 		public bool SearchValueNames => 0 != (Options & RegistrySearchOptions.SearchValueNames);
 		public bool SearchData => 0 != (Options & RegistrySearchOptions.SearchData);
-		public bool IsRecursive => 0 != (Options & RegistrySearchOptions.IsRecursive);
+		public bool IsRecursive => MaxDepth > 0;
 		public bool IgnoreCase => 0 != (Options & RegistrySearchOptions.IgnoreCase);
 		public bool MatchWholeName => 0 != (Options & RegistrySearchOptions.MatchWholeName);
 		public bool MatchPattern => 0 != (Options & RegistrySearchOptions.MatchPattern);
 
 		public bool Matches(string str)
 		{
-			if (!_patterns.IsDefaultOrEmpty)
-				return _patterns.Any(r => r.Matches(str, IgnoreCase));
+			if (!_patterns.IsDefaultOrEmpty && str != string.Empty)
+				return _patterns.Any(r => r.Matches(str));
 			else if (!SearchTexts.IsDefaultOrEmpty)
 			{
 				var comp = IgnoreCase ? StringComparison.InvariantCultureIgnoreCase
 					: StringComparison.InvariantCulture;
 
 				return SearchTexts.Any(
-					MatchWholeName ? r => str.Equals(r, comp)
+					MatchWholeName ? r => (str.Equals(r, comp) && str.TrimEnd('\0').Length == r.TrimEnd('\0').Length) //When matching whole names, reject matches terminating at a null injected in the middle of the string.
 					: r => str.Contains(r, comp)
 					);
 			}
@@ -144,7 +144,7 @@ namespace Titanis.Winterop.Registry
 
 			try
 			{
-				var str = Encoding.ASCII.GetString(n);
+				var str = Encoding.UTF8.GetString(n);
 				if (Matches(str))
 					return true;
 			}

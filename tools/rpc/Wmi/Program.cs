@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Wmi.Registry;
 
 namespace Titanis.Cli.WmiTool;
 
@@ -15,6 +16,7 @@ namespace Titanis.Cli.WmiTool;
 [Subcommand("invoke", typeof(InvokeCommand))]
 [Subcommand("delete", typeof(DeleteCommand))]
 [Subcommand("mountfs", typeof(FuseCommand))]
+[Subcommand("reg", typeof(RegistryCommand))]
 internal class Program : MultiCommand
 {
 	static void Main(string[] args)

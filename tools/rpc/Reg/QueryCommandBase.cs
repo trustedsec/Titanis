@@ -1,25 +1,21 @@
-﻿using Titanis.Cli;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Titanis.Cli;
 using Titanis.Winterop.Registry;
-using Titanis.Cli.Registry;
+using Titanis.Winterop.Security;
 
-namespace Wmi.Registry
+namespace Titanis.Msrpc.Msrrp.Cli
 {
-	/// <summary>
-	/// Implements registry query functionality based off the semantics of reg.exe
-	/// </summary>
-	//[DetailedHelpResource(typeof(Messages), nameof(Messages.wmi_base_query_Detailed))]
-	[OutputRecordType(typeof(RegistryItem))]
-	internal abstract partial class RegistryQueryCommandBase : WmiRegistryCommandBase, IRegistrySearchCallback
+	internal abstract class QueryCommandBase : RegistryKeyCommand, IRegistrySearchCallback
 	{
 		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 		public RegistryQueryParameters QueryParameters { get; set; }
 
-
-		//TODO: WMI StdRegProv GetSecurityDescriptor does not currently work as expected.
-		//[Parameter]
-		//[Description("Queries key security descriptors")]
-		//[Alias("sec")]
-		//public SwitchParam GetSecurity { get; set; }
+		/// Even if we're just enumerating keys we need QueryValue rights for <see cref="RegistryKey.QueryInfo(CancellationToken)"/>
+		protected override RegistryAccessRights RequiredKeyAccess => RegistryAccessRights.QueryValue | RegistryAccessRights.EnumerateSubkeys;
 
 		/// <summary>
 		/// Called before the query begins.
@@ -48,17 +44,12 @@ namespace Wmi.Registry
 
 		}
 
-
-		//If the value is specified, we are querying a specific value
-		//If a value is not specified We print all values under the key, and all keys under the key.
-		//Type filter applies in all cases when specified (we will return none if the type doesn't match a specific value specified)
-		protected override async Task<int> RunAsync(dynamic registry, CancellationToken cancellationToken)
+		protected override async Task<int> RunAsync(RegistryKey key, RemoteRegistryClient client, CancellationToken cancellationToken)
 		{
-			object objreg = registry; //dynamics shouldn't be passed into function calls if we can avoid it for performance reasons.
 			this.OnBeforeQuery();
 
 			var searcher = new RegistrySearcher(this, this._filter!, this.Log);
-			await searcher.DoSearch(new WmiRegistryKey(objreg, this.keyPath, this.Log), cancellationToken);
+			await searcher.DoSearch(key, cancellationToken);
 
 			OnQueryComplete();
 			return 0;
@@ -73,5 +64,6 @@ namespace Wmi.Registry
 
 		protected abstract void OnValueMatch(RegistryPath keyPath, RegistryValueInfo value);
 		void IRegistrySearchCallback.OnValueMatch(RegistryPath keyPath, RegistryValueInfo value) => this.OnValueMatch(keyPath, value);
+
 	}
 }

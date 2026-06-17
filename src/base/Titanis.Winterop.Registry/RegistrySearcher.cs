@@ -2,12 +2,13 @@
 using Titanis;
 using Titanis.Winterop;
 
+
 namespace Titanis.Winterop.Registry
 {
 	public interface IRegistrySearchCallback
 	{
 		void OnKeyMatch(RegistryPath keyPath);
-		void OnValueMatch(RegistryPath keyPath, string valueName, RegistryValueKind valueKind, RegistryData? valueData);
+		void OnValueMatch(RegistryPath keyPath, RegistryValueInfo value);
 	}
 
 	public class RegistrySearcher
@@ -31,168 +32,112 @@ namespace Titanis.Winterop.Registry
 		public async Task DoSearch(IRegistryKey registryKey, CancellationToken cancellationToken)
 		{
 			var filter = this.filter;
-			var subtreeRootKeyPath = registryKey.KeyPath;
 
-			Queue<IRegistryKey> keysToProcess = new Queue<IRegistryKey>();
-			keysToProcess.Enqueue(registryKey);
+			Queue<(IRegistryKey, int)> keysToProcess = new Queue<(IRegistryKey, int)>();
+			keysToProcess.Enqueue((registryKey, 0));
 			bool includeValues = (filter.Options & RegistrySearchOptions.SearchTargetMask & ~RegistrySearchOptions.SearchKeyNames) != 0;
-			while (keysToProcess.TryDequeue(out var key) && !cancellationToken.IsCancellationRequested)
+			bool first = true;
+
+			while (keysToProcess.TryDequeue(out var entry) && !cancellationToken.IsCancellationRequested)
 			{
-				//Only enumerate values / data if needed
+				var (key, currentDepth) = entry;
+				//Export gets screwed if we find a key as a subkey and then later process its values, so now we check the key for matching in the same step we would process its values
+				if (!first)
+				{
+					if (filter.SearchKeyNames && filter.Matches(key.KeyName))
+					{
+						searchCallback.OnKeyMatch(RegistryPath.Parse(key.KeyPath));
+					}
+				}
+				//We don't want to match on our root / first key
+				first = false;
 				if (includeValues)
 				{
 					try
 					{
 						log?.WriteDiagnostic($"Enumerating values under {key}.");
-						await key.EnumerateValues(
-							(n, t) => ShouldRetrieveData(filter, n, t),
-							(name, kind, data) =>
-							{
-								if (data != null)
-								{
-									ProcessRegistryValue(
-										key.KeyPath,
-										name,
-										kind,
-										data
-										);
-								}
-							},
-							RegistryKeyEnumerateOptions.ContinueOnException | RegistryKeyEnumerateOptions.PassExceptionToIterator,
-							cancellationToken).ConfigureAwait(false);
+						await foreach (var item in key.GetValues(true, cancellationToken).ConfigureAwait(false))
+						{
+							ProcessRegistryValue(key, item);
+						}
 					}
 					catch (Win32Exception ex)
 					{
-						log.WriteWarning($"Failed to enumerate values under {key}: {ex.Message}");
+						log?.WriteWarning($"Failed to enumerate values under {key}: {ex.Message}");
 						continue;
 					}
 				}
-
 				// Subkeys
 				if (filter.IsRecursive || filter.SearchKeyNames)
 				{
 					log?.WriteDiagnostic($"Enumerating keys under {key}.");
-					string[]? subkeyNames;
 					try
 					{
-						subkeyNames = await key.GetSubkeyNames(cancellationToken).ConfigureAwait(false);
-					}
-					catch (Win32Exception ex)
-					{
-						log?.WriteWarning($"Failed to enumerate keys under {key}: {ex}");
-						subkeyNames = null;
-					}
-
-					if (subkeyNames != null)
-					{
-						if (filter.SearchKeyNames)
+						await foreach (var subkeyName in key.GetSubkeyNames(cancellationToken).ConfigureAwait(false))
 						{
-							foreach (var keyName in subkeyNames)
-							{
-								bool keyMatches = filter.SearchKeyNames && filter.Matches(key.KeyName);
-								if (filter.SearchKeyNames)
-									searchCallback.OnKeyMatch(key.KeyPath);
-							}
-						}
-
-						if (this.filter.IsRecursive)
-						{
-							foreach (string subkeyName in subkeyNames)
+							//Matches for these are checked when we would grab there values
+							if (currentDepth < filter.MaxDepth)
 							{
 								try
 								{
-									var subkey = await key.OpenSubkey(subkeyName, cancellationToken).ConfigureAwait(false);
-									keysToProcess.Enqueue(subkey);
+									var subkey = await key.OpenSubkey(subkeyName.KeyName, Security.RegistryAccessRights.EnumerateSubkeys | Security.RegistryAccessRights.KeyRead, RegistryKeyOptions.None, cancellationToken).ConfigureAwait(false);
+									keysToProcess.Enqueue((subkey, currentDepth + 1));
 								}
 								catch (Exception ex)
 								{
-									log?.WriteError($"Error opening {key.KeyPath}\\subkeyName: {ex.Message}");
+									log?.WriteError($"Error opening {key.KeyPath}\\{subkeyName}: {ex.Message}");
+								}
+							}
+							//We won't be grabbing the values, so we need to process these subkeys for matches now.
+							else
+							{
+								if (filter.SearchKeyNames && filter.Matches(subkeyName.KeyName))
+								{
+									searchCallback.OnKeyMatch(RegistryPath.Parse(RegistryPath.Combine(key.KeyPath, subkeyName.KeyName)));
 								}
 							}
 						}
+					}
+					catch (Win32Exception ex)
+					{
+						log?.WriteWarning($"Failed to enumerate keys under {key.KeyPath}: {ex}");
 					}
 				}
 			}
 		}
 
-		private static bool ShouldRetrieveData(RegistrySearchFilter filter, string name, RegistryValueKind kind)
-			=> filter.MatchesName(name) && filter.MatchesType(kind);
-
-
-		internal void ProcessRegistryValue(
-			RegistryPath keyPath,
-			string valueName,
-			RegistryValueKind valueKind,
-			object data
+		private void ProcessRegistryValue(
+			IRegistryKey key,
+			RegistryValueInfo value
 			)
 		{
 			var log = this.log;
 
 			// Apply type filter
-			if (!filter.MatchesType(valueKind))
+			if (!filter.MatchesType(value.ValueType))
 				return;
 
 			// Apply name filter
-			if (!filter.MatchesName(valueName))
+			if (!filter.MatchesName(value.Name))
 				return;
-
-			if (data is Exception ex)
-				log.WriteWarning($"Failed to get value '{valueName}' under {keyPath}: {ex.Message}");
-			else
 			{
-				var valueData = (valueKind, data) switch
-				{
-					(RegistryValueKind.REG_SZ, string str) => RegistryData.CreateString(str),
-					(RegistryValueKind.REG_EXPAND_SZ, string str) => RegistryData.CreateExpandableString(str),
-					(RegistryValueKind.REG_BINARY, byte[] bytes) => RegistryData.CreateBinary(bytes),
-					(RegistryValueKind.REG_DWORD, uint ui4) => RegistryData.CreateDword(ui4),
-					(RegistryValueKind.REG_MULTI_SZ, string[] strs) => RegistryData.CreateRegMultiString(strs),
-					(RegistryValueKind.REG_QWORD, ulong ui8) => RegistryData.CreateDword(ui8),
-					_ => throw new Win32Exception((int)Win32ErrorCode.ERROR_INVALID_PARAMETER, $"Unsupported registry value type '{valueKind}' for value '{valueName}'")
-				};
+
 
 				// First check value name and key name, since those are easy
 				bool matches = !filter.HasSearchFilter;
 				// Check value name
 				if (!matches && filter.SearchValueNames)
-					matches = filter.SearchValueNames && filter.Matches(valueName);
-				// Check key name
-				if (!matches && filter.SearchKeyNames)
-					matches = filter.SearchKeyNames && filter.Matches(keyPath.KeyPath);
+					matches = filter.SearchValueNames && filter.Matches(value.Name);
 				// Search data
-				if (!matches)
-					matches = filter.DataSearchMatches(valueData);
+				if (!matches && value.Bytes != null)
+				{
+					matches = filter.DataSearchMatches(RegistryData.CreateRegValue(value));
+				}
 
 				if (matches)
-					//TODO: WMI StdRegProv GetSecurityDescriptor does not currently work as expected.
-
-					#region GetSecurity stuff
-					//if(this.GetSecurity.IsSet)
-					//{
-					//	if (cachedSecurityDescriptor is null || cachedSecurityDescriptor.Value.Item1 != path)
-					//	{
-					//		try
-					//		{
-					//			//why does these calls return 0x8004101D
-					//			this.WriteDiagnostic($"Getting security descriptor for {RegistryPath}.");
-					//			var result = (await registry.GetSecurityDescriptor(hive, RegistryPath.KeyPath)).ConfigureAwait(false);
-					//			var sdResult = result.Descriptor;
-					//			entry.SecurityDescriptor = sdResult;
-					//			cachedSecurityDescriptor = (path, sdResult);
-					//		}
-					//		catch (Win32Exception ex)
-					//		{
-					//			this.WriteVerbose($"Failed to get Security Descriptor for {RegistryPath}: {ex.Message}");
-					//		}
-					//	}
-					//	else
-					//	{
-					//		entry.SecurityDescriptor = cachedSecurityDescriptor.Value.Item2;
-					//	}
-					//}
-					#endregion
-
-					searchCallback.OnValueMatch(keyPath, valueName, valueKind, valueData);
+				{
+					searchCallback.OnValueMatch(RegistryPath.Parse(key.KeyPath), value);
+				}
 			}
 		}
 	}

@@ -12,6 +12,7 @@ using Titanis.Cli;
 using Titanis.Winterop;
 using Titanis.Winterop.Registry;
 using Titanis.Winterop.Security;
+using Titanis.Cli.Registry;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {
@@ -89,12 +90,8 @@ Default encodings for value types:
 		//[Mandatory]
 		public RegistryItemSpec[] Items { get; set; }
 
-		[Parameter]
-		[Description("Use backup semantics")]
-		public SwitchParam Backup { get; set; }
-
-
 		private List<RegistryKeyGroup> _keys;
+		private Dictionary<PredefinedKey, RegistryKey> _cachedRoots = new Dictionary<PredefinedKey, RegistryKey>();
 
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
@@ -114,9 +111,7 @@ Default encodings for value types:
 			var options = this.KeyOptions;
 			var rootAccess = this.BackupSemantics.IsSet ? RegistryAccessRights.QueryValue : RegistryAccessRights.CreateSubkey;
 
-			// TODO: Consider caching the root key
-			//RegistryRootKey currentRoot = RegistryRootKey.Invalid;
-			//RegistryKey? currentRootKey = null;
+
 
 			foreach (var keyGroup in this._keys)
 			{
@@ -128,30 +123,46 @@ Default encodings for value types:
 					var keySpec = keyGroup.key;
 					if (string.IsNullOrEmpty(keyGroup.key.KeyPath))
 					{
-						// This targets the root itself
-						this.WriteDiagnostic($"Opening root {keySpec.Root}");
-						key = await client.OpenRootKey(keySpec.Root, keyGroup.access, cancellationToken);
+						if (!_cachedRoots.ContainsKey(keySpec.Root))
+						{
+							// This targets the root itself
+							this.WriteDiagnostic($"Opening root {keySpec.Root}");
+							key = await client.OpenRootKey(keySpec.Root, keyGroup.access, cancellationToken);
+							_cachedRoots.Add(keySpec.Root, key);
+						}
+						else
+						{
+							key = _cachedRoots[keySpec.Root];
+						}
 					}
 					else
 					{
 						this.WriteDiagnostic($"Opening root {keySpec.Root}");
 						RegistryKey rootKey;
-						bool isSubkey = keySpec.KeyPath.Contains('\\');
-						try
+						if (!_cachedRoots.ContainsKey(keySpec.Root))
 						{
-							rootKey = await client.OpenRootKey(keySpec.Root, isSubkey ? RegistryAccessRights.EnumerateSubkeys : rootAccess, cancellationToken);
+							bool isSubkey = keySpec.KeyPath.Contains('\\');
+							try
+							{
+								rootKey = await client.OpenRootKey(keySpec.Root, isSubkey ? RegistryAccessRights.EnumerateSubkeys : rootAccess, cancellationToken);
+							}
+							catch (Win32Exception ex) when ((Win32ErrorCode)ex.NativeErrorCode == Win32ErrorCode.ERROR_ACCESS_DENIED)
+							{
+								// Try again without Create access; this will still allow the user to set values in an existing key
+								rootKey = await client.OpenRootKey(keySpec.Root, RegistryAccessRights.EnumerateSubkeys, cancellationToken);
+							}
+							_cachedRoots.Add(keySpec.Root, rootKey);
 						}
-						catch (Win32Exception ex) when ((Win32ErrorCode)ex.NativeErrorCode== Win32ErrorCode.ERROR_ACCESS_DENIED)
+						else
 						{
-							// Try again without Create access; this will still allow the user to set values in an existing key
-							rootKey = await client.OpenRootKey(keySpec.Root, RegistryAccessRights.EnumerateSubkeys, cancellationToken);
+							rootKey = _cachedRoots[keySpec.Root];
 						}
 
-						await using (rootKey)
-						{
-							this.WriteDiagnostic($"Creating subkey {keySpec.Root}\\{keySpec.KeyPath}");
-							key = await rootKey.CreateSubkey(keySpec.KeyPath, keyGroup.access, options, cancellationToken);
-						}
+
+						this.WriteDiagnostic($"Creating subkey {keySpec}");
+						key = await rootKey.CreateSubkey(keySpec.KeyPath, keyGroup.access, options, cancellationToken);
+						this.WriteMessage($"Created subkey {keySpec}");
+
 					}
 				}
 
@@ -161,53 +172,18 @@ Default encodings for value types:
 					{
 						this.WriteDiagnostic($"Setting value '{valueSpec.ValueName}' to {valueSpec.ValueData.ToHexString()}");
 						await key.SetValue(valueSpec.ValueName, valueSpec.ValueType, valueSpec.ValueData, cancellationToken);
+						this.WriteMessage($"Set Value {keyGroup.key} {valueSpec.ValueName}");
 					}
 				}
 			}
-
+			foreach (var item in this._cachedRoots)
+			{
+				item.Value.Dispose();
+			}
 			return 0;
 		}
 	}
 
-	internal class RegistryKeyGroup
-	{
-		internal readonly RegistryKeySpec key;
 
-		internal RegistryAccessRights access;
 
-		internal RegistryKeyGroup(RegistryKeySpec key)
-		{
-			this.key = key;
-		}
-
-		internal readonly List<RegistryValueSpec> values = new List<RegistryValueSpec>();
-	}
-
-	partial class RegistryPlanner : IRegistryItemVisitor
-	{
-		internal RegistryPlanner(ILog? log)
-		{
-			this._log = log;
-		}
-
-		internal readonly List<RegistryKeyGroup> keys = new List<RegistryKeyGroup>();
-		private RegistryKeyGroup? _currentGroup;
-		private readonly ILog? _log;
-
-		void IRegistryItemVisitor.Visit(RegistryKeySpec key)
-		{
-			var group = new RegistryKeyGroup(key);
-			this.keys.Add(group);
-			this._currentGroup = group;
-		}
-
-		void IRegistryItemVisitor.Visit(RegistryValueSpec value)
-		{
-			if (this._currentGroup is null)
-				throw new SyntaxException($"Value '{value.ValueName}' specified without an open key.");
-
-			this._currentGroup.values.Add(value);
-			this._currentGroup.access |= RegistryAccessRights.SetValue;
-		}
-	}
 }

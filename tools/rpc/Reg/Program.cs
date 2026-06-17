@@ -6,7 +6,9 @@ using Titanis.Winterop.Registry;
 namespace Titanis.Msrpc.Msrrp.Cli
 {
 	[Subcommand("set", typeof(SetValueCommand))]
-	[Subcommand("list", typeof(ListCommand))]
+	[Subcommand("delete", typeof(DeleteCommand))]
+	[Subcommand("query", typeof(QueryCommand))]
+	[Subcommand("export", typeof(ExportCommand))]
 	[Subcommand("save", typeof(SaveKeyCommand))]
 	[Subcommand("keyinfo", typeof(KeyInfoCommand))]
 	[Subcommand("syskey", typeof(SyskeyCommand))]

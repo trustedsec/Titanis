@@ -5,34 +5,42 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
+using Titanis.Cli.WmiTool;
 using Titanis.Msrpc.Mswmi;
 using Titanis.Winterop.Registry;
 
 namespace Wmi.Registry
 {
-	internal abstract class WmiRegistryCommandBase : WmiCommandBase
+	internal abstract class WmiRegistryCommandBase : WmiCommand
 	{
 		private const string RegistryProviderName = "StdRegProv";
 
 		[Parameter(10)]
 		[Mandatory]
-		[Placeholder(@"\\Server\[HKLM|HKCU|HKCR|HKU|HKCC][\path]")]
-		[Description("Key path")]
-		public RegistryPath KeyPath { get; set; }
+		[Placeholder(@"[HKLM|HKCU|HKCR|HKU|HKCC][\path]")]
+		[Description("Path of target registry key")]
+		public string KeyPath { get; set; }
 
 		[Parameter]
 		[Description("Locale")]
 		[DefaultValue("en-US")]
 		public string Locale { get; set; }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+		internal RegistryPath keyPath;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			base.ValidateParameters(context);
-		}
-
-		protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
-		{
-			return await this.ConnectAndRun(KeyPath.ServerName, cancellationToken).ConfigureAwait(false);
+			try
+			{
+				keyPath = RegistryPath.Parse(KeyPath);
+			}
+			catch (ArgumentException ex)
+			{
+				context.LogError($"The Key path is invalid: ${ex.Message}");
+			}
 		}
 
 		protected override async Task<int> RunAsync(WmiClient wmi, CancellationToken cancellationToken)
@@ -49,7 +57,5 @@ namespace Wmi.Registry
 
 		protected abstract Task<int> RunAsync(dynamic registry, CancellationToken cancellationToken);
 
-		public const string DefaultValueName = "(default)";
-		protected static string ValueDisplayName(string name) => string.IsNullOrEmpty(name) ? DefaultValueName : name;
 	}
 }

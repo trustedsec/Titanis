@@ -6,6 +6,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="System.Collections.Immutable" />
 		<PackageReference Include="System.Reflection" />
 		<PackageReference Include="System.Text.Json" />
 		<PackageReference Include="Titanis.Core" />

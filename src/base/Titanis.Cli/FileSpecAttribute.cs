@@ -54,6 +54,18 @@ namespace Titanis.Cli
 	}
 
 	[AttributeUsage(AttributeTargets.Property)]
+	public sealed class RegistryFileSpecAttribute : FileSpecAttribute
+	{
+		public static readonly ImmutableArray<FileTypeInfo> RegistryFileTypes = [
+			new FileTypeInfo("Registry export file", "*.reg")
+			];
+		public RegistryFileSpecAttribute(bool mustExist)
+			: base(mustExist, RegistryFileTypes)
+		{
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Property)]
 	public sealed class KeytabFileSpecAttribute : FileSpecAttribute
 	{
 		public static readonly ImmutableArray<FileTypeInfo> KeytabFileTypes = [

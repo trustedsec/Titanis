@@ -266,7 +266,7 @@ namespace Titanis.Cli
 								var value = field.GetValue(record);
 								if (value is not null)
 								{
-									if (!(value is Array array))
+									if (!(value is System.Collections.IList array))
 										array = new object[] { value };
 
 									foreach (var elem in array)
@@ -287,7 +287,8 @@ namespace Titanis.Cli
 						if (fields != null && record is not null)
 						{
 							if (_includeHeaders)
-							{
+							{ 
+								//TODO: Properly handle array like values
 								var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
 								string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._outputStyle))));
 								this.WriteOutputLine(line);

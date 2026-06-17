@@ -7,18 +7,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Titanis.Cli;
 using Titanis.Winterop.Registry;
+using Titanis.Winterop.Security;
 
-namespace Wmi.Registry
+namespace Titanis.Msrpc.Msrrp.Cli
 {
-	/// <task category="WMI;Registry;Enumeration">Produce a registry key listing formated as a .reg file</task>
-	/// <task category="WMI;Registry;Enumeration">Output a search for specific registry keys, values, or data formated as a .reg file</task>
-	[Command]
+	//TODO: review examples
 	[Description("Export registry values to file")]
 	[Example(@"Export all values and direct subkeys of HKLM\Software\MyApp", @"{0} -UserName milchick -Password Br3@kr00m! LUMON-FS1 HKLM\Software\MyApp")]
-	[Example(@"Export the value names 'InstallPath' and 'Version' under HKLM\Software\MyApp", @"{0} -UserName milchick -Password Br3@kr00m! LUMON-FS1 HKLM\Software\MyApp -ValueNameFilter InstallPath, Version")]
+	[Example(@"Export the value names 'InstallPath' and 'Version' under HKLM\Software\MyApp", @"{0} -UserName milchick -Password Br3@kr00m! LUMON-FS1 HKLM\Software\MyApp -ValueNameFilter InstallPath Version")]
 	[Example(@"Finds and exports all non-empty default value under HKLM\Software\Microsoft", @"{0} -UserName milchick -Password Br3@kr00m! LUMON-FS1 HKLM\Software\Microsoft -QueryDefaultValue -Recursive ")]
-	[Example(@"Search for and export any value name or data item containing the string 'password' or 'credential' under HKLM\Software", @"{0} -UserName milchick -Password Br3@kr00m! LUMON-FS1 HKLM\Software -ValueSearch -DataSearch -SearchPatterns password, credential -Recursive")]
-	internal class RegistryExportCommand : RegistryQueryCommandBase
+	[Example(@"Search for and export any value name or data item containing the string 'password' or 'credential' under HKLM\Software", @"{0} -UserName milchick -Password Br3@kr00m! LUMON-FS1 HKLM\Software -ValueSearch -DataSearch -SearchPatterns password credential -Recursive")]
+	internal class ExportCommand : QueryCommandBase
 	{
 		[Parameter]
 		[Description("Name of output file")]
@@ -95,8 +94,14 @@ namespace Wmi.Registry
 		protected override void OnValueMatch(RegistryPath keyPath, RegistryValueInfo value)
 		{
 			Debug.Assert(this._exporter != null);
-
-			this._exporter.WriteValue(keyPath, value.Name, value.ValueType, RegistryData.CreateRegValue(value));
+			try
+			{
+				this._exporter.WriteValue(keyPath, value.Name, value.ValueType, RegistryData.CreateRegValue(value));
+			}
+			catch (System.ArgumentException ae)
+			{
+				this.WriteWarning($"Unhandled value at {keyPath} : {value.Name}");
+			}
 		}
 
 		protected override void OnQueryComplete()
@@ -115,12 +120,7 @@ namespace Wmi.Registry
 						this.WriteWarning($"No data found to export.");
 					}
 				}
-				else
-				{
-					WriteMessage($"Export command complete");
-				}
 			}
 		}
 	}
-
 }

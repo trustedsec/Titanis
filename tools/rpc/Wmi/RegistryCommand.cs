@@ -9,11 +9,10 @@ using Titanis.Cli;
 using Titanis.Msrpc.Mswmi;
 
 // @freefirex Authored original registry MultiCommand code with add, delete, export, and query subcommands.
-
 namespace Wmi.Registry
 {
 	[Description("Interact with the Windows registry via WMI.")]
-	[Subcommand("add", typeof(RegistryAddCommand))]
+	[Subcommand("set", typeof(RegistrySetCommand))]
 	[Subcommand("delete", typeof(RegistryDeleteCommand))]
 	[Subcommand("export", typeof(RegistryExportCommand))]
 	[Subcommand("query", typeof(RegistryQueryCommand))]

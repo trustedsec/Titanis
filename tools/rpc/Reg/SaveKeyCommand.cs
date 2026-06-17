@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Titanis.Cli;
 using Titanis.Winterop.Registry;
 using Titanis.Winterop.Security;
+using Titanis.Cli.Registry;
 
 namespace Titanis.Msrpc.Msrrp.Cli
 {

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Titanis.Winterop.ErrorCodes\Titanis.Winterop.ErrorCodes.csproj" />
     <ProjectReference Include="..\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
   </ItemGroup>
 

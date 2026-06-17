@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel;
-using Titanis;
 using Titanis.Cli;
+using Titanis.Cli.Registry;
 using Titanis.Winterop;
 using Titanis.Winterop.Registry;
-using Titanis.Cli.Registry;
+using Titanis.Winterop.Security;
 
-namespace Wmi.Registry
+namespace Titanis.Msrpc.Msrrp.Cli
 {
-	/// <task category="WMI;Registry">Delete registry keys and values</task>
+	/// <task category="Registry">Delete registry keys and values</task>
 	[Command]
 	[Description("Deletes one or more registry keys and/or values")]
 	[DetailedHelpText(@"This command accepts one or more key/value specifications, allowing multiple keys and/or values to be deleted in a single execution
@@ -31,10 +31,10 @@ By default, deletion stops on the first encountered error. There is no automated
 	[Example(@"Delete the registry value 'InstallPath', 'Version' and 'Company Name' under HKLM\Software\MyApp", @"{0} -UserName milchick -Password Br3@kr00m! LUMON-FS1 HKLM\Software\MyApp InstallPath Version ""Company Name""", @"HKLM\Software\MyApp is not deleted, just the values ""InstallPath"", ""Version"" and ""Company Name""")]
 	[Example(@"Delete the registry key HKLM\Software\MyApp, HKLM\Software\YourApp and the values 'InstallPath', 'Version', and 'Company Name' under HKLM\Software\TheirApp", @"{0} -UserName milchick -Password Br3@kr00m! LUMON-FS1 HKLM\Software\YourApp HKLM\Software\TheirApp InstallPath Version ""Company Name"" HKLM\Software\MyApp",
 		@"Fully deletes the registry keys ""YourApp"" and ""MyApp"".  ""TheirApp"" is not deleted in its entirety, only ""InstallPath"", ""Version"", and ""Company Name"" are deleted.")]
-	internal class RegistryDeleteCommand : WmiRegistryCommandBase
+	internal class DeleteCommand : RegistryCommand
 	{
 		[Parameter(20)]
-		[Description("Keys and values to set")]
+		[Description("Keys and values to delete")]
 		[ValueNameOnly]
 		//[Mandatory]
 		public RegistryItemSpec[] Items { get; set; }
@@ -47,29 +47,22 @@ By default, deletion stops on the first encountered error. There is no automated
 		[Description("Continue even if a deletion fails")]
 		public SwitchParam ContinueOnError { get; set; }
 
-
-
-
 		private List<RegistryKeyGroup> _keys;
 		private uint _keysDeleted = 0;
 		private uint _valuesDeleted = 0;
+		//CachedRoots
+		private Dictionary<PredefinedKey, RegistryKey> _cachedRoots = new Dictionary<PredefinedKey, RegistryKey>();
 
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			base.ValidateParameters(context);
 			var planner = new RegistryPlanner(this.Log);
-			var initialKey = new RegistryKeySpec(keyPath.Root, keyPath.KeyPath, null);
-			initialKey.Accept(planner);
-			if (this.Items != null)
+			foreach (var item in this.Items)
 			{
-				foreach (var item in this.Items)
-				{
-					item.Accept(planner);
-				}
+				item.Accept(planner);
 			}
 
 			this._keys = planner.keys;
-			//Unlike reg we MUST use well defined types, there is no "other" for us
 			foreach (var keyGroup in this._keys)
 			{
 				if (keyGroup.values.Count == 0 && !DeleteKeys.IsSet)
@@ -77,16 +70,17 @@ By default, deletion stops on the first encountered error. There is no automated
 					context.LogError($"{keyGroup.key.Root}\\{keyGroup.key.KeyPath} specified without values. Either add -DeleteKeys or specify the values under this key to remove");
 				}
 			}
+
 		}
 
-		private async Task<Win32Exception?> DeleteSingleKey(object stdregprov, RegistryPath key)
+		private async Task<Win32Exception?> DeleteSingleKey(RegistryKey key, string subKeyPath, CancellationToken cancellationToken)
 		{
-			dynamic registry = stdregprov;
-			WriteDiagnostic($"Deleting key '{keyPath}'");
+			string target = RegistryPath.Combine(key.KeyPath, subKeyPath) ?? "";
+			WriteDiagnostic($"Deleting key {target}");
 			try
 			{
-				((Win32ErrorCode)(await registry.DeleteKey((uint)key.Root, key.KeyPath)).ReturnValue).CheckAndThrow();
-				WriteVerbose($"Deleted key '{keyPath}'");
+				await key.DeleteKey(subKeyPath, cancellationToken).ConfigureAwait(false);
+				WriteVerbose($"Deleted key '{target}'");
 				_keysDeleted++;
 				return null;
 			}
@@ -96,86 +90,108 @@ By default, deletion stops on the first encountered error. There is no automated
 			}
 		}
 
-		private async Task<bool> DeleteKey(object stdregprov, RegistryPath key, CancellationToken cancellationToken)
+		private async Task<bool> DeleteKey(RegistryKey key, string subkeyPath, CancellationToken cancellationToken)
 		{
-			dynamic registry = stdregprov;
-			uint predefKey = (uint)key.Root;
 			if (cancellationToken.IsCancellationRequested)
 			{
 				return false;
 			}
-			var deleteStatus = await DeleteSingleKey(stdregprov, key).ConfigureAwait(false);
+			var deleteStatus = await DeleteSingleKey(key, subkeyPath, cancellationToken);
 			if (deleteStatus == null)
 			{
 				return true;
 			}
-			//If the deletion didn't work we'll check for subkeys and try again.
 			WriteDiagnostic($"Enumerating subkeys of {key} for recursive deletion");
-			string[] names;
+			RegistryKey EnumKey;
 			try
 			{
-				var keyNames = await registry.EnumKey(predefKey, key.KeyPath);
-				((Win32ErrorCode)keyNames.ReturnValue).CheckAndThrow();
-				names = ((Array?)keyNames?.sNames)?.OfType<string>().ToArray() ?? Array.Empty<string>();
+				EnumKey = await key.OpenSubkey(subkeyPath, RegistryAccessRights.EnumerateSubkeys | RegistryAccessRights.QueryValue | RegistryAccessRights.Delete, KeyOptions, cancellationToken).ConfigureAwait(false);
 			}
 			catch (Win32Exception ex)
 			{
-				WriteError($"Failed to enumerate subkeys of {key}: {ex}");
+				WriteWarning($"Failed to open {subkeyPath} for subkey enumeration");
 				if (!ContinueOnError.IsSet)
 				{
 					throw;
 				}
-				return false;
-			}
-			foreach (string name in names)
-			{
-				if (cancellationToken.IsCancellationRequested)
-				{
-					return false;
-				}
-				var subKey = key.Append(name);
-				WriteDiagnostic($"Recursively deleting subkey '{subKey}'");
+				//If we're continuing, Lets retry the open without Delete rights, while the deletion as a whole won't work this allows us to still try getting as much coverage as we can.
 				try
 				{
-					_ = await DeleteKey(stdregprov, subKey, cancellationToken);
+					EnumKey = await key.OpenSubkey(subkeyPath, RegistryAccessRights.EnumerateSubkeys | RegistryAccessRights.QueryValue, KeyOptions, cancellationToken).ConfigureAwait(false);
 				}
 				catch (Win32Exception)
 				{
-					if (!ContinueOnError.IsSet)
-					{
-						throw;
-					}
-					// Continue with next subkey
+					return false;
 				}
 			}
-			deleteStatus = await DeleteSingleKey(stdregprov, key);
+			await using (EnumKey)
+			{
+				var subKeyNames = await EnumKey.GetSubkeyNames(cancellationToken).ToArray(cancellationToken);
+				foreach (var subKeyName in subKeyNames)
+				{
+					if (cancellationToken.IsCancellationRequested)
+					{
+						return false;
+					}
+					try
+					{
+						_ = await DeleteKey(EnumKey, subKeyName.KeyName, cancellationToken);
+					}
+					catch (Win32Exception ex) when ((Win32ErrorCode)ex.NativeErrorCode == Win32ErrorCode.ERROR_FILE_NOT_FOUND)
+					{
+						WriteVerbose($"{EnumKey}\\{subKeyName.KeyName} was not found");
+					}
+					catch (Exception)
+					{
+						if (!ContinueOnError.IsSet)
+						{
+							throw;
+						}
+						// Continue with next subkey
+					}
+				}
+			}
+
+			deleteStatus = await DeleteSingleKey(key, subkeyPath, cancellationToken).ConfigureAwait(false);
 			if (deleteStatus != null)
 			{
 				if (!ContinueOnError.IsSet)
 				{
 					throw deleteStatus;
 				}
-				this.WriteError($"Failed to delete key '{key}': {deleteStatus}");
+				this.WriteError($"Failed to delete key '{RegistryPath.Combine(key.KeyPath, subkeyPath)}' : {deleteStatus}");
 				return false;
 			}
 			return true;
 		}
 
-		protected override async Task<int> RunAsync(dynamic registry, CancellationToken cancellationToken)
+		protected override async Task<int> RunAsync(RemoteRegistryClient client, CancellationToken cancellationToken)
 		{
 			foreach (var keyGroup in this._keys)
 			{
 				var keySpec = keyGroup.key;
+				RegistryKey rootKey;
 				if (string.IsNullOrEmpty(keySpec.KeyPath) && keyGroup.values.Count == 0)
 				{
 					WriteWarning($"Can't delete a root key, skipping");
 					continue;
 				}
+
+				if (!_cachedRoots.ContainsKey(keySpec.Root))
+				{
+					rootKey = await client.OpenRootKey(keySpec.Root, RegistryAccessRights.Delete | RegistryAccessRights.SetValue, cancellationToken).ConfigureAwait(false);
+					_cachedRoots.Add(keySpec.Root, rootKey);
+				}
+				else
+				{
+					rootKey = _cachedRoots[keySpec.Root];
+				}
+
 				if (keyGroup.values.Count == 0)
 				{
-					WriteDiagnostic($"Deleting key {keySpec.Root}");
+					WriteDiagnostic($"Deleting key {keySpec}");
 					uint deleteCount = _keysDeleted;
-					var result = await DeleteKey((object)registry, new RegistryPath(keySpec.Root, keySpec.KeyPath), cancellationToken);
+					var result = await DeleteKey(rootKey, keySpec.KeyPath!, cancellationToken);
 					if (!result && deleteCount != _keysDeleted)
 					{
 						WriteWarning($"Delete of {keySpec} was partially completed. Validate its state if necessary.");
@@ -184,36 +200,68 @@ By default, deletion stops on the first encountered error. There is no automated
 					{
 						WriteVerbose($"Deleted key {keySpec}");
 					}
-
 				}
-
-				foreach (var valueSpec in keyGroup.values)
+				else
 				{
-					string valueName = (valueSpec.ValueName == null || valueSpec.ValueName == string.Empty) ? "" : valueSpec.ValueName;
-					uint rootAsUint = (uint)keySpec.Root;
-					try
+					RegistryKey baseKey;
+					if (string.IsNullOrEmpty(keySpec.KeyPath))
 					{
-						this.WriteDiagnostic($"Deleting value {keySpec} {valueName}");
-						((Win32ErrorCode)(await registry.DeleteValue((uint)keySpec.Root, keySpec.KeyPath, valueName).ConfigureAwait(false)).ReturnValue).CheckAndThrow();
-						_valuesDeleted++;
-						WriteVerbose($"Deleted value {keySpec} {valueName}");
+						baseKey = rootKey;
 					}
-					catch (Win32Exception ex)
+					else
 					{
-						if (ContinueOnError.IsSet)
+						WriteDiagnostic($"Opening subkey {keySpec} to delete contained values");
+						try
 						{
-							WriteWarning($"Failed to delete value {keySpec} {valueName} : {ex.Message}");
+							baseKey = await rootKey.OpenSubkey(keySpec.KeyPath!, RegistryAccessRights.SetValue, KeyOptions, cancellationToken).ConfigureAwait(false);
 						}
-						else
+						catch (Win32Exception ex)
 						{
-							throw;
+							if (ContinueOnError.IsSet)
+							{
+								WriteWarning($"Failed to open {keySpec} : {ex.Message}");
+								continue;
+							}
+							else
+							{
+								throw;
+							}
 						}
+					}
+
+					foreach (var valueSpec in keyGroup.values)
+					{
+						try
+						{
+							await baseKey.DeleteValue(valueSpec.ValueName, cancellationToken).ConfigureAwait(false);
+							_valuesDeleted++;
+						}
+						catch (Win32Exception ex)
+						{
+							if (ContinueOnError.IsSet)
+							{
+								WriteWarning($"Failed to delete value {keySpec} {valueSpec.ValueName} : {ex.Message}");
+							}
+							else
+							{
+								throw;
+							}
+						}
+					}
+
+					if (baseKey != rootKey)
+					{
+						baseKey.Dispose();
 					}
 				}
 			}
+			foreach (var item in this._cachedRoots)
+			{
+				item.Value.Dispose();
+			}
+
 			WriteMessage($"Deleted {_keysDeleted} keys.");
 			WriteMessage($"Deleted {_valuesDeleted} of the requested values.");
-
 			return 0;
 		}
 	}

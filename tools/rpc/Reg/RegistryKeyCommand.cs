@@ -16,62 +16,44 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		/// Gets the <see cref="RegistryAccessRights"/> required for the command.
 		/// </summary>
 		protected abstract RegistryAccessRights RequiredKeyAccess { get; }
-
-		private RegistryRootKey _rootKey;
-		private string? _keyPath;
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+		private RegistryPath _keyPath;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			base.ValidateParameters(context);
 
-			ParseKeyPath(this.KeyPath, out this._rootKey, out this._keyPath);
-			if (this._rootKey == RegistryRootKey.Invalid)
-				context.LogError($"The key path begins with an unsupported root key '{this._rootKey}'");
-
+			try
+			{
+				_keyPath = RegistryPath.Parse(KeyPath);
+			}
+			catch (ArgumentException ex)
+			{
+				context.LogError(nameof(KeyPath), $"The Key path is invalid: ${ex.Message}");
+			}
 
 			RegistryKeyOptions options = RegistryKeyOptions.None;
 			if (this.BackupSemantics.IsSet)
 				options |= RegistryKeyOptions.BackupRestore;
 		}
 
-		public static void ParseKeyPath(string keySpec, out RegistryRootKey rootKey, out string? path)
-        {
-			int isep = keySpec.IndexOfAny(new char[] { '/', '\\' });
-			string rootName;
-			if (isep > 0)
-			{
-				rootName = keySpec.Substring(0, isep);
-				path = keySpec.Substring(isep + 1);
-
-				var sep = keySpec[isep];
-				if (sep == '/')
-					path = path.Replace('/', '\\');
-			}
-			else
-			{
-				rootName = keySpec;
-				path = null;
-			}
-
-			rootKey = RemoteRegistryClient.TryResolveRootKey(rootName);
-		}
-
 		protected abstract Task<int> RunAsync(RegistryKey key, RemoteRegistryClient client, CancellationToken cancellationToken);
 
 		protected sealed override async Task<int> RunAsync(RemoteRegistryClient client, CancellationToken cancellationToken)
 		{
-			bool keyIsRoot = (this._keyPath is null);
-			var rootKey = await client.OpenRootKey(this._rootKey, keyIsRoot ? this.RequiredKeyAccess : RegistryAccessRights.EnumerateSubkeys, cancellationToken);
+
+			var rootKey = await client.OpenRootKey(this._keyPath.Root, _keyPath.IsRootPath ? this.RequiredKeyAccess : RegistryAccessRights.EnumerateSubkeys, cancellationToken);
 
 			RegistryKey key;
-			if (string.IsNullOrEmpty(this._keyPath))
+			if (_keyPath.IsRootPath)
 			{
 				key = rootKey;
 				rootKey = null;
 			}
 			else
 			{
-				key = await rootKey.OpenSubkey(this._keyPath, this.RequiredKeyAccess, this.KeyOptions, cancellationToken);
+				key = await rootKey.OpenSubkey(this._keyPath.KeyPath, this.RequiredKeyAccess, this.KeyOptions, cancellationToken);
 			}
 
 			return await this.RunAsync(key, client, cancellationToken);

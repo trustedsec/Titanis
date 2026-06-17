@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Titanis.Winterop.Registry
 {
-	public class RegistryExporter:IRegistrySearchCallback
+	public class RegistryExporter : IRegistrySearchCallback
 	{
 		public RegistryExporter(TextWriter writer)
 		{
@@ -23,7 +23,7 @@ namespace Titanis.Winterop.Registry
 		public int KeyCount { get; private set; }
 		public int ValueCount { get; private set; }
 
-		private RegistryPath? _lastPath;
+		private RegistryPath _lastPath = new RegistryPath(PredefinedKey.Invalid, null);
 
 		public void WriteKey(RegistryPath keyPath)
 		{
@@ -34,7 +34,7 @@ namespace Titanis.Winterop.Registry
 			this.KeyCount++;
 		}
 
-		public void WriteValue(RegistryPath keyPath, string valueName, RegistryValueKind valueKind, RegistryData? valueData)
+		public void WriteValue(RegistryPath keyPath, string valueName, RegistryValueType valueKind, RegistryData? valueData)
 		{
 			if (this._lastPath != keyPath)
 			{
@@ -53,10 +53,10 @@ namespace Titanis.Winterop.Registry
 			valueData.ExportTo(this._writer, valueNameEscaped.Length);
 		}
 
-		private void WriteKeySectionHeader(RegistryPath keyPath)
+		private void WriteKeySectionHeader(RegistryPath keyPath, bool forDeletion = false)
 		{
 			this._writer.WriteLine();
-			this._writer.WriteLine($"[{keyPath.Root}\\{keyPath.KeyPath}]");
+			this._writer.WriteLine($"[{(forDeletion ? "-" : "")}{RegistryRootKey.GetRootName(keyPath.Root)}\\{keyPath.KeyPath}]");
 		}
 
 		public void Close()
@@ -72,31 +72,10 @@ namespace Titanis.Winterop.Registry
 			this.WriteKey(keyPath);
 		}
 
-		void IRegistrySearchCallback.OnValueMatch(RegistryPath keyPath, string valueName, RegistryValueKind valueKind, RegistryData? valueData)
+		void IRegistrySearchCallback.OnValueMatch(RegistryPath keyPath, RegistryValueInfo value)
 		{
-			this.WriteValue(keyPath, valueName, valueKind, valueData);
+			this.WriteValue(keyPath, value.Name, value.ValueType, RegistryData.CreateRegValue(value));
 		}
 	}
 
-	public static class RegistryExporterExtensions
-	{
-		public static void ExportKeyToFile(this IRegistryKey key, string fileName)
-		{
-
-		}
-
-		public static RegistryExportResult ExportKeyTo(this IRegistryKey key, TextWriter writer)
-		{
-			ArgumentNullException.ThrowIfNull(key);
-			ArgumentNullException.ThrowIfNull(writer);
-
-			writer.WriteLine("Windows Registry Editor Version 5.00");
-
-			throw new NotImplementedException();
-		}
-	}
-
-	public record struct RegistryExportResult(int KeyCount, int EntryCount)
-	{
-	}
 }

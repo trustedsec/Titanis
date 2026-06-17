@@ -3,16 +3,15 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using Titanis.Cli;
 using Titanis.Winterop.Registry;
 using Titanis.Winterop.Security;
 
-namespace Titanis.Msrpc.Msrrp.Cli
+namespace Titanis.Cli.Registry
 {
 	[TypeConverter(typeof(RegistryValueSpecConverter))]
-	abstract class RegistryItemSpec
+	public abstract class RegistryItemSpec
 	{
-		internal abstract void Accept(IRegistryItemVisitor visitor);
+		public abstract void Accept(IRegistryItemVisitor visitor);
 	}
 
 	public enum RegistryValueEncoding
@@ -27,27 +26,31 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		Hex,
 		File,
 		Sddl,
+		Multi
 	}
 
-	interface IRegistryItemVisitor
+	public interface IRegistryItemVisitor
 	{
 		void Visit(RegistryKeySpec key);
 		void Visit(RegistryValueSpec value);
 	}
 
-	sealed class RegistryKeySpec : RegistryItemSpec
+	public sealed class RegistryKeySpec : RegistryItemSpec
 	{
-		public RegistryKeySpec(RegistryRootKey root, string? keyPath, string? className)
+		public RegistryKeySpec(PredefinedKey root, string? keyPath, string? className)
 		{
 			this.Root = root;
 			this.KeyPath = keyPath;
 		}
-		public RegistryRootKey Root { get; }
+		public PredefinedKey Root { get; }
 		public string? KeyPath { get; }
 
-		internal sealed override void Accept(IRegistryItemVisitor visitor) => visitor.Visit(this);
+		public sealed override void Accept(IRegistryItemVisitor visitor) => visitor.Visit(this);
+
+		public override string ToString() => $"{Root}\\{KeyPath}";
+
 	}
-	sealed class RegistryValueSpec : RegistryItemSpec
+	public sealed class RegistryValueSpec : RegistryItemSpec
 	{
 		public RegistryValueSpec(string valueName, RegistryValueType valueType, byte[] valueData)
 		{
@@ -60,7 +63,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		public RegistryValueType ValueType { get; }
 		public byte[] ValueData { get; }
 
-		internal sealed override void Accept(IRegistryItemVisitor visitor) => visitor.Visit(this);
+		public sealed override void Accept(IRegistryItemVisitor visitor) => visitor.Visit(this);
 	}
 
 	partial class RegistryValueSpecConverter : TypeConverter
@@ -75,11 +78,12 @@ namespace Titanis.Msrpc.Msrrp.Cli
 
 		public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
 		{
+			var nameOnly = (context as ParameterConverterContext)?.PropertyDescriptor?.Attributes[typeof(ValueNameOnlyAttribute)] != null;
 			if (value is string str)
 			{
 				foreach (var c in str)
 				{
-					if (c is ':')
+					if (c is ':' && !nameOnly)
 					{
 						return ParseValueSpec(str, context);
 					}
@@ -88,6 +92,8 @@ namespace Titanis.Msrpc.Msrrp.Cli
 						return ParseKeySpec(str, c);
 					}
 				}
+				if (nameOnly)
+					return new RegistryValueSpec(str, RegistryValueType.None, Array.Empty<byte>());
 
 				throw new FormatException($"The argument '{str}' does not appear to be a valid key name or value specification.");
 			}
@@ -134,7 +140,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 				{
 					RegistryValueType.ExpandString or
 					RegistryValueType.String => RegistryValueEncoding.Utf16Z,
-					RegistryValueType.MultiString => RegistryValueEncoding.Utf16,
+					RegistryValueType.MultiString => RegistryValueEncoding.Multi,
 					RegistryValueType.DwordLE or
 					RegistryValueType.DwordBE => RegistryValueEncoding.Dword,
 					RegistryValueType.Qword => RegistryValueEncoding.Qword,
@@ -145,14 +151,21 @@ namespace Titanis.Msrpc.Msrrp.Cli
 			}
 
 			RegistryValueEncoding enc;
-
+			char multiSep = ',';
 			{
 				var genc = m.Groups["e"];
 				if (genc.Success)
 				{
 					var encText = genc.Value;
-					if (!Enum.TryParse(encText, true, out enc))
+					if (encText.ToLower().StartsWith("multi"))
+					{
+						multiSep = (encText.Length > 5) ? encText[5] : ',';
+						enc = RegistryValueEncoding.Multi;
+					}
+					else if (!Enum.TryParse(encText, true, out enc))
+					{
 						throw new FormatException($"Bad value encoding type: {encText}");
+					}
 				}
 				else
 				{
@@ -173,6 +186,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 				RegistryValueEncoding.Cz => ParseCStringData(dataSpec, true),
 				RegistryValueEncoding.Utf16 => ParseUtfStringData(dataSpec, false),
 				RegistryValueEncoding.Utf16Z => ParseUtfStringData(dataSpec, true),
+				RegistryValueEncoding.Multi => ParseMultiStrData(dataSpec, multiSep),
 				RegistryValueEncoding.Dword => ParseDword(dataSpec),
 				RegistryValueEncoding.Qword => ParseQword(dataSpec),
 				RegistryValueEncoding.Hex => BinaryHelper.ParseHexString(dataSpec),
@@ -195,13 +209,8 @@ namespace Titanis.Msrpc.Msrrp.Cli
 			if (pathSep != '\\')
 				path = path.UnescapeCStyle().Replace(pathSep, '\\');
 
-			RegistryRootKey root = RegistryRootKey.Invalid;
-			string? keyRelativePath = null;
-			RegistryKeyCommand.ParseKeyPath(path, out root, out keyRelativePath);
-			if (root == RegistryRootKey.Invalid)
-				throw new FormatException($"Invalid root specified in {path}");
-
-			return new RegistryKeySpec(root, keyRelativePath, null);
+			var keyPath = RegistryPath.Parse(path);
+			return new RegistryKeySpec(keyPath.Root, keyPath.KeyPath, null);
 		}
 
 		private static byte[] ParseCStringData(string valueText, bool nullTerminate)
@@ -221,9 +230,16 @@ namespace Titanis.Msrpc.Msrrp.Cli
 			return Encoding.Unicode.GetBytes(valueText);
 		}
 
+		//TODO: Provide an option to read MULTI_SZ entries from a text file
+		private static byte[] ParseMultiStrData(string value, char separator)
+		{
+			var values = value.Split(separator);
+			return Encoding.Unicode.GetBytes(string.Join('\0', values) + "\0\0");
+		}
+
 		private byte[] ParseFileData(FileSpec filePath, IFileAccess fileAccess, ILog? log)
 		{
-            ArgumentNullException.ThrowIfNull(fileAccess);
+			ArgumentNullException.ThrowIfNull(fileAccess);
 
 			log.WriteDiagnostic($"Reading file {filePath}");
 			var data = fileAccess.ReadAllBytesFrom(filePath);
@@ -243,8 +259,8 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		{
 			byte[] bytes = new byte[8];
 
-			uint u = (uint)Command.GetScalarParamConverter(typeof(ulong)).ConvertFrom(valueText);
-			BinaryPrimitives.WriteUInt32LittleEndian(bytes, u);
+			ulong u = (ulong)Command.GetScalarParamConverter(typeof(ulong)).ConvertFrom(valueText);
+			BinaryPrimitives.WriteUInt64LittleEndian(bytes, u);
 			return bytes;
 		}
 	}

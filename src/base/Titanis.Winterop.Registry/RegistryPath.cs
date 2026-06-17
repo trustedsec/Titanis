@@ -7,43 +7,25 @@ using System.Text.RegularExpressions;
 
 namespace Titanis.Winterop.Registry
 {
-	/// <summary>
-	/// Specifies a predefined root key in the Windows registry.
-	/// </summary>
-	public enum PredefinedKey : uint
-	{
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        HKEY_CLASSES_ROOT = 0x80000000,
-        HKEY_CURRENT_USER,
-		HKEY_LOCAL_MACHINE,
-		HKEY_USERS,
-		HKEY_CURRENT_CONFIG,
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-	}
+
+
 
 	/// <summary>
 	/// Represents a Windows registry path.
 	/// </summary>
 	[TypeConverter(typeof(RegistryPathConverter))]
-	public sealed class RegistryPath
+	public sealed class RegistryPath : IEquatable<RegistryPath>
 	{
 		/// <summary>
 		/// Represents a registry path, including the predefined hive and the key path.
 		/// </summary>
-		/// <param name="server">Name of server (if remote)</param>
 		/// <param name="root">The root registry key</param>
 		/// <param name="keyPath">The path to the registry key within the specified hive. If null, an empty string is used.</param>
-		public RegistryPath(string? server, PredefinedKey root, string? keyPath)
+		public RegistryPath(PredefinedKey root, string? keyPath)
 		{
-			ServerName = server;
 			Root = root;
 			KeyPath = keyPath ?? string.Empty;
 		}
-
-		/// <summary>
-		/// Name of server containing the registry (if remote).
-		/// </summary>
-		public string? ServerName { get; }
 
 		/// <summary>
 		/// Gets the predefined key representing the hive in the registry.
@@ -58,8 +40,10 @@ namespace Titanis.Winterop.Registry
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return $"\\\\{ServerName}\\{Root}\\{KeyPath}";
+			return $"{RegistryRootKey.GetRootName(Root)}{((KeyPath.Length != 0) ? '\\' + KeyPath : String.Empty)}";
 		}
+
+		public bool IsRootPath => (KeyPath == string.Empty);
 
 		/// <summary>
 		/// Gets the final key component of <see cref="KeyPath"/>.
@@ -78,27 +62,8 @@ namespace Titanis.Winterop.Registry
 		{
 			ArgumentException.ThrowIfNullOrEmpty(subkeyName);
 
-			var subkeyPath = new RegistryPath(this.ServerName, this.Root, $"{this.KeyPath}\\{subkeyName}");
-			return subkeyPath;
+			return (this.IsRootPath) ? new RegistryPath(this.Root, subkeyName) : new RegistryPath(this.Root, $"{this.KeyPath}\\{subkeyName}");
 		}
-
-		#region Predefined roots
-		private static readonly string[] predefinedRootNames = new string[]
-		{
-			"HKEY_CLASSES_ROOT",
-			"HKEY_CURRENT_USER",
-			"HKEY_LOCAL_MACHINE",
-			"HKEY_USERS",
-			"HKEY_CURRENT_CONFIG",
-		};
-		private static readonly string[] predefinedRootShortNames = new string[]
-		{
-			"HKCR",
-			"HKCU",
-			"HKLM",
-			"HKU",
-			"HKCC",
-		};
 
 		/// <summary>
 		/// Attempts to resolve a root key name to a <see cref="PredefinedKey"/> value.
@@ -110,25 +75,22 @@ namespace Titanis.Winterop.Registry
 		{
 			if (rootName != null)
 			{
-				if (rootName.StartsWith("0x") && uint.TryParse(rootName.AsSpan(2), System.Globalization.NumberStyles.HexNumber, null, out var ul)
-					|| uint.TryParse(rootName, out ul)
-					)
-				{
-					root = (PredefinedKey)ul;
-					return true;
-				}
 
-				int i = Array.IndexOf(predefinedRootNames, rootName.ToUpper());
+
+				int i = Array.IndexOf(RegistryRootKey.RootNames, rootName.ToUpper());
+				if (i < 0)
+					i = Array.IndexOf(RegistryRootKey.RootShortNames, rootName.ToUpper());
 				if (i >= 0)
 				{
-					root = (PredefinedKey)((uint)PredefinedKey.HKEY_CLASSES_ROOT + i);
-					return true;
-				}
-
-				i = Array.IndexOf(predefinedRootShortNames, rootName.ToUpper());
-				if (i >= 0)
-				{
-					root = (PredefinedKey)((uint)PredefinedKey.HKEY_CLASSES_ROOT + i);
+					uint rootval = (uint)((uint)PredefinedKey.ClassesRoot + i);
+					if ((rootval) > ((uint)PredefinedKey.CurrentConfig))
+					{
+						root = (rootval == (uint)PredefinedKey.CurrentConfig + 1) ? PredefinedKey.PerformanceText : PredefinedKey.PerformanceNlsText;
+					}
+					else
+					{
+						root = (PredefinedKey)rootval;
+					}
 					return true;
 				}
 			}
@@ -136,7 +98,6 @@ namespace Titanis.Winterop.Registry
 			root = 0;
 			return false;
 		}
-		#endregion
 
 		/// <summary>
 		/// Parses a registry path into its components.
@@ -147,35 +108,109 @@ namespace Titanis.Winterop.Registry
 		public static RegistryPath Parse(string path)
 		{
 			if (string.IsNullOrEmpty(path)) throw new ArgumentException($"'{nameof(path)}' cannot be null or empty.", nameof(path));
+			var validRootNames = RegistryRootKey.RootNames.Concat(RegistryRootKey.RootShortNames);
+			var rootName = validRootNames.FirstOrDefault(name => path.StartsWith(name, StringComparison.OrdinalIgnoreCase));
+			if (rootName is null || !TryResolveRootName(rootName, out var root))
+			{
+				throw new ArgumentException($"Predefined key name is invalid. must be one of {string.Join(' ', validRootNames)}");
+			}
+			if (path.Length == rootName.Length)
+				return new RegistryPath(root, string.Empty);
 
+			char separator = path[rootName.Length];
 			var rgx =
-				path.StartsWith("//") ? rgxPathSlash
-				: path.StartsWith("\\\\") ? rgxPathBackslash
+				separator == '/' ? rgxPathSlash
+				: separator == '\\' ? rgxPathBackslash
 				: throw CreateBadPathException(nameof(path));
 
 			var match = rgx.Match(path);
 			if (!match.Success)
 				throw CreateBadPathException(nameof(path));
 
-			var serverName = match.Groups["server"].Value;
-			var rootName = match.Groups["root"].Value;
-			if (!TryResolveRootName(rootName, out var root))
-				throw new ArgumentException($"Key name '{rootName}' is not a supported predefined root key.  Consult the documentation for a list of valid names.", nameof(path));
-
 			string keyPath = match.Groups["keypath"].Value;
-			if (path[0] == '/')
+			if (separator == '/')
 				keyPath = keyPath.Replace('/', '\\');
+			keyPath = keyPath.TrimEnd('\\');
+			return new RegistryPath(root, keyPath);
+		}
 
-			return new RegistryPath(serverName, root, keyPath);
+		/// <summary>
+		/// Gets the subkey name from a registry path string.
+		/// </summary>
+		/// <param name="keyPath">Registry key path</param>
+		/// <returns>The key name at the end of the path</returns>
+		/// <remarks>
+		/// This method is analogous to <see cref="Path.GetFileName(string?)"/>.
+		/// The registry allows a slash (`/`) as part of a key name and
+		/// does not treat it as a path separator.
+		/// </remarks>
+		public static string GetSubkeyNameFromPath(string keyPath)
+		{
+			int isep = keyPath.LastIndexOf('\\');
+			return (isep > 0) ? keyPath.Substring(isep + 1) : keyPath;
+		}
+
+		/// <summary>
+		/// Gets the subkey name from a registry path string.
+		/// </summary>
+		/// <param name="keyPath">Registry key path</param>
+		/// <returns>The key name at the end of the path</returns>
+		/// <remarks>
+		/// This method is analogous to <see cref="Path.GetFileName(string?)"/>.
+		/// The registry allows a slash (`/`) as part of a key name and
+		/// does not treat it as a path separator.
+		/// </remarks>
+		public static string? GetParentKeyNameFromPath(string keyPath)
+		{
+			int isep = keyPath.LastIndexOf('\\');
+			return (isep > 0) ? keyPath.Substring(0, isep) : null;
+		}
+
+		/// <summary>
+		/// Combines two registry path strings.
+		/// </summary>
+		/// <param name="path1">First path to combine</param>
+		/// <param name="path2">Next path to combine</param>
+		/// <returns>A path combining <paramref name="path1"/> and <paramref name="path2"/>.</returns>
+		public static string? Combine(string path1, string? path2)
+		{
+			if (string.IsNullOrEmpty(path1))
+				return path2;
+			if (string.IsNullOrEmpty(path2))
+				return path1;
+
+			if (!path1.EndsWith('\\'))
+				path1 += '\\';
+
+			path1 += path2;
+
+			return path1;
 		}
 
 		private static Exception CreateBadPathException(string argName)
 		{
-			return new ArgumentException(@"Registry key path must be formatted as a UNC path of the form \\<serverName>\<root>\<path> or //<serverName>/<root>/<path>", argName);
+			return new ArgumentException(@"Registry key path must be formatted as a UNC path of the form <root>\<path> or <root>/<path>", argName);
 		}
 
-		private static readonly Regex rgxPathSlash = new Regex(@"^//(?<server>(\w|-|\.)*)/(?<root>\w+)(/(?<keypath>.*))?$");
-		private static readonly Regex rgxPathBackslash = new Regex(@"^\\\\(?<server>(\w|-|\.)*)\\(?<root>\w+)(\\(?<keypath>.*))?$");
+		public bool Equals(RegistryPath other)
+		{
+			return (other.KeyPath == this.KeyPath && other.Root == this.Root);
+		}
+
+		public override int GetHashCode() => this.ToString().GetHashCode();
+
+		public static bool operator ==(RegistryPath r1, RegistryPath r2)
+		{
+			return r1.Equals(r2);
+		}
+
+		public static bool operator !=(RegistryPath r1, RegistryPath r2)
+		{
+			return !(r1 == r2);
+		}
+
+		private static readonly Regex rgxPathSlash = new Regex(@"^(?<root>\w+)(/(?<keypath>.*))?$");
+		private static readonly Regex rgxPathBackslash = new Regex(@"^(?<root>\w+)(\\(?<keypath>.*))?$");
 	}
 
 	/// <summary>
