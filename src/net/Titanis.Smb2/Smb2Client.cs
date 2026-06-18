@@ -41,6 +41,7 @@ namespace Titanis.Smb2
 			this.credentialService = credentialService;
 			this.optionsService = optionsService;
 			this.traceCallback = traceCallback;
+			this.log = log;
 		}
 
 		/// <summary>
@@ -68,6 +69,7 @@ namespace Titanis.Smb2
 		private readonly IClientCredentialService credentialService;
 		private readonly ISmbOptionsService? optionsService;
 		private readonly ISmb2TraceCallback? traceCallback;
+		private readonly ILog? log;
 
 		/// <summary>
 		/// Connects to an SMB2 server.

@@ -68,9 +68,17 @@ namespace Titanis
 			return matches;
 		}
 
+		// [MS-DFSC] § 2.2.1
+		/// <summary>
+		/// Gets the share path (without the file path) normalized for a DFS referral request.
+		/// </summary>
 		internal string DfsSharePath
 			=> string.IsNullOrEmpty(ShareName) ? $@"\{ServerName}"
 			: $@"\{ServerName}\{ShareName}";
+		// [MS-DFSC] § 2.2.1
+		/// <summary>
+		/// Gets the path normalized for a DFS referral request.
+		/// </summary>
 		public string PathForDfsReferral
 			=> string.IsNullOrEmpty(ShareName) ? $@"\{ServerName}"
 			: string.IsNullOrEmpty(ShareRelativePath) ? $@"\{ServerName}\{ShareName}"

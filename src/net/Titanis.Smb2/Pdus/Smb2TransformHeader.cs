@@ -12,14 +12,14 @@ namespace Titanis.Smb2.Pdus
 	{
 		Encrypted = 1,
 	}
+
 	// [MS-SMB2] § 2.2.41
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	struct Smb2TransformHeader
 	{
 		internal static unsafe int StructSize => sizeof(Smb2TransformHeader);
-		public const int Smb2TransformSignature = 0x424D53FD;
 
-		internal uint protocolId;
+		internal Smb2ProtocolId protocolId;
 		internal Guid signature;
 		internal Guid nonce;
 		internal int originalMessageSize;

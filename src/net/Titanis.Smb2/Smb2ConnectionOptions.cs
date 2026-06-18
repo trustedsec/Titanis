@@ -105,9 +105,9 @@ namespace Titanis.Smb2
 		public CompressionCaps CompressionCaps { get; set; } = DefaultCompressionCaps;
 
 		public static readonly CompressionAlgorithm[] DefaultCompressionAlgorithms = new CompressionAlgorithm[] {
-			CompressionAlgorithm.Pattern_V1,
-			CompressionAlgorithm.Lz77,
-			CompressionAlgorithm.Lz77_Huffman,
+			//CompressionAlgorithm.Pattern_V1,
+			//CompressionAlgorithm.Lz77,
+			//CompressionAlgorithm.Lz77_Huffman,
 			CompressionAlgorithm.Lznt1,
 		};
 		/// <summary>

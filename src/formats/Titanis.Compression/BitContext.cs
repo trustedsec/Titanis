@@ -4,9 +4,15 @@ namespace Titanis.Compression
 {
 	ref struct BitContext
 	{
+		internal BitContext(ReadOnlySpan<byte> source)
+		{
+			this.source = source;
+		}
+
 		internal ReadOnlySpan<byte> source;
 		internal int sourceIndex;
 		internal int bitIndex;
+		internal int bitFlip;
 
 		public uint ReadBits(int count)
 		{
@@ -40,7 +46,7 @@ namespace Titanis.Compression
 
 		internal uint ReadBit()
 		{
-			var bit = (this.source[this.sourceIndex] >> this.bitIndex) & 1;
+			var bit = (this.source[this.sourceIndex] >> ((this.bitFlip == 0) ? this.bitIndex : (7 - this.bitIndex))) & 1;
 
 			this.bitIndex++;
 			if (this.bitIndex == 8)

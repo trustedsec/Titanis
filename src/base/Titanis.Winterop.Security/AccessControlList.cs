@@ -181,5 +181,25 @@ namespace Titanis.Winterop.Security
 
 			return aclFlags;
 		}
+
+		// [MS-DTYP] § 2.5.3.1.3 GetScopedPolicySid
+		public SecurityIdentifier? GetScopedPolicySid()
+		{
+			foreach (var ace in this.Entries)
+			{
+				if (0 == (ace.AceFlags & AccessControlEntryFlags.InheritOnly) && ace.AceType is AccessControlEntryType.ScopedPolicyId && ace is SimpleAce simple)
+				{
+					return ace.Trustee;
+				}
+			}
+
+			return null;
+		}
+
+		// [MS-DTYP] § 2.5.3.1.7 LookupAttributeInSacl
+		public SecurityIdentifier? LookupAttribute(string name)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

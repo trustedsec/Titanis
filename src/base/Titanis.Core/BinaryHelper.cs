@@ -67,6 +67,48 @@ namespace Titanis
 		/// <param name="bytes">Span of bytes</param>
 		/// <returns>A string of hexadecimal digits</returns>
 		public static string ToHexString(this Span<byte> bytes) => ToHexString(bytes, HexStringOptions.Default);
+		public static string ToHexDump(this Span<byte> bytes, bool includeAscii, int maxWidth = 16)
+		{
+			if (maxWidth <= 0)
+				throw new ArgumentOutOfRangeException(nameof(maxWidth));
+
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < bytes.Length;)
+			{
+				sb.Append($"{i:x4}:");
+
+				int end = Math.Min(i + maxWidth, bytes.Length);
+				int width = end - i;
+
+				for (int j = i; j < end; j++)
+					sb.Append($" {bytes[j]:x2}");
+
+				{
+					int r = maxWidth - width;
+					if (r > 0)
+						sb.Append(' ', 3 * r);
+				}
+
+				if (includeAscii)
+				{
+					sb.Append(' ', 3);
+					for (int j = i; j < end; j++)
+					{
+						var b = (char)bytes[j];
+						if (b < ' ' || b >= 0x80)
+							b = '.';
+						sb.Append(b);
+					}
+				}
+
+				sb.AppendLine();
+
+				i = end;
+			}
+
+			return sb.ToString();
+		}
+
 		/// <summary>
 		/// Converts a span of bytes to a string of hexadecimal digits.
 		/// </summary>

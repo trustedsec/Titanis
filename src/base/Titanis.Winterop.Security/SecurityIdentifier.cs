@@ -36,7 +36,7 @@ namespace Titanis.Winterop.Security
 	/// Represents a security identifier.
 	/// </summary>
 	[TypeConverter(typeof(SecurityIdentifierConverter))]
-	public class SecurityIdentifier
+	public class SecurityIdentifier : IEquatable<SecurityIdentifier>
 	{
 		public const int RevisionValue = 1;
 		private const string DomainPlaceholderPrefix = "S-1-5-21-<domain>-";
@@ -362,6 +362,52 @@ namespace Titanis.Winterop.Security
 
 			return sb.ToString();
 		}
+
+		#region Equality
+		/// <inheritdoc/>
+		public sealed override int GetHashCode()
+		{
+			int hash = this.IdentifierAuthority.GetHashCode();
+			for (int i = 0; i < this.SubauthorityCount; i++)
+			{
+				var subauth = this.GetSubauthority(i);
+				hash = HashCode.Combine(hash, subauth);
+			}
+			return hash;
+		}
+
+		/// <inheritdoc/>
+		public sealed override bool Equals(object? obj) => (obj is SecurityIdentifier other) && this.Equals(other);
+		/// <inheritdoc/>
+		public bool Equals(SecurityIdentifier? other)
+		{
+			if (other is null)
+				return false;
+
+			if (
+				(this.IdentifierAuthority == other.IdentifierAuthority)
+				&& (this.SubauthorityCount == this.SubauthorityCount)
+				)
+			{
+				for (int i = 0; i < this.SubauthorityCount; i++)
+				{
+					var subauthX = this.GetSubauthority(i);
+					var subauthY = other.GetSubauthority(i);
+					if (subauthX != subauthY)
+						return false;
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
+		public static bool operator ==(SecurityIdentifier? x, SecurityIdentifier? y) => object.ReferenceEquals(x, y) || (x?.Equals(y) ?? false);
+		public static bool operator !=(SecurityIdentifier? x, SecurityIdentifier? y) => !(x == y);
+
+		#endregion
+
 
 
 		private WellKnownSid FindWksMapping()

@@ -66,9 +66,8 @@ namespace Titanis.Compression
 
 		public static int Inflate(ReadOnlySpan<byte> compressed, Span<byte> uncompressed, int writeIndex)
 		{
-			BitContext ctx = new BitContext
+			BitContext ctx = new BitContext(compressed)
 			{
-				source = compressed,
 				sourceIndex = 0
 			};
 

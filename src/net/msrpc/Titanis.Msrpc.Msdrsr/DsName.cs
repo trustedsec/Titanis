@@ -8,6 +8,9 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msdrsr
 {
+	/// <summary>
+	/// Names an object within Directory Services
+	/// </summary>
 	[TypeConverter(typeof(DsNameConverter))]
 	public sealed class DsName
 	{

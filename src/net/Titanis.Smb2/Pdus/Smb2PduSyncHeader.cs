@@ -29,6 +29,16 @@ namespace Titanis.Smb2.Pdus
 		internal ulong hi;
 	}
 
+
+	public enum Smb2ProtocolId : uint
+	{
+		Smb2 = 0x424d53fe,
+		// [MS-SMB2] § 2.2.42.1 SMB2_COMPRESSION_TRANSFORM_HEADER_UNCHAINED
+		Compression = 0x424D53FC,
+		// [MS-SMB2] § 2.2.41 SMB2 TRANSFORM_HEADER
+		Transform = 0x424D53FD,
+	}
+
 	// [MS-SMB2] § 2.2.1.2 - SMB2 Packet Header - SYNC
 	[PduStruct]
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -36,10 +46,9 @@ namespace Titanis.Smb2.Pdus
 	{
 		public unsafe static short StructSize => (short)sizeof(Smb2PduSyncHeader);
 		public const uint ProcessId = 0xFEFF;
-		public const uint ValidSignature = 0x424d53fe;
 		public const int SigSize = 16;
 
-		internal uint protocolId;
+		internal Smb2ProtocolId protocolId;
 		internal short structSize;
 		internal ushort creditCharge;
 		internal Ntstatus status;
@@ -58,5 +67,40 @@ namespace Titanis.Smb2.Pdus
 			get => (ushort)this.status;
 			set => this.status = (Ntstatus)value;
 		}
+	}
+
+	enum CompressionFlags : ushort
+	{
+		None = 0,
+		Chained = 1,
+	}
+
+	// [MS-SMB2] § 2.2.42.1 SMB2_COMPRESSION_TRANSFORM_HEADER_UNCHAINED
+	[PduStruct]
+	partial struct Smb2CompressHeaderUnchained
+	{
+		internal Smb2ProtocolId protocolId;
+		internal uint originalCompressedSegmentSize;
+		internal CompressionAlgorithm compressionAlgorithm;
+		internal CompressionFlags flags;
+		internal int offset;
+	}
+
+	// [MS-SMB2] § 2.2.42.2 SMB2_COMPRESSION_TRANSFORM_HEADER_CHAINED
+	[PduStruct]
+	partial struct Smb2CompressHeaderChained
+	{
+		internal Smb2ProtocolId protocolId;
+		internal uint originalCompressedSegmentSize;
+		internal Smb2CompressChainedPayloadHeader payloadHeader;
+	}
+
+	[PduStruct]
+	partial struct Smb2CompressChainedPayloadHeader
+	{
+		internal CompressionAlgorithm compressionAlgorithm;
+		internal CompressionFlags flags;
+		internal uint length;
+		// internal uint originalPayloadSize;
 	}
 }

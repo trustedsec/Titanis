@@ -54,6 +54,7 @@
     <ProjectReference Include="..\..\crypto\Titanis.Crypto.Aes128Cmac\Titanis.Crypto.Aes128Cmac.csproj" />
     <ProjectReference Include="..\..\crypto\Titanis.Crypto.Rc4\Titanis.Crypto.Rc4.csproj" />
     <ProjectReference Include="..\..\crypto\Titanis.Crypto.Sp800_108\Titanis.Crypto.Sp800_108.csproj" />
+    <ProjectReference Include="..\..\formats\Titanis.Compression\Titanis.Compression.csproj" />
     <ProjectReference Include="..\..\security\Titanis.Security.Spnego\Titanis.Security.Spnego.csproj" />
     <ProjectReference Include="..\..\security\Titanis.Security\Titanis.Security.csproj" />
     <ProjectReference Include="..\Titanis.Net\Titanis.Net.csproj" />

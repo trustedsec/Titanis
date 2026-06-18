@@ -10,6 +10,7 @@ using System.Security.Authentication.ExtendedProtection;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Titanis.Compression;
 using Titanis.IO;
 using Titanis.Security;
 using Titanis.Smb2.Pdus;
@@ -711,7 +712,7 @@ namespace Titanis.Smb2
 
 			ref Smb2PduHeaderBuffer hdrbuf = ref pdu.pduhdrbuf;
 			ref Smb2PduSyncHeader hdr = ref hdrbuf.sync;
-			hdr.protocolId = Smb2PduSyncHeader.ValidSignature;
+			hdr.protocolId = Smb2ProtocolId.Smb2;
 			hdr.structSize = Smb2PduSyncHeader.StructSize;
 			hdr.command = pdu.Command;
 			hdr.flags = pduFlags;
@@ -768,7 +769,7 @@ namespace Titanis.Smb2
 			{
 				// [MS-SMB2] § 3.1.4.3 - Encrypting the message
 				ref Smb2TransformHeader xform = ref MemoryMarshal.AsRef<Smb2TransformHeader>(frameBytes.Span.Slice(offXform, Smb2TransformHeader.StructSize));
-				xform.protocolId = Smb2TransformHeader.Smb2TransformSignature;
+				xform.protocolId = Smb2ProtocolId.Transform;
 				xform.originalMessageSize = pduSize;
 				xform.sessionId = hdr.sessionId;
 				xform.flags_encAlgo = 1;
@@ -806,29 +807,75 @@ namespace Titanis.Smb2
 
 		internal Smb2Message ParsePdu(Memory<byte> pduBytes)
 		{
-			var sig = BinaryPrimitives.ReadUInt32LittleEndian(pduBytes.Span);
-			if (sig == Smb2TransformHeader.Smb2TransformSignature)
+			while (true)
 			{
-				ref var xform = ref MemoryMarshal.AsRef<Smb2TransformHeader>(pduBytes.Span);
-				var session = this.GetSession(xform.sessionId);
-				if (session == null)
-					throw new ProtocolViolationException("The session ID in the transform header does not match an open session.");
+				var sig = (Smb2ProtocolId)BinaryPrimitives.ReadUInt32LittleEndian(pduBytes.Span);
+				if (sig == Smb2ProtocolId.Transform)
+				{
+					ref var xform = ref MemoryMarshal.AsRef<Smb2TransformHeader>(pduBytes.Span);
+					var session = this.GetSession(xform.sessionId);
+					if (session == null)
+						throw new ProtocolViolationException("The session ID in the transform header does not match an open session.");
 
-				var cryptInfo = session.CryptInfo;
-				if (cryptInfo == null)
-					throw new ProtocolViolationException("The session does not have the cryptographic info to decrypt an encrypted packet.");
+					var cryptInfo = session.CryptInfo;
+					if (cryptInfo == null)
+						throw new ProtocolViolationException("The session does not have the cryptographic info to decrypt an encrypted packet.");
 
-				var nonceBytes = xform.NonceBytes.Slice(0, cryptInfo.NonceSize);
-				var wrapped = pduBytes.Span.Slice(Smb2TransformHeader.StructSize, xform.originalMessageSize);
-				var authData = pduBytes.Span.Slice(20, 8 * 4);
-				cryptInfo.Decrypt(
-					nonceBytes,
-					wrapped,
-					xform.SignatureBytes,
-					wrapped,
-					authData
-					);
-				pduBytes = pduBytes.Slice(Smb2TransformHeader.StructSize, xform.originalMessageSize);
+					var nonceBytes = xform.NonceBytes.Slice(0, cryptInfo.NonceSize);
+					var wrapped = pduBytes.Span.Slice(Smb2TransformHeader.StructSize, xform.originalMessageSize);
+					var authData = pduBytes.Span.Slice(20, 8 * 4);
+					cryptInfo.Decrypt(
+						nonceBytes,
+						wrapped,
+						xform.SignatureBytes,
+						wrapped,
+						authData
+						);
+					pduBytes = pduBytes.Slice(Smb2TransformHeader.StructSize, xform.originalMessageSize);
+				}
+				else if (sig == Smb2ProtocolId.Compression)
+				{
+					var flags = (CompressionFlags)BinaryPrimitives.ReadUInt16LittleEndian(pduBytes.Span.Slice(10, 2));
+					if (0 == (flags & CompressionFlags.Chained))
+					{
+						// Unchained
+						var compHeader = new ByteMemoryReader(pduBytes).ReadPduStruct<Smb2CompressHeaderUnchained>();
+						// TODO: PDU size limits
+						byte[] uncomp = new byte[compHeader.originalCompressedSegmentSize + compHeader.offset];
+						pduBytes.Span.Slice(Smb2CompressHeaderUnchained.PduStructSize).CopyTo(uncomp);
+
+						var compData = pduBytes.Span.Slice(Smb2CompressHeaderUnchained.PduStructSize + compHeader.offset);
+
+						switch (compHeader.compressionAlgorithm)
+						{
+							case CompressionAlgorithm.Lz77:
+								Lz77.Decompress(compData, uncomp, compHeader.offset);
+								break;
+							case CompressionAlgorithm.Lz77_Huffman:
+								Lz77Huffman.Decompress(compData, uncomp, compHeader.offset);
+								break;
+							case CompressionAlgorithm.Lznt1:
+								Lznt1.Decompress(compData, uncomp, compHeader.offset);
+								break;
+							case CompressionAlgorithm.None:
+							case CompressionAlgorithm.Pattern_V1:
+							default:
+								throw new NotSupportedException($"Compression algorithm {compHeader.compressionAlgorithm} not supported");
+								break;
+						}
+						pduBytes = uncomp;
+					}
+					else
+					{
+						throw new NotImplementedException("Chained support not implemented");
+
+					}
+
+				}
+				else if (sig == Smb2ProtocolId.Smb2)
+					break;
+				else
+					throw new ProtocolViolationException($"Unknown protocol signature 0x{(uint)sig:X8}");
 			}
 
 			ByteMemoryReader reader = new ByteMemoryReader(pduBytes);
