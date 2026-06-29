@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers.Binary;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -146,7 +147,7 @@ namespace Titanis.Smb2
 			public static bool operator !=(ConnectionKey left, ConnectionKey right)
 				=> !(left == right);
 		}
-		private Dictionary<ConnectionKey, ConnectionGroup> _connections = new Dictionary<ConnectionKey, ConnectionGroup>();
+		private ConcurrentDictionary<ConnectionKey, ConnectionGroup> _connections = new ConcurrentDictionary<ConnectionKey, ConnectionGroup>();
 
 		// connGroup.connections[connGroup.selectIndex++ % connGroup.connections.Count]
 		internal async Task<ConnectionGroup> GetConnectionAsync(
@@ -175,21 +176,25 @@ namespace Titanis.Smb2
 
 			// Try each of the resolved addresses
 			Exception? exception = null;
-			this._connections.TryGetValue(new ConnectionKey(serverName, port), out ConnectionGroup? connGroup);
 			var remoteEP = new DnsEndPoint(serverName, port);
 			try
 			{
 				// Connect to the server
 				var conn = await this.ConnectToAsync(remoteEP, serverName, options, cancellationToken).ConfigureAwait(false);
-				if (connGroup == null)
-				{
-					connGroup ??= new ConnectionGroup(conn);
-					this._connections.Add(new ConnectionKey(serverName, port), connGroup);
-				}
-				else
-				{
-					connGroup.connections.Add(conn);
-				}
+
+				var connGroup = this._connections.GetOrAdd(new ConnectionKey(serverName, port), (key, conn) => new ConnectionGroup(conn), conn);
+
+				return connGroup;
+
+				//if (connGroup == null)
+				//{
+				//	connGroup ??= new ConnectionGroup(conn);
+				//	this._connections.Add(new ConnectionKey(serverName, port), connGroup);
+				//}
+				//else
+				//{
+				//	connGroup.connections.Add(conn);
+				//}
 
 				// UNDONE: MultiChannel pushed
 				//if (!this.UseMultiChannel || conn.Dialect < Smb2Dialect.Smb3_1_1)
@@ -199,9 +204,6 @@ namespace Titanis.Smb2
 			{
 				exception = ex;
 			}
-
-			if (connGroup != null)
-				return connGroup;
 
 			throw new InvalidOperationException($"Unable to connect to {serverName}: {exception.Message}", exception);
 		}
