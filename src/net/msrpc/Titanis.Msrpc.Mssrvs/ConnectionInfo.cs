@@ -8,7 +8,7 @@ namespace Titanis.Msrpc.Mswkst
 		internal ConnectionInfo(CONNECTION_INFO_1 entry)
 		{
 			this.Id = (int)entry.coni1_id;
-			this.Type = (ShareType)entry.coni1_type;
+			this.Type = (ShareTypeFlags)entry.coni1_type;
 			this.NumberOfOpens = (int)entry.coni1_num_opens;
 			this.NumberOfUsers = (int)entry.coni1_num_users;
 			this.ConnectedTimeSeconds = (int)entry.coni1_time;
@@ -17,7 +17,7 @@ namespace Titanis.Msrpc.Mswkst
 		}
 
 		public int Id { get; }
-		public ShareType Type { get; }
+		public ShareTypeFlags Type { get; }
 		public int NumberOfOpens { get; }
 		public int NumberOfUsers { get; }
 		public int ConnectedTimeSeconds { get; }

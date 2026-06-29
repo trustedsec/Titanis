@@ -32,9 +32,9 @@ namespace Titanis.Msrpc.Mswkst
 		public string ShareName { get; }
 
 		[DisplayName("Server")]
-		public string? ServerName { get; set; }
+		public string? ServerName { get; }
 		[DisplayName("Type")]
-		public ShareType ShareType { get; set; }
+		public ShareTypeFlags ShareType { get; set; }
 		public string? Remark { get; set; }
 		public SharePermissions Permissions { get; set; }
 		[DisplayName("Max. Uses")]
@@ -50,17 +50,19 @@ namespace Titanis.Msrpc.Mswkst
 		public SecurityDescriptor? SecurityDescriptor { get; }
 		public ShareFlags Flags { get; set; }
 
-		internal ShareInfo(ref readonly SHARE_INFO_1 info)
+		internal ShareInfo(string serverName, ref readonly SHARE_INFO_1 info)
 		{
+			this.ServerName = serverName;
 			this.ShareName = info.shi1_netname?.value;
-			this.ShareType = (ShareType)info.shi1_type;
+			this.ShareType = (ShareTypeFlags)info.shi1_type;
 			this.Remark = info.shi1_remark?.value;
 		}
 
-		internal ShareInfo(ref readonly SHARE_INFO_2 info)
+		internal ShareInfo(string serverName,ref readonly SHARE_INFO_2 info)
 		{
+			this.ServerName = serverName;
 			this.ShareName = info.shi2_netname?.value;
-			this.ShareType = (ShareType)info.shi2_type;
+			this.ShareType = (ShareTypeFlags)info.shi2_type;
 			this.Remark = info.shi2_remark?.value;
 			this.Permissions = (SharePermissions)info.shi2_permissions;
 			this.MaxUses = (int)info.shi2_max_uses;
@@ -69,18 +71,20 @@ namespace Titanis.Msrpc.Mswkst
 			this.Password = info.shi2_passwd?.value;
 		}
 
-		internal ShareInfo(ref readonly SHARE_INFO_501 info)
+		internal ShareInfo(string serverName,ref readonly SHARE_INFO_501 info)
 		{
+			this.ServerName = serverName;
 			this.ShareName = info.shi501_netname?.value;
-			this.ShareType = (ShareType)info.shi501_type;
+			this.ShareType = (ShareTypeFlags)info.shi501_type;
 			this.Remark = info.shi501_remark?.value;
 			this.Flags = (ShareFlags)info.shi501_flags;
 		}
 
-		internal ShareInfo(ref readonly SHARE_INFO_502_I info)
+		internal ShareInfo(string serverName,ref readonly SHARE_INFO_502_I info)
 		{
+			this.ServerName = serverName;
 			this.ShareName = info.shi502_netname?.value;
-			this.ShareType = (ShareType)info.shi502_type;
+			this.ShareType = (ShareTypeFlags)info.shi502_type;
 			this.Remark = info.shi502_remark?.value;
 			this.Permissions = (SharePermissions)info.shi502_permissions;
 			this.MaxUses = (int)info.shi502_max_uses;
@@ -91,10 +95,11 @@ namespace Titanis.Msrpc.Mswkst
 			this.SecurityDescriptor = (info.shi502_security_descriptor?.value).IsNullOrEmpty() ? null : new SecurityDescriptor(info.shi502_security_descriptor!.value);
 		}
 
-		internal ShareInfo(ref readonly SHARE_INFO_503_I info)
+		internal ShareInfo(string serverName,ref readonly SHARE_INFO_503_I info)
 		{
+			this.ServerName = serverName;
 			this.ShareName = info.shi503_netname?.value;
-			this.ShareType = (ShareType)info.shi503_type;
+			this.ShareType = (ShareTypeFlags)info.shi503_type;
 			this.Remark = info.shi503_remark?.value;
 			this.Permissions = (SharePermissions)info.shi503_permissions;
 			this.MaxUses = (int)info.shi503_max_uses;
@@ -106,18 +111,21 @@ namespace Titanis.Msrpc.Mswkst
 			this.SecurityDescriptor = new SecurityDescriptor(info.shi503_security_descriptor?.value);
 		}
 
-		internal ShareInfo(ref readonly SHARE_INFO_1004 info)
+		internal ShareInfo(string serverName,ref readonly SHARE_INFO_1004 info)
 		{
+			this.ServerName = serverName;
 			this.Remark = info.shi1004_remark?.value;
 		}
 
-		internal ShareInfo(ref readonly SHARE_INFO_1005 info)
+		internal ShareInfo(string serverName,ref readonly SHARE_INFO_1005 info)
 		{
+			this.ServerName = serverName;
 			this.Flags = (ShareFlags)info.shi1005_flags;
 		}
 
-		internal ShareInfo(ref readonly SHARE_INFO_1006 info)
+		internal ShareInfo(string serverName,ref readonly SHARE_INFO_1006 info)
 		{
+			this.ServerName = serverName;
 			this.MaxUses = (int)info.shi1006_max_uses;
 		}
 	}

@@ -365,7 +365,7 @@ namespace Titanis.Msrpc.Mswkst
 			string shareName,
 			string path,
 			SharePermissions permissions,
-			ShareType shareType,
+			ShareTypeFlags shareType,
 			string remark,
 			CancellationToken cancellationToken)
 		{
@@ -486,19 +486,19 @@ namespace Titanis.Msrpc.Mswkst
 				switch (level)
 				{
 					case ShareInfoLevel.Level1:
-						GetEntriesFrom(shares, pInfo.value.ShareInfo.Level1?.value.Buffer?.value, r => new ShareInfo(r));
+						GetEntriesFrom(shares, pInfo.value.ShareInfo.Level1?.value.Buffer?.value, r => new ShareInfo(serverName, r));
 						break;
 					case ShareInfoLevel.Level2:
-						GetEntriesFrom(shares, pInfo.value.ShareInfo.Level2?.value.Buffer?.value, r => new ShareInfo(r));
+						GetEntriesFrom(shares, pInfo.value.ShareInfo.Level2?.value.Buffer?.value, r => new ShareInfo(serverName, r));
 						break;
 					case ShareInfoLevel.Level501:
-						GetEntriesFrom(shares, pInfo.value.ShareInfo.Level501?.value.Buffer?.value, r => new ShareInfo(r));
+						GetEntriesFrom(shares, pInfo.value.ShareInfo.Level501?.value.Buffer?.value, r => new ShareInfo(serverName, r));
 						break;
 					case ShareInfoLevel.Level502:
-						GetEntriesFrom(shares, pInfo.value.ShareInfo.Level502?.value.Buffer?.value, r => new ShareInfo(r));
+						GetEntriesFrom(shares, pInfo.value.ShareInfo.Level502?.value.Buffer?.value, r => new ShareInfo(serverName, r));
 						break;
 					case ShareInfoLevel.Level503:
-						GetEntriesFrom(shares, pInfo.value.ShareInfo.Level503?.value.Buffer?.value, r => new ShareInfo(r));
+						GetEntriesFrom(shares, pInfo.value.ShareInfo.Level503?.value.Buffer?.value, r => new ShareInfo(serverName, r));
 						break;
 				}
 			} while (res == Win32ErrorCode.ERROR_MORE_DATA);

@@ -9,6 +9,14 @@ namespace Titanis.Msrpc.Mswkst
 		PrintQueue = 1,
 		Device = 2,
 		Ipc = 3,
+	}
+	[Flags]
+	public enum ShareTypeFlags : uint
+	{
+		Disk = 0,
+		PrintQueue = 1,
+		Device = 2,
+		Ipc = 3,
 
 		TypeMask = 0x03,
 

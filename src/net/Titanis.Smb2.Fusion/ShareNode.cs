@@ -8,7 +8,7 @@ namespace Titanis.Smb2.Fusion;
 /// </summary>
 sealed class ShareNode : SharedDirNodeBase
 {
-	internal ShareNode(SmbMountInfo mountInfo, UncPath path, ShareType shareType, ShareInfo? shareInfo)
+	internal ShareNode(SmbMountInfo mountInfo, UncPath path, ShareTypeFlags shareType, ShareInfo? shareInfo)
 		: base(mountInfo, path)
 	{
 		this.Name = path.ShareName;
@@ -17,11 +17,11 @@ sealed class ShareNode : SharedDirNodeBase
 		this._mountTime = DateTime.UtcNow;
 	}
 
-	private readonly ShareType shareType;
+	private readonly ShareTypeFlags shareType;
 	private readonly ShareInfo? _shareInfo;
 	private readonly DateTime _mountTime;
 
-	protected override LinuxFileType ChildFileType => ((this.shareType & ShareType.TypeMask) == ShareType.Ipc) ? LinuxFileType.Socket : LinuxFileType.RegularFile;
+	protected override LinuxFileType ChildFileType => ((this.shareType & ShareTypeFlags.TypeMask) == ShareTypeFlags.Ipc) ? LinuxFileType.Socket : LinuxFileType.RegularFile;
 
 	/// <inheritdoc/>
 	public sealed override string Name { get; }
