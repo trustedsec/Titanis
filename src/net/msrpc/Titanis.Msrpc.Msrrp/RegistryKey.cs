@@ -156,8 +156,6 @@ namespace Titanis.Msrpc.Msrrp
 			var keyInfo = await this.QueryInfo(cancellationToken).ConfigureAwait(false);
 
 			int cbBuffer = keyInfo.MaxValueDataLength;
-			int cbLen = keyInfo.MaxValueDataLength;
-
 
 			int index = 0;
 			Win32ErrorCode res;
@@ -315,7 +313,7 @@ namespace Titanis.Msrpc.Msrrp
 				(RegistryValueType.Qword, 8) => BinaryPrimitives.ReadUInt64LittleEndian(data),
 				(RegistryValueType.DwordLE, 4) => BinaryPrimitives.ReadUInt32LittleEndian(data),
 				(RegistryValueType.DwordBE, 4) => BinaryPrimitives.ReadUInt32BigEndian(data),
-				(RegistryValueType.String, _) => TryDecodeUtf16String(data),
+				(RegistryValueType.String or RegistryValueType.ExpandString, _) => TryDecodeUtf16String(data),
 				(RegistryValueType.MultiString, _) => TryDecodeUtf16MultiString(data),
 				// (RegistryValueType.Binary, _) => null,
 				_ => undecodedAsBytes ? data : null
