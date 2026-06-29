@@ -180,13 +180,15 @@ namespace Titanis.Smb2.Pdus
 			return Array.ConvertAll(this.Referrals, r => r.GetInfo());
 		}
 
-		internal void ReadFrom(ByteMemoryReader reader)
+		internal static DfsGetReferralInfoResponse ReadFrom(ByteMemoryReader reader)
 		{
-			this.PathConsumed = reader.ReadUInt16LE();
-			this.NumberOfReferrals = reader.ReadUInt16LE();
-			this.Flags = (DfsReferralFlags)reader.ReadInt32LE();
+			var resp = new DfsGetReferralInfoResponse();
 
-			DfsReferral[] referrals = new DfsReferral[this.NumberOfReferrals];
+			resp.PathConsumed = reader.ReadUInt16LE();
+			resp.NumberOfReferrals = reader.ReadUInt16LE();
+			resp.Flags = (DfsReferralFlags)reader.ReadInt32LE();
+
+			DfsReferral[] referrals = new DfsReferral[resp.NumberOfReferrals];
 			for (int i = 0; i < referrals.Length; i++)
 			{
 				var offset = reader.Position;
@@ -196,6 +198,7 @@ namespace Titanis.Smb2.Pdus
 					1 => new DfsReferralV1(),
 					2 => new DfsReferralV2(),
 					3 or 4 => new DfsReferralV3(),
+					_=> throw new NotSupportedException($"Unsupported DFS referral version {version}.")
 				};
 				referrals[i] = referral;
 
@@ -206,7 +209,9 @@ namespace Titanis.Smb2.Pdus
 				reader.Position = offset + referral.Size;
 
 			}
-			this.Referrals = referrals;
+			resp.Referrals = referrals;
+
+			return resp;
 		}
 	}
 }

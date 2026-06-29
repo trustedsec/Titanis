@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Titanis.Smb2.Pdus;
 
 namespace Titanis.Smb2
@@ -25,6 +27,9 @@ namespace Titanis.Smb2
 	{
 		internal DfsReferral(DfsReferralFlags flags, int pathConsumed, DfsReferralEntry[] entries)
 		{
+			Debug.Assert(entries != null);
+			Debug.Assert(!entries.Contains(null));
+
 			this.Flags = flags;
 			this.PathConsumed = pathConsumed;
 			this.Entries = entries;

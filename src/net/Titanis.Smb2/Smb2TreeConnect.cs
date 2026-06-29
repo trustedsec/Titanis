@@ -383,7 +383,7 @@ namespace Titanis.Smb2
 		/// <summary>
 		/// Queries DFS referrals for a share.
 		/// </summary>
-		/// <returns>An array of <see cref="Smb2NicInfo"/> objects.</returns>
+		/// <returns>An array of <see cref="DfsReferral"/> objects.</returns>
 		public async Task<DfsReferral?> QueryDfsReferrals(UncPath path, int bufferSize, CancellationToken cancellationToken)
 		{
 			if (path is null) throw new ArgumentNullException(nameof(path));
@@ -408,11 +408,21 @@ namespace Titanis.Smb2
 					).ConfigureAwait(false);
 
 				ByteMemoryReader reader = new ByteMemoryReader(outputBuffer.AsMemory().Slice(0, res.outputResponseSize));
-				var resp = new DfsGetReferralInfoResponse();
-				resp.ReadFrom(reader);
+				var resp = DfsGetReferralInfoResponse.ReadFrom(reader);
+#if DEBUG
+				foreach (var referral in resp.Referrals)
+				{
+					Console.WriteLine($"[***] referral.Version = {referral.VersionNumber}");
+					if (referral.VersionNumber is 3 or 4)
+					{
+						var v3 = (DfsReferralV3)referral;
+						Console.WriteLine($"  flags = {v3.Flags}");
+					}
+				}
+#endif
 
-				var infos = resp.GetInfos();
-				return new DfsReferral(resp.Flags, resp.PathConsumed, infos);
+				var entries = resp.GetInfos();
+				return new DfsReferral(resp.Flags, resp.PathConsumed, entries);
 			}
 			catch (NtstatusException ex) when (ex.StatusCode is Ntstatus.STATUS_NOT_FOUND or Ntstatus.STATUS_NO_SUCH_DEVICE)
 			{

@@ -349,20 +349,39 @@ namespace Titanis.Smb2
 		// Windows default
 		public int DfsReferralBufferSize { get; set; } = 4096;
 
+		public const string SysvolName = "SYSVOL";
+		private const string NetlogonName = "NETLOGON";
+
 		private async Task<(Smb2TreeConnect share, UncPath resolvedPath)> ResolvePath(UncPath uncPath, CancellationToken cancellationToken)
 		{
-			if (this.FollowDfs && !uncPath.ShareName.EndsWith('$') && !IpcName.Equals(uncPath.ShareName, StringComparison.OrdinalIgnoreCase))
+			if (this.FollowDfs && uncPath.ShareName != null && !uncPath.ShareName.EndsWith('$') && !IpcName.Equals(uncPath.ShareName, StringComparison.OrdinalIgnoreCase))
 			{
+				// [MS-DFSC] § 3.1.4.1 - [2], sorta
 				if (this.TryGetCachedShare(uncPath, out var cachedShare) && !cachedShare.IsDfs)
 					return (cachedShare, uncPath);
+
+				// [MS-DFSC] § 3.1.4.1 - [5]
+				// TODO: Is the host actually a domain name?
+				// For now, guess based on the share name being SYSVOL or NETLOGON
+				bool isSysvol = uncPath.ShareName.Equals(SysvolName, StringComparison.OrdinalIgnoreCase) || uncPath.ShareName.Equals(NetlogonName, StringComparison.OrdinalIgnoreCase);
+
+				if (isSysvol)
+				{
+					// [MS-DFSC] § 3.1.4.1 - [10]
+					// TODO: Sysvol request
+				}
 
 				var ipc = await this.GetShare(new UncPath(uncPath.ServerName, uncPath.Port, IpcName, null), cancellationToken).ConfigureAwait(false);
 				UncPath sharePath = uncPath.GetShare();
 
+				// [MS-DFSC] § 3.1.4.1 - [6]
+				this.log?.WriteDiagnostic($"Sending root referral request for {sharePath} to {uncPath.ServerName}");
 				var rootReferral = await ipc.QueryDfsReferrals(sharePath, DfsReferralBufferSize, cancellationToken).ConfigureAwait(false);
 				if (rootReferral != null)
 				{
 					this.traceCallback?.OnDfsReferralReceived(sharePath, rootReferral);
+
+					// [MS-DFSC] § 3.1.4.1 - [7]
 
 					// Search for a referral with either the exact same name,
 					// or one that looks like an FQDN beginning with the server name
@@ -442,11 +461,13 @@ namespace Titanis.Smb2
 			return (refShare, refPath);
 		}
 
-		private static DfsReferralEntry? SelectPreferredReferral(UncPath uncPath, DfsReferral? rootReferral)
+		private static DfsReferralEntry? SelectPreferredReferral(UncPath uncPath, DfsReferral rootReferral)
 		{
+			if (rootReferral is null) Console.Error.WriteLine($"[***] rootReferral == null");
+			if (rootReferral.Entries is null) Console.Error.WriteLine($"[***] rootReferral.Entries == null");
 			DfsReferralEntry? exactNameMatch = null;
 			DfsReferralEntry? partialNameMatch = null;
-			foreach (var entry in rootReferral.Entries)
+			foreach (var entry in (rootReferral?.Entries ?? []))
 			{
 				if (entry.DfsTarget.ServerName.Equals(uncPath.ServerName, StringComparison.OrdinalIgnoreCase))
 					exactNameMatch = entry;
