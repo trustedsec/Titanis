@@ -54,7 +54,7 @@ namespace Titanis.Smb2.Cli
 				// Watch for notifications
 				var changeEnum = dir.ReadChangesAsync(Smb2ChangeFilter.All, options, this.BufferSize);
 
-				this.WriteVerbose($"Watching for changes to {dirPath}{(this.Recursive.IsSet ? " and subdirectories" : null)}.  Press CTRL+C to stop.");
+				this.WriteVerbose($"Watching for changes to '{dirPath}'{(this.Recursive.IsSet ? " and subdirectories" : null)}.  Press CTRL+C to stop.");
 
 				// Loop through changes
 				await foreach (var change in changeEnum.WithCancellation(cancellationToken))

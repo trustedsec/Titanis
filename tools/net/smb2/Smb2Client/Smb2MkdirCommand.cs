@@ -25,7 +25,7 @@ namespace Titanis.Smb2.Cli
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			base.ValidateParameters(context);
-			if (string.IsNullOrEmpty(this.UncPath.ShareRelativePath))
+			if (!this.UncPath.HasShareRelativePath)
 				context.LogError(nameof(this.UncPath), "The path must include at least one level after the share name.");
 		}
 

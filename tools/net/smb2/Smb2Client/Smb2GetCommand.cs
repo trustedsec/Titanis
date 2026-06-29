@@ -104,7 +104,7 @@ namespace Titanis.Smb2.Cli
 			// Determine whether the source is a directory
 			var rootObjectPath = this.UncPath;
 			WildcardPattern? pattern = null;
-			if (!string.IsNullOrEmpty(this.UncPath.ShareRelativePath))
+			if (this.UncPath.HasShareRelativePath)
 			{
 				string fileNamePart = this.UncPath.GetFileName();
 				bool hasWildcard = !string.IsNullOrEmpty(fileNamePart) && WildcardPattern.ContainsWildcardCharacter(fileNamePart);

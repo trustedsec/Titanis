@@ -25,10 +25,10 @@ namespace Titanis
 			Port = port;
 			ShareName = shareName;
 
-			ShareRelativePath = shareRelativePath?.Replace('/', '\\');
+			ShareRelativePath = shareRelativePath?.Replace('/', '\\') ?? string.Empty;
 		}
 		public UncPath(string serverName, string? shareName, string? shareRelativePath)
-			: this(serverName, 445, shareName, shareRelativePath)
+			: this(serverName, 445, shareName, shareRelativePath ?? string.Empty)
 		{
 		}
 
@@ -47,7 +47,15 @@ namespace Titanis
 		/// <summary>
 		/// Gets the path relative to the share, without a leading backslash.
 		/// </summary>
-		public string? ShareRelativePath { get; }
+		public string ShareRelativePath { get; }
+
+		/// <summary>
+		/// Gets a value indicating whether the UNC path specifies a path within the share.
+		/// </summary>
+		/// <remarks>
+		/// A UNC path without a share-relative part may identify a server, a share, or the root of a share.
+		/// </remarks>
+		public bool HasShareRelativePath => !string.IsNullOrEmpty(this.ShareRelativePath);
 
 		/// <summary>
 		/// Gets the <see cref="UncPath"/> of the share containing this path.
@@ -118,7 +126,7 @@ namespace Titanis
 		/// then this method returns the current <see cref="UncPath"/>.
 		/// </remarks>
 		public UncPath GetDirectoryPath()
-			=> string.IsNullOrEmpty(ShareRelativePath) ? this : new UncPath(ServerName, Port, ShareName, GetDirectoryName());
+			=> !this.HasShareRelativePath ? this : new UncPath(ServerName, Port, ShareName, GetDirectoryName());
 
 		private static void SplitPath(string? path, out string directoryName, out string fileName)
 		{
@@ -166,10 +174,10 @@ namespace Titanis
 		/// Gets the file name portion of the path.
 		/// </summary>
 		/// <returns>The file name without the directory.</returns>
-		public string? GetFileName()
+		public string GetFileName()
 		{
-			if (string.IsNullOrEmpty(ShareRelativePath))
-				return null;
+			if (!this.HasShareRelativePath)
+				return string.Empty;
 
 			SplitPath(this.ShareRelativePath, out _, out var fileName);
 			return fileName;

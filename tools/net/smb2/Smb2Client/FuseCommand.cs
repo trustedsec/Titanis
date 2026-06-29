@@ -49,8 +49,8 @@ internal class FuseCommand : Smb2CommandBase
 		var uncPath = this.UncPath;
 		if (string.IsNullOrEmpty(uncPath.ShareName))
 			rootNode = new ServerRootNode(mountInfo, rpcClient, uncPath);
-		else if (string.IsNullOrEmpty(uncPath.ShareRelativePath))
-			rootNode = new ShareNode(mountInfo, uncPath, (uncPath.ShareName.Equals(Smb2Client.IpcName, StringComparison.OrdinalIgnoreCase)) ? ShareType.Ipc : ShareType.Disk, null);
+		else if (!uncPath.HasShareRelativePath)
+			rootNode = new ShareNode(mountInfo, uncPath, (uncPath.ShareName.Equals(Smb2Client.IpcName, StringComparison.OrdinalIgnoreCase)) ? ShareTypeFlags.Ipc : ShareTypeFlags.Disk, null);
 		else
 			rootNode = new SharedDirNode(mountInfo, uncPath, new Smb2DirEntry()
 			{

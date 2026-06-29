@@ -68,7 +68,7 @@ namespace Titanis.Smb2.Cli
 			var dirPath = this.UncPath;
 			string searchPattern = "*";
 			bool isDir;
-			if (dirPath.ShareRelativePath.Length > 0)
+			if (dirPath.HasShareRelativePath)
 			{
 				var fileSpec = dirPath.GetFileName();
 				if (string.IsNullOrEmpty(fileSpec))
