@@ -42,6 +42,12 @@ namespace Titanis.Msrpc.Mssamr
 			return await this.OpenDomainInternal(domainSid.ToSid(), name, access, cancellationToken).ConfigureAwait(false);
 		}
 
+		public async Task<SecurityIdentifier> LookupDomain(string name, CancellationToken cancellationToken)
+		{
+			var domainSid = (await this._samClient.LookupDomain(this._handle, name, cancellationToken).ConfigureAwait(false)).value;
+			return domainSid.ToSid();
+		}
+
 		public async Task<SamDomain> OpenDomainAsync(SecurityIdentifier domainSid, SamDomainAccessRights access, CancellationToken cancellationToken)
 		{
 			return await OpenDomainInternal(domainSid, null, access, cancellationToken).ConfigureAwait(false);
@@ -51,7 +57,7 @@ namespace Titanis.Msrpc.Mssamr
 		{
 			ArgumentNullException.ThrowIfNull(domainSid);
 
-			var hDomain= await this._samClient.OpenDomain(this._handle, domainSid.ToRpcSid(), access, cancellationToken).ConfigureAwait(false);
+			var hDomain = await this._samClient.OpenDomain(this._handle, domainSid.ToRpcSid(), access, cancellationToken).ConfigureAwait(false);
 
 			return new SamDomain(this._samClient, hDomain, domainSid, name);
 		}
