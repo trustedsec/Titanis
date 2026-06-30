@@ -40,7 +40,8 @@ namespace Titanis.Winterop.SamServer
 
 			var reader = new ByteMemoryReader(bytes.ToArray());
 			var userProps = reader.ReadPduStruct<USER_PROPERTIES>();
-			List<KerberosKeyInfo> keys = new List<KerberosKeyInfo>();
+			List<KerberosKeyInfo> newKeys = new List<KerberosKeyInfo>();
+			HashSet<uint> newKeyTypes = new HashSet<uint>();
 			List<KerberosKeyInfo> oldKeys = new List<KerberosKeyInfo>();
 			bool hasKerbNew = false;
 			foreach (var prop in userProps.properties)
@@ -59,22 +60,21 @@ namespace Titanis.Winterop.SamServer
 						if (!hasKerbNew)
 						{
 							var kerb = reader.ReadPduStruct<KERB_STORED_CREDENTIAL>();
-							ExtractKerberosKeysInto(kvno, propBytes, kerb.credentials, keys);
-							ExtractKerberosKeysInto(kvno - 1, propBytes, kerb.oldCredentials, oldKeys);
+							ExtractKerberosKeysInto(kvno, propBytes, kerb.credentials, newKeys, newKeyTypes);
+							ExtractKerberosKeysInto(kvno - 1, propBytes, kerb.oldCredentials, oldKeys, null);
 							creds.KerberosSalt = propBytes.Slice(kerb.defaultSaltOffset, kerb.defaultSaltLength).ToArray();
 						}
 						break;
 					case "Primary:Kerberos-Newer-Keys":
 						{
 							// Clear old-style Primary:Kerberos
-							keys.Clear();
 							oldKeys.Clear();
 
 							var kerb = reader.ReadPduStruct<KERB_STORED_CREDENTIAL_NEW>();
-							ExtractKerberosKeysInto(kvno, propBytes, kerb.credentials, keys);
-							ExtractKerberosKeysInto(kvno, propBytes, kerb.serviceCredentials, keys);
-							ExtractKerberosKeysInto(kvno - 1, propBytes, kerb.oldCredentials, oldKeys);
-							ExtractKerberosKeysInto(kvno - 2, propBytes, kerb.olderCredentials, oldKeys);
+							ExtractKerberosKeysInto(kvno, propBytes, kerb.credentials, newKeys, newKeyTypes);
+							ExtractKerberosKeysInto(kvno, propBytes, kerb.serviceCredentials, newKeys, newKeyTypes);
+							ExtractKerberosKeysInto(kvno - 1, propBytes, kerb.oldCredentials, oldKeys, null);
+							ExtractKerberosKeysInto(kvno - 2, propBytes, kerb.olderCredentials, oldKeys, null);
 							creds.KerberosSalt = propBytes.Slice(kerb.defaultSaltOffset, kerb.defaultSaltLength).ToArray();
 
 							hasKerbNew = true;
@@ -97,13 +97,13 @@ namespace Titanis.Winterop.SamServer
 				}
 			}
 
-			creds.KerberosKeys = keys.ToArray();
+			creds.KerberosKeys = newKeys.ToArray();
 			creds.KerberosOldKeys = oldKeys.ToArray();
 
 			return creds;
 		}
 
-		private static void ExtractKerberosKeysInto(int? kvno, byte[] propBytes, KERB_KEY_DATA[]? keyData, List<KerberosKeyInfo> keys)
+		private static void ExtractKerberosKeysInto(int? kvno, byte[] propBytes, KERB_KEY_DATA[]? keyData, List<KerberosKeyInfo> keys, HashSet<uint>? keyTypes)
 		{
 			if (keyData != null)
 			{
@@ -115,14 +115,15 @@ namespace Titanis.Winterop.SamServer
 			}
 		}
 
-		private static void ExtractKerberosKeysInto(int? kvno, byte[] propBytes, KERB_KEY_DATA_NEW[]? keyData, List<KerberosKeyInfo> keys)
+		private static void ExtractKerberosKeysInto(int? kvno, byte[] propBytes, KERB_KEY_DATA_NEW[]? keyData, List<KerberosKeyInfo> keys, HashSet<uint>? keyTypes)
 		{
 			if (keyData != null)
 			{
 				foreach (var key in keyData)
 				{
 					var keyInfo = new KerberosKeyInfo(kvno, key.keyType, propBytes.Slice(key.keyOffset, key.keyLength).ToArray(), key.iterationCount);
-					keys.Add(keyInfo);
+					if (keyTypes is null || keyTypes.Add(keyInfo.KeyType))
+						keys.Add(keyInfo);
 				}
 			}
 		}
