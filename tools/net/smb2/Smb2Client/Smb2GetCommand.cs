@@ -120,12 +120,12 @@ namespace Titanis.Smb2.Cli
 				rootObjectPath,
 				new Smb2CreateInfo
 				{
-					CreateDisposition = Smb2CreateDisposition.Open,
+					CreateDisposition = Smb2CreateDisposition.OpenExisting,
 					Priority = Smb2Priority.OpenDir,
 					DesiredAccess = (uint)(Smb2FileAccessRights.ReadData | Smb2FileAccessRights.ReadEa | Smb2FileAccessRights.ReadAttributes | Smb2FileAccessRights.Synchronize),
 					ShareAccess = Smb2ShareAccess.DefaultDirShare,
 					FileAttributes = Winterop.FileAttributes.None,
-					CreateOptions = GetCreateOptions(Smb2FileCreateOptions.SynchronousIoNonalert),
+					CreateOptions = Smb2FileCreateOptions.SynchronousIoNonalert | this.GetExtraCreateOptions(),
 					ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
 					RequestMaximalAccess = true,
 					QueryOnDiskId = true,

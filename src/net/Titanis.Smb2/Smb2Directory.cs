@@ -179,6 +179,8 @@ namespace Titanis.Smb2
 			Recursive = 1,
 			QueryReparseInfo = 2,
 			QueryMaxAccessAllowed = 4,
+
+			AdditionalInfoMask = QueryReparseInfo
 		}
 
 		public const int DefaultQueryBufferSize = 1024;
@@ -190,15 +192,28 @@ namespace Titanis.Smb2
 			int bufferSize,
 			CancellationToken cancellationToken)
 		{
+			List<Smb2DirEntry> entries = new List<Smb2DirEntry>();
+			await QueryDirAsync(searchPattern, options, securityInfo, bufferSize, Smb2QueryDirListCallback.instance, entries, cancellationToken).ConfigureAwait(false);
+
+			return entries;
+		}
+		public async Task QueryDirAsync<TArg>(
+			string searchPattern,
+			Smb2DirQueryOptions options,
+			SecurityInfo securityInfo,
+			int bufferSize,
+			ISmb2QueryDirCallback<TArg> callback,
+			TArg callbackArg,
+			CancellationToken cancellationToken)
+		{
 			if (string.IsNullOrEmpty(searchPattern))
 				throw new ArgumentNullException(nameof(searchPattern));
-
-			List<Smb2DirEntry> entries = new List<Smb2DirEntry>();
 
 			var infoClass = this.Tree.ShareType == Smb2ShareType.Pipe
 				? Smb2DirEntryInfoClass.BothDirInfo
 				: Smb2DirEntryInfoClass.BothDirInfoId;
 
+			Smb2QueryDirFlags flags = Smb2QueryDirFlags.RestartScans;
 			do
 			{
 				Smb2QueryDirRequest req = new Smb2QueryDirRequest
@@ -206,13 +221,15 @@ namespace Titanis.Smb2
 					body = new Smb2QueryDirRequestBody
 					{
 						infoClass = infoClass,
-						flags = 0,
+						flags = flags,
 						// Windows default
 						dirHandle = this.Handle,
 						outputBufferLength = bufferSize,
 					},
 					searchPattern = searchPattern
 				};
+
+				flags = Smb2QueryDirFlags.None;
 
 				Smb2QueryDirResponse resp;
 				try
@@ -231,27 +248,19 @@ namespace Titanis.Smb2
 					break;
 				}
 
-				this.ReadDirEntriesInto(resp.buf, entries, infoClass);
+				await ReadDirEntriesInto(resp.buf, infoClass, options, securityInfo, callback, callbackArg, cancellationToken).ConfigureAwait(false);
 			} while (true);
-
-
-			if (
-				(0 != (options & Smb2DirQueryOptions.QueryReparseInfo))
-				|| (0 != securityInfo)
-				)
-			{
-				await QueryAdditionalFileInfoAsync(entries, options, securityInfo, cancellationToken).ConfigureAwait(false);
-			}
-
-			return entries;
 		}
 
-		private async Task QueryAdditionalFileInfoAsync(
-			List<Smb2DirEntry> entries,
+		public async Task QueryAdditionalFileInfoAsync(
+			Smb2DirEntry entry,
 			Smb2DirQueryOptions options,
 			SecurityInfo secInfo,
 			CancellationToken cancellationToken)
 		{
+			if (entry is null)
+				return;
+
 			var access = (Smb2FileAccessRights.ReadEa | Smb2FileAccessRights.ReadAttributes | Smb2FileAccessRights.Synchronize);
 			if (secInfo != SecurityInfo.None)
 			{
@@ -260,63 +269,63 @@ namespace Titanis.Smb2
 					access |= Smb2FileAccessRights.AccessSystemSecurity;
 			}
 
-			foreach (var entry in entries)
+			bool reparse = (
+					(0 != (entry.FileAttributes & Winterop.FileAttributes.ReparsePoint))
+					&& (0 != (options & Smb2DirQueryOptions.QueryReparseInfo))
+				);
+			bool otherInfo = 0 != (options & ~Smb2DirQueryOptions.QueryReparseInfo);
+			bool shouldOpen = reparse || otherInfo || (secInfo != 0);
+
+			if (shouldOpen)
 			{
-				bool reparse = (
-						(0 != (entry.FileAttributes & Winterop.FileAttributes.ReparsePoint))
-						&& (0 != (options & Smb2DirQueryOptions.QueryReparseInfo))
-					);
-				bool otherInfo = 0 != (options & ~Smb2DirQueryOptions.QueryReparseInfo);
-				bool shouldOpen = reparse || otherInfo || (secInfo != 0);
-
-				if (shouldOpen)
+				try
 				{
-					try
+					using (var file = await this.Tree.CreateFileAsync(Path.Combine(this.ShareRelativePath, entry.FileName), new Smb2CreateInfo
 					{
-						using (var file = await this.Tree.CreateFileAsync(Path.Combine(this.ShareRelativePath, entry.FileName), new Smb2CreateInfo
+						CreateDisposition = Smb2CreateDisposition.OpenExisting,
+						DesiredAccess = (uint)access,
+						ShareAccess = Smb2ShareAccess.ReadWriteDelete,
+						ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
+						CreateOptions = Smb2FileCreateOptions.SynchronousIoNonalert | Smb2FileCreateOptions.OpenReparsePoint,
+						FileAttributes = 0,
+						RequestMaximalAccess = (0 != (options & Smb2DirQueryOptions.QueryMaxAccessAllowed))
+					}, FileAccess.Read, cancellationToken).ConfigureAwait(false))
+					{
+						if (reparse)
 						{
-							CreateDisposition = Smb2CreateDisposition.Open,
-							DesiredAccess = (uint)access,
-							ShareAccess = Smb2ShareAccess.ReadWriteDelete,
-							ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-							CreateOptions = Smb2FileCreateOptions.SynchronousIoNonalert | Smb2FileCreateOptions.OpenReparsePoint,
-							FileAttributes = 0,
-							RequestMaximalAccess = (0 != (options & Smb2DirQueryOptions.QueryMaxAccessAllowed))
-						}, FileAccess.Read, cancellationToken).ConfigureAwait(false))
-						{
-							if (reparse)
+							var reparseInfo = await file.GetReparseInfoAsync(cancellationToken).ConfigureAwait(false);
+
+							entry.ReparseTag = reparseInfo.Tag;
+							if (reparseInfo is SymbolicLinkInfo symlink)
 							{
-								var reparseInfo = await file.GetReparseInfoAsync(cancellationToken).ConfigureAwait(false);
-
-								entry.ReparseTag = reparseInfo.Tag;
-								if (reparseInfo is SymbolicLinkInfo symlink)
-								{
-									entry.LinkTarget = symlink.PrintName;
-								}
-								else if (reparseInfo is MountPointInfo mount)
-								{
-									entry.LinkTarget = mount.PrintName;
-								}
+								entry.LinkTarget = symlink.PrintName;
 							}
-
-							if (secInfo != 0)
+							else if (reparseInfo is MountPointInfo mount)
 							{
-								entry.SecurityDescriptor = await file.GetSecurityAsync(secInfo, 4096, cancellationToken).ConfigureAwait(false);
+								entry.LinkTarget = mount.PrintName;
 							}
-
-							entry.MaxAccess = file.MaximalAccessAllowed;
 						}
+
+						if (secInfo != 0)
+						{
+							entry.SecurityDescriptor = await file.GetSecurityAsync(secInfo, 4096, cancellationToken).ConfigureAwait(false);
+						}
+
+						entry.MaxAccess = file.MaximalAccessAllowed;
 					}
-					catch { }
 				}
+				catch { }
 			}
 		}
 
-		private List<Smb2DirEntry> ReadDirEntriesInto(
+		private async Task ReadDirEntriesInto<TArg>(
 			Memory<byte> buf,
-			List<Smb2DirEntry> entries,
-			Smb2DirEntryInfoClass infoClass
-			)
+			Smb2DirEntryInfoClass infoClass,
+			Smb2DirQueryOptions options,
+			SecurityInfo securityInfo,
+			ISmb2QueryDirCallback<TArg> callback,
+			TArg callbackArg,
+			CancellationToken cancellationToken)
 		{
 			ByteMemoryReader reader = new ByteMemoryReader(buf);
 
@@ -352,11 +361,16 @@ namespace Titanis.Smb2
 						throw new ArgumentOutOfRangeException(nameof(infoClass));
 				}
 
-				entries.Add(entry);
+				if (
+					(0 != (options & Smb2DirQueryOptions.AdditionalInfoMask))
+					|| (0 != securityInfo)
+					)
+				{
+					await QueryAdditionalFileInfoAsync(entry, options, securityInfo, cancellationToken).ConfigureAwait(false);
+				}
 
+				callback.OnDirEntry(entry, callbackArg);
 			} while (next > 0);
-
-			return entries;
 		}
 
 		private static Smb2DirEntry ReadFullDirInfo(ByteMemoryReader reader, out int next)
@@ -477,6 +491,16 @@ namespace Titanis.Smb2
 			};
 			next = fileInfoStruc.nextEntryOffset;
 			return entry;
+		}
+	}
+
+	class Smb2QueryDirListCallback : ISmb2QueryDirCallback<List<Smb2DirEntry>>
+	{
+		internal static readonly Smb2QueryDirListCallback instance = new Smb2QueryDirListCallback();
+		public bool OnDirEntry(Smb2DirEntry entry, List<Smb2DirEntry> arg)
+		{
+			arg.Add(entry);
+			return true;
 		}
 	}
 }

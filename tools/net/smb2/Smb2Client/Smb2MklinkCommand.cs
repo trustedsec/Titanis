@@ -50,8 +50,9 @@ namespace Titanis.Smb2.Cli
 		{
 			var flags = this.Relative.IsSet ? SymbolicLinkFlags.RelativePath : SymbolicLinkFlags.FullPathName;
 			var createOptions =
-				GetCreateOptions(this.Directory.IsSet ? (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.Directory)
-				: (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.NonDirectory));
+				(this.Directory.IsSet ? (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.Directory)
+				: (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.NonDirectory))
+				| this.GetExtraCreateOptions();
 
 			// Create or open the file/directory
 			await using (var file = await client.CreateFileAsync(this.UncPath, new Smb2CreateInfo
@@ -61,7 +62,8 @@ namespace Titanis.Smb2.Cli
 				DesiredAccess = (uint)Smb2FileAccessRights.WriteAttributes,
 				FileAttributes = Winterop.FileAttributes.ReparsePoint,
 				ShareAccess = Smb2ShareAccess.ReadWriteDelete,
-				CreateDisposition = Smb2CreateDisposition.OpenIf,
+				// TODO: Should this fail if the file exists?
+				CreateDisposition = Smb2CreateDisposition.OpenOrCreate,
 				CreateOptions = createOptions,
 				RequestMaximalAccess = true,
 				QueryOnDiskId = true

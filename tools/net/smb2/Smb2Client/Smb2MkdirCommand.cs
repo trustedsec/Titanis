@@ -65,11 +65,11 @@ namespace Titanis.Smb2.Cli
 						{
 							Priority = Smb2Priority.CreateDir,
 							// OpenIf makes more sense here, but this reflects what MKDIR does
-							CreateDisposition = Smb2CreateDisposition.Create,
+							CreateDisposition = Smb2CreateDisposition.CreateNew,
 							DesiredAccess = (uint)Smb2FileAccessRights.DefaultCreateDirAccess,
 							ShareAccess = Smb2ShareAccess.ReadWrite,
 							FileAttributes = Winterop.FileAttributes.Normal,
-							CreateOptions = GetCreateOptions(Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.SynchronousIoNonalert),
+							CreateOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.SynchronousIoNonalert | this.GetExtraCreateOptions(),
 							ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
 						}, FileAccess.Read, cancellationToken);
 					}

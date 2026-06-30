@@ -29,8 +29,8 @@ namespace Titanis.Smb2.Cli
 				DesiredAccess = (uint)Smb2FileAccessRights.ReadAttributes,
 				FileAttributes = Winterop.FileAttributes.ReparsePoint,
 				ShareAccess = Smb2ShareAccess.ReadWriteDelete,
-				CreateDisposition = Smb2CreateDisposition.Open,
-				CreateOptions = GetCreateOptions(Smb2FileCreateOptions.None),
+				CreateDisposition = Smb2CreateDisposition.OpenExisting,
+				CreateOptions = this.GetExtraCreateOptions(),
 				RequestMaximalAccess = true,
 				QueryOnDiskId = true
 			}, FileAccess.Read, cancellationToken))

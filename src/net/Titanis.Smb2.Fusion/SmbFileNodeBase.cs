@@ -116,7 +116,7 @@ abstract class SmbFileNodeBase : IFuseNode
 	{
 		var file = await this.Client.CreateFileAsync(SharedPath, Smb2CreateInfo.ForCreateFile(
 			desiredAccess: access,
-			createDisposition: Smb2CreateDisposition.Open,
+			createDisposition: Smb2CreateDisposition.OpenExisting,
 			extraOptions: this._mountInfo.extraCreateOptions
 			), FileAccess.Read, cancellationToken).ConfigureAwait(false);
 		await using (file)

@@ -8,11 +8,16 @@ namespace Titanis.Smb2
 {
 	public class Smb2DirEntry
 	{
-
+		/// <summary>
+		/// Gets or sets the name of the entry, relative to the parent directory.
+		/// </summary>
 		[Browsable(false)]
 		public string FileName { get; set; }
 
 		private string? _relativePath;
+		/// <summary>
+		/// Gets or sets the path of the entry, relative to the search root.
+		/// </summary>
 		[DisplayName("Name")]
 		public string RelativePath { get => _relativePath ?? this.FileName; set => _relativePath = value; }
 
@@ -59,10 +64,10 @@ namespace Titanis.Smb2
 		public ReparseTag ReparseTag { get; internal set; }
 
 		[DisplayName("Target")]
-		public string LinkTarget { get; internal set; }
+		public string? LinkTarget { get; internal set; }
 
 		[Browsable(false)]
-		public SecurityDescriptor SecurityDescriptor { get; set; }
+		public SecurityDescriptor? SecurityDescriptor { get; set; }
 
 		[DisplayName("Sec. Desc.")]
 		public string? SecurityDescriptorSddl => this.SecurityDescriptor?.ToSddlString(SecurityDescriptorSections.All);

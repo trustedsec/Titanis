@@ -20,6 +20,7 @@ namespace Titanis.Smb2
 				impLevel = Smb2ImpersonationLevel.Identification,
 			};
 		}
+
 		internal Smb2CreateInfo(in Pdus.Smb2CreateRequestBody body)
 		{
 			this.body = body;
@@ -140,7 +141,7 @@ namespace Titanis.Smb2
 			Smb2FileAccessRights desiredAccess = Smb2FileAccessRights.DefaultCreateDirAccess,
 			Winterop.FileAttributes fileAttributes = Winterop.FileAttributes.Normal,
 			Smb2ShareAccess shareAccess = Smb2ShareAccess.ReadWrite,
-			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.Create,
+			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.CreateNew,
 			Smb2FileCreateOptions createOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.SynchronousIoNonalert,
 			Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None,
 			bool requestDurableHandle = false,
@@ -181,7 +182,7 @@ namespace Titanis.Smb2
 			Smb2FileAccessRights desiredAccess = Smb2FileAccessRights.DefaultOpenDirAccess,
 			Winterop.FileAttributes fileAttributes = Winterop.FileAttributes.None,
 			Smb2ShareAccess shareAccess = Smb2ShareAccess.DefaultDirShare,
-			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.Open,
+			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.OpenExisting,
 			Smb2FileCreateOptions createOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.SynchronousIoNonalert,
 			Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None,
 			bool requestDurableHandle = false,
@@ -222,7 +223,7 @@ namespace Titanis.Smb2
 			Smb2FileAccessRights desiredAccess = Smb2FileAccessRights.DefaultRemoveDirAccess,
 			Winterop.FileAttributes fileAttributes = Winterop.FileAttributes.None,
 			Smb2ShareAccess shareAccess = Smb2ShareAccess.DefaultDirShare,
-			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.Open,
+			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.OpenExisting,
 			Smb2FileCreateOptions createOptions = Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.SynchronousIoNonalert | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.DeleteOnClose,
 			bool requestDurableHandle = false,
 			bool requestMaximalAccess = true,
@@ -262,7 +263,7 @@ namespace Titanis.Smb2
 			Smb2FileAccessRights desiredAccess = Smb2FileAccessRights.DefaultDeleteFileAccess,
 			Winterop.FileAttributes fileAttributes = Winterop.FileAttributes.None,
 			Smb2ShareAccess shareAccess = Smb2ShareAccess.Delete,
-			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.Open,
+			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.OpenExisting,
 			Smb2FileCreateOptions createOptions = Smb2FileCreateOptions.NonDirectory | Smb2FileCreateOptions.SynchronousIoNonalert | Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.DeleteOnClose,
 			bool requestDurableHandle = false,
 			bool requestMaximalAccess = true,
@@ -336,15 +337,57 @@ namespace Titanis.Smb2
 				ReconnectDurableHandle = reconnectDurableHandle
 			};
 
+		public static Smb2CreateInfo ForOpenFileRead(
+			Smb2Priority priority = 0,
+			Smb2OplockLevel oplockLevel = Smb2OplockLevel.None,
+			Smb2ImpersonationLevel impersonationLevel = Smb2ImpersonationLevel.Impersonation,
+			Smb2FileAccessRights desiredAccess = Smb2FileAccessRights.DefaultOpenReadAccess,
+			// TODO: Normal or none?
+			Winterop.FileAttributes fileAttributes = Winterop.FileAttributes.Normal,
+			Smb2ShareAccess shareAccess = Smb2ShareAccess.Read,
+			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.OpenExisting,
+			Smb2FileCreateOptions createOptions = Smb2FileCreateOptions.NonDirectory | Smb2FileCreateOptions.SynchronousIoNonalert,
+			Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None,
+			bool requestDurableHandle = false,
+			bool requestMaximalAccess = false,
+			bool queryOnDiskId = false,
+			byte[]? securityDescriptor = null,
+			byte[]? extendedAttributes = null,
+			Smb2LeaseInfo? leaseInfo = null,
+			long? allocationSize = null,
+			DateTime? timeWarpToken = null,
+			Smb2FileHandle? reconnectDurableHandle = null
+			) =>
+			new Smb2CreateInfo
+			{
+				Priority = priority,
+				OplockLevel = oplockLevel,
+				ImpersonationLevel = impersonationLevel,
+				DesiredAccess = (uint)desiredAccess,
+				FileAttributes = fileAttributes,
+				ShareAccess = shareAccess,
+				CreateDisposition = createDisposition,
+				CreateOptions = createOptions | extraOptions,
+				RequestDurableHandle = requestDurableHandle,
+				RequestMaximalAccess = requestMaximalAccess,
+				QueryOnDiskId = queryOnDiskId,
+				SecurityDescriptor = securityDescriptor,
+				ExtendedAttributes = extendedAttributes,
+				LeaseInfo = leaseInfo,
+				AllocationSize = allocationSize,
+				TimeWarpToken = timeWarpToken,
+				ReconnectDurableHandle = reconnectDurableHandle
+			};
+
 		#region FileStream-style
 		public static Smb2CreateInfo ForCreateOrOpenFile(FileMode mode, FileAccess access, FileShare share, Smb2FileCreateOptions extraOptions = Smb2FileCreateOptions.None) => ForCreateFile(
 			createDisposition: mode switch
 			{
-				FileMode.Append => Smb2CreateDisposition.OpenIf,
-				FileMode.Open => Smb2CreateDisposition.Open,
-				FileMode.CreateNew => Smb2CreateDisposition.Create,
-				FileMode.Create => Smb2CreateDisposition.OverwriteIf,
-				FileMode.OpenOrCreate => Smb2CreateDisposition.OpenIf,
+				FileMode.Append => Smb2CreateDisposition.OpenOrCreate,
+				FileMode.Open => Smb2CreateDisposition.OpenExisting,
+				FileMode.CreateNew => Smb2CreateDisposition.CreateNew,
+				FileMode.Create => Smb2CreateDisposition.OverwriteOrCreate,
+				FileMode.OpenOrCreate => Smb2CreateDisposition.OpenOrCreate,
 
 				FileMode.Truncate => throw new NotImplementedException(),
 
@@ -367,7 +410,7 @@ namespace Titanis.Smb2
 			Smb2FileAccessRights desiredAccess = (Smb2FileAccessRights)0x0012019f,
 			Winterop.FileAttributes fileAttributes = Winterop.FileAttributes.None,
 			Smb2ShareAccess shareAccess = Smb2ShareAccess.ReadWriteDelete,
-			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.Open,
+			Smb2CreateDisposition createDisposition = Smb2CreateDisposition.OpenExisting,
 			Smb2FileCreateOptions createOptions = Smb2FileCreateOptions.None,
 			bool requestDurableHandle = false,
 			bool requestMaximalAccess = false,

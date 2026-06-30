@@ -568,7 +568,7 @@ namespace Titanis.Smb2
 					DesiredAccess = (uint)Smb2FileAccessRights.ReadAttributes,
 					FileAttributes = 0,
 					ShareAccess = Smb2ShareAccess.ReadWriteDelete,
-					CreateDisposition = Smb2CreateDisposition.Open,
+					CreateDisposition = Smb2CreateDisposition.OpenExisting,
 					CreateOptions = Smb2FileCreateOptions.OpenReparsePoint | extraOptions,
 					RequestMaximalAccess = true,
 					QueryOnDiskId = true,

@@ -93,8 +93,8 @@ namespace Titanis.Smb2.Cli
 						DesiredAccess = (uint)Smb2FileAccessRights.ReadAttributes,
 						FileAttributes = 0,
 						ShareAccess = Smb2ShareAccess.ReadWriteDelete,
-						CreateDisposition = Smb2CreateDisposition.Open,
-						CreateOptions = GetCreateOptions(Smb2FileCreateOptions.OpenReparsePoint),
+						CreateDisposition = Smb2CreateDisposition.OpenExisting,
+						CreateOptions = Smb2FileCreateOptions.OpenReparsePoint | this.GetExtraCreateOptions(),
 						RequestMaximalAccess = true,
 						QueryOnDiskId = true
 					}, FileAccess.Read, cancellationToken))
@@ -124,8 +124,8 @@ namespace Titanis.Smb2.Cli
 						DesiredAccess = (uint)Smb2FileAccessRights.ReadAttributes,
 						FileAttributes = 0,
 						ShareAccess = Smb2ShareAccess.ReadWriteDelete,
-						CreateDisposition = Smb2CreateDisposition.Open,
-						CreateOptions = GetCreateOptions(Smb2FileCreateOptions.OpenReparsePoint),
+						CreateDisposition = Smb2CreateDisposition.OpenExisting,
+						CreateOptions = Smb2FileCreateOptions.OpenReparsePoint | this.GetExtraCreateOptions(),
 						RequestMaximalAccess = true,
 						QueryOnDiskId = true
 					}, FileAccess.Read, cancellationToken))
@@ -156,7 +156,7 @@ namespace Titanis.Smb2.Cli
 					}
 				}
 
-				await using (var file = (Smb2OpenFile)await client.CreateFileAsync(this.UncPath, GetCreateFileCreateInfo(attrs), FileAccess.ReadWrite, cancellationToken))
+				await using (var file = (Smb2OpenFile)await client.CreateFileAsync(this.UncPath, Smb2CreateInfo.ForCreateFile(fileAttributes: attrs, extraOptions: this.GetExtraCreateOptions()), FileAccess.ReadWrite, cancellationToken))
 				{
 					if (sourceStream.CanSeek)
 					{

@@ -29,8 +29,8 @@ namespace Titanis.Smb2.Cli
 		{
 			// Determine create options depending on whether to delete the object
 			Smb2FileCreateOptions createOptions =
-				GetCreateOptions(this.RemoveDirectory.IsSet ? (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.DeleteOnClose)
-				: Smb2FileCreateOptions.DeleteOnClose);
+				(this.RemoveDirectory.IsSet ? (Smb2FileCreateOptions.OpenReparsePoint | Smb2FileCreateOptions.DeleteOnClose) : Smb2FileCreateOptions.DeleteOnClose)
+				| this.GetExtraCreateOptions();
 
 			// Determine access rights
 			var access =
@@ -45,7 +45,7 @@ namespace Titanis.Smb2.Cli
 				DesiredAccess = (uint)access,
 				FileAttributes = Winterop.FileAttributes.Normal,
 				ShareAccess = Smb2ShareAccess.ReadWriteDelete,
-				CreateDisposition = Smb2CreateDisposition.Open,
+				CreateDisposition = Smb2CreateDisposition.OpenExisting,
 				CreateOptions = createOptions,
 				RequestMaximalAccess = true,
 				QueryOnDiskId = true

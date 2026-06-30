@@ -68,13 +68,13 @@ namespace Titanis.Smb2.Cli
 		{
 			base.ValidateParameters(context);
 
-			if(SetAttributes != null && (!string.IsNullOrEmpty(UpdateAttributes) || CopyFileAttributes.IsSet))
+			if (SetAttributes != null && (!string.IsNullOrEmpty(UpdateAttributes) || CopyFileAttributes.IsSet))
 			{
 				context.LogError($"-{nameof(this.SetAttributes)} cannot be used with -{nameof(this.UpdateAttributes)} or -{nameof(this.CopyFileAttributes)}");
 			}
 			if (this.UpdateAttributes is not null)
 			{
-				if(string.IsNullOrEmpty(UpdateAttributes) || !(UpdateAttributes[0] is '+' or '-'))
+				if (string.IsNullOrEmpty(UpdateAttributes) || !(UpdateAttributes[0] is '+' or '-'))
 				{
 					context.LogError($"UpdateAttributes must begin with a '-' or '+'");
 				}
@@ -84,7 +84,7 @@ namespace Titanis.Smb2.Cli
 			{
 				GetMasks(UpdateAttributes, out userAddMask, out userRemoveMask);
 				var check = userAddMask & userRemoveMask;
-				if( check != 0)
+				if (check != 0)
 				{
 					context.LogError($"The following attributes are found in both add (+) and remove (-) : {check}");
 				}
@@ -169,7 +169,7 @@ namespace Titanis.Smb2.Cli
 					subMask |= currentValue;
 				}
 			}
-			if(invalidChars.Length > 0)
+			if (invalidChars.Length > 0)
 			{
 				throw new ArgumentException($"Invalid attribute character(s) '{invalidChars}' in attribute string '{updateAttributes}'");
 			}
@@ -178,7 +178,7 @@ namespace Titanis.Smb2.Cli
 		protected sealed override async Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
 		{
 			Winterop.FileAttributes? attributes = null;
-			
+
 			if (this.TimestampsFrom != null)
 			{
 				this.WriteDiagnostic($"Opening {TimestampsFrom}");
@@ -199,13 +199,15 @@ namespace Titanis.Smb2.Cli
 				}
 			}
 
-			var createOptions = GetCreateFileCreateInfo(Winterop.FileAttributes.Normal);
-			createOptions.CreateDisposition = Smb2CreateDisposition.OpenIf;
-			createOptions.DesiredAccess = (uint)(Smb2FileAccessRights.ReadAttributes | Smb2FileAccessRights.WriteAttributes | Smb2FileAccessRights.Synchronize);
+			var createOptions = Smb2CreateInfo.ForCreateFile(
+				extraOptions: this.GetExtraCreateOptions(),
+				createDisposition: Smb2CreateDisposition.OpenOrCreate,
+				desiredAccess: Smb2FileAccessRights.ReadAttributes | Smb2FileAccessRights.WriteAttributes | Smb2FileAccessRights.Synchronize
+				);
 			this.WriteDiagnostic($"Opening or creating {UncPath}");
 			await using (var file = await client.CreateFileAsync(UncPath, createOptions, FileAccess.ReadWrite, cancellationToken))
 			{
-				if(file.CreateAction == Smb2CreateAction.Created)
+				if (file.CreateAction == Smb2CreateAction.Created)
 				{
 					this.WriteVerbose($"Created new file {this.UncPath}");
 				}
@@ -215,7 +217,7 @@ namespace Titanis.Smb2.Cli
 				}
 				this.WriteDiagnostic($"Getting original file info for {this.UncPath}");
 				FileBasicInfo originalFileInfo = await file.GetBasicInfoAsync(cancellationToken);
-				
+
 				if (SetAttributes != null)
 				{
 					attributes = SetAttributes.Attributes;
@@ -237,13 +239,13 @@ originalFileInfo.CreationTime, (CreateTimestamp != null) ? CreateTimestamp : Smb
 (originalFileInfo.LastWriteTime), (LastWriteTimestamp != null) ? LastWriteTimestamp : Smb2TouchCommand.NotUpdated,
 (originalFileInfo.ChangeTime), (ChangeTimestamp != null) ? ChangeTimestamp : Smb2TouchCommand.NotUpdated,
 originalFileInfo.Attributes, ((int)originalFileInfo.Attributes).ToString("x8"), (attributes != originalFileInfo.Attributes) ? attributes : Smb2TouchCommand.NotUpdated, ((int)attributes!.Value).ToString("x8")));
-					await file.SetBasicInfoAsync(
-						CreateTimestamp,
-						LastAccessTimestamp,
-						LastWriteTimestamp,
-						ChangeTimestamp,
-						attributes!.Value,
-						cancellationToken).ConfigureAwait(false);
+				await file.SetBasicInfoAsync(
+					CreateTimestamp,
+					LastAccessTimestamp,
+					LastWriteTimestamp,
+					ChangeTimestamp,
+					attributes!.Value,
+					cancellationToken).ConfigureAwait(false);
 				this.WriteRecord(new Smb2DirEntry
 				{
 					FileName = UncPath.GetFileName(),

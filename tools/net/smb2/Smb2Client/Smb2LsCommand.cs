@@ -56,12 +56,6 @@ namespace Titanis.Smb2.Cli
 				this.QueryBufferSize = Smb2Directory.DefaultQueryBufferSize;
 		}
 
-		class TraversalStats
-		{
-			public int Directories { get; set; }
-			public int Files { get; set; }
-		}
-
 		protected sealed override async Task<int> RunAsync(Smb2Client client, CancellationToken cancellationToken)
 		{
 			// If the last part of the path contains * or ?, treat it as a seacrh pattern
@@ -88,7 +82,7 @@ namespace Titanis.Smb2.Cli
 					else
 					{
 						// Check whether it is a directory
-						isDir = await client.DirectoryExists(dirPath, cancellationToken, this.GetCreateOptions(0));
+						isDir = await client.DirectoryExists(dirPath, cancellationToken, this.GetExtraCreateOptions());
 
 						if (!isDir)
 						{
@@ -124,127 +118,21 @@ namespace Titanis.Smb2.Cli
 				options |= Smb2Directory.Smb2DirQueryOptions.QueryMaxAccessAllowed;
 
 			// This is known to be a directory
-			var stats = new TraversalStats();
-			if (this.Depth == 0)
-			{
-				var items = await GetDirectoryListingAsync(client, dirPath, searchPattern, secInfo, options, null, stats, cancellationToken);
-				this.WriteRecords(items);
-
-				ulong size = items.Aggregate(0UL, (acc, r) => acc + r.Size);
-				this.WriteVerbose($"{items.Count} files, {size:N0} bytes");
-			}
-			else
-			{
-				int depth = this.Depth;
-				if (depth < 0)
-					depth = int.MaxValue;
-
-				await ListSubtreeAsync(
-					client,
-					dirPath,
-					searchPattern,
-					secInfo,
-					options,
-					null,
-					depth,
-					stats,
-					cancellationToken);
-			}
+			Smb2Traversal traverser = new Smb2Traversal(
+				(this.Depth >= 0) ? this.Depth : int.MaxValue,
+				this.Context,
+				client,
+				searchPattern,
+				options,
+				secInfo,
+				this.QueryBufferSize,
+				this.GetExtraCreateOptions(),
+				this.TimeWarpToken?.Timestamp
+				);
+			traverser.AddRoot(new Smb2DirEntryNode(dirPath, new Smb2DirEntry()));
+			await traverser.Traverse(cancellationToken);
 
 			return 0;
-		}
-
-		private async Task ListSubtreeAsync(
-			Smb2Client client,
-			UncPath dirPath,
-			string searchPattern,
-			SecurityInfo secInfo,
-			Smb2Directory.Smb2DirQueryOptions options,
-			string? prefix,
-			int depth,
-			TraversalStats stats,
-			CancellationToken cancellationToken)
-		{
-			var items = await GetDirectoryListingAsync(client, dirPath, searchPattern, secInfo, options, prefix, stats, cancellationToken);
-			foreach (var item in items)
-			{
-				this.WriteRecord(item);
-				if (item.IsDirectory && !item.IsReparsePoint && depth > 0)
-				{
-					try
-					{
-						await ListSubtreeAsync(
-							client,
-							dirPath.Append(item.FileName),
-							searchPattern,
-							secInfo,
-							options,
-							item.RelativePath + '\\',
-							depth - 1,
-							stats,
-							cancellationToken);
-					}
-					catch { }
-				}
-			}
-		}
-
-		private async Task<List<Smb2DirEntry>> GetDirectoryListingAsync(
-			Smb2Client client,
-			UncPath dirPath,
-			string searchPattern,
-			SecurityInfo secInfo,
-			Smb2Directory.Smb2DirQueryOptions options,
-			string? prefix,
-			TraversalStats stats,
-			CancellationToken cancellationToken)
-		{
-			stats.Directories++;
-
-			this.WriteVerbose($"Traversing {dirPath}; found {stats.Files} files in {stats.Directories} directories");
-
-			// Open directory
-			await using (var dir = (Smb2Directory)await client.CreateFileAsync(dirPath, new Smb2CreateInfo()
-			{
-				CreateDisposition = Smb2CreateDisposition.Open,
-				Priority = Smb2Priority.OpenDir,
-				DesiredAccess = (uint)Smb2FileAccessRights.DefaultOpenDirAccess,
-				ShareAccess = Smb2ShareAccess.DefaultDirShare,
-				FileAttributes = Winterop.FileAttributes.None,
-				CreateOptions = GetCreateOptions(Smb2FileCreateOptions.Directory | Smb2FileCreateOptions.SynchronousIoNonalert),
-				ImpersonationLevel = Smb2ImpersonationLevel.Impersonation,
-				RequestMaximalAccess = true,
-				QueryOnDiskId = true,
-				TimeWarpToken = this.TimeWarpToken?.Timestamp
-				//OplockLevel = lease ? Smb2OplockLevel.Lease : Smb2OplockLevel.None,
-				//LeaseInfo = lease
-				//	? new Smb2LeaseInfo()
-				//	{
-				//		LeaseState = Smb2LeaseState.ReadCaching | Smb2LeaseState.HandleCaching,
-				//		UseV2Struct = this.Session.Connection.Dialect >= Smb2Dialect.Smb3_0
-				//	}
-				//	: null
-			}, FileAccess.Read, cancellationToken))
-			{
-				// Enumerate files in directory
-				var listing = await dir.QueryDirAsync(
-					searchPattern,
-					options,
-					secInfo,
-					this.QueryBufferSize,
-					cancellationToken);
-				var items = listing.FindAll(r => r.FileName != "." && r.FileName != "..");
-				if (prefix != null)
-				{
-					foreach (var item in items)
-					{
-						item.RelativePath = prefix + item.FileName;
-					}
-				}
-				stats.Files += items.Count;
-
-				return items;
-			}
 		}
 
 		TreeHandler ISupportTreeOutput.CreateTreeHandler()

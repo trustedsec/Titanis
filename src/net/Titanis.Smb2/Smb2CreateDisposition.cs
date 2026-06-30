@@ -12,23 +12,23 @@
 		/// <summary>
 		/// If the file already exists, return success; otherwise, fail the operation. 
 		/// </summary>
-		Open = 1,
+		OpenExisting = 1,
 		/// <summary>
 		/// If the file already exists, fail the operation; otherwise, create the file.
 		/// </summary>
-		Create = 2,
+		CreateNew = 2,
 		/// <summary>
 		/// Open the file if it already exists; otherwise, create the file.
 		/// </summary>
-		OpenIf = 3,
+		OpenOrCreate = 3,
 		/// <summary>
 		/// Overwrite the file if it already exists; otherwise, fail the operation. 
 		/// </summary>
-		Overwrite = 4,
+		OverwriteExisting = 4,
 		/// <summary>
 		/// Overwrite the file if it already exists; otherwise, create the file.
 		/// </summary>
-		OverwriteIf = 5,
+		OverwriteOrCreate = 5,
 	}
 
 }
