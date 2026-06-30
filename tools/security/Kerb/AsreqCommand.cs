@@ -33,7 +33,7 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 	[Example("Requesting a TGT with an NTLM Hash", "{0} -UserName milchick -NtlmHash B406A01772D0AD225D7B1C67DD81496F -Kdc 10.66.0.11 -Realm LUMON -v -OutputFileName milchick-tgt.kirbi -Overwrite")]
 	[Example("Requesting a TGT with an AES 128 key", "{0} -UserName milchick -AesKey c5673764957bc2839e367ba7b82f32e1 -Kdc 10.66.0.11 -Realm LUMON -v -OutputFileName milchick-tgt.kirbi -Overwrite")]
 	[Example("Requesting a TGT with an AES 256 key", "{0} -UserName milchick -AesKey 76332deee4296dcb20200888630755268e605c8576e50ff38db2d8b92351f4e4 -Kdc 10.66.0.11 -Realm LUMON -v -OutputFileName milchick-tgt.kirbi -Overwrite")]
-	public class AsreqCommand : TicketRequestCommand
+	public class AsreqCommand : KdcRequestCommand
 	{
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 

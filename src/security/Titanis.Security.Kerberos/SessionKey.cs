@@ -52,7 +52,7 @@ namespace Titanis.Security.Kerberos
 		internal Checksum Checksum(KeyUsage usage, Span<byte> data)
 		{
 			var cksumBytes = new byte[this.EncryptionProfile.ChecksumSizeBytes];
-			this.EncryptionProfile.ComputeChecksum(this.KeyBytes, KeyUsage.X509Checksum, KeyIntent.Checksum, [], SecBufferList.Create(SecBuffer.Integrity(data)), [], cksumBytes);
+			this.EncryptionProfile.ComputeChecksum(this.KeyBytes, usage, KeyIntent.Checksum, [], SecBufferList.Create(SecBuffer.Integrity(data)), [], cksumBytes);
 			return new Checksum((int)this.EncryptionProfile.ChecksumType, cksumBytes);
 		}
 

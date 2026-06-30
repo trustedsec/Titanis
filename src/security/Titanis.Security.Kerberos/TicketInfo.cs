@@ -333,6 +333,7 @@ namespace Titanis.Security.Kerberos
 			return encProfile.GenerateSubkey();
 		}
 
+
 		#region Authorization data
 		private TicketAuthorizationData? _cachedAuthData;
 		private TicketAuthorizationData? CachedAuthData => (this._cachedAuthData ??= this.TryDecryptAuthData());
@@ -348,27 +349,28 @@ namespace Titanis.Security.Kerberos
 
 		public TicketAuthorizationData DecryptAuthorizationData(SessionKey? ticketKey, SessionKey? asrepKey)
 		{
-			if (this._cachedAuthData is null)
-			{
-				ticketKey ??= this.TicketKey;
-				asrepKey ??= this.AsrepKey;
-
-				ArgumentNullException.ThrowIfNull(ticketKey);
-
-				EncryptedData encPart = this.ticket.enc_part;
-
-				this._cachedAuthData = DecryptAuthorizationData(ticketKey, asrepKey, encPart);
-			}
+			EnsureAuthDataDecrypted(ticketKey, asrepKey);
 
 			return this._cachedAuthData;
 		}
 
-		internal static TicketAuthorizationData DecryptAuthorizationData(SessionKey ticketKey, SessionKey? asrepKey, EncryptedData encPart)
+		private void EnsureAuthDataDecrypted(SessionKey? ticketKey, SessionKey? asrepKey)
 		{
-			var encTicketPart = Asn1DerDecoder.DecodeTlv<EncTicketPart>(ticketKey.Decrypt(KeyUsage.Asrep_Tgsrep_Ticket, encPart.cipher.ToArray()));
-			var authz = new TicketAuthorizationData();
-			authz.Process(encTicketPart, asrepKey);
-			return authz;
+			if (this._cachedAuthData is null)
+			{
+				ticketKey ??= this.TicketKey;
+				asrepKey ??= this.AsrepKey;
+				ArgumentNullException.ThrowIfNull(ticketKey);
+
+				var encTicketPart = Asn1DerDecoder.DecodeTlv<EncTicketPart>(ticketKey.Decrypt(KeyUsage.Asrep_Tgsrep_Ticket, this.ticket.enc_part.cipher.ToArray()));
+
+				var authz = new TicketAuthorizationData();
+				authz.Process(encTicketPart?.Value?.authorization_data, ticketKey, asrepKey);
+				this._cachedAuthData = authz;
+
+				this.TicketKey = ticketKey;
+				this.AsrepKey = asrepKey;
+			}
 		}
 
 		internal void ChangeSpn(ServicePrincipalName targetSpn)

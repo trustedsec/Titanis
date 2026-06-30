@@ -32,6 +32,11 @@ public abstract class TicketRequestCommand : KdcCommand
 	[Description("Name of ticket cache file")]
 	public string? TicketCache { get; set; }
 
+	[Parameter]
+	[Category(ParameterCategories.AuthenticationKerberos)]
+	[Description("Name of client workstation")]
+	public string? Workstation { get; set; }
+
 	protected override void ValidateParameters(ParameterValidationContext context)
 	{
 		base.ValidateParameters(context);

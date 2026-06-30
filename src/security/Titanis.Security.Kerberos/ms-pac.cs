@@ -130,88 +130,6 @@ namespace ms_pac
 		}
 	}
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.7")]
-	public struct PAC_INFO_BUFFER : Titanis.DceRpc.IRpcFixedStruct
-	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.ulType);
-			encoder.WriteValue(this.cbBufferSize);
-			encoder.WriteValue(this.Offset);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.ulType = decoder.ReadUInt32();
-			this.cbBufferSize = decoder.ReadUInt32();
-			this.Offset = decoder.ReadUInt64();
-		}
-		public uint ulType;
-		public uint cbBufferSize;
-		public ulong Offset;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-		}
-	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.7")]
-	public struct PACTYPE : Titanis.DceRpc.IRpcFixedStruct
-	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.cBuffers);
-			encoder.WriteValue(this.Version);
-			if ((this.Buffers == null))
-			{
-				this.Buffers = new PAC_INFO_BUFFER[1];
-			}
-			for (int i = 0; (i < 1); i++
-			)
-			{
-				PAC_INFO_BUFFER elem_0 = this.Buffers[i];
-				encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment._8Byte);
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.cBuffers = decoder.ReadUInt32();
-			this.Version = decoder.ReadUInt32();
-			if ((this.Buffers == null))
-			{
-				this.Buffers = new PAC_INFO_BUFFER[1];
-			}
-			for (int i = 0; (i < 1); i++
-			)
-			{
-				PAC_INFO_BUFFER elem_0 = this.Buffers[i];
-				elem_0 = decoder.ReadFixedStruct<PAC_INFO_BUFFER>(Titanis.DceRpc.NdrAlignment._8Byte);
-				this.Buffers[i] = elem_0;
-			}
-		}
-		public uint cBuffers;
-		public uint Version;
-		public PAC_INFO_BUFFER[] Buffers;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			for (int i = 0; (i < 1); i++
-			)
-			{
-				PAC_INFO_BUFFER elem_0 = this.Buffers[i];
-				encoder.WriteStructDeferral(elem_0);
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			for (int i = 0; (i < 1); i++
-			)
-			{
-				PAC_INFO_BUFFER elem_0 = this.Buffers[i];
-				decoder.ReadStructDeferral<PAC_INFO_BUFFER>(ref elem_0);
-				this.Buffers[i] = elem_0;
-			}
-		}
-	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.7")]
 	public struct CYPHER_BLOCK : Titanis.DceRpc.IRpcFixedStruct
 	{
 		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
@@ -611,28 +529,6 @@ namespace ms_pac
 		}
 	}
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.7")]
-	public struct PAC_CREDENTIAL_INFO : Titanis.DceRpc.IRpcFixedStruct
-	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.Version);
-			encoder.WriteValue(this.EncryptionType);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.Version = decoder.ReadUInt32();
-			this.EncryptionType = decoder.ReadUInt32();
-		}
-		public uint Version;
-		public uint EncryptionType;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-		}
-	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.7")]
 	public struct SECPKG_SUPPLEMENTAL_CRED : Titanis.DceRpc.IRpcFixedStruct
 	{
 		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
@@ -804,30 +700,6 @@ namespace ms_pac
 		}
 		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
 		{
-		}
-	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.7")]
-	public struct PAC_CLIENT_INFO : Titanis.DceRpc.IRpcFixedStruct
-	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteFixedStruct(this.ClientId, Titanis.DceRpc.NdrAlignment._4Byte);
-			encoder.WriteValue(this.NameLength);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.ClientId = decoder.ReadFixedStruct<ms_dtyp.FILETIME>(Titanis.DceRpc.NdrAlignment._4Byte);
-			this.NameLength = decoder.ReadUInt16();
-		}
-		public ms_dtyp.FILETIME ClientId;
-		public ushort NameLength;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteStructDeferral(this.ClientId);
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			decoder.ReadStructDeferral<ms_dtyp.FILETIME>(ref this.ClientId);
 		}
 	}
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.7")]

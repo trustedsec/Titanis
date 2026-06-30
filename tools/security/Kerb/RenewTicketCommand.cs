@@ -13,7 +13,7 @@ If you specify -TargetSpn with one or more SPNs, {0} only renews tickets matchin
 ")]
 [Example("Renewing all tickets in a file", "{0} -Ticket milchick-lumon-fs1.kirbi 10.66.0.11 -OutputFileName milchick-lumon-fs1.kirbi -Overwrite")]
 [Example("Renewing tickets from cache", "{0} -TicketCache milchick.ccache 10.66.0.11 -TargetSpn host/lumon-fs1, cifs/lumon-fs1")]
-public class RenewTicketCommand : TicketRequestCommand
+public class RenewTicketCommand : KdcRequestCommand
 {
 
 	[Parameter]
@@ -25,7 +25,7 @@ public class RenewTicketCommand : TicketRequestCommand
 	public TicketParameterGroup TicketParameters { get; set; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-	[Parameter(KdcPosition + 1)]
+	[Parameter(After = nameof(Kdc))]
 	[Category(ParameterCategories.AuthenticationKerberos)]
 	[Description("SPNs to renew tickets for")]
 	public SecurityPrincipalName[] TargetSpn { get; set; }

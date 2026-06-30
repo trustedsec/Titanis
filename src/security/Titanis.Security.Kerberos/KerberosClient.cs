@@ -15,7 +15,6 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +24,7 @@ using Titanis.Asn1.Serialization;
 using Titanis.Crypto;
 using Titanis.IO;
 using Titanis.Net;
+
 using static Titanis.Security.Kerberos.KerberosClient;
 
 [assembly: InternalsVisibleTo("Titanis.Security.Kerberos.Test")]
@@ -1475,6 +1475,80 @@ namespace Titanis.Security.Kerberos
 				return KerberosFileFormat.Ccache;
 			else
 				return KerberosFileFormat.Kirbi;
+		}
+
+		public TicketInfo ForgeTicket(
+			KdcOptions options,
+			SecurityPrincipalName clientName,
+			string clientRealm,
+			string ticketRealm,
+			SecurityPrincipalName targetSpn,
+			string targetRealm,
+			SessionKey sessionKey,
+			SessionKey ticketKey,
+			DateTime authTime,
+			DateTime endTime,
+			DateTime? startTime,
+			DateTime? renewTill,
+			LogonInfo? logonInfo,
+			UpnDnsInfo? upnDnsInfo,
+			SessionKey? kdcKey
+			)
+		{
+			kdcKey ??= ticketKey;
+			var pacBytes = TicketAuthorizationData.BuildPac(
+				authTime,
+				logonInfo,
+				upnDnsInfo,
+				ticketKey,
+				kdcKey.EncryptionProfile.ChecksumType,
+				new byte[kdcKey.EncryptionProfile.ChecksumSizeBytes]
+				);
+			var adelem = new AuthorizationData_Element((int)AdType.IfRelevant, Asn1DerEncoder.EncodeTlv(new Asn1SequenceOf<AuthorizationData_Element>([new AuthorizationData_Element((int)AdType.Pac, pacBytes)])).ToArray());
+#if DEBUG
+			var newPac = new TicketAuthorizationData();
+			newPac.Process(adelem, ticketKey, null, false);
+#endif
+
+
+			EncTicketPart encTicketPart = new EncTicketPart(new EncTicketPart_Tagged3(
+				new Asn1BitString((uint)options),
+				sessionKey.key,
+				clientRealm,
+				Structs.PrincipalName(clientName),
+				new TransitedEncoding(0, []),
+				authTime,
+				endTime,
+				startTime,
+				renewTill,
+				null,
+				[adelem]
+				));
+			byte[] encData = Asn1DerEncoder.EncodeTlv(encTicketPart).ToArray();
+			var encTicketBytes = ticketKey.EncryptAndWrap(KeyUsage.Asrep_Tgsrep_Ticket, encData);
+
+			EncKDCRepPart encRepPart = new EncKDCRepPart(
+				sessionKey.key,
+				[],
+				0,
+				new Asn1BitString((uint)options),
+				authTime,
+				endTime,
+				targetRealm,
+				Structs.PrincipalName(targetSpn),
+				null,
+				startTime,
+				renewTill,
+				[],
+				[]
+				);
+			TicketInfo ticket = new TicketInfo(0, new Ticket_Tagged1(5, ticketRealm, Structs.PrincipalName(targetSpn), encTicketBytes), sessionKey, encRepPart, clientName.GetNamePart(0), clientRealm, null, ticketKey);
+
+#if DEBUG
+			ticket.DecryptAuthorizationData(ticketKey, null);
+#endif
+
+			return ticket;
 		}
 	}
 

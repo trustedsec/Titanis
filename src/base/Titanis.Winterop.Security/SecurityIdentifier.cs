@@ -73,7 +73,7 @@ namespace Titanis.Winterop.Security
 		/// </summary>
 		/// <param name="authority">Authority</param>
 		public SecurityIdentifier(SecurityIdentifierAuthority authority)
-			: this(BuildSidFromComponents(authority, Array.Empty<uint>()), 0)
+			: this(BuildSidFromComponents(authority, []), 0)
 		{ }
 		/// <summary>
 		/// Initializes a new <see cref="SecurityIdentifier"/> from its components.
@@ -88,7 +88,7 @@ namespace Titanis.Winterop.Security
 		/// </summary>
 		/// <param name="authority">Authority</param>
 		/// <param name="subauthorities">Subauthorities</param>
-		public SecurityIdentifier(SecurityIdentifierAuthority authority, uint[] subauthorities)
+		public SecurityIdentifier(SecurityIdentifierAuthority authority, ReadOnlySpan<uint> subauthorities)
 			: this(BuildSidFromComponents(authority, subauthorities), 0)
 		{ }
 
@@ -188,6 +188,20 @@ namespace Titanis.Winterop.Security
 				throw new ArgumentOutOfRangeException(nameof(index), "The index must be non-negative and less than the number of subauthorities.");
 
 			return BinaryPrimitives.ReadUInt32LittleEndian(_bytes.AsSpan().Slice(8 + 4 * index, 4));
+		}
+
+		/// <summary>
+		/// Gets the list of subauthorities.
+		/// </summary>
+		/// <returns>An array of the subauthorities</returns>
+		public uint[] GetSubauthorities()
+		{
+			uint[] subauths = new uint[this.SubauthorityCount];
+			for (int i = 0; i < subauths.Length; i++)
+			{
+				subauths[i] = this.GetSubauthority(i);
+			}
+			return subauths;
 		}
 
 		/// <summary>

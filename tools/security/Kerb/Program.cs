@@ -13,7 +13,8 @@ namespace Titanis.Cli.Kerb
 	[Subcommand("setpw", typeof(SetPasswordCommand))]
 	[Subcommand("s2k", typeof(S2kCommand))]
 	[Subcommand("keytab", typeof(KeytabCommand))]
-	internal class Program : MultiCommand
+	[Subcommand("forge", typeof(ForgeCommand))]
+	public class Program : MultiCommand
 	{
 		static void Main(string[] args)
 			=> RunProgramAsync<Program>(args);

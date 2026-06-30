@@ -4,7 +4,7 @@
 
 namespace Titanis.Security.Kerberos
 {
-	enum EncChecksumType
+	public enum EncChecksumType
 	{
 		// [RFC 3961] § 8
 		Crc32 = 1,
