@@ -315,7 +315,18 @@ namespace Titanis.Msrpc.Msdrsr
 								uuidInvocIdSrc = invocIdSrc,
 								pNC = objectName.ToRpcDsName(),
 								usnvecFrom = usnvecFrom,
-								pUpToDateVecDest = null,
+								pUpToDateVecDest = new RpcPointer<UPTODATE_VECTOR_V1_EXT>(new UPTODATE_VECTOR_V1_EXT
+								{
+									cNumCursors = 1,
+									dwVersion = 1,
+									rgCursors = new UPTODATE_CURSOR_V1[1]
+									{
+										new UPTODATE_CURSOR_V1
+										{
+											uuidDsa=invocIdSrc
+										}
+									}
+								}),
 								ulFlags = (uint)options,
 								cMaxObjects = (uint)maxObjCount,
 								cMaxBytes = (uint)maxByteCount,
@@ -453,6 +464,10 @@ namespace Titanis.Msrpc.Msdrsr
 					more = repres.more;
 					usnvecFrom = repres.usnvec;
 					usnvecFrom_ = new UsnVector(usnvecFrom);
+
+#if DEBUG
+					Console.Out.WriteLine($"*** NEW USN vector: {usnvecFrom_.ToBytes().ToHexString()}");
+#endif
 				} while (more);
 
 				if (prevOutputTask != null)
@@ -499,6 +514,11 @@ namespace Titanis.Msrpc.Msdrsr
 					pObj = pObj.value.pNextEntInf;
 				}
 			}).Unwrap();
+
+#if DEBUG
+			// TODO: Add to log
+			Console.Out.WriteLine($"*** cNumNcSizeObjects: {rep6.cNumNcSizeObjects}; cNumNcSizeValues: {rep6.cNumNcSizeValues}");
+#endif
 
 			return new ReplicateResult(rep6.fMoreData != 0, rep6.usnvecTo, outputTask);
 		}

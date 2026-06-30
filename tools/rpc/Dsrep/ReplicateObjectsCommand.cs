@@ -71,7 +71,7 @@ public class ReplicateObjectsCommand : ReplicateCommand
 				} while ((!query.PagingBookmark.IsNullOrEmpty() || !query.DirSyncCookie.IsNullOrEmpty()) && pageHasResults && !cancellationToken.IsCancellationRequested);
 
 				if (!hasAnyMatches)
-					this.WriteWarning($"The LDAP query with filter '{objSpec.Filter.ToString()}' did not return any results");
+					this.WriteWarning($"The object specification '{objSpec?.ToString()}' did not return any results");
 			}
 		}
 	}

@@ -254,6 +254,11 @@ public class DsobjSpec
 	public DsName? Dsname { get; }
 	public LdapFilter? Filter { get; }
 	public string? Name { get; }
+
+	public override string ToString()
+	{
+		return (this.Filter?.ToString()) ?? this.Dsname?.ToString() ?? this.Name;
+	}
 }
 
 public class DsobjSpecConverter : TypeConverter
