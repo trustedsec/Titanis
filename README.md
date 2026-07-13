@@ -45,12 +45,12 @@ Titanis is a library of protocol implementations and command line utilities, wri
 
 For recent changes, see the [change log](CHANGELOG.md)
 
-For an overview on supported authentication scenarios, see [Authentication](doc/UserGuide/syntax-auth.md) - Describes how to control authentication with parameters
+For an overview on supported authentication scenarios, see [Authentication](docs/UserGuide/syntax-auth.md) - Describes how to control authentication with parameters
 
 
 The toolset implements callbacks and logging features to integrate into your operational environment.
 
-For a list of command line tools and tasks you can perform with them, check the [Tool Index](doc/UserGuide/tools/index.md)
+For a list of command line tools and tasks you can perform with them, check the [Tool Index](docs/UserGuide/tools/index.md)
 
 # Target Audience
 *  **Security researchers** - Research how Windows reacts to various types of requests
@@ -61,9 +61,9 @@ For a list of command line tools and tasks you can perform with them, check the 
 
 [Build Instructions](BUILD.md)
 
-If you are a user, see the [User Guide](doc/UserGuide/index.md) for a list of command line utilities and how to use them.
+If you are a user, see the [User Guide](docs/UserGuide/index.md) for a list of command line utilities and how to use them.
 
-If you are a developer, see the [Developer Guide](doc/DevGuide/index.md) for information on how to enhance the code base.
+If you are a developer, see the [Developer Guide](docs/DevGuide/index.md) for information on how to enhance the code base.
 
 # Planned Enhancements
 * Task Scheduler support ([MS-TSCH](https://winprotocoldoc.z19.web.core.windows.net/MS-TSCH/[MS-TSCH].pdf))

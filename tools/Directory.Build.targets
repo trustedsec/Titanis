@@ -11,7 +11,7 @@
 
 	<Target Name="BuildDocs" AfterTargets="Build">
 		<Message Text="Building documentation" Importance="high" />
-		<BuildToolDocTask Condition="'$(ArtifactsBasePath)'!=''" AssemblyFile="$(OutputPath)$(AssemblyName)$(TargetExt)" DocFile="$(SolutionDir)doc\UserGuide\tools\$(AssemblyName).md" />
+		<BuildToolDocTask Condition="'$(ArtifactsBasePath)'!=''" AssemblyFile="$(OutputPath)$(AssemblyName)$(TargetExt)" DocFile="$(SolutionDir)docs\UserGuide\tools\$(AssemblyName).md" />
 	</Target>
 
 	<Target Name="PublishAll" AfterTargets="Build" Condition="'$(Publishing)'=='' and '$(Configuration)'=='Release'" >
