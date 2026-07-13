@@ -1,0 +1,137 @@
+body {
+	--accent-color: #A0E0FF;
+	--hover-color: #003060;
+	--highlight-color: #002040;
+	--scroll-color: #001830;
+	--background-color: #080C18;
+	--text-color: white;
+	--line-color: #204080;
+	display: grid;
+	grid-template-areas:
+		"nav . header"
+		"nav . body"
+		"nav . ."
+		"nav . footer";
+	grid-template-rows: auto auto auto auto;
+	grid-template-columns: max-content 12px 1fr;
+	margin: 0px;
+	color: var(--text-color);
+	background-color: var(--background-color);
+	font-family: "Segoe UI", Arial, Helvetica, sans-serif, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+	scrollbar-color: var(--accent-color) var(--scroll-color);
+}
+
+main {
+	grid-area: body;
+	overflow: auto;
+}
+
+.page-header {
+	grid-area: header;
+}
+
+.page-footer {
+	grid-area: footer;
+}
+
+a {
+	color: var(--accent-color)
+}
+
+p {
+	margin-left: 1em;
+	line-height: 1.75;
+}
+
+
+
+
+aside.nav-menu {
+	position: sticky;
+	top: 0;
+	max-height: 100vh;
+
+	grid-area: nav;
+	resize: horizontal;
+	overflow: auto;
+}
+
+ul.nav-list {
+	list-style-type: none;
+	padding-left: 1em;
+}
+
+ul.nav-list-0 {
+}
+
+ul.nav-list-1 {
+	padding-left: 0px;
+}
+
+a.nav-link:hover {
+	background-color: var(--hover-color);
+}
+
+a.nav-link {
+	display: block;
+	color: var(--text-color);
+	text-decoration: none;
+	padding: 3px 3px 3px 12px;
+}
+
+a.nav-link-0 {
+	text-transform: uppercase;
+}
+
+a.nav-link-current {
+	background-color: var(--highlight-color);
+	border-left: var(--accent-color) solid 3px;
+	padding-left: 9px;
+}
+
+
+
+h1 {
+	padding-top: 12pt;
+	border-bottom: solid 1px var(--line-color);
+}
+
+
+
+code {
+	/*text-decoration: dashed underline var(--highlight-color);*/
+	padding: 3px;
+	border-radius: 6px;
+	border: 2px solid var(--highlight-color)
+}
+
+pre code {
+	border: none;
+	text-decoration: none;
+}
+
+pre.highlight {
+	background-color: black;
+	padding: 12px;
+}
+
+
+
+
+table {
+	border-collapse: collapse;
+	border:1px solid var(--line-color);
+	margin: 12px;
+}
+
+th {
+	border: 1px solid var(--line-color);
+	color: var(--accent-color);
+	background-color: var(--highlight-color)
+}
+
+td {
+	vertical-align: top;
+	border: 1px solid var(--line-color);
+	padding: 3px;
+}

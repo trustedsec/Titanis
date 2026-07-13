@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>{{ page.title }}</title>
+	<link rel="stylesheet" href="{{ site.baseurl }}/css/default.css">
+</head>
+<body>
+	<header class="page-header">
+		<p>
+			{% assign pageTitle = page.title %}
+			{% assign items = site.data.sitemap.items %}
+			{% assign parts = page.url | split: "/" %}
+			{% assign navUrl = "/" %}
+			{% for part in parts %}
+				{% if part.size > 0 %}
+					<!-- Part: "{{part}}" -->
+					{% assign filter = part | append: "/" %}
+					{% assign matching = items | where_exp:"item","item.href == filter" | first %}
+					{% if matching %}
+			<!-- Matching: {{filter}} with {{ matching | inspect }} -->
+						{% assign items = matching.items %}
+						{% assign navUrl = navUrl | append: matching.href %}
+			<a href="{{ site.baseurl}}/{{ navUrl }}">{{ matching.title }}</a> &gt;
+					{% else %}
+						{% assign matching = items | where_exp:"item","item.href == part" | first %}
+						{% if matching %}
+				<!--Matching page: {{ matching.title }} -->
+			
+							{% assign pageTitle = matching.title %}
+							{% assign items = nil %}
+						{% endif %}
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+		</p>
+
+		<h1>{{ pageTitle }}</h1>
+	</header>
+	<main>
+		<section>
+			{{ content }}
+		</section>
+	</main>
+	<aside class="nav-menu">
+		<nav>
+			{% include navlist.html nav=site.data.sitemap baseUrl="/" level=0 %}
+		</nav>
+	</aside>
+	<footer class="page-footer">
+	</footer>
+</body>
+</html>

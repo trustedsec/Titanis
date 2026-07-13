@@ -1,12 +1,10 @@
-# Tool Output
-
 When a tool executes, it provides both primary output as well as status
 information.  Primary output contains the results of the command and is written
 to STDOUT, while status information describes logging information describing
-the operation of the tool.
+the operation of the tool.  This article focuses on the primary output.  For details on logging, see [Customizing Logging](logging.md)
 
 Most commands write primary output to STDOUT in the form of records.  Each
-record may be printed in one of several styles specified with `-OutputStyle`:
+record contains one or more fields and may be printed in one of several styles specified with `-OutputStyle`:
 
 |Style|Description|
 |-|-|
@@ -16,20 +14,25 @@ record may be printed in one of several styles specified with `-OutputStyle`:
 |Tsv|Each record is printed as tab-separated values.|
 |Json|Each record is printed as a JSON object within an array.|
 
+Some commands (e.g. `Smb2Client get`) that deal with raw data use the `Raw` format which is printed to STDOUT as a stream of bytes.
+
+# Output Fields
 Use `-OutputFields` to specify which fields to print.  The help text for the
 command lists the fields supported by the commands.  Note that specifying some
 fields may alter the behavior of the command.  For example, the command may
-issue another request to the server to get the additional field.
+issue another request to the server to get the additional field.  To specify multiple output fields, specify each field after `-OutputFields`:
 
-Some commands that deal with raw data use the `Raw` format which is printed to STDOUT as a stream of bytes.
+For example, to list named pipes with their security descriptors, use:
+```
+Smb2Client ls //lumon-dc1/ipc$ -OutputFields FileName, SecurityDescriptorSddl
+```
 
-# Logging
-During execution, a tool writes status information to STDERR in the form of log messages.  Each message is assigned a log level indicating the severity of the message.  By default, only messages with a level of `Info` or higher are printed.  To control the level of messages written, use `-LogLevel`.  You can also use `-v` for `Verbose` and `-vv` for `Diagnostic'.
+In this case, the command must make an extra call to the server to get the security descriptor.
 
-Use `-LogFormat` to control how log messages appear on the console:
+Specifying an invalid field name is not an error, but no value will be printed.
 
-|Option|Description|Example|
-|-|-|-|
-| `Text` | Unstructured free-form text with the severity, category, and message text | `[Kerberos] DIAG: Requesting TGT for realm LUMON.IND for user milchick (nonce=-40593729)` |
-| `TextWithTimestamp` | Similar to `Text` with the addition of an ISO-formatted timestamp | `[2025-10-23T16:14:09.6977870Z][Kerberos] DIAG: Requesting TGT for realm LUMON.IND for user milchick (nonce=-40593729)` |
-| `Json` | Serios of JSON objects | `{"Severity":"Diagnostic","SeverityValue":-200,"Source":"Kerberos","MessageId":0,"MessageText":"Requesting TGT for realm LUMON.IND for user milchick (nonce=-525351544)","Parameters":null}` |
+## Dynamic Fields
+Some commands, such as `Wmi query` or `Ldap query`, offer dynamic fields that are determined at runtime.  This usually affects the request to the server.  In these cases, the help text does not include a list of output fields.
+
+# Headers
+By default, the **Table** and **List** styles output headers for the fields.  To prevent this, specify `-OutputHeaders:no`  This is often useful when piping the output to another command.
