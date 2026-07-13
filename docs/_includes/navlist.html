@@ -1,0 +1,14 @@
+<ul class="nav-list nav-list-{{ include.level }}">
+	{% for item in include.nav.items %}
+		{% assign linkUrl = include.baseUrl | append: item.href %}
+		{% assign activeLinkClass = "" %}
+		{% if linkUrl == page.url %}
+			{% assign activeLinkClass = "nav-link-current" %}
+		{% endif %}
+		<li class="nav-item nav-item-{{ include.level }}"><a class="nav-link nav-link-{{ include.level }} {{ activeLinkClass }}" href="{{ site.baseurl }}{{ linkUrl }}">{{ item.title }}</a></li>
+		{% if item.items %}
+			{% assign linkLevel = include.level | plus: 1 %}
+			{% include navlist.html nav=item baseUrl=linkUrl level=linkLevel %}
+		{% endif %}
+	{% endfor %}
+</ul>

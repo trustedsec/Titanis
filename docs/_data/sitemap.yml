@@ -1,0 +1,158 @@
+items:
+  - title: User Guide
+    href: UserGuide/
+    items:
+      - title: Getting Started
+        href: getting-started.html
+      - title: Syntax Basics
+        href: syntax.html
+      - title: Using Command-Line Completion
+        href: comp.html
+      - title: Parameter Defaults
+        href: param-defaults.html
+        items:
+          - title: Command-Specific Options
+            href: "#command-specific-options"
+          - title: Parameter Profiles
+            href: "#parameter-profiles"
+      - title: Authentication Guide
+        href: syntax-auth.html
+        items:
+          - title: Quick Reference
+            href: "#quick-reference"
+          - title: Ticket Files
+            href: "#ticket-files"
+          - title: SPN Overrides
+            href: "#spn-overrides"
+          - title: Inter-realm Referrals
+            href: "#inter-realm-referrals"
+          - title: PK-INIT
+            href: "#pk-init"
+          - title: Service for User (S4U)
+            href: "#service-for-user-s4u"
+      - title: Customizing Output
+        href: output.html
+        items:
+          - title: Logging
+            href: "#logging"
+      - title: How To
+        href: HowTo/
+        items:
+          - title: Authentication and Authorization
+            href: auth/
+            items:
+            - title: Kerberos
+              href: kerberos.html
+              items:
+                - title: Get AS Info for a User
+                  href: "#get-as-info-for-a-user"
+                - title: Compute Keys from a Password and Salt
+                  href: "#compute-keys-from-a-password-and-salt"
+                - title: Request a TGT with Password
+                  href: "#request-a-tgt-with-password"
+                - title: Request a TGT with PKINIT
+                  href: "#request-a-tgt-with-pkinit"
+                - title: Request Initial Service Ticket
+                  href: "#request-initial-service-ticket"
+                - title: Request a Service Ticket
+                  href: "#request-a-service-ticket"
+                - title: Request an Inter-realm ticket
+                  href: "#request-an-inter-realm-ticket"
+                - title: Request Armored Tickets
+                  href: "#request-armored-tickets"
+                - title: Request a U2U Ticket
+                  href: "#request-a-u2u-ticket"
+                - title: Request a S4U-to-self Ticket
+                  href: "#request-a-s4u-to-self-ticket"
+                - title: Request a S4U-to-proxy Ticket
+                  href: "#request-a-s4u-to-proxy-ticket"
+                - title: Renew a Ticket
+                  href: "#renew-a-ticket"
+                - title: Print Authorization Data
+                  href: "#print-authorization-data"
+                - title: Forge a Ticket
+                  href: "#forge-a-ticket"
+                - title: View Ticket Cache
+                  href: "#view-ticket-cache"
+                - title: Combine Ticket Files
+                  href: "#combine-ticket-files"
+                - title: Split Ticket Files
+                  href: "#split-ticket-files"
+                - title: Clear Ticket Cache
+                  href: "#clear-ticket-cache"
+                - title: Convert a Ticket File
+                  href: "#convert-a-ticket-file"
+                - title: Change a Password
+                  href: "#change-a-password"
+                - title: Reset a Password
+                  href: "#reset-a-password"
+            - title: LSA
+              href: lsa.html
+              items:
+                - title: Domain Controller Notes
+                  href: "#domain-controller-notes"
+                - title: Whoami
+                  href: "#whoami"
+                - title: Lookup SID for Name
+                  href: "#lookup-sid-for-name"
+                - title: Lookup Name for SID
+                  href: "#lookup-name-for-sid"
+                - title: Enumerate Policy Accounts
+                  href: "#enumerate-policy-accounts"
+                - title: List Privileged Accounts
+                  href: "#list-privileged-accounts"
+                - title: Query Account Privileges
+                  href: "#query-account-privileges"
+                - title: Create a Policy Account
+                  href: "#create-a-policy-account"
+                - title: Grant a Privilege
+                  href: "#grant-a-privilege"
+                - title: Revoke a Privilege
+                  href: "#revoke-a-privilege"
+                - title: Get System Access Rights
+                  href: "#get-system-access-rights"
+            - title: SDDL
+              href: sddl.html
+              items:
+                - title: Describe a Security Descriptor
+                  href: "#describe-a-security-descriptor"
+                - title: Convert Between Binary Descriptor and SDDL
+                  href: "#convert-between-binary-descriptor-and-sddl"
+                - title: Lookup GUID of Property or Permission
+                  href: "#lookup-guid-of-property-or-permission"
+                - title: Lookup Well-Known Security Principal
+                  href: "#lookup-well-known-security-principal"
+            - title: LDAP
+              href: ldap.html
+              items:
+                - title: Search for a user
+                  href: "#search"
+                - title: Query users and groups
+                  href: "#query"
+                - title: Query SPN mappings
+                  href: "#query-spn"
+                - title: Add certificate credential
+                  href: "#add-cert"
+                - title: Add/remove SPN mapping
+                  href: "#add-spn"
+                - title: Change or reset password
+                  href: "#change-password"
+          - title: File Sharing
+            href: smb.html
+            items:
+              - title: Enumerate shares
+                href: "#enumerate-shares"
+              - title: Query NICS
+                href: "#query-nics"
+              - title: List a directory
+                href: "#list-a-directory"
+              - title: Watch a directory for changes
+                href: "#watch-a-directory-for-changes"
+              - title: Get files
+                href: "#get-files"
+              - title: Put files
+                href: "#put-files"
+
+
+  - title: Developer Guide
+    href: DevGuide/

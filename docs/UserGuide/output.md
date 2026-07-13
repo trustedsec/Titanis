@@ -1,5 +1,3 @@
-# Tool Output
-
 When a tool executes, it provides both primary output as well as status
 information.  Primary output contains the results of the command and is written
 to STDOUT, while status information describes logging information describing

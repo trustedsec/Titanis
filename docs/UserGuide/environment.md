@@ -39,3 +39,5 @@ For each identity, create a `.cred` file with the following variables:
 * `TITANIS_DEFAULT_PASSWORD`
 * `TITANIS_DEFAULT_USERDOMAIN`
 * `KRB5CCNAME`
+
+For other authentication scenarios, see the [Authentication Guide](syntax-auth.md).
