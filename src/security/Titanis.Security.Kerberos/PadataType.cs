@@ -48,5 +48,8 @@ namespace Titanis.Security.Kerberos
 		PacOptions = 167,
 		KerbKeyListReq = 161,
 		KerbKeyListRep = 162,
+
+		// [RFC 8636] § 4
+		TdCmsDigestAlgorithms = 111,
 	}
 }

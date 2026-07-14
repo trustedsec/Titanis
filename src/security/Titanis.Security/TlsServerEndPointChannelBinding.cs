@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Security.Authentication.ExtendedProtection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -20,7 +21,7 @@ namespace Titanis.Security
 			if (serverCertificate is null) throw new ArgumentNullException(nameof(serverCertificate));
 			ServerCertificate = serverCertificate;
 
-			this._hashAlg = this.GetHashAlg(serverCertificate.SignatureAlgorithm);
+			this._hashAlg = GetHashAlg(serverCertificate.SignatureAlgorithm);
 		}
 
 		public override string Name => "tls-server-end-point";
@@ -28,7 +29,14 @@ namespace Titanis.Security
 		public X509Certificate2 ServerCertificate { get; }
 		private HashAlgorithm _hashAlg;
 
-		private HashAlgorithm GetHashAlg(Oid algId)
+		public static HashAlgorithm? GetHashAlg(Oid algId)
+		{
+			var hashAlg = TryGetHashAlg(algId);
+			if (hashAlg is null)
+				throw new NotSupportedException("The signature algorithm indicated by the certificate is not supported.");
+			return hashAlg;
+		}
+		public static HashAlgorithm? TryGetHashAlg(Oid algId)
 		{
 			var alg = SignatureAlgorithms.GetByOid(algId);
 			HashAlgorithm? hashAlg = null;
@@ -53,8 +61,6 @@ namespace Titanis.Security
 				}
 			}
 
-			if (hashAlg is null)
-				throw new NotSupportedException("The signature algorithm indicated by the certificate is not supported.");
 			return hashAlg;
 
 		}

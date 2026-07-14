@@ -155,13 +155,31 @@ namespace Titanis.Security.Kerberos
 		public PA_DATA DoPkinit(KDC_REQ_BODY kdcReqBody, X509Certificate2 cert)
 		{
 			Debug.Assert(kdcReqBody != null);
-			var kdcReqBodyBytes = Asn1DerEncoder.EncodeTlv(kdcReqBody);
+			var kdcReqBodyBytes = Asn1DerEncoder.EncodeTlv(kdcReqBody).ToArray();
 			var paChecksum = new byte[20];
-			SHA1.HashData(kdcReqBodyBytes.Span, paChecksum);
+			SHA1.HashData(kdcReqBodyBytes.AsSpan(), paChecksum);
 
 			KerberosTime kerbTime = KerberosTime.Now();
 
 			var nonce = (uint)kdcReqBody.nonce;
+
+			PKChecksum2? cksum2 = null;
+			if (this.SupportCmsAlgorithms != null)
+			{
+				foreach (var algId in this.SupportCmsAlgorithms)
+				{
+					var alg = TlsServerEndPointChannelBinding.TryGetHashAlg(algId.algorithm.ToOid());
+					if (alg != null)
+					{
+						byte[] algHash = alg.ComputeHash(kdcReqBodyBytes);
+						cksum2 = new PKChecksum2(
+							algHash,
+					new PKIX1Explicit88.AlgorithmIdentifier(new Asn1Oid(SignatureAlgorithms.Sha512NoSign.Value), null)
+							);
+						break;
+					}
+				}
+			}
 
 			// [RFC 4556] § 3.2.1 - Generation of Client Request
 
@@ -170,7 +188,8 @@ namespace Titanis.Security.Kerberos
 					kerbTime.dt,
 					(uint)nonce,
 					paChecksum,
-					this._freshnessToken
+					this._freshnessToken,
+					cksum2
 				),
 				new PKIX1Explicit88.SubjectPublicKeyInfo(
 					new PKIX1Explicit88.AlgorithmIdentifier(DhPublicNumber, this._dhkey.Group.EncodeDomainParameters()),

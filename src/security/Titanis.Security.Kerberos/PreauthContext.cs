@@ -1,4 +1,5 @@
 ﻿using KerberosV5Spec2;
+using PKIX1Explicit88;
 using System;
 using System.Buffers.Binary;
 using System.Collections;
@@ -140,6 +141,10 @@ namespace Titanis.Security.Kerberos
 					this.ProcessPacOptions(padata.padata_value);
 					break;
 
+				case PadataType.TdCmsDigestAlgorithms:
+					this.ProcessCmsAlgorithmList(padata.padata_value);
+					break;
+
 				case PadataType.TgsReq:
 				case PadataType.PacRequest:
 				case PadataType.FxCookie:
@@ -153,6 +158,13 @@ namespace Titanis.Security.Kerberos
 			}
 
 			return false;
+		}
+
+		public AlgorithmIdentifier[]? SupportCmsAlgorithms { get; private set; }
+		private void ProcessCmsAlgorithmList(byte[] padata_value)
+		{
+			var algs = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<AlgorithmIdentifier>>(padata_value);
+			this.SupportCmsAlgorithms = algs.Values;
 		}
 
 		private void ProcessPacOptions(byte[] padata_value)

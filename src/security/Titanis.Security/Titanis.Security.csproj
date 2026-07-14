@@ -13,12 +13,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SignatureAlgorithms.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.HashCode" />
     <PackageReference Include="Titanis.Core" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\base\Titanis.Core\Titanis.Core.csproj" />
+    <ProjectReference Include="..\..\crypto\Titanis.Crypto\Titanis.Crypto.csproj" />
     <ProjectReference Include="..\..\formats\Titanis.Asn1\Titanis.Asn1.csproj" />
   </ItemGroup>
 

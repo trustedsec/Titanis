@@ -242,6 +242,76 @@ namespace KerberosV5_PK_INIT_SPEC
 		}
 	}
 
+	// [MS-PKCA] § 2.2.3 PA-PK-AS-REQ
+	partial class PKChecksum2 : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<PKChecksum2>, IAsn1DerDecodableValue<PKChecksum2>
+	{
+		internal byte[] checksum;
+		internal AlgorithmIdentifier algorithmIdentifier;
+
+		public PKChecksum2(byte[] checksum, AlgorithmIdentifier algorithmIdentifier)
+		{
+			this.checksum = checksum;
+			this.algorithmIdentifier = algorithmIdentifier;
+		}
+
+		public Asn1Tag Tag => new Asn1Tag(0x20000010);
+
+		public static Asn1Tag StaticTag => new Asn1Tag(0x20000010);
+
+		public void EncodeValue(Asn1DerEncoder encoder)
+		{
+			encoder.EncodeExplicitTlv(new Asn1Tag(0xA0000001), this.algorithmIdentifier, (encoder, r) =>
+			{
+				encoder.EncodeValueTlv(this.algorithmIdentifier);
+			});
+			encoder.EncodeExplicitTlv(new Asn1Tag(0xA0000000), this.checksum, (encoder, r) =>
+			{
+				encoder.EncodeOctetStringTlv(this.checksum);
+			});
+		}
+
+		public void EncodeTlv(Asn1DerEncoder encoder)
+		{
+			encoder.EncodeValueTlv(this, this.Tag);
+		}
+
+		public static PKChecksum2 DecodeValueFrom(Asn1DerDecoder decoder)
+		{
+			var instance = new PKChecksum2(decoder);
+			return instance;
+		}
+
+		public static PKChecksum2 DecodeTlvFrom(Asn1DerDecoder decoder)
+		{
+			var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+			var instance = PKChecksum2.DecodeValueFrom(decoder);
+			decoder.CloseTlv(tlvFrame);
+			return instance;
+		}
+
+		public static bool TryDecodeTlvFrom(Asn1DerDecoder decoder, [NotNullWhen(true)] out PKChecksum2? instance)
+		{
+			if (decoder.CheckTag(new Asn1Tag(0x20000010)))
+			{
+				var tlvFrame = decoder.DecodeTlvStart(new Asn1Tag(0x20000010));
+				instance = PKChecksum2.DecodeValueFrom(decoder);
+				decoder.CloseTlv(tlvFrame);
+				return true;
+			}
+			else
+			{
+				instance = default;
+				return false;
+			}
+		}
+
+		private PKChecksum2(Asn1DerDecoder decoder)
+		{
+			this.checksum = decoder.DecodeTaggedValue<byte[]>(new Asn1Tag(0xA0000000), (encoder) => decoder.DecodeOctetStringTlv());
+			this.algorithmIdentifier = decoder.DecodeTaggedValue<AlgorithmIdentifier>(new Asn1Tag(0xA0000001), (encoder) => decoder.DecodeTlv<AlgorithmIdentifier>());
+		}
+	}
+
 	[Asn1Sequence()]
 	partial class PKAuthenticator : IAsn1DerEncodableTlv, IAsn1DerEncodableValue, IAsn1DerDecodableTlv<PKAuthenticator>, IAsn1DerDecodableValue<PKAuthenticator>
 	{
@@ -255,15 +325,17 @@ namespace KerberosV5_PK_INIT_SPEC
 		internal Byte[]? paChecksum;
 
 		internal byte[]? freshnessToken;
+		internal PKChecksum2? checksum2;
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
-		public PKAuthenticator(uint cusec, GeneralizedTime ctime, uint nonce, Byte[]? paChecksum = default, byte[]? freshnessToken=null)
+		public PKAuthenticator(uint cusec, GeneralizedTime ctime, uint nonce, Byte[]? paChecksum = default, byte[]? freshnessToken = null, PKChecksum2? pkauth2 = null)
 		{
 			this.cusec = cusec;
 			this.ctime = ctime;
 			this.nonce = nonce;
 			this.paChecksum = paChecksum;
 			this.freshnessToken = freshnessToken;
+			this.checksum2 = pkauth2;
 		}
 
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
@@ -275,6 +347,11 @@ namespace KerberosV5_PK_INIT_SPEC
 		[GeneratedCodeAttribute("Animus ASN.1 Compiler", "0.9.8")]
 		public void EncodeValue(Asn1DerEncoder encoder)
 		{
+			if (this.checksum2 is not null)
+				encoder.EncodeExplicitTlv<PKChecksum2>(new Asn1Tag(0xA0000005), this.checksum2, (encoder, r) =>
+				{
+					encoder.EncodeValueTlv<PKChecksum2>(r);
+				});
 			if (this.freshnessToken is not null)
 				encoder.EncodeExplicitTlv<Byte[]>(new Asn1Tag(0xA0000004), this.freshnessToken, (encoder, r) =>
 				{
@@ -346,6 +423,7 @@ namespace KerberosV5_PK_INIT_SPEC
 			this.nonce = decoder.DecodeTaggedValue<uint>(new Asn1Tag(0xA0000002), (encoder) => decoder.DecodeIntegerTlvAsUInt32());
 			this.paChecksum = decoder.CheckTag(new Asn1Tag(0xA0000003)) ? decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000003), (encoder) => decoder.DecodeOctetStringTlv()) : default(Byte[]);
 			this.freshnessToken = decoder.CheckTag(new Asn1Tag(0xA0000004)) ? decoder.DecodeTaggedValue<Byte[]>(new Asn1Tag(0xA0000004), (encoder) => decoder.DecodeOctetStringTlv()) : default(Byte[]);
+			this.checksum2 = decoder.CheckTag(new Asn1Tag(0xA0000005)) ? decoder.DecodeTaggedValue<PKChecksum2>(new Asn1Tag(0xA0000005), (encoder) => decoder.DecodeTlv<PKChecksum2>()) : default(PKChecksum2);
 		}
 	}
 

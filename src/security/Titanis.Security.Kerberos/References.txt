@@ -14,6 +14,7 @@
 [RFC 6113] - A Generalized Framework for Kerberos Pre-Authentication
 [RFC 6806] - Kerberos Principal Name Canonicalization and Cross-Realm Referrals
 [RFC 8070] - PKINIT freshness
+[RFC 8636] - Public Key Cryptography for Initial Authentication in Kerberos (PKINIT) Algorithm Agility
 [MS-KILE]
 [MS-SFU] S4U2self, S4U2proxy
 [ChangePW] - Kerberos Change Password Protocol
