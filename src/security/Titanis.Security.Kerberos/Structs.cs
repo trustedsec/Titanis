@@ -1,4 +1,5 @@
-﻿using KerberosV5Spec2;
+﻿using KerberosPreauthFramework;
+using KerberosV5Spec2;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -34,6 +35,9 @@ namespace Titanis.Security.Kerberos
 
 		internal static PA_DATA PAData_APReq(AP_REQ apreq)
 			=> PAData(PadataType.TgsReq, apreq);
+
+		internal static PA_DATA PAData_FastReq(PA_FX_FAST_REQUEST fastReq)
+			=> PAData(PadataType.FxFast, fastReq);
 
 		internal static PA_DATA PAData_PacOptions(PacOptions options)
 			=> PAData(PadataType.PacOptions, new PA_PAC_OPTIONS(new Asn1BitString((uint)options)));
@@ -72,7 +76,8 @@ namespace Titanis.Security.Kerberos
 			KerberosV5Spec2.PrincipalName? sname,
 			int nonce,
 			int[] etypes,
-			KerberosV5Spec2.HostAddress[]? hostAddresses
+			KerberosV5Spec2.HostAddress[]? hostAddresses,
+			EncryptedData? authzData
 			)
 			=> new KDC_REQ_BODY(
 				new Asn1BitString((uint)ticketParameters.Options),
@@ -85,6 +90,7 @@ namespace Titanis.Security.Kerberos
 				ticketParameters.StartTime,
 				ticketParameters.RenewTill,
 				hostAddresses,
+				authzData,
 				additional_tickets: (ticketParameters.addlTicketStruc != null) ? [ticketParameters.addlTicketStruc] : null
 			);
 
@@ -94,7 +100,7 @@ namespace Titanis.Security.Kerberos
 		internal static Authenticator Authenticator(
 			KerberosV5Spec2.PrincipalName cname,
 			string crealm,
-			Checksum cksum,
+			Checksum? cksum,
 			KerberosTime now,
 			int seqnbr,
 			EncryptionKey? subkey

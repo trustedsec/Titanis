@@ -74,6 +74,43 @@ namespace Titanis.Security.Kerberos
 				;
 		}
 
+		public abstract int HashSizeBytes { get; }
+		protected abstract void HashUnkeyed(ReadOnlySpan<byte> bytes, Span<byte> hash);
+
+		// [RFC 6113] § Appendix A
+		// [RFC 3961] is ambiguous on this
+		internal override int PrfSizeBytes => this.CipherBlockSizeBytes;
+
+		// [RFC 3961] § 5.3.  Cryptosystem Profile Based on Simplified Profile
+		/// <summary>
+		/// Computes a pseudo-random value.
+		/// </summary>
+		/// <param name="protocolKey">Protocol key</param>
+		/// <param name="seed">Seed bytes</param>
+		/// <param name="outputBuffer">Output buffer</param>
+		internal override void PseudoRandom(
+			ReadOnlySpan<byte> protocolKey,
+			ReadOnlySpan<byte> seed,
+			Span<byte> outputBuffer)
+		{
+			Debug.Assert(outputBuffer.Length == this.PrfSizeBytes);
+
+			Span<byte> tmp1 = stackalloc byte[this.HashSizeBytes];
+			this.HashUnkeyed(seed, tmp1);
+			if (this.MessageBlockSizeBytes > 1)
+			{
+				var m = tmp1.Length % this.MessageBlockSizeBytes;
+				tmp1 = tmp1[..^m];
+			}
+
+			tmp1.Slice(0, outputBuffer.Length).CopyTo(outputBuffer);
+
+			Span<byte> prfConstant = [(byte)'p', (byte)'r', (byte)'f'];
+			Span<byte> buf = new byte[this.KeySizeBytes];
+			DK(protocolKey, prfConstant, buf);
+			this.EncryptCore(buf, outputBuffer, new SecBufferList());
+		}
+
 		#region Key derivation
 		private void DeriveKey(ReadOnlySpan<byte> baseKey, ReadOnlySpan<byte> salt, Span<byte> keyBuffer)
 			=> this.DR(baseKey, salt, keyBuffer);
@@ -190,7 +227,7 @@ namespace Titanis.Security.Kerberos
 			// [RFC 3962] § 5
 			// Of note, this RFC requires the last 2 blocks be swapped regardless of size
 
-			Debug.Assert(confounder.Length == handler.BlockSizeBytes);
+			Debug.Assert(confounder.Length >= handler.BlockSizeBytes);
 
 			int messageSize = confounder.Length + bufferList.TotalPrivacyLength;
 			if (messageSize < handler.BlockSizeBytes)

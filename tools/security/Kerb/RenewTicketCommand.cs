@@ -75,7 +75,7 @@ public class RenewTicketCommand : KdcRequestCommand
 
 		List<TicketInfo> renewedTickets = new List<TicketInfo>();
 		bool flexEndTime = !this.TicketParameters.EndTime.HasValue;
-		var ticketParams = this.TicketParameters.GetTicketParameters(this.Log);
+		var ticketParams = this.TicketParameters.GetTicketParameters(this.Log, KerberosClient.DefaultTicketOptions);
 
 		// TODO: What ticket options does Windows use for renewal?
 

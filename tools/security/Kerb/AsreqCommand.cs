@@ -79,7 +79,7 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 					krb,
 					target,
 					this.EncTypes,
-					this.TicketParamGroup?.GetTicketParameters(this.Log),
+					this.TicketParamGroup?.GetTicketParameters(this.Log, KerberosClient.DefaultTgtOptions),
 					cancellationToken,
 					this.Log);
 

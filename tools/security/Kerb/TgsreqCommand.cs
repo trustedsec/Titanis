@@ -71,6 +71,10 @@ By default, all supported encryption types are sent in the request.  To limit th
 		public string? U2uTicket { get; set; }
 
 		[Parameter]
+		[Description("Name of file containing armor ticket")]
+		public string? ArmorTicket { get; set; }
+
+		[Parameter]
 		[Description("Password for service account (for decrypting authorization data)")]
 		public string? ServicePassword { get; set; }
 
@@ -137,6 +141,14 @@ By default, all supported encryption types are sent in the request.  To limit th
 			if (sourceTicket is null)
 				return null;
 
+			TicketInfo? armorTicket;
+			if (this.ArmorTicket != null)
+			{
+				armorTicket = LoadTgtFromStore(krb, ticketStoreFile);
+			}
+			else
+				armorTicket = null;
+
 
 			TicketInfo? u2uTicket;
 			if (!string.IsNullOrEmpty(this.U2uTicket))
@@ -152,12 +164,13 @@ By default, all supported encryption types are sent in the request.  To limit th
 
 			this.WriteVerbose($"Using ticket for {sourceTicket.ClientName}@{sourceTicket.ClientRealm} => {sourceTicket.TargetSpn} expiring {sourceTicket.EndTime}");
 
-			TicketParameters ticketParams = this.TicketParamGroup?.GetTicketParameters(this.Log) ?? krb.GetDefaultTicketOptions(sourceTicket);
+			TicketParameters ticketParams = this.TicketParamGroup?.GetTicketParameters(this.Log, KerberosClient.DefaultTicketOptions) ?? krb.GetDefaultTicketOptions(sourceTicket);
 			if (this.Forwarded.IsSet)
 				ticketParams.Options |= KdcOptions.Forwarded;
 			ticketParams.S4UserName = this.S4UserName;
 			ticketParams.S4UserCertificate = this._s4uCert;
 			ticketParams.S4ProxyService = this.S4ProxyService;
+			ticketParams.ArmorTicket = armorTicket;
 
 			SessionKey? serviceKey;
 			if (u2uTicket != null)

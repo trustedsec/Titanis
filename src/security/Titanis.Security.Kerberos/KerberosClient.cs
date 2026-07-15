@@ -1,3 +1,4 @@
+﻿using KerberosPreauthFramework;
 ﻿using KerberosV5Spec2;
 using System;
 using System.Buffers;
@@ -248,6 +249,53 @@ namespace Titanis.Security.Kerberos
 			return encProfile;
 		}
 
+		// [RFC 6113] § 5.1 - Combining Keys
+		internal static SessionKey KrbFxCf2(
+			EncProfile encProf,
+			SessionKey key1,
+			SessionKey key2,
+			ReadOnlySpan<byte> pepper1,
+			ReadOnlySpan<byte> pepper2
+			)
+		{
+			var cbSeed = encProf.KeyGenerationSeedSizeBytes;
+
+			Span<byte> buf1 = stackalloc byte[cbSeed];
+			PrfPlus(key1, pepper1, buf1);
+			Span<byte> buf2 = stackalloc byte[cbSeed];
+			PrfPlus(key2, pepper2, buf2);
+
+			for (int i = 0; i < buf1.Length; i++)
+			{
+				buf1[i] ^= buf2[i];
+			}
+			return encProf.RandomToKey(buf1);
+		}
+		// [RFC 6113] § 5.1 - Combining Keys
+		private static void PrfPlus(
+			SessionKey key,
+			ReadOnlySpan<byte> shared,
+			Span<byte> output)
+		{
+			int offset = 0;
+			int count = 0;
+			Span<byte> shared_1 = stackalloc byte[1 + shared.Length];
+			shared.CopyTo(shared_1.Slice(1));
+			var encProf = key.EncryptionProfile;
+			do
+			{
+				count++;
+				shared_1[0] = (byte)count;
+
+				Span<byte> prfbuf = stackalloc byte[encProf.PrfSizeBytes];
+				encProf.PseudoRandom(key.KeyBytes, shared_1, prfbuf);
+
+				prfbuf.Slice(0, Math.Min(prfbuf.Length, output.Length - offset)).CopyTo(output.Slice(offset));
+				// output.Slice(offset, encProf.PrfSizeBytes)
+				offset += prfbuf.Length;
+			} while (offset < output.Length);
+		}
+
 		/// <summary>
 		/// Requests a ticket-granting ticket for the specified realm.
 		/// </summary>
@@ -308,6 +356,7 @@ namespace Titanis.Security.Kerberos
 
 			PreauthContext paContext = credential.CreatePreauthContext(this, this._callback);
 			paContext._requestPac = true;
+			paContext.PacRequestOptions = ticketParameters.PacRequestOptions;
 			TicketRequestContext context = new TicketRequestContext(ticketParameters, credential, paContext, null, false);
 
 			var asreq = this.CreateASReq(
@@ -320,7 +369,8 @@ namespace Titanis.Security.Kerberos
 					Structs.PrincipalName(targetSpn),
 					context.nonce,
 					encTypeValues,
-					this.MakeHostAddress()
+					this.MakeHostAddress(),
+					null
 				));
 
 			this._callback?.OnRequestingTgt(targetRealm, credential, ticketParameters, asreq.Asreq.req_body.nonce);
@@ -672,13 +722,15 @@ namespace Titanis.Security.Kerberos
 
 			bool usingSubkey = tgt.SessionKey.EType != EType.Rc4Hmac;
 			var sessionKey = usingSubkey ? tgt.GenerateSessionKey() : tgt.SessionKey;
+
 			KerberosNullCredential cred = new KerberosNullCredential(new UserPrincipalName(tgt.ClientName, tgt.TicketRealm));
 			TicketRequestContext context = new TicketRequestContext(ticketParameters, null, cred.CreatePreauthContext(this, this._callback), sessionKey, usingSubkey)
 			{
-				Tgt = tgt
+				Tgt = tgt,
+				ArmorSubkey = (ticketParameters.ArmorTicket?.GenerateSessionKey() ?? null)
 			};
 
-			var tgsreq = this.CreateTgsReq(spn, tgt, realm, encTypes, ticketParameters, context);
+			var tgsreq = this.CreateTgsReq(spn, tgt, realm, encTypes, context);
 
 			this._callback?.OnRequestingTicket(spn, tgt, ticketParameters);
 
@@ -697,10 +749,17 @@ namespace Titanis.Security.Kerberos
 			TicketParameters ticketParams,
 			TicketRequestContext context)
 		{
+			context.preauth.ArmorKey = context.ArmorKey;
 			context.preauth.TryProcessPadata(ticketParams.CorrelationId, rep.padata);
 
-			Debug.Assert(context.sessionKey != null);
-			var encPart = this.ExtractTgsEncPart(rep, context.sessionKey, context.usingSubkey).Value;
+			var replyKey = context.SessionKey;
+			SessionKey? armorStrengthenKey = context.preauth.ArmorStrengthenKey;
+			if (armorStrengthenKey != null)
+			{
+				replyKey = KrbFxCf2(armorStrengthenKey.EncryptionProfile, armorStrengthenKey, replyKey, StrengthenKeyPepper, ReplyKeyPepper);
+			}
+
+			var encPart = this.ExtractTgsEncPart(rep, replyKey, context.usingSubkey).Value;
 			if (encPart.nonce != context.nonce)
 				throw new SecurityException("The nonce in the TGS-REP does not match the nonce sent in the TGS-REQ.");
 
@@ -824,15 +883,19 @@ namespace Titanis.Security.Kerberos
 			TicketInfo ticket,
 			string realm,
 			EType[]? etypes,
-			TicketParameters ticketParameters,
 			TicketRequestContext context
 			)
 		{
-			ArgumentNullException.ThrowIfNull(ticketParameters);
+			var ticketParameters = context.ticketParameters;
+			bool useArmor = ticketParameters.ArmorTicket != null;
 
 			var cname = Structs.PrincipalName(PrincipalNameType.Principal, ticket.ClientName);
 
-			int seqnbr = GenerateNonce();
+			// Windows uses the same value for nonce and seqnbr
+			int seqnbr = context.nonce;// GenerateNonce();
+			var encAuthzData = (ticketParameters.AuthorizationData != null)
+				? context.SessionKey.EncryptAndWrap(context.usingSubkey ? KeyUsage.TgsReq_KdcReqBody_AuthData_AuthSubkey : KeyUsage.TgsReq_KdcReqBody_AuthData_SessionKey, ticketParameters.AuthorizationData)
+				: null;
 
 			KDC_REQ_BODY reqBody = Structs.KdcReqBody(
 				ticketParameters,
@@ -841,7 +904,8 @@ namespace Titanis.Security.Kerberos
 				Structs.PrincipalName(spn),
 				context.nonce,
 				(etypes == null) ? this.GetAllETypes() : Array.ConvertAll(etypes, r => (int)r),
-				null
+				null,
+				encAuthzData
 				);
 
 			var pacOptions = PacOptions.BranchAware;
@@ -881,7 +945,7 @@ namespace Titanis.Security.Kerberos
 					var userIdBytes = Asn1DerEncoder.EncodeTlv(userId).ToArray();
 
 					Checksum cksum;
-					if (context.sessionKey.EType is EType.Rc4Hmac or EType.Rc4HmacExp)
+					if (context.SessionKey.EType is EType.Rc4Hmac or EType.Rc4HmacExp)
 					{
 						Md4Context md4 = new Md4Context();
 						md4.Initialize();
@@ -893,14 +957,14 @@ namespace Titanis.Security.Kerberos
 					}
 					else
 					{
-						cksum = context.sessionKey.Checksum(KeyUsage.X509Checksum, userIdBytes);
+						cksum = context.SessionKey.Checksum(KeyUsage.X509Checksum, userIdBytes);
 					}
 
 					var s4uCert = new PA_S4U_X509_USER(userId, cksum);
 					padatas.Add(Structs.PAData(PadataType.S4u2Self_X509User, Asn1DerEncoder.EncodeTlv(s4uCert).ToArray()));
 					if (ticketParameters.S4UserCertificate is null)
 					{
-						var cksumBytes = Rc4Hmac.Hash(context.sessionKey.KeyBytes, (int)KrbMessageType.PaForUser, s4uByteArray);
+						var cksumBytes = Rc4Hmac.Hash(context.SessionKey.KeyBytes, (int)KrbMessageType.PaForUser, s4uByteArray);
 						var s4u = new PA_FOR_USER(Structs.PrincipalName(nameType, ticketParameters.S4UserName.UserName), s4uRealm, Structs.Checksum(EncChecksumType.HmacMd5String, cksumBytes), "Kerberos");
 						padatas.Add(Structs.PAData(PadataType.S4u2Self_PaForUser, Asn1DerEncoder.EncodeTlv(s4u).ToArray()));
 					}
@@ -913,9 +977,10 @@ namespace Titanis.Security.Kerberos
 				}
 			}
 
-			padatas.Add(Kerberos.Structs.PAData_PacOptions(pacOptions));
+			if (!useArmor)
+				padatas.Add(Kerberos.Structs.PAData_PacOptions(pacOptions));
 
-			AP_REQ apreq = Structs.APReq(
+			AP_REQ apreqOuter = Structs.APReq(
 				(0 != (ticketParameters.Options & KdcOptions.EncTicketInSKey)) ? APOptions.UseSessionKey : APOptions.None,
 				ticket.ticket,
 				ticket.SessionKey.EncryptAndWrap(
@@ -926,10 +991,51 @@ namespace Titanis.Security.Kerberos
 						ComputeChecksum(Asn1DerEncoder.EncodeTlv(reqBody).Span),
 						context.now,
 						seqnbr,
-						context.usingSubkey ? context.sessionKey.key : null
+						context.usingSubkey ? context.SessionKey.key : null
 						)).Span)
 				);
-			padatas.Add(Structs.PAData_APReq(apreq));
+			PA_DATA padataApreq = Structs.PAData_APReq(apreqOuter);
+			padatas.Add(padataApreq);
+
+			// [RFC 6113] § 5.4.2. FAST Request
+			if (useArmor)
+			{
+				var armorSubkey = context.ArmorSubkey;
+
+				// New APREQ
+				context.now = new KerberosTime(context.now.AsDateTime() + TimeSpan.FromMicroseconds(1));
+				var apreqArmored = Structs.APReq(
+					(0 != (ticketParameters.Options & KdcOptions.EncTicketInSKey)) ? APOptions.UseSessionKey : APOptions.None,
+					ticket.ticket,
+					ticket.SessionKey.EncryptAndWrap(
+						KeyUsage.ApreqAuth_AppSessionKey_IncludesAuthSubkey,
+						Asn1DerEncoder.EncodeTlv(Structs.Authenticator(
+							cname,
+							ticket.ClientRealm,
+							null,
+							context.now,
+							seqnbr,
+							armorSubkey?.key
+							)).Span)
+					);
+
+				// [MS-KILE] § 3.3.5.7.4 Compound Identity
+				var armorKey = KrbFxCf2(armorSubkey.EncryptionProfile, armorSubkey, ticketParameters.ArmorTicket.SessionKey, SubkeyArmorPepper, TicketArmorPepper);
+				armorKey = KrbFxCf2(armorSubkey.EncryptionProfile, armorKey, context.SessionKey, ExplicitArmorPepper, TgsArmorPepper);
+				context.ArmorKey = armorKey;
+
+				var armorChecksum = armorKey.Checksum(KeyUsage.FastReqChecksum, padataApreq.padata_value);
+				pacOptions |= PacOptions.Claims;
+				var armoredPadatas = new List<PA_DATA>();
+				armoredPadatas.Add(Structs.PAData_PacOptions(pacOptions));
+				var fastreq = new KrbFastReq(new Asn1BitString(0U), armoredPadatas.ToArray(), reqBody);
+				PA_DATA padataArmorApreq = Structs.PAData_APReq(apreqArmored);
+				PA_FX_FAST_REQUEST padata_fastreq = new PA_FX_FAST_REQUEST()
+				{
+					Armored_data = new KrbFastArmoredReq(armorChecksum, armorKey.EncryptAndWrap(KeyUsage.FastEnc, Asn1DerEncoder.EncodeTlv(fastreq).Span), new KrbFastArmor(1, padataArmorApreq.padata_value))
+				};
+				padatas.Add(Structs.PAData_FastReq(padata_fastreq));
+			}
 
 			// padatas.Add(Structs.PAData_KerbKeyListReq([EType.Rc4Hmac]));
 
@@ -943,6 +1049,13 @@ namespace Titanis.Security.Kerberos
 
 			return req;
 		}
+
+		private readonly static byte[] SubkeyArmorPepper = Encoding.UTF8.GetBytes("subkeyarmor");
+		private readonly static byte[] TicketArmorPepper = Encoding.UTF8.GetBytes("ticketarmor");
+		private readonly static byte[] ExplicitArmorPepper = Encoding.UTF8.GetBytes("explicitarmor");
+		private readonly static byte[] TgsArmorPepper = Encoding.UTF8.GetBytes("tgsarmor");
+		private readonly static byte[] StrengthenKeyPepper = Encoding.UTF8.GetBytes("strengthenkey");
+		private readonly static byte[] ReplyKeyPepper = Encoding.UTF8.GetBytes("replykey");
 
 		internal static AP_REQ CreateAPReq(
 			TicketInfo ticket,
@@ -1822,7 +1935,7 @@ namespace Titanis.Security.Kerberos
 			TicketParameters? ticketParameters,
 			KerberosCredential? credential,
 			PreauthContext preauth,
-			SessionKey? sessionKey,
+			SessionKey sessionKey,
 			bool usingSubkey
 			)
 		{
@@ -1830,20 +1943,23 @@ namespace Titanis.Security.Kerberos
 			this.ticketParameters = ticketParameters;
 			this.credential = credential;
 			this.preauth = preauth;
-			this.sessionKey = sessionKey;
+			this.SessionKey = sessionKey;
 			this.usingSubkey = usingSubkey;
 			this.now = KerberosTime.Now();
 		}
 
 		internal readonly TicketParameters? ticketParameters;
 		internal readonly KerberosCredential? credential;
-		internal readonly SessionKey? sessionKey;
 		internal readonly bool usingSubkey;
+
+		internal SessionKey SessionKey { get; }
+		internal SessionKey? ArmorSubkey { get; set; }
 
 		internal int nonce;
 		internal readonly PreauthContext preauth;
-		internal readonly KerberosTime now;
+		internal KerberosTime now;
 
 		public TicketInfo? Tgt { get; internal set; }
+		public SessionKey ArmorKey { get; internal set; }
 	}
 }

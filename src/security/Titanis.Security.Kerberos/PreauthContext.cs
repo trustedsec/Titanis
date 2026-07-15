@@ -1,4 +1,5 @@
-﻿using KerberosV5Spec2;
+﻿using KerberosPreauthFramework;
+using KerberosV5Spec2;
 using PKIX1Explicit88;
 using System;
 using System.Buffers.Binary;
@@ -145,10 +146,13 @@ namespace Titanis.Security.Kerberos
 					this.ProcessCmsAlgorithmList(padata.padata_value);
 					break;
 
+				case PadataType.FxFast:
+					this.ProcessFast(padata.padata_value);
+					break;
+
 				case PadataType.TgsReq:
 				case PadataType.PacRequest:
 				case PadataType.FxCookie:
-				case PadataType.FxFast:
 				case PadataType.FxError:
 				case PadataType.EncryptedChallenge:
 				case PadataType.KerbKeyListReq:
@@ -158,6 +162,22 @@ namespace Titanis.Security.Kerberos
 			}
 
 			return false;
+		}
+
+		public SessionKey? ArmorKey { get; set; }
+		public SessionKey? ArmorStrengthenKey { get; set; }
+		private void ProcessFast(byte[] padata_value)
+		{
+			var fastReply = Asn1DerDecoder.DecodeTlv<PA_FX_FAST_REPLY>(padata_value);
+			if (this.ArmorKey != null)
+			{
+				ReadOnlyMemory<byte> decData = this.ArmorKey.Decrypt(KeyUsage.FastRep, fastReply.Armored_data.enc_fast_rep);
+				var rep = Asn1DerDecoder.DecodeTlv<KrbFastResponse>(decData);
+				if (rep.strengthen_key != null)
+				{
+					this.ArmorStrengthenKey = this.Client.CreateSessionKeyFor(rep.strengthen_key);
+				}
+			}
 		}
 
 		public AlgorithmIdentifier[]? SupportCmsAlgorithms { get; private set; }
@@ -268,10 +288,15 @@ namespace Titanis.Security.Kerberos
 			this.BuildPadataList(reqBody, paList);
 			return paList.ToArray();
 		}
+		public PacOptions? PacRequestOptions { get; set; }
 		protected virtual void BuildPadataList(KDC_REQ_BODY reqBody, List<PA_DATA> padataList)
 		{
 			if (this._requestPac)
+			{
 				padataList.Add(Structs.PAData_PacRequest(true));
+				if (this.PacRequestOptions.HasValue)
+					padataList.Add(Structs.PAData_PacOptions(this.PacRequestOptions.Value));
+			}
 		}
 	}
 

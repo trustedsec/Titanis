@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
+using Titanis.Crypto;
 
 namespace Titanis.Security.Kerberos
 {
@@ -50,6 +51,14 @@ namespace Titanis.Security.Kerberos
 			return aes;
 		}
 
+		public override int HashSizeBytes => 160 / 8;
+		protected override void HashUnkeyed(ReadOnlySpan<byte> bytes, Span<byte> hash)
+		{
+			Sha1Context sha1ctx=new Sha1Context();
+			sha1ctx.Initialize();
+			sha1ctx.HashData(bytes);
+			sha1ctx.HashFinal(hash);
+		}
 		/// <inheritdoc/>
 		protected sealed override void ComputeChecksum(
 			ReadOnlySpan<byte> specificKey,

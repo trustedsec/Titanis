@@ -24,7 +24,7 @@ namespace Titanis.Security.Kerberos
 		internal readonly DateTime dt;
 		internal readonly uint usec;
 
-		internal DateTime AsDateTime() => this.dt + TimeSpan.FromTicks(this.usec * 10);
+		internal DateTime AsDateTime() => this.dt + TimeSpan.FromTicks(this.usec * TimeSpan.TicksPerMicrosecond);
 
 		internal static KerberosTime Now() => Now(default);
 		internal static KerberosTime Now(TimeSpan skew) => new KerberosTime(DateTime.UtcNow + skew);

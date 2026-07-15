@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace Titanis.Security.Kerberos
 {
 	[Flags]
-	enum PacOptions : uint
+	public enum PacOptions : uint
 	{
 		// [MS-KILE] § 2.2.10
 		None = 0,

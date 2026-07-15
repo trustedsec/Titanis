@@ -33,8 +33,12 @@ namespace Titanis.Security.Kerberos
 			}
 		}
 
+		public TicketInfo? ArmorTicket { get; set; }
+
 		internal KerberosV5Spec2.Ticket_Tagged1? addlTicketStruc;
 
 		public string? TicketComment { get; internal set; }
+		public PacOptions? PacRequestOptions { get; set; }
+		public byte[]? AuthorizationData { get; set; }
 	}
 }

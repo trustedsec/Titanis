@@ -46,7 +46,7 @@ namespace Titanis.Cli.Kerb
 		[Description("Comment to associate with ticket")]
 		public string? TicketComment { get; set; }
 
-		public TicketParameters GetTicketParameters(ILog? log)
+		public TicketParameters GetTicketParameters(ILog? log, KdcOptions defaultOptions)
 		{
 			TicketParameters ticketParameters = new();
 
@@ -86,7 +86,7 @@ namespace Titanis.Cli.Kerb
 			}
 			else
 			{
-				options = KerberosClient.DefaultTgtOptions;
+				options = defaultOptions;
 				var end = KerberosClient.GetDefaultEndTime();
 				ticketParameters.RenewTill = ticketParameters.EndTime = end;
 			}
