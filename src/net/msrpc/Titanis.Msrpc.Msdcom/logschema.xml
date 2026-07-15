@@ -54,5 +54,18 @@
 			<param name="port" type="int"/>
 			<![CDATA[Connecting to exporter OXID={oxid:X8} on {address}:{port} (correlation={correlationId})]]>
 		</message>
+		<message name="ConnectToExporterFailed" severity="Error">
+			<param name="correlationId" type="Guid"/>
+			<param name="oxid" type="ulong"/>
+			<param name="address" type="string"/>
+			<param name="port" type="int"/>
+			<param name="hres" type="uint"/>
+			<param name="errorMessage" type="string"/>
+			<param name="errorDetails" type="string"/>
+			<![CDATA[Connecting to exporter OXID={oxid:X8} on {address}:{port} (correlation={correlationId})
+	HRESULT: {hres}
+	Message: 0x{errorMessage:X8}
+	Details: {errorDetails}]]>
+		</message>
 	</source>
 </logSchema>

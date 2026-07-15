@@ -69,5 +69,12 @@ namespace Titanis.Msrpc.Msdcom
 
 			this._chainedCallback?.OnConnectingToExporter(correlationId, oxid, binding);
 		}
+
+		void IDcomCallback.OnExporterConnectionFailed(Guid correlationId, ulong oxid, StringBinding binding, Exception ex)
+		{
+			this._log.WriteDcomClientConnectToExporterFailedMessage(correlationId, oxid, binding.HostName, binding.Port, (uint)ex.HResult, ex.Message, ex.ToString());
+
+			this._chainedCallback?.OnExporterConnectionFailed(correlationId, oxid, binding, ex);
+		}
 	}
 }

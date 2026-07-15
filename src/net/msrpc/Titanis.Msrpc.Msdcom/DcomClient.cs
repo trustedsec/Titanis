@@ -39,6 +39,7 @@ namespace Titanis.Msrpc.Msdcom
 		void OnActivatedObject(Guid correlationId, Guid clsid, Guid iid, ActivationResult result);
 		void OnActivationFailed(Guid correlationId, Guid clsid, Guid iid, Exception ex);
 		void OnConnectingToExporter(Guid correlationId, ulong oxid, StringBinding binding);
+		void OnExporterConnectionFailed(Guid correlationId, ulong oxid, StringBinding binding, Exception ex);
 	}
 	/// <seealso cref="ConnectTo(string, RpcClient, CancellationToken, IDcomCallback?)"/>
 	public class DcomClient : IObjrefMarshal
@@ -395,14 +396,17 @@ namespace Titanis.Msrpc.Msdcom
 					}
 					catch (Exception ex)
 					{
-						// TODO: Log exception
+						this._callback?.OnExporterConnectionFailed(result.CorrelationId, result.Oxid, binding, ex);
 						connectException = ex;
 					}
 				}
 			}
 
 			if (!connected)
-				throw new Exception("DCOM failed to connect to the object exporter binding.");
+			{
+				if (connectException != null)
+					throw new Exception("DCOM failed to connect to the object exporter binding.", connectException);
+			}
 
 			var exporter = new ObjectExporterRecord
 			{
