@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ReplicateTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\tools\rpc\Dsrep\Dsrep.csproj" />
     <ProjectReference Include="..\..\Titanis.TestUtilities\Titanis.TestUtilities.csproj" />
   </ItemGroup>
