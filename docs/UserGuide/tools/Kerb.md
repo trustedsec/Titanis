@@ -12,6 +12,7 @@ Kerb <subcommand>
 |-|-|
 |[asreq](#kerb-asreq)|Requests a TGT from the KDC.|
 |[changepw](#kerb-changepw)|Changes an account password|
+|[forge](#kerb-forge)|Forges a ticket|
 |[getasinfo](#kerb-getasinfo)|Gets server time and encryption types (with salts) for a user account.|
 |[keytab](#kerb-keytab)|Display and edit keytab files|
 |[renew](#kerb-renew)|Renews a ticket|
@@ -43,6 +44,7 @@ Kerb asreq [options] <UserName> <Kdc>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ArmorTicket||&lt;String&gt;|Name of file containing armor ticket|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -321,6 +323,113 @@ Kerb changepw [options] <UserName> <Kdc> <NewPassword>
 ```
 Kerb changepw milchick@LUMON 10.66.0.11 -Password EradicateFolly! Br3@kr00m!
 ```
+# Kerb forge
+  Forges a ticket
+
+## Synopsis
+```
+Kerb forge [options] -TicketEType <EType> -TicketKey <HexString> -UserSid <SecurityIdentifier> -UserName <UserPrincipalName> <Target>
+```
+
+## Parameters
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|&lt;Target&gt;||&lt;SecurityPrincipalName[]&gt;|Target SPN|
+
+
+## Options
+
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
+||||**Possible values:**|
+||||  Freeform|
+||||  Raw|
+||||  Table|
+||||  List|
+||||  Csv|
+||||  Tsv|
+||||  Json|
+||||  TreeTable|
+|    -DomainRids||&lt;UInt32[]&gt;|Group RIDs, relative to the user domain|
+|-E, -ExtraSids||&lt;SecurityIdentifier[]&gt;|Extra group SIDs|
+|-F, -FullName||&lt;String&gt;|User's full name|
+|    -HomeDirectory||&lt;String&gt;|UNC path of home directory|
+|    -HomeDrive||&lt;String&gt;|Home Drive (e.g. H:)|
+|    -LogonScript||&lt;String&gt;|UNC path of logon script|
+|    -LogonServer||&lt;String&gt;|Name of logon server|
+|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    -PrimaryGroupId||&lt;UInt32&gt;|Primary group ID|
+|    -ProfilePath||&lt;String&gt;|UNC path of user profile|
+|    -Realm||&lt;String&gt;|Ticket realm|
+|    -ResourceDomainSid||&lt;SecurityIdentifier&gt;|Domain of SID containing resource|
+|    -ResourceGroupRids||&lt;UInt32[]&gt;|Group RIDs, relative to the resource domain|
+|-S, -ServiceRealm||&lt;String&gt;|Service realm|
+|    -TicketEType||&lt;EType&gt;|Ticket encryption type|
+||||**Possible values:**|
+||||  DesCbcMd5|
+||||  DesCbcCrc|
+||||  Rc4Hmac|
+||||  Rc4HmacExp|
+||||  Aes128CtsHmacSha1_96|
+||||  Aes256CtsHmacSha1_96|
+||||  DsaWithSha1|
+||||  Md5WithRsa|
+||||  Sha1WithRsa|
+||||  Rc2Cbc|
+||||  Rsa|
+||||  RsaesOaep|
+||||  DesEde3Cbc|
+|    -TicketKey||&lt;HexString&gt;|Key to encrypt ticket with|
+|    -UserDomain||&lt;String&gt;|Logon domain (NetBIOS) of the user|
+|    -UserName||&lt;UserPrincipalName&gt;|User name|
+|    -UserRealm||&lt;String&gt;|Logon domain (FQDN) of the user|
+|    -UserSid||&lt;SecurityIdentifier&gt;|User SID|
+
+
+### Authentication (Kerberos)
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
+|-W, -Workstation||&lt;String&gt;|Name of client workstation|
+
+
+### Output
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|-A, -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
+|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+||||  Default: 0|
+||||**Possible values:**|
+||||  Text|
+||||  TextWithTimestamp|
+||||  Json|
+|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
+|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
+|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
+|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
+||||**Possible values:**|
+||||  Debug|
+||||  Diagnostic|
+||||  Verbose|
+||||  Info|
+||||  Warning|
+||||  Error|
+||||  Critical|
+|    -OutputFileName||&lt;String&gt;|Name of file to write ticket to|
+|    -Overwrite||&lt;SwitchParam&gt;|Overwrites the output file, if it exists|
+|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+
+
+## Details
+
+  The forged ticket includes a PAC signed with 
+  
 # Kerb getasinfo
   Gets server time and encryption types (with salts) for a user account.
 
@@ -352,6 +461,21 @@ Kerb getasinfo [options] <UserName> <Kdc>
 ||||  Tsv|
 ||||  Json|
 ||||  TreeTable|
+|-E, -EncTypes||&lt;EType[]&gt;|ETypes to request|
+||||**Possible values:**|
+||||  DesCbcMd5|
+||||  DesCbcCrc|
+||||  Rc4Hmac|
+||||  Rc4HmacExp|
+||||  Aes128CtsHmacSha1_96|
+||||  Aes256CtsHmacSha1_96|
+||||  DsaWithSha1|
+||||  Md5WithRsa|
+||||  Sha1WithRsa|
+||||  Rc2Cbc|
+||||  Rsa|
+||||  RsaesOaep|
+||||  DesEde3Cbc|
 |    -OutputFields||&lt;String[]&gt;|Fields to display in output|
 ||||**Possible values:**|
 ||||  EType|
@@ -455,7 +579,7 @@ Kerb renew [options] <Kdc> [ <TargetSpn> ]
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |&lt;Kdc&gt;||&lt;EndPoint&gt;|Host name or address of KDC|
-|&lt;TargetSpn&gt;||&lt;SecurityPrincipalName[]&gt;|SPNs to renew tickets for|
+|    -TargetSpn||&lt;SecurityPrincipalName[]&gt;|SPNs to renew tickets for|
 
 
 ## Options
@@ -463,6 +587,7 @@ Kerb renew [options] <Kdc> [ <TargetSpn> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ArmorTicket||&lt;String&gt;|Name of file containing armor ticket|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -490,6 +615,7 @@ Kerb renew [options] <Kdc> [ <TargetSpn> ]
 |    -Renewable||&lt;SwitchParam&gt;|Requests a renewable ticket|
 |    -RenewableOk||&lt;SwitchParam&gt;|Accepts a renewable ticket if the end time is over the limit|
 |    -RenewTill||&lt;DateTime&gt;|Requests a ticket renewable until the specified time (implies -Renewable)|
+|    -TargetSpn||&lt;SecurityPrincipalName[]&gt;|SPNs to renew tickets for|
 |    -Ticket||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-W, -Workstation||&lt;String&gt;|Name of client workstation|
@@ -508,7 +634,7 @@ Kerb renew [options] <Kdc> [ <TargetSpn> ]
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|-A, -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
+|    -Append||&lt;SwitchParam&gt;|Appends to the output file, if it exists|
 |    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
 ||||**Possible values:**|
@@ -1045,7 +1171,7 @@ Kerb setpw -UserName milchick@LUMON -Kdc 10.66.0.11 -Password Br3@kr00m! marks@l
 
 ## Synopsis
 ```
-Kerb tgsreq [options] <Kdc> <Target>
+Kerb tgsreq [options] -Target <SecurityPrincipalName[]> <Kdc> <Target>
 ```
 
 ## Parameters
@@ -1053,7 +1179,7 @@ Kerb tgsreq [options] <Kdc> <Target>
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |&lt;Kdc&gt;||&lt;EndPoint&gt;|Host name or address of KDC|
-|&lt;Target&gt;||&lt;SecurityPrincipalName[]&gt;|SPN(s) to request ticket(s) for|
+|    -Target||&lt;SecurityPrincipalName[]&gt;|SPN(s) to request ticket(s) for|
 
 
 ## Options
@@ -1061,6 +1187,7 @@ Kerb tgsreq [options] <Kdc> <Target>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
+|    -ArmorTicket||&lt;String&gt;|Name of file containing armor ticket|
 |    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
 ||||**Possible values:**|
 ||||  Freeform|
@@ -1110,6 +1237,7 @@ Kerb tgsreq [options] <Kdc> <Target>
 |    -RenewableOk||&lt;SwitchParam&gt;|Accepts a renewable ticket if the end time is over the limit|
 |    -RenewTill||&lt;DateTime&gt;|Requests a ticket renewable until the specified time (implies -Renewable)|
 |    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    -Target||&lt;SecurityPrincipalName[]&gt;|SPN(s) to request ticket(s) for|
 |    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    -TicketCache||&lt;String&gt;|Name of ticket cache file|
 |-W, -Workstation||&lt;String&gt;|Name of client workstation|

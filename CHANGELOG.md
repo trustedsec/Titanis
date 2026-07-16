@@ -1,5 +1,22 @@
 Change Log
 
+# 2026-07-16
+* Kerberos
+	* FAST / armoring / compound identities (`Kerb asreq|tgsreq -ArmorTicket`)
+	* Ticket forging (`Kerb forge`)
+		* Specify values for PAC fields
+* Directory Replication
+	* Supports replication for either a single object or an entire domain
+	* Supports compression (MS-ZIP and Xpress)
+	* Better version negotiation
+* SMB3
+	* Supports compression
+
+## Minor
+* SMB/RPC are safe for multithreading
+* Support for REG_EXPAND_SZ registry value type
+* SAM LookupDomain
+
 # 2026-06-09
 
 ## Enhancements
