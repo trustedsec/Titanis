@@ -16,6 +16,9 @@ namespace Titanis.Security
 		X500Principal = 6,
 		SmtpName = 7,
 		Enterprise = 10,
-		MsPrincipal = -128
+		MsPrincipal = -128,
+
+		// [RFC 6111] § 3.1. Well-Known Kerberos Principal Names
+		WellKnown = 11,
 	}
 }

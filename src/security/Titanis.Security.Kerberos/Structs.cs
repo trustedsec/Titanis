@@ -39,6 +39,9 @@ namespace Titanis.Security.Kerberos
 		internal static PA_DATA PAData_FastReq(PA_FX_FAST_REQUEST fastReq)
 			=> PAData(PadataType.FxFast, fastReq);
 
+		internal static PA_DATA PAData_FastCookie(byte[] cookie)
+			=> PAData(PadataType.FxCookie, cookie);
+
 		internal static PA_DATA PAData_PacOptions(PacOptions options)
 			=> PAData(PadataType.PacOptions, new PA_PAC_OPTIONS(new Asn1BitString((uint)options)));
 
@@ -47,8 +50,8 @@ namespace Titanis.Security.Kerberos
 			return PAData(PadataType.KerbKeyListReq, new KerbKeyListRequest(etypes));
 		}
 
-		internal static PA_DATA PAData_TSEnc(byte[] encts)
-			=> PAData(PadataType.EncTimestamp, encts);
+		internal static PA_DATA PAData_TSEnc(PadataType type, byte[] encts)
+			=> PAData(type, encts);
 
 		internal static PA_ENC_TS_ENC PAEnc_TSEnc(TimeSpan skew)
 		{

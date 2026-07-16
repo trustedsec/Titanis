@@ -72,6 +72,9 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 		protected sealed override async Task<IList<TicketInfo>> RequestTickets(KerberosClient krb, CancellationToken cancellationToken)
 		{
 			List<TicketInfo> tickets = new List<TicketInfo>();
+			TicketParameters? ticketParams = this.TicketParamGroup?.GetTicketParameters(this.Log, KerberosClient.DefaultTgtOptions);
+			TicketInfo? armorTicket = this.ArmorTicket != null ? this.LoadTgtFromStore(krb, this.ArmorTicket) : null;
+			ticketParams.ArmorTicket = armorTicket;
 			foreach (var target in this.Target)
 			{
 				this.WriteDiagnostic($"Requesting ticket for target={((target is null) ? "<null>" : target)}");
@@ -79,7 +82,7 @@ If you don't specify any options for the ticket, {0} uses default values, reques
 					krb,
 					target,
 					this.EncTypes,
-					this.TicketParamGroup?.GetTicketParameters(this.Log, KerberosClient.DefaultTgtOptions),
+					ticketParams,
 					cancellationToken,
 					this.Log);
 

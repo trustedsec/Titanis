@@ -80,7 +80,7 @@ namespace Titanis.Security.Kerberos
 		/// <remarks>
 		/// This is called by <see cref="KerberosClient"/> when it receives an <c>AS-REP</c> PDU.
 		/// </remarks>
-		internal PA_DATA[]? TryProcessPadata(Guid correlationId, IList<PA_DATA>? paList)
+		internal bool TryProcessPadata(Guid correlationId, IList<PA_DATA>? paList)
 		{
 			if (paList != null)
 			{
@@ -93,11 +93,10 @@ namespace Titanis.Security.Kerberos
 					hasSupportedPreauth |= isSupported;
 				}
 
-				if (hasSupportedPreauth)
-					return this.BuildPadataList(this._lastReqBody);
+				return hasSupportedPreauth;
 			}
 
-			return null;
+			return false;
 		}
 
 		public SupportedEncryptionTypes? SupportedEncryptionTypes { get; set; }
@@ -147,14 +146,19 @@ namespace Titanis.Security.Kerberos
 					break;
 
 				case PadataType.FxFast:
-					this.ProcessFast(padata.padata_value);
+					return this.ProcessFast(padata.padata_value);
+
+				case PadataType.FxCookie:
+					this.ProcessFastCookie(padata.padata_value);
 					break;
+
+				case PadataType.EncryptedChallenge:
+					this.ProcessEncryptedChallenge(padata.padata_value);
+					return true;
 
 				case PadataType.TgsReq:
 				case PadataType.PacRequest:
-				case PadataType.FxCookie:
 				case PadataType.FxError:
-				case PadataType.EncryptedChallenge:
 				case PadataType.KerbKeyListReq:
 				case PadataType.KerbKeyListRep:
 				default:
@@ -164,20 +168,51 @@ namespace Titanis.Security.Kerberos
 			return false;
 		}
 
+		private bool _supportsEncryptedChallenge;
+		private byte[]? _encryptedChallenge;
+		private void ProcessEncryptedChallenge(byte[]? padata_value)
+		{
+			this._supportsEncryptedChallenge = true;
+			this._encryptedChallenge = padata_value;
+		}
+
+		public bool SupportsFast { get; set; }
 		public SessionKey? ArmorKey { get; set; }
 		public SessionKey? ArmorStrengthenKey { get; set; }
-		private void ProcessFast(byte[] padata_value)
+
+		private bool ProcessFast(byte[] padata_value)
 		{
-			var fastReply = Asn1DerDecoder.DecodeTlv<PA_FX_FAST_REPLY>(padata_value);
-			if (this.ArmorKey != null)
+			this.SupportsFast = true;
+			bool authSupported = false;
+			if (!padata_value.IsNullOrEmpty())
 			{
-				ReadOnlyMemory<byte> decData = this.ArmorKey.Decrypt(KeyUsage.FastRep, fastReply.Armored_data.enc_fast_rep);
-				var rep = Asn1DerDecoder.DecodeTlv<KrbFastResponse>(decData);
-				if (rep.strengthen_key != null)
+				var fastReply = Asn1DerDecoder.DecodeTlv<PA_FX_FAST_REPLY>(padata_value);
+				if (this.ArmorKey != null)
 				{
-					this.ArmorStrengthenKey = this.Client.CreateSessionKeyFor(rep.strengthen_key);
+					ReadOnlyMemory<byte> decData = this.ArmorKey.Decrypt(KeyUsage.FastRep, fastReply.Armored_data.enc_fast_rep);
+					var rep = Asn1DerDecoder.DecodeTlv<KrbFastResponse>(decData);
+					if (rep.strengthen_key != null)
+					{
+						this.ArmorStrengthenKey = this.Client.CreateSessionKeyFor(rep.strengthen_key);
+					}
+					if (rep.padata != null)
+					{
+						foreach (var padata in rep.padata)
+						{
+							if (this.ProcessPadata(Guid.Empty, padata))
+								authSupported = true;
+						}
+					}
 				}
 			}
+
+			return authSupported;
+		}
+
+		private byte[]? _fastCookie;
+		private void ProcessFastCookie(byte[] padata_value)
+		{
+			this._fastCookie = padata_value;
 		}
 
 		public AlgorithmIdentifier[]? SupportCmsAlgorithms { get; private set; }
@@ -273,20 +308,20 @@ namespace Titanis.Security.Kerberos
 		}
 
 		#region EncTimestamp
-		protected virtual void ProcessEncTimestamp(Guid correlationId, byte[] padata_value)
+		protected virtual void ProcessEncTimestamp(Guid correlationId, byte[] padata_value, bool useArmor)
 		{
 			// Do nothing
 		}
 		#endregion
 
 		private KDC_REQ_BODY? _lastReqBody;
-		internal PA_DATA[] BuildPadataList(KDC_REQ_BODY reqBody)
+		internal List<PA_DATA> BuildPadataList(KDC_REQ_BODY reqBody)
 		{
 			this._lastReqBody = reqBody;
 
 			List<PA_DATA> paList = new List<PA_DATA>(2);
 			this.BuildPadataList(reqBody, paList);
-			return paList.ToArray();
+			return paList;
 		}
 		public PacOptions? PacRequestOptions { get; set; }
 		protected virtual void BuildPadataList(KDC_REQ_BODY reqBody, List<PA_DATA> padataList)
@@ -296,6 +331,11 @@ namespace Titanis.Security.Kerberos
 				padataList.Add(Structs.PAData_PacRequest(true));
 				if (this.PacRequestOptions.HasValue)
 					padataList.Add(Structs.PAData_PacOptions(this.PacRequestOptions.Value));
+			}
+			if (this._fastCookie != null)
+			{
+				padataList.Add(Structs.PAData_FastCookie(this._fastCookie));
+				this._fastCookie = null;
 			}
 		}
 	}

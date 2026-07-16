@@ -9,7 +9,7 @@ namespace Titanis.Cli.Kerb;
 {
 		nameof(TicketInfo.ClientName), nameof(TicketInfo.ClientRealm), nameof(TicketInfo.TargetSpn), nameof(TicketInfo.EndTime), nameof(TicketInfo.KdcOptions)
 })]
-public abstract class TicketRequestCommand : KdcCommand
+public abstract class TicketRequestCommand : Command
 {
 
 	[Parameter]
@@ -57,6 +57,8 @@ public abstract class TicketRequestCommand : KdcCommand
 			}
 		}
 	}
+
+	protected virtual KerberosClient CreateKerberosClient() => this.Services.CreateKerberosClient();
 
 	protected abstract Task<IList<TicketInfo>?> RequestTickets(KerberosClient krb, CancellationToken cancellationToken);
 

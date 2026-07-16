@@ -31,6 +31,10 @@ If the user exists but does not require preauthentication, the KDC will instead 
 		[Description("Name of realm (domain)")]
 		public string? Realm { get; set; }
 
+		[Parameter]
+		[Description("ETypes to request")]
+		public EType[]? EncTypes { get; set; }
+
 		[Parameter(10)]
 		[Mandatory]
 		[Category(ParameterCategories.AuthenticationKerberos)]
@@ -55,7 +59,7 @@ If the user exists but does not require preauthentication, the KDC will instead 
 		{
 			KerberosClient krb = this.CreateKerberosClient(new SimpleKdcLocator(new DnsEndPoint(this.Kdc, KerberosClient.KdcTcpPort)));
 
-			var asInfo = await krb.GetASInfo(Realm ?? this.UserName.Realm, this.UserName.UserName, cancellationToken).ConfigureAwait(false);
+			var asInfo = await krb.GetASInfo(Realm ?? this.UserName.Realm, this.UserName.UserName, this.EncTypes, cancellationToken).ConfigureAwait(false);
 
 			this.WriteMessage($"KDC time: {asInfo.KdcTime:O}");
 			this.WriteRecords(asInfo.SupportedEncryptionTypes);

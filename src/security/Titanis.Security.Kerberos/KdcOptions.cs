@@ -33,5 +33,8 @@ namespace Titanis.Security.Kerberos
 
 		// [MS-SFU] § 2.2.3
 		CNameInAddlTicket = (1 << (31 - 14)),
+
+		// [RFC 6112] § 3. Definitions
+		Anonymous = (1 << (31 - 16)),
 	}
 }

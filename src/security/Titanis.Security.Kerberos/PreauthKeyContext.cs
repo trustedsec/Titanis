@@ -1,6 +1,7 @@
 ﻿using KerberosV5Spec2;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Titanis.Asn1.Serialization;
 
 namespace Titanis.Security.Kerberos
@@ -25,7 +26,7 @@ namespace Titanis.Security.Kerberos
 		#region Encrypted timestamp
 		private PA_DATA? _tsenc;
 
-		private Memory<byte> EncryptTimestamp(Guid correlationId)
+		private Memory<byte> EncryptTimestamp(Guid correlationId, bool useArmor)
 		{
 			var cred = this.Credential;
 			if (cred == null)
@@ -39,21 +40,29 @@ namespace Titanis.Security.Kerberos
 
 			var encProfile = encInfo.encProfile;
 			var protoKey = cred.DeriveProtocolKeyFor(encProfile, salt);
+			var usage = KeyUsage.AsreqPaEncTimestamp;
+			if (useArmor && this.ArmorKey != null)
+			{
+				var armorKey = this.ArmorKey;
+				// [RFC 6113] § 5.4.6.  The Encrypted Challenge FAST Factor
+				protoKey = KerberosClient.KrbFxCf2(armorKey.EncryptionProfile, armorKey, protoKey, Encoding.UTF8.GetBytes("clientchallengearmor"), Encoding.UTF8.GetBytes("challengelongterm"));
+				usage = KeyUsage.EncChallengeClient;
+			}
 			this.Callback?.OnEncryptingTS(correlationId, protoKey, salt);
-			var tsencData = protoKey.EncryptAndWrap(KeyUsage.AsreqPaEncTimestamp, tsencBytes);
+			var tsencData = protoKey.EncryptAndWrap(usage, tsencBytes);
 
 			var padataBytes = Asn1DerEncoder.EncodeTlv(tsencData);
 
 			return padataBytes;
 		}
 
-		protected override void ProcessEncTimestamp(Guid correlationId, byte[] padata_value)
+		protected override void ProcessEncTimestamp(Guid correlationId, byte[] padata_value, bool useArmor)
 		{
 			var cred = this.Credential;
 			if (cred != null && cred.SupportsPreauthType(PadataType.EncTimestamp))
 			{
-				var tsenc = this.EncryptTimestamp(correlationId);
-				this._tsenc = Structs.PAData_TSEnc(tsenc.ToArray());
+				var tsenc = this.EncryptTimestamp(correlationId, useArmor);
+				this._tsenc = Structs.PAData_TSEnc(useArmor ? PadataType.EncryptedChallenge : PadataType.EncTimestamp, tsenc.ToArray());
 			}
 		}
 		#endregion
@@ -63,7 +72,10 @@ namespace Titanis.Security.Kerberos
 			switch ((PadataType)padata.padata_type)
 			{
 				case PadataType.EncTimestamp:
-					this.ProcessEncTimestamp(correlationId, padata.padata_value);
+					this.ProcessEncTimestamp(correlationId, padata.padata_value, false);
+					return true;
+				case PadataType.EncryptedChallenge:
+					this.ProcessEncTimestamp(correlationId, padata.padata_value, true);
 					return true;
 			}
 			return base.ProcessPadata(correlationId, padata);

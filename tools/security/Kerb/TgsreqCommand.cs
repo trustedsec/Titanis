@@ -71,10 +71,6 @@ By default, all supported encryption types are sent in the request.  To limit th
 		public string? U2uTicket { get; set; }
 
 		[Parameter]
-		[Description("Name of file containing armor ticket")]
-		public string? ArmorTicket { get; set; }
-
-		[Parameter]
 		[Description("Password for service account (for decrypting authorization data)")]
 		public string? ServicePassword { get; set; }
 
@@ -141,15 +137,6 @@ By default, all supported encryption types are sent in the request.  To limit th
 			if (sourceTicket is null)
 				return null;
 
-			TicketInfo? armorTicket;
-			if (this.ArmorTicket != null)
-			{
-				armorTicket = LoadTgtFromStore(krb, ticketStoreFile);
-			}
-			else
-				armorTicket = null;
-
-
 			TicketInfo? u2uTicket;
 			if (!string.IsNullOrEmpty(this.U2uTicket))
 			{
@@ -170,6 +157,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 			ticketParams.S4UserName = this.S4UserName;
 			ticketParams.S4UserCertificate = this._s4uCert;
 			ticketParams.S4ProxyService = this.S4ProxyService;
+			TicketInfo? armorTicket = this.ArmorTicket != null ? LoadTgtFromStore(krb, this.ArmorTicket) : null;
 			ticketParams.ArmorTicket = armorTicket;
 
 			SessionKey? serviceKey;
@@ -227,35 +215,6 @@ By default, all supported encryption types are sent in the request.  To limit th
 			}
 
 			return newTickets;
-		}
-
-		private TicketInfo? LoadTgtFromStore(KerberosClient krb, string ticketStoreFileUnresolved)
-		{
-			ticketStoreFileUnresolved = this.ResolveFsPath(ticketStoreFileUnresolved);
-			this.WriteVerbose($"Reading TGT from {ticketStoreFileUnresolved}");
-			var tgtStore = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(ticketStoreFileUnresolved), ticketStoreFileUnresolved, out _);
-
-			TicketInfo? sourceTicket;
-			if (ticketStoreFileUnresolved.Length == 0)
-			{
-				this.WriteError($"The file {ticketStoreFileUnresolved} does not contain any tickets.");
-				sourceTicket = null;
-			}
-			else
-			{
-				var tgtCandidates = tgtStore.Where(r => r.IsCurrent && r.IsTgt).ToList();
-				if (tgtCandidates.Count == 0)
-				{
-					this.WriteError($"The file {ticketStoreFileUnresolved} does not contain any valid ticket-granting tickets.");
-					sourceTicket = null;
-				}
-				else
-				{
-					sourceTicket = tgtCandidates[0];
-				}
-			}
-
-			return sourceTicket;
 		}
 	}
 }

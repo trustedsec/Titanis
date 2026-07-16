@@ -56,7 +56,7 @@ namespace Titanis.Security.Kerberos
 
 				// [RFC 8070]
 				case PadataType.AsFreshness:
-					this.ProcessFreshnell(padata.padata_value);
+					this.ProcessFreshness(padata.padata_value);
 					break;
 
 					// [MS-PKCA] 
@@ -107,7 +107,7 @@ namespace Titanis.Security.Kerberos
 		}
 
 		private byte[]? _freshnessToken;
-		private void ProcessFreshnell(byte[] token)
+		private void ProcessFreshness(byte[] token)
 		{
 			this._freshnessToken = token;
 		}

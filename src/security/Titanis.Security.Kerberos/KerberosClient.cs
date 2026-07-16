@@ -1,71 +1,31 @@
 ﻿using KerberosPreauthFramework;
-﻿using KerberosV5Spec2;
+using KerberosV5Spec2;
 using System;
 using System.Buffers;
 using System.Buffers.Binary;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Titanis.Asn1;
-using Titanis.Asn1.Metadata;
 using Titanis.Asn1.Serialization;
 using Titanis.Crypto;
 using Titanis.IO;
 using Titanis.Net;
-
 using static Titanis.Security.Kerberos.KerberosClient;
 
 [assembly: InternalsVisibleTo("Titanis.Security.Kerberos.Test")]
 
 namespace Titanis.Security.Kerberos
 {
-	public class TicketParameters
-	{
-		public TicketParameters()
-		{
-			this.CorrelationId = Guid.NewGuid();
-		}
-
-		public Guid CorrelationId { get; set; }
-		public KdcOptions Options { get; set; }
-		public DateTime? StartTime { get; set; }
-		// [RFC4120] § 5.4.1
-		public DateTime? EndTime { get; set; }
-		public static DateTime DefaultEndTime => new DateTime(1970, 1, 1, 0, 0, 0);
-		public DateTime? RenewTill { get; set; }
-		public UserPrincipalName? S4UserName { get; set; }
-		public X509Certificate? S4UserCertificate { get; set; }
-		public bool IndicatesS4User => this.S4UserName is not null || this.S4UserCertificate is not null;
-		public SecurityPrincipalName? S4ProxyService { get; set; }
-
-		private TicketInfo? _additionalTicket;
-		public TicketInfo? AdditionalTicket
-		{
-			get => _additionalTicket;
-			set
-			{
-				_additionalTicket = value;
-				this.addlTicketStruc = value?.ticket;
-			}
-		}
-
-		internal KerberosV5Spec2.Ticket_Tagged1? addlTicketStruc;
-
-		public string? TicketComment { get; internal set; }
-	}
 	/// <summary>
 	/// Implements a Kerberos client.
 	/// </summary>
@@ -357,8 +317,13 @@ namespace Titanis.Security.Kerberos
 			PreauthContext paContext = credential.CreatePreauthContext(this, this._callback);
 			paContext._requestPac = true;
 			paContext.PacRequestOptions = ticketParameters.PacRequestOptions;
-			TicketRequestContext context = new TicketRequestContext(ticketParameters, credential, paContext, null, false);
+			TicketRequestContext context = new TicketRequestContext(ticketParameters, credential, paContext, null, false)
+			{
+				ArmorSubkey = (ticketParameters.ArmorTicket?.GenerateSessionKey() ?? null)
+			};
 
+			do
+			{
 			var asreq = this.CreateASReq(
 				context,
 				paContext,
@@ -379,7 +344,7 @@ namespace Titanis.Security.Kerberos
 			var rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, asreq, cancellationToken).ConfigureAwait(false);
 			var recvTime = DateTime.UtcNow;
 			// TODO: Add a max loop count to avoid getting stuck.
-			while (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Error)
+				if (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Error)
 			{
 				var err = rep.Error;
 				if ((KerberosErrorCode)err.error_code is KerberosErrorCode.KDC_ERR_PREAUTH_REQUIRED && !err.e_data.IsNullOrEmpty())
@@ -388,18 +353,11 @@ namespace Titanis.Security.Kerberos
 
 					var paList = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<PA_DATA>>(err.e_data).Values;
 					this._callback?.OnReceivedAsrepPreauthRequired(ticketParameters.CorrelationId, paList);
-					var paResponseData = paContext.TryProcessPadata(ticketParameters.CorrelationId, paList);
-					if (paResponseData != null)
-					{
-						asreq.Asreq.padata = paResponseData;
+						if (!paContext.TryProcessPadata(ticketParameters.CorrelationId, paList))
+							throw new InvalidOperationException(Messages.Krb5_NoSupportedPreauths);
 
-						sendTime = DateTime.UtcNow;
-						rep = await this.TransceiveKdcAsync(targetRealm, LocateKdcOptions.Home, asreq, cancellationToken).ConfigureAwait(false);
-						recvTime = DateTime.UtcNow;
 						continue;
-					}
 
-					throw new InvalidOperationException(Messages.Krb5_NoSupportedPreauths);
 				}
 				else
 				{
@@ -408,16 +366,17 @@ namespace Titanis.Security.Kerberos
 					throw ex;
 				}
 			}
-
-			if (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Asrep)
+				else if (rep.SelectedChoice == KDC_REP_CHOICE.ChoiceIndex.Asrep)
 				return ProcessASRep(ticketParameters.CorrelationId, rep.Asrep, context, Midpoint(sendTime, recvTime));
 			else
 				throw new SecurityException(Messages.Krb5_NoASRep);
+			} while (true);
 		}
 
 		public async Task<KdcInfo> GetASInfo(
 			string targetRealm,
 			string userName,
+			EType[]? etypes,
 			CancellationToken cancellationToken)
 		{
 			ArgumentException.ThrowIfNullOrEmpty(targetRealm);
@@ -440,8 +399,9 @@ namespace Titanis.Security.Kerberos
 					targetRealm,
 					Structs.PrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.Krbtgt, targetRealm),
 					context.nonce,
-					this.GetAllETypes(),
-					this.MakeHostAddress()
+					(etypes != null) ? (Array.ConvertAll(etypes, r => (int)r)) : this.GetAllETypes(),
+					this.MakeHostAddress(),
+					null
 				));
 
 			var sendTime = DateTime.UtcNow;
@@ -564,12 +524,17 @@ namespace Titanis.Security.Kerberos
 			}
 
 			var encProfile = this.GetEncProfile((EType)asrep.enc_part.etype);
-			var protoKey = paContext.DeriveProtocolKey(encProfile);
+			var replyKey = paContext.DeriveProtocolKey(encProfile);
+			SessionKey? armorStrengthenKey = paContext.ArmorStrengthenKey;
+			if (armorStrengthenKey != null)
+			{
+				replyKey = KrbFxCf2(armorStrengthenKey.EncryptionProfile, armorStrengthenKey, replyKey, StrengthenKeyPepper, ReplyKeyPepper);
+			}
 			var encPart = Asn1DerDecoder.DecodeTlv<EncASRepPart>(
-				protoKey.Decrypt(KeyUsage.AsrepEncPart, asrep.enc_part)
+				replyKey.Decrypt(KeyUsage.AsrepEncPart, asrep.enc_part)
 				).Value;
 
-			asrepKey = protoKey;
+			asrepKey = replyKey;
 			return encPart;
 		}
 
@@ -859,10 +824,46 @@ namespace Titanis.Security.Kerberos
 			)
 		{
 			var credential = context.credential;
+
+			var padataList = preauth.BuildPadataList(reqBody);
+			padataList.Add(Structs.PAData_PacOptions(PacOptions.Claims));
+
+			if (context.ticketParameters?.ArmorTicket != null)
+			{
+				var armorSubkey = context.ArmorSubkey;
+				var ticketParameters = context.ticketParameters;
+
+				var armorKey = KrbFxCf2(armorSubkey.EncryptionProfile, armorSubkey, ticketParameters.ArmorTicket.SessionKey, SubkeyArmorPepper, TicketArmorPepper);
+				context.ArmorKey = armorKey;
+				context.preauth.ArmorKey = armorKey;
+
+				var armorTicket = context.ticketParameters.ArmorTicket;
+				var reqBodyBytes = Asn1DerEncoder.EncodeTlv(reqBody);
+				padataList = [Structs.PAData_FastReq(new PA_FX_FAST_REQUEST() {
+					Armored_data =new KrbFastArmoredReq(
+						armorKey.Checksum(KeyUsage.FastReqChecksum, reqBodyBytes.Span),
+						armorKey.EncryptAndWrap(KeyUsage.FastEnc, Asn1DerEncoder.EncodeTlv(new KrbFastReq(new Asn1BitString(0U), padataList.ToArray(), reqBody)).Span),
+						new KrbFastArmor(1, Asn1DerEncoder.EncodeTlv(Structs.APReq(
+								(0 != (ticketParameters.Options & KdcOptions.EncTicketInSKey)) ? APOptions.UseSessionKey : APOptions.None,
+								armorTicket.ticket,
+								armorTicket.SessionKey.EncryptAndWrap(
+									KeyUsage.ApreqAuth_AppSessionKey_IncludesAuthSubkey,
+									Asn1DerEncoder.EncodeTlv(Structs.Authenticator(
+										Structs.PrincipalName(PrincipalNameType.Principal, armorTicket.ClientName),
+										armorTicket.ClientRealm,
+										null,
+										context.now,
+										0,
+										armorSubkey?.key
+										)).Span)
+							)).ToArray()))
+					})];
+			}
+
 			KDC_REQ_CHOICE req = new KDC_REQ_CHOICE
 			{
 				Asreq = Structs.ASReq(
-					preauth.BuildPadataList(reqBody),
+					padataList.ToArray(),
 					reqBody
 					)
 			};
@@ -1001,38 +1002,37 @@ namespace Titanis.Security.Kerberos
 			if (useArmor)
 			{
 				var armorSubkey = context.ArmorSubkey;
+				var armorTicket = ticketParameters.ArmorTicket;
 
 				// New APREQ
 				context.now = new KerberosTime(context.now.AsDateTime() + TimeSpan.FromMicroseconds(1));
-				var apreqArmored = Structs.APReq(
-					(0 != (ticketParameters.Options & KdcOptions.EncTicketInSKey)) ? APOptions.UseSessionKey : APOptions.None,
-					ticket.ticket,
-					ticket.SessionKey.EncryptAndWrap(
-						KeyUsage.ApreqAuth_AppSessionKey_IncludesAuthSubkey,
-						Asn1DerEncoder.EncodeTlv(Structs.Authenticator(
-							cname,
-							ticket.ClientRealm,
-							null,
-							context.now,
-							seqnbr,
-							armorSubkey?.key
-							)).Span)
-					);
 
 				// [MS-KILE] § 3.3.5.7.4 Compound Identity
 				var armorKey = KrbFxCf2(armorSubkey.EncryptionProfile, armorSubkey, ticketParameters.ArmorTicket.SessionKey, SubkeyArmorPepper, TicketArmorPepper);
 				armorKey = KrbFxCf2(armorSubkey.EncryptionProfile, armorKey, context.SessionKey, ExplicitArmorPepper, TgsArmorPepper);
 				context.ArmorKey = armorKey;
 
-				var armorChecksum = armorKey.Checksum(KeyUsage.FastReqChecksum, padataApreq.padata_value);
-				pacOptions |= PacOptions.Claims;
 				var armoredPadatas = new List<PA_DATA>();
-				armoredPadatas.Add(Structs.PAData_PacOptions(pacOptions));
-				var fastreq = new KrbFastReq(new Asn1BitString(0U), armoredPadatas.ToArray(), reqBody);
-				PA_DATA padataArmorApreq = Structs.PAData_APReq(apreqArmored);
+				armoredPadatas.Add(Structs.PAData_PacOptions(pacOptions | PacOptions.Claims));
 				PA_FX_FAST_REQUEST padata_fastreq = new PA_FX_FAST_REQUEST()
 				{
-					Armored_data = new KrbFastArmoredReq(armorChecksum, armorKey.EncryptAndWrap(KeyUsage.FastEnc, Asn1DerEncoder.EncodeTlv(fastreq).Span), new KrbFastArmor(1, padataArmorApreq.padata_value))
+					Armored_data = new KrbFastArmoredReq(
+						armorKey.Checksum(KeyUsage.FastReqChecksum, padataApreq.padata_value),
+						armorKey.EncryptAndWrap(KeyUsage.FastEnc, Asn1DerEncoder.EncodeTlv(new KrbFastReq(new Asn1BitString(0U), armoredPadatas.ToArray(), reqBody)).Span),
+						new KrbFastArmor(1, Asn1DerEncoder.EncodeTlv(Structs.APReq(
+							(0 != (ticketParameters.Options & KdcOptions.EncTicketInSKey)) ? APOptions.UseSessionKey : APOptions.None,
+							armorTicket.ticket,
+							armorTicket.SessionKey.EncryptAndWrap(
+								KeyUsage.ApreqAuth_AppSessionKey_IncludesAuthSubkey,
+								Asn1DerEncoder.EncodeTlv(Structs.Authenticator(
+									Structs.PrincipalName(PrincipalNameType.Principal, armorTicket.ClientName),
+									armorTicket.ClientRealm,
+									null,
+									context.now,
+									seqnbr,
+									armorSubkey?.key
+									)).Span)
+							)).ToArray()))
 				};
 				padatas.Add(Structs.PAData_FastReq(padata_fastreq));
 			}

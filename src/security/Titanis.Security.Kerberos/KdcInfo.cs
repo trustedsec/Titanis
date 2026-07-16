@@ -9,7 +9,7 @@ namespace Titanis.Security.Kerberos
 	/// <summary>
 	/// Information retrieved from a KDC.
 	/// </summary>
-	/// <seealso cref="KerberosClient.GetASInfo(string, string, System.Threading.CancellationToken)"/>
+	/// <seealso cref="KerberosClient.GetASInfo(string, string, EType[], System.Threading.CancellationToken)"/>
 	public class KdcInfo
 	{
 		public KdcInfo(DateTime kdcTime, IList<KdcEncryptionTypeInfo> supportedEncryptionTypes)
