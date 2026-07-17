@@ -131,7 +131,7 @@ namespace Titanis.Cli
 				}
 
 				if (addrs.Count == 0)
-					throw new InvalidOperationException("Server address resolved, but none of the addresses meets the address family requirements.");
+					throw new InvalidOperationException($"Cannot resolve host '{hostName}'.");
 
 				return addrs.ToArray();
 			}
