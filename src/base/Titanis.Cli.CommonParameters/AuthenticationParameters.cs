@@ -85,6 +85,11 @@ namespace Titanis.Cli
 
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
+		[Description("Name of file containing the armor ticket")]
+		public string? ArmorTicket { get; set; }
+
+		[Parameter]
+		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Alias("Ticket")]
 		[Description("Name of file containing service tickets (.kirbi or ccache)")]
 		public string[]? Tickets { get; set; }
@@ -476,7 +481,7 @@ namespace Titanis.Cli
 		/// If <paramref name="spn"/> is missing, no Kerberos context is created.
 		/// </para>
 		/// </remarks>
-		private AuthClientContext? CreateAuthContext(
+		private async ValueTask<AuthClientContext?> CreateAuthContext(
 			SecurityPrincipalName? spn,
 			SecurityCapabilities requiredCaps,
 			AuthOptions options)
@@ -496,7 +501,7 @@ namespace Titanis.Cli
 				var cancellationToken = CancellationToken.None;
 
 				var sockService = this.Services.RequireService<ISocketService>();
-				var socket = sockService.ConnectTcp(this.AuthProxy, cancellationToken).Result;
+				var socket = await sockService.ConnectTcp(AuthProxy, cancellationToken).ConfigureAwait(false);
 
 				var proxyContext = new AuthProxyClientContext(this.UserName?.ToString(), socket)
 				{
@@ -510,8 +515,7 @@ namespace Titanis.Cli
 
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
 			bool canCreateKerberos = apreqSpn != null && !this.Anonymous.IsSet;
-			KerberosClientContext? extraKerbContext = null;
-			KerberosClientContextBase? krbContext = canCreateKerberos ? this.TryCreateKerberosContext(ticketSpn, requiredCaps, true, out extraKerbContext) : null;
+			(KerberosClientContextBase? krbContext, KerberosClientContextBase? extraKerbContext) = canCreateKerberos ? await TryCreateKerberosContext(ticketSpn, requiredCaps, true).ConfigureAwait(false) : (null, null);
 			if (krbContext != null)
 			{
 				count = 2;
@@ -589,11 +593,11 @@ namespace Titanis.Cli
 		/// <param name="targetSpn">Target SPN</param>
 		/// <returns></returns>
 		/// <exception cref="InvalidOperationException"></exception>
-		public MskileClientContext? TryCreateKerberosContext(
+		public async ValueTask<(MskileClientContext?, KerberosClientContext?)> TryCreateKerberosContext(
 			SecurityPrincipalName targetSpn,
 			SecurityCapabilities requiredCaps,
-			bool wantExtra,
-			out KerberosClientContext? extraContext)
+			bool wantExtra
+			)
 		{
 			ArgumentNullException.ThrowIfNull(targetSpn);
 			// TODO: There is no guarantee that the parameters are valid.  Sure the CLI will validate them, but there is no guarantee that this invocation is from a CLI program
@@ -603,10 +607,7 @@ namespace Titanis.Cli
 			// Configure the Kerberos client
 			KerberosClient? krb = this.TryGetKerberosClient();
 			if (krb is null)
-			{
-				extraContext = null;
-				return null;
-			}
+				return (null, null);
 
 			{
 				if ((targetSpn is ServicePrincipalName svcpn) && IPAddress.TryParse(svcpn.ServiceInstance, out var _))
@@ -740,6 +741,25 @@ namespace Titanis.Cli
 				}
 			}
 
+			TicketInfo? armorTicket;
+			if (this.ArmorTicket != null)
+			{
+				var ticketFileName = this.RequireFileAccess().ResolveFsPath(this.ArmorTicket);
+				log?.WriteVerbose($"Loading ticket(s) from {ticketFileName}");
+				var tgtCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(ticketFileName), ticketFileName, krb);
+				armorTicket = tgtCache.GetAllTickets().Where(r => r.IsCurrent).FirstOrDefault();
+				if (armorTicket != null)
+				{
+					log?.WriteVerbose($"Using armor ticket for client '{armorTicket.ClientName}'.");
+				}
+				else
+				{
+					log?.WriteWarning($"No armor tickets found in file '{ticketFileName}'.");
+				}
+			}
+			else
+				armorTicket = null;
+
 			KerberosCredential? cred = TryGetKerberosCreds(authUserName, authRealm);
 
 			// A credential is required regardless of whether it is used for authentication
@@ -765,6 +785,7 @@ namespace Titanis.Cli
 					try
 					{
 						var ticketParams = krb.GetDefaultTicketOptions(null);
+						ticketParams.ArmorTicket = armorTicket;
 						if (this.S4UserName != null || this._s4UserCert != null)
 						{
 							ticketParams.S4UserName = this.S4UserName;
@@ -772,23 +793,19 @@ namespace Titanis.Cli
 							ticketParams.S4ProxyService = this.S4ProxyService;
 						}
 
-						serviceTicket = Task.Factory.StartNew(async () =>
+						try
 						{
-							try
-							{
-								return await krb.GetTicketAsync(
-									targetSpn,
-									cred.Realm,
-									cred,
-									ticketParams,
-									CancellationToken.None).ConfigureAwait(false);
-							}
-							catch (KerberosException ex) when (ex.KerberosErrorCode == KerberosErrorCode.KDC_ERR_S_PRINCIPAL_UNKNOWN && ex.UnderlyingNtstatus == Ntstatus.STATUS_USER2USER_REQUIRED)
-							{
-								u2UserName = targetSpn as UserPrincipalName;
-								return null;
-							}
-						}, TaskCreationOptions.LongRunning).Unwrap().Result;
+							serviceTicket = await krb.GetTicketAsync(
+								targetSpn,
+								cred.Realm,
+								cred,
+								ticketParams,
+								CancellationToken.None).ConfigureAwait(false);
+						}
+						catch (KerberosException ex) when (ex.KerberosErrorCode == KerberosErrorCode.KDC_ERR_S_PRINCIPAL_UNKNOWN && ex.UnderlyingNtstatus == Ntstatus.STATUS_USER2USER_REQUIRED)
+						{
+							u2UserName = targetSpn as UserPrincipalName;
+						}
 					}
 					catch (Exception ex)
 					{
@@ -839,7 +856,9 @@ namespace Titanis.Cli
 			{
 				if (tgt is null && cred is not null)
 				{
-					tgt = Task.Factory.StartNew(() => krb.RequestTgt(authRealm, cred, CancellationToken.None)).Unwrap().Result;
+					var tgtParams = krb.GetDefaultTgtParameters();
+					tgtParams.ArmorTicket = armorTicket;
+					tgt = await krb.RequestTgt(authRealm, cred, CancellationToken.None).ConfigureAwait(false);
 				}
 
 				if (tgt is null)
@@ -874,7 +893,7 @@ namespace Titanis.Cli
 						| SecurityCapabilities.ReplayDetection
 						| requiredCaps
 				};
-				extraContext = wantExtra ? new KerberosClientContext(
+				var extraContext = wantExtra ? new KerberosClientContext(
 					cred,
 					this._kerberosClient,
 					targetSpn,
@@ -888,11 +907,10 @@ namespace Titanis.Cli
 						| SecurityCapabilities.ReplayDetection
 						| requiredCaps
 				} : null;
-				return krbContext;
+				return (krbContext, extraContext);
 			}
 
-			extraContext = null;
-			return null;
+			return (null, null);
 		}
 
 		private TicketCacheFile LoadTicketFile(string ticketFileName, KerberosClient krb, ILog? log)
@@ -1053,13 +1071,13 @@ namespace Titanis.Cli
 			}
 
 			/// <inheritdoc/>
-			public sealed override AuthClientContext? GetAuthContextForService(SecurityPrincipalName spn, SecurityCapabilities requiredCaps, AuthOptions options)
+			public sealed override async ValueTask<AuthClientContext?> GetAuthContextForService(SecurityPrincipalName spn, SecurityCapabilities requiredCaps, AuthOptions options)
 			{
 				ArgumentNullException.ThrowIfNull(spn);
-				var authContext = this.authParams.CreateAuthContext(
+				var authContext = await authParams.CreateAuthContext(
 					spn,
 					requiredCaps,
-					options);
+					options).ConfigureAwait(false);
 				return authContext;
 			}
 		}

@@ -253,7 +253,7 @@ namespace Titanis.Smb2
 			var connGroup = await this.GetConnectionAsync(serverName, port, cancellationToken).ConfigureAwait(false);
 			var conn0 = connGroup.SelectConnection();
 
-			var authContext = this.credentialService.GetAuthContextForService(new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClass, serverName), SecurityCapabilities.Integrity);
+			var authContext = await credentialService.GetAuthContextForService(new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClass, serverName), SecurityCapabilities.Integrity).ConfigureAwait(false);
 
 			const int SpnegoRpcType = 9;
 			if (authContext == null)

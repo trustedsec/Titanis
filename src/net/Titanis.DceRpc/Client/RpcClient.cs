@@ -301,11 +301,11 @@ namespace Titanis.DceRpc.Client
 					if (authLevel >= RpcAuthLevel.PacketPrivacy)
 						caps |= SecurityCapabilities.Confidentiality;
 
-					if (spn is not null)
+					if ((spn is not null) && (this._credentialService != null))
 					{
-						authContext = this._credentialService?.GetAuthContextForService(spn, caps, AuthOptions.None);
+						authContext = await _credentialService.GetAuthContextForService(spn, caps, AuthOptions.None).ConfigureAwait(false);
 						if (authContext is null && spn is ServicePrincipalName svcpn)
-							authContext = this._credentialService?.GetAuthContextForService(svcpn.WithServiceClass(ServiceClassNames.HostU), caps, AuthOptions.PreferSpnego);
+							authContext = await _credentialService.GetAuthContextForService(svcpn.WithServiceClass(ServiceClassNames.HostU), caps, AuthOptions.PreferSpnego).ConfigureAwait(false);
 					}
 					else
 						authContext = null;

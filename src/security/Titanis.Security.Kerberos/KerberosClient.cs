@@ -273,7 +273,7 @@ namespace Titanis.Security.Kerberos
 			string targetRealm,
 			KerberosCredential credential,
 			CancellationToken cancellationToken)
-			=> this.RequestInitialTicket(targetRealm, credential, null, GetDefaultTgtOptions(), null, cancellationToken);
+			=> this.RequestInitialTicket(targetRealm, credential, null, GetDefaultTgtParameters(), null, cancellationToken);
 		/// <summary>
 		/// Requests a ticket-granting ticket for the specified realm.
 		/// </summary>
@@ -303,7 +303,7 @@ namespace Titanis.Security.Kerberos
 			targetSpn ??= new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.Krbtgt, targetRealm);
 
 			if (ticketParameters == null)
-				ticketParameters = GetDefaultTgtOptions();
+				ticketParameters = GetDefaultTgtParameters();
 
 			if (!ticketParameters.EndTime.HasValue)
 				ticketParameters.EndTime = GetDefaultEndTime();
@@ -394,7 +394,7 @@ namespace Titanis.Security.Kerberos
 				context,
 				preauth,
 				Structs.KdcReqBody(
-					GetDefaultTgtOptions(),
+					GetDefaultTgtParameters(),
 					Structs.PrincipalName(PrincipalNameType.Principal, userName),
 					targetRealm,
 					Structs.PrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.Krbtgt, targetRealm),
@@ -792,7 +792,7 @@ namespace Titanis.Security.Kerberos
 
 		public EType[] DefaultETypes { get; set; } = defaultEtypes;
 
-		public TicketParameters GetDefaultTgtOptions()
+		public TicketParameters GetDefaultTgtParameters()
 		{
 			DateTime till = GetDefaultEndTime();
 			return new TicketParameters()

@@ -13,7 +13,7 @@ namespace Titanis.Net
 	public class ClientCredentialServiceBase : IClientCredentialService
 	{
 		/// <inheritdoc/>
-		public virtual AuthClientContext? GetAuthContextForResource(string resourceType, object resourceKey, SecurityCapabilities requiredCaps, AuthOptions options)
+		public virtual ValueTask<AuthClientContext?> GetAuthContextForResource(string resourceType, object resourceKey, SecurityCapabilities requiredCaps, AuthOptions options)
 		{
 			if (resourceType is ResourceTypes.Service)
 			{
@@ -30,7 +30,7 @@ namespace Titanis.Net
 					throw new ArgumentException($"resourceKey must be a {nameof(UncPath)} for resource type '{ResourceTypes.Service}', but an argument of type '{resourceKey?.GetType()?.FullName ?? "<null>"}' was provided.", nameof(resourceKey));
 			}
 			else
-				return null;
+				return ValueTask.FromResult<AuthClientContext?>(null);
 		}
 		/// <summary>
 		/// Gets a credential for a service.
@@ -39,10 +39,10 @@ namespace Titanis.Net
 		/// <param name="requiredCaps"><see cref="SecurityCapabilities"/> required by the caller</param>
 		/// <param name="options">Options affecting the creation of the authentication context</param>
 		/// <returns>An <see cref="AuthClientContext"/> for the credentials, if found; otherwise, <see langword="null"/></returns>
-		public virtual AuthClientContext? GetAuthContextForService(SecurityPrincipalName spn, SecurityCapabilities requiredCaps, AuthOptions options)
+		public virtual ValueTask<AuthClientContext?> GetAuthContextForService(SecurityPrincipalName spn, SecurityCapabilities requiredCaps, AuthOptions options)
 		{
 			ArgumentNullException.ThrowIfNull(spn);
-			return null;
+			return ValueTask.FromResult<AuthClientContext?>(null);
 		}
 
 		/// <summary>
@@ -52,10 +52,10 @@ namespace Titanis.Net
 		/// <param name="requiredCaps"><see cref="SecurityCapabilities"/> required by the caller</param>
 		/// <param name="options">Options affecting the creation of the authentication context</param>
 		/// <returns>An <see cref="AuthClientContext"/> for the credentials, if found; otherwise, <see langword="null"/></returns>
-		public virtual AuthClientContext? GetAuthContextForSmbShare(UncPath uncPath, SecurityCapabilities requiredCaps, AuthOptions options)
+		public virtual ValueTask<AuthClientContext?> GetAuthContextForSmbShare(UncPath uncPath, SecurityCapabilities requiredCaps, AuthOptions options)
 		{
 			ArgumentNullException.ThrowIfNull(uncPath);
-			return null;
+			return ValueTask.FromResult<AuthClientContext?>(null);
 		}
 	}
 	/// <summary>
@@ -151,7 +151,7 @@ namespace Titanis.Net
 		}
 
 		/// <inheritdoc/>
-		public AuthClientContext GetAuthContextForResource(string resourceType, object resourceKey, SecurityCapabilities requiredCaps, AuthOptions options)
+		public async ValueTask<AuthClientContext> GetAuthContextForResource(string resourceType, object resourceKey, SecurityCapabilities requiredCaps, AuthOptions options)
 		{
 			if (this._credentials.TryGetValue(new CredKey(resourceType, resourceKey), out var cred))
 			{
@@ -167,7 +167,7 @@ namespace Titanis.Net
 					return this.DefaultCredentialFactory(spn, requiredCaps);
 			}
 
-			return this._fallbackService?.GetAuthContextForResource(resourceType, resourceKey, requiredCaps, options);
+			return (this._fallbackService != null) ? await _fallbackService.GetAuthContextForResource(resourceType, resourceKey, requiredCaps, options).ConfigureAwait(false) : null;
 		}
 	}
 }

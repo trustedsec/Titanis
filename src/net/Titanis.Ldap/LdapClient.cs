@@ -164,7 +164,7 @@ namespace Titanis.Ldap
 				var flags = (sslOptions != null)
 					? SecurityCapabilities.None
 					: SecurityCapabilities.Integrity | SecurityCapabilities.SequenceDetection | SecurityCapabilities.ReplayDetection | SecurityCapabilities.Confidentiality;
-				var authContext = credentials.GetAuthContextForService(spn, flags, AuthOptions.PreferSpnego);
+				var authContext = await credentials.GetAuthContextForService(spn, flags, AuthOptions.PreferSpnego).ConfigureAwait(false);
 				if (authContext != null)
 				{
 					if (authContext is null)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Titanis.Security;
 
 namespace Titanis.Net
@@ -34,18 +35,18 @@ namespace Titanis.Net
 		/// See <see cref="ResourceTypes"/> for a list of predefined resource types.
 		/// </para>
 		/// </remarks>
-		AuthClientContext? GetAuthContextForResource(string resourceType, object resourceKey, SecurityCapabilities requiredCaps, AuthOptions options = AuthOptions.None);
+		ValueTask<AuthClientContext?> GetAuthContextForResource(string resourceType, object resourceKey, SecurityCapabilities requiredCaps, AuthOptions options = AuthOptions.None);
 	}
 
 	public static class ClientCredentialServiceExtensions
 	{
-		public static AuthClientContext? GetAuthContextForSmbShare(
+		public static ValueTask<AuthClientContext?> GetAuthContextForSmbShare(
 			this IClientCredentialService credentialService,
 			UncPath sharePath,
 			SecurityCapabilities requiredCaps,
 			AuthOptions options = AuthOptions.None)
 			=> credentialService.GetAuthContextForResource(ResourceTypes.SmbShare, sharePath, requiredCaps, options);
-		public static AuthClientContext? GetAuthContextForService(
+		public static ValueTask<AuthClientContext?> GetAuthContextForService(
 			this IClientCredentialService credentialService,
 			SecurityPrincipalName service,
 			SecurityCapabilities requiredCaps,
