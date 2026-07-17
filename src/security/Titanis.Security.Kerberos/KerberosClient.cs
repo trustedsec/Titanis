@@ -1590,40 +1590,22 @@ namespace Titanis.Security.Kerberos
 				return KerberosFileFormat.Kirbi;
 		}
 
-		public TicketInfo ForgeTicket(
+		private TicketInfo BuildTicket(
 			KdcOptions options,
 			SecurityPrincipalName clientName,
 			string clientRealm,
 			string ticketRealm,
 			SecurityPrincipalName targetSpn,
 			string targetRealm,
-			SessionKey sessionKey,
-			SessionKey ticketKey,
 			DateTime authTime,
 			DateTime endTime,
 			DateTime? startTime,
 			DateTime? renewTill,
-			LogonInfo? logonInfo,
-			UpnDnsInfo? upnDnsInfo,
-			SessionKey? kdcKey
+			SessionKey sessionKey,
+			SessionKey ticketKey,
+			AuthorizationData_Element[] adElems
 			)
 		{
-			kdcKey ??= ticketKey;
-			var pacBytes = TicketAuthorizationData.BuildPac(
-				authTime,
-				logonInfo,
-				upnDnsInfo,
-				ticketKey,
-				kdcKey.EncryptionProfile.ChecksumType,
-				new byte[kdcKey.EncryptionProfile.ChecksumSizeBytes]
-				);
-			var adelem = new AuthorizationData_Element((int)AdType.IfRelevant, Asn1DerEncoder.EncodeTlv(new Asn1SequenceOf<AuthorizationData_Element>([new AuthorizationData_Element((int)AdType.Pac, pacBytes)])).ToArray());
-#if DEBUG
-			var newPac = new TicketAuthorizationData();
-			newPac.Process(adelem, ticketKey, null, false);
-#endif
-
-
 			EncTicketPart encTicketPart = new EncTicketPart(new EncTicketPart_Tagged3(
 				new Asn1BitString((uint)options),
 				sessionKey.key,
@@ -1635,7 +1617,7 @@ namespace Titanis.Security.Kerberos
 				startTime,
 				renewTill,
 				null,
-				[adelem]
+				adElems
 				));
 			byte[] encData = Asn1DerEncoder.EncodeTlv(encTicketPart).ToArray();
 			var encTicketBytes = ticketKey.EncryptAndWrap(KeyUsage.Asrep_Tgsrep_Ticket, encData);
@@ -1658,10 +1640,89 @@ namespace Titanis.Security.Kerberos
 			TicketInfo ticket = new TicketInfo(0, new Ticket_Tagged1(5, ticketRealm, Structs.PrincipalName(targetSpn), encTicketBytes), sessionKey, encRepPart, clientName.GetNamePart(0), clientRealm, null, ticketKey);
 
 #if DEBUG
-			ticket.DecryptAuthorizationData(ticketKey, null);
+			//ticket.DecryptAuthorizationData(ticketKey, null);
+#endif
+			return ticket;
+		}
+		public TicketInfo ForgeTicket(
+			KdcOptions options,
+			SecurityPrincipalName clientName,
+			string clientRealm,
+			string ticketRealm,
+			SecurityPrincipalName targetSpn,
+			string targetRealm,
+			SessionKey sessionKey,
+			SessionKey serverKey,
+			DateTime authTime,
+			DateTime endTime,
+			DateTime? startTime,
+			DateTime? renewTill,
+			LogonInfo? logonInfo,
+			UpnDnsInfo? upnDnsInfo,
+			SessionKey? kdcKey
+			)
+		{
+			byte[]? ticketChecksum;
+			if (kdcKey != null)
+			{
+				var adelem = new AuthorizationData_Element((int)AdType.IfRelevant, Asn1DerEncoder.EncodeTlv(new Asn1SequenceOf<AuthorizationData_Element>([new AuthorizationData_Element((int)AdType.Pac, [0])])).ToArray());
+
+				var tempTicket = BuildTicket(
+					options,
+					clientName,
+					clientRealm,
+					ticketRealm,
+					targetSpn,
+					targetRealm,
+					authTime,
+					endTime,
+					startTime,
+					renewTill,
+					sessionKey,
+					serverKey,
+					[adelem]
+					);
+				var tempTicketBytes = Asn1DerEncoder.EncodeTlv(tempTicket.ticket);
+				ticketChecksum = kdcKey.Checksum(KeyUsage.NonKerbChecksumSalt, tempTicketBytes.Span).checksum;
+			}
+			else
+				ticketChecksum = null;
+
+			{
+				kdcKey ??= serverKey;
+				var pacBytes = TicketAuthorizationData.BuildPac(
+					authTime,
+					logonInfo,
+					upnDnsInfo,
+					serverKey,
+					kdcKey,
+					kdcKey.EncryptionProfile.ChecksumType,
+					ticketChecksum
+					);
+				var adelem = new AuthorizationData_Element((int)AdType.IfRelevant, Asn1DerEncoder.EncodeTlv(new Asn1SequenceOf<AuthorizationData_Element>([new AuthorizationData_Element((int)AdType.Pac, pacBytes)])).ToArray());
+#if DEBUG
+				var newPac = new TicketAuthorizationData();
+				newPac.Process(adelem, serverKey, null, false);
 #endif
 
-			return ticket;
+				var ticket = BuildTicket(
+					options,
+					clientName,
+					clientRealm,
+					ticketRealm,
+					targetSpn,
+					targetRealm,
+					authTime,
+					endTime,
+					startTime,
+					renewTill,
+					sessionKey,
+					serverKey,
+					[adelem]
+					);
+
+				return ticket;
+			}
 		}
 	}
 

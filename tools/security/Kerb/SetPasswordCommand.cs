@@ -45,7 +45,7 @@ public class SetPasswordCommand : Command, IHaveServerName
 	{
 		var krb = this.CreateKerberosClient(new SimpleKdcLocator(this.Authentication.Kdc));
 
-		var krbAuthContext = this.Authentication.TryCreateKerberosContext(KerberosClient.ChangePwSpn, SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality, false, out _);
+		(var krbAuthContext, _) = await this.Authentication.TryCreateKerberosContext(KerberosClient.ChangePwSpn, SecurityCapabilities.Integrity | SecurityCapabilities.Confidentiality, false);
 		var cred = krbAuthContext.Credential;
 
 		await krb.SetPassword(

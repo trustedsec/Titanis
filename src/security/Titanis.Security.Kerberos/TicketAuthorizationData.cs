@@ -79,29 +79,54 @@ namespace Titanis.Security.Kerberos
 			LogonInfo logonInfo,
 			UpnDnsInfo? upnDnsInfo,
 			SessionKey serverKey,
+			SessionKey? kdcKey,
 			EncChecksumType ticketChecksumType,
-			byte[] ticketChecksum
+			byte[]? ticketChecksum
 			)
 		{
-			PacBuilder builder = new PacBuilder(7);
+			int bufferCount = 6;
+			if (ticketChecksum != null)
+				bufferCount++;
+			if (kdcKey != null)
+				bufferCount += 2;
+
+			PacBuilder builder = new PacBuilder(bufferCount);
 			builder.WriteLogonInfo(logonInfo);
+			// Server checksum
 			var offServerChecksum = builder.WriteServerChecksum(PacBufferType.ServerChecksum, serverKey);
-			var offKdcChecksum = builder.WriteServerChecksum(PacBufferType.KdcChecksum, serverKey);
+			// KDC checksum
+			var offKdcChecksum = (kdcKey != null) ? builder.WriteServerChecksum(PacBufferType.KdcChecksum, serverKey)
+				: 0;
+			// Client info
 			builder.WriteClientInfo(authTime, logonInfo.EffectiveName);
 			if (upnDnsInfo != null)
 				builder.WriteUpnDnsInfo(upnDnsInfo);
 
+			// TODO: Claims
 			//builder.WriteClientClaims();
-			builder.WriteTicketChecksum(ticketChecksumType, ticketChecksum);
-			builder.WriteServerChecksum(PacBufferType.ExtendedKdcChecksum, serverKey);
+			if (ticketChecksum != null)
+				builder.WriteTicketChecksum(ticketChecksumType, ticketChecksum);
+
+			var offExtKdcChecksum = (kdcKey != null) ? builder.WriteServerChecksum(PacBufferType.ExtendedKdcChecksum, kdcKey)
+				: 0;
 
 			var bytes = builder.GetBytes();
+			Checksum checksum;
+			// Extended KDC
+			if (kdcKey != null)
+			{
+				checksum = kdcKey.Checksum(KeyUsage.NonKerbChecksumSalt, bytes);
+				checksum.checksum.CopyTo(bytes.Slice(offExtKdcChecksum));
+			}
 			// Server
-			var checksum = serverKey.Checksum(KeyUsage.NonKerbChecksumSalt, bytes);
-			checksum.checksum.CopyTo(bytes.Slice(offServerChecksum));
-			// KDC
 			checksum = serverKey.Checksum(KeyUsage.NonKerbChecksumSalt, bytes);
-			checksum.checksum.CopyTo(bytes.Slice(offKdcChecksum));
+			checksum.checksum.CopyTo(bytes.Slice(offServerChecksum));
+			if (kdcKey != null)
+			{
+				// KDC
+				checksum = serverKey.Checksum(KeyUsage.NonKerbChecksumSalt, bytes);
+				checksum.checksum.CopyTo(bytes.Slice(offKdcChecksum));
+			}
 
 			return bytes;
 		}
