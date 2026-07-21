@@ -93,9 +93,9 @@ By default, all supported encryption types are sent in the request.  To limit th
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			base.ValidateParameters(context);
-			if (string.IsNullOrEmpty(this.Tgt) && string.IsNullOrEmpty(this.TicketCache))
+			if ((this.Tgt == null) && (this.TicketCache == null))
 				context.LogError($"Either -{nameof(Tgt)} or -{nameof(TicketCache)} must be specified.");
-			if (!string.IsNullOrEmpty(this.S4UserCert))
+			if (this.S4UserCert != null)
 			{
 				try
 				{
@@ -131,9 +131,9 @@ By default, all supported encryption types are sent in the request.  To limit th
 
 		protected sealed override async Task<IList<TicketInfo>?> RequestTickets(KerberosClient krb, CancellationToken cancellationToken)
 		{
-			string ticketStoreFile;
-			if (!string.IsNullOrEmpty(this.Tgt)) ticketStoreFile = this.Tgt;
-			else if (!string.IsNullOrEmpty(this.TicketCache)) ticketStoreFile = this.TicketCache;
+			FileSpec ticketStoreFile;
+			if (this.Tgt != null) ticketStoreFile = this.Tgt;
+			else if (this.TicketCache != null) ticketStoreFile = this.TicketCache;
 			else throw new InvalidOperationException($"The command is not configured with -{nameof(Tgt)} -{nameof(TicketCache)}.");
 
 			TicketInfo? sourceTicket = LoadTgtFromStore(krb, ticketStoreFile);
@@ -141,7 +141,7 @@ By default, all supported encryption types are sent in the request.  To limit th
 				return null;
 
 			TicketInfo? u2uTicket;
-			if (!string.IsNullOrEmpty(this.U2uTicket))
+			if (this.U2uTicket != null)
 			{
 				u2uTicket = LoadTgtFromStore(krb, this.U2uTicket);
 				if (u2uTicket is null)

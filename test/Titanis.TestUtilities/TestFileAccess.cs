@@ -28,12 +28,13 @@ public class TestFileAccess : IFileAccess
 	//private readonly string _rootNS;
 	private readonly string _resNamePrefix;
 
-	public string ResolveFsPath(string filePath)
+	public string ResolveFsPath(FileSpec filePath)
 	{
-		if (!filePath.StartsWith(TestFsPrefix))
-			filePath = Path.Combine(TestFsPrefix, filePath);
+		string path = filePath.FileName;
+		if (!path.StartsWith(TestFsPrefix))
+			path = Path.Combine(TestFsPrefix, path);
 
-		return filePath;
+		return filePath.FileName;
 	}
 
 	public string[] GetFiles(string directory, string searchPattern)
@@ -67,9 +68,9 @@ public class TestFileAccess : IFileAccess
 		return found.ToArray();
 	}
 
-	public byte[] ReadAllBytesFrom(string fileName)
+	public byte[] ReadAllBytesFrom(FileSpec fileName)
 	{
-		string resName = this.FileNameToResourceName(fileName);
+		string resName = this.FileNameToResourceName(this.ResolveFsPath(fileName));
 		var resStream = this._resourceAssembly.GetManifestResourceStream(resName);
 
 		if (resStream is null)
@@ -81,9 +82,9 @@ public class TestFileAccess : IFileAccess
 		return bytes;
 	}
 
-	public string ReadAllTextFrom(string fileName)
+	public string ReadAllTextFrom(FileSpec fileName)
 	{
-		StreamReader reader = this.OpenTextFile(fileName);
+		StreamReader reader = this.OpenTextFile(this.ResolveFsPath(fileName));
 		string text = reader.ReadToEnd();
 		reader.Close();
 		return text;
@@ -101,9 +102,9 @@ public class TestFileAccess : IFileAccess
 		return reader;
 	}
 
-	public IEnumerable<string> ReadLinesFrom(string fileName)
+	public IEnumerable<string> ReadLinesFrom(FileSpec fileName)
 	{
-		StreamReader reader = this.OpenTextFile(fileName);
+		StreamReader reader = this.OpenTextFile(this.ResolveFsPath(fileName));
 		while (reader.Peek() >= 0)
 		{
 			yield return reader.ReadLine();
@@ -119,9 +120,9 @@ public class TestFileAccess : IFileAccess
 		return resName;
 	}
 
-	public bool FileExists(string path)
+	public bool FileExists(FileSpec path)
 	{
-		var resName = this.FileNameToResourceName(path);
+		var resName = this.FileNameToResourceName(this.ResolveFsPath(path));
 		var info = this._resourceAssembly.GetManifestResourceInfo(resName);
 		return info != null;
 	}
@@ -130,9 +131,15 @@ public class TestFileAccess : IFileAccess
 
 	private Dictionary<string, byte[]> _writtenFiles = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
 
-	public void WriteAllBytesTo(string fileName, byte[] contents)
+	public void WriteAllTextTo(FileSpec fileName, string contents)
 	{
-		fileName = this.ResolveFsPath(fileName);
-		this._writtenFiles[fileName] = contents;
+		var path = this.ResolveFsPath(fileName);
+		this._writtenFiles[path] = Encoding.UTF8.GetBytes(contents);
+	}
+
+	public void WriteAllBytesTo(FileSpec fileName, byte[] contents)
+	{
+		var path = this.ResolveFsPath(fileName);
+		this._writtenFiles[path] = contents;
 	}
 }

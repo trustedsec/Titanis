@@ -43,16 +43,16 @@ public abstract class TicketRequestCommand : Command
 	{
 		base.ValidateParameters(context);
 
-		if (string.IsNullOrEmpty(this.OutputFileName))
+		if (this.OutputFileName is null)
 		{
-			if (string.IsNullOrEmpty(this.TicketCache))
+			if (this.TicketCache is null)
 			{
 				context.LogError(new ParameterValidationError(null, $"-{nameof(OutputFileName)} is required unless -{nameof(TicketCache)} is specified"));
 			}
 		}
 		else
 		{
-			string outFileName = this.ResolveFsPath(this.OutputFileName);
+			var outFileName = this.OutputFileName;
 			if (this.FileAccessService.FileExists(outFileName) && !(this.Overwrite.IsSet || this.Append.IsSet))
 			{
 				context.LogError($"Output file '{outFileName}' already exists.  Specify a different file name or use -Overwrite to overwrite it or -Append to append to it.");
@@ -66,23 +66,23 @@ public abstract class TicketRequestCommand : Command
 
 	protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 	{
-		string? outFileName = string.IsNullOrEmpty(this.OutputFileName) ? null : this.ResolveFsPath(this.OutputFileName);
+		var outFileName = this.OutputFileName;
 
 		KerberosClient krb = this.CreateKerberosClient();
-		if (!string.IsNullOrEmpty(this.TicketCache))
+		if (this.TicketCache != null)
 		{
-			string ticketCacheFile = this.ResolveFsPath(this.TicketCache);
+			var ticketCacheFile = this.TicketCache;
 			var cacheBytes = this.FileAccessService.FileExists(ticketCacheFile)
 				? this.FileAccessService.ReadAllBytesFrom(ticketCacheFile)
 				: [];
-			krb.TicketCache = new TicketCacheFile(cacheBytes, ticketCacheFile, krb);
+			krb.TicketCache = new TicketCacheFile(cacheBytes, ticketCacheFile.FileName, krb);
 		}
 
 		// Load tickets from file, if it exists
 		List<TicketInfo> tickets = new List<TicketInfo>();
 		if ((outFileName is not null) && this.Append.IsSet && this.FileAccessService.FileExists(outFileName))
 		{
-			TicketInfo[] existingTickets = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(outFileName), outFileName, out _);
+			TicketInfo[] existingTickets = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(outFileName), outFileName.FileName, out _);
 			this.WriteVerbose($"Loaded {existingTickets.Length} ticket(s) from {outFileName}.");
 			tickets.AddRange(existingTickets);
 		}
@@ -91,10 +91,10 @@ public abstract class TicketRequestCommand : Command
 		if (newTickets is not null)
 		{
 			this.WriteRecords(newTickets);
-			if (newTickets.Count > 0 && !string.IsNullOrEmpty(outFileName))
+			if (newTickets.Count > 0 && outFileName != null)
 			{
 				tickets.AddRange(newTickets);
-				var tgtBytes = krb.ExportTickets(tickets, KerberosClient.GetFormatFromFileName(outFileName));
+				var tgtBytes = krb.ExportTickets(tickets, KerberosClient.GetFormatFromFileName(outFileName.FileName));
 				this.FileAccessService.WriteAllBytesTo(outFileName, tgtBytes);
 
 				this.WriteVerbose($"Exported {tickets.Count} ticket(s) to {outFileName}");

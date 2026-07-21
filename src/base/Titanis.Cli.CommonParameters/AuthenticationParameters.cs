@@ -81,23 +81,23 @@ namespace Titanis.Cli
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Name of file containing a ticket-granting ticket (.kirbi or ccache)")]
-		public string? Tgt { get; set; }
+		public FileSpec? Tgt { get; set; }
 
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Name of file containing the armor ticket")]
-		public string? ArmorTicket { get; set; }
+		public FileSpec? ArmorTicket { get; set; }
 
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Alias("Ticket")]
 		[Description("Name of file containing service tickets (.kirbi or ccache)")]
-		public string[]? Tickets { get; set; }
+		public FileSpec[]? Tickets { get; set; }
 
 		[Parameter(EnvironmentVariable = KerberosClient.Krb5CacheVariableName)]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Name of ticket cache file")]
-		public string? TicketCache { get; set; }
+		public FileSpec? TicketCache { get; set; }
 
 		[Parameter]
 		[Description("Requests delegation (sends TGT and key for Kerberos)")]
@@ -106,7 +106,7 @@ namespace Titanis.Cli
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Sends the tickets (and keys) to the target for delegation")]
-		public string[]? DelegateTicket { get; set; }
+		public FileSpec[]? DelegateTicket { get; set; }
 
 		[Parameter]
 		[Description("NTLM version number (a.b.c.d)")]
@@ -272,7 +272,7 @@ namespace Titanis.Cli
 						context.LogError(new ParameterValidationError(nameof(UserCertificateParameterGroup.UserCert), $"-{nameof(UserCertificateParameterGroup.UserCert)} requires -{nameof(Kdc)}"));
 				}
 
-				if (!string.IsNullOrEmpty(this.S4UserCert))
+				if (this.S4UserCert != null)
 				{
 					log?.WriteDiagnostic($"Loading user certificate from {this.S4UserCert}...");
 					var certBytes = this.RequireFileAccess().ReadAllBytesFrom(this.S4UserCert);
@@ -307,7 +307,7 @@ namespace Titanis.Cli
 			this._validated = true;
 		}
 
-		public static List<KeytabEntry>? LoadKeytab(string keytabFileName, SecurityPrincipalName userName, string? userDomain, IFileAccess fileAccess, ILog? log)
+		public static List<KeytabEntry>? LoadKeytab(FileSpec keytabFileName, SecurityPrincipalName userName, string? userDomain, IFileAccess fileAccess, ILog? log)
 		{
 			log?.WriteDiagnostic($"Loading keytab file {keytabFileName}");
 			var kt = KeytabFile.LoadFrom(fileAccess.ReadAllBytesFrom(keytabFileName));
@@ -350,8 +350,8 @@ namespace Titanis.Cli
 
 		public static bool LoadCertificateAndKey(
 			IFileAccess fileAccess,
-			string certFileName,
-			string? keyFile,
+			FileSpec certFileName,
+			FileSpec? keyFile,
 			string? keyPassphrase,
 			ILog? log,
 			ParameterValidationContext validationContext,
@@ -363,9 +363,6 @@ namespace Titanis.Cli
 			bool passException = false)
 		{
 			ArgumentNullException.ThrowIfNull(fileAccess);
-
-			certFileName = fileAccess.ResolveFsPath(certFileName);
-			keyFile = string.IsNullOrEmpty(keyFile) ? null : fileAccess.ResolveFsPath(keyFile);
 
 			log?.WriteDiagnostic($"Opening certificate file {certFileName}");
 			cert = null;
@@ -699,11 +696,10 @@ namespace Titanis.Cli
 				authRealm ??= krb.TicketCache.HomeTgt.ClientRealm;
 			}
 			// Check the -Tgt file
-			if ((serviceTicket is null) && (tgt is null) && !string.IsNullOrEmpty(tgtFileName))
+			if ((serviceTicket is null) && (tgt is null) && (tgtFileName != null))
 			{
-				tgtFileName = this.RequireFileAccess().ResolveFsPath(tgtFileName);
 				log?.WriteVerbose($"Loading ticket(s) from {tgtFileName}");
-				var tgtCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(tgtFileName), tgtFileName, krb);
+				var tgtCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(tgtFileName), tgtFileName.FileName, krb);
 				var tickets = tgtCache.GetAllTickets();
 				foreach (var ticket in tickets)
 				{
@@ -744,9 +740,9 @@ namespace Titanis.Cli
 			TicketInfo? armorTicket;
 			if (this.ArmorTicket != null)
 			{
-				var ticketFileName = this.RequireFileAccess().ResolveFsPath(this.ArmorTicket);
+				var ticketFileName = this.ArmorTicket;
 				log?.WriteVerbose($"Loading ticket(s) from {ticketFileName}");
-				var tgtCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(ticketFileName), ticketFileName, krb);
+				var tgtCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(ticketFileName), ticketFileName.FileName, krb);
 				armorTicket = tgtCache.GetAllTickets().Where(r => r.IsCurrent).FirstOrDefault();
 				if (armorTicket != null)
 				{
@@ -913,12 +909,11 @@ namespace Titanis.Cli
 			return (null, null);
 		}
 
-		private TicketCacheFile LoadTicketFile(string ticketFileName, KerberosClient krb, ILog? log)
+		private TicketCacheFile LoadTicketFile(FileSpec ticketFileName, KerberosClient krb, ILog? log)
 		{
-			ticketFileName = this.ResolveFsPath(ticketFileName);
 			// TODO: Resolve file name
 			log?.WriteVerbose($"Loading tickets from {ticketFileName}");
-			var fileCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(ticketFileName), ticketFileName, krb);
+			var fileCache = new TicketCacheFile(this.RequireFileAccess().ReadAllBytesFrom(ticketFileName), ticketFileName.FileName, krb);
 			log?.WriteVerbose($"Loaded {fileCache.TicketCount} tickets from {ticketFileName}");
 			return fileCache;
 		}
@@ -942,12 +937,12 @@ namespace Titanis.Cli
 				krb.Workstation = HostAddress.FromNetbiosName(this.Workstation);
 			this._kerberosClient = krb;
 
-			if (!string.IsNullOrEmpty(this.TicketCache))
+			if (this.TicketCache != null)
 			{
 				// TODO: ResolveFsPath
 
 				var fileAccess = this.RequireFileAccess();
-				var cacheFileName = fileAccess.ResolveFsPath(this.TicketCache);
+				var cacheFileName = this.TicketCache;
 				byte[]? cacheBytes;
 				if (fileAccess.FileExists(cacheFileName))
 				{
@@ -960,7 +955,7 @@ namespace Titanis.Cli
 					cacheBytes = null;
 				}
 				// TODO: This doesn't match the search below, which checks user name.  Document the semantics of the ticket cache
-				var ticketCache = new TicketCacheFile(cacheBytes, cacheFileName, krb);
+				var ticketCache = new TicketCacheFile(cacheBytes, cacheFileName.FileName, krb);
 				krb.TicketCache = ticketCache;
 			}
 			else

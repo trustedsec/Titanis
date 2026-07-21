@@ -34,7 +34,7 @@ namespace Titanis.Cli
 		protected virtual void Initialize(IServiceContainer services) { }
 
 		protected IFileAccess RequireFileAccess() => this.Services?.RequireService<IFileAccess>();
-		protected string ResolveFsPath(string path) => this.RequireFileAccess().ResolveFsPath(path);
+		protected string ResolveFsPath(FileSpec path) => this.RequireFileAccess().ResolveFsPath(path);
 		protected ILog? Log => this.Services?.GetService<ILog>();
 
 		protected TCallback? GetCallback<TCallback>()
@@ -42,7 +42,7 @@ namespace Titanis.Cli
 			=> null;
 
 
-		protected static byte[] LoadCertFile(IFileAccess fileAccess, string fileName, [CallerArgumentExpression(nameof(fileName))] string? argName = null)
+		protected static byte[] LoadCertFile(IFileAccess fileAccess, FileSpec fileName, [CallerArgumentExpression(nameof(fileName))] string? argName = null)
 		{
 			byte[] certBytes = fileAccess.ReadAllBytesFrom(fileName);
 			if (certBytes.Length == 0)

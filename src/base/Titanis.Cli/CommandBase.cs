@@ -460,7 +460,7 @@ namespace Titanis.Cli
 			return this.VerifyContext().OpenRawInputStream();
 		}
 		#endregion
-		protected string ResolveFsPath(string path)
+		protected string ResolveFsPath(FileSpec path)
 		{
 			return this.FileAccessService.ResolveFsPath(path);
 		}

@@ -37,7 +37,7 @@ internal class AddUserCommand : AddCommandBase
 
 	[Parameter]
 	[Description("Names of files containing certificates to associate with the user")]
-	public string[]? UserCerts { get; set; }
+	public FileSpec[]? UserCerts { get; set; }
 
 	[Parameter]
 	[Description("Groups to make the user a member of")]

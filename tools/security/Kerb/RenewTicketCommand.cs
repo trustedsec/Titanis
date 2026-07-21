@@ -47,11 +47,11 @@ public class RenewTicketCommand : KdcRequestCommand
 	protected override async Task<IList<TicketInfo>?> RequestTickets(KerberosClient krb, CancellationToken cancellationToken)
 	{
 		List<TicketInfo> sourceTickets = new List<TicketInfo>();
-		if (!string.IsNullOrEmpty(this.Ticket))
+		if (this.Ticket != null)
 		{
-			string ticketFile = this.ResolveFsPath(this.Ticket);
+			var ticketFile = this.Ticket;
 			this.WriteDiagnostic($"Loading tickets from {ticketFile}");
-			var tickets = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(ticketFile), ticketFile, out var format);
+			var tickets = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(ticketFile), ticketFile.FileName, out var format);
 
 			if (this.TargetSpn != null)
 			{

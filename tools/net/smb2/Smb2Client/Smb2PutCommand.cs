@@ -20,7 +20,7 @@ namespace Titanis.Smb2.Cli
 	{
 		[Parameter(UncParamPos - 1)]
 		[Description("Name of local file to send")]
-		public string? SourceFileName { get; set; }
+		public FileSpec? SourceFileName { get; set; }
 
 		[Parameter]
 		[Description("Size of chunks to copy")]
@@ -76,9 +76,9 @@ namespace Titanis.Smb2.Cli
 				var sourceFileName = this.SourceFileName;
 				Winterop.FileAttributes fileAttributes = Winterop.FileAttributes.Normal;
 				// Get source file attributes
-				Winterop.FileAttributes attrs = string.IsNullOrEmpty(sourceFileName)
+				Winterop.FileAttributes attrs = sourceFileName == null
 					? Winterop.FileAttributes.Normal
-					: (Winterop.FileAttributes)File.GetAttributes(sourceFileName);
+					: (Winterop.FileAttributes)File.GetAttributes(this.FileAccessService.ResolveFsPath(sourceFileName));
 
 				UncPath destPath = this.UncPath;
 
@@ -102,7 +102,7 @@ namespace Titanis.Smb2.Cli
 						isDestDir = file.IsDirectory;
 						if (isDestDir)
 						{
-							string? sourceFilePart = string.IsNullOrEmpty(SourceFileName) ? null : Path.GetFileName(sourceFileName);
+							string? sourceFilePart = (sourceFileName != null) ? null : Path.GetFileName(sourceFileName.FileName);
 							if (sourceFilePart == null)
 								throw new InvalidOperationException("The destination is a directory, but no source file name was provided.  When copying from console input, you must provide a destination file name.");
 
@@ -133,7 +133,7 @@ namespace Titanis.Smb2.Cli
 						isDestDir = file.IsDirectory;
 						if (isDestDir)
 						{
-							string? sourceFilePart = string.IsNullOrEmpty(SourceFileName) ? null : Path.GetFileName(sourceFileName);
+							string? sourceFilePart = (sourceFileName is null) ? null : Path.GetFileName(sourceFileName.FileName);
 							if (sourceFilePart == null)
 								throw new InvalidOperationException("The destination is a directory, but no source file name was provided.  When copying from console input, you must provide a destination file name.");
 
@@ -175,12 +175,13 @@ namespace Titanis.Smb2.Cli
 						LastWriteTimestamp ??= fileBasicInfo.LastWriteTime;
 						ChangeTimestamp ??= fileBasicInfo.ChangeTime;
 					}
-					else if (!string.IsNullOrEmpty(SourceFileName))
+					else if (this.SourceFileName != null)
 					{
-						DateTime dateTime = File.GetLastWriteTimeUtc(sourceFileName);
+						string resolved = this.FileAccessService.ResolveFsPath(sourceFileName);
+						DateTime dateTime = File.GetLastWriteTimeUtc(resolved);
 						LastWriteTimestamp ??= dateTime;
 						ChangeTimestamp ??= dateTime;
-						fileAttributes = (Winterop.FileAttributes)File.GetAttributes(sourceFileName);
+						fileAttributes = (Winterop.FileAttributes)File.GetAttributes(resolved);
 					}
 
 					if (CreateTimestamp != null || LastAccessTimestamp != null || LastWriteTimestamp != null || ChangeTimestamp != null)
@@ -203,8 +204,8 @@ namespace Titanis.Smb2.Cli
 
 		private Stream GetSourceStream()
 		{
-			if (!string.IsNullOrEmpty(this.SourceFileName))
-				return File.OpenRead(this.ResolveFsPath(this.SourceFileName));
+			if (this.SourceFileName != null)
+				return this.FileAccessService.OpenRead(this.SourceFileName);
 			else
 				return this.OpenRawInputStream();
 		}

@@ -39,7 +39,7 @@ public abstract class ReplicateCommand : DsbindCommand, IDrsChangeCallback, IHav
 {
 	[Parameter]
 	[Description("Name of keytab file to export to")]
-	public string? ExportKeytab { get; set; }
+	public FileSpec? ExportKeytab { get; set; }
 
 	[Parameter]
 	[Description("Starting USN vector (as 48 hex bytes)")]
@@ -81,7 +81,7 @@ public abstract class ReplicateCommand : DsbindCommand, IDrsChangeCallback, IHav
 
 		if (wantsSuppCreds)
 			attrOids.Add(LdapAttributeTypes.SupplementalCredentials.Oid);
-		if (!string.IsNullOrEmpty(this.ExportKeytab))
+		if (this.ExportKeytab != null)
 		{
 			attrOids.Add(LdapAttributeTypes.ServicePrincipalName.Oid);
 			attrOids.Add(LdapAttributeTypes.MsDSKeyVersionNumber.Oid);
@@ -141,13 +141,13 @@ public abstract class ReplicateCommand : DsbindCommand, IDrsChangeCallback, IHav
 		if (maxParallel == 1)
 			this.WriteMessage($"Up-to-date USN vector: {usnvec.ToBytes().ToHexString()}");
 
-		if (!string.IsNullOrEmpty(this.ExportKeytab))
+		if (this.ExportKeytab != null)
 		{
 			if (kt.Entries.Count == 0)
 				this.WriteWarning($"No keys collected; will not export empty keytab file.");
 			else
 			{
-				var ktFile = this.FileAccessService.ResolveFsPath(this.ExportKeytab);
+				var ktFile = this.ExportKeytab;
 				byte[] ktBytes = kt.ToBytes();
 				this.FileAccessService.WriteAllBytesTo(ktFile, ktBytes);
 				this.WriteVerbose($"Wrote {ktBytes.Length} to {ktFile}.");

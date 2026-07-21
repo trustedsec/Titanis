@@ -43,7 +43,7 @@ internal class SelfCertCommand : Command
 
 	[Parameter]
 	[Description("Name of file containing certificate to copy")]
-	public string? TemplateFile { get; set; }
+	public FileSpec? TemplateFile { get; set; }
 
 	[Parameter]
 	[Description("Subject alternate name")]
@@ -52,11 +52,11 @@ internal class SelfCertCommand : Command
 	[Parameter]
 	[Mandatory]
 	[Description("Name of .pfx file")]
-	public string PfxFileName { get; set; }
+	public FileSpec PfxFileName { get; set; }
 
 	[Parameter]
 	[Description("Name of certificate file (.pem or .cer)")]
-	public string? CertFileName { get; set; }
+	public FileSpec? CertFileName { get; set; }
 
 
 	private static readonly HashAlgorithmName[] hashAlgs = new HashAlgorithmName[]
@@ -86,7 +86,7 @@ internal class SelfCertCommand : Command
 		HashAlgorithmName hashAlg;
 		X500DistinguishedName? subject;
 
-		if (!string.IsNullOrEmpty(this.TemplateFile))
+		if (this.TemplateFile != null)
 		{
 			var certFileName = this.ResolveFsPath(this.TemplateFile);
 			this.WriteDiagnostic($"Loading template certificate from '{certFileName}'");
@@ -138,20 +138,17 @@ internal class SelfCertCommand : Command
 		this.WriteDiagnostic("Generating certificate");
 		var newCert = builder.CreateSelfSigned(DateTime.Today, DateTime.Today + TimeSpan.FromDays(90));
 
-		var pfxFile = this.ResolveFsPath(this.PfxFileName);
-
 		// Write PFX
-		this.FileAccessService.WriteAllBytesTo(pfxFile, newCert.Export(X509ContentType.Pfx));
+		this.FileAccessService.WriteAllBytesTo(this.PfxFileName, newCert.Export(X509ContentType.Pfx));
 
-		if (!string.IsNullOrEmpty(this.CertFileName))
+		if (this.CertFileName != null)
 		{
-			var certFileName = this.ResolveFsPath(this.CertFileName);
-			string? outExt = Path.GetExtension(certFileName)?.ToUpper();
+			string? outExt = this.CertFileName.Extension?.ToUpper();
 
 			if (outExt.Equals(".PEM", StringComparison.OrdinalIgnoreCase))
-				File.WriteAllText(certFileName, newCert.ExportCertificatePem());
+				this.FileAccessService.WriteAllTextTo(this.CertFileName, newCert.ExportCertificatePem());
 			else
-				this.FileAccessService.WriteAllBytesTo(certFileName, newCert.Export(X509ContentType.Cert));
+				this.FileAccessService.WriteAllBytesTo(this.CertFileName, newCert.Export(X509ContentType.Cert));
 		}
 
 

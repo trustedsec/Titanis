@@ -35,11 +35,11 @@ namespace Titanis.Cli.LdapTool
 
 		[Parameter]
 		[Description("Name of PEM or PFX certificate file")]
-		public string? SslCert { get; set; }
+		public FileSpec? SslCert { get; set; }
 
 		[Parameter]
 		[Description("Name of PFX file for SSL authentication")]
-		public string? SslKeyFile { get; set; }
+		public FileSpec? SslKeyFile { get; set; }
 
 		[Parameter]
 		[Description("Password for -SslCert or -SslKeyFile")]
@@ -63,8 +63,8 @@ namespace Titanis.Cli.LdapTool
 				{
 					AuthenticationParameters.LoadCertificateAndKey(
 						this.FileAccessService,
-						SslCert,
-						SslKeyFile,
+						this.SslCert,
+						this.SslKeyFile,
 						SslKeyPassword,
 						this.Log,
 						context,

@@ -743,7 +743,7 @@ namespace Titanis.Cli
 									if (fileAccess is null)
 										throw new ParameterSyntaxException(parameter.Name, $"Parameter {parameter.Name} received file expansion argument, but the command does not have file system access.");
 
-									foreach (var line in fileAccess.ReadLinesFrom(argText))
+									foreach (var line in fileAccess.ReadLinesFrom(new FileSpec(argText)))
 									{
 										if (string.IsNullOrEmpty(line))
 											continue;

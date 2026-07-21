@@ -27,16 +27,15 @@ public abstract class KdcRequestCommand : TicketRequestCommand, IHaveServerName
 	[KerberosTicketFileSpec(true)]
 	public FileSpec? ArmorTicket { get; set; }
 
-	protected TicketInfo? LoadTgtFromStore(KerberosClient krb, string ticketStoreFileUnresolved)
+	protected TicketInfo? LoadTgtFromStore(KerberosClient krb, FileSpec ticketStoreFileName)
 	{
-		ticketStoreFileUnresolved = this.ResolveFsPath(ticketStoreFileUnresolved);
-		this.WriteVerbose($"Reading TGT from {ticketStoreFileUnresolved}");
-		var tgtStore = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(ticketStoreFileUnresolved), ticketStoreFileUnresolved, out _);
+		this.WriteVerbose($"Reading TGT from {ticketStoreFileName}");
+		var tgtStore = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(ticketStoreFileName), ticketStoreFileName.FileName, out _);
 
 		TicketInfo? sourceTicket;
-		if (ticketStoreFileUnresolved.Length == 0)
+		if (tgtStore.Length == 0)
 		{
-			this.WriteError($"The file {ticketStoreFileUnresolved} does not contain any tickets.");
+			this.WriteError($"The file {ticketStoreFileName} does not contain any tickets.");
 			sourceTicket = null;
 		}
 		else
@@ -44,7 +43,7 @@ public abstract class KdcRequestCommand : TicketRequestCommand, IHaveServerName
 			var tgtCandidates = tgtStore.Where(r => r.IsCurrent && r.IsTgt).ToList();
 			if (tgtCandidates.Count == 0)
 			{
-				this.WriteError($"The file {ticketStoreFileUnresolved} does not contain any valid ticket-granting tickets.");
+				this.WriteError($"The file {ticketStoreFileName} does not contain any valid ticket-granting tickets.");
 				sourceTicket = null;
 			}
 			else

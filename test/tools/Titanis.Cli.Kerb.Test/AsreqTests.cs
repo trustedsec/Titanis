@@ -88,7 +88,7 @@ public class AsreqTests : CliCommandTest<AsreqCommand>
 		EType[] expectedETypes
 		)
 	{
-		var signerCert = new X509Certificate2(this.fileAccess.ReadAllBytesFrom("milchick.pfx"), "password");
+		var signerCert = new X509Certificate2(this.fileAccess.ReadAllBytesFrom(new FileSpec("milchick.pfx")), "password");
 
 		// Initial AS-REQ (no preauth)
 		kerbTransport.Expect(r => r.TransceiveKdcAsync(

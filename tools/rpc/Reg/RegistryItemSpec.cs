@@ -176,7 +176,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 				RegistryValueEncoding.Dword => ParseDword(dataSpec),
 				RegistryValueEncoding.Qword => ParseQword(dataSpec),
 				RegistryValueEncoding.Hex => BinaryHelper.ParseHexString(dataSpec),
-				RegistryValueEncoding.File => ParseFileData(dataSpec, services?.GetService<IFileAccess>(), log),
+				RegistryValueEncoding.File => ParseFileData(new FileSpec(dataSpec), context?.GetService<IFileAccess>(), log),
 				RegistryValueEncoding.Sddl => ParseSecurityDescriptor(dataSpec),
 				RegistryValueEncoding.Unspecified or _ => throw new FormatException("No encoding type specified"),
 			};
@@ -221,7 +221,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 			return Encoding.Unicode.GetBytes(valueText);
 		}
 
-		private byte[] ParseFileData(string filePath, IFileAccess fileAccess, ILog? log)
+		private byte[] ParseFileData(FileSpec filePath, IFileAccess fileAccess, ILog? log)
 		{
             ArgumentNullException.ThrowIfNull(fileAccess);
 

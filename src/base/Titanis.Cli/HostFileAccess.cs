@@ -10,9 +10,13 @@ namespace Titanis.Cli
 	/// </summary>
 	public class HostFileAccess : IFileAccess
 	{
-		public string ResolveFsPath(string path)
+		public string ResolveFsPath(FileSpec path)
 		{
-			return Path.GetFullPath(path);
+			if (path is null) throw new ArgumentNullException(nameof(path));
+			if (path.IsResolved)
+				return path.FileName;
+
+			return Path.GetFullPath(path.FileName);
 		}
 
 		public string[] GetFiles(string directory, string searchPattern)
@@ -20,30 +24,38 @@ namespace Titanis.Cli
 			return Directory.GetFiles(directory, searchPattern);
 		}
 
-		public byte[] ReadAllBytesFrom(string fileName)
+		public byte[] ReadAllBytesFrom(FileSpec fileName)
 		{
-			fileName = this.ResolveFsPath(fileName);
-			return File.ReadAllBytes(fileName);
+			var path = this.ResolveFsPath(fileName);
+			return File.ReadAllBytes(path);
 		}
 
-		public string ReadAllTextFrom(string fileName)
+		public string ReadAllTextFrom(FileSpec fileName)
 		{
-			fileName = this.ResolveFsPath(fileName);
-			return File.ReadAllText(fileName);
+			var path = this.ResolveFsPath(fileName);
+			return File.ReadAllText(path);
 		}
 
-		public bool FileExists(string path) => File.Exists(this.ResolveFsPath(path));
+		public bool FileExists(FileSpec path) => File.Exists(this.ResolveFsPath(path));
 
-		public void WriteAllBytesTo(string fileName, byte[] contents)
+		public Stream OpenRead(FileSpec path) => File.OpenRead(this.ResolveFsPath(path));
+
+		public void WriteAllTextTo(FileSpec fileName, string contents)
 		{
-			fileName = this.ResolveFsPath(fileName);
-			File.WriteAllBytes(fileName, contents);
+			var path = this.ResolveFsPath(fileName);
+			File.WriteAllText(path, contents);
 		}
 
-		public IEnumerable<string> ReadLinesFrom(string fileName)
+		public void WriteAllBytesTo(FileSpec fileName, byte[] contents)
 		{
-			fileName = this.ResolveFsPath(fileName);
-			return File.ReadLines(fileName);
+			var path = this.ResolveFsPath(fileName);
+			File.WriteAllBytes(path, contents);
+		}
+
+		public IEnumerable<string> ReadLinesFrom(FileSpec fileName)
+		{
+			var path = this.ResolveFsPath(fileName);
+			return File.ReadLines(path);
 		}
 	}
 }

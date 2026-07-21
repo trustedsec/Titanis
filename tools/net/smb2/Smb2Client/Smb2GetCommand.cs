@@ -25,7 +25,7 @@ namespace Titanis.Smb2.Cli
 	{
 		[Parameter(UncParamPos + 1)]
 		[Description("Name of local file to write")]
-		public string? DestinationFileName { get; set; }
+		public FileSpec? DestinationFileName { get; set; }
 
 		[Parameter]
 		[Description("Size of chunks to copy")]
@@ -94,11 +94,9 @@ namespace Titanis.Smb2.Cli
 			if (this.Compress.IsSet)
 				readOptions |= Smb2ReadOptions.Compressed;
 
-			var destPath =
-				string.IsNullOrEmpty(this.DestinationFileName) ? null
-				: this.ResolveFsPath(this.DestinationFileName);
+			var destPath = this.DestinationFileName;
 
-			if (destPath != null && (destPath.StartsWith(@"\\") || destPath.StartsWith(@"//")))
+			if (destPath != null && (destPath.FileName.StartsWith(@"\\") || destPath.FileName.StartsWith(@"//")))
 				this.WriteWarning("The destination part appears to be a UNC path.  Note that the destination is resolved using the OS functions and not using configured parameters.");
 
 			// Determine whether the source is a directory
@@ -143,12 +141,12 @@ namespace Titanis.Smb2.Cli
 				{
 					var dir = (Smb2Directory)rootObject;
 
-					if (string.IsNullOrEmpty(destPath))
+					if (destPath is null)
 						throw new InvalidOperationException($"The source path is a directory, but no destination path was specified.");
 					if (this.FileAccessService.FileExists(destPath))
 						throw new InvalidOperationException($"The source path is a directory but the destination path identifies a file.  The destination for a directory copy operation must be a directory.");
 
-					Directory.CreateDirectory(destPath);
+					Directory.CreateDirectory(this.FileAccessService.ResolveFsPath(destPath));
 
 					await CopyDirectory(
 						client,
@@ -176,7 +174,7 @@ namespace Titanis.Smb2.Cli
 
 		private async Task CopyFile(
 			Smb2OpenFile file,
-			string? destPath,
+			FileSpec? destPath,
 			Smb2ReadOptions readOptions,
 			CancellationToken cancellationToken)
 		{
@@ -207,28 +205,30 @@ namespace Titanis.Smb2.Cli
 				}
 
 				// Apply the timestamps from the remote file to the local one
-				if (!string.IsNullOrEmpty(destPath))
+				if (destPath != null)
 				{
-					File.SetCreationTimeUtc(destPath, file.CreationTime);
-					File.SetLastWriteTimeUtc(destPath, file.LastWriteTime);
+					var resolved = this.FileAccessService.ResolveFsPath(destPath);
+					File.SetCreationTimeUtc(resolved, file.CreationTime);
+					File.SetLastWriteTimeUtc(resolved, file.LastWriteTime);
 				}
 			}
 		}
 
-		private Stream GetDestStream(string fileName, FileAttributes fileAttributes, long fileSize)
+		private Stream GetDestStream(FileSpec fileName, FileAttributes fileAttributes, long fileSize)
 		{
-			if (!string.IsNullOrEmpty(fileName))
+			if (fileName != null)
 			{
+				var resolved = this.FileAccessService.ResolveFsPath(fileName);
 				if (this.FileAccessService.FileExists(fileName))
 				{
 					if (this.Overwrite.IsSet)
 					{
-						var attrs = File.GetAttributes(fileName);
+						var attrs = File.GetAttributes(resolved);
 						if (0 != (attrs & (FileAttributes.System | FileAttributes.ReadOnly | FileAttributes.Hidden)))
 						{
 							this.WriteWarning($"{fileName} marked as read-only, hidden, or system; clearing attributes and overwriting.");
 							// Clear the read-only bit
-							File.SetAttributes(fileName, FileAttributes.Normal);
+							File.SetAttributes(resolved, FileAttributes.Normal);
 						}
 					}
 					else
@@ -247,7 +247,7 @@ namespace Titanis.Smb2.Cli
 				try
 				{
 					stream.SetLength(fileSize);
-					File.SetAttributes(fileName, fileAttributes);
+					File.SetAttributes(resolved, fileAttributes);
 				}
 				catch (Exception ex) { }
 				return stream;
@@ -262,7 +262,7 @@ namespace Titanis.Smb2.Cli
 			Smb2Directory dir,
 			UncPath dirPath,
 			WildcardPattern? pattern,
-			string destPath,
+			FileSpec destPath,
 			Smb2ReadOptions readOptions,
 			int depth,
 			CancellationToken cancellationToken)
@@ -282,7 +282,7 @@ namespace Titanis.Smb2.Cli
 
 				// Determine paths of item
 				UncPath itemPath = dirPath.Append(entry.FileName);
-				string destItemPath = Path.Combine(destPath, entry.FileName);
+				var destItemPath = new FileSpec(Path.Combine(this.FileAccessService.ResolveFsPath(destPath), entry.FileName),true);
 
 				try
 				{
@@ -292,7 +292,7 @@ namespace Titanis.Smb2.Cli
 							continue;
 
 						// Create local directory
-						Directory.CreateDirectory(destItemPath);
+						Directory.CreateDirectory(destItemPath.FileName);
 						// Open the remote directory
 						await using (var subdir = (Smb2Directory)await smb.CreateFileAsync(itemPath, this.GetOpenDirectoryCreateInfo(), FileAccess.Read, cancellationToken))
 						{

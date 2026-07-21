@@ -120,7 +120,7 @@ struct ChangeContext
 		object? value = change.Encoding switch
 		{
 			AttributeEncoding.Unspecified => LdapAttribute.ParseSpecialValue(change.Name, change.Value),
-			AttributeEncoding.File => this._fileAccess.ReadAllBytesFrom((this._fileAccess ?? throw new InvalidOperationException($"Unable to read file '{change.Value}' because the command host does not provide file access.")).ResolveFsPath(change.Value)),
+			AttributeEncoding.File => this._fileAccess.ReadAllBytesFrom(new FileSpec(change.Value, false)),
 			AttributeEncoding.Hex => BinaryHelper.ParseHexString(change.Value),
 			AttributeEncoding.Base64 => Convert.FromBase64String(change.Value),
 			_ => throw new FormatException($"Unsupported encoding {change.Encoding}.")

@@ -14,12 +14,12 @@ namespace Titanis.Cli
 		[Parameter]
 		[Description("Name of file containing user's certificate (for PKINIT)")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
-		public string? UserCert { get; set; }
+		public FileSpec? UserCert { get; set; }
 
 		[Parameter]
 		[Description("Name of file containing user's key (for PKINIT)")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
-		public string? UserKey { get; set; }
+		public FileSpec? UserKey { get; set; }
 
 		[Parameter]
 		[Description("Password to decrypt file containing user's key (for PKINIT)")]
@@ -37,7 +37,7 @@ namespace Titanis.Cli
 			// Try loading the certificate
 			// This will populate or validate UserName and UserDomain
 
-			if (!string.IsNullOrEmpty(this.UserCert))
+			if (this.UserCert != null)
 			{
 				AuthenticationParameters.LoadCertificateAndKey(
 					this.RequireFileAccess(),
@@ -68,9 +68,9 @@ namespace Titanis.Cli
 			}
 			else
 			{
-				if (!string.IsNullOrEmpty(this.UserKey))
+				if (this.UserKey != null)
 					context.LogError(new ParameterValidationError(nameof(UserKeyPassword), $"-{nameof(UserKey)} is only valid with -{nameof(UserCert)} or -{nameof(UserKey)}"));
-				if (!string.IsNullOrEmpty(this.UserKeyPassword) && string.IsNullOrEmpty(this.UserCert))
+				if (!string.IsNullOrEmpty(this.UserKeyPassword) && (this.UserCert is null))
 					context.LogError(new ParameterValidationError(nameof(UserKeyPassword), $"-{nameof(UserKeyPassword)} is only valid with -{nameof(UserCert)}"));
 			}
 

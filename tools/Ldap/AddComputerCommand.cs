@@ -29,7 +29,7 @@ internal class AddComputerCommand : AddCommandBase
 
 	[Parameter]
 	[Description("Names of files containing certificates to associate with the user")]
-	public string[]? UserCerts { get; set; }
+	public FileSpec[]? UserCerts { get; set; }
 
 	[Parameter]
 	[Description("Name of installed operating system")]

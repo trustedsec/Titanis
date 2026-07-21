@@ -24,8 +24,8 @@ namespace Titanis.Cli.Kerb
 The command accepts both -TicketCache and -From to specify one or more files to read tickets from.  If -From is specified, -TicketCache is ignored.  This is to facilitate the use of $KRB5CCNAME.  If this environment variable is set, you don't need to specify -From.  If you specify -From, this expresses your desire to ignore the ticket cache.
 
 Specify the source files using -From.  You may specify multiple files and multiple wildcard patterns.  {0} reads all files from the tickets and applies any filters specified before printing the tickets to the screen.  If you specify -Into, the results are written to the file you specify.  Use -Overwrite to overwrite the outptu file if it already exists.")]
-	[Example("Print tickets from all mlichick*.ccache files", @"{0} -From milchick*.ccache", Tag ="AllMilchickCcache")]
-	[Example("Combine tickets from all mlichick*.kirbi files", @"{0} -From milchick*.ccache -Into all-milchick.ccache", Tag ="CombineMilchickCache")]
+	[Example("Print tickets from all milchick*.ccache files", @"{0} -From milchick*.ccache", Tag = "AllMilchickCcache")]
+	[Example("Combine tickets from all milchick*.kirbi files", @"{0} -From milchick*.ccache -Into all-milchick.ccache", Tag = "CombineMilchickCache")]
 	[Example("Print only current tickets from all mlichick*.kirbi files", @"{0} -From milchick*.kirbi -Current")]
 	[Example("Print only TGTs", @"{0} -From milchick*.kirbi -MatchingSpn krbtgt/.*")]
 	[Example("Print only tickets for CIFS", @"{0} -From milchick*.kirbi -MatchingSpn cifs/.*")]
@@ -146,7 +146,7 @@ Specify the source files using -From.  You may specify multiple files and multip
 			this._clientNamePatterns = this.ToRegex(this.MatchingClientName);
 			this._spnPatterns = this.ToRegex(this.MatchingSpn);
 
-			if (string.IsNullOrEmpty(this.TicketCache) && this.From.IsNullOrEmpty())
+			if (this.TicketCache == null && this.From.IsNullOrEmpty())
 			{
 				context.LogError(nameof(From), $"You must specify either -{nameof(this.From)} or -{nameof(this.TicketCache)}");
 			}
@@ -183,10 +183,10 @@ Specify the source files using -From.  You may specify multiple files and multip
 
 			KerberosClient krb = this.CreateKerberosClient(null);
 
-			string[] sourceFileNames;
+			FileSpec[] sourceFileNames;
 			if (this.From != null)
 				sourceFileNames = this.From;
-			else if (!string.IsNullOrEmpty(this.TicketCache))
+			else if (this.TicketCache != null)
 				sourceFileNames = [this.TicketCache];
 			else
 				// This condition should be caught by parameter validation
@@ -208,10 +208,10 @@ Specify the source files using -From.  You may specify multiple files and multip
 				{
 					foreach (var fileName in fileNames)
 					{
-						var filePath = this.ResolveFsPath(fileName);
+						var filePath = fileName;
 						this.WriteVerbose($"Reading file {filePath}");
 
-						var tickets = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(filePath), filePath, out _);
+						var tickets = krb.LoadTicketsFromFile(this.FileAccessService.ReadAllBytesFrom(new FileSpec(filePath, true)), filePath, out _);
 
 						var selected = tickets.Where(this.Matches).ToList();
 
@@ -317,9 +317,9 @@ Specify the source files using -From.  You may specify multiple files and multip
 
 			if (this.Into != null)
 			{
-				var outFileName = this.ResolveFsPath(this.Into);
+				var outFileName = this.Into;
 				this.WriteMessage($"Writing tickets to {outFileName}");
-				var bytes = krb.ExportTickets(allTickets, KerberosClient.GetFormatFromFileName(outFileName));
+				var bytes = krb.ExportTickets(allTickets, KerberosClient.GetFormatFromFileName(outFileName.FileName));
 
 				if (this.FileAccessService.FileExists(outFileName) && !this.Overwrite.IsSet)
 				{
