@@ -5,7 +5,7 @@ using System.Text;
 namespace Titanis.Cli
 {
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-	public class SubcommandAttribute : Attribute
+	public sealed class SubcommandAttribute : Attribute
 	{
 		public SubcommandAttribute(string name, Type handlerType)
 		{
@@ -13,6 +13,7 @@ namespace Titanis.Cli
 			this.CommandType = handlerType;
 		}
 
+		public sealed override object TypeId => this.Name;
 		public string Name { get; }
 		public Type CommandType { get; }
 	}

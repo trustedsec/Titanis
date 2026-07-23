@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Reflection;
 
 namespace Titanis.Cli
@@ -10,20 +11,18 @@ namespace Titanis.Cli
 	/// <seealso cref="ParameterGroupAttribute"/>
 	public class ParameterGroupInfo
 	{
-		internal ParameterGroupInfo(Type groupType, ParameterGroupOptions options)
+		internal ParameterGroupInfo(ParameterGroupOptions options)
 		{
-			this.GroupType = groupType;
 			this.Options = options;
 		}
 
 		internal ParameterGroupInfo(
-			Type groupType,
 			ParameterGroupInfo? nestingGroup,
 			PropertyDescriptor? groupProperty,
 			ConstructorInfo? constructor,
 			string? groupCategory,
 			ParameterGroupOptions options)
-			: this(groupType, options)
+			: this(options)
 		{
 			this.NestingGroup = nestingGroup;
 			this.GroupProperty = groupProperty;
@@ -31,16 +30,16 @@ namespace Titanis.Cli
 			this.GroupCategory = groupCategory;
 		}
 
-		internal object GetGroupObject(Command command, object owner)
-			=> this.GetGroupObject(command, owner, true)!;
-		internal object? GetGroupObject(Command command, object owner, bool create)
+		internal object GetGroupObject(object instance, object owner)
+			=> this.GetGroupObject(instance, owner, true)!;
+		internal object? GetGroupObject(object instance, object owner, bool create)
 		{
 			if (this.NestingGroup != null)
-				owner = this.NestingGroup.GetGroupObject(command, owner);
+				owner = this.NestingGroup.GetGroupObject(instance, owner);
 
 			if (this.GroupProperty == null)
 			{
-				return command;
+				return instance;
 			}
 			else
 			{
@@ -49,17 +48,13 @@ namespace Titanis.Cli
 				{
 					propValue = this.Constructor.Invoke(null);
 					if (propValue is IParameterGroup parmGroup)
-						parmGroup.Initialize(command.Services, command);
+						parmGroup.Initialize((instance as IServiceProvider)?.GetService<IServiceContainer>(), instance);
 					this.GroupProperty.SetValue(owner, propValue);
 				}
 				return propValue;
 			}
 		}
 
-		/// <summary>
-		/// Gets the type implementing this group.
-		/// </summary>
-		public Type GroupType { get; }
 		/// <summary>
 		/// <see cref="ParameterGroupInfo"/> of the group containing this group.
 		/// </summary>

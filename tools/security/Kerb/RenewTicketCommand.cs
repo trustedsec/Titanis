@@ -19,7 +19,8 @@ public class RenewTicketCommand : KdcRequestCommand
 	[Parameter]
 	[Category(ParameterCategories.AuthenticationKerberos)]
 	[Description("Name of file containing a ticket-granting ticket (.kirbi or ccache)")]
-	public string? Ticket { get; set; }
+	[KerberosTicketFileSpec(true)]
+	public FileSpec? Ticket { get; set; }
 
 	[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
 	public TicketParameterGroup TicketParameters { get; set; }

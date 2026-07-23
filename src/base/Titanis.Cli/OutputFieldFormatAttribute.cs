@@ -21,6 +21,7 @@ namespace Titanis.Cli
 			this.FormatterType = formatterType;
 		}
 
+		public override object TypeId => this.FieldName;
 		public string FieldName { get; }
 		public string? FormatString { get; }
 		public Type? FormatterType { get; }

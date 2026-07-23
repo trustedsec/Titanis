@@ -43,7 +43,7 @@ namespace Titanis.Security.Kerberos
 
 		internal readonly KerberosV5Spec2.EncryptionKey key;
 		[Browsable(false)]
-		internal byte[] KeyBytes => this.key.keyvalue;
+		public byte[] KeyBytes => this.key.keyvalue;
 
 		[DisplayName("Key")]
 		public string KeyText => this.KeyBytes.ToHexString();

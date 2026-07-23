@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Titanis.Cli
 {
-	public class TerminalLog : TextWriterLog
+	public class TerminalLog : LogWriter
 	{
-		public TerminalLog(ITerminal terminal) : base((terminal ?? throw new ArgumentNullException(nameof(terminal))).OutputWriter)
+		public TerminalLog(ITerminal terminal)
 		{
 			if (terminal is null) throw new ArgumentNullException(nameof(terminal));
 			Terminal = terminal;
@@ -48,11 +48,6 @@ namespace Titanis.Cli
 				));
 		}
 
-		public override void WriteMessage(LogMessage message)
-		{
-			base.WriteMessage(message);
-		}
-
 		protected override void WriteMessage(LogMessage message, bool lineBreak)
 		{
 			if (message is null) throw new ArgumentNullException(nameof(message));
@@ -68,7 +63,11 @@ namespace Titanis.Cli
 			}
 			else
 			{
-				base.WriteMessage(message, lineBreak);
+				string text = base.FormatMessage(message);
+				if (lineBreak)
+					this.Terminal.WriteOutputLine(text);
+				else
+					this.Terminal.WriteOutput(text);
 			}
 		}
 

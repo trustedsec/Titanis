@@ -140,7 +140,10 @@ namespace Titanis.Security
 
 		public sealed override int GetHashCode()
 		{
-			return System.HashCode.Combine(UserName.GetHashCode(StringComparison.OrdinalIgnoreCase), Realm.GetHashCode(StringComparison.OrdinalIgnoreCase));
+			return System.HashCode.Combine(
+				UserName.GetHashCode(StringComparison.OrdinalIgnoreCase),
+				Realm?.GetHashCode(StringComparison.OrdinalIgnoreCase) ?? 0
+				);
 		}
 
 		public UserPrincipalName WithRealm(string? realm)

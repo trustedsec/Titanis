@@ -89,15 +89,30 @@ namespace Titanis.Cli
 		}
 		public sealed override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
 		{
-			var asDefault = (context is null);
+			var asDefault = (context as ParameterConverterContext)?.IsForDefault ?? false;
 			var specFlag = asDefault ? SwitchParamFlags.None : SwitchParamFlags.Specified;
 			if (value is Boolean b)
-				return new SwitchParam(specFlag | SwitchParamFlags.Set);
+				return new SwitchParam((b ? (specFlag | SwitchParamFlags.Set) : specFlag));
 			else if (value is string str)
 			{
 				return SwitchParam.Parse(str, asDefault);
 			}
 			return base.ConvertFrom(context, culture, value);
+		}
+
+		public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+		{
+			return (destinationType == typeof(bool)) || (destinationType == typeof(bool?)) || base.CanConvertTo(context, destinationType);
+		}
+		public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+		{
+			var sw = (SwitchParam)value;
+			if (destinationType == typeof(bool))
+				return sw.IsSet;
+			else if (destinationType == typeof(bool?))
+				return sw.IsSpecified ? sw.IsSet : null;
+			else
+				return base.ConvertTo(context, culture, value, destinationType);
 		}
 	}
 }

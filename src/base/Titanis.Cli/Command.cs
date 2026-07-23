@@ -36,6 +36,7 @@ namespace Titanis.Cli
 		#region Common fields
 		[Parameter]
 		[Alias("OutputStyle")]
+		[Category(ParameterCategories.Output)]
 		[Description("Determines the output style")]
 		public OutputStyle? ConsoleOutputStyle { get; set; }
 
@@ -43,7 +44,8 @@ namespace Titanis.Cli
 
 
 		private string[]? _outputFields;
-		[Parameter(ParameterFlags.OutputOnly)]
+		[Parameter(ParameterFlags.AffectsOutput)]
+		[Category(ParameterCategories.Output)]
 		[Description("Fields to display in output")]
 		[ValueListProvider(typeof(FieldListProvider))]
 		public string[]? OutputFields
@@ -58,6 +60,7 @@ namespace Titanis.Cli
 		protected bool OutputFieldsSpecified { get; private set; }
 
 		[Parameter]
+		[Category(ParameterCategories.Output)]
 		[Description("Print headers for table/list/CSV/TSV styles")]
 		[DefaultValue(true)]
 		public SwitchParam OutputHeaders { get; set; }
@@ -170,30 +173,74 @@ namespace Titanis.Cli
 					}
 				}
 
-				CommandMetadata metadata = GetCommandMetadata(this.GetType(), context.MetadataContext);
-				this.DefaultOutputStyle = metadata.DefaultOutputStyle;
+				CommandMetadata metadata = this.GetCommandMetadata(context.MetadataContext);
 
-				var validation = this.Parse(args, startIndex, metadata, true);
-				if (validation.Errors.Count > 0)
-					throw new SyntaxException(validation.GenerateMessage());
+				var paramValues = this.Parse(args, startIndex, metadata);
+				return InvokeAsync(metadata, paramValues, cancellationToken);
+			}
+		}
 
-				try
+		public Task<int> InvokeAsync(ICommandContext context, Dictionary<string, object?> paramValues, CancellationToken cancellationToken)
+		{
+			if (context is null) throw new ArgumentNullException(nameof(context));
+			this.Context = context;
+			try
+			{
+				CommandMetadata metadata = this.GetCommandMetadata(context.MetadataContext);
+
+				var paramValueList = new Dictionary<ParameterMetadata, object?>();
+				if (paramValues != null)
 				{
-					if (metadata.OutputRecordType is not null)
+					foreach (var entry in paramValues)
 					{
-						if (this.OutputFields == null)
-							this._outputFields = metadata.DefaultOutputFields;
-						else if (this.OutputFields.Length == 1 && this.OutputFields[0] is "*")
-							this.OutputFields = null;
-
-						this.SetOutputFormat(this.ConsoleOutputStyle ?? metadata.DefaultOutputStyle);
+						if (metadata.ParametersByName.TryGetValue(entry.Key, out var param))
+							paramValueList.Add(param, entry.Value);
 					}
 				}
-				catch { }
 
-				this.PrintBanner();
-				return this.RunAsync(cancellationToken);
+				return this.InvokeAsync(metadata, paramValueList, cancellationToken);
 			}
+			finally
+			{
+				this.Context = null;
+			}
+		}
+		private Task<int> InvokeAsync(CommandMetadata metadata, Dictionary<ParameterMetadata, object?>? paramValues, CancellationToken cancellationToken)
+		{
+			Debug.Assert(this.Context != null);
+			var context = this.Context;
+			ImportEnvDefaults(metadata, paramValues, context);
+
+			this.DefaultOutputStyle = metadata.DefaultOutputStyle;
+			ApplyValues(paramValues, context, metadata);
+
+			var validateContext = new ParameterValidationContext();
+			foreach (var group in metadata.ParameterGroups)
+			{
+				var groupObj = group.GetGroupObject(this, false);
+				if (groupObj is IValidateParameters validator)
+					validator.ValidateParameters(validateContext, group.Options);
+			}
+
+			if (validateContext.Errors.Count > 0)
+				throw new SyntaxException(validateContext.Errors);
+
+			try
+			{
+				if (metadata.OutputRecordType is not null)
+				{
+					if (this.OutputFields == null)
+						this._outputFields = metadata.DefaultOutputFields;
+					else if (this.OutputFields.Length == 1 && this.OutputFields[0] is "*")
+						this.OutputFields = null;
+
+					this.SetOutputFormat(this.ConsoleOutputStyle ?? metadata.DefaultOutputStyle);
+				}
+			}
+			catch { }
+
+			this.PrintBanner();
+			return this.RunAsync(cancellationToken);
 		}
 
 #if DEBUG
@@ -223,7 +270,8 @@ namespace Titanis.Cli
 		{
 			if (context is null) throw new ArgumentNullException(nameof(context));
 
-			var desc = context.Resolver.GetCustomAttribute<DescriptionAttribute>(commandType, true)?.Description;
+			ICustomTypeDescriptor typeDescr = context.Resolver.GetDescriptor(commandType);
+			var desc = typeDescr.GetCustomAttribute<DescriptionAttribute>(true)?.Description;
 
 			writer
 				.WriteBodyTextLine(desc)
@@ -280,6 +328,7 @@ namespace Titanis.Cli
 			}
 
 			var namedParams = md.Parameters.Where(r => !r.IsPositional).ToList();
+			namedParams.Sort((x, y) => x.Name.CompareTo(y.Name));
 			if (namedParams.Count > 0)
 			{
 				writer.AppendLine().WriteHeading("Options").AppendLine();
@@ -305,7 +354,7 @@ namespace Titanis.Cli
 				writer.AppendLine().WriteHeading("Details").AppendLine().WriteBodyTextLine(string.Format(details, commandName));
 			}
 
-			var examples = GetExamples(commandType, context);
+			var examples = GetExamples(typeDescr, context);
 			if (examples.Count > 0)
 			{
 				writer.AppendLine().WriteHeading("Examples");
@@ -333,7 +382,7 @@ namespace Titanis.Cli
 {prefix}() {{
   _arguments \");
 
-			var md = GetCommandMetadata(this.GetType(), context);
+			var md = this.GetCommandMetadata(context);
 			var parameters = md.Parameters;
 
 			var groups = parameters.OrderBy(r => r.Name).GroupBy(r => r.IsPositional ? null : r.Category);
@@ -384,9 +433,10 @@ namespace Titanis.Cli
 			writer.WriteLine('}');
 		}
 
-		private static IList<ExampleAttribute> GetExamples(Type commandType, CommandMetadataContext context)
+		private static IList<ExampleAttribute> GetExamples(ICustomTypeDescriptor typeDescr, CommandMetadataContext context)
 		{
-			var examples = context.Resolver.GetCustomAttributes<ExampleAttribute>(commandType, true).ToList();
+			var attrs = typeDescr.GetAttributes();
+			var examples = attrs.OfType<ExampleAttribute>().ToList();
 			return examples;
 		}
 
@@ -475,7 +525,16 @@ namespace Titanis.Cli
 		/// <exception cref="ArgumentException"><paramref name="commandType"/> does not inherit <see cref="Command"/></exception>
 		public static CommandMetadata GetCommandMetadata(Type commandType, CommandMetadataContext context)
 		{
-			return new CommandMetadata(commandType, context);
+			return new CommandMetadata(context.Resolver.GetDescriptor(commandType), commandType, context);
+		}
+
+		/// <summary>
+		/// Gets the metadata describing the command and its parameters.
+		/// </summary>
+		/// <returns></returns>
+		public CommandMetadata GetCommandMetadata(CommandMetadataContext context)
+		{
+			return new CommandMetadata(context.Resolver.GetDescriptor(this), this.GetType(), context);
 		}
 
 		/// <summary>
@@ -494,6 +553,10 @@ namespace Titanis.Cli
 				return converter_;
 			}
 
+			if (paramType.IsEnum)
+				// The built-in enum converter is overly strict and cannot handle undefined values like 0.
+				return new EnumConverter(paramType);
+
 			var converter = TypeDescriptor.GetConverter(paramType);
 			if (converter != null)
 			{
@@ -508,39 +571,32 @@ namespace Titanis.Cli
 				return converter;
 			}
 
-			if (paramType.GetTypeInfo().IsEnum)
+			TypeCode typeCode = Type.GetTypeCode(paramType);
+			switch (typeCode)
 			{
-				return new EnumConverter(paramType);
-			}
-			else
-			{
-				TypeCode typeCode = Type.GetTypeCode(paramType);
-				switch (typeCode)
-				{
-					case TypeCode.Boolean: return Singleton.SingleInstance<BooleanConverter>();
-					case TypeCode.Char: return Singleton.SingleInstance<CharConverter>();
-					case TypeCode.SByte: return new IntegerConverter<sbyte>(Singleton.SingleInstance<SByteConverter>(), sbyte.Parse, 8);
-					case TypeCode.Byte: return new IntegerConverter<byte>(Singleton.SingleInstance<ByteConverter>(), byte.Parse, 8);
-					case TypeCode.Int16: return new IntegerConverter<short>(Singleton.SingleInstance<Int16Converter>(), short.Parse, 16);
-					case TypeCode.UInt16: return new IntegerConverter<ushort>(Singleton.SingleInstance<UInt16Converter>(), ushort.Parse, 16);
-					case TypeCode.Int32: return new IntegerConverter<int>(Singleton.SingleInstance<Int32Converter>(), int.Parse, 32);
-					case TypeCode.UInt32: return new IntegerConverter<uint>(Singleton.SingleInstance<UInt32Converter>(), uint.Parse, 32);
-					case TypeCode.Int64: return new IntegerConverter<long>(Singleton.SingleInstance<Int64Converter>(), long.Parse, 64);
-					case TypeCode.UInt64: return new IntegerConverter<ulong>(Singleton.SingleInstance<UInt64Converter>(), ulong.Parse, 64);
-					case TypeCode.Single: return Singleton.SingleInstance<SingleConverter>();
-					case TypeCode.Double: return Singleton.SingleInstance<DoubleConverter>();
-					case TypeCode.Decimal: return Singleton.SingleInstance<DecimalConverter>();
-					case TypeCode.DateTime: return Singleton.SingleInstance<DateTimeConverter>();
-					case TypeCode.String: return Singleton.SingleInstance<StringConverter>();
-					case TypeCode.Empty:
-					//case TypeCode.DBNull:
-					default:
-						throw new ArgumentException(string.Format(Messages.Cli_UnsupportedParamType, paramType.FullName));
-				}
+				case TypeCode.Boolean: return Singleton.SingleInstance<BooleanConverter>();
+				case TypeCode.Char: return Singleton.SingleInstance<CharConverter>();
+				case TypeCode.SByte: return new IntegerConverter<sbyte>(Singleton.SingleInstance<SByteConverter>(), sbyte.Parse, 8);
+				case TypeCode.Byte: return new IntegerConverter<byte>(Singleton.SingleInstance<ByteConverter>(), byte.Parse, 8);
+				case TypeCode.Int16: return new IntegerConverter<short>(Singleton.SingleInstance<Int16Converter>(), short.Parse, 16);
+				case TypeCode.UInt16: return new IntegerConverter<ushort>(Singleton.SingleInstance<UInt16Converter>(), ushort.Parse, 16);
+				case TypeCode.Int32: return new IntegerConverter<int>(Singleton.SingleInstance<Int32Converter>(), int.Parse, 32);
+				case TypeCode.UInt32: return new IntegerConverter<uint>(Singleton.SingleInstance<UInt32Converter>(), uint.Parse, 32);
+				case TypeCode.Int64: return new IntegerConverter<long>(Singleton.SingleInstance<Int64Converter>(), long.Parse, 64);
+				case TypeCode.UInt64: return new IntegerConverter<ulong>(Singleton.SingleInstance<UInt64Converter>(), ulong.Parse, 64);
+				case TypeCode.Single: return Singleton.SingleInstance<SingleConverter>();
+				case TypeCode.Double: return Singleton.SingleInstance<DoubleConverter>();
+				case TypeCode.Decimal: return Singleton.SingleInstance<DecimalConverter>();
+				case TypeCode.DateTime: return Singleton.SingleInstance<DateTimeConverter>();
+				case TypeCode.String: return Singleton.SingleInstance<StringConverter>();
+				case TypeCode.Empty:
+				//case TypeCode.DBNull:
+				default:
+					throw new ArgumentException(string.Format(Messages.Cli_UnsupportedParamType, paramType.FullName));
 			}
 		}
 
-		private ParameterValidationContext Parse(IList<Token> tokens, int startIndex, CommandMetadata metadata, bool useEnvDefaults)
+		private Dictionary<ParameterMetadata, object?> Parse(IList<Token> tokens, int startIndex, CommandMetadata metadata)
 		{
 			Dictionary<ParameterMetadata, object?> setParams = new();
 			var context = this.Context;
@@ -557,7 +613,7 @@ namespace Titanis.Cli
 			bool isFinalPos = false;
 			bool endOfOptions = false;
 
-			ParameterConverterContext converterContext = new ParameterConverterContext(this);
+			ParameterConverterContext converterContext = new ParameterConverterContext(this, null, ParameterConverterContextOptions.None);
 			int positionalIndex = 0;
 			for (int i = startIndex; i < tokens.Count; i++)
 			{
@@ -731,91 +787,105 @@ namespace Titanis.Cli
 
 				if (argValue != UnsetValue)
 				{
-					parameter.SetValue(this, argValue);
 					if (setParams.ContainsKey(parameter))
 						throw new ParameterSyntaxException(parameter.Name, $"Parameter {parameter.Name} is specified more than once.");
 					setParams.Add(parameter, argValue);
 				}
 			}
 
-			// Import environment defaults
-			if (useEnvDefaults)
+			return setParams;
+		}
+
+		private void ImportEnvDefaults(CommandMetadata metadata, Dictionary<ParameterMetadata, object?> setParams, ICommandContext? context)
+		{
+			ParameterConverterContext converterContext = new ParameterConverterContext(this, null, ParameterConverterContextOptions.None);
+			foreach (var param in metadata.Parameters)
 			{
-				foreach (var param in metadata.Parameters)
+				if (!setParams.ContainsKey(param))
 				{
-					if (!setParams.ContainsKey(param))
+					object? envValue = null;
+					if (param.EnvironmentVariable is not null)
+						envValue = context?.GetVariable(param.EnvironmentVariable);
+					if (envValue is null)
 					{
-						object? envValue = null;
-						if (param.EnvironmentVariable is not null)
-							envValue = context?.GetVariable(param.EnvironmentVariable);
-						if (envValue is null)
+						var envKey = $"TITANIS_DEFAULT_" + param.Name.ToUpper();
+						envValue = context?.GetVariable(envKey);
+					}
+					if (envValue is not null)
+					{
+						if (param.IsList)
 						{
-							var envKey = $"TITANIS_DEFAULT_" + param.Name.ToUpper();
-							envValue = context?.GetVariable(envKey);
-						}
-						if (envValue is not null)
-						{
-							if (param.IsList)
+							Array arrDefault;
+							if (envValue is string str)
 							{
-								Array arrDefault;
-								if (envValue is string str)
-								{
-									var defaultTokens = CommandLineParser.Tokenize(str);
-									arrDefault = defaultTokens;
-								}
-								else if (envValue is Array arr)
-								{
-									arrDefault = arr;
-								}
-								else
-								{
-									arrDefault = new object[] { envValue };
-								}
-
-								Array arrCoerced = Array.CreateInstance(param.ElementType, arrDefault.Length);
-								bool failed = false;
-								for (int i = 0; i < arrDefault.Length; i++)
-								{
-									var defaultElem = arrDefault.GetValue(i);
-
-									try
-									{
-										this.WriteMessage($"Importing default for '{param.Name}': {defaultElem}");
-										converterContext.Parameter = param;
-										var coerced = param.ConvertValue(defaultElem, converterContext);
-										arrCoerced.SetValue(coerced, i);
-									}
-									catch (Exception ex)
-									{
-										failed = true;
-										this.WriteWarning($"Failed to parse default value '{envValue}' for parameter '{param.Name}': {ex.Message}");
-									}
-								}
-
-								if (!failed)
-								{
-									param.SetValue(this, arrCoerced);
-									setParams.Add(param, arrCoerced);
-								}
+								var defaultTokens = CommandLineParser.Tokenize(str);
+								arrDefault = defaultTokens;
+							}
+							else if (envValue is Array arr)
+							{
+								arrDefault = arr;
 							}
 							else
 							{
+								arrDefault = new object[] { envValue };
+							}
+
+							Array arrCoerced = Array.CreateInstance(param.ElementType, arrDefault.Length);
+							bool failed = false;
+							for (int i = 0; i < arrDefault.Length; i++)
+							{
+								var defaultElem = arrDefault.GetValue(i);
+
 								try
 								{
-									this.WriteMessage($"Importing default for '{param.Name}': {envValue}");
+									this.WriteMessage($"Importing default for '{param.Name}': {defaultElem}");
 									converterContext.Parameter = param;
-									var coerced = param.ConvertValue(envValue, converterContext);
-									param.SetValue(this, coerced);
-									setParams.Add(param, coerced);
+									var coerced = param.ConvertValue(defaultElem, converterContext);
+									arrCoerced.SetValue(coerced, i);
 								}
 								catch (Exception ex)
 								{
+									failed = true;
 									this.WriteWarning($"Failed to parse default value '{envValue}' for parameter '{param.Name}': {ex.Message}");
 								}
+							}
+
+							if (!failed)
+							{
+								setParams.Add(param, arrCoerced);
+							}
+						}
+						else
+						{
+							try
+							{
+								this.WriteMessage($"Importing default for '{param.Name}': {envValue}");
+								converterContext.Parameter = param;
+								var coerced = param.ConvertValue(envValue, converterContext);
+								setParams.Add(param, coerced);
+							}
+							catch (Exception ex)
+							{
+								this.WriteWarning($"Failed to parse default value '{envValue}' for parameter '{param.Name}': {ex.Message}");
 							}
 						}
 					}
 				}
+			}
+		}
+
+		private static object UnsetValue = new object();
+
+		void ApplyValues(
+			Dictionary<ParameterMetadata, object?> setParams,
+			ICommandContext context,
+			CommandMetadata metadata
+			)
+		{
+			foreach (var paramEntry in setParams)
+			{
+				var argValue = paramEntry.Value;
+				paramEntry.Key.SetValue(this, argValue);
 			}
 
 			{
@@ -824,24 +894,6 @@ namespace Titanis.Cli
 				{
 					if (!setParams.ContainsKey(param))
 					{
-						if (useEnvDefaults)
-						{
-							var envKey = $"TITANIS_DEFAULT_" + param.Name.ToUpper();
-							var envValue = context?.GetVariable(envKey);
-							if (envValue is not null)
-							{
-								try
-								{
-									converterContext.Parameter = param;
-									var value = param.ConvertValue(envValue, converterContext);
-								}
-								catch (Exception ex)
-								{
-									this.WriteWarning($"Failed to parse default value '{envValue}' for parameter '{param.Name}': {ex.Message}");
-								}
-							}
-						}
-
 						if (param.IsMandatory)
 							(missingParamNames ??= new()).Add(param.Name);
 						else if (param.HasDefaultValue)
@@ -858,21 +910,7 @@ namespace Titanis.Cli
 					throw new MissingParametersException(missingParamNames.ToArray());
 				}
 			}
-
-			{
-				var validateContext = new ParameterValidationContext();
-				foreach (var group in metadata.ParameterGroups)
-				{
-					var groupObj = group.GetGroupObject(this, false);
-					if (groupObj is IValidateParameters validator)
-						validator.ValidateParameters(validateContext, group.Options);
-				}
-
-				return validateContext;
-			}
 		}
-
-		private static object UnsetValue = new object();
 
 		#region Callback support
 		public virtual TCallback? GetCallback<TCallback>()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Linq;
@@ -36,7 +37,11 @@ namespace Titanis.Cli
 		/// <summary>
 		/// The parameter is only available if an OutputRecordType is specified.
 		/// </summary>
-		OutputOnly = 0x10,
+		AffectsOutput = 0x10,
+		/// <summary>
+		/// The parameter provides output only and does not accept input.
+		/// </summary>
+		OutputOnly = 0x20,
 	}
 
 	/// <summary>
@@ -86,6 +91,9 @@ namespace Titanis.Cli
 			if (property.PropertyType == typeof(SwitchParam))
 				flags |= ParameterFlags.IsSwitch;
 
+			if (property.IsReadOnly)
+				flags |= ParameterFlags.OutputOnly;
+
 			// Element type
 			Type? elementType;
 			if (property.PropertyType.IsArray)
@@ -122,6 +130,8 @@ namespace Titanis.Cli
 			// Category
 			// Don't use property.Category, since this returns "Misc" if no category is specified.
 			this.Category = property.GetCustomAttribute<CategoryAttribute>()?.Category;
+			// DisplayName
+			this.DisplayName = property.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? MakeDisplayName(property.Name);
 			// Environment
 			this.EnvironmentVariable = attr.EnvironmentVariable;
 			// Placeholder
@@ -139,6 +149,13 @@ namespace Titanis.Cli
 					this.RawDefaultValue = defaultValue;
 					flags |= ParameterFlags.HasDefaultValue;
 				}
+			}
+
+			// File type info
+			{
+				var atrFileSpec = property.GetCustomAttribute<FileSpecAttribute>(true);
+				this.IsFileSpec = (atrFileSpec != null);
+				this._atrFileSpec = atrFileSpec;
 			}
 
 			// Value list
@@ -181,6 +198,36 @@ namespace Titanis.Cli
 			}
 
 			this.Flags = flags;
+		}
+
+		private string? MakeDisplayName(string name)
+		{
+			if (string.IsNullOrEmpty(name))
+				return name;
+
+			StringBuilder sb = new StringBuilder(name.Length);
+			char p = name[0];
+			bool pendingCaps = true;
+			for (int i = 1; i <= name.Length; i++)
+			{
+				char c = (i < name.Length) ? name[i] : '\0';
+
+				if (char.IsLower(p) && char.IsUpper(c))
+				{
+					sb.Append(p).Append(' ');
+				}
+				else
+				{
+					if (!pendingCaps && !char.IsUpper(c))
+						p = char.ToLower(p);
+					pendingCaps = char.IsUpper(c) && char.IsUpper(p);
+					sb.Append(p);
+				}
+
+				p = c;
+			}
+
+			return sb.ToString();
 		}
 
 		/// <summary>
@@ -232,6 +279,8 @@ namespace Titanis.Cli
 		/// Gets a <see cref="ParameterFlags"/> value describing aspects of the parameter.
 		/// </summary>
 		public ParameterFlags Flags { get; }
+		public bool IsOutputOnly => 0 != (this.Flags & ParameterFlags.OutputOnly);
+		public bool AffectsOutput => 0 != (this.Flags & ParameterFlags.AffectsOutput);
 		/// <summary>
 		/// Gets a value indicating whether a parameter is positional.
 		/// </summary>
@@ -240,6 +289,8 @@ namespace Titanis.Cli
 		/// Gets the name of the parameter.
 		/// </summary>
 		public string Name => this.Property.Name;
+		public string? DisplayName { get; }
+
 		/// <summary>
 		/// Gets a list of aliases for this parameter.
 		/// </summary>
@@ -271,7 +322,7 @@ namespace Titanis.Cli
 		public string? EnvironmentVariable { get; }
 
 		// Converter
-		private TypeConverter GetConverter()
+		public TypeConverter GetConverter()
 		{
 			var paramConverter = Command.GetScalarParamConverter(this.ElementType, this.Property);
 			return paramConverter;
@@ -301,7 +352,7 @@ namespace Titanis.Cli
 				{
 					var converter = this.GetConverter();
 					if (converter != null)
-						defaultValue = converter.ConvertFrom(null, null, defaultValue);
+						defaultValue = converter.ConvertFrom(new ParameterConverterContext(null, this, ParameterConverterContextOptions.ForDefault), null, defaultValue);
 				}
 				return defaultValue;
 			}
@@ -323,6 +374,11 @@ namespace Titanis.Cli
 		/// Ges a value indicating whether the parameter accepts a list of values.
 		/// </summary>
 		public bool IsList => 0 != (this.Flags & ParameterFlags.IsList);
+
+		private readonly FileSpecAttribute? _atrFileSpec;
+		public bool IsFileSpec { get; }
+		public bool FileMustExist => this._atrFileSpec?.MustExist ?? false;
+		public ImmutableArray<FileTypeInfo> FileTypes => this._atrFileSpec?.FileTypes ?? [];
 
 		/// <summary>
 		/// Gets a value indicating whether the parameter defines a list of values.
@@ -365,7 +421,7 @@ namespace Titanis.Cli
 			return this.GetConverter().ConvertFrom(context, null, rawValue);
 		}
 
-		private object GetGroupObject(Command command, object owner, ParameterGroupInfo? group) => group == null ? owner : group.GetGroupObject(command, owner);
+		private object GetGroupObject(object instance, object owner, ParameterGroupInfo? group) => group == null ? owner : group.GetGroupObject(instance, owner);
 		/// <summary>
 		/// Sets the value of the parameter.
 		/// </summary>
@@ -376,7 +432,7 @@ namespace Titanis.Cli
 		/// <paramref name="argValue"/> must be of the correct type.
 		/// Use <see cref="ConvertValue(object, ITypeDescriptorContext?)"/> to convert the values if necessary.
 		/// </remarks>
-		public void SetValue(Command command, object? argValue)
+		public void SetValue(object command, object? argValue)
 		{
 			if (command is null) throw new ArgumentNullException(nameof(command));
 

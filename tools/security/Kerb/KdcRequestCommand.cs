@@ -24,7 +24,8 @@ public abstract class KdcRequestCommand : TicketRequestCommand, IHaveServerName
 
 	[Parameter]
 	[Description("Name of file containing armor ticket")]
-	public string? ArmorTicket { get; set; }
+	[KerberosTicketFileSpec(true)]
+	public FileSpec? ArmorTicket { get; set; }
 
 	protected TicketInfo? LoadTgtFromStore(KerberosClient krb, string ticketStoreFileUnresolved)
 	{

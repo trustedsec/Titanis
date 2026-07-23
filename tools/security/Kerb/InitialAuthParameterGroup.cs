@@ -52,7 +52,8 @@ public class InitialAuthParameterGroup : ParameterGroupBase
 	[Parameter(EnvironmentVariable = "KRB5_CLIENT_KTNAME")]
 	[Description("Name of keytab file")]
 	[Category(ParameterCategories.AuthenticationKerberos)]
-	public string? Keytab { get; set; }
+	[KeytabFileSpec(true)]
+	public FileSpec? Keytab { get; set; }
 
 	private X509Certificate2? _userCert;
 

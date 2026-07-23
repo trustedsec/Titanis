@@ -78,11 +78,13 @@ namespace Titanis.Cli
 
 		/// <inheritdoc/>
 		public sealed override void GetHelpText(IDocWriter writer, string commandName, CommandMetadataContext context) => BuildCommandHelpText(this.GetType().GetTypeInfo(), writer, commandName, context);
-		public static void BuildCommandHelpText(TypeInfo commandType, IDocWriter writer, string commandName, CommandMetadataContext context)
+		public static void BuildCommandHelpText(Type commandType_, IDocWriter writer, string commandName, CommandMetadataContext context)
 		{
 			if (context is null) throw new ArgumentNullException(nameof(context));
 
-			var desc = context.Resolver.GetCustomAttribute<DescriptionAttribute>(commandType, true)?.Description;
+			var commandTypeDescr = context.Resolver.GetDescriptor(commandType_);
+			var commandAttrs = commandTypeDescr.GetAttributes().OfType<Attribute>().ToArray();
+			var desc = commandAttrs.OfType<DescriptionAttribute>().FirstOrDefault()?.Description;
 
 			writer
 				.WriteBodyTextLine(desc)
@@ -97,7 +99,7 @@ namespace Titanis.Cli
 
 			writer.WriteSubheading("Subcommands");
 
-			SubcommandAttribute[] attrs = context.Resolver.GetCustomAttributes<SubcommandAttribute>(commandType, true).ToArray();
+			SubcommandAttribute[] attrs = commandAttrs.OfType<SubcommandAttribute>().ToArray();
 			Array.Sort(attrs, (x, y) => x.Name.CompareTo(y.Name));
 			TextTable tbl = new TextTable() { LeftMargin = "  " };
 			foreach (var attr in attrs)

@@ -108,10 +108,12 @@ namespace Titanis.Cli
 			List<OutputField> fields = new List<OutputField>(props.Count);
 			if (fieldNames != null)
 			{
-				var propsByName = props.OfType<PropertyDescriptor>().ToDictionary(r => r.Name, StringComparer.OrdinalIgnoreCase);
+				// If the descriptor has duplicate property names, handle gracefully
+				var propsByName = props.OfType<PropertyDescriptor>().ToLookup(r => r.Name, StringComparer.OrdinalIgnoreCase);
 				foreach (var name in fieldNames)
 				{
-					if (propsByName.TryGetValue(name, out var prop))
+					var prop = propsByName[name].FirstOrDefault();
+					if (prop != null)
 						fields.Add(new PropertyOutputField(prop, context));
 					else if (includeDummyFields)
 						fields.Add(new DummyOutputField(name, name, null, DisplayAlignment.Left));

@@ -23,6 +23,7 @@ You may specify multiple values.  Each output record prints both the numeric val
 public class TimestampCommand : Command
 {
 	[Parameter(0)]
+	[Description("Timestamp or date to convert")]
 	public string[] TimestampOrDate { get; set; }
 
 	protected override Task<int> RunAsync(CancellationToken cancellationToken)

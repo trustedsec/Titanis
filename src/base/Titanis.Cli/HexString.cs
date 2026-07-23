@@ -16,7 +16,7 @@ namespace Titanis.Cli
 	[TypeConverter(typeof(HexStringConverter))]
 	public class HexString
 	{
-		public HexString(byte[] bytes, string? originalText)
+		public HexString(byte[] bytes, string? originalText = null)
 		{
 			if (bytes == null)
 				throw new ArgumentNullException(nameof(bytes));
@@ -26,6 +26,8 @@ namespace Titanis.Cli
 
 		public byte[] Bytes { get; }
 		public string? OriginalText { get; }
+
+		public override string ToString() => this.OriginalText ?? ((this.Bytes != null) ? BinaryHelper.ToHexString(this.Bytes) : string.Empty);
 
 		public static HexString Parse(string text)
 		{

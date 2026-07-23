@@ -41,6 +41,8 @@ namespace Titanis.Cli
 	{
 		private List<ParameterValidationError> _errors = new List<ParameterValidationError>();
 
+		internal Dictionary<ParameterMetadata, object?> parsedValues = new Dictionary<ParameterMetadata, object?>();
+
 		/// <summary>
 		/// Gets a list of reported errors.
 		/// </summary>
@@ -67,26 +69,6 @@ namespace Titanis.Cli
 		{
 			if (error is null) throw new ArgumentNullException(nameof(error));
 			this._errors.Add(error);
-		}
-
-		/// <summary>
-		/// Generates a message describing the logged errors.
-		/// </summary>
-		/// <returns>A string</returns>
-		public string GenerateMessage()
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.AppendLine("One or more problems were encountered during parameter validation.");
-			foreach (var error in this.Errors)
-			{
-				var name = error.ParameterName;
-				if (string.IsNullOrEmpty(name))
-					sb.AppendLine(error.Message);
-				else
-					sb.AppendLine($"{name}: {error.Message}");
-			}
-
-			return sb.ToString();
 		}
 	}
 }

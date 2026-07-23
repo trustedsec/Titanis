@@ -99,7 +99,7 @@ namespace Titanis.Cli
 		public ICommandContext? Context
 		{
 			get => this._context;
-			private set
+			private protected set
 			{
 				this._context = value;
 				if (value != null)
@@ -500,13 +500,16 @@ namespace Titanis.Cli
 			return rc;
 		}
 
-		internal static string GetDetailedHelp(Type commandType, CommandMetadataContext context)
+		internal static string GetDetailedHelp(
+			Type commandType,
+			CommandMetadataContext context)
 		{
 			StringBuilder sb = new StringBuilder();
 			DocumentationPlacement place = 0;
 			while (commandType != null)
 			{
-				var det = context.Resolver.GetCustomAttribute<DetailedHelpTextAttribute>(commandType, true);
+				var typeDescr = context.Resolver.GetDescriptor(commandType);
+				var det = typeDescr.GetCustomAttribute<DetailedHelpTextAttribute>(true);
 				if (det != null)
 				{
 					if (sb.Length > 0)

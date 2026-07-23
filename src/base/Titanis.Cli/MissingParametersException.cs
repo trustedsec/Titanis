@@ -16,8 +16,13 @@ namespace Titanis.Cli
 		/// Initializes a new <see cref="MissingParametersException"/>.
 		/// </summary>
 		/// <param name="missingParameterNames">Names of missing parameters</param>
-		public MissingParametersException(string[] missingParameterNames) : base(string.Format(Messages.Cli_MandatoryArgMissing_ParamNames, string.Join(", ", missingParameterNames)))
+		public MissingParametersException(string[] missingParameterNames) : base(CreateErrors(missingParameterNames), string.Format(Messages.Cli_MandatoryArgMissing_ParamNames, string.Join(", ", missingParameterNames)))
 		{
+		}
+
+		private static IReadOnlyList<ParameterValidationError> CreateErrors(string[] missingParameterNames)
+		{
+			return Array.ConvertAll(missingParameterNames, r => new ParameterValidationError(r, "The mandatory parameter was not provided."));
 		}
 
 		/// <summary>

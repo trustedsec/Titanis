@@ -17,6 +17,7 @@ namespace Titanis.Cli
 			this.Explanation = explanation;
 		}
 
+		public override object TypeId => this.Caption;
 		public string Caption { get; }
 		public string CommandLine { get; }
 		public string? Explanation { get; }

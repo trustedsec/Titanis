@@ -126,6 +126,8 @@ public class TestFileAccess : IFileAccess
 		return info != null;
 	}
 
+	public Stream OpenRead(FileSpec path) => throw new NotImplementedException();
+
 	private Dictionary<string, byte[]> _writtenFiles = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
 
 	public void WriteAllBytesTo(string fileName, byte[] contents)

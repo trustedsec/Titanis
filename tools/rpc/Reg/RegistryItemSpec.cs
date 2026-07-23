@@ -165,8 +165,7 @@ namespace Titanis.Msrpc.Msrrp.Cli
 
 			var dataSpec = m.Groups["d"].Value;
 
-			var services = (context?.Instance as IServiceProvider);
-			var log = services?.GetService<ILog>();
+			var log = context?.GetService<ILog>();
 
 			byte[] valueData = enc switch
 			{
@@ -225,8 +224,6 @@ namespace Titanis.Msrpc.Msrrp.Cli
 		private byte[] ParseFileData(string filePath, IFileAccess fileAccess, ILog? log)
 		{
             ArgumentNullException.ThrowIfNull(fileAccess);
-
-            filePath = fileAccess?.ResolveFsPath(filePath);
 
 			log.WriteDiagnostic($"Reading file {filePath}");
 			var data = fileAccess.ReadAllBytesFrom(filePath);

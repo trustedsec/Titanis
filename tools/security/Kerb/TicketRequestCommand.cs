@@ -15,7 +15,8 @@ public abstract class TicketRequestCommand : Command
 	[Parameter]
 	[Category(ParameterCategories.Output)]
 	[Description("Name of file to write ticket to")]
-	public string? OutputFileName { get; set; }
+	[KerberosTicketFileSpec(false)]
+	public FileSpec? OutputFileName { get; set; }
 
 	[Parameter]
 	[Category(ParameterCategories.Output)]
@@ -30,7 +31,8 @@ public abstract class TicketRequestCommand : Command
 	[Parameter(EnvironmentVariable = KerberosClient.Krb5CacheVariableName)]
 	[Category(ParameterCategories.AuthenticationKerberos)]
 	[Description("Name of ticket cache file")]
-	public string? TicketCache { get; set; }
+	[KerberosTicketFileSpec(false)]
+	public FileSpec? TicketCache { get; set; }
 
 	[Parameter]
 	[Category(ParameterCategories.AuthenticationKerberos)]

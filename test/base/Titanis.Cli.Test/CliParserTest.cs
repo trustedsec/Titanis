@@ -42,7 +42,7 @@ namespace Titanis.Cli.Test
 			var tokens = CommandLineParser.Tokenize(cmdline);
 
 			CommandMetadataContext mdContext = new CommandMetadataContext(MetadataResolver.Default);
-			var md = Command.GetCommandMetadata(typeof(TCommand), mdContext);
+			var md = cmd.GetCommandMetadata(mdContext);
 			var log = new TestLog();
 
 			MockRepository mocks = new Mocks.MockRepository();

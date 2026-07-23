@@ -6,72 +6,49 @@ using System.Text.Json;
 
 namespace Titanis.Cli
 {
-	public class TextWriterLog : ILog
+	public abstract class LogWriter : ILog
 	{
-		public TextWriterLog(TextWriter writer)
-		{
-			if (writer is null) throw new ArgumentNullException(nameof(writer));
-			Writer = writer;
-		}
-
-		public TextWriter Writer { get; }
 		public LogMessageSeverity LogLevel { get; set; } = LogMessageSeverity.Info;
 		public LogFormat Format { get; set; } = LogFormat.Text;
 
-		public virtual void WriteMessage(LogMessage message)
-		{
-			WriteMessage(message, true);
-		}
+		public const string TaskSourceName = "Task";
 
-		/// <summary>
-		/// Represents a log record with a JSON context.
-		/// </summary>
-		/// <remarks>
-		/// This class is used to serialize log messages to JSON.
-		/// </remarks>
-		class LogRecord
-		{
-			public LogRecord() { }
-			public LogRecord(string severity, LogMessageSeverity severityValue, string? source, int messageId, string? messageText)
-			{
-				Severity = severity;
-				SeverityValue = severityValue;
-				Source = source;
-				MessageId = messageId;
-				MessageText = messageText;
-			}
-
-			public string? Severity { get; set; }
-			public LogMessageSeverity? SeverityValue { get; set; }
-			public string? Source { get; set; }
-			public int MessageId { get; set; }
-			public string? MessageText { get; set; }
-			public Dictionary<string, string>? Parameters { get; set; }
-		}
-
-		protected virtual void WriteMessage(LogMessage message, bool lineBreak)
+		public void WriteMessage(LogMessage message)
 		{
 			if (message is null) throw new ArgumentNullException(nameof(message));
-			if (message.Severity < LogLevel)
-				return;
+			this.WriteMessage(message, true);
+		}
+		protected abstract void WriteMessage(LogMessage message, bool lineBreak);
 
-			var levelToken = GetLogLevelToken(message.Severity);
-			var logLine = FormatMessage(message, levelToken);
-			if (lineBreak)
-				Writer.WriteLine(logLine);
-			else
-				Writer.Write(logLine);
+
+		public static string GetLogLevelToken(LogMessageSeverity level)
+		{
+			return level switch
+			{
+				LogMessageSeverity.Debug => "DBG",
+				LogMessageSeverity.Diagnostic => "DIAG",
+				LogMessageSeverity.Verbose => "VERBOSE",
+				LogMessageSeverity.Info => "INFO",
+				LogMessageSeverity.Warning => "WARN",
+				LogMessageSeverity.Error => "ERROR",
+				LogMessageSeverity.Critical => "ERROR",
+				_ => $"({level})"
+			};
 		}
 
-		private string FormatMessage(LogMessage message, string levelToken)
-			=> Format switch
+
+		protected string FormatMessage(LogMessage message)
+		{
+			var levelToken = GetLogLevelToken(message.Severity);
+			return Format switch
 			{
 				LogFormat.Json => FormatJson(message),
 				LogFormat.TextWithTimestamp => $"[{message.LogDate:O}]{(string.IsNullOrEmpty(message.Source) ? null : $"[{message.Source}]")} {levelToken} : {message.Text}",
 				_ => $"{(string.IsNullOrEmpty(message.Source) ? null : $"[{message.Source}] ")}{(message.Severity > LogMessageSeverity.Info ? $"{levelToken} : " : null)}{message.Text}"
 			};
+		}
 
-		private string FormatJson(LogMessage message)
+		protected string FormatJson(LogMessage message)
 		{
 			LogRecord rec = new LogRecord(
 				message.Severity.ToString(),
@@ -101,6 +78,7 @@ namespace Titanis.Cli
 			return json;
 		}
 
+
 		protected string? CurrentTask { get; set; }
 		public virtual void WriteTaskStart(string description)
 		{
@@ -118,21 +96,57 @@ namespace Titanis.Cli
 			WriteMessage(new LogMessage(LogMessageSeverity.Info, TaskSourceName, CurrentTask + " [complete]"));
 		}
 
-		public const string TaskSourceName = "Task";
 
-		public static string GetLogLevelToken(LogMessageSeverity level)
+		/// <summary>
+		/// Represents a log record with a JSON context.
+		/// </summary>
+		/// <remarks>
+		/// This class is used to serialize log messages to JSON.
+		/// </remarks>
+		class LogRecord
 		{
-			return level switch
+			public LogRecord() { }
+			public LogRecord(string severity, LogMessageSeverity severityValue, string? source, int messageId, string? messageText)
 			{
-				LogMessageSeverity.Debug => "DBG",
-				LogMessageSeverity.Diagnostic => "DIAG",
-				LogMessageSeverity.Verbose => "VERBOSE",
-				LogMessageSeverity.Info => "INFO",
-				LogMessageSeverity.Warning => "WARN",
-				LogMessageSeverity.Error => "ERROR",
-				LogMessageSeverity.Critical => "ERROR",
-				_ => $"({level})"
-			};
+				Severity = severity;
+				SeverityValue = severityValue;
+				Source = source;
+				MessageId = messageId;
+				MessageText = messageText;
+			}
+
+			public string? Severity { get; set; }
+			public LogMessageSeverity? SeverityValue { get; set; }
+			public string? Source { get; set; }
+			public int MessageId { get; set; }
+			public string? MessageText { get; set; }
+			public Dictionary<string, string>? Parameters { get; set; }
+		}
+	}
+	/// <summary>
+	/// Implements a log that writes events to a <see cref="TextWriter"/>.
+	/// </summary>
+	public class TextWriterLog : LogWriter
+	{
+		public TextWriterLog(TextWriter writer)
+		{
+			if (writer is null) throw new ArgumentNullException(nameof(writer));
+			Writer = writer;
+		}
+
+		public TextWriter Writer { get; }
+
+		protected override void WriteMessage(LogMessage message, bool lineBreak)
+		{
+			if (message is null) throw new ArgumentNullException(nameof(message));
+			if (message.Severity < LogLevel)
+				return;
+
+			var logLine = FormatMessage(message);
+			if (lineBreak)
+				this.Writer.WriteLine(logLine);
+			else
+				this.Writer.Write(logLine);
 		}
 	}
 }

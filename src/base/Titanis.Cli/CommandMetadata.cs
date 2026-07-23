@@ -19,20 +19,30 @@ namespace Titanis.Cli
 		}
 
 		internal CommandMetadata(
+			ICustomTypeDescriptor typeDescr,
 			Type implementingType,
 			CommandMetadataContext context
 			)
 		{
-			if (implementingType is null) throw new ArgumentNullException(nameof(implementingType));
+			if (typeDescr is null) throw new ArgumentNullException(nameof(typeDescr));
 			if (context is null) throw new ArgumentNullException(nameof(context));
 
-			if (!context.Resolver.ReflectType(typeof(CommandBase)).IsAssignableFrom(implementingType))
-				throw new ArgumentException(string.Format(Messages.Cli_NonCommandType, implementingType.FullName), nameof(implementingType));
+			// UNDONE: This can now be used with generic objects
+			//if (!context.Resolver.ReflectType(typeof(CommandBase)).IsAssignableFrom(implementingType))
+			//	throw new ArgumentException(string.Format(Messages.Cli_NonCommandType, implementingType.FullName), nameof(implementingType));
 
 			this.ImplementingType = implementingType;
-			this.Description = context.Resolver.GetCustomAttribute<DescriptionAttribute>(implementingType, true)?.Description;
 
-			var atrOutput = context.Resolver.GetCustomAttribute<OutputRecordTypeAttribute>(implementingType, true);
+			var typeAttrs = typeDescr.GetAttributes();
+			OutputRecordTypeAttribute? atrOutput = null;
+			foreach (var attr in typeAttrs)
+			{
+				if (attr is DescriptionAttribute desc)
+					this.Description = desc.Description;
+				else if (attr is OutputRecordTypeAttribute outrec)
+					atrOutput = outrec;
+			}
+
 			if (atrOutput != null)
 			{
 				this.OutputRecordType = atrOutput.RecordType;
@@ -40,26 +50,44 @@ namespace Titanis.Cli
 				this.DefaultOutputFields = atrOutput.DefaultFields;
 			}
 
+			var paramMd = DiscoverParameters(this, context, typeDescr, this.OutputRecordType is not null);
+			this.Parameters = paramMd.Parameters;
+			this.PositionalParameters = paramMd.PositionalParameters;
+			this.ParametersByName = paramMd.ParametersByName;
+			this.ParameterGroups = paramMd.ParameterGroups;
+		}
+
+		public static CommandMetadata DiscoverParameters(object instance)
 			{
+			if (instance is null) throw new ArgumentNullException(nameof(instance));
+
+			MetadataResolver resolver = new ReflectionMetadataResolver();
+			CommandMetadataContext context = new CommandMetadataContext(resolver);
+			return new CommandMetadata(resolver.GetDescriptor(instance), instance?.GetType(), context);
+		}
+
+		static ParamObjectMetadata DiscoverParameters(
+			CommandMetadata owner,
+			CommandMetadataContext context,
+			ICustomTypeDescriptor ownerDescr,
+			bool isOutputDeclared
+			)
+		{
 				Dictionary<string, ParameterMetadata> paramsByName = new Dictionary<string, ParameterMetadata>(StringComparer.OrdinalIgnoreCase);
 				List<ParameterMetadata> parameters = new List<ParameterMetadata>();
 				SortedList<int, ParameterMetadata> positional = new SortedList<int, ParameterMetadata>();
 				List<ParamInfo> relposParams = new List<ParamInfo>();
 
-				HashSet<Type> paramGroupTypes = new HashSet<Type>()
-				{
-					implementingType
-				};
-				Queue<ParameterGroupInfo> groupQueue = new Queue<ParameterGroupInfo>();
+			HashSet<Type> paramGroupTypes = new HashSet<Type>();
+			Queue<(ICustomTypeDescriptor, ParameterGroupInfo)> groupQueue = new();
 				List<ParameterGroupInfo> groups = new List<ParameterGroupInfo>();
-				groupQueue.Enqueue(new ParameterGroupInfo(implementingType, ParameterGroupOptions.None));
+			groupQueue.Enqueue((ownerDescr, new ParameterGroupInfo(ParameterGroupOptions.None)));
 				while (groupQueue.Count > 0)
 				{
-					var group = groupQueue.Dequeue();
-					var groupType = group.GroupType;
+				(var groupTypeDescr, var group) = groupQueue.Dequeue();
 					groups.Add(group);
 
-					var props = context.GetProperties(groupType);
+				var props = groupTypeDescr.GetProperties();
 					foreach (PropertyDescriptor prop in props)
 					{
 						ParameterAttribute? attr = prop.GetCustomAttribute<ParameterAttribute>(true);
@@ -82,14 +110,13 @@ namespace Titanis.Cli
 							if (paramGroupTypes.Add(propType))
 							{
 							ParameterGroupInfo subgroup = new ParameterGroupInfo(
-								propType,
 								group,
 								prop,
 								ctor,
 								prop.GetCustomAttribute<CategoryAttribute>(true)?.Category,
 								groupAttr.Options
 								);
-							groupQueue.Enqueue(subgroup);
+							groupQueue.Enqueue((context.Resolver.GetDescriptor(propType), subgroup));
 						}
 							else
 							{
@@ -100,10 +127,10 @@ namespace Titanis.Cli
 						if (attr is null)
 							continue;
 
-						if (OutputRecordType is null && 0 != (attr.Flags & ParameterFlags.OutputOnly))
+					if (!isOutputDeclared && 0 != (attr.Flags & ParameterFlags.AffectsOutput))
 							continue;
 
-						ParameterMetadata parm = CreateParameter(prop, attr, group, context);
+					ParameterMetadata parm = new ParameterMetadata(prop, attr, group, owner, context);
 						parameters.Add(parm);
 
 						int position;
@@ -131,22 +158,20 @@ namespace Titanis.Cli
 					}
 				}
 
-				this.ParameterGroups = new ReadOnlyCollection<ParameterGroupInfo>(groups);
+			var parameterGroups = new ReadOnlyCollection<ParameterGroupInfo>(groups);
 
-				parameters.Sort((x, y) => x.Name.CompareTo(y.Name));
-				this.Parameters = new ReadOnlyCollection<ParameterMetadata>(parameters);
-
+			ReadOnlyCollection<ParameterMetadata> posParams;
 				if (relposParams.Count > 0)
 				{
 					LinkedList<ParameterMetadata> s = new LinkedList<ParameterMetadata>(positional.Values);
-					List<ParameterMetadata> posparms = new List<ParameterMetadata>();
+				List<ParameterMetadata> orderedParams = new List<ParameterMetadata>();
 
 					while (s.Count > 0)
 					{
 						var parm = s.First.Value;
 						s.RemoveFirst();
 
-						posparms.Add(parm);
+					orderedParams.Add(parm);
 
 						var afters = relposParams.FindAll(r => r.attr.After == parm.Name);
 						if (afters.Count > 0)
@@ -165,36 +190,23 @@ namespace Titanis.Cli
 						throw new MetadataException($"Parameter declaration for '{relpos.param.Name}' specifies relative positioning to '{relpos.attr.After}', but no parameter named '{relpos.attr.After}' has been declared.", relpos.param.Name);
 					}
 
-					this.PositionalParameters = new ReadOnlyCollection<ParameterMetadata>(posparms);
+				posParams = new ReadOnlyCollection<ParameterMetadata>(orderedParams);
 				}
 				else
 				{
-					this.PositionalParameters = new ReadOnlyCollection<ParameterMetadata>(positional.Values);
+				posParams = new ReadOnlyCollection<ParameterMetadata>(positional.Values);
 				}
 
-				this.ParametersByName = new ReadOnlyDictionary<string, ParameterMetadata>(paramsByName);
-			}
-		}
-
-
-		private ParameterMetadata CreateParameter(
-			PropertyDescriptor property,
-			ParameterAttribute attr,
-			ParameterGroupInfo? group,
-			CommandMetadataContext context)
-		{
-			ParameterMetadata parm = new ParameterMetadata(
-				property,
-				attr,
-				group,
-				this,
-				context
+			return new ParamObjectMetadata(
+				new ReadOnlyCollection<ParameterMetadata>(parameters),
+				posParams,
+				new ReadOnlyDictionary<string, ParameterMetadata>(paramsByName),
+				parameterGroups
 				);
-			return parm;
 		}
 
 		public string? Description { get; }
-		public Type ImplementingType { get; }
+		public Type? ImplementingType { get; }
 		public IReadOnlyList<ParameterGroupInfo> ParameterGroups { get; }
 		public IReadOnlyList<ParameterMetadata> Parameters { get; }
 		public IReadOnlyList<ParameterMetadata> PositionalParameters { get; }

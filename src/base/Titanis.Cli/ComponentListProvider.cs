@@ -101,8 +101,9 @@ namespace Titanis.Cli
 		/// <inheritdoc/>
 		public sealed override Array GetValueListFor(ParameterMetadata parameter, object? command, CommandMetadataContext context)
 		{
+			var impType = parameter.DeclaringCommand.ImplementingType;
 			var components = new List<ComponentInfo>();
-			ComponentCatalog.DiscoverComponents(parameter.DeclaringCommand.ImplementingType.Assembly, context.Resolver, components);
+			ComponentCatalog.DiscoverComponents(impType?.Assembly, context.Resolver, components);
 			var tags = (new string[] { "*" }).Concat(components.Select(r => r.Tag)).ToArray();
 			return tags;
 		}

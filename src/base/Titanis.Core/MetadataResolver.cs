@@ -11,17 +11,31 @@ using System.Text;
 
 namespace Titanis
 {
+	/// <summary>
+	/// Resolves metadata.
+	/// </summary>
 	public abstract class MetadataResolver
 	{
 		public static MetadataResolver Default => Singleton.SingleInstance<ReflectionMetadataResolver>();
 
+		public ICustomTypeDescriptor GetDescriptor(object instance)
+		{
+			if (instance is ICustomTypeDescriptor custom)
+				return custom;
+			return TypeDescriptor.GetProvider(instance).GetTypeDescriptor(instance);
+		}
+		public abstract ICustomTypeDescriptor GetDescriptor(Type type);
+
 		public abstract Type ReflectType(Type type);
-		public abstract bool IsDefined(MemberInfo member, Type attributeType);
-		public virtual T? GetCustomAttribute<T>(MemberInfo member, bool inherit) where T : Attribute
+		public T? GetCustomAttribute<T>(Type member, bool inherit) where T : Attribute
 		{
 			return this.GetCustomAttributes<T>(member, inherit).FirstOrDefault();
 		}
-		public abstract IEnumerable<T> GetCustomAttributes<T>(MemberInfo type, bool inherit) where T : Attribute;
+		public IEnumerable<T> GetCustomAttributes<T>(Type type, bool inherit) where T : Attribute
+		{
+			var attrs = this.GetDescriptor(type).GetAttributes().OfType<T>();
+			return attrs;
+		}
 
 		public abstract Array GetEnumValues(Type enumType);
 
@@ -82,6 +96,16 @@ namespace Titanis
 			}
 			return false;
 		}
+		public static TAttribute? GetCustomAttribute<TAttribute>(this ICustomTypeDescriptor typeDescr, bool inherited = true)
+			where TAttribute : Attribute
+		{
+			foreach (var attr in typeDescr.GetAttributes())
+			{
+				if (attr is TAttribute typed)
+					return typed;
+			}
+			return null;
+		}
 		public static TAttribute? GetCustomAttribute<TAttribute>(this PropertyDescriptor property, bool inherited = true)
 			where TAttribute : Attribute
 		{
@@ -97,11 +121,7 @@ namespace Titanis
 	public sealed class ReflectionMetadataResolver : MetadataResolver
 	{
 		public sealed override Type ReflectType(Type type) => type;
-		public sealed override bool IsDefined(MemberInfo member, Type attributeType) => member.IsDefined(attributeType);
-		public sealed override T GetCustomAttribute<T>(MemberInfo member, bool inherit)
-			=> member.GetCustomAttribute<T>(inherit);
-		public sealed override IEnumerable<T> GetCustomAttributes<T>(MemberInfo member, bool inherit)
-			=> member.GetCustomAttributes<T>(inherit);
+		public override ICustomTypeDescriptor GetDescriptor(Type type) => TypeDescriptor.GetProvider(type).GetTypeDescriptor(type);
 
 		public sealed override Array GetEnumValues(Type enumType)
 		{

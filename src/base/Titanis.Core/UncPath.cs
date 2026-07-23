@@ -265,10 +265,17 @@ namespace Titanis
 			return sb.ToString();
 		}
 
-		public UncPath Append(string fileName)
+		public UncPath Append(params string[] fileNameParts)
 		{
-			return Parse(Combine(ToString(), fileName));
+			string str = this.ToString();
+			foreach (var part in fileNameParts)
+			{
+				str = Combine(str, part);
+			}
+			return Parse(str);
 		}
+
+		public UncPath WithServerName(string serverName) => new UncPath(serverName, this.Port, this.ShareName, this.ShareRelativePath);
 	}
 
 	/// <summary>

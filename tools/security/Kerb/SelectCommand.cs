@@ -40,12 +40,14 @@ Specify the source files using -From.  You may specify multiple files and multip
 		[Parameter(0)]
 		[Description("File names or patterns")]
 		[Category(TicketSourceCategory)]
-		public string[]? From { get; set; }
+		[KerberosTicketFileSpec(true)]
+		public FileSpec[]? From { get; set; }
 
 		[Parameter(EnvironmentVariable = KerberosClient.Krb5CacheVariableName)]
 		[Category(TicketSourceCategory)]
 		[Description("Name of ticket cache file")]
-		public string? TicketCache { get; set; }
+		[KerberosTicketFileSpec(true)]
+		public FileSpec? TicketCache { get; set; }
 		#endregion
 
 		#region Output
@@ -57,7 +59,8 @@ Specify the source files using -From.  You may specify multiple files and multip
 		[Parameter]
 		[Description("Target file name")]
 		[Category(ParameterCategories.Output)]
-		public string? Into { get; set; }
+		[KerberosTicketFileSpec(false)]
+		public FileSpec? Into { get; set; }
 		#endregion
 
 		[Parameter]

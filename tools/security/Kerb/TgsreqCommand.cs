@@ -35,7 +35,8 @@ By default, all supported encryption types are sent in the request.  To limit th
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Name of file containing a ticket-granting ticket (.kirbi or ccache)")]
-		public string? Tgt { get; set; }
+		[KerberosTicketFileSpec(true)]
+		public FileSpec? Tgt { get; set; }
 
 		[Parameter]
 		[Category(ParameterCategories.AuthenticationKerberos)]
@@ -60,7 +61,8 @@ By default, all supported encryption types are sent in the request.  To limit th
 		[Parameter]
 		[Description("Name of file containing a certificate of a user to impersonate with S4U")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
-		public string? S4UserCert { get; set; }
+		[CertificateFileSpec(true)]
+		public FileSpec? S4UserCert { get; set; }
 
 		[Parameter]
 		[Description("Name of service account with S4U2proxy")]
@@ -68,7 +70,8 @@ By default, all supported encryption types are sent in the request.  To limit th
 
 		[Parameter]
 		[Description("Name of file containing U2U ticket")]
-		public string? U2uTicket { get; set; }
+		[KerberosTicketFileSpec(true)]
+		public FileSpec? U2uTicket { get; set; }
 
 		[Parameter]
 		[Description("Password for service account (for decrypting authorization data)")]
