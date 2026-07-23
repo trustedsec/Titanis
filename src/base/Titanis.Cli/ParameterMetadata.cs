@@ -71,6 +71,7 @@ namespace Titanis.Cli
 		{
 			this.Property = property;
 			this.Position = attr.Position;
+			this.IsPositional = (this.Position != ParameterAttribute.NoPosition || !string.IsNullOrEmpty(attr.After));
 			this.Group = group;
 			this.DeclaringCommand = command;
 
@@ -234,7 +235,7 @@ namespace Titanis.Cli
 		/// <summary>
 		/// Gets a value indicating whether a parameter is positional.
 		/// </summary>
-		public bool IsPositional => this.Position != ParameterAttribute.NoPosition;
+		public bool IsPositional { get; }
 		/// <summary>
 		/// Gets the name of the parameter.
 		/// </summary>
