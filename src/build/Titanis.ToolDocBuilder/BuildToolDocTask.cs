@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using Titanis.Cli;
 
 namespace Titanis.ToolDocBuilder
@@ -22,6 +23,9 @@ namespace Titanis.ToolDocBuilder
 		[Required]
 		public string? DocFile { get; set; }
 
+		[Required]
+		public string? BashAutocompFile { get; set; }
+
 		public bool Execute()
 		{
 			if (this.BuildEngine is null)
@@ -34,7 +38,7 @@ namespace Titanis.ToolDocBuilder
 
 			try
 			{
-				return GenerateDoc(this.BuildEngine, this.AssemblyFile!, this.DocFile!);
+				return GenerateDoc(this.BuildEngine, this.AssemblyFile!, this.DocFile!, this.BashAutocompFile!);
 			}
 			catch (Exception ex)
 			{
@@ -43,10 +47,16 @@ namespace Titanis.ToolDocBuilder
 			}
 		}
 
-		public static bool GenerateDoc(IBuildEngine buildEngine, string assemblyFile, string docFile)
+		public static bool GenerateDoc(
+			IBuildEngine buildEngine,
+			string assemblyFile,
+			string docFile,
+			string bashAutocompFile)
 		{
 			List<string> searchDirs = new List<string>();
 			searchDirs.Add(Path.GetDirectoryName(assemblyFile));
+
+			buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Building documentation for '{assemblyFile}' with documentation file '{docFile}'.", null, SenderName, MessageImportance.Normal));
 
 			string? netInstallBase;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -110,7 +120,7 @@ namespace Titanis.ToolDocBuilder
 			var commandType = cliAssembly.GetType("Titanis.Cli.Command");
 			var multiCommandType = cliAssembly.GetType("Titanis.Cli.MultiCommand");
 
-			var asm = loadContext.LoadFromAssemblyPath(assemblyFile);
+			var asm = loadContext.LoadFromByteArray(File.ReadAllBytes(assemblyFile));
 			var programType = asm.EntryPoint.DeclaringType;
 
 			bool isCommand = (commandBaseType.IsAssignableFrom(programType));
@@ -119,6 +129,9 @@ namespace Titanis.ToolDocBuilder
 				using var fileWriter = File.CreateText(docFile);
 				var docWriter = new MarkdownDocWriter(fileWriter, 80);
 
+				using var bashComp = File.CreateText(bashAutocompFile);
+				bashComp.NewLine = "\n";
+				bashComp.WriteLine("#!/bin/bash");
 
 				Queue<SubcommandAttribute> commandQueue = new Queue<SubcommandAttribute>();
 				commandQueue.Enqueue(new SubcommandAttribute(asm.GetName().Name, programType));
@@ -126,9 +139,15 @@ namespace Titanis.ToolDocBuilder
 				{
 					var commandInfo = commandQueue.Dequeue();
 					var commandName = commandInfo.Name;
+					var bashName = commandInfo.Name.Replace(' ', '_');
+					var aliasName = commandInfo.Name.Replace(' ', '-');
 					var type = commandInfo.CommandType;
 
 					fileWriter.WriteLine($"# {commandName}");
+
+					bashComp.WriteLine();
+					bashComp.WriteLine($"# {commandName}");
+					bashComp.WriteLine($"_comp_{bashName} () {{");
 
 					if (commandType.IsAssignableFrom(type))
 					{
@@ -137,11 +156,43 @@ namespace Titanis.ToolDocBuilder
 						var md = Command.GetCommandMetadata(type, mdContext);
 						if (string.IsNullOrEmpty(md.Description))
 							buildEngine.LogErrorEvent(MakeMissingDescError(type.FullName));
+
+						StringBuilder sbBashParams = new StringBuilder();
+						List<string> posNames = new List<string>();
 						foreach (var param in md.Parameters)
 						{
 							if (string.IsNullOrEmpty(param.Description))
 								buildEngine.LogErrorEvent(MakeMissingDescError(commandName, param.Name));
+
+							if (sbBashParams.Length > 0)
+								sbBashParams.Append('|');
+
+							string formatToken = string.Empty;// (param.ElementType.Name == nameof(FileSpec)) ? "file" : (param.ElementType.IsEnum) ? "enum" : "";
+							if (param.HasValueList)
+							{
+								var valueList = param.GetValueList(null, mdContext);
+								if (valueList != null)
+								{
+									formatToken = "list:" + string.Join(";", valueList.OfType<object>());
 						}
+							}
+							else if (param.IsFileSpec)
+							{
+								formatToken = $"file:{string.Join(";", param.FileTypes.SelectMany(r => r.Patterns))}";
+							}
+							else
+							{
+
+							}
+							sbBashParams.Append($"-{param.Name}:{formatToken}");
+						}
+						foreach (var param in md.PositionalParameters)
+						{
+							sbBashParams.Append($"|@:{param.Name}");
+						}
+
+						bashComp.WriteLine($"\t_comp_Titanis \"$2\" \"{sbBashParams}\"");
+						bashComp.WriteLine("\treturn $?");
 
 						Command.BuildCommandHelpText(type, docWriter, commandName, null, mdContext);
 					}
@@ -157,11 +208,17 @@ namespace Titanis.ToolDocBuilder
 
 						var subcmds = mdResolver.GetCustomAttributes<SubcommandAttribute>(type, true);
 						subcmds = subcmds.OrderBy(r => r.Name);
+
 						foreach (var subcmd in subcmds)
 						{
 							commandQueue.Enqueue(new SubcommandAttribute(commandName + " " + subcmd.Name, subcmd.CommandType));
 						}
+
+						bashComp.WriteLine($"\t_comp_T_subcommands \"$1\" \"$2\" {string.Join(" ", subcmds.Select(r => r.Name))}");
+						bashComp.WriteLine("\treturn $?");
 					}
+					bashComp.WriteLine("}");
+					bashComp.WriteLine($"complete -F _comp_{bashName} {aliasName}");
 				}
 			}
 
@@ -199,183 +256,14 @@ namespace Titanis.ToolDocBuilder
 					string path = Path.Combine(searchDir, baseName);
 					if (File.Exists(path))
 					{
-						var refasm = context.LoadFromAssemblyPath(path);
+						var bytes = File.ReadAllBytes(path);
+						var refasm = context.LoadFromByteArray(bytes);
 						return refasm;
 					}
 				}
 
 				return null;
 			}
-		}
-	}
-
-	class ContextResolver : MetadataResolver
-	{
-		private readonly MetadataLoadContext context;
-		private readonly IBuildEngine buildEngine;
-
-		public ContextResolver(MetadataLoadContext context, IBuildEngine buildEngine)
-		{
-			this.context = context;
-			this.buildEngine = buildEngine;
-		}
-
-		class EnumValue
-		{
-			public EnumValue(string name, object value)
-			{
-				Name = name;
-				Value = value;
-			}
-
-			public string Name { get; }
-			public object Value { get; }
-
-			public sealed override string ToString()
-			{
-				return this.Name;
-
-			}
-		}
-		public sealed override Array GetEnumValues(Type enumType)
-		{
-			FieldInfo[] fields = enumType.GetFields(BindingFlags.Public | BindingFlags.Static);
-			EnumValue[] values = Array.ConvertAll(fields, f => new EnumValue(f.Name, f.GetRawConstantValue()));
-			return values;
-		}
-
-		public sealed override Type ReflectType(Type sourceType)
-		{
-			var declaringType = sourceType.DeclaringType;
-			if (declaringType is null)
-			{
-				var fullName = sourceType.FullName;
-				Assembly asm;
-				try
-				{
-					asm = context.LoadFromAssemblyName(sourceType.Assembly.GetName());
-				}
-				catch (Exception)
-				{
-					asm = context.LoadFromAssemblyName("netstandard");
-				}
-				var resolved = asm.GetType(fullName);
-				return resolved;
-			}
-			else
-			{
-				var declaring = this.ReflectType(declaringType);
-				return (Type)declaring.GetMember(sourceType.Name)[0];
-			}
-		}
-
-		public sealed override bool IsDefined(MemberInfo member, Type attributeType)
-		{
-			return this.GetCustomAttributes(member, attributeType, true).Any();
-		}
-		public sealed override IEnumerable<T> GetCustomAttributes<T>(MemberInfo member, bool inherit)
-		{
-			return GetCustomAttributes(member, typeof(T), inherit).OfType<T>();
-		}
-
-		private IEnumerable<Attribute> GetCustomAttributes(MemberInfo member, Type attributeType, bool inherit)
-		{
-			attributeType = this.ReflectType(attributeType);
-
-			var attrData = member.GetCustomAttributesData();
-			foreach (var attrDatum in attrData)
-			{
-				bool matches =
-					(attrDatum.AttributeType.Equals(attributeType))
-					|| (inherit && (attributeType.IsAssignableFrom(attrDatum.AttributeType)));
-				if (matches)
-				{
-					var attr = TryInstantiateAttr(attrDatum);
-					if (attr is not null)
-						yield return (Attribute)attr;
-				}
-			}
-		}
-
-		private Attribute? TryInstantiateAttr(CustomAttributeData attrDatum)
-		{
-			return ReflectAttribute(attrDatum);
-		}
-		private Attribute? ReflectAttribute(CustomAttributeData attrDatum)
-		{
-			Type? type = attrDatum.AttributeType.FullName switch
-			{
-				"System.ComponentModel.BrowsableAttribute" => typeof(BrowsableAttribute),
-				"System.ComponentModel.DefaultValueAttribute" => typeof(DefaultValueAttribute),
-				"System.ComponentModel.DescriptionAttribute" => typeof(DescriptionAttribute),
-				"System.ComponentModel.DisplayNameAttribute" => typeof(DisplayNameAttribute),
-				"System.ComponentModel.CategoryAttribute" => typeof(CategoryAttribute),
-				"System.Runtime.CompilerServices.NullableAttribute" => typeof(NullableAttribute),
-				"Titanis.Cli.AliasAttribute" => typeof(AliasAttribute),
-				"Titanis.Cli.ComponentAttribute" => typeof(ComponentAttribute),
-				"Titanis.Cli.DefaultPortAttribute" => typeof(DefaultPortAttribute),
-				"Titanis.Cli.DetailedHelpResourceAttribute" => typeof(DetailedHelpResourceAttribute),
-				"Titanis.Cli.DetailedHelpTextAttribute" => typeof(DetailedHelpTextAttribute),
-				"Titanis.Cli.ExampleAttribute" => typeof(ExampleAttribute),
-				"Titanis.Cli.MandatoryAttribute" => typeof(MandatoryAttribute),
-				"Titanis.Cli.OutputRecordTypeAttribute" => typeof(OutputRecordTypeAttribute),
-				"Titanis.Cli.ParameterAttribute" => typeof(ParameterAttribute),
-				"Titanis.Cli.ParameterGroupAttribute" => typeof(ParameterGroupAttribute),
-				"Titanis.Cli.PlaceholderAttribute" => typeof(PlaceholderAttribute),
-				"Titanis.Cli.SubcommandAttribute" => typeof(SubcommandAttribute),
-				"Titanis.Cli.ValueListProviderAttribute" => typeof(ValueListProviderAttribute),
-				"Titanis.DisplayAlignmentAttribute" => typeof(DisplayAlignmentAttribute),
-				"Titanis.DisplayFormatStringAttribute" => typeof(DisplayFormatStringAttribute),
-				"Titanis.FileSizeAttribute" => typeof(FileSizeAttribute),
-				_ => this.GetRuntimeType(attrDatum.AttributeType)
-			};
-			if (type is null)
-				return null;
-
-			var args = attrDatum.ConstructorArguments.Select(r => ConvertCtorArg(r)).ToArray();
-			Attribute? attr;
-			try
-			{
-				attr = (Attribute)Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.DefaultBinder, args, null);
-			}
-			catch (Exception ex)
-			{
-				buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Error instantiating attribute {type.FullName} with arguments ({string.Join(", ", args.Select(r => (r is null) ? "<null>" : $"[{r.GetType().FullName}]{r}"))}): {ex}", null, BuildToolDocTask.SenderName, MessageImportance.High));
-				throw;
-			}
-			foreach (var namedArg in attrDatum.NamedArguments)
-			{
-				var member = type.GetMember(namedArg.MemberName)[0];
-				var value = ConvertCtorArg(namedArg.TypedValue);
-				if (member is FieldInfo field)
-					field.SetValue(attr, value);
-				else if (member is PropertyInfo prop)
-					prop.SetValue(attr, value);
-			}
-
-			return attr;
-		}
-
-
-		private object ConvertCtorArg(CustomAttributeTypedArgument typedValue)
-		{
-			if (typedValue.Value is IList<CustomAttributeTypedArgument> list)
-			{
-				var args = list.Select(r => ConvertCtorArg(r)).ToArray();
-				Array typedArgs = Array.CreateInstance(this.GetRuntimeType(typedValue.ArgumentType.GetElementType()), args.Length);
-				for (int i = 0; i < args.Length; i++)
-				{
-					var arg = args[i];
-					typedArgs.SetValue(arg, i);
-				}
-				return typedArgs;
-			}
-			else if (typedValue.ArgumentType.IsEnum)
-			{
-				return Enum.ToObject(this.GetRuntimeType(typedValue.ArgumentType), typedValue.Value);
-			}
-			else
-				return typedValue.Value;
 		}
 	}
 
