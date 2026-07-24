@@ -12,16 +12,19 @@ namespace Titanis.Cli
 	public class UserCertificateParameterGroup : ParameterGroupBase
 	{
 		[Parameter]
+		[Advanced]
 		[Description("Name of file containing user's certificate (for PKINIT)")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		public FileSpec? UserCert { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Name of file containing user's key (for PKINIT)")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		public FileSpec? UserKey { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Password to decrypt file containing user's key (for PKINIT)")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		public string? UserKeyPassword { get; set; }

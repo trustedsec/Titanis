@@ -27,6 +27,7 @@ namespace Titanis.Smb2.Cli
 		public SwitchParam Recursive { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Buffer size (default = 2048)")]
 		public int BufferSize { get; set; }
 

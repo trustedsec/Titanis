@@ -37,6 +37,7 @@ namespace Titanis.Smb2.Cli
 	public sealed class Smb2LsCommand : Smb2TreeCommand, ISupportTreeOutput
 	{
 		[Parameter]
+		[Advanced]
 		[Description("Specifies the buffer size for querying the directory listing.")]
 		public int QueryBufferSize { get; set; }
 

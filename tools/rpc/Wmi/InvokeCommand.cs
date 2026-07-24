@@ -34,6 +34,7 @@ internal class InvokeCommand : WmiObjectCommandBase
 	public string[] Arguments { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Description("List of parameters to skip")]
 	public string[] SkipParams { get; set; }
 

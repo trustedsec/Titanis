@@ -18,6 +18,7 @@ namespace Titanis.Cli.LdapTool;
 public abstract class LdapGenericSearchCommandBase : LdapCommandBase, ILdapClientSearchCallback
 {
 	[Parameter]
+	[Advanced]
 	[Description("Number of results to fetch per page")]
 	[DefaultValue(100)]
 	public int? PageSize { get; set; }
@@ -27,6 +28,7 @@ public abstract class LdapGenericSearchCommandBase : LdapCommandBase, ILdapClien
 	public int? RecordLimit { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Description("Follows referrals")]
 	public SwitchParam FollowReferrals { get; set; }
 

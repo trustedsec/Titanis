@@ -11,6 +11,7 @@ internal abstract class QueryCommandBase : WmiNamespaceCommandBase
 {
 
 	[Parameter]
+	[Advanced]
 	[Description("Number of results to fetch at a time")]
 	[DefaultValue(10)]
 	public int PageSize { get; set; }

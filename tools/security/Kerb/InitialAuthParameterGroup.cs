@@ -40,16 +40,19 @@ public class InitialAuthParameterGroup : ParameterGroupBase
 	public HexString? NtlmHash { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Category(ParameterCategories.AuthenticationKerberos)]
 	[Description("AES 128 key")]
 	public HexString? AesKey { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Category(ParameterCategories.AuthenticationKerberos)]
 	[Description("DES key")]
 	public HexString? DesKey { get; set; }
 
 	[Parameter(EnvironmentVariable = "KRB5_CLIENT_KTNAME")]
+	[Advanced]
 	[Description("Name of keytab file")]
 	[Category(ParameterCategories.AuthenticationKerberos)]
 	[KeytabFileSpec(true)]

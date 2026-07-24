@@ -68,6 +68,7 @@ namespace Titanis.Cli
 		public HexString? AesKey { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("DES key")]
 		public HexString? DesKey { get; set; }
@@ -84,6 +85,7 @@ namespace Titanis.Cli
 		public FileSpec? Tgt { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Name of file containing the armor ticket")]
 		public FileSpec? ArmorTicket { get; set; }
@@ -100,10 +102,13 @@ namespace Titanis.Cli
 		public FileSpec? TicketCache { get; set; }
 
 		[Parameter]
+		[Advanced]
+		[Category(ParameterCategories.Authentication)]
 		[Description("Requests delegation (sends TGT and key for Kerberos)")]
 		public SwitchParam Delegate { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Sends the tickets (and keys) to the target for delegation")]
 		public FileSpec[]? DelegateTicket { get; set; }
@@ -111,6 +116,7 @@ namespace Titanis.Cli
 		[Parameter]
 		[Description("NTLM version number (a.b.c.d)")]
 		[Category(ParameterCategories.AuthenticationNtlm)]
+		[Advanced]
 		public Version? NtlmVersion { get; set; }
 
 		private UserCertificateParameterGroup? _certParams;
@@ -141,35 +147,42 @@ namespace Titanis.Cli
 		[Parameter(EnvironmentVariable = "KRB5_CLIENT_KTNAME")]
 		[Description("Name of keytab file")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
-		public string? Keytab { get; set; }
+		[Advanced]
+		public FileSpec? Keytab { get; set; }
 
 		[Parameter]
 		[Description("Name of user to impersonate with S4U")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
+		[Advanced]
 		public UserPrincipalName? S4UserName { get; set; }
 
 		[Parameter]
 		[Description("User name to request TGT for U2U")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
+		[Advanced]
 		public UserPrincipalName? U2UserName { get; set; }
 
 		[Parameter]
 		[Description("Name of file containing a certificate of a user to impersonate with S4U")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
-		public string? S4UserCert { get; set; }
+		[Advanced]
+		public FileSpec? S4UserCert { get; set; }
 
 		[Parameter]
 		[Description("Name of service to proxy through")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
+		[Advanced]
 		public SecurityPrincipalName? S4ProxyService { get; set; }
 
 		[Parameter]
 		[Description("Specifies an SPN override")]
+		[Advanced]
 		public SpnMapping[]? SpnOverride { get; set; }
 
 		#region AuthProxy
 		[Parameter]
 		[Description("Endpoint of auth proxy")]
+		[Advanced]
 		public EndPoint AuthProxy { get; set; }
 		#endregion
 

@@ -12,11 +12,13 @@ namespace Titanis.Cli.Kerb
 		public SwitchParam Forwardable { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Category(ParameterCategories.AuthenticationKerberos)]
-		[Description("Requests a forwardable ticket")]
+		[Description("Requests a proxiable ticket")]
 		public SwitchParam Proxiable { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Description("Requests a postdated ticket with the specified start date")]
 		public DateTime? Postdate { get; set; }

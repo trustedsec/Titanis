@@ -25,6 +25,7 @@ namespace Titanis.ToolDocBuilder
 
 		[Required]
 		public string? BashAutocompFile { get; set; }
+		public string? ZshAutocompPath { get; set; }
 
 		public bool Execute()
 		{
@@ -38,7 +39,7 @@ namespace Titanis.ToolDocBuilder
 
 			try
 			{
-				return GenerateDoc(this.BuildEngine, this.AssemblyFile!, this.DocFile!, this.BashAutocompFile!);
+				return GenerateDoc(this.BuildEngine, this.AssemblyFile!, this.DocFile!, this.BashAutocompFile!, this.ZshAutocompPath!);
 			}
 			catch (Exception ex)
 			{
@@ -51,7 +52,8 @@ namespace Titanis.ToolDocBuilder
 			IBuildEngine buildEngine,
 			string assemblyFile,
 			string docFile,
-			string bashAutocompFile)
+			string bashAutocompFile,
+			string zshAutocompPath)
 		{
 			List<string> searchDirs = new List<string>();
 			searchDirs.Add(Path.GetDirectoryName(assemblyFile));
@@ -149,6 +151,12 @@ namespace Titanis.ToolDocBuilder
 					bashComp.WriteLine($"# {commandName}");
 					bashComp.WriteLine($"_comp_{bashName} () {{");
 
+					using var zshComp = File.CreateText(Path.Combine(zshAutocompPath, $"_{bashName}"));
+					zshComp.NewLine = "\n";
+					zshComp.WriteLine($"#compdef {bashName}");
+					zshComp.WriteLine();
+					zshComp.WriteLine($"_{bashName}() {{");
+
 					if (commandType.IsAssignableFrom(type))
 					{
 						buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Processing command type {commandType.FullName}", null, SenderName, MessageImportance.Low));
@@ -157,42 +165,56 @@ namespace Titanis.ToolDocBuilder
 						if (string.IsNullOrEmpty(md.Description))
 							buildEngine.LogErrorEvent(MakeMissingDescError(type.FullName));
 
-						StringBuilder sbBashParams = new StringBuilder();
+						bashComp.WriteLine($"\tdeclare -A params=(");
+						zshComp.WriteLine($"\tdeclare -A params=(");
+
+						//StringBuilder sbBashParams = new StringBuilder();
 						List<string> posNames = new List<string>();
 						foreach (var param in md.Parameters)
 						{
 							if (string.IsNullOrEmpty(param.Description))
 								buildEngine.LogErrorEvent(MakeMissingDescError(commandName, param.Name));
 
-							if (sbBashParams.Length > 0)
-								sbBashParams.Append('|');
-
+							string valuesToken = string.Empty;
 							string formatToken = string.Empty;// (param.ElementType.Name == nameof(FileSpec)) ? "file" : (param.ElementType.IsEnum) ? "enum" : "";
 							if (param.HasValueList)
 							{
 								var valueList = param.GetValueList(null, mdContext);
 								if (valueList != null)
 								{
-									formatToken = "list:" + string.Join(";", valueList.OfType<object>());
+									formatToken = "list";
+									valuesToken = string.Join(";", valueList.OfType<object>());
 						}
 							}
 							else if (param.IsFileSpec)
 							{
-								formatToken = $"file:{string.Join(";", param.FileTypes.SelectMany(r => r.Patterns))}";
+								formatToken = "file";
+								valuesToken = string.Join(";", param.FileTypes.SelectMany(r => r.Patterns));
 							}
 							else
 							{
-
+								valuesToken = string.Empty;
 							}
-							sbBashParams.Append($"-{param.Name}:{formatToken}");
-						}
+							//sbBashParams.Append($"-{param.Name}:{formatToken}");
+
+							bashComp.WriteLine($"\t\t['-{param.Name.ToLower()}']=$'{param.Name}:{formatToken}:{valuesToken}'");
+							zshComp.WriteLine($"\t\t['-{param.Name.ToLower()}']=$'{param.Name}|{(param.IsMandatory ? "X" : param.IsAdvanced ? "@" : null)}|{(param.IsSwitch ? null : EscapeShellString(param.Placeholder))}|{formatToken}|{valuesToken}|{EscapeShellString(param.Category)}|{EscapeShellString(param.Description)}'");
+							}
+						bashComp.WriteLine($"\t)");
+						zshComp.WriteLine($"\t)");
+
+						bashComp.WriteLine($"\tdeclare -a paramsByPos=(");
+						zshComp.WriteLine($"\tdeclare -a paramsByPos=(");
 						foreach (var param in md.PositionalParameters)
 						{
-							sbBashParams.Append($"|@:{param.Name}");
+							bashComp.WriteLine($"\t\t'{param.Name}'");
+							zshComp.WriteLine($"\t\t'{param.Name}'");
 						}
+						bashComp.WriteLine($"\t)");
+						zshComp.WriteLine($"\t)");
 
-						bashComp.WriteLine($"\t_comp_Titanis \"$2\" \"{sbBashParams}\"");
-						bashComp.WriteLine("\treturn $?");
+						zshComp.WriteLine($"\t_comp_Titanis");
+						bashComp.WriteLine($"\t_comp_Titanis");
 
 						Command.BuildCommandHelpText(type, docWriter, commandName, null, mdContext);
 					}
@@ -209,14 +231,26 @@ namespace Titanis.ToolDocBuilder
 						var subcmds = mdResolver.GetCustomAttributes<SubcommandAttribute>(type, true);
 						subcmds = subcmds.OrderBy(r => r.Name);
 
+						zshComp.WriteLine("\tlocal -a commands=(");
+
 						foreach (var subcmd in subcmds)
 						{
 							commandQueue.Enqueue(new SubcommandAttribute(commandName + " " + subcmd.Name, subcmd.CommandType));
+
+							var md = Command.GetCommandMetadata(subcmd.CommandType, mdContext);
+
+							zshComp.WriteLine($"\t\t'{subcmd.Name}:{EscapeShellString(md.Description)}'");
 						}
 
 						bashComp.WriteLine($"\t_comp_T_subcommands \"$1\" \"$2\" {string.Join(" ", subcmds.Select(r => r.Name))}");
 						bashComp.WriteLine("\treturn $?");
+
+						zshComp.WriteLine($"\t)");
+						zshComp.WriteLine($"\t_comp_T_subcommands");
 					}
+
+					zshComp.WriteLine("}");
+
 					bashComp.WriteLine("}");
 					bashComp.WriteLine($"complete -F _comp_{bashName} {aliasName}");
 				}
@@ -224,6 +258,8 @@ namespace Titanis.ToolDocBuilder
 
 			return true;
 		}
+
+		private static string? EscapeShellString(string? str) => str?.Replace("'", "\\'");
 
 		private static BuildErrorEventArgs MakeMissingDescError(string commandName, string paramName)
 		{

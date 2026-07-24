@@ -42,6 +42,10 @@ namespace Titanis.Cli
 		/// The parameter provides output only and does not accept input.
 		/// </summary>
 		OutputOnly = 0x20,
+		/// <summary>
+		/// Only show this parameter in advanced help
+		/// </summary>
+		IsAdvanced = 0x40,
 	}
 
 	/// <summary>
@@ -93,6 +97,9 @@ namespace Titanis.Cli
 
 			if (property.IsReadOnly)
 				flags |= ParameterFlags.OutputOnly;
+
+			if (property.IsDefined<AdvancedAttribute>())
+				flags |= ParameterFlags.IsAdvanced;
 
 			// Element type
 			Type? elementType;
@@ -363,6 +370,7 @@ namespace Titanis.Cli
 		/// Gets a value indicating whether the parameter is mandatory.
 		/// </summary>
 		public bool IsMandatory => (0 != (this.Flags & ParameterFlags.Mandatory));
+		public bool IsAdvanced => (0 != (this.Flags & ParameterFlags.IsAdvanced));
 		/// <summary>
 		/// Gets a value indicating whether the parameter is a switch.
 		/// </summary>

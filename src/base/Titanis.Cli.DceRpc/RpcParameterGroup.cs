@@ -31,22 +31,27 @@ namespace Titanis.Cli
 		public SmbParameters SmbParameters { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Time to wait for RPC connections")]
 		public Duration? RpcConnectTimeout { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Time to wait for RPC calls")]
 		public Duration? RpcCallTimeout { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Uses SP-NEGO for authentication")]
 		public SwitchParam Spnego { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Authenticates EP mapper requests")]
 		public SwitchParam AuthEpm { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Encrypts EP mappend requests")]
 		public SwitchParam EncryptEpm { get; set; }
 

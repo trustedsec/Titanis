@@ -1,0 +1,189 @@
+#autoload +X
+
+_comp_T_param() {
+	local paramSpec=$1
+
+	local -a parts=( "${(@s/|/)paramSpec}" )
+	local paramName=${parts[0]}
+	local paramType=${parts[4]}
+	local -a items=( "${(@s/;/)parts[5]}" )
+
+	if [[ -z $paramType ]]; then
+		# No completions available
+		return 1
+	fi
+
+	if [[ "$paramType" = "list" ]]; then
+		_describe "Options" items
+		return 0
+	elif [[ "$paramType" = "file" ]]; then
+		local -a filePatterns=(${(@s/;/)parts[5]})
+		if [[ -n $filePatterns ]]; then
+			_files -g "${filePatterns}"
+		else
+			_files
+		fi
+		return 0
+	else
+		# COMPREPLY=( $(compgen -A "$paramType" "$cmp") )
+		return 0
+	fi
+}
+
+_T_filterArray() {
+	local pattern=$1
+	if [[ -z $pattern ]]; then
+		COMPREPLY=(${@:2})
+		return 0
+	fi
+
+	local matching=()
+	local i
+	for i in ${@:2}; do
+		if [[ -z $pattern || ${i:l} = ${pattern:l}* ]]; then
+			matching+=($i)
+		fi
+	done
+
+	COMPREPLY=(${matching[@]})
+
+	return 0
+}
+
+_comp_Titanis() {
+	local args=( ${words[2,-1]} )
+	local argCount=${#args[@]}
+	local -i targetArgIndex=$((CURRENT - 1))
+
+	local curArg="${args[$targetArgIndex]}"
+	if [[ $curArg == -* ]]; then
+		# Cursor is on a parameter name
+		# Filter parameter names to exclude used parameters
+		declare -A usedParams
+		local arg
+		for arg in "${args[@]}"; do
+			usedParams[${arg:l}]=true
+		done
+
+		declare -a availParams
+		local paramSpec
+		declare -A catLookup
+		for paramSpec in "${params[@]}"; do
+			local -a parts=( "${(@s/|/)paramSpec}" )
+
+			local paramName=$parts[1]
+			local paramReq=$parts[2]
+			local paramPH=$parts[3]
+			local paramType=$parts[4]
+			local paramValues=$parts[5]
+			local paramCat=$parts[6]
+			local paramDesc=$parts[7]
+
+			if [[ -z "$paramCat" ]]; then
+				paramCat="Other"
+			fi
+			if [[ "$paramReq" = "X" ]]; then
+				paramReq="*"
+			fi
+
+			if [[ "$paramReq" = "@" ]]; then
+				if [[ $hide_adv = 1 ]]; then
+					continue
+				fi
+			fi
+
+			if [[ -n $paramPH ]]; then
+				paramPH=${paramPH//:/\\:}
+				paramPH="<$paramPH>"
+			fi
+
+			if [[ ! -v usedParams[-${paramName:l}] ]]; then
+				declare -i catIndex
+				if (( ${+catLookup[$paramCat]} )); then
+					:
+					catIndex=${catLookup[$paramCat]}
+				else
+					catIndex=${#catLookup[@]}
+					catLookup[$paramCat]=$catIndex
+
+					if (( ${#describeArgs} > 0 )); then
+						describeArgs+=(--)
+					fi
+					describeArgs+=("'$paramCat'" cat_$catIndex)
+				fi
+				local catArrName="cat_$catIndex"
+				typeset -a $catArrName
+				typeset -a "disp_$catArrName"
+				eval "$catArrName+=(\"-$paramName:$paramDesc\")"
+				eval "disp_$catArrName+=(\"-$paramName$paramReq $paramPH:$paramDesc\")"
+
+				availParams+=("-$paramName:$paramDesc")
+			fi
+		done
+
+		local cat
+		for cat in "${(k)catLookup[@]}"; do
+			local catIndex=${catLookup[$cat]}
+			_describe "$cat" "disp_cat_$catIndex" "cat_$catIndex" -J "TitanisParams_$cat"
+		done
+		return 0
+	fi
+
+	local nextPos=1
+	local i
+	local selArgName=""
+	local isPos=0
+	declare -A argValues
+	for ((i=1; i<=$targetArgIndex; i++)); do
+		arg=${args[i]}
+		isPos=0
+
+		if [[ $arg = -*^ ]]; then
+			# This is a file insertion parameter
+			_files
+			return
+		elif [[ $arg = -* ]]; then
+			argName=${arg:l}
+		elif [[ $arg = *, ]]; then
+			# Keep the same arg name
+			:
+		elif [[ -n "$argName" ]]; then
+			# Consume this named argument
+			selArgName=${argName:l}
+			argValues+=( [$selArgName]="$arg" )
+			argName=""
+		else
+			while true; do
+				selArgName="${paramsByPos[nextPos]:l}"
+				if [[ -z $selArgName ]]; then
+					# No more positional args
+					break
+				fi
+				selArgName="-$selArgName"
+				((nextPos++))
+
+				if [[ ! -v argValues[$selArgName] ]]; then
+					isPos=1
+					break
+				fi
+			done
+		fi
+	done
+
+	if [[ -n $selArgName ]]; then
+		if [[ $isPos -gt 0 && -z $cmp ]]; then
+			# Help the user by printing the name of the positional argument
+			local -a parts=(${(@s/|/)params[$selArgName]})
+			local -a valuelist=("-$parts[1]:$parts[7]")
+			_describe "Parameters" valuelist
+			return 0
+		else
+			local argSpec=${params[$selArgName]}
+			_comp_T_param "$argSpec"
+			return $?
+		fi
+	else
+		# No completion available
+		return 1
+	fi
+}

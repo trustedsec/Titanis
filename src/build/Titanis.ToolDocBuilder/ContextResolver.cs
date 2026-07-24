@@ -110,23 +110,10 @@ namespace Titanis.ToolDocBuilder
 				"System.ComponentModel.DisplayNameAttribute" => typeof(DisplayNameAttribute),
 				"System.ComponentModel.CategoryAttribute" => typeof(CategoryAttribute),
 				"System.Runtime.CompilerServices.NullableAttribute" => typeof(NullableAttribute),
-				"Titanis.Cli.AliasAttribute" => typeof(AliasAttribute),
-				"Titanis.Cli.ComponentAttribute" => typeof(ComponentAttribute),
-				"Titanis.Cli.DefaultPortAttribute" => typeof(DefaultPortAttribute),
-				"Titanis.Cli.DetailedHelpResourceAttribute" => typeof(DetailedHelpResourceAttribute),
-				"Titanis.Cli.DetailedHelpTextAttribute" => typeof(DetailedHelpTextAttribute),
-				"Titanis.Cli.ExampleAttribute" => typeof(ExampleAttribute),
-				"Titanis.Cli.MandatoryAttribute" => typeof(MandatoryAttribute),
-				"Titanis.Cli.OutputRecordTypeAttribute" => typeof(OutputRecordTypeAttribute),
-				"Titanis.Cli.ParameterAttribute" => typeof(ParameterAttribute),
-				"Titanis.Cli.ParameterGroupAttribute" => typeof(ParameterGroupAttribute),
-				"Titanis.Cli.PlaceholderAttribute" => typeof(PlaceholderAttribute),
-				"Titanis.Cli.SubcommandAttribute" => typeof(SubcommandAttribute),
-				"Titanis.Cli.ValueListProviderAttribute" => typeof(ValueListProviderAttribute),
 				"Titanis.DisplayAlignmentAttribute" => typeof(DisplayAlignmentAttribute),
 				"Titanis.DisplayFormatStringAttribute" => typeof(DisplayFormatStringAttribute),
 				"Titanis.FileSizeAttribute" => typeof(FileSizeAttribute),
-				_ => this.GetRuntimeType(attrDatum.AttributeType)
+				_ => (attrDatum.AttributeType.FullName.StartsWith("Titanis.Cli.")) ? typeof(Command).Assembly.GetType(attrDatum.AttributeType.FullName) : this.GetRuntimeType(attrDatum.AttributeType)
 			};
 			if (type is null)
 				return null;

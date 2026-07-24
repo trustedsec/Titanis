@@ -16,6 +16,7 @@
 			AssemblyFile="$(OutputPath)$(AssemblyName)$(TargetExt)"
 			DocFile="$(SolutionDir)docs\UserGuide\tools\$(AssemblyName).md"
 			BashAutocompFile="$(SolutionDir)autocomp\bash\toolcomp-$(AssemblyName).sh"
+			ZshAutocompPath="$(SolutionDir)autocomp\zsh\"
 			/>
 	</Target>
 

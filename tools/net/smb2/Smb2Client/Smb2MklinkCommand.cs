@@ -27,6 +27,7 @@ namespace Titanis.Smb2.Cli
 		public string? TargetPath { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("The path to display to the user in directory listings (defaults to <TargetPath>)")]
 		public string? PrintPath { get; set; }
 

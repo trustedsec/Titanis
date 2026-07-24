@@ -271,6 +271,7 @@ namespace Titanis.Cli
 
 		private LogFormat _logFormat;
 		[Parameter]
+		[Advanced]
 		[Alias("LogFormat")]
 		[Category(ParameterCategories.Output)]
 		[Description("Sets the format of log messages written to the console")]
@@ -307,6 +308,7 @@ namespace Titanis.Cli
 		/// Gets a value indicating whether to print verbose messages.
 		/// </summary>
 		[Parameter]
+		[Advanced]
 		[Alias("vv")]
 		[Category(ParameterCategories.Output)]
 		[Description("Prints diagnostic messages")]
@@ -324,6 +326,7 @@ namespace Titanis.Cli
 		/// Gets a value indicating whether to print verbose messages.
 		/// </summary>
 		[Parameter]
+		[Advanced]
 		[Alias("vvv")]
 		[Category(ParameterCategories.Output)]
 		[Description("Prints debug messages")]
@@ -347,6 +350,7 @@ namespace Titanis.Cli
 		/// and printed with the digit separator.
 		/// </remarks>
 		[Parameter]
+		[Advanced]
 		[Category(ParameterCategories.Output)]
 		[Description("Formats file sizes as human-readable values")]
 		public SwitchParam HumanReadable { get; set; }

@@ -10,6 +10,7 @@ internal abstract class WmiNamespaceCommandBase : WmiCommand
 	public string Namespace { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Description("Locale")]
 	[DefaultValue("en-US")]
 	public string Locale { get; set; }

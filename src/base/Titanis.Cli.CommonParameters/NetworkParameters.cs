@@ -23,12 +23,14 @@ namespace Titanis.Cli
 		[Alias("6")]
 		[Description("Only use TCP over IPv6 endpoint")]
 		[Category(ParameterCategories.Connection)]
+		[Advanced]
 		public SwitchParam UseTcp6Only { get; set; }
 
 		[Parameter]
 		[Alias("4")]
 		[Description("Only use TCP over IPv4 endpoint")]
 		[Category(ParameterCategories.Connection)]
+		[Advanced]
 		public SwitchParam UseTcp4Only { get; set; }
 
 		[Parameter]

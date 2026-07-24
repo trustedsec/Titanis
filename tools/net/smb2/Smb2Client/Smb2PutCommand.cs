@@ -23,6 +23,7 @@ namespace Titanis.Smb2.Cli
 		public FileSpec? SourceFileName { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Size of chunks to copy")]
 		[DefaultValue(Smb2Client.DefaultChunkSize)]
 		public int ChunkSize { get; set; }

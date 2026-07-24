@@ -60,6 +60,7 @@ namespace Titanis.Cli
 		protected bool OutputFieldsSpecified { get; private set; }
 
 		[Parameter]
+		[Advanced]
 		[Category(ParameterCategories.Output)]
 		[Description("Print headers for table/list/CSV/TSV styles")]
 		[DefaultValue(true)]

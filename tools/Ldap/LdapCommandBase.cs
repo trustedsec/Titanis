@@ -34,14 +34,17 @@ namespace Titanis.Cli.LdapTool
 		public SwitchParam Ssl { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Name of PEM or PFX certificate file")]
 		public FileSpec? SslCert { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Name of PFX file for SSL authentication")]
 		public FileSpec? SslKeyFile { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Password for -SslCert or -SslKeyFile")]
 		public string? SslKeyPassword { get; set; }
 

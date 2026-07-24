@@ -9,6 +9,7 @@ namespace Titanis.Smb2.Cli
 	public abstract class ServerServiceRpcCommand : RpcCommand<ServerServiceClient>
 	{
 		[Parameter]
+		[Advanced]
 		[Description("Max size for response buffer")]
 		public int BufferSize { get; set; }
 

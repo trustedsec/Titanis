@@ -9,7 +9,9 @@ namespace Titanis.Cli.EpmTool;
 public abstract class EpmCommand : RpcCommand<EpmClient>
 {
 	[Parameter]
+	[Advanced]
 	[Description("Number of results to fetch at a time")]
+	[DefaultValue(DefaultPageSize)]
 	public int PageSize { get; set; }
 
 	const int DefaultPageSize = 32;

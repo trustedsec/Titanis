@@ -7,18 +7,19 @@ _comp_T_param() {
 	local paramName paramType rest
 	IFS=":" read -r paramName paramType rest <<< "$paramSpec"
 
-	if [[ "$paramType" = "" ]]; then
+	if [[ -z "$paramType" ]]; then
 		# No completions available
 		COMPREPLY=()
 		return 1
 	fi
+
 
 	if [[ "$paramType" = "list" ]]; then
 		IFS=";" read -r -a COMPREPLY <<< $rest
 		_T_filterArray "$cmp" "${COMPREPLY[@]}"
 		return 0
 	elif [[ "$paramType" = "file" ]]; then
-		local -a filePatterns
+		declare -a filePatterns
 		IFS=";" read -r -a filePatterns <<< $rest
 		COMPREPLY=()
 		for i in "${filePatterns[@]}"; do
@@ -52,32 +53,11 @@ _T_filterArray() {
 }
 
 _comp_Titanis() {
-	local cmp=$1
-	local argName
-	local arg
+	# Expect -A params and -a paramsByPos
 	local args=( "${COMP_WORDS[@]:1}" )
 	local argCount=${#args[@]}
+	local -i targetArgIndex=$((COMP_CWORD - 1))
 
-	local -a paramSpecs
-	IFS="|" read -r -a paramSpecs <<< "$2"
-
-	declare -A paramSpecsByName
-	declare -a paramsByPos
-	local paramSpec
-	for paramSpec in "${paramSpecs[@]}"; do
-		local paramName paramType
-		IFS=":" read -r paramName paramType <<< "$paramSpec"
-
-		if [[ $paramName = -* ]]; then
-			# This is a named argument
-			paramSpecsByName+=(["${paramName,,}"]="${paramSpec}")
-		elif [[ $paramName = @ ]]; then
-			# This is a positional argument
-			paramsByPos+=( "-$paramType" )
-		fi
-	done
-
-	local targetArgIndex=$((COMP_CWORD - 1))
 	if [[ "${COMP_LINE:(COMP_POINT-1):2}" == " " ]]; then
 		# Cursor is at the end of the line
 		#((targetArgIndex++))
@@ -88,19 +68,20 @@ _comp_Titanis() {
 	if [[ $curArg == -* ]]; then
 		# Cursor is on a parameter name
 		# Filter parameter names to exclude used parameters
-		local -A usedParams
+		declare -A usedParams
 		for arg in ${args[@]}; do
 			usedParams+=( ["${arg,,}"]=true )
 		done
 
-		local -a availParams
-		local paramSpec
-		for paramSpec in "${paramSpecs[@]}"; do
-			local paramName paramType
-			IFS=':' read -r paramName paramType <<< "$paramSpec"
+		declare -a availParams
+		local paramName
+		for paramName in "${!params[@]}"; do
+			local paramSpec=${params[$paramName]}
+			local paramType rest
+			IFS=':' read -r paramName paramType rest <<< "$paramSpec"
 
-			if [[ ! -v usedParams["${paramName,,}"] ]]; then
-				availParams+=("$paramName")
+			if [[ ! -v usedParams["-${paramName,,}"] ]]; then
+				availParams+=("-${paramName}")
 			fi
 		done
 
@@ -108,13 +89,14 @@ _comp_Titanis() {
 		return 0;
 	fi
 
-	local nextPos=0
-	local i 
+	local -i nextPos=0
+	local i
 	local selArgName=""
-	local isPos=0
+	local -i isPos=0
 	declare -A argValues
+	local argName=""
 	for ((i=0; i<=$targetArgIndex; i++)); do
-		arg=${args[i]}
+		local arg=${args[i]}
 		isPos=0
 
 		if [[ $arg = -* ]]; then
@@ -125,14 +107,14 @@ _comp_Titanis() {
 		elif [[ -n "$argName" ]]; then
 			# Consume this named argument
 			selArgName=$argName
-			argValues+=( ["$selArgName"]="$arg" )
+			argValues+=( ["${selArgName,,}"]="$arg" )
 			argName=""
 		else
 			while true; do
-				selArgName="${paramsByPos[nextPos]}"
+				selArgName="-${paramsByPos[nextPos]}"
 				((nextPos++))
 
-				if [[ ! -v argValues["$selArgName"] ]]; then
+				if [[ ! -v argValues["${selArgName,,}"] ]]; then
 					isPos=1
 					break
 				fi
@@ -141,14 +123,13 @@ _comp_Titanis() {
 	done
 
 	if [[ -n $selArgName ]]; then
-		if [[ $isPos -gt 0 && -z $cmp ]]; then
+		if [[ $isPos -gt 0 && -z $curArg ]]; then
 			# Help the user by printing the name of the positional argument
 			COMPREPLY=( "$selArgName" )
 			return 0
 		else
-			local argSpec=${paramSpecsByName[${selArgName,,}]}
-			_comp_T_param $argSpec $cmp
-			return $?
+			local argSpec=${params[${selArgName,,}]}
+			_comp_T_param "$argSpec" "$curArg"
 		fi
 	else
 		# No completion available
@@ -158,11 +139,11 @@ _comp_Titanis() {
 
 _comp_T_subcommands() {
 	local base=${COMP_WORDS[0]}
-	local subcmds=( ${@:3} )
+	local -a subcmds=( ${@:3} )
 	local cmp=$2
 
 	if [ $COMP_CWORD -eq 1 ]; then
-		_T_filterArray "$cmp" ${subcmds[@]}
+		_T_filterArray "$cmp" "${subcmds[@]}"
 	else
 		local subcmd="${COMP_WORDS[1]}"
 		((COMP_CWORD--))

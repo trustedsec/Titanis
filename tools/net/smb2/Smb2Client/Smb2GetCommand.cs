@@ -28,14 +28,17 @@ namespace Titanis.Smb2.Cli
 		public FileSpec? DestinationFileName { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Size of chunks to copy")]
 		public int ChunkSize { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Reads the data directly from storage")]
 		public SwitchParam Unbuffered { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Requests the server compress the data")]
 		public SwitchParam Compress { get; set; }
 
@@ -44,10 +47,12 @@ namespace Titanis.Smb2.Cli
 		public int Depth { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Specifies the buffer size for querying the directory listing (for recursive operations).")]
 		public int QueryBufferSize { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Only copies the directory structure, but not the files.")]
 		public SwitchParam TreeOnly { get; set; }
 

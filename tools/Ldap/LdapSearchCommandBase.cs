@@ -8,7 +8,6 @@ namespace Titanis.Cli.LdapTool;
 
 public abstract class LdapSearchCommandBase : LdapGenericSearchCommandBase
 {
-
 	[Parameter]
 	[Description("DN of search root (default is domain root)")]
 	public LdapDistinguishedName[]? SearchBase { get; set; }
@@ -18,26 +17,32 @@ public abstract class LdapSearchCommandBase : LdapGenericSearchCommandBase
 	public LdapSearchScope? Scope { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Description("Includes delete items (but not recycled)")]
 	public SwitchParam IncludeDeleted { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Description("Includes deleted and recycled items")]
 	public SwitchParam IncludeRecycled { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Description("Includes links to deleted items")]
 	public SwitchParam IncludeDeletedLinks { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Description("Only return changes since [cookie]")]
 	public HexString? DirSync { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Description("Request extended DNs")]
 	public SwitchParam ExtendedDN { get; set; }
 
 	[Parameter]
+	[Advanced]
 	[Description("Request link TTLs")]
 	public SwitchParam LinkTtl { get; set; }
 

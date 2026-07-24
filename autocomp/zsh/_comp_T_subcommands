@@ -1,0 +1,12 @@
+#autoload +X
+
+_comp_T_subcommands() {
+	if [ $CURRENT -eq 2 ]; then
+		_describe "${base} subcommands" commands
+	else
+		((CURRENT--))
+		words=( "${words[1]}_${words[2]}" ${words[3,-1]} )
+		_${words[1]}
+	fi
+	return 0
+}

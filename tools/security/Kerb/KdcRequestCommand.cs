@@ -23,6 +23,8 @@ public abstract class KdcRequestCommand : TicketRequestCommand, IHaveServerName
 	public NetworkParameters NetworkParameters { get; set; }
 
 	[Parameter]
+	[Advanced]
+	[Category(ParameterCategories.AuthenticationKerberos)]
 	[Description("Name of file containing armor ticket")]
 	[KerberosTicketFileSpec(true)]
 	public FileSpec? ArmorTicket { get; set; }

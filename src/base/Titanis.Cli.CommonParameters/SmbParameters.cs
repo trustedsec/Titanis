@@ -15,17 +15,20 @@ namespace Titanis.Cli
 	public class SmbParameters : ParameterGroupBase
 	{
 		[Parameter]
+		[Advanced]
 		[Description("List of SMB2 dialects to negotiate")]
 		[Category(ParameterCategories.Connection)]
 		public Smb2Dialect[]? Dialects { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Alias("signreq")]
 		[Description("Requires packets to be signed")]
 		[Category(ParameterCategories.Connection)]
 		public SwitchParam RequireSigning { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Category(ParameterCategories.Connection)]
 		[Description("Requires the client to authenticate the negotiation")]
 		public SwitchParam RequireSecureNegotiate { get; set; }
@@ -37,13 +40,17 @@ namespace Titanis.Cli
 
 		#region Features
 		[Parameter]
+		[Advanced]
 		[Description("Checks for and follows DFS referrals (default=true)")]
 		[Category(ParameterCategories.ClientBehavior)]
+		[DefaultValue(true)]
 		public SwitchParam FollowDfs { get; set; }
 
 		[Parameter]
+		[Advanced]
 		[Description("Specifies the size for the DFS referral buffer (default=4096)")]
 		[Category(ParameterCategories.ClientBehavior)]
+		[DefaultValue(4096)]
 		public int DfsReferralBufferSize { get; set; } = 4096;
 		#endregion
 
