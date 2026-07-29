@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Titanis
 {
@@ -21,6 +23,15 @@ namespace Titanis
 			{
 				yield return item;
 			}
+		}
+		public static async Task<T[]> ToArray<T>(this IAsyncEnumerable<T> enumerable, CancellationToken cancellationToken)
+		{
+			List<T> list = new List<T>();
+			await foreach (var item in enumerable.WithCancellation(cancellationToken).ConfigureAwait(false))
+			{
+				list.Add(item);
+			}
+			return list.ToArray();
 		}
 	}
 }
