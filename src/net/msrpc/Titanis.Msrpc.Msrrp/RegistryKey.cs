@@ -130,15 +130,15 @@ namespace Titanis.Msrpc.Msrrp
 			RpcPointer<ms_dtyp.RPC_UNICODE_STRING> lpClassIn = new(new ms_dtyp.RPC_UNICODE_STRING() { MaximumLength = (ushort)(keyInfo.MaxClassLength * 2) });
 			RpcPointer<RpcPointer<ms_dtyp.RPC_UNICODE_STRING>> lplpClassOut = new();
 			while ((res = (Win32ErrorCode)await this._owner.proxy.BaseRegEnumKey(
-					this._hkey,
-					(uint)index++,
-					lpNameIn,
-					lpNameOut,
-					lpClassIn,
-					lplpClassOut,
-					new RpcPointer<ms_dtyp.FILETIME>(),
-					cancellationToken
-					).ConfigureAwait(false)) == Win32ErrorCode.ERROR_SUCCESS)
+				this._hkey,
+				(uint)index++,
+				lpNameIn,
+				lpNameOut,
+				lpClassIn,
+				lplpClassOut,
+				new RpcPointer<ms_dtyp.FILETIME>(),
+				cancellationToken
+				).ConfigureAwait(false)) == Win32ErrorCode.ERROR_SUCCESS)
 			{
 				var name = lpNameOut.value.AsString().TrimEnd('\0');
 				var className = lplpClassOut.value.value.AsString()?.TrimEnd('\0');
@@ -156,6 +156,7 @@ namespace Titanis.Msrpc.Msrrp
 			var keyInfo = await this.QueryInfo(cancellationToken).ConfigureAwait(false);
 
 			int cbBuffer = keyInfo.MaxValueDataLength;
+			keyInfo.MaxValueNameLength++;
 
 			int index = 0;
 			Win32ErrorCode res;
@@ -169,16 +170,16 @@ namespace Titanis.Msrpc.Msrrp
 			RpcPointer<uint> lpcbData = new(includeData ? (uint)cbBuffer : 0);
 			RpcPointer<uint> lpcbLen = new(0U);
 			while ((res = (Win32ErrorCode)await this._owner.proxy.BaseRegEnumValue(
-					this._hkey,
-					(uint)index,
-					lpValueNameIn,
-					lpValueNameOut,
-					lpType,
-					lpData,
-					lpcbData,
-					lpcbLen,
-					cancellationToken
-					).ConfigureAwait(false)) == Win32ErrorCode.ERROR_SUCCESS)
+				this._hkey,
+				(uint)index,
+				lpValueNameIn,
+				lpValueNameOut,
+				lpType,
+				lpData,
+				lpcbData,
+				lpcbLen,
+				cancellationToken
+				).ConfigureAwait(false)) == Win32ErrorCode.ERROR_SUCCESS)
 			{
 				var valueBuf = lpData?.value.Array;
 				var data = (valueBuf != null) ? valueBuf.AsSpan(0, Math.Min((int)lpcbLen.value, cbBuffer)).ToArray() : null;
