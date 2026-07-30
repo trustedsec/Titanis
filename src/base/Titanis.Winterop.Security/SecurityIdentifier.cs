@@ -293,7 +293,7 @@ namespace Titanis.Winterop.Security
 
 			var c1 = ctx[0];
 			var c2 = ctx[1];
-			if (c1 == 'S' && c2 == '-')
+			if (char.ToUpper(c1) == 'S' && c2 == '-')
 			{
 				ctx.Advance(1);
 

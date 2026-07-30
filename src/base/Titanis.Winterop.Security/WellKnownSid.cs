@@ -436,9 +436,9 @@ namespace Titanis.Winterop.Security
 		{
 			public WksSddlKey(char c1, char c2)
 			{
-				ushort value = c1;
+				ushort value = char.ToUpper(c1);
 				value <<= 8;
-				value |= c2;
+				value |= char.ToUpper(c2);
 				this.value = value;
 			}
 
