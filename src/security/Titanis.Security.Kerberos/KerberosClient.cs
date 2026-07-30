@@ -1143,31 +1143,31 @@ namespace Titanis.Security.Kerberos
 		}
 #endif
 
-		public async Task ChangePassword(
+		public Task ChangePassword(
 			EndPoint kdcEP,
 			TicketInfo ticket,
 			KerberosCredential credential,
 			string newPassword,
 			HostAddress hostAddress,
 			CancellationToken cancellationToken
-			)
-		{
-			ArgumentNullException.ThrowIfNull(kdcEP);
-			ArgumentNullException.ThrowIfNull(ticket);
-			ArgumentNullException.ThrowIfNull(credential);
-			ArgumentNullException.ThrowIfNull(newPassword);
-			ArgumentNullException.ThrowIfNull(hostAddress);
+			) => this.SetPassword(kdcEP, ticket, credential, newPassword, null, null, hostAddress, cancellationToken);
+		//{
+		//	ArgumentNullException.ThrowIfNull(kdcEP);
+		//	ArgumentNullException.ThrowIfNull(ticket);
+		//	ArgumentNullException.ThrowIfNull(credential);
+		//	ArgumentNullException.ThrowIfNull(newPassword);
+		//	ArgumentNullException.ThrowIfNull(hostAddress);
 
-			byte[] privData = Encoding.UTF8.GetBytes(newPassword);
+		//	byte[] privData = Encoding.UTF8.GetBytes(newPassword);
 
-			await this.EnsureTransport().SendChangepwRequest(
-				this,
-				kdcEP,
-				privData,
-				ChangepwMessage.ChangepwVersionNumber,
-				new ChangepwRequest(credential, ticket),
-				cancellationToken).ConfigureAwait(false);
-		}
+		//	await this.EnsureTransport().SendChangepwRequest(
+		//		this,
+		//		kdcEP,
+		//		privData,
+		//		ChangepwMessage.ChangepwRequestVersionNumber,
+		//		new ChangepwRequest(credential, ticket),
+		//		cancellationToken).ConfigureAwait(false);
+		//}
 
 		public async Task SetPassword(
 			EndPoint kdcEP,
@@ -1196,7 +1196,7 @@ namespace Titanis.Security.Kerberos
 				this,
 				kdcEP,
 				privData,
-				ChangepwMessage.Win2kResetPasswordVersionNumber,
+				ChangepwVersion.Win2kResetPasswordVersionNumber,
 				new ChangepwRequest(credential, ticket),
 				cancellationToken).ConfigureAwait(false);
 		}

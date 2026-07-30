@@ -32,7 +32,7 @@ namespace Titanis.Security.Kerberos
 			KDC_REQ_CHOICE kdcreq,
 			CancellationToken cancellationToken);
 
-		Task SendChangepwRequest(KerberosClient client, EndPoint kdcEP, byte[] privData, ushort version, ChangepwRequest request, CancellationToken cancellationToken);
+		Task SendChangepwRequest(KerberosClient client, EndPoint kdcEP, byte[] privData, ChangepwVersion version, ChangepwRequest request, CancellationToken cancellationToken);
 	}
 
 	internal class KerberosSocketTransport : IKerberosTransport
@@ -68,9 +68,9 @@ namespace Titanis.Security.Kerberos
 			CancellationToken cancellationToken)
 		{
 			ArgumentNullException.ThrowIfNull(kdcEP);
-            ArgumentNullException.ThrowIfNull(kdcreq);
+			ArgumentNullException.ThrowIfNull(kdcreq);
 
-            Debug.Assert(!string.IsNullOrEmpty(realm));
+			Debug.Assert(!string.IsNullOrEmpty(realm));
 
 			Memory<byte> requestBytes = BuildPdu(kdcreq);
 
@@ -116,7 +116,7 @@ namespace Titanis.Security.Kerberos
 			KerberosClient client,
 			EndPoint kdcEP,
 			byte[] privData,
-			ushort version,
+			ChangepwVersion version,
 			ChangepwRequest request,
 			CancellationToken cancellationToken)
 		{
@@ -160,22 +160,37 @@ namespace Titanis.Security.Kerberos
 					cbRecv += await socket.ReceiveAtLeastAsync(replyBuf.AsMemory(cbRecv), cbMessage - cbRecv, cancellationToken).ConfigureAwait(false);
 			}
 
-			var reader = new ByteMemoryReader(replyBuf.AsMemory(4, cbRecv - 4));
-			var reply = reader.ReadPduStruct<ChangepwMessage>();
-			authContext.Initialize(reply.Apreqdata);
-			var privReply = Asn1DerDecoder.DecodeTlv<KRB_PRIV>(reply.PrivMessage);
-
-			var privEncpart = authContext.InitiatorSubkey.DecryptTlv<EncKrbPrivPart>(KeyUsage.Priv, privReply.Value.enc_part).Value;
-			if (privEncpart.user_data.Length >= 2)
+			if (version == ChangepwVersion.Win2kResetPasswordVersionNumber
+				&& replyBuf[4] == 0x7E
+				)
 			{
-				var status = (ChangepwStatus)BinaryPrimitives.ReadUInt16BigEndian(privEncpart.user_data);
-				if (status != ChangepwStatus.Success)
-				{
-					string? errorMessage = null;
-					if (privEncpart.user_data.Length > 2)
-						errorMessage = Encoding.UTF8.GetString(privEncpart.user_data.Slice(2));
+				var cbReply = BinaryPrimitives.ReadInt32BigEndian(replyBuf.AsSpan(0, 4));
+				KRB_ERROR err = Asn1DerDecoder.DecodeTlv<KRB_ERROR>(replyBuf.AsMemory(4, cbReply));
+				if (err.Value.error_code != 0)
+					throw err.Value.GetException();
 
-					throw new KrbChangePasswordException(status, errorMessage);
+				return;
+			}
+			else
+			{
+				var reader = new ByteMemoryReader(replyBuf.AsMemory(4, cbRecv - 4));
+
+				var reply = reader.ReadPduStruct<ChangepwMessage>();
+				authContext.Initialize(reply.Apreqdata);
+				var privReply = Asn1DerDecoder.DecodeTlv<KRB_PRIV>(reply.PrivMessage);
+
+				var privEncpart = authContext.InitiatorSubkey.DecryptTlv<EncKrbPrivPart>(KeyUsage.Priv, privReply.Value.enc_part).Value;
+				if (privEncpart.user_data.Length >= 2)
+				{
+					var status = (ChangepwStatus)BinaryPrimitives.ReadUInt16BigEndian(privEncpart.user_data);
+					if (status != ChangepwStatus.Success)
+					{
+						string? errorMessage = null;
+						if (privEncpart.user_data.Length > 2)
+							errorMessage = Encoding.UTF8.GetString(privEncpart.user_data.Slice(2));
+
+						throw new KrbChangePasswordException(status, errorMessage);
+					}
 				}
 			}
 		}
