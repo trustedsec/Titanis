@@ -19,8 +19,4 @@
 	  <ProjectReference Include="$(SolutionDir)src\build\Titanis.CodeAnalysis.Cli\Titanis.CodeAnalysis.Cli\Titanis.CodeAnalysis.Cli.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
 </Project>

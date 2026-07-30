@@ -110,9 +110,14 @@ namespace Titanis.Winterop.Registry
 			if (string.IsNullOrEmpty(path)) throw new ArgumentException($"'{nameof(path)}' cannot be null or empty.", nameof(path));
 			var validRootNames = RegistryRootKey.RootNames.Concat(RegistryRootKey.RootShortNames);
 			var rootName = validRootNames.FirstOrDefault(name => path.StartsWith(name, StringComparison.OrdinalIgnoreCase));
-			if (rootName is null || !TryResolveRootName(rootName, out var root))
+			PredefinedKey root;
+			if (rootName is null)
 			{
-				throw new ArgumentException($"Predefined key name is invalid. must be one of {string.Join(' ', validRootNames)}");
+				throw new ArgumentException($"Predefined key name cannot be null. Must be one of {string.Join(' ', validRootNames)}");
+			}
+			else if (!TryResolveRootName(rootName, out root))
+			{
+				throw new ArgumentException($"Predefined key name is invalid. Must be one of {string.Join(' ', validRootNames)}");
 			}
 			if (path.Length == rootName.Length)
 				return new RegistryPath(root, string.Empty);

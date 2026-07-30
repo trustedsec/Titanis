@@ -316,9 +316,13 @@ namespace Titanis.Msrpc.Msrrp
 			result.CheckAndThrow();
 		}
 
-		public async Task DeleteValue(string? valueName, CancellationToken cancellationToken)
+		public async Task DeleteValue(string valueName, CancellationToken cancellationToken)
 		{
-			RPC_UNICODE_STRING lpValueName = string.IsNullOrEmpty(valueName) ? new RPC_UNICODE_STRING
+			if(valueName == null)
+			{
+				throw new ArgumentException("Argument can not be null", nameof(valueName));
+			}
+			RPC_UNICODE_STRING lpValueName = valueName == string.Empty ? new RPC_UNICODE_STRING
 			{
 				Buffer = new RpcPointer<ArraySegment<char>>(new char[1]),
 				Length = 2,
