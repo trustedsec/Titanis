@@ -124,18 +124,28 @@ items:
             - title: LDAP
               href: ldap.html
               items:
-                - title: Search for a user
-                  href: "#search"
-                - title: Query users and groups
-                  href: "#query"
-                - title: Query SPN mappings
-                  href: "#query-spn"
-                - title: Add certificate credential
-                  href: "#add-cert"
-                - title: Add/remove SPN mapping
-                  href: "#add-spn"
-                - title: Change or reset password
-                  href: "#change-password"
+                - title: Search for a User
+                  href: "#search-for-a-user"
+                - title: Accounts with Stale Passwords
+                  href: "#accounts-with-stale-passwords"
+                - title: Query SPN Mappings
+                  href: "#query-spn-mappings"
+                - title: Query Transitive Group Members
+                  href: "#query-transitive-group-members"
+                - title: Accounts with RBCD
+                  href: "#accounts-with-rbcd"
+                - title: Add Certificate Credential
+                  href: "#add-certificate-credential"
+                - title: Add/Remove SPN Mapping
+                  href: "#add-remove-spn-mapping"
+                - title: Change or Reset Password
+                  href: "#change-or-reset-password"
+                - title: Add Member to Group
+                  href: "#add-member-to-group"
+                - title: Query Membership Expiration
+                  href: "#query-membership-expiration"
+                - title: Add Expiring Group Membership
+                  href: "#add-expiring-group-membership"
           - title: File Sharing
             href: smb.html
             items:
