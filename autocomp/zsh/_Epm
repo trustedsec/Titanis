@@ -1,0 +1,8 @@
+#compdef Epm
+
+_Epm() {
+	local -a commands=(
+		'lsep:Lists the dynamic RPC endpoints registered with the endpoint mapper'
+	)
+	_comp_T_subcommands
+}

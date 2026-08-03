@@ -1,0 +1,34 @@
+#compdef Kerb_select
+
+_Kerb_select() {
+	declare -A params=(
+		['-from']=$'From||FileSpec[]|file|*.ccache;*.kirbi|Ticket Source|File names or patterns'
+		['-ticketcache']=$'TicketCache||FileSpec|file|*.ccache;*.kirbi|Ticket Source|Name of ticket cache file'
+		['-overwrite']=$'Overwrite||SwitchParam|||Output|Overwrites target file if it exists'
+		['-into']=$'Into||FileSpec|file|*.ccache;*.kirbi|Output|Target file name'
+		['-ticketkey']=$'TicketKey||HexString[]|||Ticket Decryption|Key to decrypt the ticket'
+		['-servicepassword']=$'ServicePassword||String[]|||Ticket Decryption|Password for service account'
+		['-servicesalt']=$'ServiceSalt||String[]|||Ticket Decryption|Salt for service account'
+		['-current']=$'Current||SwitchParam|||Ticket Filter|Only select tickets currently valid'
+		['-matchingclientname']=$'MatchingClientName||String[]|||Ticket Filter|Regex of client name to match'
+		['-matchingspn']=$'MatchingSpn||String[]|||Ticket Filter|Regex of SPN to match'
+		['-matchingticketetype']=$'MatchingTicketEType||EType[]|list|DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc|Ticket Filter|Filter for ticket encryption type'
+		['-matchingsessionetype']=$'MatchingSessionEType||EType[]|list|DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc|Ticket Filter|Filter for session key encryption type'
+		['-seqnbr']=$'SeqNbr||NumberOrRange[]|||Ticket Filter|Seq. nbr. or range'
+		['-invertmatch']=$'InvertMatch||SwitchParam|||Ticket Filter|Invert match; select whatever doesn\'t match'
+		['-printauthdata']=$'PrintAuthData||SwitchParam|||Output|Prints ticket authorization data (if decrypted)'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle||OutputStyle|list|Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable|Output|Determines the output style'
+		['-outputfields']=$'OutputFields||String[]|list|SourceFileName;SeqNbr;Comment;ClientName;ClientRealm;TicketRealm;TargetSpn;ServiceClass;ServiceInstance;ServiceRealm;KdcOptions;EndTime;StartTime;RenewTill;AsrepKeyText;TicketKeyText;SupportedEncryptionTypes;SessionEType;SessionKeyText;TicketEType;TgsrepHashcatMethod;TicketHash;IsCurrent;SecurityGroups;NtlmHashText|Output|Fields to display in output'
+		['-outputheaders']=$'OutputHeaders|@|SwitchParam|||Output|Print headers for table/list/CSV/TSV styles'
+		['-loglevel']=$'LogLevel||LogMessageSeverity|list|Debug;Diagnostic;Verbose;Info;Warning;Error;Critical|Output|Sets the lowest level of messages to log'
+		['-consolelogformat']=$'ConsoleLogFormat|@|LogFormat|list|Text;TextWithTimestamp;Json|Output|Sets the format of log messages written to the console'
+		['-verbose']=$'Verbose||SwitchParam|||Output|Prints verbose messages'
+		['-diagnostic']=$'Diagnostic|@|SwitchParam|||Output|Prints diagnostic messages'
+		['-debuglog']=$'DebugLog|@|SwitchParam|||Output|Prints debug messages'
+		['-humanreadable']=$'HumanReadable|@|SwitchParam|||Output|Formats file sizes as human-readable values'
+	)
+	declare -a paramsByPos=(
+		'From'
+	)
+	_comp_Titanis
+}

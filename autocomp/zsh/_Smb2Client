@@ -1,0 +1,25 @@
+#compdef Smb2Client
+
+_Smb2Client() {
+	local -a commands=(
+		'enumnics:Queries the server for a list of network interfaces.'
+		'enumopenfiles:Lists files open on the server.'
+		'enumsessions:Lists active sessions on the server.'
+		'enumshares:Lists shares on the server'
+		'enumsnapshots:Lists the available snapshots for a file or directory.'
+		'enumstreams:Lists the data streams of a file or directory.'
+		'get:Gets the contents of a file.'
+		'ls:Lists the contents of a directory (including named pipes).'
+		'mkdir:Creates a directory.'
+		'mklink:Creates a symbolic link.'
+		'mount:Creates a mount point or junction.'
+		'mountfs:Mounts an SMB2 server or share to the local file system.'
+		'put:Sends a file to the server.'
+		'rm:Deletes a file.'
+		'rmdir:Deletes a directory.'
+		'touch:Updates the timestamps or attributes of a file or directory on an SMB share.'
+		'umount:Unmounts a mount point.'
+		'watch:Watches for modifications to a directory or subtree.'
+	)
+	_comp_T_subcommands
+}

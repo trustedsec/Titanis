@@ -1,0 +1,20 @@
+#compdef Wmi
+
+_Wmi() {
+	local -a commands=(
+		'backup:Backs up the WMI repository'
+		'delete:Deletes a WMI object'
+		'exec:Executes a command on a remote system via WMI'
+		'get:Gets an object with a WMI path'
+		'invoke:Invokes a method on a WMI class or object'
+		'lsclass:Lists the classes within a namespace.'
+		'lsmethod:Lists the methods of a class or object.'
+		'lsns:Lists the available namespaces within a namespace.'
+		'lsprop:Lists the properties of a class or object.'
+		'mountfs:Mounts a WMI namespace as a file system'
+		'query:Executes a WMI query'
+		'reg:Interact with the Windows registry via WMI.'
+		'restore:Restores the WMI repository'
+	)
+	_comp_T_subcommands
+}

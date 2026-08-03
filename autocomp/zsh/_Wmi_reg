@@ -1,0 +1,11 @@
+#compdef Wmi_reg
+
+_Wmi_reg() {
+	local -a commands=(
+		'delete:Deletes one or more registry keys and/or values'
+		'export:Export registry values to file'
+		'query:Query registry values'
+		'set:Sets one or more values in a registry key'
+	)
+	_comp_T_subcommands
+}

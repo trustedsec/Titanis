@@ -1,0 +1,13 @@
+#compdef Scm
+
+_Scm() {
+	local -a commands=(
+		'create:Creates and optionally starts a new service'
+		'delete:Deletes a service'
+		'qtriggers:Queries the status of a service'
+		'query:Queries the status of a service'
+		'start:Starts a service'
+		'stop:Stops a service'
+	)
+	_comp_T_subcommands
+}

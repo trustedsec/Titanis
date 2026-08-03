@@ -1,0 +1,17 @@
+#compdef Kerb
+
+_Kerb() {
+	local -a commands=(
+		'asreq:Requests a TGT from the KDC.'
+		'changepw:Changes an account password'
+		'forge:Forges a ticket'
+		'getasinfo:Gets server time and encryption types (with salts) for a user account.'
+		'keytab:Display and edit keytab files'
+		'renew:Renews a ticket'
+		's2k:Generates a protocol key from a string, such as a password'
+		'select:Selects and displays tickets from a file.'
+		'setpw:Sets the password of (another) account'
+		'tgsreq:Requests a ticket from the KDC.'
+	)
+	_comp_T_subcommands
+}

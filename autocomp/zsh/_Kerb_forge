@@ -1,0 +1,45 @@
+#compdef Kerb_forge
+
+_Kerb_forge() {
+	declare -A params=(
+		['-ticketetype']=$'TicketEType|X|EType|list|DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc||Ticket encryption type'
+		['-serverkey']=$'ServerKey|X|HexString||||Key of server to receive the ticket'
+		['-kdcetype']=$'KdcEType||EType|list|DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc||KDC key type'
+		['-kdckey']=$'KdcKey||HexString||||Key to sign the ticket and PAC with'
+		['-target']=$'Target|X|SecurityPrincipalName[]||||Target SPN'
+		['-usersid']=$'UserSid|X|SecurityIdentifier||||User SID'
+		['-username']=$'UserName|X|UserPrincipalName||||User name'
+		['-userrealm']=$'UserRealm||String||||Logon domain (FQDN) of the user'
+		['-realm']=$'Realm||String||||Ticket realm'
+		['-servicerealm']=$'ServiceRealm||String||||Service realm'
+		['-logonserver']=$'LogonServer||String||||Name of logon server'
+		['-userdomain']=$'UserDomain||String||||Logon domain (NetBIOS) of the user'
+		['-domainrids']=$'DomainRids||UInt32[]||||Group RIDs, relative to the user domain'
+		['-extrasids']=$'ExtraSids||SecurityIdentifier[]||||Extra group SIDs'
+		['-resourcedomainsid']=$'ResourceDomainSid||SecurityIdentifier||||Domain of SID containing resource'
+		['-resourcegrouprids']=$'ResourceGroupRids||UInt32[]||||Group RIDs, relative to the resource domain'
+		['-fullname']=$'FullName||String||||User\'s full name'
+		['-primarygroupid']=$'PrimaryGroupId||UInt32||||Primary group ID'
+		['-logonscript']=$'LogonScript||String||||UNC path of logon script'
+		['-profilepath']=$'ProfilePath||String||||UNC path of user profile'
+		['-homedirectory']=$'HomeDirectory||String||||UNC path of home directory'
+		['-homedrive']=$'HomeDrive||String||||Home Drive (e.g. H:)'
+		['-outputfilename']=$'OutputFileName||FileSpec|file|*.ccache;*.kirbi|Output|Name of file to write ticket to'
+		['-overwrite']=$'Overwrite||SwitchParam|||Output|Overwrites the output file, if it exists'
+		['-append']=$'Append||SwitchParam|||Output|Appends to the output file, if it exists'
+		['-ticketcache']=$'TicketCache||FileSpec|file|*.ccache;*.kirbi|Authentication (Kerberos)|Name of ticket cache file'
+		['-workstation']=$'Workstation||String|||Authentication (Kerberos)|Name of client workstation'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle||OutputStyle|list|Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable|Output|Determines the output style'
+		['-outputheaders']=$'OutputHeaders|@|SwitchParam|||Output|Print headers for table/list/CSV/TSV styles'
+		['-loglevel']=$'LogLevel||LogMessageSeverity|list|Debug;Diagnostic;Verbose;Info;Warning;Error;Critical|Output|Sets the lowest level of messages to log'
+		['-consolelogformat']=$'ConsoleLogFormat|@|LogFormat|list|Text;TextWithTimestamp;Json|Output|Sets the format of log messages written to the console'
+		['-verbose']=$'Verbose||SwitchParam|||Output|Prints verbose messages'
+		['-diagnostic']=$'Diagnostic|@|SwitchParam|||Output|Prints diagnostic messages'
+		['-debuglog']=$'DebugLog|@|SwitchParam|||Output|Prints debug messages'
+		['-humanreadable']=$'HumanReadable|@|SwitchParam|||Output|Formats file sizes as human-readable values'
+	)
+	declare -a paramsByPos=(
+		'Target'
+	)
+	_comp_Titanis
+}

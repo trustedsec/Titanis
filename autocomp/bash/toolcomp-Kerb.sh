@@ -1,0 +1,405 @@
+#!/bin/bash
+
+# Kerb
+_comp_Kerb () {
+	_comp_T_subcommands "$1" "$2" asreq changepw forge getasinfo keytab renew s2k select setpw tgsreq
+	return $?
+}
+complete -F _comp_Kerb Kerb
+
+# Kerb asreq
+_comp_Kerb_asreq () {
+	declare -A params=(
+		['-enctypes']=$'EncTypes:list:DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc'
+		['-target']=$'Target::'
+		['-kdc']=$'Kdc::'
+		['-armorticket']=$'ArmorTicket:file:*.ccache;*.kirbi'
+		['-outputfilename']=$'OutputFileName:file:*.ccache;*.kirbi'
+		['-overwrite']=$'Overwrite::'
+		['-append']=$'Append::'
+		['-ticketcache']=$'TicketCache:file:*.ccache;*.kirbi'
+		['-workstation']=$'Workstation::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputheaders']=$'OutputHeaders::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+		['-username']=$'UserName::'
+		['-realm']=$'Realm::'
+		['-password']=$'Password::'
+		['-ntlmhash']=$'NtlmHash::'
+		['-aeskey']=$'AesKey::'
+		['-deskey']=$'DesKey::'
+		['-keytab']=$'Keytab:file:*.keytab;*.kt'
+		['-forwardable']=$'Forwardable::'
+		['-proxiable']=$'Proxiable::'
+		['-postdate']=$'Postdate::'
+		['-renewable']=$'Renewable::'
+		['-renewtill']=$'RenewTill::'
+		['-endtime']=$'EndTime::'
+		['-renewableok']=$'RenewableOk::'
+		['-ticketcomment']=$'TicketComment::'
+		['-hostaddress']=$'HostAddress::'
+		['-usetcp6only']=$'UseTcp6Only::'
+		['-usetcp4only']=$'UseTcp4Only::'
+		['-socks5']=$'Socks5::'
+		['-usercert']=$'UserCert::'
+		['-userkey']=$'UserKey::'
+		['-userkeypassword']=$'UserKeyPassword::'
+	)
+	declare -a paramsByPos=(
+		'UserName'
+		'Kdc'
+	)
+	_comp_Titanis
+}
+complete -F _comp_Kerb_asreq Kerb-asreq
+
+# Kerb changepw
+_comp_Kerb_changepw () {
+	declare -A params=(
+		['-newpassword']=$'NewPassword::'
+		['-kdc']=$'Kdc::'
+		['-workstation']=$'Workstation::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputheaders']=$'OutputHeaders::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+		['-username']=$'UserName::'
+		['-realm']=$'Realm::'
+		['-password']=$'Password::'
+		['-ntlmhash']=$'NtlmHash::'
+		['-aeskey']=$'AesKey::'
+		['-deskey']=$'DesKey::'
+		['-keytab']=$'Keytab:file:*.keytab;*.kt'
+		['-hostaddress']=$'HostAddress::'
+		['-usetcp6only']=$'UseTcp6Only::'
+		['-usetcp4only']=$'UseTcp4Only::'
+		['-socks5']=$'Socks5::'
+		['-usercert']=$'UserCert::'
+		['-userkey']=$'UserKey::'
+		['-userkeypassword']=$'UserKeyPassword::'
+	)
+	declare -a paramsByPos=(
+		'UserName'
+		'Kdc'
+		'NewPassword'
+	)
+	_comp_Titanis
+}
+complete -F _comp_Kerb_changepw Kerb-changepw
+
+# Kerb forge
+_comp_Kerb_forge () {
+	declare -A params=(
+		['-ticketetype']=$'TicketEType:list:DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc'
+		['-serverkey']=$'ServerKey::'
+		['-kdcetype']=$'KdcEType:list:DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc'
+		['-kdckey']=$'KdcKey::'
+		['-target']=$'Target::'
+		['-usersid']=$'UserSid::'
+		['-username']=$'UserName::'
+		['-userrealm']=$'UserRealm::'
+		['-realm']=$'Realm::'
+		['-servicerealm']=$'ServiceRealm::'
+		['-logonserver']=$'LogonServer::'
+		['-userdomain']=$'UserDomain::'
+		['-domainrids']=$'DomainRids::'
+		['-extrasids']=$'ExtraSids::'
+		['-resourcedomainsid']=$'ResourceDomainSid::'
+		['-resourcegrouprids']=$'ResourceGroupRids::'
+		['-fullname']=$'FullName::'
+		['-primarygroupid']=$'PrimaryGroupId::'
+		['-logonscript']=$'LogonScript::'
+		['-profilepath']=$'ProfilePath::'
+		['-homedirectory']=$'HomeDirectory::'
+		['-homedrive']=$'HomeDrive::'
+		['-outputfilename']=$'OutputFileName:file:*.ccache;*.kirbi'
+		['-overwrite']=$'Overwrite::'
+		['-append']=$'Append::'
+		['-ticketcache']=$'TicketCache:file:*.ccache;*.kirbi'
+		['-workstation']=$'Workstation::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputheaders']=$'OutputHeaders::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+	)
+	declare -a paramsByPos=(
+		'Target'
+	)
+	_comp_Titanis
+}
+complete -F _comp_Kerb_forge Kerb-forge
+
+# Kerb getasinfo
+_comp_Kerb_getasinfo () {
+	declare -A params=(
+		['-username']=$'UserName::'
+		['-realm']=$'Realm::'
+		['-enctypes']=$'EncTypes:list:DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc'
+		['-kdc']=$'Kdc::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputfields']=$'OutputFields:list:EType;SaltText;SaltHex'
+		['-outputheaders']=$'OutputHeaders::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+		['-hostaddress']=$'HostAddress::'
+		['-usetcp6only']=$'UseTcp6Only::'
+		['-usetcp4only']=$'UseTcp4Only::'
+		['-socks5']=$'Socks5::'
+	)
+	declare -a paramsByPos=(
+		'UserName'
+		'Kdc'
+	)
+	_comp_Titanis
+}
+complete -F _comp_Kerb_getasinfo Kerb-getasinfo
+
+# Kerb keytab
+_comp_Kerb_keytab () {
+	_comp_T_subcommands "$1" "$2" list
+	return $?
+}
+complete -F _comp_Kerb_keytab Kerb-keytab
+
+# Kerb renew
+_comp_Kerb_renew () {
+	declare -A params=(
+		['-ticket']=$'Ticket:file:*.ccache;*.kirbi'
+		['-targetspn']=$'TargetSpn::'
+		['-kdc']=$'Kdc::'
+		['-armorticket']=$'ArmorTicket:file:*.ccache;*.kirbi'
+		['-outputfilename']=$'OutputFileName:file:*.ccache;*.kirbi'
+		['-overwrite']=$'Overwrite::'
+		['-append']=$'Append::'
+		['-ticketcache']=$'TicketCache:file:*.ccache;*.kirbi'
+		['-workstation']=$'Workstation::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputheaders']=$'OutputHeaders::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+		['-forwardable']=$'Forwardable::'
+		['-proxiable']=$'Proxiable::'
+		['-postdate']=$'Postdate::'
+		['-renewable']=$'Renewable::'
+		['-renewtill']=$'RenewTill::'
+		['-endtime']=$'EndTime::'
+		['-renewableok']=$'RenewableOk::'
+		['-ticketcomment']=$'TicketComment::'
+		['-hostaddress']=$'HostAddress::'
+		['-usetcp6only']=$'UseTcp6Only::'
+		['-usetcp4only']=$'UseTcp4Only::'
+		['-socks5']=$'Socks5::'
+	)
+	declare -a paramsByPos=(
+		'Kdc'
+		'TargetSpn'
+	)
+	_comp_Titanis
+}
+complete -F _comp_Kerb_renew Kerb-renew
+
+# Kerb s2k
+_comp_Kerb_s2k () {
+	declare -A params=(
+		['-password']=$'Password::'
+		['-salt']=$'Salt::'
+		['-enctype']=$'EncType:list:DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc'
+		['-continueonerror']=$'ContinueOnError::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputfields']=$'OutputFields:list:EType;KeyText'
+		['-outputheaders']=$'OutputHeaders::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+	)
+	declare -a paramsByPos=(
+		'Password'
+		'Salt'
+		'EncType'
+	)
+	_comp_Titanis
+}
+complete -F _comp_Kerb_s2k Kerb-s2k
+
+# Kerb select
+_comp_Kerb_select () {
+	declare -A params=(
+		['-from']=$'From:file:*.ccache;*.kirbi'
+		['-ticketcache']=$'TicketCache:file:*.ccache;*.kirbi'
+		['-overwrite']=$'Overwrite::'
+		['-into']=$'Into:file:*.ccache;*.kirbi'
+		['-ticketkey']=$'TicketKey::'
+		['-servicepassword']=$'ServicePassword::'
+		['-servicesalt']=$'ServiceSalt::'
+		['-current']=$'Current::'
+		['-matchingclientname']=$'MatchingClientName::'
+		['-matchingspn']=$'MatchingSpn::'
+		['-matchingticketetype']=$'MatchingTicketEType:list:DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc'
+		['-matchingsessionetype']=$'MatchingSessionEType:list:DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc'
+		['-seqnbr']=$'SeqNbr::'
+		['-invertmatch']=$'InvertMatch::'
+		['-printauthdata']=$'PrintAuthData::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputfields']=$'OutputFields:list:SourceFileName;SeqNbr;Comment;ClientName;ClientRealm;TicketRealm;TargetSpn;ServiceClass;ServiceInstance;ServiceRealm;KdcOptions;EndTime;StartTime;RenewTill;AsrepKeyText;TicketKeyText;SupportedEncryptionTypes;SessionEType;SessionKeyText;TicketEType;TgsrepHashcatMethod;TicketHash;IsCurrent;SecurityGroups;NtlmHashText'
+		['-outputheaders']=$'OutputHeaders::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+	)
+	declare -a paramsByPos=(
+		'From'
+	)
+	_comp_Titanis
+}
+complete -F _comp_Kerb_select Kerb-select
+
+# Kerb setpw
+_comp_Kerb_setpw () {
+	declare -A params=(
+		['-targetaccount']=$'TargetAccount::'
+		['-newpassword']=$'NewPassword::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputheaders']=$'OutputHeaders::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+		['-anonymous']=$'Anonymous::'
+		['-username']=$'UserName::'
+		['-userdomain']=$'UserDomain::'
+		['-password']=$'Password::'
+		['-ntlmhash']=$'NtlmHash::'
+		['-aeskey']=$'AesKey::'
+		['-deskey']=$'DesKey::'
+		['-workstation']=$'Workstation::'
+		['-tgt']=$'Tgt::'
+		['-armorticket']=$'ArmorTicket::'
+		['-tickets']=$'Tickets::'
+		['-ticketcache']=$'TicketCache::'
+		['-delegate']=$'Delegate::'
+		['-delegateticket']=$'DelegateTicket::'
+		['-ntlmversion']=$'NtlmVersion::'
+		['-kdc']=$'Kdc::'
+		['-keytab']=$'Keytab::'
+		['-s4username']=$'S4UserName::'
+		['-u2username']=$'U2UserName::'
+		['-s4usercert']=$'S4UserCert::'
+		['-s4proxyservice']=$'S4ProxyService::'
+		['-spnoverride']=$'SpnOverride::'
+		['-authproxy']=$'AuthProxy::'
+		['-hostaddress']=$'HostAddress::'
+		['-usetcp6only']=$'UseTcp6Only::'
+		['-usetcp4only']=$'UseTcp4Only::'
+		['-socks5']=$'Socks5::'
+		['-usercert']=$'UserCert::'
+		['-userkey']=$'UserKey::'
+		['-userkeypassword']=$'UserKeyPassword::'
+	)
+	declare -a paramsByPos=(
+		'TargetAccount'
+		'NewPassword'
+	)
+	_comp_Titanis
+}
+complete -F _comp_Kerb_setpw Kerb-setpw
+
+# Kerb tgsreq
+_comp_Kerb_tgsreq () {
+	declare -A params=(
+		['-target']=$'Target::'
+		['-tgt']=$'Tgt:file:*.ccache;*.kirbi'
+		['-enctypes']=$'EncTypes:list:DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc'
+		['-forwarded']=$'Forwarded::'
+		['-realm']=$'Realm::'
+		['-s4username']=$'S4UserName::'
+		['-s4usercert']=$'S4UserCert:file:*.cer;*.crt;*.pem;*.pfx;*.p12'
+		['-s4proxyservice']=$'S4ProxyService::'
+		['-u2uticket']=$'U2uTicket:file:*.ccache;*.kirbi'
+		['-servicepassword']=$'ServicePassword::'
+		['-servicesalt']=$'ServiceSalt::'
+		['-asrepkey']=$'AsrepKey::'
+		['-kdc']=$'Kdc::'
+		['-armorticket']=$'ArmorTicket:file:*.ccache;*.kirbi'
+		['-outputfilename']=$'OutputFileName:file:*.ccache;*.kirbi'
+		['-overwrite']=$'Overwrite::'
+		['-append']=$'Append::'
+		['-ticketcache']=$'TicketCache:file:*.ccache;*.kirbi'
+		['-workstation']=$'Workstation::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputheaders']=$'OutputHeaders::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+		['-forwardable']=$'Forwardable::'
+		['-proxiable']=$'Proxiable::'
+		['-postdate']=$'Postdate::'
+		['-renewable']=$'Renewable::'
+		['-renewtill']=$'RenewTill::'
+		['-endtime']=$'EndTime::'
+		['-renewableok']=$'RenewableOk::'
+		['-ticketcomment']=$'TicketComment::'
+		['-hostaddress']=$'HostAddress::'
+		['-usetcp6only']=$'UseTcp6Only::'
+		['-usetcp4only']=$'UseTcp4Only::'
+		['-socks5']=$'Socks5::'
+	)
+	declare -a paramsByPos=(
+		'Kdc'
+		'Target'
+	)
+	_comp_Titanis
+}
+complete -F _comp_Kerb_tgsreq Kerb-tgsreq
+
+# Kerb keytab list
+_comp_Kerb_keytab_list () {
+	declare -A params=(
+		['-keytab']=$'Keytab::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputfields']=$'OutputFields:list:Principal;Realm;Timestamp;Kvno;EType;KeyText'
+		['-outputheaders']=$'OutputHeaders::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+	)
+	declare -a paramsByPos=(
+		'Keytab'
+	)
+	_comp_Titanis
+}
+complete -F _comp_Kerb_keytab_list Kerb-keytab-list

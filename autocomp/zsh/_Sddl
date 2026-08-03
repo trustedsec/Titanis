@@ -1,0 +1,10 @@
+#compdef Sddl
+
+_Sddl() {
+	local -a commands=(
+		'describe:Describes a security descriptor'
+		'lookupguid:Looks up a GUID representing an AD extended right, property, or property set'
+		'lookupwks:Looks up a well-known SID'
+	)
+	_comp_T_subcommands
+}

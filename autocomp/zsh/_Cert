@@ -1,0 +1,8 @@
+#compdef Cert
+
+_Cert() {
+	local -a commands=(
+		'selfcert:Create a self-signed certificate'
+	)
+	_comp_T_subcommands
+}

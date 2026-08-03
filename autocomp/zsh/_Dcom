@@ -1,0 +1,9 @@
+#compdef Dcom
+
+_Dcom() {
+	local -a commands=(
+		'activate:Activates an object over DCOM'
+		'invoke:Invokes a method on an OLE automation object over DCOM'
+	)
+	_comp_T_subcommands
+}

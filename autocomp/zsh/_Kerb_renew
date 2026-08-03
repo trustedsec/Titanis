@@ -1,0 +1,40 @@
+#compdef Kerb_renew
+
+_Kerb_renew() {
+	declare -A params=(
+		['-ticket']=$'Ticket||FileSpec|file|*.ccache;*.kirbi|Authentication (Kerberos)|Name of file containing a ticket-granting ticket (.kirbi or ccache)'
+		['-targetspn']=$'TargetSpn||SecurityPrincipalName[]|||Authentication (Kerberos)|SPNs to renew tickets for'
+		['-kdc']=$'Kdc|X|EndPoint|||Authentication (Kerberos)|Host name or address of KDC'
+		['-armorticket']=$'ArmorTicket|@|FileSpec|file|*.ccache;*.kirbi|Authentication (Kerberos)|Name of file containing armor ticket'
+		['-outputfilename']=$'OutputFileName||FileSpec|file|*.ccache;*.kirbi|Output|Name of file to write ticket to'
+		['-overwrite']=$'Overwrite||SwitchParam|||Output|Overwrites the output file, if it exists'
+		['-append']=$'Append||SwitchParam|||Output|Appends to the output file, if it exists'
+		['-ticketcache']=$'TicketCache||FileSpec|file|*.ccache;*.kirbi|Authentication (Kerberos)|Name of ticket cache file'
+		['-workstation']=$'Workstation||String|||Authentication (Kerberos)|Name of client workstation'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle||OutputStyle|list|Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable|Output|Determines the output style'
+		['-outputheaders']=$'OutputHeaders|@|SwitchParam|||Output|Print headers for table/list/CSV/TSV styles'
+		['-loglevel']=$'LogLevel||LogMessageSeverity|list|Debug;Diagnostic;Verbose;Info;Warning;Error;Critical|Output|Sets the lowest level of messages to log'
+		['-consolelogformat']=$'ConsoleLogFormat|@|LogFormat|list|Text;TextWithTimestamp;Json|Output|Sets the format of log messages written to the console'
+		['-verbose']=$'Verbose||SwitchParam|||Output|Prints verbose messages'
+		['-diagnostic']=$'Diagnostic|@|SwitchParam|||Output|Prints diagnostic messages'
+		['-debuglog']=$'DebugLog|@|SwitchParam|||Output|Prints debug messages'
+		['-humanreadable']=$'HumanReadable|@|SwitchParam|||Output|Formats file sizes as human-readable values'
+		['-forwardable']=$'Forwardable||SwitchParam|||Authentication (Kerberos)|Requests a forwardable ticket'
+		['-proxiable']=$'Proxiable|@|SwitchParam|||Authentication (Kerberos)|Requests a proxiable ticket'
+		['-postdate']=$'Postdate|@|DateTime|||Authentication (Kerberos)|Requests a postdated ticket with the specified start date'
+		['-renewable']=$'Renewable||SwitchParam|||Authentication (Kerberos)|Requests a renewable ticket'
+		['-renewtill']=$'RenewTill||DateTime|||Authentication (Kerberos)|Requests a ticket renewable until the specified time (implies -Renewable)'
+		['-endtime']=$'EndTime||DateTime|||Authentication (Kerberos)|End time'
+		['-renewableok']=$'RenewableOk||SwitchParam|||Authentication (Kerberos)|Accepts a renewable ticket if the end time is over the limit'
+		['-ticketcomment']=$'TicketComment||String||||Comment to associate with ticket'
+		['-hostaddress']=$'HostAddress||String[]|||Connection|Network address(es) of the server'
+		['-usetcp6only']=$'UseTcp6Only|@|SwitchParam|||Connection|Only use TCP over IPv6 endpoint'
+		['-usetcp4only']=$'UseTcp4Only|@|SwitchParam|||Connection|Only use TCP over IPv4 endpoint'
+		['-socks5']=$'Socks5||host-or-ip:port||||End point of SOCKS 5 server to use'
+	)
+	declare -a paramsByPos=(
+		'Kdc'
+		'TargetSpn'
+	)
+	_comp_Titanis
+}

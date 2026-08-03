@@ -1,0 +1,24 @@
+#compdef Ldap
+
+_Ldap() {
+	local -a commands=(
+		'add:Adds an object to the directory'
+		'addcomputer:Adds a computer account to the directory'
+		'addou:Adds a new organizational unit'
+		'adduser:Adds a new user'
+		'listsyntax:Lists AD syntaxes'
+		'lspart:Gets a list of partitions in the Active Directory forest'
+		'mod:Modifies an object in the directory'
+		'moduser:Modifies a directory entry'
+		'mountfs:Mounts a directory as a file system'
+		'namedbits:Prints the bits with symbolic names'
+		'query:Queries the directory'
+		'rm:Deletes an object from the directory'
+		'schema:Gets the schema'
+		'search:Searches the directory by name'
+		'timestamp:Converts between the Active Directory timestamp value and a UTC date/time'
+		'watch:Watches for changes to an object or subtree'
+		'whoami:Gets the name of the authenticated user'
+	)
+	_comp_T_subcommands
+}

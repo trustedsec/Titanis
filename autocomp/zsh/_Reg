@@ -1,0 +1,19 @@
+#compdef Reg
+
+_Reg() {
+	local -a commands=(
+		'delete:Deletes one or more registry keys and/or values'
+		'dumplsasecrets:Dumps the LSA secrets of a remote system'
+		'dumpsam:Dumps the SAM of a remote system'
+		'export:Export registry values to file'
+		'getdcomapp:Gets information about a DCOM application'
+		'getsd:Gets the security descriptor of a registry key'
+		'keyinfo:Gets key info'
+		'query:Lists the contents of a key'
+		'save:Saves a key to a file'
+		'set:Sets one or more values in a registry key'
+		'setsd:Sets the security descriptor of a registry key'
+		'syskey:Prints the system key of a remote system'
+	)
+	_comp_T_subcommands
+}

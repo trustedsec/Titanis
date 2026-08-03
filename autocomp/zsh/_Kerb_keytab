@@ -1,0 +1,8 @@
+#compdef Kerb_keytab
+
+_Kerb_keytab() {
+	local -a commands=(
+		'list:Lists the entries in a keytab file'
+	)
+	_comp_T_subcommands
+}

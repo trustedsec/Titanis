@@ -1,0 +1,11 @@
+#compdef Sam
+
+_Sam() {
+	local -a commands=(
+		'aliasmembers:Gets the members of an alias'
+		'enumaliases:Enumerates aliases'
+		'enumgroups:Enumerates groups'
+		'enumusers:Enumerates user accounts'
+	)
+	_comp_T_subcommands
+}

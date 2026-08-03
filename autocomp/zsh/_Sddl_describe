@@ -1,0 +1,22 @@
+#compdef Sddl_describe
+
+_Sddl_describe() {
+	declare -A params=(
+		['-sddlorhex']=$'SddlOrHex|X|SecurityDescriptor[]||||Security descriptor in hex or SDDL notation'
+		['-objecttype']=$'ObjectType||SecurityObjectType|list|File;Directory;RegistryKey;SamServer;SamDomain;SamGroup;SamAlias;SamUserAccount;DirectoryObject;Scm;Service||Type of object'
+		['-printhex']=$'PrintHex||SwitchParam||||Prints the binary form as a string of hex digits'
+		['-printsddl']=$'PrintSddl||SwitchParam||||Prints the SDDL form'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle||OutputStyle|list|Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable|Output|Determines the output style'
+		['-outputheaders']=$'OutputHeaders|@|SwitchParam|||Output|Print headers for table/list/CSV/TSV styles'
+		['-loglevel']=$'LogLevel||LogMessageSeverity|list|Debug;Diagnostic;Verbose;Info;Warning;Error;Critical|Output|Sets the lowest level of messages to log'
+		['-consolelogformat']=$'ConsoleLogFormat|@|LogFormat|list|Text;TextWithTimestamp;Json|Output|Sets the format of log messages written to the console'
+		['-verbose']=$'Verbose||SwitchParam|||Output|Prints verbose messages'
+		['-diagnostic']=$'Diagnostic|@|SwitchParam|||Output|Prints diagnostic messages'
+		['-debuglog']=$'DebugLog|@|SwitchParam|||Output|Prints debug messages'
+		['-humanreadable']=$'HumanReadable|@|SwitchParam|||Output|Formats file sizes as human-readable values'
+	)
+	declare -a paramsByPos=(
+		'SddlOrHex'
+	)
+	_comp_Titanis
+}

@@ -1,0 +1,10 @@
+#compdef Dsrep
+
+_Dsrep() {
+	local -a commands=(
+		'dcinfo:Gets information on domain controllers'
+		'rep:Requests replica changes'
+		'repnc:Replicates a naming context'
+	)
+	_comp_T_subcommands
+}

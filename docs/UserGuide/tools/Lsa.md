@@ -1,5 +1,5 @@
 # Lsa
-  Commands for interacting with the LSA
+Commands for interacting with the LSA
 
 ## Synopsis
 ```
@@ -10,70 +10,68 @@ Lsa <subcommand>
 
 |Command|Description|
 |-|-|
-|[addpriv](#lsa-addpriv)|Adds one or more privileges to an account|
-|[createaccount](#lsa-createaccount)|Creates an account|
-|[enumaccounts](#lsa-enumaccounts)|Enumerates accounts|
-|[enumprivaccounts](#lsa-enumprivaccounts)|Enumerates accounts that have a specific privilege or user right|
-|[getprivs](#lsa-getprivs)|Gets the privileges assigned to an account.|
-|[getrights](#lsa-getrights)|Gets the user rights and privileges granted to an account|
-|[getsysaccess](#lsa-getsysaccess)|Gets the system access rights granted to an account|
-|[lookupname](#lsa-lookupname)|Gets the SID for one or more account names|
-|[lookupsid](#lsa-lookupsid)|Translates one or more SIDs to their account names|
-|[rmpriv](#lsa-rmpriv)|Removes one or more privileges from an account|
-|[setsysaccess](#lsa-setsysaccess)|Sets the system access rights granted to an account|
-|[whoami](#lsa-whoami)|Gets the name and domain of the connected user|
+|**[addpriv](#lsa-addpriv)**|Adds one or more privileges to an account|
+|**[createaccount](#lsa-createaccount)**|Creates an account|
+|**[enumaccounts](#lsa-enumaccounts)**|Enumerates accounts|
+|**[enumprivaccounts](#lsa-enumprivaccounts)**|Enumerates accounts that have a specific privilege or user right|
+|**[getprivs](#lsa-getprivs)**|Gets the privileges assigned to an account.|
+|**[getrights](#lsa-getrights)**|Gets the user rights and privileges granted to an account|
+|**[getsysaccess](#lsa-getsysaccess)**|Gets the system access rights granted to an account|
+|**[lookupname](#lsa-lookupname)**|Gets the SID for one or more account names|
+|**[lookupsid](#lsa-lookupsid)**|Translates one or more SIDs to their account names|
+|**[rmpriv](#lsa-rmpriv)**|Removes one or more privileges from an account|
+|**[setsysaccess](#lsa-setsysaccess)**|Sets the system access rights granted to an account|
+|**[whoami](#lsa-whoami)**|Gets the name and domain of the connected user|
 
 
-  For help on a subcommand, use `Lsa <subcommand> -h`
+For help on a subcommand, use `Lsa <subcommand> -h`
 # Lsa addpriv
-  Adds one or more privileges to an account
+Adds one or more privileges to an account
 
 ## Synopsis
-```
-Lsa addpriv [options] <ServerName> <Privileges>
-```
+**Lsa addpriv** [*options*] &lt;*ServerName*&gt; &lt;*Privileges*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
-|&lt;Privileges&gt;||&lt;String[]&gt;|Names or values of the privileges to add|
-||||**Possible values:**|
-||||  SeCreateTokenPrivilege|
-||||  SeAssignPrimaryTokenPrivilege|
-||||  SeLockMemoryPrivilege|
-||||  SeIncreaseQuotaPrivilege|
-||||  SeMachineAccountPrivilege|
-||||  SeTcbPrivilege|
-||||  SeSecurityPrivilege|
-||||  SeTakeOwnershipPrivilege|
-||||  SeLoadDriverPrivilege|
-||||  SeSystemProfilePrivilege|
-||||  SeSystemtimePrivilege|
-||||  SeProfileSingleProcessPrivilege|
-||||  SeIncreaseBasePriorityPrivilege|
-||||  SeCreatePagefilePrivilege|
-||||  SeCreatePermanentPrivilege|
-||||  SeBackupPrivilege|
-||||  SeRestorePrivilege|
-||||  SeShutdownPrivilege|
-||||  SeDebugPrivilege|
-||||  SeAuditPrivilege|
-||||  SeSystemEnvironment|
-||||  SeChangeNotifyPrivilege|
-||||  SeRemoteShutdownPrivilege|
-||||  SeUndockPrivilege|
-||||  SeSyncAgentPrivilege|
-||||  SeEnableDelegationPrivilege|
-||||  SeManageVolumePrivilege|
-||||  SeImpersonatePrivilege|
-||||  SeCreateGlobalPrivilege|
-||||  SeTrustedCredManAccessPrivilege|
-||||  SeRelabelPrivilege|
-||||  SeIncreaseWorkingSetPrivilege|
-||||  SeTimeZonePrivilege|
-||||  SeCreateSymbolicLinkPrivilege|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*Privileges*&gt;||&lt;*String[]*&gt;|Names or values of the privileges to add|
+||||Possible values:|
+||||  **SeCreateTokenPrivilege**|
+||||  **SeAssignPrimaryTokenPrivilege**|
+||||  **SeLockMemoryPrivilege**|
+||||  **SeIncreaseQuotaPrivilege**|
+||||  **SeMachineAccountPrivilege**|
+||||  **SeTcbPrivilege**|
+||||  **SeSecurityPrivilege**|
+||||  **SeTakeOwnershipPrivilege**|
+||||  **SeLoadDriverPrivilege**|
+||||  **SeSystemProfilePrivilege**|
+||||  **SeSystemtimePrivilege**|
+||||  **SeProfileSingleProcessPrivilege**|
+||||  **SeIncreaseBasePriorityPrivilege**|
+||||  **SeCreatePagefilePrivilege**|
+||||  **SeCreatePermanentPrivilege**|
+||||  **SeBackupPrivilege**|
+||||  **SeRestorePrivilege**|
+||||  **SeShutdownPrivilege**|
+||||  **SeDebugPrivilege**|
+||||  **SeAuditPrivilege**|
+||||  **SeSystemEnvironment**|
+||||  **SeChangeNotifyPrivilege**|
+||||  **SeRemoteShutdownPrivilege**|
+||||  **SeUndockPrivilege**|
+||||  **SeSyncAgentPrivilege**|
+||||  **SeEnableDelegationPrivilege**|
+||||  **SeManageVolumePrivilege**|
+||||  **SeImpersonatePrivilege**|
+||||  **SeCreateGlobalPrivilege**|
+||||  **SeTrustedCredManAccessPrivilege**|
+||||  **SeRelabelPrivilege**|
+||||  **SeIncreaseWorkingSetPrivilege**|
+||||  **SeTimeZonePrivilege**|
+||||  **SeCreateSymbolicLinkPrivilege**|
 
 
 ## Options
@@ -81,136 +79,140 @@ Lsa addpriv [options] <ServerName> <Privileges>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ByName||&lt;String&gt;|Account name|
-|    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-ByName**||&lt;*String*&gt;|Account name|
+|    **-BySid**||&lt;*SecurityIdentifier*&gt;|SID of account|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Details
 
-  Each privilege may be the symbolic name or the value, expressed as a 64-bit
-  integer.  If the name is not a predefined privilege, Lsa addpriv resolves the
-  name with the remote LSA.
-  
-  This command cannot be used to grant a user right.
-  
-  Note that the LSA tracks accounts separate from the SAM.  Even for local
-  accounts, you make need to create the LSA account first.
-  
+Each privilege may be the symbolic name or the value, expressed as a 64-bit
+integer.  If the name is not a predefined privilege, Lsa addpriv resolves the
+name with the remote LSA.
+
+This command cannot be used to grant a user right.
+
+Note that the LSA tracks accounts separate from the SAM.  Even for local
+accounts, you make need to create the LSA account first.
+
 
 ## Examples
 
@@ -226,19 +228,17 @@ Lsa addpriv LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administra
 Lsa addpriv LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-21-1752138614-393460150-3098146133-1103 SeLoadDriver SeTcb
 ```
 # Lsa createaccount
-  Creates an account
+Creates an account
 
 ## Synopsis
-```
-Lsa createaccount [options] <ServerName> <Sid>
-```
+**Lsa createaccount** [*options*] &lt;*ServerName*&gt; &lt;*Sid*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
-|&lt;Sid&gt;||&lt;SecurityIdentifier&gt;|SID of account to create|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*Sid*&gt;||&lt;*SecurityIdentifier*&gt;|SID of account to create|
 
 
 ## Options
@@ -246,121 +246,125 @@ Lsa createaccount [options] <ServerName> <Sid>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -377,18 +381,16 @@ Lsa createaccount LUMON-FS1 -UserName milchick -Password Br3@kr00m! S-1-5-32-646
 Lsa createaccount LUMON-FS1 -UserName milchick -Password Br3@kr00m! S-1-5-21-1752138614-393460150-3098146133-1103
 ```
 # Lsa enumaccounts
-  Enumerates accounts
+Enumerates accounts
 
 ## Synopsis
-```
-Lsa enumaccounts [options] <ServerName>
-```
+**Lsa enumaccounts** [*options*] &lt;*ServerName*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -396,134 +398,138 @@ Lsa enumaccounts [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  Sid|
-||||  AccountName|
-||||  DomainName|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
+||||Possible values:|
+||||  **Sid**|
+||||  **AccountName**|
+||||  **DomainName**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Details
 
-  By default, the output only includes the SIDs of the accounts.  Use
-  -OutputFields if you want additional information such as the account or domain
-  name.  The additional fields require another RPC call to the server.
-  
+By default, the output only includes the SIDs of the accounts.  Use
+-OutputFields if you want additional information such as the account or domain
+name.  The additional fields require another RPC call to the server.
+
 
 ## Examples
 
@@ -539,18 +545,16 @@ Lsa enumaccounts LUMON-FS1 -UserName milchick -Password Br3@kr00m!
 Lsa enumaccounts LUMON-FS1 -UserName milchick -Password Br3@kr00m! -OutputFields Sid, AccountName, DomainName
 ```
 # Lsa enumprivaccounts
-  Enumerates accounts that have a specific privilege or user right
+Enumerates accounts that have a specific privilege or user right
 
 ## Synopsis
-```
-Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
-```
+**Lsa enumprivaccounts** [*options*]** -Privilege** &lt;*String* &gt; &lt;*ServerName*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -558,173 +562,177 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  Sid|
-||||  AccountName|
-||||  DomainName|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -Privilege||&lt;String&gt;|Name of privilege or user right to check for|
-||||**Possible values:**|
-||||  SeCreateTokenPrivilege|
-||||  SeAssignPrimaryTokenPrivilege|
-||||  SeLockMemoryPrivilege|
-||||  SeIncreaseQuotaPrivilege|
-||||  SeMachineAccountPrivilege|
-||||  SeTcbPrivilege|
-||||  SeSecurityPrivilege|
-||||  SeTakeOwnershipPrivilege|
-||||  SeLoadDriverPrivilege|
-||||  SeSystemProfilePrivilege|
-||||  SeSystemtimePrivilege|
-||||  SeProfileSingleProcessPrivilege|
-||||  SeIncreaseBasePriorityPrivilege|
-||||  SeCreatePagefilePrivilege|
-||||  SeCreatePermanentPrivilege|
-||||  SeBackupPrivilege|
-||||  SeRestorePrivilege|
-||||  SeShutdownPrivilege|
-||||  SeDebugPrivilege|
-||||  SeAuditPrivilege|
-||||  SeSystemEnvironment|
-||||  SeChangeNotifyPrivilege|
-||||  SeRemoteShutdownPrivilege|
-||||  SeUndockPrivilege|
-||||  SeSyncAgentPrivilege|
-||||  SeEnableDelegationPrivilege|
-||||  SeManageVolumePrivilege|
-||||  SeImpersonatePrivilege|
-||||  SeCreateGlobalPrivilege|
-||||  SeTrustedCredManAccessPrivilege|
-||||  SeRelabelPrivilege|
-||||  SeIncreaseWorkingSetPrivilege|
-||||  SeTimeZonePrivilege|
-||||  SeCreateSymbolicLinkPrivilege|
-||||  None|
-||||  SeInteractiveLogonRight|
-||||  SeNetworkLogonRight|
-||||  SeBatchLogonRight|
-||||  SeServiceLogonRight|
-||||  SeDenyInteractiveLogonRight|
-||||  SeDenyNetworkLogonRight|
-||||  SeDenyBatchLogonRight|
-||||  SeDenyServiceLogonRight|
-||||  SeRemoteInteractiveLogonRight|
-||||  SeDenyRemoteInteractiveLogonRight|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-Privilege**||&lt;*String*&gt;|Name of privilege or user right to check for|
+||||Possible values:|
+||||  **SeCreateTokenPrivilege**|
+||||  **SeAssignPrimaryTokenPrivilege**|
+||||  **SeLockMemoryPrivilege**|
+||||  **SeIncreaseQuotaPrivilege**|
+||||  **SeMachineAccountPrivilege**|
+||||  **SeTcbPrivilege**|
+||||  **SeSecurityPrivilege**|
+||||  **SeTakeOwnershipPrivilege**|
+||||  **SeLoadDriverPrivilege**|
+||||  **SeSystemProfilePrivilege**|
+||||  **SeSystemtimePrivilege**|
+||||  **SeProfileSingleProcessPrivilege**|
+||||  **SeIncreaseBasePriorityPrivilege**|
+||||  **SeCreatePagefilePrivilege**|
+||||  **SeCreatePermanentPrivilege**|
+||||  **SeBackupPrivilege**|
+||||  **SeRestorePrivilege**|
+||||  **SeShutdownPrivilege**|
+||||  **SeDebugPrivilege**|
+||||  **SeAuditPrivilege**|
+||||  **SeSystemEnvironment**|
+||||  **SeChangeNotifyPrivilege**|
+||||  **SeRemoteShutdownPrivilege**|
+||||  **SeUndockPrivilege**|
+||||  **SeSyncAgentPrivilege**|
+||||  **SeEnableDelegationPrivilege**|
+||||  **SeManageVolumePrivilege**|
+||||  **SeImpersonatePrivilege**|
+||||  **SeCreateGlobalPrivilege**|
+||||  **SeTrustedCredManAccessPrivilege**|
+||||  **SeRelabelPrivilege**|
+||||  **SeIncreaseWorkingSetPrivilege**|
+||||  **SeTimeZonePrivilege**|
+||||  **SeCreateSymbolicLinkPrivilege**|
+||||  **None**|
+||||  **SeInteractiveLogonRight**|
+||||  **SeNetworkLogonRight**|
+||||  **SeBatchLogonRight**|
+||||  **SeServiceLogonRight**|
+||||  **SeDenyInteractiveLogonRight**|
+||||  **SeDenyNetworkLogonRight**|
+||||  **SeDenyBatchLogonRight**|
+||||  **SeDenyServiceLogonRight**|
+||||  **SeRemoteInteractiveLogonRight**|
+||||  **SeDenyRemoteInteractiveLogonRight**|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
+||||Possible values:|
+||||  **Sid**|
+||||  **AccountName**|
+||||  **DomainName**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -735,18 +743,16 @@ Lsa enumprivaccounts [options] -Privilege <String> <ServerName>
 Lsa enumprivaccounts LUMON-FS1 -UserName milchick -Password Br3@kr00m! -Privilege SeInteractiveLogonRight
 ```
 # Lsa getprivs
-  Gets the privileges assigned to an account.
+Gets the privileges assigned to an account.
 
 ## Synopsis
-```
-Lsa getprivs [options] <ServerName>
-```
+**Lsa getprivs** [*options*] &lt;*ServerName*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -754,138 +760,142 @@ Lsa getprivs [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ByName||&lt;String&gt;|Account name|
-|    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  Privilege|
-||||  Attributes|
-||||  PrivilegeName|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-ByName**||&lt;*String*&gt;|Account name|
+|    **-BySid**||&lt;*SecurityIdentifier*&gt;|SID of account|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
+||||Possible values:|
+||||  **Privilege**|
+||||  **Attributes**|
+||||  **PrivilegeName**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Details
 
-  One of -BySid or -ByName is required to specify the account to get the
-  privileges for.  The account may be a user or group.
-  
-  By default, only the names of predefined privileges are resolved.  Te get the
-  names of all privileges, use -OutputFields to specify PrivilegeName
-  
+One of -BySid or -ByName is required to specify the account to get the
+privileges for.  The account may be a user or group.
+
+By default, only the names of predefined privileges are resolved.  Te get the
+names of all privileges, use -OutputFields to specify PrivilegeName
+
 
 ## Examples
 
@@ -907,18 +917,16 @@ Lsa getprivs LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administr
 Lsa getprivs LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administrator -OutputFields Privilege, PrivilegeName
 ```
 # Lsa getrights
-  Gets the user rights and privileges granted to an account
+Gets the user rights and privileges granted to an account
 
 ## Synopsis
-```
-Lsa getrights [options] <ServerName>
-```
+**Lsa getrights** [*options*] &lt;*ServerName*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -926,126 +934,130 @@ Lsa getrights [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ByName||&lt;String&gt;|Account name|
-|    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  Name|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-ByName**||&lt;*String*&gt;|Account name|
+|    **-BySid**||&lt;*SecurityIdentifier*&gt;|SID of account|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
+||||Possible values:|
+||||  **Name**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -1062,18 +1074,16 @@ Lsa getrights LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-32-
 Lsa getrights LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administrators
 ```
 # Lsa getsysaccess
-  Gets the system access rights granted to an account
+Gets the system access rights granted to an account
 
 ## Synopsis
-```
-Lsa getsysaccess [options] <ServerName>
-```
+**Lsa getsysaccess** [*options*] &lt;*ServerName*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -1081,126 +1091,130 @@ Lsa getsysaccess [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ByName||&lt;String&gt;|Account name|
-|    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  Value|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-ByName**||&lt;*String*&gt;|Account name|
+|    **-BySid**||&lt;*SecurityIdentifier*&gt;|SID of account|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
+||||Possible values:|
+||||  **Value**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Examples
@@ -1217,19 +1231,17 @@ Lsa getsysaccess LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-
 Lsa getsysaccess LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administrators
 ```
 # Lsa lookupname
-  Gets the SID for one or more account names
+Gets the SID for one or more account names
 
 ## Synopsis
-```
-Lsa lookupname [options] <ServerName> <AccountNames>
-```
+**Lsa lookupname** [*options*] &lt;*ServerName*&gt; &lt;*AccountNames*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
-|&lt;AccountNames&gt;||&lt;String[]&gt;|Names of accounts to look up|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*AccountNames*&gt;||&lt;*String[]*&gt;|Names of accounts to look up|
 
 
 ## Options
@@ -1237,135 +1249,139 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  AccountName|
-||||  NameType|
-||||  DomainName|
-||||  DomainSid|
-||||  AccountRid|
-||||  AccountSid|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
+||||Possible values:|
+||||  **AccountName**|
+||||  **NameType**|
+||||  **DomainName**|
+||||  **DomainSid**|
+||||  **AccountRid**|
+||||  **AccountSid**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Details
 
-  The command accepts multiple user names
-  
+The command accepts multiple user names
+
 
 ## Examples
 
@@ -1375,19 +1391,17 @@ Lsa lookupname [options] <ServerName> <AccountNames>
 Lsa lookupname LUMON-FS1 -UserName milchick -Password Br3@kr00m! marks milchick
 ```
 # Lsa lookupsid
-  Translates one or more SIDs to their account names
+Translates one or more SIDs to their account names
 
 ## Synopsis
-```
-Lsa lookupsid [options] <ServerName> <Sids>
-```
+**Lsa lookupsid** [*options*] &lt;*ServerName*&gt; &lt;*Sids*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
-|&lt;Sids&gt;||&lt;SecurityIdentifier[]&gt;|SIDs to look up|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*Sids*&gt;||&lt;*SecurityIdentifier[]*&gt;|SIDs to look up|
 
 
 ## Options
@@ -1395,135 +1409,139 @@ Lsa lookupsid [options] <ServerName> <Sids>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  AccountName|
-||||  NameType|
-||||  DomainName|
-||||  DomainSid|
-||||  AccountRid|
-||||  AccountSid|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
+||||Possible values:|
+||||  **AccountName**|
+||||  **NameType**|
+||||  **DomainName**|
+||||  **DomainSid**|
+||||  **AccountRid**|
+||||  **AccountSid**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Details
 
-  The command accepts multiple SIDs
-  
+The command accepts multiple SIDs
+
 
 ## Examples
 
@@ -1532,66 +1550,64 @@ Lsa lookupsid [options] <ServerName> <Sids>
 ```
 Lsa lookupsid LUMON-FS1 -UserName milchick -Password Br3@kr00m! S-1-5-21-1752138614-393460150-3098146133-1103 S-1-5-21-1752138614-393460150-3098146133-1107
 ```
-  Titanis tries to connect via TCP but cannot find an enpoint, and falls back to
-  connecting over SMB.
+Titanis tries to connect via TCP but cannot find an enpoint, and falls back to
+connecting over SMB.
 
 ### Example 2 - Look up multiple names on a DC
 
 ```
 Lsa lookupsid LUMON-DC1 -PreferSmb -UserName milchick -Password Br3@kr00m! S-1-5-21-1752138614-393460150-3098146133-1103 S-1-5-21-1752138614-393460150-3098146133-1107
 ```
-  By default, Titanis checks for a TCP endpoint and tries to connect over IP
-  first.  Specifying -PreferSmb forces it to skip the check for the TCP endpoint
-  and uses named pipes instead.
+By default, Titanis checks for a TCP endpoint and tries to connect over IP
+first.  Specifying -PreferSmb forces it to skip the check for the TCP endpoint
+and uses named pipes instead.
 # Lsa rmpriv
-  Removes one or more privileges from an account
+Removes one or more privileges from an account
 
 ## Synopsis
-```
-Lsa rmpriv [options] <ServerName> <Privileges>
-```
+**Lsa rmpriv** [*options*] &lt;*ServerName*&gt; &lt;*Privileges*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
-|&lt;Privileges&gt;||&lt;String[]&gt;|Names or values of the privileges to add|
-||||**Possible values:**|
-||||  SeCreateTokenPrivilege|
-||||  SeAssignPrimaryTokenPrivilege|
-||||  SeLockMemoryPrivilege|
-||||  SeIncreaseQuotaPrivilege|
-||||  SeMachineAccountPrivilege|
-||||  SeTcbPrivilege|
-||||  SeSecurityPrivilege|
-||||  SeTakeOwnershipPrivilege|
-||||  SeLoadDriverPrivilege|
-||||  SeSystemProfilePrivilege|
-||||  SeSystemtimePrivilege|
-||||  SeProfileSingleProcessPrivilege|
-||||  SeIncreaseBasePriorityPrivilege|
-||||  SeCreatePagefilePrivilege|
-||||  SeCreatePermanentPrivilege|
-||||  SeBackupPrivilege|
-||||  SeRestorePrivilege|
-||||  SeShutdownPrivilege|
-||||  SeDebugPrivilege|
-||||  SeAuditPrivilege|
-||||  SeSystemEnvironment|
-||||  SeChangeNotifyPrivilege|
-||||  SeRemoteShutdownPrivilege|
-||||  SeUndockPrivilege|
-||||  SeSyncAgentPrivilege|
-||||  SeEnableDelegationPrivilege|
-||||  SeManageVolumePrivilege|
-||||  SeImpersonatePrivilege|
-||||  SeCreateGlobalPrivilege|
-||||  SeTrustedCredManAccessPrivilege|
-||||  SeRelabelPrivilege|
-||||  SeIncreaseWorkingSetPrivilege|
-||||  SeTimeZonePrivilege|
-||||  SeCreateSymbolicLinkPrivilege|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*Privileges*&gt;||&lt;*String[]*&gt;|Names or values of the privileges to add|
+||||Possible values:|
+||||  **SeCreateTokenPrivilege**|
+||||  **SeAssignPrimaryTokenPrivilege**|
+||||  **SeLockMemoryPrivilege**|
+||||  **SeIncreaseQuotaPrivilege**|
+||||  **SeMachineAccountPrivilege**|
+||||  **SeTcbPrivilege**|
+||||  **SeSecurityPrivilege**|
+||||  **SeTakeOwnershipPrivilege**|
+||||  **SeLoadDriverPrivilege**|
+||||  **SeSystemProfilePrivilege**|
+||||  **SeSystemtimePrivilege**|
+||||  **SeProfileSingleProcessPrivilege**|
+||||  **SeIncreaseBasePriorityPrivilege**|
+||||  **SeCreatePagefilePrivilege**|
+||||  **SeCreatePermanentPrivilege**|
+||||  **SeBackupPrivilege**|
+||||  **SeRestorePrivilege**|
+||||  **SeShutdownPrivilege**|
+||||  **SeDebugPrivilege**|
+||||  **SeAuditPrivilege**|
+||||  **SeSystemEnvironment**|
+||||  **SeChangeNotifyPrivilege**|
+||||  **SeRemoteShutdownPrivilege**|
+||||  **SeUndockPrivilege**|
+||||  **SeSyncAgentPrivilege**|
+||||  **SeEnableDelegationPrivilege**|
+||||  **SeManageVolumePrivilege**|
+||||  **SeImpersonatePrivilege**|
+||||  **SeCreateGlobalPrivilege**|
+||||  **SeTrustedCredManAccessPrivilege**|
+||||  **SeRelabelPrivilege**|
+||||  **SeIncreaseWorkingSetPrivilege**|
+||||  **SeTimeZonePrivilege**|
+||||  **SeCreateSymbolicLinkPrivilege**|
 
 
 ## Options
@@ -1599,140 +1615,144 @@ Lsa rmpriv [options] <ServerName> <Privileges>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ByName||&lt;String&gt;|Account name|
-|    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-ByName**||&lt;*String*&gt;|Account name|
+|    **-BySid**||&lt;*SecurityIdentifier*&gt;|SID of account|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Details
 
-  Each privilege may be the symbolic name or the value, expressed as a 64-bit
-  integer.  If the name is not a predefined privilege, Lsa rmpriv resolves the
-  name with the remote LSA.  For predefined privilege names (those in the help
-  text), you are not required to append `Privilege` to the name.
-  
-  To remove all privileges, use `*`.  Note that you may have to escape this
-  depending on which shell you are using.
-  
-  This command cannot be used to remove a user right.
-  
-  Note that the LSA tracks accounts separate from the SAM.  Even for local
-  accounts, you make need to create the LSA account first.
-  
+Each privilege may be the symbolic name or the value, expressed as a 64-bit
+integer.  If the name is not a predefined privilege, Lsa rmpriv resolves the
+name with the remote LSA.  For predefined privilege names (those in the help
+text), you are not required to append `Privilege` to the name.
+
+To remove all privileges, use `*`.  Note that you may have to escape this
+depending on which shell you are using.
+
+This command cannot be used to remove a user right.
+
+Note that the LSA tracks accounts separate from the SAM.  Even for local
+accounts, you make need to create the LSA account first.
+
 
 ## Examples
 
@@ -1754,31 +1774,29 @@ Lsa rmpriv LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-32-646
 Lsa rmpriv LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-32-646 *
 ```
 # Lsa setsysaccess
-  Sets the system access rights granted to an account
+Sets the system access rights granted to an account
 
 ## Synopsis
-```
-Lsa setsysaccess [options] <ServerName> <Rights>
-```
+**Lsa setsysaccess** [*options*] &lt;*ServerName*&gt; &lt;*Rights*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
-|&lt;Rights&gt;||&lt;SystemAccessRights[]&gt;|Access rights to grant|
-||||**Possible values:**|
-||||  None|
-||||  SeInteractiveLogonRight|
-||||  SeNetworkLogonRight|
-||||  SeBatchLogonRight|
-||||  SeServiceLogonRight|
-||||  SeDenyInteractiveLogonRight|
-||||  SeDenyNetworkLogonRight|
-||||  SeDenyBatchLogonRight|
-||||  SeDenyServiceLogonRight|
-||||  SeRemoteInteractiveLogonRight|
-||||  SeDenyRemoteInteractiveLogonRight|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*Rights*&gt;||&lt;*SystemAccessRights[]*&gt;|Access rights to grant|
+||||Possible values:|
+||||  **None**|
+||||  **SeInteractiveLogonRight**|
+||||  **SeNetworkLogonRight**|
+||||  **SeBatchLogonRight**|
+||||  **SeServiceLogonRight**|
+||||  **SeDenyInteractiveLogonRight**|
+||||  **SeDenyNetworkLogonRight**|
+||||  **SeDenyBatchLogonRight**|
+||||  **SeDenyServiceLogonRight**|
+||||  **SeRemoteInteractiveLogonRight**|
+||||  **SeDenyRemoteInteractiveLogonRight**|
 
 
 ## Options
@@ -1786,136 +1804,140 @@ Lsa setsysaccess [options] <ServerName> <Rights>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ByName||&lt;String&gt;|Account name|
-|    -BySid||&lt;SecurityIdentifier&gt;|SID of account|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  Value|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -Reset||&lt;SwitchParam&gt;|Clears any rights already set on the account|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-ByName**||&lt;*String*&gt;|Account name|
+|    **-BySid**||&lt;*SecurityIdentifier*&gt;|SID of account|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-Reset**||&lt;*SwitchParam*&gt;|Clears any rights already set on the account|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
+||||Possible values:|
+||||  **Value**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Details
 
-  By default, the specified access rights are added to the rights already granted
-  to the account.  Use -Reset to clear existing access rights and only grant the
-  rights specified.  To reset all access rights currently granted, use -Reset and
-  specify a single right of 0
-  
+By default, the specified access rights are added to the rights already granted
+to the account.  Use -Reset to clear existing access rights and only grant the
+rights specified.  To reset all access rights currently granted, use -Reset and
+specify a single right of 0
+
 
 ## Examples
 
@@ -1931,18 +1953,16 @@ Lsa setsysaccess LUMON-FS1 -UserName milchick -Password Br3@kr00m! -BySid S-1-5-
 Lsa setsysaccess LUMON-FS1 -UserName milchick -Password Br3@kr00m! -ByName Administrators SeBatchLogonRight
 ```
 # Lsa whoami
-  Gets the name and domain of the connected user
+Gets the name and domain of the connected user
 
 ## Synopsis
-```
-Lsa whoami [options] <ServerName>
-```
+**Lsa whoami** [*options*] &lt;*ServerName*&gt;
 
 ## Parameters
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;ServerName&gt;||&lt;String&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -1950,129 +1970,133 @@ Lsa whoami [options] <ServerName>
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AuthEpm||&lt;SwitchParam&gt;|Authenticates EP mapper requests|
-|    -AuthProxy||&lt;EndPoint&gt;|Endpoint of auth proxy|
-|    -ConsoleOutputStyle|-OutputStyle|&lt;OutputStyle&gt;|Determines the output style|
-||||**Possible values:**|
-||||  Freeform|
-||||  Raw|
-||||  Table|
-||||  List|
-||||  Csv|
-||||  Tsv|
-||||  Json|
-||||  TreeTable|
-|    -Delegate||&lt;SwitchParam&gt;|Requests delegation (sends TGT and key for Kerberos)|
-|    -EncryptEpm||&lt;SwitchParam&gt;|Encrypts EP mappend requests|
-|    -EncryptRpc||&lt;SwitchParam&gt;|Encrypts RPC messages|
-|    -OutputFields||&lt;String[]&gt;|Fields to display in output|
-||||**Possible values:**|
-||||  WireName|
-||||  UserName|
-||||  Realm|
-||||  OriginalText|
-||||  NameType|
-||||  NamePartCount|
-|    -OutputHeaders||&lt;SwitchParam&gt;|Print headers for table/list/CSV/TSV styles|
-||||  Default: True|
-|    -PreferSmb||&lt;SwitchParam&gt;|If the interface supports named pipes, attempt to connect over the named pipe instead of TCP|
-|    -RpcCallTimeout||&lt;Duration&gt;|Time to wait for RPC calls|
-|    -RpcConnectTimeout||&lt;Duration&gt;|Time to wait for RPC connections|
-|    -Socks5||&lt;host-or-ip:port&gt;|End point of SOCKS 5 server to use|
-|    -Spnego||&lt;SwitchParam&gt;|Uses SP-NEGO for authentication|
-|    -SpnOverride||&lt;SpnMapping[]&gt;|Specifies an SPN override|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Anonymous||&lt;SwitchParam&gt;|Uses anonymous login|
-|    -NtlmHash||&lt;hexadecimal hash&gt;|NTLM hash for NTLM authentication|
-|    -Password|-p|&lt;String&gt;|Password to authenticate with|
-|    -UserDomain|-ud|&lt;String&gt;|Domain of user to authenticate with|
-|    -UserName|-u|&lt;UserPrincipalName&gt;|User name to authenticate with, not including the domain|
+|    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
+|    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
+|    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
+|    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
 
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -AesKey||&lt;HexString&gt;|AES key (128 or 256)|
-|    -DelegateTicket||&lt;String[]&gt;|Sends the tickets (and keys) to the target for delegation|
-|    -DesKey||&lt;HexString&gt;|DES key|
-|    -Kdc||&lt;host-or-ip:port&gt;|KDC endpoint|
-|    -Keytab||&lt;String&gt;|Name of keytab file|
-|    -S4ProxyService||&lt;SecurityPrincipalName&gt;|Name of service to proxy through|
-|    -S4UserCert||&lt;String&gt;|Name of file containing a certificate of a user to impersonate with S4U|
-|    -S4UserName||&lt;UserPrincipalName&gt;|Name of user to impersonate with S4U|
-|    -Tgt||&lt;String&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
-|    -TicketCache||&lt;String&gt;|Name of ticket cache file|
-|    -Tickets|-Ticket|&lt;String[]&gt;|Name of file containing service tickets (.kirbi or ccache)|
-|    -U2UserName||&lt;UserPrincipalName&gt;|User name to request TGT for U2U|
-|    -UserCert||&lt;String&gt;|Name of file containing user's certificate (for PKINIT)|
-|    -UserKey||&lt;String&gt;|Name of file containing user's key (for PKINIT)|
-|    -UserKeyPassword||&lt;String&gt;|Password to decrypt file containing user's key (for PKINIT)|
+|    **-AesKey**||&lt;*HexString*&gt;|AES key (128 or 256)|
+|    **-ArmorTicket**||&lt;*FileSpec*&gt;|Name of file containing the armor ticket|
+|    **-DelegateTicket**||&lt;*FileSpec[]*&gt;|Sends the tickets (and keys) to the target for delegation|
+|    **-DesKey**||&lt;*HexString*&gt;|DES key|
+|    **-Kdc**||&lt;*host-or-ip:port*&gt;|KDC endpoint|
+|    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
+|    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
+|    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
+|    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
+|    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
+|    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
+|    **-U2UserName**||&lt;*UserPrincipalName*&gt;|User name to request TGT for U2U|
+|    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
+|    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
+|    **-UserKeyPassword**||&lt;*String*&gt;|Password to decrypt file containing user's key (for PKINIT)|
 
 
 ### Authentication (NTLM)
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -NtlmVersion||&lt;Version&gt;|NTLM version number (a.b.c.d)|
-|    -Workstation|-w|&lt;String&gt;|Name of workstation to send with NTLM authentication|
+|    **-NtlmVersion**||&lt;*Version*&gt;|NTLM version number (a.b.c.d)|
+|    **-Workstation**|**-w**|&lt;*String*&gt;|Name of workstation to send with NTLM authentication|
 
 
 ### Client Behavior
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -DfsReferralBufferSize||&lt;Int32&gt;|Specifies the size for the DFS referral buffer (default=4096)|
-|-F, -FollowDfs||&lt;SwitchParam&gt;|Checks for and follows DFS referrals (default=true)|
+|    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
+||||  Default: 4096|
+|**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
+||||  Default: True|
 
 
 ### Connection
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -Dialects||&lt;Smb2Dialect[]&gt;|List of SMB2 dialects to negotiate|
-||||**Possible values:**|
-||||  Smb2_0_2|
-||||  Smb2_1|
-||||  Smb3_0|
-||||  Smb3_0_2|
-||||  Smb3_1_1|
-|    -EncryptSmb||&lt;SwitchParam&gt;|Requires an encrypted connection|
-|    -HostAddress|-ha|&lt;String[]&gt;|Network address(es) of the server|
-|    -RequireSecureNegotiate||&lt;SwitchParam&gt;|Requires the client to authenticate the negotiation|
-|    -RequireSigning|-signreq|&lt;SwitchParam&gt;|Requires packets to be signed|
-|    -UseTcp4Only|-4|&lt;SwitchParam&gt;|Only use TCP over IPv4 endpoint|
-|    -UseTcp6Only|-6|&lt;SwitchParam&gt;|Only use TCP over IPv6 endpoint|
+|    **-Dialects**||&lt;*Smb2Dialect[]*&gt;|List of SMB2 dialects to negotiate|
+||||Possible values:|
+||||  **Smb2_0_2**|
+||||  **Smb2_1**|
+||||  **Smb3_0**|
+||||  **Smb3_0_2**|
+||||  **Smb3_1_1**|
+|    **-EncryptSmb**||&lt;*SwitchParam*&gt;|Requires an encrypted connection|
+|    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
+|    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
+|    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
 ### Output
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    -ConsoleLogFormat|-LogFormat|&lt;LogFormat&gt;|Sets the format of log messages written to the console|
+|    **-ConsoleLogFormat**|**-LogFormat**|&lt;*LogFormat*&gt;|Sets the format of log messages written to the console|
 ||||  Default: 0|
-||||**Possible values:**|
-||||  Text|
-||||  TextWithTimestamp|
-||||  Json|
-|    -DebugLog|-vvv|&lt;SwitchParam&gt;|Prints debug messages|
-|    -Diagnostic|-vv|&lt;SwitchParam&gt;|Prints diagnostic messages|
-|    -HumanReadable||&lt;SwitchParam&gt;|Formats file sizes as human-readable values|
-|    -LogLevel||&lt;LogMessageSeverity&gt;|Sets the lowest level of messages to log|
-||||**Possible values:**|
-||||  Debug|
-||||  Diagnostic|
-||||  Verbose|
-||||  Info|
-||||  Warning|
-||||  Error|
-||||  Critical|
-|    -Verbose|-V|&lt;SwitchParam&gt;|Prints verbose messages|
+||||Possible values:|
+||||  **Text**|
+||||  **TextWithTimestamp**|
+||||  **Json**|
+|    **-ConsoleOutputStyle**|**-OutputStyle**|&lt;*OutputStyle*&gt;|Determines the output style|
+||||Possible values:|
+||||  **Freeform**|
+||||  **Raw**|
+||||  **Table**|
+||||  **List**|
+||||  **Csv**|
+||||  **Tsv**|
+||||  **Json**|
+||||  **TreeTable**|
+|    **-DebugLog**|**-vvv**|&lt;*SwitchParam*&gt;|Prints debug messages|
+|    **-Diagnostic**|**-vv**|&lt;*SwitchParam*&gt;|Prints diagnostic messages|
+|    **-HumanReadable**||&lt;*SwitchParam*&gt;|Formats file sizes as human-readable values|
+|    **-LogLevel**||&lt;*LogMessageSeverity*&gt;|Sets the lowest level of messages to log|
+||||Possible values:|
+||||  **Debug**|
+||||  **Diagnostic**|
+||||  **Verbose**|
+||||  **Info**|
+||||  **Warning**|
+||||  **Error**|
+||||  **Critical**|
+|    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
+||||Possible values:|
+||||  **WireName**|
+||||  **UserName**|
+||||  **Realm**|
+||||  **OriginalText**|
+||||  **NameType**|
+||||  **NamePartCount**|
+|    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
+||||  Default: True|
+|    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
 ## Examples

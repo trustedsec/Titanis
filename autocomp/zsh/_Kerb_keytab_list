@@ -1,0 +1,20 @@
+#compdef Kerb_keytab_list
+
+_Kerb_keytab_list() {
+	declare -A params=(
+		['-keytab']=$'Keytab|X|String||||Name of keytab file'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle||OutputStyle|list|Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable|Output|Determines the output style'
+		['-outputfields']=$'OutputFields||String[]|list|Principal;Realm;Timestamp;Kvno;EType;KeyText|Output|Fields to display in output'
+		['-outputheaders']=$'OutputHeaders|@|SwitchParam|||Output|Print headers for table/list/CSV/TSV styles'
+		['-loglevel']=$'LogLevel||LogMessageSeverity|list|Debug;Diagnostic;Verbose;Info;Warning;Error;Critical|Output|Sets the lowest level of messages to log'
+		['-consolelogformat']=$'ConsoleLogFormat|@|LogFormat|list|Text;TextWithTimestamp;Json|Output|Sets the format of log messages written to the console'
+		['-verbose']=$'Verbose||SwitchParam|||Output|Prints verbose messages'
+		['-diagnostic']=$'Diagnostic|@|SwitchParam|||Output|Prints diagnostic messages'
+		['-debuglog']=$'DebugLog|@|SwitchParam|||Output|Prints debug messages'
+		['-humanreadable']=$'HumanReadable|@|SwitchParam|||Output|Formats file sizes as human-readable values'
+	)
+	declare -a paramsByPos=(
+		'Keytab'
+	)
+	_comp_Titanis
+}

@@ -1,0 +1,25 @@
+#compdef Cert_selfcert
+
+_Cert_selfcert() {
+	declare -A params=(
+		['-subject']=$'Subject|X|String||||Subject name as an X.500 string'
+		['-keysizebits']=$'KeySizeBits||Int32||||Size of key, in bits'
+		['-hashalgorithm']=$'HashAlgorithm||HashAlgorithm|list|Md5;Sha1;Sha256;Sha384;Sha512;Sha3_256;Sha3_384;Sha3_512||Hash algorithm'
+		['-templatefile']=$'TemplateFile||FileSpec||||Name of file containing certificate to copy'
+		['-subjectaltname']=$'SubjectAltName||String||||Subject alternate name'
+		['-pfxfilename']=$'PfxFileName|X|FileSpec||||Name of .pfx file'
+		['-certfilename']=$'CertFileName||FileSpec||||Name of certificate file (.pem or .cer)'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle||OutputStyle|list|Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable|Output|Determines the output style'
+		['-outputheaders']=$'OutputHeaders|@|SwitchParam|||Output|Print headers for table/list/CSV/TSV styles'
+		['-loglevel']=$'LogLevel||LogMessageSeverity|list|Debug;Diagnostic;Verbose;Info;Warning;Error;Critical|Output|Sets the lowest level of messages to log'
+		['-consolelogformat']=$'ConsoleLogFormat|@|LogFormat|list|Text;TextWithTimestamp;Json|Output|Sets the format of log messages written to the console'
+		['-verbose']=$'Verbose||SwitchParam|||Output|Prints verbose messages'
+		['-diagnostic']=$'Diagnostic|@|SwitchParam|||Output|Prints diagnostic messages'
+		['-debuglog']=$'DebugLog|@|SwitchParam|||Output|Prints debug messages'
+		['-humanreadable']=$'HumanReadable|@|SwitchParam|||Output|Formats file sizes as human-readable values'
+	)
+	declare -a paramsByPos=(
+		'Subject'
+	)
+	_comp_Titanis
+}

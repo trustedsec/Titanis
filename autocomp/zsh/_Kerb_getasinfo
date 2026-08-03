@@ -1,0 +1,28 @@
+#compdef Kerb_getasinfo
+
+_Kerb_getasinfo() {
+	declare -A params=(
+		['-username']=$'UserName|X|UserPrincipalName|||Authentication (Kerberos)|Name of user (no domain)'
+		['-realm']=$'Realm||String|||Authentication (Kerberos)|Name of realm (domain)'
+		['-enctypes']=$'EncTypes||EType[]|list|DesCbcMd5;DesCbcCrc;Rc4Hmac;Rc4HmacExp;Aes128CtsHmacSha1_96;Aes256CtsHmacSha1_96;DsaWithSha1;Md5WithRsa;Sha1WithRsa;Rc2Cbc;Rsa;RsaesOaep;DesEde3Cbc||ETypes to request'
+		['-kdc']=$'Kdc|X|String|||Authentication (Kerberos)|Host name or address of KDC'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle||OutputStyle|list|Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable|Output|Determines the output style'
+		['-outputfields']=$'OutputFields||String[]|list|EType;SaltText;SaltHex|Output|Fields to display in output'
+		['-outputheaders']=$'OutputHeaders|@|SwitchParam|||Output|Print headers for table/list/CSV/TSV styles'
+		['-loglevel']=$'LogLevel||LogMessageSeverity|list|Debug;Diagnostic;Verbose;Info;Warning;Error;Critical|Output|Sets the lowest level of messages to log'
+		['-consolelogformat']=$'ConsoleLogFormat|@|LogFormat|list|Text;TextWithTimestamp;Json|Output|Sets the format of log messages written to the console'
+		['-verbose']=$'Verbose||SwitchParam|||Output|Prints verbose messages'
+		['-diagnostic']=$'Diagnostic|@|SwitchParam|||Output|Prints diagnostic messages'
+		['-debuglog']=$'DebugLog|@|SwitchParam|||Output|Prints debug messages'
+		['-humanreadable']=$'HumanReadable|@|SwitchParam|||Output|Formats file sizes as human-readable values'
+		['-hostaddress']=$'HostAddress||String[]|||Connection|Network address(es) of the server'
+		['-usetcp6only']=$'UseTcp6Only|@|SwitchParam|||Connection|Only use TCP over IPv6 endpoint'
+		['-usetcp4only']=$'UseTcp4Only|@|SwitchParam|||Connection|Only use TCP over IPv4 endpoint'
+		['-socks5']=$'Socks5||host-or-ip:port||||End point of SOCKS 5 server to use'
+	)
+	declare -a paramsByPos=(
+		'UserName'
+		'Kdc'
+	)
+	_comp_Titanis
+}

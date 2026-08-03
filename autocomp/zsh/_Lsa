@@ -1,0 +1,19 @@
+#compdef Lsa
+
+_Lsa() {
+	local -a commands=(
+		'addpriv:Adds one or more privileges to an account'
+		'createaccount:Creates an account'
+		'enumaccounts:Enumerates accounts'
+		'enumprivaccounts:Enumerates accounts that have a specific privilege or user right'
+		'getprivs:Gets the privileges assigned to an account.'
+		'getrights:Gets the user rights and privileges granted to an account'
+		'getsysaccess:Gets the system access rights granted to an account'
+		'lookupname:Gets the SID for one or more account names'
+		'lookupsid:Translates one or more SIDs to their account names'
+		'rmpriv:Removes one or more privileges from an account'
+		'setsysaccess:Sets the system access rights granted to an account'
+		'whoami:Gets the name and domain of the connected user'
+	)
+	_comp_T_subcommands
+}
