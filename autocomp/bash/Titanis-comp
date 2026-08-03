@@ -9,8 +9,50 @@ _comp_T_param() {
 
 	if [[ -z "$paramType" ]]; then
 		# No completions available
-		COMPREPLY=()
-		return 1
+
+		local pvname="TITANIS_PVLIST_${paramName^^}[@]"
+		if [[ -n $pvname ]]; then
+			local pv
+			for pv in "${!pvname}"; do
+				if [[ $pv = ^* ]]; then
+					pv=${pv#^}
+					declare -a pvparts
+					IFS=";" read -r -a pvparts <<< $pv
+					local pvfile="${pvparts[0]}"
+					local -i pvfield=${pvparts[1]}
+					local pvdelim="${pvparts[2]}"
+					if [[ -z $pvdelim ]]; then
+						pvdelim="$IFS"
+					fi
+
+					if [[ -f $pvfile ]]; then
+						if [[ $pvfield = 0 ]]; then
+							local fileline
+							while IFS= read -r fileline; do
+								if [[ $fileline != \#* ]]; then
+									COMPREPLY+=( "$fileline" )
+								fi
+							done < $pvfile
+						else
+							declare -a filevalues
+							((pvfield--))
+							while IFS="$pvdelim" read -r -a filevalues; do
+								if [[ $filevalues != \#* ]]; then
+									COMPREPLY+=( "${filevalues[$pvfield]}" )
+								fi
+							done < $pvfile
+						fi
+					fi
+				else
+					COMPREPLY+=( "$pv" )
+				fi
+			done
+			_T_filterArray "$cmp" "${COMPREPLY[@]}"
+			return 0
+		else
+			COMPREPLY=()
+			return 1
+		fi
 	fi
 
 
@@ -27,6 +69,7 @@ _comp_T_param() {
 		done
 		return 0
 	else
+		local pvname="TITANIS_PVLIST_$paramName"
 		COMPREPLY=( $(compgen -A "$paramType" "$cmp") )
 		return 0
 	fi
@@ -148,7 +191,7 @@ _comp_T_subcommands() {
 		local subcmd="${COMP_WORDS[1]}"
 		((COMP_CWORD--))
 		COMP_WORDS=( "${base}_${subcmd}" "${COMP_WORDS[@]:2}" )
-		_comp_${base}_$subcmd $base $cmp
+		_${base}_$subcmd $base $cmp
 	fi
 	return 0
 }

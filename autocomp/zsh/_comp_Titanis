@@ -4,12 +4,54 @@ _comp_T_param() {
 	local paramSpec=$1
 
 	local -a parts=( "${(@s/|/)paramSpec}" )
-	local paramName=${parts[0]}
+	local paramName=${parts[1]}
 	local paramType=${parts[4]}
 	local -a items=( "${(@s/;/)parts[5]}" )
 
 	if [[ -z $paramType ]]; then
-		# No completions available
+		local pvname="TITANIS_PVLIST_${paramName:u}"
+		if [[ -n ${(P)pvname} ]]; then
+			local pv
+			for pv in ${(P)pvname[@]}; do
+				if [[ $pv = \^* ]]; then
+					pv=${pv[2,-1]}
+					local -a pvparts=(${(s/;/)pv})
+					local pvfile="${pvparts[1]}"
+					local -i pvfield=${pvparts[2]}
+					local pvdelim="${pvparts[3]}"
+					if [[ -z $pvdelim ]]; then
+						pvdelim="$IFS"
+					fi
+
+					local -a valuelist
+					if [[ -f $pvfile ]]; then
+						if [[ $pvfield = 0 ]]; then
+							local -a filelines=("${(f)$(<$pvfile)}")
+							local fileline
+							for fileline in "${filelines[@]}"; do
+								if [[ $fileline != \#* ]]; then
+									compadd -- "$fileline"
+								fi
+							done
+						else
+							local -a filelines=("${(f)$(<$pvfile)}")
+							local fileline
+							for fileline in "${filelines[@]}"; do
+								if [[ $fileline != \#* ]]; then
+									IFS=$pvdelim local -a parts=(${=fileline})
+									compadd -- "${parts[$pvfield]}"
+								fi
+							done
+						fi
+					fi
+				else
+					compadd -- "${pv[@]}"
+				fi
+			done
+			return 0
+		else
+			return 1
+		fi
 		return 1
 	fi
 
@@ -138,7 +180,7 @@ _comp_Titanis() {
 		arg=${args[i]}
 		isPos=0
 
-		if [[ $arg = -*^ ]]; then
+		if [[ $arg = -*\^ ]]; then
 			# This is a file insertion parameter
 			_files
 			return
