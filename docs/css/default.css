@@ -6,23 +6,18 @@ body {
 	--background-color: #080C18;
 	--text-color: white;
 	--line-color: #204080;
-
 	display: grid;
 	grid-template-areas:
 		"nav . header"
 		"nav . body"
 		"nav . ."
-		"nav . footer"
-		;
+		"nav . footer";
 	grid-template-rows: auto auto auto auto;
-	grid-template-columns: auto 12px auto;
-
+	grid-template-columns: max-content 12px 1fr;
 	margin: 0px;
-
 	color: var(--text-color);
 	background-color: var(--background-color);
 	font-family: "Segoe UI", Arial, Helvetica, sans-serif, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
-
 	scrollbar-color: var(--accent-color) var(--scroll-color);
 }
 

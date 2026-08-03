@@ -1,6 +1,6 @@
 Titanis offers several command line tools for working with network protocols.  Most of the tools have a name resembling the protocol they work with.  In this tutorial, you'll learn how to use **Smb2Client**, which uses the Windows protocol for file sharing.
 
-To view help for any command, use **-c**:
+To view help for any command, use **-h**:
 
 ```
 Smb2Client -h
@@ -87,7 +87,7 @@ $  Smb2Client enumshares lumon-dc1 -UserName milchick -Password 'Br3@kr00m!' -vv
 ...
 ```
 
-For more information on logging, see [Customizing Logging](syntax-logging.md)
+For more information on logging, see [Customizing Logging](logging.md)
 
 # Parameter Defaults
 Due to the number of available options, Titanis command lines can become quite long, with some parameters being repeated with each invocation.  To help with this, Titanis commands accept parameter defaults as environment variables.  To specify a default value for any named parameter, set an environment variable with the name **TITANIS_DEFAULT_**<*name*>.

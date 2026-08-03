@@ -1,3 +1,5 @@
+[View the User Guide on the documentation site](https://trustedsec.github.io/Titanis/UserGuide/)
+
 # Introduction
 Titanis is a library of protocol implementations and command line utilities, written in C#, for interacting with Windows environments.  It uses .NET 8 and is cross-platform (Windows and Linux).  Some of the protocols implemented:
 
