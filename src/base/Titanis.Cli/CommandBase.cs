@@ -33,14 +33,6 @@ namespace Titanis.Cli
 			=> candidate is "-?" or "-h" or "--help";
 
 		/// <summary>
-		/// Determines whether a token indicates the user is requesting a zsh completion script.
-		/// </summary>
-		/// <param name="candidate">Token to check</param>
-		/// <returns><see langword="true"/></returns>
-		protected static bool IsZshCompletionRequest(string candidate)
-			=> candidate is "--zcomprc";
-
-		/// <summary>
 		/// Invokes the command.
 		/// </summary>
 		/// <param name="args">Arguments to the command</param>
@@ -210,7 +202,8 @@ namespace Titanis.Cli
 				var cmd = ex.command ?? this;
 				var prefix = ex.commandPrefix ?? command;
 				context.WriteMessage(this.BuildBanner());
-				context.WriteMessage(cmd.GetHelpText(prefix, metadata));
+				cmd.Context = context;
+				cmd.PrintHelpText(prefix, metadata);
 
 				ConsoleColor? color = null;
 				try
@@ -476,32 +469,12 @@ namespace Titanis.Cli
 		/// </summary>
 		/// <param name="commandName">Gets the name used to invoke the command</param>
 		/// <returns>Command documentation</returns>
-		public abstract void GetHelpText(IDocWriter writer, string commandName, CommandMetadataContext context);
-		public string GetHelpText(string commandName, CommandMetadataContext context)
+		public abstract void PrintHelpText(IDocWriter writer, string commandName, CommandMetadataContext context);
+		internal void PrintHelpText(string commandName, CommandMetadataContext context)
 		{
 			const int ConsoleWidth = 80;
-			StringDocWriter writer = new StringDocWriter(ConsoleWidth, Indent);
-			this.GetHelpText(writer, commandName, context);
-			return writer.ToString();
-		}
-
-		public abstract void GetZshCompletionScript(TextWriter writer, string commandName, string prefix, CommandMetadataContext context);
-		public string GetZshCompletionScript(string command, CommandMetadataContext context)
-		{
-			var writer = new StringWriter()
-			{
-				NewLine = "\n"
-			};
-			writer.WriteLine($"#compdef {command}");
-			writer.WriteLine();
-
-			this.GetZshCompletionScript(writer, command, $"_{command}", context);
-
-			var rc = writer.ToString();
-			rc = rc.Replace("\r\n", "\n")
-				.Replace('\r', '\n');
-
-			return rc;
+			StringDocWriter writer = new StringDocWriter(this.Context.Terminal, ConsoleWidth, Indent);
+			this.PrintHelpText(writer, commandName, context);
 		}
 
 		internal static string GetDetailedHelp(

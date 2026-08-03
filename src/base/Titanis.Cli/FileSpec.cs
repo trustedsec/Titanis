@@ -37,7 +37,12 @@ namespace Titanis.Cli
 		}
 		public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
 		{
-			return base.ConvertFrom(context, culture, value);
+			if (value is string str)
+			{
+				return new FileSpec(str);
+			}
+			else
+				return base.ConvertFrom(context, culture, value);
 		}
 	}
 }

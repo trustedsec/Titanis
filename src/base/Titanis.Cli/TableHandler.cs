@@ -85,6 +85,6 @@ namespace Titanis.Cli
 			}
 		}
 
-		public string BuildOutput() => this._tbl.ToString();
+		public TextTable BuildTable() => this._tbl;
 	}
 }

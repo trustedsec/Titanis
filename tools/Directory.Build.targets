@@ -15,8 +15,9 @@
 			Condition="'$(ArtifactsBasePath)'!=''"
 			AssemblyFile="$(OutputPath)$(AssemblyName)$(TargetExt)"
 			DocFile="$(SolutionDir)docs\UserGuide\tools\$(AssemblyName).md"
-			BashAutocompFile="$(SolutionDir)autocomp\bash\toolcomp-$(AssemblyName).sh"
+			BashAutocompFile="$(SolutionDir)autocomp\bash\$(AssemblyName)"
 			ZshAutocompPath="$(SolutionDir)autocomp\zsh\"
+			ManPagePath="$(SolutionDir)man\man1\"
 			/>
 	</Target>
 

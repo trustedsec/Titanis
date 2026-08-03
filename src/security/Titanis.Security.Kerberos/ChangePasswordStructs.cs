@@ -8,17 +8,20 @@ using System.Threading.Tasks;
 
 namespace Titanis.Security.Kerberos
 {
+	enum ChangepwVersion : ushort
+	{
+		Request = 1,
+		Win2kResetPasswordVersionNumber = 0xff80,
+	}
+
 	// [RFC 3244]
 	[PduStruct]
 	[PduByteOrder(PduByteOrder.BigEndian)]
 	partial struct ChangepwMessage
 	{
-		internal const ushort ChangepwVersionNumber = 1;
-		internal const ushort Win2kResetPasswordVersionNumber = 0xff80;
-
 		public ushort MessageLength { get; set; }
 		[DefaultValue(1)]
-		public ushort ProtocolVersionNumber { get; set; }
+		public ChangepwVersion ProtocolVersionNumber { get; set; }
 		public ushort ApreqLength { get; set; }
 		[PduArraySize(nameof(ApreqLength))]
 		public byte[] Apreqdata { get; set; }
@@ -39,6 +42,25 @@ namespace Titanis.Security.Kerberos
 		AccessDenied = 5,
 		BadVersion = 6,
 		InitialFlagNeeded = 7,
+	}
+
+	// [RFC 3244]
+	[PduStruct]
+	[PduByteOrder(PduByteOrder.BigEndian)]
+	partial struct ChangepwReplyMessage
+	{
+		internal const ushort ChangepwVersionNumber = 1;
+
+		public ushort MessageLength { get; set; }
+		[DefaultValue(1)]
+		public ushort ProtocolVersionNumber { get; set; }
+		public ushort ApreqLength { get; set; }
+		[PduArraySize(nameof(ApreqLength))]
+		public byte[] Apreqdata { get; set; }
+
+		private int PrivLength => this.MessageLength - 6 - this.ApreqLength;
+		[PduArraySize(nameof(PrivLength))]
+		public byte[] PrivMessage { get; set; }
 	}
 
 	/// <summary>

@@ -8,12 +8,13 @@ namespace Titanis.Cli
 	{
 		IDocWriter WriteHeading(string text);
 		IDocWriter WriteSubheading(string text);
-		IDocWriter WriteBodyText(string text);
-		IDocWriter WriteBodyTextLine(string? text);
-		IDocWriter AppendLine();
+		IDocWriter WriteText(string text);
+		IDocWriter WriteText(FormattedText text);
+		IDocWriter WriteLine(string? text);
+		IDocWriter WriteLine();
 
 		IDocWriter WriteTable(TextTable table, params string[] columnNames);
-		abstract void BeginCodeBlock();
-		abstract void EndCodeBlock();
+		abstract IDocWriter BeginCodeBlock();
+		abstract IDocWriter EndCodeBlock();
 	}
 }

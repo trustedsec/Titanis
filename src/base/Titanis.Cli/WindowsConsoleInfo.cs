@@ -34,24 +34,26 @@ namespace Titanis.Cli
 		/// </summary>
 		private object _outputLock = new object();
 
-		private Stack<ConsoleColor>? _textColorStack;
-		public void PopTextColor()
+		public void SetTextColor(ConsoleColor color)
 		{
 			lock (this._outputLock)
 			{
-				var stack = this._textColorStack;
-				if (stack is not null && stack.Count > 0)
-					Console.ForegroundColor = stack.Pop();
+				Console.ForegroundColor = color;
 			}
 		}
 
-		public void PushTextColor(ConsoleColor color)
+		public void SetTextStyles(FormattedTextStyles styles, FormattedTextStyles mask)
 		{
 			lock (this._outputLock)
 			{
-				var stack = (this._textColorStack ??= new Stack<ConsoleColor>());
-				stack.Push(Console.ForegroundColor);
-				Console.ForegroundColor = color;
+				if (0 != (mask & FormattedTextStyles.Italic))
+				{
+					Console.Write((0 != (styles & FormattedTextStyles.Italic)) ? "\x1B[4m" : "\x1B[24m");
+				}
+				if (0 != (mask & FormattedTextStyles.Bold))
+				{
+					Console.Write((0 != (styles & FormattedTextStyles.Bold)) ? "\x1B[1m" : "\x1B[22m");
+				}
 			}
 		}
 

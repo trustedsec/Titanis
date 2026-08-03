@@ -9,6 +9,8 @@ namespace Titanis.Cli
 	{
 		public SubcommandAttribute(string name, Type handlerType)
 		{
+			if (name != name.Trim())
+				throw new Exception();
 			this.Name = name;
 			this.CommandType = handlerType;
 		}

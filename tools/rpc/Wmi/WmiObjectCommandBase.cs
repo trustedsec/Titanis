@@ -63,7 +63,7 @@ internal abstract class WmiObjectCommandBase : WmiNamespaceCommandBase
 					hasObject = true;
 					try
 					{
-						this.WriteDiagnostic($"Processing object {query.Current.RelativePath}");
+						//this.WriteDiagnostic($"Processing object {query.Current.RelativePath}");
 						await ProcessObject(query.Current, ns, cancellationToken);
 						count++;
 					}

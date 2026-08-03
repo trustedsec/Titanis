@@ -6,16 +6,11 @@ using System.Text;
 
 namespace Titanis.Cli
 {
-	public interface ITextTableRenderCallback
-	{
-		void RenderCellText(TextTableCell cell, StringBuilder sb);
-	}
-
 	/// <summary>
 	/// Represents a table that is rendered to text.
 	/// </summary>
 	/// <remarks>
-	/// Use <see cref="ToString()"/> or one its overloads to render the table as text.
+	/// Use <see cref="BuildString()"/> or one its overloads to render the table as text.
 	/// </remarks>
 	public class TextTable
 	{
@@ -41,6 +36,12 @@ namespace Titanis.Cli
 			this.Rows.Add(tr);
 			return tr;
 		}
+		public TextTableRow AddRow(params FormattedText?[] cells)
+		{
+			TextTableRow tr = new TextTableRow(Array.ConvertAll(cells, r => new TextTableCell(r)));
+			this.Rows.Add(tr);
+			return tr;
+		}
 		public TextTableRow AddRow(params TextTableCell?[] cells)
 		{
 			TextTableRow tr = new TextTableRow(cells);
@@ -61,122 +62,23 @@ namespace Titanis.Cli
 		/// </summary>
 		public string? ColumnSeparator { get; set; } = "  ";
 
+		public sealed override string ToString() => this.BuildString();
 		/// <summary>
 		/// Renders the table as a string.
 		/// </summary>
-		public sealed override string ToString()
+		public string BuildString()
 		{
 			StringBuilder sb = new StringBuilder();
-			this.ToString(sb);
+			//this.BuildString(sb);
 			return sb.ToString();
 		}
-		public string ToString(StringBuilder sb, ITextTableRenderCallback? callback = null)
+		public void Render(TextTableFormatterBase formatter)
 		{
-			string columnSeparator = this.ColumnSeparator ?? string.Empty;
-			string leftMargin = this.LeftMargin ?? string.Empty;
-			string rightMargin = this.RightMargin ?? string.Empty;
-
-			// Count columns
-			var columnCount = 0;
+			if (formatter is null) throw new ArgumentNullException(nameof(formatter));
 			foreach (var row in this.Rows)
 			{
-				if (row != null)
-					columnCount = Math.Max(columnCount, row.Cells.Count);
+				formatter.RenderRow(row);
 			}
-
-			StringBuilder tempSB = new StringBuilder();
-
-			// Measure columns
-			var columnWidths = new int[columnCount];
-			foreach (var row in this.Rows)
-			{
-				if (row is null)
-					continue;
-
-				for (int i = 0; i < row.Cells.Count; i++)
-				{
-					var cell = row.Cells[i];
-					if (cell != null)
-					{
-						if (callback != null)
-						{
-							callback.RenderCellText(cell, tempSB);
-							cell.RenderedText = tempSB.ToString();
-							tempSB.Clear();
-						}
-						else
-						{
-							cell.RenderedText = cell.Text ?? string.Empty;
-						}
-
-						columnWidths[i] = Math.Max(columnWidths[i], cell.RenderedText?.Length ?? 0);
-					}
-				}
-			}
-
-			// Print rows
-			int rowWidth = columnWidths.Sum();
-			//StringBuilder sb = new StringBuilder(this.Rows.Count * (rowWidth + leftMargin.Length + rightMargin.Length + 2));
-			foreach (var row in this.Rows)
-			{
-				sb.Append(leftMargin);
-
-				if (row is null)
-					continue;
-
-				for (int i = 0; i < row.Cells.Count; i++)
-				{
-					var colWidth = columnWidths[i];
-					if (i > 0 && colWidth > 0)
-						sb.Append(columnSeparator);
-
-					var cell = row.Cells[i];
-					if (cell != null)
-					{
-						bool shouldPadRight = (i + 1 < columnCount) || !string.IsNullOrEmpty(rightMargin) || cell.Padding != ' ';
-
-						var cellText = cell.RenderedText!;
-						if (cellText.Length == colWidth)
-							sb.Append(cellText);
-						else if (cellText.Length == 0)
-						{
-							if (shouldPadRight)
-								sb.Append(new string(cell.Padding, colWidth));
-						}
-						else
-						{
-							switch (cell.Alignment)
-							{
-								case DisplayAlignment.Center:
-									sb.Append(new string(cell.Padding, (colWidth - cellText.Length) / 2));
-									sb.Append(cellText);
-									if (shouldPadRight)
-										sb.Append(new string(cell.Padding, (colWidth - cellText.Length + 1) / 2));
-									break;
-								case DisplayAlignment.Right:
-									sb.Append(new string(cell.Padding, colWidth - cellText.Length));
-									sb.Append(cellText);
-									break;
-								case DisplayAlignment.Left:
-								default:
-									sb.Append(cellText);
-									if (shouldPadRight)
-										sb.Append(new string(cell.Padding, colWidth - cellText.Length));
-									break;
-							}
-						}
-					}
-					else
-					{
-						sb.Append(new string(' ', colWidth));
-					}
-				}
-
-				sb.Append(rightMargin);
-				sb.AppendLine();
-			}
-
-			return sb.ToString();
 		}
 
 		public static TextTable BuildTable<TRecord>(OutputField<TRecord>[] fields, IEnumerable<TRecord> items)
@@ -231,6 +133,12 @@ namespace Titanis.Cli
 			this.Cells.Add(cell);
 			return cell;
 		}
+		public TextTableCell AddCell(FormattedText text, DisplayAlignment alignment = DisplayAlignment.Left)
+		{
+			var cell = new TextTableCell(text, alignment);
+			this.Cells.Add(cell);
+			return cell;
+		}
 	}
 
 	[Flags]
@@ -250,21 +158,26 @@ namespace Titanis.Cli
 	{
 		public TextTableCell()
 		{
-			this.Text = string.Empty;
-		}
-		public TextTableCell(string? text)
-		{
-			this.Text = text ?? string.Empty;
+			this.IsEmpty = true;
+			this.FormattedText = FormattedTextFactory.Empty;
 		}
 		public TextTableCell(string? text, DisplayAlignment alignment = DisplayAlignment.Left)
 		{
-			this.Text = text ?? string.Empty;
+			this.IsEmpty=string.IsNullOrEmpty(text);
+			this.FormattedText = new FormattedText(text);
 			this.Alignment = alignment;
 		}
+		public TextTableCell(FormattedText text, DisplayAlignment alignment = DisplayAlignment.Left)
+		{
+			if (text is null) throw new ArgumentNullException(nameof(text));
+			this.FormattedText = text;
+			this.Alignment = alignment;
+		}
+		public bool IsEmpty { get; }
 		/// <summary>
-		/// Gets or sets the text in the cell.
+		/// Gets or sets the formatted text in the cell.
 		/// </summary>
-		public string? Text { get; set; }
+		public FormattedText FormattedText { get; }
 		/// <summary>
 		/// Gets or sets the alignment of the text within the cell.
 		/// </summary>
@@ -273,9 +186,5 @@ namespace Titanis.Cli
 		/// Gets the text to pad the cell with if the text is shorter than the column containing it.
 		/// </summary>
 		public char Padding { get; set; } = ' ';
-
-		public TextStyleOptions StyleOptions { get; set; }
-
-		internal string? RenderedText { get; set; }
 	}
 }

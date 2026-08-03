@@ -28,6 +28,11 @@ namespace Titanis.Cli
 			this.Parts = parts;
 		}
 
+		public FormattedText(string? text)
+		{
+			this.Parts = [new TextPart(text ?? string.Empty)];
+		}
+
 		/// <summary>
 		/// Gets the parts constituting formatted text.
 		/// </summary>
@@ -47,14 +52,28 @@ namespace Titanis.Cli
 				part.PrintTo(target);
 			}
 		}
+
 	}
 
 	public static class FormattedTextFactory
 	{
+		private static readonly FormattedText _empty = new FormattedText([]);
+		public static FormattedText Empty => _empty;
+
+		public static FormattedTextBuilder Builder() => new FormattedTextBuilder();
 		public static FormattedTextPart Text(string? text) => new TextPart(text);
 		public static FormattedTextPart LineBreak() => new TextPart(Environment.NewLine);
 		public static PushTextColorPart PushTextColor(ConsoleColor color) => new PushTextColorPart(color);
 		public static PopTextColorPart PopTextColor() => Singleton.SingleInstance<PopTextColorPart>();
+
+		public static FormattedText Bold(string text) => Styled(text, FormattedTextStyles.Bold);
+		public static FormattedText Italic(string text) => Styled(text, FormattedTextStyles.Bold);
+		public static FormattedText Styled(string text, FormattedTextStyles styles) => new FormattedText([
+			new PushTextStylePart(styles),
+			new TextPart(text),
+			_popStyle,
+			]);
+		private static readonly PopTextStylePart _popStyle = new PopTextStylePart();
 	}
 
 	/// <summary>
@@ -90,6 +109,29 @@ namespace Titanis.Cli
 		}
 	}
 
+	public sealed class LinkTextPart : FormattedTextPart
+	{
+		public LinkTextPart(string? text, string linkTarget)
+		{
+			this.Text = text ?? string.Empty;
+			LinkTarget = linkTarget;
+		}
+
+		public string Text { get; }
+		public string LinkTarget { get; }
+
+		/// <inheritdoc/>
+		public sealed override string ToString()
+			=> this.Text;
+
+		/// <inheritdoc/>
+		internal sealed override void PrintTo(FormattedTextTarget target)
+		{
+			if (!string.IsNullOrEmpty(this.Text))
+				target.WriteLink(this.Text, this.LinkTarget);
+		}
+	}
+
 	public sealed class PushTextColorPart : FormattedTextPart
 	{
 		public PushTextColorPart(ConsoleColor color)
@@ -119,6 +161,48 @@ namespace Titanis.Cli
 		internal sealed override void PrintTo(FormattedTextTarget target)
 		{
 			target.PopTextColor();
+		}
+	}
+
+
+
+	public sealed class PushTextStylePart : FormattedTextPart
+	{
+		public PushTextStylePart(FormattedTextStyles styles, FormattedTextStyles mask)
+		{
+			Styles = styles;
+			Mask = mask;
+		}
+		public PushTextStylePart(FormattedTextStyles styles)
+		{
+			Styles = styles;
+			Mask = styles;
+		}
+
+		public FormattedTextStyles Styles { get; }
+		public FormattedTextStyles Mask { get; }
+
+		public sealed override string ToString()
+			=> $"<PushStyle: {this.Styles} & {this.Mask}>";
+
+		internal sealed override void PrintTo(FormattedTextTarget target)
+		{
+			target.PushTextStyles(this.Styles, this.Mask);
+		}
+	}
+
+	public sealed class PopTextStylePart : FormattedTextPart
+	{
+		public PopTextStylePart()
+		{
+		}
+
+		public sealed override string ToString()
+			=> $"<PopStyles>";
+
+		internal sealed override void PrintTo(FormattedTextTarget target)
+		{
+			target.PopTextStyles();
 		}
 	}
 }

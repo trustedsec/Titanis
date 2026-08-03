@@ -130,7 +130,7 @@ namespace Titanis.Cli
 						tbl.AddRow(node.Record, node.BuildLineArt(false), node.BuildLineArt(true), false);
 					}
 
-					this.WriteOutput(tbl.BuildOutput());
+					this.PrintTable(tbl.BuildTable());
 				}
 				this._treeHandler = null;
 			}
@@ -140,7 +140,7 @@ namespace Titanis.Cli
 				{
 					if (this._resultTable != null)
 					{
-						this.WriteOutputLine(this._resultTable.BuildOutput());
+						this.PrintTable(this._resultTable.BuildTable());
 						this._resultsPending = false;
 						this._resultTable = null;
 					}
@@ -329,6 +329,6 @@ namespace Titanis.Cli
 		public abstract ILog Log { get; }
 		public abstract void WriteOutput(string? message);
 		public abstract void WriteOutputLine(string? message);
-
+		protected abstract void PrintTable(TextTable table);
 	}
 }

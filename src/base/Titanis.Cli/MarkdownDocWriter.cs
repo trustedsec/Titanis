@@ -8,8 +8,8 @@ namespace Titanis.Cli
 	{
 		private readonly TextWriter writer;
 
-		public MarkdownDocWriter(TextWriter writer, int maxLineWidth, string indent = "")
-			: base(maxLineWidth, indent)
+		public MarkdownDocWriter(TextWriter writer, int maxLineWidth)
+			: base(maxLineWidth, string.Empty)
 		{
 			if (writer is null) throw new ArgumentNullException(nameof(writer));
 			if (maxLineWidth < 1)
@@ -35,14 +35,67 @@ namespace Titanis.Cli
 			this.writer.WriteLine($"### {text}");
 		}
 
+		private void _WriteRaw(string text)
+		{
+			this.writer.Write(text);
+		}
+		private void _WriteRawLine(string text)
+		{
+			this.writer.WriteLine(text);
+		}
+
+		class TableFormatter : TextTableFormatterBase
+		{
+			private readonly MarkdownDocWriter _writer;
+			private readonly int _colCount;
+
+			internal TableFormatter(MarkdownDocWriter writer, int colCount)
+			{
+				this._writer = writer;
+				this._colCount = colCount;
+			}
+
+			public override void RenderRow(TextTableRow? row)
+			{
+				bool hasContent = false;
+				foreach (var cell in row.Cells)
+				{
+					if (!(cell?.IsEmpty ?? true))
+					{
+						hasContent = true;
+						break;
+					}
+				}
+				if (!hasContent)
+					return;
+
+				var writer = this._writer;
+				for (int i = 0; i < this._colCount; i++)
+				{
+					writer._WriteRaw("|");
+					if (i < row.Cells.Count)
+					{
+						var cell = row.Cells[i];
+
+						if (cell != null)
+						{
+							cell.FormattedText.PrintTo(this._writer);
+						}
+					}
+				}
+				writer._WriteRawLine("|");
+			}
+		}
+
+		private bool _inTable;
 		protected sealed override void WriteTableImpl(TextTable table, params string[] columnNames)
 		{
 			if (table is null) throw new ArgumentNullException(nameof(table));
 
 			this.writer.WriteLine();
 
+			// Render headings
 			StringBuilder sb = new StringBuilder();
-
 			foreach (var colName in columnNames)
 			{
 				this.writer.Write('|');
@@ -55,70 +108,10 @@ namespace Titanis.Cli
 			}
 			this.writer.WriteLine('|');
 
-			int colCount = columnNames.Length;
-			foreach (var row in table.Rows)
-			{
-				bool hasContent = false;
-				foreach (var cell in row.Cells)
-				{
-					if (cell?.Text is not null)
-					{
-						hasContent = true;
-						break;
-					}
-				}
-				if (!hasContent)
-					continue;
-
-				for (int i = 0; i < colCount; i++)
-				{
-					this.writer.Write('|');
-					if (i < row.Cells.Count)
-					{
-						var cell = row.Cells[i];
-
-						if (cell != null)
-						{
-							string? preamble = null;
-							string? postamble = null;
-							if (0 != (cell.StyleOptions & TextStyleOptions.Bold))
-							{
-								preamble += "**";
-								postamble += "**";
-							}
-							if (0 != (cell.StyleOptions & TextStyleOptions.Italic))
-							{
-								preamble += "*";
-								postamble += "*";
-							}
-							ITextTableRenderCallback render = this;
-
-
-							this.writer.Write(preamble);
-							render.RenderCellText(cell, sb);
-							this.writer.Write(sb.ToString());
-							sb.Clear();
-							this.writer.Write(postamble);
-						}
-					}
-				}
-				this.writer.WriteLine('|');
-			}
+			table.Render(new TableFormatter(this, columnNames.Length));
 
 			this.writer.WriteLine();
 		}
-
-		protected sealed override void RenderCellText(TextTableCell cell, StringBuilder sb)
-		{
-			StringBuilder tempSB = (sb.Length == 0) ? sb : new StringBuilder();
-			base.RenderCellText(cell, tempSB);
-			tempSB.Replace("\\", "\\\\")
-				.Replace("|", "\\|")
-				;
-			if (tempSB != sb)
-				sb.Append(tempSB);
-		}
-
 
 		// TODO: What other characters must be escaped?
 		private static readonly char[] SpecialChars = new char[] { '<', '>', '&' };
@@ -193,9 +186,20 @@ namespace Titanis.Cli
 				base.WriteIndent();
 		}
 
-		protected override string RenderLinkTo(string linkText, string? target)
+		protected override FormattedTextStyles SetTextStyles(FormattedTextStyles baseStyles, FormattedTextStyles styles, FormattedTextStyles mask)
 		{
-			return $"[{linkText}]({target?.ToLower()?.Replace(" ", "-")})";
+			var changed = (baseStyles ^ styles) & mask;
+			if (0 != (changed & FormattedTextStyles.Bold))
+				this._WriteRaw("**");
+			if (0 != (changed & FormattedTextStyles.Italic))
+				this._WriteRaw("*");
+
+			return baseStyles ^= changed;
+		}
+
+		internal override void WriteLink(string text, string linkTarget)
+		{
+			this._WriteRaw($"[{text}]({linkTarget})");
 		}
 	}
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Build.Framework;
 using System.ComponentModel;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Xml;
 using Titanis.Cli;
 
 namespace Titanis.ToolDocBuilder
@@ -63,6 +65,44 @@ namespace Titanis.ToolDocBuilder
 				var declaring = this.ReflectType(declaringType);
 				return (Type)declaring.GetMember(sourceType.Name)[0];
 			}
+		}
+
+		class AssemblyLoadInfo
+		{
+			internal AssemblyLoadInfo(string fileName, XmlDocument? docFile)
+			{
+				FileName = fileName;
+				DocFile = docFile;
+			}
+
+			public string FileName { get; }
+			public XmlDocument? DocFile { get; }
+		}
+		private System.Runtime.CompilerServices.ConditionalWeakTable<Assembly, AssemblyLoadInfo> _asmLoadInfo = new System.Runtime.CompilerServices.ConditionalWeakTable<Assembly, AssemblyLoadInfo>();
+		internal Assembly LoadAssemblyFile(string fileName)
+		{
+			var asm = this.context.LoadFromByteArray(File.ReadAllBytes(fileName));
+
+			XmlDocument? doc = null;
+			{
+				var xmlDocName = fileName + ".xml";
+				if (File.Exists(xmlDocName))
+				{
+					try
+					{
+						doc = new XmlDocument();
+						doc.Load(xmlDocName);
+					}
+					catch
+					{
+						doc = null;
+					}
+				}
+			}
+
+			this._asmLoadInfo.Add(asm, new AssemblyLoadInfo(fileName, doc));
+
+			return asm;
 		}
 
 		public override ICustomTypeDescriptor GetDescriptor(Type type)

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Titanis.Cli
 {
-	public abstract class DocWriterBase : IDocWriter, ITextTableRenderCallback
+	public abstract class DocWriterBase : FormattedTextTarget, IDocWriter
 	{
 		public DocWriterBase(int maxLineWidth, string indent)
 		{
@@ -29,7 +29,7 @@ namespace Titanis.Cli
 		}
 		#endregion
 
-		public IDocWriter AppendLine()
+		public IDocWriter WriteLine()
 		{
 			this.AppendLineImpl();
 			this.ClearDirty();
@@ -64,7 +64,7 @@ namespace Titanis.Cli
 
 
 
-		protected void WriteText(string? text)
+		private void WriteTextToOutput(string? text)
 		{
 			if (!string.IsNullOrEmpty(text))
 			{
@@ -76,14 +76,26 @@ namespace Titanis.Cli
 		protected abstract void WriteTextImpl(string text);
 
 
-		public IDocWriter WriteBodyText(string? text)
+		IDocWriter IDocWriter.WriteText(string? text)
+		{
+			this.WriteText(text);
+			return this;
+		}
+
+		protected virtual FormattedTextTarget? GetTextTarget() => this;
+		public IDocWriter WriteText(FormattedText text)
+		{
+			if (text is null) throw new ArgumentNullException(nameof(text));
+
+			text.PrintTo(this.GetTextTarget() ?? this);
+			return this;
+		}
+		public override void WriteText(string? text)
 		{
 			if (string.IsNullOrEmpty(text))
-				return this;
+				return;
 
 			var maxWidth = this.MaxLineWidth;
-
-			text = ReplaceDocMacros(text)!;
 
 			DocHelper.DocContext context = new DocHelper.DocContext(text!);
 			DocHelper.TextRunInfo run;
@@ -92,42 +104,42 @@ namespace Titanis.Cli
 				run = context.GetNextRun(maxWidth);
 				if (!this.IsLineDirty)
 					WriteIndent();
-				this.WriteText(text.Substring(run.startIndex, run.length));
+				this.WriteTextToOutput(text.Substring(run.startIndex, run.length));
 				if (run.reason != DocHelper.TextRunBreakReason.EndOfText)
-					this.AppendLine();
+					this.WriteLine();
 			} while (run.reason != DocHelper.TextRunBreakReason.EndOfText);
-
-			return this;
 		}
 
 		protected virtual void WriteIndent()
 		{
-			this.WriteText("  ");
+			this.WriteTextToOutput(this.Indent);
 		}
 
-		public IDocWriter WriteBodyTextLine(string? text)
+		public IDocWriter WriteLine(string? text)
 		{
-			this.WriteBodyText(text);
-			this.AppendLine();
+			this.WriteText(text);
+			this.WriteLine();
 			return this;
 		}
 
 		protected bool InCodeBlock { get; private set; }
 		protected virtual void BeginCodeBlockImpl() { }
-		public void BeginCodeBlock()
+		public IDocWriter BeginCodeBlock()
 		{
 			this.InCodeBlock = true;
 			this.BeginCodeBlockImpl();
+			return this;
 		}
 
 		protected virtual void EndCodeBlockImpl()
 		{
-			this.AppendLine();
+			this.WriteLine();
 		}
-		public void EndCodeBlock()
+		public IDocWriter EndCodeBlock()
 		{
 			this.InCodeBlock = false;
 			this.EndCodeBlockImpl();
+			return this;
 		}
 
 		protected virtual void RenderText(string? text, StringBuilder sb)
@@ -135,77 +147,13 @@ namespace Titanis.Cli
 			sb.Append(text);
 		}
 
-		#region Doc macros
-		private const string TokenSequence = "##doc[";
 
-		protected string? ReplaceDocMacros(string? text)
+		protected override void SetTextColor(ConsoleColor color)
 		{
-			if (text is null || !text.Contains(TokenSequence))
-				return text;
-
-			var sb = new StringBuilder();
-			this.ReplaceDocMacros(text, sb);
-			text = sb.ToString();
-			sb.Clear();
-			return text;
 		}
-		protected void ReplaceDocMacros(string? text, StringBuilder sb)
+		protected override FormattedTextStyles SetTextStyles(FormattedTextStyles baseStyles, FormattedTextStyles styles, FormattedTextStyles mask)
 		{
-			if ((text is null) || !text!.Contains(TokenSequence))
-			{
-				RenderText(text, sb);
-				return;
-			}
-
-			int startIndex = 0;
-			int tokenIndex;
-			while ((tokenIndex = text.IndexOf(TokenSequence, startIndex)) >= 0)
-			{
-				if (tokenIndex > startIndex)
-					this.RenderText(text.Substring(startIndex, tokenIndex - startIndex), sb);
-
-				tokenIndex += TokenSequence.Length;
-				int endIndex = text.IndexOf(']', tokenIndex);
-				string content = text.Substring(tokenIndex, endIndex - tokenIndex);
-
-				var tokens = content.Split(';');
-				string? replacement = null;
-				switch (tokens[0])
-				{
-					case "link":
-						{
-							var linkText = tokens.ElementAtOrDefault(1) ?? string.Empty;
-							var target = tokens.ElementAtOrDefault(2);
-							if (target is null && linkText.StartsWith("#"))
-							{
-								target = linkText;
-								linkText = linkText.Substring(1);
-							}
-							replacement = this.RenderLinkTo(linkText, target);
-						}
-						break;
-					default:
-						break;
-				}
-
-				if (replacement != null)
-					this.RenderText(replacement, sb);
-
-				startIndex = endIndex + 1;
-			}
-		}
-
-		protected virtual string RenderLinkTo(string linkText, string? target)
-			=> linkText;
-
-		#endregion
-
-		void ITextTableRenderCallback.RenderCellText(TextTableCell cell, StringBuilder sb)
-			=> this.RenderCellText(cell, sb);
-		protected virtual void RenderCellText(TextTableCell cell, StringBuilder sb)
-		{
-			var text = cell.Text;
-			ReplaceDocMacros(cell?.Text, sb);
+			return FormattedTextStyles.None;
 		}
 	}
 }

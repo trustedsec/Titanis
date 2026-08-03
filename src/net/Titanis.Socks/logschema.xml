@@ -8,7 +8,7 @@
 			<param name="upstreamEP" type="EndPoint"/>
 			<![CDATA[Connecting to SOCKS v{version} server {socksEP} for upstream connection to {upstreamEP}]]>
 		</message>
-		<message name="Connected" severity="Diagnostic">
+		<message name="Connected" severity="Verbose">
 			<param name="version" type="int"/>
 			<param name="socksEP" type="EndPoint"/>
 			<param name="upstreamEP" type="EndPoint"/>

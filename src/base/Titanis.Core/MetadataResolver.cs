@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml;
 
 namespace Titanis
 {
@@ -26,6 +27,56 @@ namespace Titanis
 			return TypeDescriptor.GetProvider(instance).GetTypeDescriptor(instance);
 		}
 		public abstract ICustomTypeDescriptor GetDescriptor(Type type);
+		protected virtual XmlDocument? LoadDocForType(Assembly assembly)
+		{
+			string fileName = assembly.Location;
+			fileName = Path.ChangeExtension(fileName, ".xml");
+			if (File.Exists(fileName))
+			{
+				XmlDocument doc = new XmlDocument();
+				doc.Load(fileName);
+				return doc;
+			}
+
+			return null;
+		}
+
+		class XmlDocInfo
+		{
+			internal readonly XmlDocument? doc;
+			internal readonly XmlNamespaceManager? nsmgr;
+
+			internal XmlDocInfo(XmlDocument? doc, XmlNamespaceManager? nsmgr)
+			{
+				this.doc = doc;
+				this.nsmgr = nsmgr;
+			}
+		}
+		private System.Runtime.CompilerServices.ConditionalWeakTable<Assembly, XmlDocInfo> _asmDocInfo = new System.Runtime.CompilerServices.ConditionalWeakTable<Assembly, XmlDocInfo>();
+		public XmlNode? GetDocumentation(Type type)
+		{
+			if (type is null) throw new ArgumentNullException(nameof(type));
+			if (!this._asmDocInfo.TryGetValue(type.Assembly, out var docInfo))
+			{
+				var doc = this.LoadDocForType(type.Assembly);
+				XmlNamespaceManager? nsmgr = null;
+				if (doc != null)
+				{
+					nsmgr = new XmlNamespaceManager(doc.NameTable);
+					nsmgr.AddNamespace("doc", "");
+				}
+				docInfo = new XmlDocInfo(doc, nsmgr);
+				this._asmDocInfo.Add(type.Assembly, docInfo);
+			}
+
+			if (docInfo.doc != null)
+			{
+				const string prefix = "doc";
+				return docInfo.doc.SelectSingleNode($"/{prefix}:doc/{prefix}:members/{prefix}:member[@name='T:{type.FullName}']", docInfo.nsmgr);
+			}
+
+			return null;
+		}
 
 		public abstract Type ReflectType(Type type);
 		public T? GetCustomAttribute<T>(Type member, bool inherit) where T : Attribute

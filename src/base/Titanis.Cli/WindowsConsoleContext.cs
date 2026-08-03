@@ -100,5 +100,15 @@ namespace Titanis.Cli
 			return _services.GetService(serviceType);
 		}
 
+		protected override void PrintTable(TextTable table)
+		{
+			DocWriterTableFormatter formatter = new(
+				table.ColumnSeparator,
+				table.LeftMargin,
+				table.RightMargin
+				);
+			table.Render(formatter);
+			formatter.Complete(new StringDocWriter(this.Terminal, 80, string.Empty));
+		}
 	}
 }

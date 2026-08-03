@@ -2,10 +2,13 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO.Compression;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml;
 using Titanis.Cli;
 
 namespace Titanis.ToolDocBuilder
@@ -25,7 +28,10 @@ namespace Titanis.ToolDocBuilder
 
 		[Required]
 		public string? BashAutocompFile { get; set; }
+		[Required]
 		public string? ZshAutocompPath { get; set; }
+		[Required]
+		public string? ManPagePath { get; set; }
 
 		public bool Execute()
 		{
@@ -39,7 +45,14 @@ namespace Titanis.ToolDocBuilder
 
 			try
 			{
-				return GenerateDoc(this.BuildEngine, this.AssemblyFile!, this.DocFile!, this.BashAutocompFile!, this.ZshAutocompPath!);
+				return GenerateDoc(
+					this.BuildEngine,
+					this.AssemblyFile!,
+					this.DocFile!,
+					this.BashAutocompFile,
+					this.ZshAutocompPath!,
+					this.ManPagePath
+					);
 			}
 			catch (Exception ex)
 			{
@@ -52,8 +65,9 @@ namespace Titanis.ToolDocBuilder
 			IBuildEngine buildEngine,
 			string assemblyFile,
 			string docFile,
-			string bashAutocompFile,
-			string zshAutocompPath)
+			string? bashAutocompFile,
+			string? zshAutocompPath,
+			string? manPagePath)
 		{
 			List<string> searchDirs = new List<string>();
 			searchDirs.Add(Path.GetDirectoryName(assemblyFile));
@@ -122,7 +136,11 @@ namespace Titanis.ToolDocBuilder
 			var commandType = cliAssembly.GetType("Titanis.Cli.Command");
 			var multiCommandType = cliAssembly.GetType("Titanis.Cli.MultiCommand");
 
-			var asm = loadContext.LoadFromByteArray(File.ReadAllBytes(assemblyFile));
+			var asm = mdResolver.LoadAssemblyFile(assemblyFile);
+			var fileDate = File.GetLastWriteTimeUtc(assemblyFile);
+			AssemblyName asmName = asm.GetName();
+			var version = asmName.Version;
+
 			var programType = asm.EntryPoint.DeclaringType;
 
 			bool isCommand = (commandBaseType.IsAssignableFrom(programType));
@@ -131,9 +149,10 @@ namespace Titanis.ToolDocBuilder
 				using var fileWriter = File.CreateText(docFile);
 				var docWriter = new MarkdownDocWriter(fileWriter, 80);
 
-				using var bashComp = File.CreateText(bashAutocompFile);
+				using TextWriter bashComp = (string.IsNullOrEmpty(bashAutocompFile) ? new StringWriter() : File.CreateText(bashAutocompFile));
 				bashComp.NewLine = "\n";
-				bashComp.WriteLine("#!/bin/bash");
+				bashComp.WriteLine("# bash completion");
+				bashComp.WriteLine("source \"${BASH_SOURCE[0]%/*}/Titanis-comp\"");
 
 				Queue<SubcommandAttribute> commandQueue = new Queue<SubcommandAttribute>();
 				commandQueue.Enqueue(new SubcommandAttribute(asm.GetName().Name, programType));
@@ -145,21 +164,33 @@ namespace Titanis.ToolDocBuilder
 					var aliasName = commandInfo.Name.Replace(' ', '-');
 					var type = commandInfo.CommandType;
 
+					var desc = mdResolver.GetCustomAttribute<DescriptionAttribute>(type, true)?.Description;
+
 					fileWriter.WriteLine($"# {commandName}");
 
 					bashComp.WriteLine();
 					bashComp.WriteLine($"# {commandName}");
-					bashComp.WriteLine($"_comp_{bashName} () {{");
+					bashComp.WriteLine($"_{bashName} () {{");
 
-					using var zshComp = File.CreateText(Path.Combine(zshAutocompPath, $"_{bashName}"));
+					using TextWriter zshComp = string.IsNullOrEmpty(zshAutocompPath) ? new StringWriter() : File.CreateText(Path.Combine(zshAutocompPath, $"_{bashName}"));
 					zshComp.NewLine = "\n";
 					zshComp.WriteLine($"#compdef {bashName}");
 					zshComp.WriteLine();
 					zshComp.WriteLine($"_{bashName}() {{");
 
+					using TextWriter manPage = new StringWriter();
+					manPage.NewLine = "\n";
+					var manWriter = new ManWriter(manPage);
+					manWriter.WriteComment("t");
+					manWriter.WriteComment($"Man page for {aliasName}");
+					manPage.WriteLine(".pc");
+					manPage.WriteLine($".TH MAN 1 \"{fileDate:yyyy-MM-dd}\" \"{version}\" \"{asmName.Name}\"");
+					manWriter.SectionHeader("NAME");
+					manPage.WriteLine($"{aliasName} \\- {desc}");
+
 					if (commandType.IsAssignableFrom(type))
 					{
-						buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Processing command type {commandType.FullName}", null, SenderName, MessageImportance.Low));
+						buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Processing command type {type.FullName}", null, SenderName, MessageImportance.Low));
 
 						var md = Command.GetCommandMetadata(type, mdContext);
 						if (string.IsNullOrEmpty(md.Description))
@@ -217,12 +248,12 @@ namespace Titanis.ToolDocBuilder
 						bashComp.WriteLine($"\t_comp_Titanis");
 
 						Command.BuildCommandHelpText(type, docWriter, commandName, null, mdContext);
+						Command.BuildCommandHelpText(type, manWriter, commandName, null, mdContext);
 					}
 					else if (multiCommandType.IsAssignableFrom(type))
 					{
 						buildEngine.LogMessageEvent(new BuildMessageEventArgs($"Processing multi-command type {commandType.FullName}", null, SenderName, MessageImportance.Low));
 
-						var desc = mdResolver.GetCustomAttribute<DescriptionAttribute>(type, true)?.Description;
 						if (string.IsNullOrEmpty(desc))
 							buildEngine.LogErrorEvent(MakeMissingDescError(type.FullName));
 
@@ -252,7 +283,19 @@ namespace Titanis.ToolDocBuilder
 					zshComp.WriteLine("}");
 
 					bashComp.WriteLine("}");
-					bashComp.WriteLine($"complete -F _comp_{bashName} {aliasName}");
+					bashComp.WriteLine($"complete -F _{bashName} {aliasName}");
+
+					if (!string.IsNullOrEmpty(manPagePath))
+					{
+						if (!Directory.Exists(manPagePath))
+							Directory.CreateDirectory(manPagePath);
+						using var manStream = File.Create(Path.Combine(manPagePath, $"{aliasName}.1.gz"));
+						using var mangz = new GZipStream(manStream, CompressionLevel.Optimal);
+						using var mantext = new StreamWriter(mangz, Encoding.UTF8);
+						mantext.NewLine = "\n";
+						mantext.Write(manPage.ToString());
+						mantext.Flush();
+					}
 				}
 			}
 

@@ -81,9 +81,13 @@ public class TestCommandContext : CommandContextBase, ICommandContext
 	}
 
 	public List<object> OutputRecords { get; } = new List<object>();
-    protected override void OnRecordWritten(object? record)
-    {
-        base.OnRecordWritten(record);
+	protected override void OnRecordWritten(object? record)
+	{
+		base.OnRecordWritten(record);
 		this.OutputRecords.Add(record);
-    }
+	}
+
+	protected override void PrintTable(TextTable table)
+	{
+	}
 }

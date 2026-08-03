@@ -139,14 +139,7 @@ namespace Titanis.Cli
 
 			if (args.Length > startIndex && IsDistressCall(args[startIndex].Text))
 			{
-				string helpText = this.GetHelpText(command, context.MetadataContext);
-				this.WriteMessage(helpText);
-				return Task.FromResult(0);
-			}
-			else if (args.Length > startIndex && IsZshCompletionRequest(args[startIndex].Text))
-			{
-				string rc = this.GetZshCompletionScript(command, context.MetadataContext);
-				Console.WriteLine(rc);
+				this.PrintHelpText(command, context.MetadataContext);
 				return Task.FromResult(0);
 			}
 			else
@@ -266,61 +259,84 @@ namespace Titanis.Cli
 
 
 		/// <inheritdoc/>
-		public sealed override void GetHelpText(IDocWriter writer, string commandName, CommandMetadataContext context) => BuildCommandHelpText(this.GetType(), writer, commandName, this, context);
+		public sealed override void PrintHelpText(IDocWriter writer, string commandName, CommandMetadataContext context) => BuildCommandHelpText(this.GetType(), writer, commandName, this, context);
 		public static void BuildCommandHelpText(Type commandType, IDocWriter writer, string commandName, object? commandInstance, CommandMetadataContext context)
 		{
 			if (context is null) throw new ArgumentNullException(nameof(context));
 
 			ICustomTypeDescriptor typeDescr = context.Resolver.GetDescriptor(commandType);
-			var desc = typeDescr.GetCustomAttribute<DescriptionAttribute>(true)?.Description;
+			var doc = context.Resolver.GetDocumentation(commandType);
 
-			writer
-				.WriteBodyTextLine(desc)
-				.AppendLine()
-				.WriteHeading("Synopsis")
-				;
-
-			writer.BeginCodeBlock();
-			writer.WriteBodyText($"{commandName}");
+			var desc = typeDescr.GetCustomAttribute<DescriptionAttribute>(true)?.Description ?? doc?.SelectSingleNode("doc:summary")?.InnerText;
 
 			var md = GetCommandMetadata(commandType, context);
-			if (md.Parameters.Count > 0)
-				writer.WriteBodyText(" [options]");
-			foreach (var namedParam in md.ParametersByName.Values)
-			{
-				if (!namedParam.IsPositional && namedParam.IsMandatory)
-				{
-					if (namedParam.IsSwitch)
-						writer.WriteBodyText($" -{namedParam.Name}");
-					else
-					{
-						var ph = namedParam.Placeholder;
-						if (string.IsNullOrEmpty(ph))
-						{
-							ph = namedParam.ElementType.Name;
-							if (namedParam.IsList)
-								ph += "...";
-						}
 
-						writer.WriteBodyText($" -{namedParam.Name} <{namedParam.Placeholder}>");
+			// Synopsis
+			{
+				FormattedTextBuilder b = FormattedTextFactory.Builder();
+				b.Bold(commandName);
+
+				if (md.Parameters.Count > 0)
+					b.Text(" [").Italic("options").Text("]");
+
+				foreach (var namedParam in md.ParametersByName.Values)
+				{
+					if (!namedParam.IsPositional && namedParam.IsMandatory)
+					{
+						if (namedParam.IsSwitch)
+						{
+							b.Bold($" -{namedParam.Name}");
+						}
+						else
+						{
+							var ph = namedParam.Placeholder;
+							if (string.IsNullOrEmpty(ph))
+							{
+								ph = namedParam.ElementType.Name;
+								if (namedParam.IsList)
+									ph += "...";
+							}
+
+							b.Bold($" -{namedParam.Name}")
+								.Text(" <")
+								.Italic(ph)
+								.Text(" >");
+						}
 					}
 				}
+				foreach (var posParam in md.PositionalParameters)
+				{
+					if (posParam.IsMandatory)
+					{
+						b.Text(" <")
+							.Italic(posParam.Name)
+							.Text(">");
+					}
+					else
+					{
+						b.Text(" [ <")
+							.Italic(posParam.Name)
+							.Text("> ]");
+					}
+				}
+
+
+				writer
+					.WriteLine(desc)
+					.WriteLine()
+					.WriteHeading("Synopsis")
+					.WriteText(b.Build())
+					.WriteLine()
+					;
+				;
 			}
-			foreach (var posParam in md.PositionalParameters)
-			{
-				if (posParam.IsMandatory)
-					writer.WriteBodyText($" <{posParam.Name}>");
-				else
-					writer.WriteBodyText($" [ <{posParam.Name}> ]");
-			}
-			writer.EndCodeBlock();
 
 
 			HashSet<string> allParamNames = new HashSet<string>(md.ParametersByName.Keys);
 
 			if (md.PositionalParameters.Count > 0)
 			{
-				writer.AppendLine().WriteHeading("Parameters");
+				writer.WriteLine().WriteHeading("Parameters");
 
 				TextTable table = new TextTable() { LeftMargin = "  " };
 				BuildParametersTable(table, md.PositionalParameters, allParamNames, commandInstance, context);
@@ -332,14 +348,14 @@ namespace Titanis.Cli
 			namedParams.Sort((x, y) => x.Name.CompareTo(y.Name));
 			if (namedParams.Count > 0)
 			{
-				writer.AppendLine().WriteHeading("Options").AppendLine();
+				writer.WriteLine().WriteHeading("Options").WriteLine();
 
 				var groups = namedParams.GroupBy(r => r.Category).OrderBy(r => r.Key);
 				foreach (var group in groups)
 				{
 					if (!string.IsNullOrEmpty(group.Key))
 					{
-						writer.AppendLine().WriteSubheading($"{group.Key}");
+						writer.WriteLine().WriteSubheading($"{group.Key}");
 					}
 
 					TextTable table = new TextTable() { LeftMargin = Indent };
@@ -352,87 +368,31 @@ namespace Titanis.Cli
 			var details = GetDetailedHelp(commandType, context);
 			if (!string.IsNullOrEmpty(details))
 			{
-				writer.AppendLine().WriteHeading("Details").AppendLine().WriteBodyTextLine(string.Format(details, commandName));
+				writer.WriteLine().WriteHeading("Details").WriteLine().WriteLine(string.Format(details, commandName));
 			}
 
 			var examples = GetExamples(typeDescr, context);
 			if (examples.Count > 0)
 			{
-				writer.AppendLine().WriteHeading("Examples");
+				writer.WriteLine().WriteHeading("Examples");
 
 				int index = 0;
 				foreach (var example in examples)
 				{
 					index++;
 
-					writer.AppendLine();
-					writer.WriteSubheading($"Example {index} - {example.Caption}").AppendLine();
+					writer.WriteLine();
+					writer.WriteSubheading($"Example {index} - {example.Caption}").WriteLine();
 					writer.BeginCodeBlock();
-					writer.WriteBodyTextLine(example.CommandLine.Replace("{0}", commandName) /* Use a simple Replace call instead of string.Format so that other { and } don't need to be escaped. string.Format(example.CommandLine, commandName) */ );
+					writer.WriteLine(example.CommandLine.Replace("{0}", commandName) /* Use a simple Replace call instead of string.Format so that other { and } don't need to be escaped. string.Format(example.CommandLine, commandName) */ );
 					writer.EndCodeBlock();
 
 					if (!string.IsNullOrEmpty(example.Explanation))
-						writer.WriteBodyTextLine(example.Explanation!.Replace("{0}", commandName));
+						writer.WriteLine(example.Explanation!.Replace("{0}", commandName));
 				}
 			}
 		}
 
-		public override void GetZshCompletionScript(TextWriter writer, string commandName, string prefix, CommandMetadataContext context)
-		{
-			writer.WriteLine(@$"
-{prefix}() {{
-  _arguments \");
-
-			var md = this.GetCommandMetadata(context);
-			var parameters = md.Parameters;
-
-			var groups = parameters.OrderBy(r => r.Name).GroupBy(r => r.IsPositional ? null : r.Category);
-			foreach (var group in groups.OrderBy(r => r.Key))
-			{
-				if (!string.IsNullOrEmpty(group.Key))
-					writer.WriteLine($"  + '{group.Key}' \\");
-
-				foreach (var param in parameters)
-				{
-					string action = "";
-					if (param.HasValueList)
-					{
-						StringBuilder sb = new StringBuilder(":(");
-						if (param.HasValueList)
-						{
-							var values = param.GetValueList(this, context);
-							if (values.Length > 0)
-							{
-								System.Collections.IList list = values;
-								for (int i = 0; i < list.Count; i++)
-								{
-									object? value = list[i];
-									if (i > 0)
-										sb.Append(' ');
-									sb.Append(value);
-								}
-								sb.Append(')');
-
-								action = sb.ToString();
-							}
-						}
-					}
-
-					string optSpec = param.IsPositional
-						? string.Empty
-						: $"-{param.Name}[{param.Description.Replace("[", @"\[").Replace("]", @"\]")}]";
-
-					string ph = param.Placeholder;
-					if (param.IsPositional)
-						ph = $@"{param.Name}\:{ph}";
-
-					writer.WriteLine($@"  ""{optSpec}:{ph}{action}"" \");
-				}
-			}
-
-			writer.WriteLine();
-			writer.WriteLine('}');
-		}
 
 		private static IList<ExampleAttribute> GetExamples(ICustomTypeDescriptor typeDescr, CommandMetadataContext context)
 		{
@@ -448,33 +408,35 @@ namespace Titanis.Cli
 				var tr = table.AddRow();
 				if (param.IsPositional)
 				{
-					tr.AddCell($"<{param.Name}>");
+					tr.AddCell(FormattedTextFactory.Builder().Text("<").Italic(param.Name).Text(">").Build());
 					tr.AddCell();
 				}
 				else
 				{
-					string prefix;
 					{
-						var initial = param.Name.Substring(0, 1);
-						if (1 == allParamNames.Count(r => r.StartsWith(initial, StringComparison.OrdinalIgnoreCase)))
-							prefix = $"-{initial}, ";
-						else
-							prefix = "    ";
-					}
+						var b = FormattedTextFactory.Builder();
+						{
+							var initial = param.Name.Substring(0, 1);
+							if (1 == allParamNames.Count(r => r.StartsWith(initial, StringComparison.OrdinalIgnoreCase)))
+								b.Bold($"-{initial}").Text(", ");
+							else
+								b.Text("    ");
+						}
 
-					tr.AddCell(prefix + '-' + param.Name);
+						tr.AddCell(b.Bold('-' + param.Name).Build());
+					}
 
 					if (param.Aliases.Length > 0)
 					{
 						string alias0 = "-" + param.Aliases[0];
-						tr.AddCell(alias0);
+						tr.AddCell(FormattedTextFactory.Bold(alias0));
 					}
 					else
 						tr.AddCell();
 				}
 
 				if (!string.IsNullOrEmpty(param.Placeholder))
-					tr.AddCell($"<{param.Placeholder}>");
+					tr.AddCell(FormattedTextFactory.Builder().Text("<").Italic(param.Placeholder).Text(">").Build());
 				else
 					tr.AddCell();
 
@@ -492,12 +454,14 @@ namespace Titanis.Cli
 					{
 						table.AddRow();
 						var pvHeaderRow = table.AddRow((TextTableCell?)null, null, null);
-						pvHeaderRow.AddCell(new TextTableCell("Possible values:") { StyleOptions = TextStyleOptions.Bold });
+						pvHeaderRow.AddCell("Possible values:");
 
 						foreach (var value in valueList)
 						{
 							var valueRow = table.AddRow((TextTableCell?)null, null, null);
-							valueRow.AddCell(new TextTableCell("  " + value?.ToString()));
+							valueRow.AddCell(new TextTableCell(FormattedTextFactory.Builder()
+								.Text("  ")
+								.Bold(value?.ToString() ?? string.Empty).Build()));
 						}
 
 						table.AddRow();

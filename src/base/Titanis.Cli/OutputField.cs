@@ -126,6 +126,11 @@ namespace Titanis.Cli
 					if (fieldNames == null && prop.IsBrowsable)
 						fields.Add(new PropertyOutputField(prop, context));
 				}
+				if (fields.Count == 0)
+				{
+					// The object has no properties; print the object itself.
+					fields.Add(new SelfOutputField());
+				}
 			}
 
 			return fields.ToArray();
@@ -202,6 +207,15 @@ namespace Titanis.Cli
 		}
 	}
 
+	/// <summary>
+	/// Represents a field that may or may not be valid.
+	/// </summary>
+	/// <remarks>
+	/// This class is mainly used for dynamic records.
+	/// Rather than being bound to a specific property on a specific class,
+	/// this implementation binds to the name on each record, and if
+	/// no property is found, outputs nothing.
+	/// </remarks>
 	public sealed class DummyOutputField : OutputField
 	{
 		public DummyOutputField(
@@ -275,6 +289,22 @@ namespace Titanis.Cli
 				return this.GetValue(rec);
 			else
 				return null;
+		}
+	}
+
+	public class SelfOutputField : OutputField
+	{
+		public override string Name => string.Empty;
+
+		public override string Caption => string.Empty;
+
+		public override string? FormatString => null;
+
+		public override DisplayAlignment Alignment => DisplayAlignment.Left;
+
+		public override object? GetValue(object record)
+		{
+			return record;
 		}
 	}
 
