@@ -1,3 +1,17 @@
+# Whoami
+The Active Directory implementation provides a few ways to get information about your identity.
+
+## LDAP Whoami
+```
+Ldap whoami lumon-dc1
+```
+
+## RootDSE Query
+This query returns your user name in <*domain*>\\<*user*> syntax, along with a list of your groups as SIDs.  Note that this list is based on your Kerberos ticket, not on the contents of the directory.
+```
+Ldap query lumon-dc1 -SearchBase ""  -ConsoleOutputStyle List -OutputFields msDS-PrincipalName, tokenGroups
+```
+
 # Search for a User
 
 ```
@@ -20,7 +34,7 @@ Ldap query lumon-dc1 '(&(!(userAccountControl|=Disabled))(servicePrincipalName=*
 
 # Accounts with RBCD
 ```
-Ldap query lumon-dc1 '(&(msDS-AllowedToDelegateTo=*)(userAccountControl&=TrustedForS4U)(!(userAccountControl|=Disabled)))' -OutputFields samAccountName, msDS-AllowedToDelegateTo  -ConsoleOutputStyle List
+Ldap query lumon-dc1 '(&(msDS-AllowedToDelegateTo=*)(userAccountControl&=TrustedForS4U)(!(userAccountControl|=Disabled)))' -OutputFields samAccountName, msDS-AllowedToDelegateTo
 ```
 
 # Query Transitive Group Members

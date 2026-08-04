@@ -53,6 +53,8 @@ Lsa createaccount lumon-fs1 S-1-5-21-1718252288-3416168337-1457700507-1104
 # Grant a Privilege
 Before granting a privilege to a policy account, the policy account must exist.
 
+Note that this command does not include system access rights, such as SeInteractiveLogonRight, SeNetworkLogonRight.  Use either `getsysaccess` or `getrights` for this.
+
 ## By Name
 ```
 Lsa addpriv lumon-fs1 -Privileges SeBackupPrivilege -ByName milchick
@@ -85,5 +87,37 @@ Lsa getsysaccess lumon-fs1 -ByName milchick
 
 ## By SID
 ```
-Lsa rmpriv lumon-fs1 -Privileges SeBackupPrivilege -BySid S-1-5-21-1718252288-3416168337-1457700507-1104
+Lsa getsysaccess lumon-fs1 -BySid S-1-5-21-1718252288-3416168337-1457700507-1104
+```
+
+# Set System Access Rights
+By default, this command adds the specified rights to the rights already granted to a policy account.  To remove other rights, specify `-Reset`.
+
+## By Name
+```
+Lsa setsysaccess lumon-fs1 SeInteractiveLogonRight, SeNetworkLogonRight -ByName milchick
+```
+
+## By SID
+```
+Lsa setsysaccess lumon-fs1 SeInteractiveLogonRight, SeNetworkLogonRight -BySid S-1-5-21-1718252288-3416168337-1457700507-1104
+```
+
+
+## Reset Existing Rights
+```
+Lsa setsysaccess lumon-fs1 0 -Reset -ByName milchick
+```
+
+# Get User Rights
+This command returns both privileges and system access rights granted to a policy account.
+
+## By Name
+```
+Lsa getrights -ServerName lumon-fs1  -ByName milchick
+```
+
+## By SID
+```
+Lsa getrights -ServerName lumon-fs1  -BySid S-1-5-21-1718252288-3416168337-1457700507-1104
 ```

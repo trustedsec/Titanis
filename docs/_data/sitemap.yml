@@ -40,6 +40,17 @@ items:
           - title: Authentication and Authorization
             href: auth/
             items:
+            - title: Directory Replication
+              href: dsrep.html
+              items:
+                - title: Get DC Info
+                  href: "#get-dc-info"
+                - title: Replicate Object
+                  href: "#replicate-object"
+                - title: Replicate Naming Context
+                  href: "#replicate-naming-context"
+                - title: Export Keys to Keytab
+                  href: "#export keys to keytab"
             - title: Kerberos
               href: kerberos.html
               items:
@@ -85,6 +96,33 @@ items:
                   href: "#change-a-password"
                 - title: Reset a Password
                   href: "#reset-a-password"
+            - title: LDAP
+              href: ldap.html
+              items:
+                - title: Whoami
+                  href: "#whoami"
+                - title: Search for a User
+                  href: "#search-for-a-user"
+                - title: Accounts with Stale Passwords
+                  href: "#accounts-with-stale-passwords"
+                - title: Query SPN Mappings
+                  href: "#query-spn-mappings"
+                - title: Query Transitive Group Members
+                  href: "#query-transitive-group-members"
+                - title: Accounts with RBCD
+                  href: "#accounts-with-rbcd"
+                - title: Add Certificate Credential
+                  href: "#add-certificate-credential"
+                - title: Add/Remove SPN Mapping
+                  href: "#add-remove-spn-mapping"
+                - title: Change or Reset Password
+                  href: "#change-or-reset-password"
+                - title: Add Member to Group
+                  href: "#add-member-to-group"
+                - title: Query Membership Expiration
+                  href: "#query-membership-expiration"
+                - title: Add Expiring Group Membership
+                  href: "#add-expiring-group-membership"
             - title: LSA
               href: lsa.html
               items:
@@ -110,6 +148,26 @@ items:
                   href: "#revoke-a-privilege"
                 - title: Get System Access Rights
                   href: "#get-system-access-rights"
+                - title: Set System Access Rights
+                  href: "#set-system-access-rights"
+                - title: Get User Rights
+                  href: "#get-user-rights"
+            - title: Registry
+              href: reg.html
+              items:
+                - title: Get Syskey
+                  href: "#get-syskey"
+                - title: Dump SAM
+                  href: "#dump-sam"
+                - title: Dump LSA Secrets
+                  href: "#dump-lsa-secrets"
+            - title: SAM
+              href: sam.html
+              items:
+                - title: Enumerate Users
+                  href: "#enumerate-users"
+                - title: Enumerate Groups and Aliases
+                  href: "#enumerate-groups-and-aliases"
             - title: SDDL
               href: sddl.html
               items:
@@ -121,45 +179,49 @@ items:
                   href: "#lookup-guid-of-property-or-permission"
                 - title: Lookup Well-Known Security Principal
                   href: "#lookup-well-known-security-principal"
-            - title: LDAP
-              href: ldap.html
+            - title: WMI
+              href: wmi.html
               items:
-                - title: Search for a User
-                  href: "#search-for-a-user"
-                - title: Accounts with Stale Passwords
-                  href: "#accounts-with-stale-passwords"
-                - title: Query SPN Mappings
-                  href: "#query-spn-mappings"
-                - title: Query Transitive Group Members
-                  href: "#query-transitive-group-members"
-                - title: Accounts with RBCD
-                  href: "#accounts-with-rbcd"
-                - title: Add Certificate Credential
-                  href: "#add-certificate-credential"
-                - title: Add/Remove SPN Mapping
-                  href: "#add-remove-spn-mapping"
-                - title: Change or Reset Password
-                  href: "#change-or-reset-password"
-                - title: Add Member to Group
-                  href: "#add-member-to-group"
-                - title: Query Membership Expiration
-                  href: "#query-membership-expiration"
-                - title: Add Expiring Group Membership
-                  href: "#add-expiring-group-membership"
+                - title: List User Accounts
+                  href: "#list-user-accounts"
+                - title: List Groups
+                  href: "#list-groups"
+                - title: List Group Members
+                  href: "#list-group-members"
+          - title: Enumeration
+            href: enum/
+            items:
+              - title: LDAP
+                href: ldap.md
+                items:
+                  - title: Get DC Info
+                    href: "#get-dc-info"
+                  - title: Domain Info
+                    href: "#domain-info"
+                  - title: List Partitions
+                    href: "#list-partitions"
+                  - title: Enumerate DNS Records
+                    href: "#enumerate-dns-records"
+                  - title: List Sites
+                    href: "#list-sites"
+                  - title: List Subnets
+                    href: "#list-subnets"
           - title: File Sharing
             href: smb.html
             items:
-              - title: Enumerate shares
+              - title: Enumerate Shares
                 href: "#enumerate-shares"
               - title: Query NICS
                 href: "#query-nics"
-              - title: List a directory
+              - title: List a Directory
                 href: "#list-a-directory"
-              - title: Watch a directory for changes
+              - title: List Named Pipes
+                href: "#list-named-pipes"
+              - title: Watch a Directory for Changes
                 href: "#watch-a-directory-for-changes"
-              - title: Get files
+              - title: Get Files
                 href: "#get-files"
-              - title: Put files
+              - title: Put Files
                 href: "#put-files"
 
 

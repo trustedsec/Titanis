@@ -6,6 +6,25 @@ For bash, simply source the completion scripts:
 for f in $titanisdir/autocomp/bash/*; do source $f; done
 ```
 
+## Bash Extras
+Although not required for completion to work, here are a few settings you can add to `.inputrc`.  For more details on these settings and other available settings, see `man readline 3`.
+
+```
+set show-all-if-ambiguous
+```
+By default, if you type part of an argument with multiple matches, you must press TAB twice for a list of suggestions.  This setting causes bash to display all matches on a single tab press.
+
+```
+set colored-completion-prefix on
+```
+When multiple matches are found, Bash highlights the common prefix in the list of results.
+
+```
+TAB: menu-complete
+```
+When multiple matches are found, pressing TAB twice will cycle through the matches on the command line.
+
+
 ## Zsh
 For zsh, you must add the directory containing the completion scripts to $fpath before calling **compinit**.  This is usually done in **.zshrc**.
 1. Edit **.zshrc** in your home directory.
@@ -15,6 +34,44 @@ For zsh, you must add the directory containing the completion scripts to $fpath 
 fpath+=(titanis/autocomp/zsh)
 ```
 For changes to be effective, you must reinitialize completion.  The easiest way to do this is to restart zsh.
+
+## Zsh Extras
+Here are a few additional options you can use with zsh to enhance your command line experience.  You can either add these directly to `.zshrc` in your home directory, or add them to a separate file (e.g. `titanis.zshrc`) and source this file from `.zshrc`.  Note that most of these affect all commands, not just Titanis.
+
+```
+zstyle ':completion:*' menu yes select
+```
+
+This displays the completions as a menu, both for subcommands and parameters.  Titanis completions generally include additional syntax information and descriptions.
+
+```
+zstyle ':completion:*:default' list-colors '(TitanisParams_*)=(#b)-[^ \*@]#(@|)(\*|) #(<[^>]#>)( #)(--*)=0=35=31=33=0=36'
+```
+
+This applies coloring to parameters in the menu.  The numbers at the end are the ANSI color codes to use.
+
+```
+zstyle ':completion::complete:*:*:values' format '%F{green}-- %d --%f'
+```
+This applies coloring to the category headings in the completion menus.
+
+```
+hide_adv=1
+```
+Some Titanis commands offer an overwhelming number of options.  Setting this variable hides advanced options from the menus.  Note that this also disables completion of advanced parameter names.
+
+```
+_comp_T_simple() {
+        local -i hide_adv=1
+        _main_complete
+}
+
+zle -C expand-or-complete-simple expand-or-complete _comp_T_simple
+
+# Bind to Ctrl+X,Ctrl+X
+bindkey "^X^X" expand-or-complete-simple
+```
+This solves the same problem as `hide_adv` above, but it only applies when completion is invoked from a different binding, in this case, **Ctrl+X,Ctrl+X**.  Pressing TAB still shows all options, but **Ctrl+X,Ctrl+X** hides advanced options.
 
 
 # Discovering Subcommands
