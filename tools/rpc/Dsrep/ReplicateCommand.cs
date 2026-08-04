@@ -164,7 +164,7 @@ public abstract class ReplicateCommand : DsbindCommand, IDrsChangeCallback, IHav
 		var userName = entry[LdapAttributeTypes.SAMAccountName]?.Value as string;
 		if (!string.IsNullOrEmpty(userName))
 		{
-			AddKeys(entry, new(userName), realm, keytabEntries);
+			AddKeys(entry, new SimplePrincipalName(userName), realm, keytabEntries);
 		}
 
 		var spns = entry[LdapAttributeTypes.ServicePrincipalName]?.Values;
@@ -172,19 +172,22 @@ public abstract class ReplicateCommand : DsbindCommand, IDrsChangeCallback, IHav
 		{
 			foreach (string spn in spns)
 			{
-				AddKeys(entry, new(userName), realm, keytabEntries);
+				AddKeys(entry, ServicePrincipalName.Parse(spn), realm, keytabEntries);
 			}
 		}
 	}
 
-	private static void AddKeys(LdapEntry entry, SimplePrincipalName upn, string realm, List<KeytabEntry> keytabEntries)
+	private static void AddKeys(LdapEntry entry, SecurityPrincipalName upn, string realm, List<KeytabEntry> keytabEntries)
 	{
 		// Current key
 		{
-			var key = entry[KerberosKeysName]?.Value as KerberosKeyInfo;
-			if (key != null)
+			var newKeys = entry[KerberosKeysName]?.Values;
+			if (newKeys != null)
 			{
-				keytabEntries.Add(CreateKeytabEntry(realm, upn, key));
+				foreach (KerberosKeyInfo key in newKeys)
+				{
+					keytabEntries.Add(CreateKeytabEntry(realm, upn, key));
+				}
 			}
 		}
 		// Old (and older) keys

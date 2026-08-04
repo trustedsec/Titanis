@@ -35,6 +35,7 @@ namespace Titanis.Cli
 
 		[Parameter]
 		[Description("End point of SOCKS 5 server to use")]
+		[Category(ParameterCategories.Connection)]
 		[Placeholder("host-or-ip:port")]
 		public EndPoint Socks5 { get; set; }
 

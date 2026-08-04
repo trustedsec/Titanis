@@ -39,14 +39,17 @@ namespace Titanis.Smb2.Cli
 		[Parameter]
 		[Advanced]
 		[Description("Specifies the buffer size for querying the directory listing.")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public int QueryBufferSize { get; set; }
 
 		[Parameter]
 		[Description("Sets the depth limit for a recursive listing (default = 0 [no recursion], -1 = no limit)")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public int Depth { get; set; }
 
 		[Parameter]
 		[Description("Snapshot version, either as a date/time or a @GMT token")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public TimeWarpToken? TimeWarpToken { get; set; }
 
 		protected override void ValidateParameters(ParameterValidationContext context)

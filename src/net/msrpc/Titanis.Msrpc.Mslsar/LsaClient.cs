@@ -344,7 +344,7 @@ namespace Titanis.Msrpc.Mslsar
 			var res = (Ntstatus)await _proxy.LsarEnumerateAccountRights(handle, sid.ToRpcSid(), userRights, cancellationToken).ConfigureAwait(false);
 			res.CheckAndThrow();
 
-			return Array.ConvertAll(userRights.value.UserRights.value, r =>
+			return (userRights.value.UserRights is null) ? [] : Array.ConvertAll(userRights.value.UserRights.value, r =>
 			{
 				string name = r.AsString();
 

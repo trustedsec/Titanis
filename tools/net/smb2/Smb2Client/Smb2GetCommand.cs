@@ -30,42 +30,51 @@ namespace Titanis.Smb2.Cli
 		[Parameter]
 		[Advanced]
 		[Description("Size of chunks to copy")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public int ChunkSize { get; set; }
 
 		[Parameter]
 		[Advanced]
 		[Description("Reads the data directly from storage")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public SwitchParam Unbuffered { get; set; }
 
 		[Parameter]
 		[Advanced]
 		[Description("Requests the server compress the data")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public SwitchParam Compress { get; set; }
 
 		[Parameter]
 		[Description("Depth of directory tree to traverse (default = 0 [no recursion], -1 = no limit)")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public int Depth { get; set; }
 
 		[Parameter]
 		[Advanced]
 		[Description("Specifies the buffer size for querying the directory listing (for recursive operations).")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public int QueryBufferSize { get; set; }
 
 		[Parameter]
 		[Advanced]
 		[Description("Only copies the directory structure, but not the files.")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public SwitchParam TreeOnly { get; set; }
 
 		[Parameter]
 		[Description("Overwrites existing local files")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public SwitchParam Overwrite { get; set; }
 
 		[Parameter]
 		[Description("Continues copying after an error occurs")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public SwitchParam ContinueOnError { get; set; }
 
 		[Parameter]
 		[Description("Snapshot version, either as a date/time or a @GMT token")]
+		[Category(ParameterCategories.ClientBehavior)]
 		public TimeWarpToken? TimeWarpToken { get; set; }
 
 		// Observed from TYPE command

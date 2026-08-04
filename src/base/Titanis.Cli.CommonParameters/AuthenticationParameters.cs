@@ -176,12 +176,14 @@ namespace Titanis.Cli
 
 		[Parameter]
 		[Description("Specifies an SPN override")]
+		[Category(ParameterCategories.AuthenticationKerberos)]
 		[Advanced]
 		public SpnMapping[]? SpnOverride { get; set; }
 
 		#region AuthProxy
 		[Parameter]
 		[Description("Endpoint of auth proxy")]
+		[Category(ParameterCategories.Authentication)]
 		[Advanced]
 		public EndPoint AuthProxy { get; set; }
 		#endregion
