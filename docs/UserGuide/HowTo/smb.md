@@ -66,9 +66,3 @@ To print a single file, name the file and specify a destination to save the file
 ```
 Smb2Client get //lumon-fs1/admin$/win.ini local-win.ini
 ```
-
-## Download Single File to Disk
-To print a single file, name the file and specify a destination to save the file to.
-```
-Smb2Client get //lumon-fs1/admin$/win.ini local-win.ini
-```

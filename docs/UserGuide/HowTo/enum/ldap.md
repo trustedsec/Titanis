@@ -23,4 +23,34 @@ The functional levels determine whether certain schema attributes are available,
 ## Naming Contexts
 A *naming context* is also referred to as a *partition*.  These attributes describe the topology of the forest.
 
+#Domain Info
+```
+Ldap query lumon-dc1 -SearchBase DomainRoot -Scope Base -OutputFields \* -ConsoleOutputStyle List
+```
+
+
 # List Partitions
+To get a list of partitions, including a list of all domains and DNS zones in the forest:
+```
+Ldap lspart lumon-dc1
+```
+
+The output includes the DN of the NC roots.
+
+# Enumerate DNS Records
+```
+Ldap query lumon-dc1 '(dnsRecord=*)' -OutputFields EntryName, dc, dnsRecord
+```
+Titanis decodes the DNS record data and prints it in a human-readable form.
+
+# List Sites
+```
+Ldap query lumon-dc1 -SearchBase ConfigRoot '(objectClass=site)'
+```
+
+# List Subnets
+```
+Ldap query lumon-dc1 -SearchBase ConfigRoot '(objectClass=subnet)' -OutputFields name
+```
+
+The name of each subnet object is the CIDR notation for the subnet it describes.
