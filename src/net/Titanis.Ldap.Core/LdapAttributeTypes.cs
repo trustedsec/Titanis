@@ -57,6 +57,18 @@ namespace Titanis.Ldap
 		public static AttributeTypeDescription supportedSASLMechanisms = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["supportedSASLMechanisms"], syntax: AdSyntaxes.StringUnicode);
 		public static AttributeTypeDescription ldapServiceName = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["ldapServiceName"], syntax: AdSyntaxes.StringUnicode);
 		public static AttributeTypeDescription supportedCapabilities = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["supportedCapabilities"], syntax: AdSyntaxes.StringObjectIdentifier);
+		public static AttributeTypeDescription domainFunctionality = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["domainFunctionality"], syntax: AdSyntaxes.Integer);
+		public static AttributeTypeDescription forestFunctionality = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["forestFunctionality"], syntax: AdSyntaxes.Integer);
+		public static AttributeTypeDescription domainControllerFunctionality = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["domainControllerFunctionality"], syntax: AdSyntaxes.Integer);
+		public static AttributeTypeDescription currentTime = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["currentTime"], syntax: AdSyntaxes.StringGeneralizedTime);
+		public static AttributeTypeDescription isGlobalCatalogReady = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["isGlobalCatalogReady"], syntax: AdSyntaxes.Boolean);
+		public static AttributeTypeDescription msDSPrefixTable= new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["msDS-PrefixTable"], syntax: AdSyntaxes.StringUnicode);
+		public static AttributeTypeDescription configurableSettingsEffective = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["ConfigurableSettingsEffective"], syntax: AdSyntaxes.StringUnicode);
+		public static AttributeTypeDescription lDAPPoliciesEffective = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["LDAPPoliciesEffective"], syntax: AdSyntaxes.StringUnicode);
+		public static AttributeTypeDescription msDSArenaInfo = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["msDS-ArenaInfo"], syntax: AdSyntaxes.StringUnicode);
+		public static AttributeTypeDescription dumpLdapNotifications = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["dumpLdapNotifications"], syntax: AdSyntaxes.StringUnicode);
+		public static AttributeTypeDescription dsaVersionString = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["dsaVersionString"], syntax: AdSyntaxes.StringUnicode);
+		public static AttributeTypeDescription validFSMOs = new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", ["validFSMOs"], syntax: AdSyntaxes.ObjectDsDn);
 		#endregion
 
 		//public static AttributeTypeDescription SubschemaSubentry= new AttributeTypeDescription(AttributeTypeDescriptionFlags.None, "", [""], syntax: LdapSyntaxes.StringObjectIdentifier);
@@ -1572,6 +1584,18 @@ namespace Titanis.Ldap
 			ldapServiceName,
 			supportedCapabilities,
 			OmObjectClass,
+			domainFunctionality,
+			domainControllerFunctionality,
+			forestFunctionality,
+			currentTime,
+			isGlobalCatalogReady,
+			msDSPrefixTable,
+			configurableSettingsEffective,
+			lDAPPoliciesEffective,
+			msDSArenaInfo,
+			dumpLdapNotifications,
+			dsaVersionString,
+			validFSMOs,
 
 			ObjectClass,
 			#endregion
