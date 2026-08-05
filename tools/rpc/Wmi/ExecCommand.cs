@@ -90,7 +90,8 @@ internal class ExecCommand : WmiCommand
 				var newSize = outFile.AllocationSize;
 				if (newSize > fileStream.Position)
 				{
-					var cbRead = await fileStream.ReadAsync(buffer, 0, BufferSize);
+					var cbRead = await fileStream.ReadAsync(buffer, 0, BufferSize, cancellationToken);
+
 					if (cbRead > 0)
 					{
 						string output = Encoding.UTF8.GetString(buffer.AsSpan().Slice(0, cbRead));
