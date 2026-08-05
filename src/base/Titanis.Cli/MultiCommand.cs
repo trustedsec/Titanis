@@ -70,7 +70,7 @@ namespace Titanis.Cli
 		}
 
 		/// <inheritdoc/>
-		public sealed override void PrintHelpText(IDocWriter writer, string commandName, CommandMetadataContext context) => BuildCommandHelpText(this.GetType().GetTypeInfo(), writer, commandName, context);
+		public sealed override void PrintHelpText(IDocWriter writer, string commandName, CommandMetadataContext context) => BuildCommandHelpText(this.GetType().GetTypeInfo(), writer, commandName, context, CommandHelpOptions.Default);
 		public static void BuildCommandHelpText(Type commandType_, IDocWriter writer, string commandName, CommandMetadataContext context, CommandHelpOptions options)
 		{
 			if (context is null) throw new ArgumentNullException(nameof(context));
