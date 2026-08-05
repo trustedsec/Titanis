@@ -1,5 +1,21 @@
 Change Log
 
+# 2026-08-05
+* Usability enhancements
+	* Distribution includes .deb package
+	* Completions for bash and zsh
+	* How-To documentation
+	* man pages, searchable with `man -k <keyword>`
+* Registry
+	* Enhanced querying, searching, and recursion
+	* Export to .reg file
+	* Delete key
+* Wmi reg - Access the registry via Wmi
+
+## Minor Enhancements Bugfixes
+* Fixed problem with Wmi exec hanging while waiting for output
+* Ldap supports syntaxes used by rootDSE attributes
+
 # 2026-07-16
 * Kerberos
 	* FAST / armoring / compound identities (`Kerb asreq|tgsreq -ArmorTicket`)
