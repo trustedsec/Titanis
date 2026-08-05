@@ -28,6 +28,9 @@ public class AliasMembersCommand : SamDomainEnumCommand
 	[Description("Name or RID of alias")]
 	public string[] AliasRidOrName { get; set; }
 
+	private HashSet<string> _allNames = new HashSet<string>();
+	private HashSet<string> _resolvedNames = new HashSet<string>();
+
 	protected override async Task RunAsync(SamDomain domain, SamEntry domainInfo, Sam sam, CancellationToken cancellationToken)
 	{
 		List<uint> rids = new List<uint>();
@@ -43,6 +46,7 @@ public class AliasMembersCommand : SamDomainEnumCommand
 			else
 			{
 				names.Add(aliasRidOrName);
+				this._allNames.Add(aliasRidOrName);
 			}
 		}
 
@@ -55,7 +59,8 @@ public class AliasMembersCommand : SamDomainEnumCommand
 			}
 			catch (NtstatusException ex) when (ex.StatusCode == Ntstatus.STATUS_NONE_MAPPED)
 			{
-				this.WriteError($"None of the names could be resolved");
+				// UNDONE: Checked after all domains enumerated
+				//this.WriteError($"None of the names could be resolved");
 				rids2 = [];
 			}
 			catch (Exception ex)
@@ -67,6 +72,8 @@ public class AliasMembersCommand : SamDomainEnumCommand
 			foreach (var entry in rids2)
 			{
 				rids.Add(entry.Id);
+				if (entry.EntryType != SamEntryType.Unknown)
+					this._resolvedNames.Add(entry.Name);
 			}
 		}
 
@@ -84,5 +91,15 @@ public class AliasMembersCommand : SamDomainEnumCommand
 
 			}
 		}
+	}
+
+	protected override ValueTask OnAfterDomains(Sam sam, CancellationToken cancellationToken)
+	{
+		foreach (var name in this._allNames)
+		{
+			if (!this._resolvedNames.Contains(name))
+				this.WriteError($"Could not resolve name '{name}'.");
+		}
+		return base.OnAfterDomains(sam, cancellationToken);
 	}
 }

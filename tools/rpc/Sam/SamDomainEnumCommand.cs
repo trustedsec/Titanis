@@ -39,8 +39,14 @@ public abstract class SamDomainEnumCommand : SamCommand
 
 			await this.RunAsync(domain, domainInfo, sam, cancellationToken);
 		}
+		await this.OnAfterDomains(sam, cancellationToken);
 
 		return 0;
+	}
+
+	protected virtual ValueTask OnAfterDomains(Sam sam, CancellationToken cancellationToken)
+	{
+		return ValueTask.CompletedTask;
 	}
 
 	protected abstract Task RunAsync(SamDomain domain, SamEntry domainInfo, Sam sam, CancellationToken cancellationToken);
