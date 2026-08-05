@@ -257,8 +257,8 @@ namespace Titanis.ToolDocBuilder
 						if (string.IsNullOrEmpty(desc))
 							buildEngine.LogErrorEvent(MakeMissingDescError(type.FullName));
 
-						MultiCommand.BuildCommandHelpText(type.GetTypeInfo(), docWriter, commandName, mdContext);
-						MultiCommand.BuildCommandHelpText(type.GetTypeInfo(), manWriter, commandName, mdContext);
+						MultiCommand.BuildCommandHelpText(type.GetTypeInfo(), docWriter, commandName, mdContext, CommandHelpOptions.Default);
+						MultiCommand.BuildCommandHelpText(type.GetTypeInfo(), manWriter, commandName, mdContext, CommandHelpOptions.Default & ~CommandHelpOptions.Description);
 
 						var subcmds = mdResolver.GetCustomAttributes<SubcommandAttribute>(type, true);
 						subcmds = subcmds.OrderBy(r => r.Name);
