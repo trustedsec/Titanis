@@ -248,7 +248,7 @@ namespace Titanis.ToolDocBuilder
 						bashComp.WriteLine($"\t_comp_Titanis");
 
 						Command.BuildCommandHelpText(type, docWriter, commandName, null, mdContext);
-						Command.BuildCommandHelpText(type, manWriter, commandName, null, mdContext);
+						Command.BuildCommandHelpText(type, manWriter, commandName, null, mdContext, CommandHelpOptions.Default & ~CommandHelpOptions.Description);
 					}
 					else if (multiCommandType.IsAssignableFrom(type))
 					{
@@ -258,6 +258,7 @@ namespace Titanis.ToolDocBuilder
 							buildEngine.LogErrorEvent(MakeMissingDescError(type.FullName));
 
 						MultiCommand.BuildCommandHelpText(type.GetTypeInfo(), docWriter, commandName, mdContext);
+						MultiCommand.BuildCommandHelpText(type.GetTypeInfo(), manWriter, commandName, mdContext);
 
 						var subcmds = mdResolver.GetCustomAttributes<SubcommandAttribute>(type, true);
 						subcmds = subcmds.OrderBy(r => r.Name);

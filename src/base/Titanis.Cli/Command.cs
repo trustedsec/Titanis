@@ -22,6 +22,23 @@ using Titanis.Reflection;
 namespace Titanis.Cli
 {
 	/// <summary>
+	/// Specifies options for generating command help text.
+	/// </summary>
+	public enum CommandHelpOptions
+	{
+		None = 0,
+
+		Description = 1,
+		Synopsis = 2,
+		Parameters = 4,
+		Details = 8,
+		Examples = 0x10,
+
+		All = Description | Synopsis | Parameters | Details | Examples,
+		Default = All
+	}
+
+	/// <summary>
 	/// Represents a command that accepts arguments.
 	/// </summary>
 	/// <remarks>
@@ -260,7 +277,8 @@ namespace Titanis.Cli
 
 		/// <inheritdoc/>
 		public sealed override void PrintHelpText(IDocWriter writer, string commandName, CommandMetadataContext context) => BuildCommandHelpText(this.GetType(), writer, commandName, this, context);
-		public static void BuildCommandHelpText(Type commandType, IDocWriter writer, string commandName, object? commandInstance, CommandMetadataContext context)
+
+		public static void BuildCommandHelpText(Type commandType, IDocWriter writer, string commandName, object? commandInstance, CommandMetadataContext context, CommandHelpOptions options = CommandHelpOptions.Default)
 		{
 			if (context is null) throw new ArgumentNullException(nameof(context));
 
@@ -320,75 +338,91 @@ namespace Titanis.Cli
 					}
 				}
 
-
-				writer
-					.WriteLine(desc)
-					.WriteLine()
-					.WriteHeading("Synopsis")
-					.WriteText(b.Build())
-					.WriteLine()
-					;
-				;
-			}
-
-
-			HashSet<string> allParamNames = new HashSet<string>(md.ParametersByName.Keys);
-
-			if (md.PositionalParameters.Count > 0)
-			{
-				writer.WriteLine().WriteHeading("Parameters");
-
-				TextTable table = new TextTable() { LeftMargin = "  " };
-				BuildParametersTable(table, md.PositionalParameters, allParamNames, commandInstance, context);
-
-				writer.WriteTable(table, ParamColNames);
-			}
-
-			var namedParams = md.Parameters.Where(r => !r.IsPositional).ToList();
-			namedParams.Sort((x, y) => x.Name.CompareTo(y.Name));
-			if (namedParams.Count > 0)
-			{
-				writer.WriteLine().WriteHeading("Options").WriteLine();
-
-				var groups = namedParams.GroupBy(r => r.Category).OrderBy(r => r.Key);
-				foreach (var group in groups)
+				if (0 != (options & CommandHelpOptions.Description))
 				{
-					if (!string.IsNullOrEmpty(group.Key))
-					{
-						writer.WriteLine().WriteSubheading($"{group.Key}");
-					}
+					writer
+						.WriteLine(desc)
+						.WriteLine()
+						;
+				}
 
-					TextTable table = new TextTable() { LeftMargin = Indent };
-					BuildParametersTable(table, group, allParamNames, commandInstance, context);
-
-					writer.WriteTable(table, "Name", "Aliases", "Value", "Description");
+				if (0 != (options & CommandHelpOptions.Synopsis))
+				{
+					writer
+						.WriteHeading("Synopsis")
+						.WriteText(b.Build())
+						.WriteLine()
+						;
+					;
 				}
 			}
 
-			var details = GetDetailedHelp(commandType, context);
-			if (!string.IsNullOrEmpty(details))
+			if (0 != (options & CommandHelpOptions.Parameters))
 			{
-				writer.WriteLine().WriteHeading("Details").WriteLine().WriteLine(string.Format(details, commandName));
+				HashSet<string> allParamNames = new HashSet<string>(md.ParametersByName.Keys);
+
+				if (md.PositionalParameters.Count > 0)
+				{
+					writer.WriteLine().WriteHeading("Parameters");
+
+					TextTable table = new TextTable() { LeftMargin = "  " };
+					BuildParametersTable(table, md.PositionalParameters, allParamNames, commandInstance, context);
+
+					writer.WriteTable(table, ParamColNames);
+				}
+
+				var namedParams = md.Parameters.Where(r => !r.IsPositional).ToList();
+				namedParams.Sort((x, y) => x.Name.CompareTo(y.Name));
+				if (namedParams.Count > 0)
+				{
+					writer.WriteLine().WriteHeading("Options").WriteLine();
+
+					var groups = namedParams.GroupBy(r => r.Category).OrderBy(r => r.Key);
+					foreach (var group in groups)
+					{
+						if (!string.IsNullOrEmpty(group.Key))
+						{
+							writer.WriteLine().WriteSubheading($"{group.Key}");
+						}
+
+						TextTable table = new TextTable() { LeftMargin = Indent };
+						BuildParametersTable(table, group, allParamNames, commandInstance, context);
+
+						writer.WriteTable(table, "Name", "Aliases", "Value", "Description");
+					}
+				}
 			}
 
-			var examples = GetExamples(typeDescr, context);
-			if (examples.Count > 0)
+			if (0 != (options & CommandHelpOptions.Details))
 			{
-				writer.WriteLine().WriteHeading("Examples");
-
-				int index = 0;
-				foreach (var example in examples)
+				var details = GetDetailedHelp(commandType, context);
+				if (!string.IsNullOrEmpty(details))
 				{
-					index++;
+					writer.WriteLine().WriteHeading("Details").WriteLine().WriteLine(string.Format(details, commandName));
+				}
+			}
 
-					writer.WriteLine();
-					writer.WriteSubheading($"Example {index} - {example.Caption}").WriteLine();
-					writer.BeginCodeBlock();
-					writer.WriteLine(example.CommandLine.Replace("{0}", commandName) /* Use a simple Replace call instead of string.Format so that other { and } don't need to be escaped. string.Format(example.CommandLine, commandName) */ );
-					writer.EndCodeBlock();
+			if (0 != (options & CommandHelpOptions.Details))
+			{
+				var examples = GetExamples(typeDescr, context);
+				if (examples.Count > 0)
+				{
+					writer.WriteLine().WriteHeading("Examples");
 
-					if (!string.IsNullOrEmpty(example.Explanation))
-						writer.WriteLine(example.Explanation!.Replace("{0}", commandName));
+					int index = 0;
+					foreach (var example in examples)
+					{
+						index++;
+
+						writer.WriteLine();
+						writer.WriteSubheading($"Example {index} - {example.Caption}").WriteLine();
+						writer.BeginCodeBlock();
+						writer.WriteLine(example.CommandLine.Replace("{0}", commandName) /* Use a simple Replace call instead of string.Format so that other { and } don't need to be escaped. string.Format(example.CommandLine, commandName) */ );
+						writer.EndCodeBlock();
+
+						if (!string.IsNullOrEmpty(example.Explanation))
+							writer.WriteLine(example.Explanation!.Replace("{0}", commandName));
+					}
 				}
 			}
 		}
