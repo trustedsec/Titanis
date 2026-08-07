@@ -16,6 +16,66 @@ namespace Titanis
 		void MarkTaskComplete();
 	}
 
+	public class LogBroadcaster : ILog
+	{
+		public LogBroadcaster()
+		{
+
+		}
+
+		private List<ILog> _listeners = new List<ILog>();
+		public void AddListener(ILog listener)
+		{
+			if (listener is null) throw new ArgumentNullException(nameof(listener));
+			this._listeners.Add(listener);
+		}
+
+		private void ForAll(Action<ILog> action)
+		{
+			foreach (var log in this._listeners)
+			{
+				try
+				{
+					action(log);
+				}
+				catch
+				{
+					// TODO: Notify diagnostic?
+					// Ignore
+				}
+			}
+		}
+
+		private LogMessageSeverity _level;
+
+		public LogMessageSeverity LogLevel
+		{
+			get { return _level; }
+			set
+			{
+				_level = value;
+				this.ForAll(r => r.LogLevel = value);
+			}
+		}
+
+		private LogFormat _format;
+
+		public LogFormat Format
+		{
+			get { return _format; }
+			set
+			{
+				_format = value;
+				this.ForAll(R => R.Format = value);
+			}
+		}
+
+		void ILog.WriteMessage(LogMessage message) => this.ForAll(r => r.WriteMessage(message));
+		void ILog.WriteTaskStart(string description) => this.ForAll(r => r.WriteTaskStart(description));
+		void ILog.WriteTaskError(Exception ex) => this.ForAll(r => r.WriteTaskError(ex));
+		void ILog.MarkTaskComplete() => this.ForAll(r => r.MarkTaskComplete());
+	}
+
 	public static class LogExtensions
 	{
 		/// <summary>

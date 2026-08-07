@@ -15,6 +15,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Titanis.Core\Titanis.Core.csproj" />
+		<ProjectReference Include="..\Titanis.Info\Titanis.Info.csproj" />
 		<ProjectReference Include="..\Titanis.Reflection\Titanis.Reflection.csproj" />
 	</ItemGroup>
 

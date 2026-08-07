@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Titanis.Info;
 
 namespace Titanis.Ldap
 {
@@ -77,6 +78,7 @@ namespace Titanis.Ldap
 		}
 
 		[DisplayName("dn")]
+		[InfoKey]
 		public LdapDistinguishedName? EntryName { get; }
 		public LdapAttribute[] Attributes { get; }
 		public string? ObjectClass { get; }
@@ -113,7 +115,7 @@ namespace Titanis.Ldap
 	class LdapNamePropertyDescriptor : PropertyDescriptor
 	{
 		internal LdapNamePropertyDescriptor()
-			: base(nameof(LdapEntry.EntryName), null)
+			: base(nameof(LdapEntry.EntryName), [new InfoKeyAttribute()])
 		{
 		}
 
@@ -187,7 +189,7 @@ namespace Titanis.Ldap
 	partial class LdapEntry : ICustomTypeDescriptor
 	{
 		AttributeCollection ICustomTypeDescriptor.GetAttributes() => AttributeCollection.Empty;
-		string? ICustomTypeDescriptor.GetClassName() => this.ObjectClass;
+		string? ICustomTypeDescriptor.GetClassName() => this.GetType().FullName;
 		string? ICustomTypeDescriptor.GetComponentName() => this.EntryName?.Text;
 		TypeConverter? ICustomTypeDescriptor.GetConverter() => null;
 		EventDescriptor? ICustomTypeDescriptor.GetDefaultEvent() => null;

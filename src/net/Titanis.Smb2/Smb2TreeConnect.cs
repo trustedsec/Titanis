@@ -363,7 +363,7 @@ namespace Titanis.Smb2
 					).ConfigureAwait(false);
 
 				ByteMemoryReader reader = new ByteMemoryReader(outputBuffer.AsMemory().Slice(0, res.outputResponseSize));
-				var nics = reader.ReadNicInfoList();
+				var nics = reader.ReadNicInfoList(this.Session.Connection.ServerName);
 				return nics.ToArray();
 			}
 			finally

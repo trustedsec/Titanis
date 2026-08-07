@@ -47,6 +47,7 @@ public abstract class LsaPolicyCommand : LsaCommand
 					continue;
 
 				var account = accounts[i];
+				account.ServerName = this.ServerName;
 				account.AccountName = mapping.AccountName;
 				account.DomainName = mapping.DomainName;
 			}

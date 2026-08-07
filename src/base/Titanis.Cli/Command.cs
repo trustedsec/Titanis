@@ -87,9 +87,27 @@ namespace Titanis.Cli
 
 		[Parameter]
 		[Advanced]
-		[Category(ParameterCategories.Output)]
+		[Category(ParameterCategories.Logging)]
 		[Description("Infobase file to log results to")]
-		public FileSpec? LogBase { get; set; }
+		public virtual FileSpec? LogBase { get; set; }
+
+		[Parameter]
+		[Advanced]
+		[Category(ParameterCategories.Logging)]
+		[Description("Partition to associate log entries with")]
+		public string? LogPartition { get; set; }
+
+		[Parameter]
+		[Advanced]
+		[Category(ParameterCategories.Logging)]
+		[Description("Comment to associate with log entries")]
+		public string? LogComment { get; set; }
+
+		[Parameter]
+		[Advanced]
+		[Category(ParameterCategories.Logging)]
+		[Description("Nema=Value pairs to associate with log entries")]
+		public string[]? LogAttributes { get; set; }
 
 		protected void SetOutputFormat(OutputStyle style)
 		{
@@ -233,7 +251,7 @@ namespace Titanis.Cli
 			this.DefaultOutputStyle = metadata.DefaultOutputStyle;
 			ApplyValues(paramValues, context, metadata);
 
-			await this.LogInvocation(this.GetType().Name, paramValues, cancellationToken).ConfigureAwait(false);
+			await this.LogInvocation(this.CommandName ?? this.GetType().Name, this.GetType().Assembly.GetName().Version.ToString(), paramValues, cancellationToken).ConfigureAwait(false);
 
 			var validateContext = new ParameterValidationContext();
 			foreach (var group in metadata.ParameterGroups)
@@ -301,7 +319,7 @@ namespace Titanis.Cli
 				}).Unwrap().Wait();
 			}
 		}
-		private async Task LogInvocation(string name, Dictionary<ParameterMetadata, object?> paramValues, CancellationToken cancellationToken)
+		private async Task LogInvocation(string name, string version, Dictionary<ParameterMetadata, object?> paramValues, CancellationToken cancellationToken)
 		{
 			try
 			{
@@ -319,7 +337,7 @@ namespace Titanis.Cli
 					}
 
 					var args = paramValues.ToDictionary(r => r.Key.Name, r => r.Value);
-					this._invocLog = await this._infobase.LogCommand(name, args, cancellationToken);
+					this._invocLog = await this._infobase.LogCommand(name, version, args, this.LogPartition, this.LogComment, null, cancellationToken);
 					this.Context.AddLogListener(this._invocLog);
 					this.Context.AddResultHook(new LogResultHook(this._invocLog));
 				}

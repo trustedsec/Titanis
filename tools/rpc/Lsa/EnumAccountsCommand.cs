@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Titanis.Info;
 using Titanis.Msrpc.Mslsar;
 using Titanis.Winterop.Security;
 
@@ -6,6 +7,9 @@ namespace Titanis.Cli.LsaTool;
 
 public class LsaAccountInfo
 {
+	[InfoKey]
+	public string ServerName { get; set; }
+	[InfoKey]
 	public SecurityIdentifier Sid { get; set; }
 	public string? AccountName { get; set; }
 	public string? DomainName { get; set; }

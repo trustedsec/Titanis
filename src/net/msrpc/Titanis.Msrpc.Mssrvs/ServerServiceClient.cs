@@ -175,6 +175,7 @@ namespace Titanis.Msrpc.Mswkst
 			RpcPointer<uint> pResumeHandle = new RpcPointer<uint>();
 
 			List<OpenFileInfo> files = new List<OpenFileInfo>();
+			var serverBaseName = serverName.TrimStart('\\');
 			Win32ErrorCode res;
 			do
 			{
@@ -214,10 +215,10 @@ namespace Titanis.Msrpc.Mswkst
 				switch (level)
 				{
 					case OpenFileInfoLevel.Level2:
-						GetEntriesFrom(files, pInfo.value.FileInfo.Level2?.value.Buffer?.value, r => new OpenFileInfo(r));
+						GetEntriesFrom(files, pInfo.value.FileInfo.Level2?.value.Buffer?.value, r => new OpenFileInfo(serverBaseName, r));
 						break;
 					case OpenFileInfoLevel.Level3:
-						GetEntriesFrom(files, pInfo.value.FileInfo.Level3?.value.Buffer?.value, r => new OpenFileInfo(r));
+						GetEntriesFrom(files, pInfo.value.FileInfo.Level3?.value.Buffer?.value, r => new OpenFileInfo(serverBaseName, r));
 						break;
 				}
 			} while (res == Win32ErrorCode.ERROR_MORE_DATA);
@@ -226,11 +227,11 @@ namespace Titanis.Msrpc.Mswkst
 			return files;
 		}
 
-		public async Task<OpenFileInfo> GetOpenFileInfo(int fileId, CancellationToken cancellationToken)
+		public async Task<OpenFileInfo> GetOpenFileInfo(string serverName, int fileId, CancellationToken cancellationToken)
 		{
 			RpcPointer<FILE_INFO> pInfo = new RpcPointer<FILE_INFO>();
 			Win32ErrorCode res = (Win32ErrorCode)await this._proxy.NetrFileGetInfo(
-				LocalName,
+				serverName,
 				(uint)fileId,
 				3,
 				pInfo,
@@ -238,7 +239,7 @@ namespace Titanis.Msrpc.Mswkst
 				).ConfigureAwait(false);
 			res.CheckAndThrow();
 
-			return new OpenFileInfo(pInfo.value.FileInfo3.value);
+			return new OpenFileInfo(serverName, pInfo.value.FileInfo3.value);
 		}
 
 		public async Task CloseFile(int fileId, CancellationToken cancellationToken)

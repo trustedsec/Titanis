@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
+using Titanis.Info;
 
 namespace Titanis.Smb2
 {
@@ -10,8 +11,13 @@ namespace Titanis.Smb2
 
 		internal Smb2NicInfo() { }
 
+		[InfoKey]
+		public string ServerName { get; set; }
+
+		[InfoKey]
 		[DisplayName("Interface Index")]
 		public int InterfaceIndex => this.info.ifIndex;
+
 		public Smb2NicCapabilities Capabilities => this.info.caps;
 		[DisplayName("Link Speed")]
 		public long LinkSpeed => this.info.linkSpeed;

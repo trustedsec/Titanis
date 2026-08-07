@@ -20,7 +20,7 @@ namespace Titanis.Cli
 			this.Terminal = new WindowsConsoleInfo();
 			this._textTarget = new TerminalTarget(this.Terminal, (t, s) => t.WriteOutput(s));
 			this.WorkingDirectory = Environment.CurrentDirectory;
-			this.Log = new TerminalLog(this.Terminal);
+			this.AddLogListener(new TerminalLog(this.Terminal));
 
 			this.FileAccess = new HostFileAccess();
 
@@ -44,8 +44,6 @@ namespace Titanis.Cli
 
 		public ITerminal Terminal { get; }
 		private readonly TerminalTarget _textTarget;
-
-		public override ILog Log { get; }
 
 		public string WorkingDirectory { get; }
 

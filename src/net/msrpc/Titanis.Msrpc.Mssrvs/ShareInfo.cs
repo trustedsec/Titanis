@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Security.AccessControl;
+using Titanis.Info;
 using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Mswkst
@@ -29,9 +30,11 @@ namespace Titanis.Msrpc.Mswkst
 	public class ShareInfo
 	{
 		[DisplayName("Name")]
+		[InfoKey]
 		public string ShareName { get; }
 
 		[DisplayName("Server")]
+		[InfoKey]
 		public string? ServerName { get; }
 		[DisplayName("Type")]
 		public ShareTypeFlags ShareType { get; set; }
@@ -58,7 +61,7 @@ namespace Titanis.Msrpc.Mswkst
 			this.Remark = info.shi1_remark?.value;
 		}
 
-		internal ShareInfo(string serverName,ref readonly SHARE_INFO_2 info)
+		internal ShareInfo(string serverName, ref readonly SHARE_INFO_2 info)
 		{
 			this.ServerName = serverName;
 			this.ShareName = info.shi2_netname?.value;
@@ -71,7 +74,7 @@ namespace Titanis.Msrpc.Mswkst
 			this.Password = info.shi2_passwd?.value;
 		}
 
-		internal ShareInfo(string serverName,ref readonly SHARE_INFO_501 info)
+		internal ShareInfo(string serverName, ref readonly SHARE_INFO_501 info)
 		{
 			this.ServerName = serverName;
 			this.ShareName = info.shi501_netname?.value;
@@ -80,7 +83,7 @@ namespace Titanis.Msrpc.Mswkst
 			this.Flags = (ShareFlags)info.shi501_flags;
 		}
 
-		internal ShareInfo(string serverName,ref readonly SHARE_INFO_502_I info)
+		internal ShareInfo(string serverName, ref readonly SHARE_INFO_502_I info)
 		{
 			this.ServerName = serverName;
 			this.ShareName = info.shi502_netname?.value;
@@ -95,7 +98,7 @@ namespace Titanis.Msrpc.Mswkst
 			this.SecurityDescriptor = (info.shi502_security_descriptor?.value).IsNullOrEmpty() ? null : new SecurityDescriptor(info.shi502_security_descriptor!.value);
 		}
 
-		internal ShareInfo(string serverName,ref readonly SHARE_INFO_503_I info)
+		internal ShareInfo(string serverName, ref readonly SHARE_INFO_503_I info)
 		{
 			this.ServerName = serverName;
 			this.ShareName = info.shi503_netname?.value;
@@ -111,19 +114,19 @@ namespace Titanis.Msrpc.Mswkst
 			this.SecurityDescriptor = new SecurityDescriptor(info.shi503_security_descriptor?.value);
 		}
 
-		internal ShareInfo(string serverName,ref readonly SHARE_INFO_1004 info)
+		internal ShareInfo(string serverName, ref readonly SHARE_INFO_1004 info)
 		{
 			this.ServerName = serverName;
 			this.Remark = info.shi1004_remark?.value;
 		}
 
-		internal ShareInfo(string serverName,ref readonly SHARE_INFO_1005 info)
+		internal ShareInfo(string serverName, ref readonly SHARE_INFO_1005 info)
 		{
 			this.ServerName = serverName;
 			this.Flags = (ShareFlags)info.shi1005_flags;
 		}
 
-		internal ShareInfo(string serverName,ref readonly SHARE_INFO_1006 info)
+		internal ShareInfo(string serverName, ref readonly SHARE_INFO_1006 info)
 		{
 			this.ServerName = serverName;
 			this.MaxUses = (int)info.shi1006_max_uses;

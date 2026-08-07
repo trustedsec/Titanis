@@ -295,7 +295,8 @@ namespace Titanis.Ldap
 		}
 	}
 
-	public struct AdTimestamp
+	[InfoValue(typeof(DateTime?))]
+	public struct AdTimestamp : IInfoValue
 	{
 		public AdTimestamp(long value)
 		{
@@ -308,7 +309,7 @@ namespace Titanis.Ldap
 
 		public readonly long Value { get; }
 
-		public readonly DateTime AsDateTimeUtc() => DateTime.FromFileTimeUtc(this.Value);
+		public readonly DateTime? AsDateTimeUtc() => this.Value != long.MaxValue ? DateTime.FromFileTimeUtc(this.Value) : null;
 
 		public override string ToString() => $"{this.Value:N0} ({this.AsDateTimeUtc():O})";
 
@@ -346,6 +347,8 @@ namespace Titanis.Ldap
 				throw new ArgumentException($"Could not parse timestamp as either a numeric value or date/time.");
 			}
 		}
+
+		public object? GetValue() => this.AsDateTimeUtc();
 	}
 	// cf.:
 	// [RFC 4517] § 3.3.16

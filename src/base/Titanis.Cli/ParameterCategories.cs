@@ -17,5 +17,6 @@ namespace Titanis.Cli
 		public const string Installation = "Installation";
 		public const string Removal = "Removal";
 		public const string Rpc = "RPC";
+		public const string Logging = "Logging";
 	}
 }

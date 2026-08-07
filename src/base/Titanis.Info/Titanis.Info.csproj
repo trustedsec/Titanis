@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  <LangVersion>13.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Titanis.Core\Titanis.Core.csproj" />
+    <ProjectReference Include="..\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
+  </ItemGroup>
+
+</Project>

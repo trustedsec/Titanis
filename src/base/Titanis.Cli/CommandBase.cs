@@ -57,6 +57,8 @@ namespace Titanis.Cli
 		public async Task<int> InvokeAsync(ICommandContext context, string command, Token[] args, int startIndex, CancellationToken cancellationToken)
 		{
 			this.Context = context;
+			this.CommandName = command;
+
 			// TODO: This is a bit of a kludge
 			if (context is CommandContextBase ctxBase)
 				ctxBase.currentCommand = this;
@@ -100,6 +102,7 @@ namespace Titanis.Cli
 				}
 			}
 		}
+		protected string? CommandName { get; set; }
 
 		private ServiceContainer? _services;
 		/// <summary>
