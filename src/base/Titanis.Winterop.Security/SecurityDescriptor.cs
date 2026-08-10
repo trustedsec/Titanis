@@ -425,12 +425,12 @@ namespace Titanis.Winterop.Security
 			{
 				if (str[1] == ':')
 				{
-					var sd = SecurityDescriptor.ParseSddl(str, PlaceholderDomainSid);
+					var sd = SecurityDescriptor.ParseSddl(str.AsSpan(), PlaceholderDomainSid);
 					return sd;
 				}
 				else
 				{
-					var bytes = BinaryHelper.ParseHexString(str);
+					var bytes = BinaryHelper.ParseHexString(str.AsSpan());
 					return new SecurityDescriptor(bytes);
 				}
 			}

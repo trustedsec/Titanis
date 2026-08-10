@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Titanis.Msrpc.Mslsar
+namespace Titanis.Winterop.Security
 {
 	public enum Privilege : long
 	{

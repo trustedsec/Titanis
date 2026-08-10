@@ -374,7 +374,7 @@ namespace Titanis.Winterop.Security
 		{
 			if (ctx.LengthRemaining >= GuidTextLength && ctx[0] != ';')
 			{
-				if (Guid.TryParse(ctx.Remaining(GuidTextLength), out var guid))
+				if (Compat.TryParseGuid(ctx.Remaining(GuidTextLength), out var guid))
 				{
 					ctx.Advance(GuidTextLength);
 					return guid;
@@ -702,8 +702,13 @@ namespace Titanis.Winterop.Security
 		}
 	}
 
+	public interface ICallbackAce
+	{
+		byte[] ApplicationData { get; }
+	}
+
 	// [MS-DTYP] § 2.4.4.6 ACCESS_ALLOWED_CALLBACK_ACE
-	public sealed class CallbackAce : AccessControlEntry
+	public sealed class CallbackAce : AccessControlEntry, ICallbackAce
 	{
 		public CallbackAce(
 			AccessControlEntryType type,
@@ -750,8 +755,13 @@ namespace Titanis.Winterop.Security
 		}
 	}
 
+	public interface IObjectAce
+	{
+		Guid? ObjectType { get; }
+		Guid? InheritedObjectType { get; }
+	}
 	// [MS-DTYP] § 2.4.4.3 ACCESS_ALLOWED_OBJECT_ACE
-	public sealed class ObjectAce : AccessControlEntry
+	public sealed class ObjectAce : AccessControlEntry, IObjectAce
 	{
 		public ObjectAce(
 			AccessControlEntryType type,
@@ -812,7 +822,7 @@ namespace Titanis.Winterop.Security
 	}
 
 	// [MS-DTYP] § 2.4.4.8 ACCESS_ALLOWED_CALLBACK_OBJECT_ACE
-	public sealed class CallbackObjectAce : AccessControlEntry
+	public sealed class CallbackObjectAce : AccessControlEntry, IObjectAce, ICallbackAce
 	{
 		public CallbackObjectAce(
 			AccessControlEntryType type,
@@ -880,7 +890,7 @@ namespace Titanis.Winterop.Security
 	}
 
 	// [MS-DTYP] § 2.4.4.15 SYSTEM_RESOURCE_ATTRIBUTE_ACE
-	public sealed class ResourceAttributeAce : AccessControlEntry
+	public sealed class ResourceAttributeAce : AccessControlEntry, ICallbackAce
 	{
 		public ResourceAttributeAce(
 			AccessControlEntryType type,
@@ -897,6 +907,7 @@ namespace Titanis.Winterop.Security
 
 		public sealed override uint AccessMask { get; }
 		public byte[] AttributeData { get; }
+		byte[] ICallbackAce.ApplicationData => this.AttributeData;
 
 		public override void BuildSddl(StringBuilder sb)
 		{

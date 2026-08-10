@@ -196,10 +196,33 @@ namespace Titanis.Winterop.Security
 			return null;
 		}
 
+		// [MS-DTYP] § 2.5.3.1.4 GetCentralizedAccessPolicy
+		public SecurityIdentifier? GetCentralizedAccessPolicy()
+		{
+			var scoped = this.GetScopedPolicySid();
+			// TODO: This needs some sort of hook to get the policy
+			return null;
+		}
+
 		// [MS-DTYP] § 2.5.3.1.7 LookupAttributeInSacl
 		public SecurityIdentifier? LookupAttribute(string name)
 		{
 			throw new NotImplementedException();
+		}
+
+		// [MS-DTYP] § 2.5.3.1.7 LookupAttributeInSacl
+		public int LookupAttributeInSacl(
+			string attributeName
+			)
+		{
+			throw new NotImplementedException();
+			foreach (var ace in this.Entries)
+			{
+				if (ace.AceType == AccessControlEntryType.ResourceAttribute)
+				{
+					throw new NotImplementedException();
+				}
+			}
 		}
 	}
 }

@@ -273,7 +273,7 @@ namespace Titanis.Winterop.Security
 				Span<char> revised = stackalloc char[text.Length - DomainPlaceholderPrefix.Length + sub.Length];
 				sub.AsSpan().CopyTo(revised);
 				text.Slice(DomainPlaceholderPrefix.Length).CopyTo(revised.Slice(sub.Length));
-				text = sub;
+				text = sub.AsSpan();
 				hasDomainPlaceholder = true;
 			}
 
@@ -542,6 +542,32 @@ namespace Titanis.Winterop.Security
 			BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(bytes.Length - 4, 4), relativeId);
 			return new SecurityIdentifier(bytes);
 		}
+
+		// [MS-DTYP] § 2.5.3.1.2 SidDominates
+		public bool SidDominates(SecurityIdentifier other)
+		{
+			var sid1 = this;
+
+			if (other is null) throw new ArgumentNullException(nameof(other));
+
+			if (sid1 == other)
+				return true;
+
+			if (other.SubauthorityCount > sid1.SubauthorityCount)
+				return false;
+
+			uint[] subauths = sid1.GetSubauthorities();
+			uint[] subauths2 = other.GetSubauthorities();
+			for (int i = 0; i < subauths.Length; i++)
+			{
+				uint subauth1 = subauths[i];
+				uint subauth2 = subauths2[i];
+				if (subauth1 >= subauth2)
+					return true;
+			}
+
+			return false;
+		}
 	}
 
 	public class SecurityIdentifierConverter : TypeConverter
@@ -554,7 +580,7 @@ namespace Titanis.Winterop.Security
 		{
 			if (value is string str)
 			{
-				return SecurityIdentifier.Parse(str, SecurityDescriptorConverter.PlaceholderDomainSid);
+				return SecurityIdentifier.Parse(str.AsSpan(), SecurityDescriptorConverter.PlaceholderDomainSid);
 			}
 			else
 				return base.ConvertFrom(context, culture, value);

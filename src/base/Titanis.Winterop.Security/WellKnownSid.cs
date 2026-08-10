@@ -447,7 +447,7 @@ namespace Titanis.Winterop.Security
 
 			public override string ToString()
 			{
-				return string.Create(2, this.value, (b, s) =>
+				return Compat.CreateString(2, this.value, (b, s) =>
 				{
 					b[0] = (char)(s >> 8);
 					b[1] = (char)(byte)s;
