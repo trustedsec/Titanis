@@ -18,7 +18,7 @@ namespace Titanis.Cli
 		public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
 		{
 			if (value is string str)
-				return Enum.Parse(this.EnumType, str);
+				return Enum.Parse(this.EnumType, str, true);
 			return base.ConvertFrom(context, culture, value);
 		}
 		public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
