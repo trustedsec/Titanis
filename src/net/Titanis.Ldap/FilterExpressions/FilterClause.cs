@@ -68,7 +68,7 @@ namespace Titanis.Ldap.FilterExpressions
 		public string AttributeDescription { get; }
 		public AssertionValue AssertionValue { get; }
 
-		internal AttributeValueAssertion ToAssertion(FilterExpressionContext context)
+		internal AttributeValueAssertion ToAssertion(Asn1FilterBuilder b, FilterExpressionContext context)
 		{
 			string value = this.AssertionValue.Resolve(context);
 			var attrSyntax = LdapAttributeTypes.TryGetByNameOrOid(this.AttributeDescription)?.Syntax;
@@ -81,7 +81,7 @@ namespace Titanis.Ldap.FilterExpressions
 			{
 				encodedValue = Encoding.UTF8.GetBytes(value);
 			}
-			return new AttributeValueAssertion(Encoding.UTF8.GetBytes(this.AttributeDescription), encodedValue);
+			return new AttributeValueAssertion(b.GetAttrBytes(this.AttributeDescription), encodedValue);
 		}
 	}
 	public sealed class EqualsExpression : AssertionExpression

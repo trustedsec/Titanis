@@ -19,16 +19,11 @@ internal class SchemaCommand : LdapCommandBase
 		LdapQuery query = new(ldap.SchemaRoot, LdapSearchScope.SingleLevel, FilterFactory.Matches(LdapAttributeTypes.ObjectClass, "attributeSchema"), attrs)
 		{
 			PageSize = 100,
-			Options = LdapQueryOptions.IncludeMissingAttributes
+			Options = LdapQueryOptions.IncludeMissingAttributes | LdapQueryOptions.AllPages
 		};
 
-		do
-		{
-			var res = await ldap.Search(query, cancellationToken);
-			query.PagingBookmark = res.Bookmark;
-
-			this.WriteRecords(res.Entries);
-		} while (!query.PagingBookmark.IsNullOrEmpty());
+		var res = await ldap.Search(query, cancellationToken);
+		this.WriteRecords(res.Entries);
 
 		return 0;
 	}

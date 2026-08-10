@@ -26,7 +26,7 @@ internal class FuseCommand : LdapCommandBase
 	{
 		var fuseParams = this.FuseParameters;
 
-		var root = (await ldap.Search(new LdapQuery(this.SearchBase ?? ldap.DomainRoot, LdapSearchScope.Base, null, null), cancellationToken).ConfigureAwait(false)).Entries.ToArray().FirstOrDefault();
+		var root = (await ldap.Search(new LdapQuery(this.SearchBase ?? ldap.DomainRoot, LdapSearchScope.Base, null, null) { Options = LdapQueryOptions.AllPages }, cancellationToken).ConfigureAwait(false)).Entries.ToArray().FirstOrDefault();
 		await Task.Yield();
 		var rootNode = new LdapEntryNode(new LdapMountInfo
 		{

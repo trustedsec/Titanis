@@ -225,6 +225,7 @@ namespace Titanis.Ldap
 			internal ILdapClientSearchCallback? callback;
 
 			internal int entryCount;
+			internal int pageEntryCount;
 			internal readonly List<LdapEntry> entries = new List<LdapEntry>();
 			internal readonly List<string> referrals = new List<string>();
 
@@ -297,6 +298,7 @@ namespace Titanis.Ldap
 
 					LdapEntry entry = new LdapEntry(name, attrs.ToArray());
 					this.entryCount++;
+					this.pageEntryCount++;
 					if (this.callback != null)
 						this.callback.OnEntry(entry);
 					else
@@ -372,12 +374,14 @@ namespace Titanis.Ldap
 			var allAttrs = (query.IncludeMissingAttributes ? query.Attributes : null);
 
 			List<Control> controls = new List<Control>();
+			Control? paging = null;
 			if (searchBase != null)
 			{
 				if (query.PageSize.HasValue)
 				{
 					byte[] pagingControl = Asn1DerEncoder.EncodeTlv(new PagingSearchControlValue(query.PageSize.Value, query.PagingBookmark ?? Array.Empty<byte>())).ToArray();
-					controls.Add(new Control(Encoding.UTF8.GetBytes(AdExtensions.PagingControlOid), false, pagingControl));
+					paging = new(Encoding.UTF8.GetBytes(AdExtensions.PagingControlOid), false, pagingControl);
+					controls.Add(paging);
 				}
 				if (query.WatchForChanges)
 				{
@@ -416,27 +420,38 @@ namespace Titanis.Ldap
 				attributes
 				);
 			var callback = new SearchResultBuilder(allAttrs, query.Options) { callback = searchCallback };
-			var resp = await this._channel.Search(asn1Search, callback, controls.ToArray(), cancellationToken).ConfigureAwait(false);
 
-			byte[]? bookmark = null;
-			byte[]? dirsyncCookie = null;
-			if (!resp.message.controls.IsNullOrEmpty())
+			byte[]? bookmark = query.PagingBookmark;
+			byte[]? dirsyncCookie;
+			do
 			{
-				foreach (var control in resp.message.controls)
+				callback.pageEntryCount = 0;
+				if (paging != null)
 				{
-					var oid = Encoding.UTF8.GetString(control.controlType);
-					if (oid == AdExtensions.PagingControlOid)
+					paging.controlValue = Asn1DerEncoder.EncodeTlv(new PagingSearchControlValue(query.PageSize.Value, bookmark ?? Array.Empty<byte>())).ToArray();
+				}
+
+				var resp = await this._channel.Search(asn1Search, callback, controls.ToArray(), cancellationToken).ConfigureAwait(false);
+				bookmark = null;
+				dirsyncCookie = null;
+				if (!resp.message.controls.IsNullOrEmpty())
+				{
+					foreach (var control in resp.message.controls)
 					{
-						var pagingValue = Asn1DerDecoder.DecodeTlv<PagingSearchControlValue>(control.controlValue);
-						bookmark = pagingValue.cookie;
-					}
-					else if (oid == AdExtensions.DirSyncOid)
-					{
-						var dirsyncValue = Asn1DerDecoder.DecodeTlv<DirSyncRequestValue>(control.controlValue);
-						dirsyncCookie = dirsyncValue.cookie;
+						var oid = Encoding.UTF8.GetString(control.controlType);
+						if (oid == AdExtensions.PagingControlOid)
+						{
+							var pagingValue = Asn1DerDecoder.DecodeTlv<PagingSearchControlValue>(control.controlValue);
+							bookmark = pagingValue.cookie;
+						}
+						else if (oid == AdExtensions.DirSyncOid)
+						{
+							var dirsyncValue = Asn1DerDecoder.DecodeTlv<DirSyncRequestValue>(control.controlValue);
+							dirsyncCookie = dirsyncValue.cookie;
+						}
 					}
 				}
-			}
+			} while ((0 != (query.Options & LdapQueryOptions.AllPages)) && (callback.pageEntryCount > 0) && !bookmark.IsNullOrEmpty() && !cancellationToken.IsCancellationRequested);
 
 			return new LdapSearchResult(callback.entryCount, callback.entries.ToArray(), callback.referrals.ToArray()) { Bookmark = bookmark, DirsyncCookie = dirsyncCookie };
 		}

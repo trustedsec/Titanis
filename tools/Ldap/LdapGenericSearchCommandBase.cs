@@ -1,10 +1,6 @@
-﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Titanis.Ldap;
 
 namespace Titanis.Cli.LdapTool;
@@ -81,6 +77,55 @@ public abstract class LdapGenericSearchCommandBase : LdapCommandBase, ILdapClien
 
 		if (!this.OutputFields.IsNullOrEmpty())
 		{
+			List<AttributeSpec> attrs = new List<AttributeSpec>(this.OutputFields.Length);
+			//if (this.OutputFields is ["**"])
+			//{
+			//	var allAttrs = await ldap.Search(new LdapQuery(ldap.SchemaRoot, LdapSearchScope.SingleLevel, LdapFilter.Parse("(objectClass=attributeSchema)"), [LdapAttributeTypes.LDAPDisplayName]) { Options = LdapQueryOptions.AllPages, PageSize = 100 }, cancellationToken);
+			//	foreach (var attrEntry in allAttrs.Entries)
+			//	{
+			//		var ldapName = attrEntry[LdapAttributeTypes.LDAPDisplayName]?.Value as string;
+			//		if (ldapName != null)
+			//		{
+			//			attrs.Add(ldapName);
+			//			fieldNames.Add(ldapName);
+			//		}
+			//	}
+			//	this.OutputFields = fieldNames.ToArray();
+			//}
+			//else
+			{
+				List<string> fieldNames = new List<string>(1 + this.OutputFields.Length);
+				foreach (var name in this.OutputFields)
+				{
+					//if (name.Equals("*constructed", StringComparison.OrdinalIgnoreCase))
+					//{
+					//	var allAttrs = await ldap.Search(new LdapQuery(ldap.SchemaRoot, LdapSearchScope.SingleLevel, LdapFilter.Parse("(&(objectClass=attributeSchema)(systemFlags&=Constructed))"), [LdapAttributeTypes.LDAPDisplayName]) { Options = LdapQueryOptions.AllPages, PageSize = 100 }, cancellationToken);
+					//	foreach (var attrEntry in allAttrs.Entries)
+					//	{
+					//		var ldapName = attrEntry[LdapAttributeTypes.LDAPDisplayName]?.Value as string;
+					//		if (ldapName != null)
+					//		{
+					//			attrs.Add(ldapName);
+					//			fieldNames.Add(ldapName);
+					//		}
+					//	}
+
+					//}
+					//else
+					{
+						if (!name.Equals(nameof(LdapEntry.EntryName), StringComparison.OrdinalIgnoreCase))
+						{
+							attrs.Add(new AttributeSpec(name));
+						}
+						fieldNames.Add(name);
+					}
+				}
+				this.OutputFields = fieldNames.ToArray();
+			}
+
+			if (attrs.Count == 0)
+				// The user has not requested any attributes; put a known-bad value to prevent all attributes from being returned (Windows does this)
+				attrs.Add("1.1");
 			query.Attributes = Array.ConvertAll(this.OutputFields!, r => new AttributeSpec(r));
 		}
 

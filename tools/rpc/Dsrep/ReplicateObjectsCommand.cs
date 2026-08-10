@@ -45,32 +45,12 @@ public class ReplicateObjectsCommand : ReplicateCommand
 				var filter = objSpec.Filter ?? LdapFilter.Parse($"(samAccountName={objSpec.Name})");
 				LdapQuery query = new(ldapClient.DomainRoot, LdapSearchScope.Subtree, filter, [])
 				{
-					PageSize = 20
+					PageSize = 20,
+					Options = LdapQueryOptions.AllPages
 				};
 
-				bool pageHasResults = false;
-				bool hasAnyMatches = false;
-				do
-				{
-					pageHasResults = false;
-					var results = await ldapClient.Search(query, cancellationToken);
-					if (results.Entries.Length > 0)
-					{
-						query.PagingBookmark = results.Bookmark;
-						query.DirSyncCookie = results.DirsyncCookie;
-						pageHasResults = true;
-						hasAnyMatches = true;
-
-						foreach (var entry in results.Entries)
-						{
-							yield return new DsName(Guid.Empty, null, entry.EntryName);
-						}
-					}
-					else
-						break;
-				} while ((!query.PagingBookmark.IsNullOrEmpty() || !query.DirSyncCookie.IsNullOrEmpty()) && pageHasResults && !cancellationToken.IsCancellationRequested);
-
-				if (!hasAnyMatches)
+				var results = await ldapClient.Search(query, cancellationToken);
+				if (results.EntryCount == 0)
 					this.WriteWarning($"The object specification '{objSpec?.ToString()}' did not return any results");
 			}
 		}

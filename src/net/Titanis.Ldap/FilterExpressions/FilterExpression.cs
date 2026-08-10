@@ -21,6 +21,13 @@ namespace Titanis.Ldap.FilterExpressions
 		public string Attribute { get; }
 	}
 
+	[Flags]
+	public enum LdapFilterParseOptions
+	{
+		None = 0,
+		UseAttributeOids = 1,
+	}
+
 	public sealed partial class FilterExpression
 	{
 		public FilterExpression(FilterClause rootClause, ImmutableArray<FilterParameterUsage> paramUsages = default)
@@ -43,10 +50,10 @@ namespace Titanis.Ldap.FilterExpressions
 			}
 		}
 
-		public LdapFilter ToFilter(FilterExpressionContext? context = null)
+		public LdapFilter ToFilter(LdapFilterParseOptions options = LdapFilterParseOptions.None, FilterExpressionContext? context = null)
 		{
 			context ??= NullFilterContext.Instance;
-			Asn1FilterBuilder b = new Asn1FilterBuilder(context);
+			Asn1FilterBuilder b = new Asn1FilterBuilder(options, context);
 			return new LdapFilter(this.RootClause.Accept(b));
 		}
 

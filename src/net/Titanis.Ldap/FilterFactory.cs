@@ -23,9 +23,9 @@ namespace Titanis.Ldap
 			this.struc = struc;
 		}
 
-		public static LdapFilter Parse(string filterExpression)
+		public static LdapFilter Parse(string filterExpression, LdapFilterParseOptions options = LdapFilterParseOptions.None)
 		{
-			return FilterExpression.Parse(filterExpression).ToFilter();
+			return FilterExpression.Parse(filterExpression).ToFilter(options);
 		}
 	}
 

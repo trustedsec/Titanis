@@ -22,6 +22,7 @@ namespace Titanis.Ldap
 		/// This is useful in data-binding scenarios when records must appear uniform.
 		/// </remarks>
 		IncludeMissingAttributes = 1,
+		AllPages = 2,
 	}
 
 	public class LdapQuery

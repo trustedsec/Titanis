@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Titanis.Msrpc.Mslsar;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.LsaTool;
 

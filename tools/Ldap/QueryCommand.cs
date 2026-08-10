@@ -61,14 +61,22 @@ internal class QueryCommand : QueryCommandBase
 	[Description("LDAP query")]
 	public string? Filter { get; set; }
 
+	[Parameter]
+	[Description("Uses OIDs in filter instead of attribute names")]
+	public SwitchParam FilterWithOids { get; set; }
+
 	private LdapFilter? _filter;
 	protected override void ValidateParameters(ParameterValidationContext context)
 	{
 		if (!string.IsNullOrEmpty(this.Filter))
 		{
+			var options = LdapFilterParseOptions.None;
+			if (this.FilterWithOids.IsSet)
+				options |= LdapFilterParseOptions.UseAttributeOids;
+
 			try
 			{
-				this._filter = LdapFilter.Parse(this.Filter);
+				this._filter = LdapFilter.Parse(this.Filter, options);
 			}
 			catch (Exception ex)
 			{
