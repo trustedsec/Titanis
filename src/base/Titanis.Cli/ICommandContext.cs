@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +12,35 @@ namespace Titanis.Cli
 {
 	public interface ICommandResultHook
 	{
-		void OnResult(object? record);
+		void OnResult(object? record, RecordInfo? info);
+	}
+
+	public class RecordAlert
+	{
+		public RecordAlert(string? fieldName, int fieldValueIndex = NoValueIndex)
+		{
+			this.FieldName = fieldName;
+			this.FieldValueIndex = fieldValueIndex;
+		}
+
+		public const int NoValueIndex = -1;
+		public string? FieldName { get; }
+		public int FieldValueIndex { get; }
+	}
+	public class RecordInfo
+	{
+		public RecordInfo(ImmutableArray<RecordAlert> alerts = default)
+		{
+			Alerts = alerts;
+		}
+
+		public ImmutableArray<RecordAlert> Alerts { get; }
+
+		public bool HasAlertOnField(string? fieldName) => HasAlertOnField(fieldName, RecordAlert.NoValueIndex);
+		public bool HasAlertOnField(string? fieldName, int valueIndex)
+		{
+			return this.Alerts.Any(r => r.FieldName == fieldName && r.FieldValueIndex == valueIndex);
+		}
 	}
 
 	public interface ICommandContext
@@ -56,5 +86,6 @@ namespace Titanis.Cli
 		void AddResultHook(ICommandResultHook hook);
 		void WriteRecords(IEnumerable records);
 		void WriteRecord(object? record);
+		void WriteRecord(object? record, RecordInfo? info);
 	}
 }

@@ -53,6 +53,16 @@ namespace Titanis.Cli
 			}
 		}
 
+		public FormattedText Prepend(FormattedTextPart part)
+		{
+			if (part is null) throw new ArgumentNullException(nameof(part));
+			return new FormattedText([part, new EmbeddedTextPart(this)]);
+		}
+
+		public FormattedText Wrap(ConsoleColor color)
+		{
+			return new FormattedText([FormattedTextFactory.PushTextColor(color), new EmbeddedTextPart(this), FormattedTextFactory.PopTextColor()]);
+		}
 	}
 
 	public static class FormattedTextFactory
@@ -87,6 +97,18 @@ namespace Titanis.Cli
 		/// </summary>
 		/// <param name="target">Print target</param>
 		internal abstract void PrintTo(FormattedTextTarget target);
+	}
+
+	public sealed class EmbeddedTextPart : FormattedTextPart
+	{
+		public EmbeddedTextPart(FormattedText text)
+		{
+			Text = text;
+		}
+
+		public FormattedText Text { get; }
+
+		internal override void PrintTo(FormattedTextTarget target) => target.WriteEmbedded(this.Text);
 	}
 
 	public sealed class TextPart : FormattedTextPart

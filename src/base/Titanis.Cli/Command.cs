@@ -285,7 +285,7 @@ namespace Titanis.Cli
 				this.log = log;
 			}
 
-			public void OnResult(object? record)
+			public void OnResult(object? record, RecordInfo? info)
 			{
 				CancellationToken cx = CancellationToken.None;
 				Task.Factory.StartNew(async () =>

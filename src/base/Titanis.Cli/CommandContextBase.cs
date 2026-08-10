@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -127,7 +128,7 @@ namespace Titanis.Cli
 					var tbl = new TableHandler(this._treeHandler.GetDisplayFields(), this._includeHeaders, this._outputStyle);
 					foreach (var node in allNodes)
 					{
-						tbl.AddRow(node.Record, node.BuildLineArt(false), node.BuildLineArt(true), false);
+						tbl.AddRow(node.Record, node.RecordInfo, node.BuildLineArt(false), node.BuildLineArt(true), false);
 					}
 
 					this.PrintTable(tbl.BuildTable());
@@ -157,7 +158,7 @@ namespace Titanis.Cli
 
 		#region Formatting support
 
-		static string FormatValue(string sep, string? text)
+		static string FormatCsvValue(string sep, string? text)
 		{
 			if (string.IsNullOrEmpty(text))
 				return text;
@@ -187,9 +188,9 @@ namespace Titanis.Cli
 			(this._resultHooks ??= new List<ICommandResultHook>()).Add(hook);
 		}
 
-		protected virtual void OnRecordWritten(object? record)
+		protected virtual void OnRecordWritten(object? record, RecordInfo? info)
 		{
-			this._resultHooks?.ForEach(r => r.OnResult(record));
+			this._resultHooks?.ForEach(r => r.OnResult(record, info));
 		}
 
 		public void WriteRecords(System.Collections.IEnumerable records)
@@ -205,7 +206,8 @@ namespace Titanis.Cli
 				}
 			}
 		}
-		public void WriteRecord(object? record)
+		public void WriteRecord(object? record) => this.WriteRecord(record, null);
+		public void WriteRecord(object? record, RecordInfo? info)
 		{
 			this._recordsExpected = true;
 
@@ -213,7 +215,7 @@ namespace Titanis.Cli
 			if (this._treeHandler != null)
 			{
 				this._treeHandler.fields ??= (this._outputFieldProvider ??= CreateDefaultFieldProvider()).GetFieldsForRecord(record);
-				this._treeHandler.AddRecord(record);
+				this._treeHandler.AddRecord(record, info);
 			}
 			else
 			{
@@ -234,7 +236,7 @@ namespace Titanis.Cli
 						if (this._outputStyle is OutputStyle.Csv or OutputStyle.Tsv)
 						{
 							var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
-							string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.Name)));
+							string line = string.Join(sep, fields.Select(r => FormatCsvValue(sep, r.Name)));
 							this.WriteOutputLine(line);
 						}
 					}
@@ -260,7 +262,7 @@ namespace Titanis.Cli
 								Debug.Assert(fields != null);
 
 								this._resultsPending = true;
-								this._resultTable.AddRow(record);
+								this._resultTable.AddRow(record, info);
 							}
 						}
 						break;
@@ -282,9 +284,9 @@ namespace Titanis.Cli
 										var formatted = field.FormatValue(elem, this._outputStyle);
 
 										if (this._includeHeaders)
-											this.WriteOutputLine($"{field.Caption}: {formatted}");
-										else
-											this.WriteOutputLine(formatted);
+											this.WriteOutput($"{field.Caption}: ");
+
+										this.WriteOutputLine(formatted);
 									}
 								}
 							}
@@ -298,8 +300,29 @@ namespace Titanis.Cli
 							{
 								//TODO: Properly handle array like values
 								var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
-								string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._outputStyle))));
-								this.WriteOutputLine(line);
+								for (int i = 0; i < fields.Length; i++)
+								{
+									if (i > 0)
+										this.WriteOutput(sep);
+
+									OutputField? field = fields[i];
+									var value = field.GetValue(record);
+									if (field is IList list)
+									{
+										for (int j = 0; j < list.Count; j++)
+										{
+											if (j > 0)
+												this.WriteOutput(";");
+
+											object? item = list[j];
+											this.WriteOutput(FormatCsvValue(sep, item?.ToString()));
+										}
+									}
+									else
+									{
+										this.WriteOutput(FormatCsvValue(sep, value?.ToString()));
+									}
+								}
 							}
 						}
 						break;
@@ -312,7 +335,9 @@ namespace Titanis.Cli
 								var fieldValue = field.GetValue(record);
 								if (fieldValue != null)
 								{
-									string formatted = field.FormatValue(fieldValue, OutputStyle.Json);
+									if (Convert.GetTypeCode(fieldValue) == TypeCode.Object)
+										fieldValue = fieldValue.ToString();
+
 									values.Add(field.Name, fieldValue);
 								}
 							}
@@ -328,7 +353,7 @@ namespace Titanis.Cli
 			}
 			this._recordsWritten++;
 
-			this.OnRecordWritten(record);
+			this.OnRecordWritten(record, info);
 		}
 
 		#endregion
@@ -339,7 +364,9 @@ namespace Titanis.Cli
 		public void AddLogListener(ILog listener) => this._log.AddListener(listener);
 
 		public abstract void WriteOutput(string? message);
+		public abstract void WriteOutput(FormattedText message);
 		public abstract void WriteOutputLine(string? message);
+		public abstract void WriteOutputLine(FormattedText? message);
 		protected abstract void PrintTable(TextTable table);
 	}
 }

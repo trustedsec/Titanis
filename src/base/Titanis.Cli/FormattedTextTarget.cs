@@ -64,6 +64,11 @@ namespace Titanis.Cli
 		{
 			this.WriteText(text);
 		}
+
+		internal virtual void WriteEmbedded(FormattedText text)
+		{
+			text?.PrintTo(this);
+		}
 		#endregion
 	}
 

@@ -443,7 +443,7 @@ namespace Titanis.Cli
 				this.VerifyContext().WriteRecords(records);
 		}
 
-		protected void WriteRecord(object? record) => this.VerifyContext().WriteRecord(record);
+		protected void WriteRecord(object? record, RecordInfo? info = null) => this.VerifyContext().WriteRecord(record, info);
 
 		protected Stream OpenRawOutputStream()
 		{

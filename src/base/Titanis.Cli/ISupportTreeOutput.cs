@@ -22,7 +22,7 @@ namespace Titanis.Cli
 	/// </summary>
 	/// <seealso cref="ISupportTreeOutput.CreateTreeHandler"/>
 	/// <remarks>
-	/// As output is generated, the records are added by calling <see cref="AddRecord(object?)"/>.
+	/// As output is generated, the records are added by calling <see cref="AddRecord(object?, RecordInfo?)"/>.
 	/// Once the output is complete, call <see cref="BuildTree"/> to generate an ordered list of nodes.
 	/// </remarks>
 	public abstract class TreeHandler
@@ -56,7 +56,7 @@ namespace Titanis.Cli
 		/// Adds a record to the tree.
 		/// </summary>
 		/// <param name="record"></param>
-		public abstract void AddRecord(object? record);
+		public abstract void AddRecord(object? record, RecordInfo? recordInfo);
 		/// <summary>
 		/// Generates an ordered list of nodes.
 		/// </summary>
@@ -67,12 +67,13 @@ namespace Titanis.Cli
 		/// Represents a node within the tree.
 		/// </summary>
 		/// <param name="record">The record represented by the node</param>
-		public abstract class TreeNode(object record)
+		public abstract class TreeNode(object record, RecordInfo? recordInfo)
 		{
 			/// <summary>
 			/// Gets the record represented by the node.
 			/// </summary>
 			public object Record => record;
+			public RecordInfo? RecordInfo => recordInfo;
 			/// <summary>
 			/// Gets a bitfield indicating which lines to draw for parents.
 			/// </summary>
@@ -113,7 +114,7 @@ namespace Titanis.Cli
 			this._nodesByKey = new ConcurrentDictionary<TKey, TreeNodeTyped>(this._keyComparer);
 		}
 
-		class TreeNodeTyped(object record) : TreeNode(record)
+		class TreeNodeTyped(object record, RecordInfo? recordInfo) : TreeNode(record, recordInfo)
 		{
 			internal TKey key;
 
@@ -155,9 +156,9 @@ namespace Titanis.Cli
 		private readonly IEqualityComparer<TKey>? _keyComparer;
 		private readonly IComparer<TKey>? _keySorter;
 
-		public override void AddRecord(object? record)
+		public override void AddRecord(object? record, RecordInfo? recordInfo)
 		{
-			var node = new TreeNodeTyped(record);
+			var node = new TreeNodeTyped(record, recordInfo);
 			if (record is TRecord typed)
 			{
 				var key = this._keySelector(typed);

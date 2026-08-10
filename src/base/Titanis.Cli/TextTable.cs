@@ -133,7 +133,7 @@ namespace Titanis.Cli
 			this.Cells.Add(cell);
 			return cell;
 		}
-		public TextTableCell AddCell(FormattedText text, DisplayAlignment alignment = DisplayAlignment.Left)
+		public TextTableCell AddCell(FormattedText? text, DisplayAlignment alignment = DisplayAlignment.Left)
 		{
 			var cell = new TextTableCell(text, alignment);
 			this.Cells.Add(cell);
@@ -163,14 +163,13 @@ namespace Titanis.Cli
 		}
 		public TextTableCell(string? text, DisplayAlignment alignment = DisplayAlignment.Left)
 		{
-			this.IsEmpty=string.IsNullOrEmpty(text);
-			this.FormattedText = new FormattedText(text);
+			this.IsEmpty = string.IsNullOrEmpty(text);
+			this.FormattedText = this.IsEmpty ? FormattedTextFactory.Empty : new FormattedText(text);
 			this.Alignment = alignment;
 		}
-		public TextTableCell(FormattedText text, DisplayAlignment alignment = DisplayAlignment.Left)
+		public TextTableCell(FormattedText? text, DisplayAlignment alignment = DisplayAlignment.Left)
 		{
-			if (text is null) throw new ArgumentNullException(nameof(text));
-			this.FormattedText = text;
+			this.FormattedText = text ?? FormattedTextFactory.Empty;
 			this.Alignment = alignment;
 		}
 		public bool IsEmpty { get; }

@@ -18,6 +18,7 @@ namespace Titanis.Cli
 			: base(metadata)
 		{
 			this.Terminal = new WindowsConsoleInfo();
+			this._textTarget = new TerminalTarget(this.Terminal, (t, s) => t.WriteOutput(s));
 			this.WorkingDirectory = Environment.CurrentDirectory;
 			this.Log = new TerminalLog(this.Terminal);
 
@@ -42,6 +43,7 @@ namespace Titanis.Cli
 
 
 		public ITerminal Terminal { get; }
+		private readonly TerminalTarget _textTarget;
 
 		public override ILog Log { get; }
 
@@ -76,10 +78,21 @@ namespace Titanis.Cli
 		{
 			this.Terminal.WriteOutput(message);
 		}
-
+		public override void WriteOutput(FormattedText message)
+		{
+			message?.PrintTo(this._textTarget);
+		}
 		public override void WriteOutputLine(string? message)
 		{
 			this.Terminal.WriteOutputLine(message);
+		}
+		public override void WriteOutputLine(FormattedText? message)
+		{
+			if (message != null)
+			{
+				message.PrintTo(this._textTarget);
+				this.Terminal.WriteOutputLine(null);
+			}
 		}
 
 		public string Prompt(string prompt)

@@ -18,7 +18,7 @@ public class TestCommandContext : CommandContextBase, ICommandContext
 	{
 		this._testContext = testContext;
 		this._hostServices = hostServices;
-		this.Log = new TestLog(testContext);
+		this.AddLogListener(new TestLog(testContext));
 		hostServices.AddService(typeof(ILog), this.Log);
 	}
 
@@ -31,8 +31,6 @@ public class TestCommandContext : CommandContextBase, ICommandContext
 
 	public IServiceProvider HostServices => this._hostServices;
 
-
-	public override ILog Log { get; }
 
 	public bool OutputFlushed { get; private set; }
 	public override void FlushOutput()
@@ -80,10 +78,24 @@ public class TestCommandContext : CommandContextBase, ICommandContext
 		this._testContext.WriteLine(message);
 	}
 
-	public List<object> OutputRecords { get; } = new List<object>();
-	protected override void OnRecordWritten(object? record)
+	public override void WriteOutput(FormattedText message)
 	{
-		base.OnRecordWritten(record);
+		PlaintextTarget target = new PlaintextTarget();
+		message?.PrintTo(target);
+		this.WriteOutput(target.GetText());
+	}
+	public override void WriteOutputLine(FormattedText? message)
+	{
+		PlaintextTarget target = new PlaintextTarget();
+		message?.PrintTo(target);
+		this.WriteOutputLine(target.GetText());
+	}
+
+	public List<object> OutputRecords { get; } = new List<object>();
+	protected override void OnRecordWritten(object? record, RecordInfo? info)
+	{
+		base.OnRecordWritten(record, info);
+		if (record != null)
 		this.OutputRecords.Add(record);
 	}
 

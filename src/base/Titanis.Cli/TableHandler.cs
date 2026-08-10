@@ -38,12 +38,13 @@ namespace Titanis.Cli
 			return tbl;
 		}
 
-		internal void AddRow(object? record, string? prefix = null, string? subPrefix = null, bool repeatHeader = true)
+		internal void AddRow(object? record, RecordInfo? info, string? prefix = null, string? subPrefix = null, bool repeatHeader = true)
 		{
 			var tbl = this._tbl;
 			if (record is not null)
 			{
 				int maxArrayLength = 1;
+				bool recordHasAlert = info?.HasAlertOnField(null) ?? false;
 				for (int arrayIndex = 0; arrayIndex < maxArrayLength; arrayIndex++)
 				{
 					var tr = tbl.AddRow();
@@ -51,8 +52,9 @@ namespace Titanis.Cli
 					{
 						OutputField? field = fields![fieldIndex];
 						var value = field.GetValue(record);
-						string? formatted;
+						FormattedText? formatted;
 
+						bool fieldHasAlert = (recordHasAlert && (fieldIndex == 0)) || (info?.HasAlertOnField(field.Name) ?? false);
 						if ((value is IList arr))
 						{
 							maxArrayLength = Math.Max(maxArrayLength, arr.Count);
@@ -72,8 +74,12 @@ namespace Titanis.Cli
 						else
 							formatted = null;
 
+						bool cellHasAlert = fieldHasAlert || (info?.HasAlertOnField(field.Name, arrayIndex) ?? false);
+
+						if (cellHasAlert)
+							formatted = formatted?.Wrap(ConsoleColor.Magenta);
 						if (fieldIndex == 0)
-							formatted = ((arrayIndex == 0) ? prefix : subPrefix) + formatted;
+							formatted = formatted?.Prepend(FormattedTextFactory.Text((arrayIndex == 0) ? prefix : subPrefix));
 
 						tr.AddCell(formatted, field.Alignment);
 					}

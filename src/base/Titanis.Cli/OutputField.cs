@@ -6,6 +6,12 @@ using System.Reflection;
 
 namespace Titanis.Cli
 {
+	public struct OutputRecordContext
+	{
+		public object Record { get; set; }	
+		public object? FieldValue { get; set; }	
+		public OutputStyle OutputStyle { get; set; }	
+	}
 	/// <summary>
 	/// Describes an output field in a table or list.
 	/// </summary>
@@ -46,15 +52,19 @@ namespace Titanis.Cli
 		public string? EffectiveFormatString => this.FormatStringOverride ?? this.FormatString;
 
 		public abstract object? GetValue(object record);
-		public string? FormatValue(object? value, OutputStyle outputStyle)
+		public FormattedText? FormatValue(object? value, OutputStyle outputStyle)
 		{
 			var fmt = this.EffectiveFormatString;
-			return
+			var str =
 				(fmt is not null) ? (
 					(this.formatter is not null) ? this.formatter.FormatValue(value, fmt, this, outputStyle)
 					: (value is IFormattable f) ? (fmt.Contains("{0") ? string.Format(fmt, f) : f.ToString(fmt, null))
 					: value?.ToString()
 				) : value?.ToString();
+			if (str != null)
+				return new FormattedText(str);
+			else
+				return null;
 		}
 
 		class EnumValueProperty : PropertyDescriptor
