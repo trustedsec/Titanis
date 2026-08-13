@@ -236,6 +236,7 @@ namespace Titanis.Security
 				new SecBuffer(copy.Slice(this.buf1.Length + this.buf2.Length, this.buf3.Length), this.buf3.Options));
 
 		}
+#endif
 
 		public byte[] ToArray(MessageSecBufferOptions options)
 		{
@@ -244,7 +245,6 @@ namespace Titanis.Security
 			this.CopySectionTo(options, 0, copy);
 			return copy;
 		}
-#endif
 
 		private readonly unsafe SecBufferList* pExtension;
 		private readonly int _extensionIndex;

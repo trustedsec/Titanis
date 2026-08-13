@@ -77,7 +77,7 @@ namespace Titanis.Cli
 			if (!hasAuth)
 			{
 				if (this.AuthEpm.IsSet) context.LogError(nameof(AuthEpm), $"-{nameof(AuthEpm)} requires authentication, but no authentication information is provided.");
-				if (this.EncryptRpc.IsSet) context.LogError(nameof(EncryptRpc), $"-{nameof(EncryptEpm)} requires authentication, but no authentication information is provided.");
+				if (this.EncryptEpm.IsSet) context.LogError(nameof(EncryptEpm), $"-{nameof(EncryptEpm)} requires authentication, but no authentication information is provided.");
 				if (this.EncryptRpc.IsSet) context.LogError(nameof(EncryptRpc), $"-{nameof(EncryptRpc)} requires authentication, but no authentication information is provided.");
 			}
 
@@ -159,7 +159,7 @@ namespace Titanis.Cli
 
 				if (remoteEP != null)
 				{
-					SecurityCapabilities rpcRequiredCaps = SecurityCapabilities.DceStyle;
+					SecurityCapabilities rpcRequiredCaps = SecurityCapabilities.DceStyle | SecurityCapabilities.MutualAuthentication | SecurityCapabilities.SequenceDetection | SecurityCapabilities.ReplayDetection;
 					if (svcClient.RequiresEncryptionOverTcp || this.EncryptRpc.IsSet)
 						rpcRequiredCaps |= SecurityCapabilities.Confidentiality;
 

@@ -23,6 +23,7 @@ using Titanis.Security;
 using Titanis.Security.Kerberos;
 using Titanis.Security.Ntlm;
 using Titanis.Security.Spnego;
+using Titanis.Security.Sspi;
 using Titanis.Winterop;
 
 namespace Titanis.Cli
@@ -188,6 +189,14 @@ namespace Titanis.Cli
 		public EndPoint AuthProxy { get; set; }
 		#endregion
 
+		#region SSPI
+		[Parameter]
+		[Description("Uses SSPI authentication (Windows only)")]
+		[Category(ParameterCategories.Authentication)]
+		[Advanced]
+		public SwitchParam Sspi { get; set; }
+		#endregion
+
 		/// <summary>
 		/// Gets a value indicating whether the user provided Kerberos parameters.
 		/// </summary>
@@ -197,10 +206,11 @@ namespace Titanis.Cli
 		/// </summary>
 		public bool HasNtlmInfo { get; private set; }
 		public bool HasAuthProxy => this.AuthProxy != null;
+		public bool HasSspi => this.Sspi.IsSet;
 		/// <summary>
 		/// Gets a value indicating whether the user provided authentication parameters.
 		/// </summary>
-		public bool HasAuthInfo => this.HasKerberosInfo | this.HasNtlmInfo | this.HasAuthProxy;
+		public bool HasAuthInfo => this.HasKerberosInfo | this.HasNtlmInfo | this.HasAuthProxy | this.HasSspi;
 
 		private bool _validated;
 		private List<KeytabEntry>? _clientKeytabEntries;
@@ -309,7 +319,7 @@ namespace Titanis.Cli
 			}
 			this.HasNtlmInfo = hasNtlm;
 
-			if (isRequired && !hasKerbCred && !hasNtlm && this.AuthProxy == null)
+			if (isRequired && !hasKerbCred && !hasNtlm && this.AuthProxy == null && !this.Sspi.IsSet)
 			{
 				context.LogError(nameof(Anonymous), "No authentication specified.  Either provide a user name with -UserName, or specify -Anonymous to authenticate as anonymous.");
 			}
@@ -508,7 +518,14 @@ namespace Titanis.Cli
 				apreqSpn = spn;
 			}
 
-			if (this.AuthProxy != null)
+			if (this.HasSspi)
+			{
+				var sspi = SspiClientContext.ForNegotiate(null);
+				sspi.RequiredCapabilities = requiredCaps;
+				sspi.TargetSpn = spn;
+				return sspi;
+			}
+			else if (this.AuthProxy != null)
 			{
 				var cancellationToken = CancellationToken.None;
 

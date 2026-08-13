@@ -24,10 +24,10 @@ namespace Titanis.Security
 		/// Provides a unique identifier to correlate this authentication context with a higher-level operation.
 		/// </summary>
 		public Guid CorrelationId { get; set; } = Guid.NewGuid();
-        /// <summary>
-        /// Gets a value indicating whether authentication is complete.
-        /// </summary>
-        public abstract bool IsComplete { get; }
+		/// <summary>
+		/// Gets a value indicating whether authentication is complete.
+		/// </summary>
+		public abstract bool IsComplete { get; }
 		/// <summary>
 		/// Gets the token to send to the remote party.
 		/// </summary>

@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Titanis.Crypto;
+using Titanis.IO;
 
 namespace Titanis.Security
 {
@@ -65,20 +66,22 @@ namespace Titanis.Security
 
 		}
 
+		const string ChannelBindingPrefix = "tls-server-end-point:";
+		public override int RequiredLength => (5 * 4) + ChannelBindingPrefix.Length + (this._hashAlg.HashSize / 8);
+
 		/// <inheritdoc/>
-		public override byte[] GetBytes()
+		public override int GetBytes(Span<byte> buffer)
 		{
+			int cbReq = this.RequiredLength;
+
 			X509Certificate2 remoteCert = this.ServerCertificate;
 			HashAlgorithm? hashAlg = this._hashAlg;
-			const string ChannelBindingPrefix = "tls-server-end-point:";
-			var gssBytes = new byte[(5 * 4) + ChannelBindingPrefix.Length + (hashAlg.HashSize / 8)];
-			BinaryPrimitives.WriteInt32LittleEndian(gssBytes.Slice(4 * 4, 4), (ChannelBindingPrefix.Length + (hashAlg.HashSize / 8)));
+			BinaryPrimitives.WriteInt32LittleEndian(buffer.Slice(4 * 4, 4), (ChannelBindingPrefix.Length + (hashAlg.HashSize / 8)));
 			var hash = hashAlg.ComputeHash(remoteCert.RawData);
-			Encoding.UTF8.GetBytes(ChannelBindingPrefix, 0, ChannelBindingPrefix.Length, gssBytes, 5 * 4);
-			hash.CopyTo(gssBytes.Slice((5 * 4) + ChannelBindingPrefix.Length));
+			Encoding.UTF8.GetBytes(ChannelBindingPrefix.AsSpan(), buffer.Slice(5 * 4));
+			hash.CopyTo(buffer.Slice((5 * 4) + ChannelBindingPrefix.Length));
 
-			return gssBytes;
-
+			return cbReq;
 		}
 	}
 }
