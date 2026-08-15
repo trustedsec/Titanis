@@ -5,24 +5,22 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Titanis.Cli;
+using Titanis.Ldap;
 using Titanis.Msrpc.Msdrsr;
 
 namespace Titanis.Cli.Dsrep;
 
-/// <task category="RPC;Enumeration">Get info on domain controllers</task>
 [Command]
-[Description("Gets information on domain controllers")]
-[OutputRecordType(typeof(DomainControllerInfo))]
-public class DcinfoCommand : DsbindCommand
+[Description("Gets pending replication operations")]
+[OutputRecordType(typeof(DsrepPendingOp))]
+public class QueueCommand : DsbindCommand
 {
 	protected override DsbindScenario Scenario => DsbindScenario.Repnc;
 
 	protected override async Task<int> RunAsync(DirectoryReplicationClient client, DsBinding dsbind, CancellationToken cancellationToken)
 	{
-		var dcinfos = await dsbind.GetDcInfo(this.RpcParameters.Authentication.UserDomain, cancellationToken);
-		this.WriteRecords(dcinfos);
-
+		var info = await dsbind.GetPendingOps(cancellationToken);
+		this.WriteRecords(info);
 		return 0;
 	}
 }

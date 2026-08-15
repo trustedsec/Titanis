@@ -17,6 +17,11 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Msdrsr
 {
+	public enum DsbindScenario
+	{
+		Unspecified,
+		Repnc
+	}
 	public class DirectoryReplicationClient : RpcServiceClient<ms_drsr.drsuapiClientProxy>
 	{
 		public DirectoryReplicationClient()
@@ -39,6 +44,8 @@ namespace Titanis.Msrpc.Msdrsr
 
 		// [MS-DRSR] 5.138 NTSAPI_CLIENT_GUID [sic]
 		public static readonly Guid NtdsapiClientGuid = new Guid("e24d201a-4fd6-11d1-a3da-0000f875ae0d");
+
+
 
 		internal Task Unbind(RpcContextHandle hbind, CancellationToken cancellationToken)
 		{
@@ -78,9 +85,9 @@ namespace Titanis.Msrpc.Msdrsr
 			;
 
 
-		public Task<DsBinding> Dsbind(CancellationToken cancellationToken)
-			=> Dsbind(NtdsapiClientGuid, Guid.Empty, 1116, cancellationToken, Windows2025BindFlags);
-		public async Task<DsBinding> Dsbind(Guid clientGuid, Guid siteGuid, int pid, CancellationToken cancellationToken, DrsBindFlags flags = Windows2025BindFlags)
+		public Task<DsBinding> Dsbind(DsbindScenario scenario, CancellationToken cancellationToken)
+			=> Dsbind(scenario, NtdsapiClientGuid, Guid.Empty, 1116, cancellationToken, Windows2025BindFlags);
+		public async Task<DsBinding> Dsbind(DsbindScenario scenario, Guid clientGuid, Guid siteGuid, int pid, CancellationToken cancellationToken, DrsBindFlags flags = Windows2025BindFlags)
 		{
 			DceRpc.RpcPointer<DceRpc.RpcContextHandle> phDrs = new();
 
@@ -90,14 +97,14 @@ namespace Titanis.Msrpc.Msdrsr
 			{
 				ext1 = new DRS_EXTENSIONS_INT
 				{
-					BindFlags = flags,
+					BindFlags = (scenario == DsbindScenario.Repnc) ? flags : 0,
 					SiteObjGuid = siteGuid,
 					Pid = pid,
 					ReplEpoch = 0,
-					MoreFlags = (DrsBindMoreFlags)0x0000080e,
+					MoreFlags = (scenario == DsbindScenario.Repnc) ? (DrsBindMoreFlags)0x0000080e : 0,
 					ConfigObjGuid = default,
 				},
-				ExtCaps = 0x00001fff
+				ExtCaps = (scenario == DsbindScenario.Repnc) ? 0x00001fff : 0
 			});
 
 			DceRpc.RpcPointer<ms_drsr.DRS_EXTENSIONS> pextClient = new(new ms_drsr.DRS_EXTENSIONS

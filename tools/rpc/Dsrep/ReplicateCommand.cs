@@ -57,6 +57,8 @@ public abstract class ReplicateCommand : DsbindCommand, IDrsChangeCallback, IHav
 
 	protected virtual int GetDegreeOfParallelism() => 1;
 
+	protected override DsbindScenario Scenario => DsbindScenario.Repnc;
+
 	private string[] GetLdapAttributes(string[] fieldNames)
 	{
 		List<string> attrOids = new(fieldNames.Length);

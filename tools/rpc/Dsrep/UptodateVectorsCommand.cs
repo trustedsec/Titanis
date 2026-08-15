@@ -1,28 +1,30 @@
-﻿using ms_drsr;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Titanis.Cli;
+using Titanis.Ldap;
 using Titanis.Msrpc.Msdrsr;
 
 namespace Titanis.Cli.Dsrep;
 
-/// <task category="RPC;Enumeration">Get info on domain controllers</task>
 [Command]
-[Description("Gets information on domain controllers")]
-[OutputRecordType(typeof(DomainControllerInfo))]
-public class DcinfoCommand : DsbindCommand
+[Description("Gets up-to-date vector info")]
+[OutputRecordType(typeof(DsrepVector))]
+public class UptodateVectorsCommand : DsbindCommand
 {
 	protected override DsbindScenario Scenario => DsbindScenario.Repnc;
 
+	[Parameter(After = nameof(ServerName))]
+	[Mandatory]
+	[Description("Domain DN")]
+	public LdapDistinguishedName Domain { get; set; }
+
 	protected override async Task<int> RunAsync(DirectoryReplicationClient client, DsBinding dsbind, CancellationToken cancellationToken)
 	{
-		var dcinfos = await dsbind.GetDcInfo(this.RpcParameters.Authentication.UserDomain, cancellationToken);
-		this.WriteRecords(dcinfos);
-
+		var infos = await dsbind.GetUptodateVectors(this.Domain, cancellationToken);
+		this.WriteRecords(infos);
 		return 0;
 	}
 }

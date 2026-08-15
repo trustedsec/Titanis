@@ -16,13 +16,15 @@ public abstract class DsbindCommand : RpcCommand<DirectoryReplicationClient>
 	[DefaultValue(true)]
 	public SwitchParam Accept2003Deflate { get; set; }
 
+	protected abstract DsbindScenario Scenario { get; }
+
 	protected sealed override async Task<int> RunAsync(DirectoryReplicationClient client, CancellationToken cancellationToken)
 	{
 		var pid = Random.Shared.Next(100, 500) * 4;
 		var flags = DirectoryReplicationClient.Windows2025BindFlags;
 		if (!this.Accept2003Deflate.IsSet)
 			flags &= ~DrsBindFlags.W2K3Deflate;
-		await using (var bind = await client.Dsbind(DirectoryReplicationClient.NtdsapiClientGuid, Guid.Empty, pid, cancellationToken, flags))
+		await using (var bind = await client.Dsbind(this.Scenario, DirectoryReplicationClient.NtdsapiClientGuid, Guid.Empty, pid, cancellationToken, flags))
 		{
 			return await this.RunAsync(client, bind, cancellationToken);
 		}

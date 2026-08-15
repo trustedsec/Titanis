@@ -1,19 +1,10 @@
 ﻿using ms_drsr;
-using System;
 using System.Buffers.Binary;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.IO.Compression;
-using System.Linq;
-using System.Runtime.InteropServices.Marshalling;
-using System.Text;
-using System.Threading.Tasks;
 using Titanis.Asn1;
 using Titanis.Asn1.Serialization;
 using Titanis.Compression;
 using Titanis.DceRpc;
-using Titanis.IO;
 using Titanis.Ldap;
 using Titanis.Winterop;
 
@@ -25,7 +16,7 @@ namespace Titanis.Msrpc.Msdrsr
 		Task OnError(DsName objectName, Exception exception);
 	}
 
-	public class DsBinding : IDisposable, IAsyncDisposable
+	public partial class DsBinding : IDisposable, IAsyncDisposable
 	{
 		internal DsBinding(RpcContextHandle hbind, DirectoryReplicationClient owner, DRS_EXTENSIONS_INT2 serverExt)
 		{
@@ -113,6 +104,496 @@ namespace Titanis.Msrpc.Msdrsr
 				));
 			return dcInfos;
 		}
+
+
+		#region Topology
+
+		public Task<string[]> GetSites(DsCrackNameResultFormat format, CancellationToken cancellationToken) =>
+			this.CrackName(DsCrackNameFormat.ListSites, format, cancellationToken);
+		public Task<string[]> GetRoles(DsCrackNameResultFormat format, CancellationToken cancellationToken)
+			=> this.CrackName(DsCrackNameFormat.ListRoles, format, cancellationToken);
+		public Task<string[]> GetDomainsInSite(string site, DsCrackNameResultFormat format, CancellationToken cancellationToken) =>
+			this.CrackName(site, DsCrackNameFormat.ListDomainsInSite, format, cancellationToken);
+		public Task<string[]> GetDomains(DsCrackNameResultFormat format, CancellationToken cancellationToken) =>
+			this.CrackName(DsCrackNameFormat.ListDomains, format, cancellationToken);
+		public Task<string[]> GetPartitions(DsCrackNameResultFormat format, CancellationToken cancellationToken) =>
+			this.CrackName(DsCrackNameFormat.ListPartitions, format, cancellationToken);
+		public Task<string[]> GetGlobalCatalogServers(DsCrackNameResultFormat format, CancellationToken cancellationToken) =>
+			this.CrackName(DsCrackNameFormat.ListGlobalCatalogServers, format, cancellationToken);
+
+		private Task<string[]> CrackName(DsCrackNameFormat offeredFormat, DsCrackNameResultFormat desiredFormat, CancellationToken cancellationToken) => this.CrackNames(["."], offeredFormat, desiredFormat, cancellationToken);
+		public Task<string[]> CrackName(string name, DsCrackNameFormat offeredFormat, DsCrackNameResultFormat desiredFormat, CancellationToken cancellationToken) =>
+			this.CrackNames([name], offeredFormat, desiredFormat, cancellationToken);
+
+		public async Task<string[]> CrackNames(string[] names, DsCrackNameFormat offeredFormat, DsCrackNameResultFormat desiredFormat, CancellationToken cancellationToken)
+		{
+			if (names.IsNullOrEmpty())
+				throw new ArgumentNullException(nameof(names));
+
+			const int CrackRequestVersion = 1;
+			const int CrackResponseVersion = 1;
+			RpcPointer<uint> pdwOutVersion = new();
+			RpcPointer<DRS_MSG_CRACKREPLY> pmsgOut = new();
+			var res = (Win32ErrorCode)await owner.proxy.IDL_DRSCrackNames(
+				hbind,
+				CrackRequestVersion,
+				new DRS_MSG_CRACKREQ()
+				{
+					unionSwitch = CrackRequestVersion,
+					V1 = new DRS_MSG_CRACKREQ_V1
+					{
+						CodePage = 1252,
+						LocaleId = 1033,
+						dwFlags = 0,
+						formatOffered = (uint)offeredFormat,
+						formatDesired = (uint)desiredFormat,
+						cNames = (uint)names.Length,
+						rpNames = new RpcPointer<RpcPointer<string>[]>(Array.ConvertAll(names, r => new RpcPointer<string>(r)))
+					}
+				},
+				pdwOutVersion,
+				pmsgOut,
+				cancellationToken
+				).ConfigureAwait(false);
+			res.CheckAndThrow();
+
+			if (pmsgOut.value.unionSwitch != CrackResponseVersion)
+			{
+				var results = pmsgOut.value.V1.pResult.value.rItems.value?.Select(r => r.pName.value)?.ToArray() ?? [];
+				return results;
+			}
+			else
+			{
+				throw new NotSupportedException($"The server replied with an unsupported version number: {pmsgOut.value.unionSwitch}");
+			}
+		}
+		#endregion
+
+		public async Task AddSidHistory(
+			DsrepAddSidHistoryOptions options,
+			string sourceDomain,
+			string sourcePrincipal,
+			string? sourceDc,
+			string? sourceCredsUser,
+			string? sourceCredsDomain,
+			string? sourceCredsPassword,
+			string destDomain,
+			string destPrincipal,
+			CancellationToken cancellationToken
+			)
+		{
+			RpcPointer<uint> pdwOutVersion = new();
+			RpcPointer<DRS_MSG_ADDSIDREPLY> pmsgOut = new();
+			var res = (Win32ErrorCode)await owner.proxy.IDL_DRSAddSidHistory(
+				hbind,
+				1,
+				new DRS_MSG_ADDSIDREQ
+				{
+					unionSwitch = 1,
+					V1 = new DRS_MSG_ADDSIDREQ_V1
+					{
+						Flags = (uint)options,
+						SrcDomain = new RpcPointer<string>(sourceDomain),
+						SrcPrincipal = new RpcPointer<string>(sourcePrincipal),
+						SrcDomainController = sourceDc.ToRpcPointerOrNull(),
+						SrcCredsUserLength = (uint)(sourceCredsUser?.Length ?? 0),
+						SrcCredsUser = (sourceCredsUser != null) ? new RpcPointer<char[]>(sourceCredsUser.ToCharArray()) : null,
+						SrcCredsDomainLength = (uint)(sourceCredsDomain?.Length ?? 0),
+						SrcCredsDomain = (sourceCredsDomain != null) ? new RpcPointer<char[]>(sourceCredsDomain.ToCharArray()) : null,
+						SrcCredsPasswordLength = (uint)(sourceCredsPassword?.Length ?? 0),
+						SrcCredsPassword = (sourceCredsPassword != null) ? new RpcPointer<char[]>(sourceCredsPassword.ToCharArray()) : null,
+						DstDomain = destDomain.ToRpcPointerOrNull(),
+						DstPrincipal = destPrincipal.ToRpcPointerOrNull()
+					}
+				},
+				pdwOutVersion,
+				pmsgOut,
+				cancellationToken
+				).ConfigureAwait(false);
+			res.CheckAndThrow();
+
+			if (pmsgOut.value.unionSwitch == 1)
+			{
+				((Win32ErrorCode)pmsgOut.value.V1.dwWin32Error).CheckAndThrow();
+			}
+		}
+
+		#region Replication
+		// [MS-DRSR] § 4.1.13.1.5 DRS_MSG_GETREPLINFO_REPLY
+		enum ReplInfoReplySwitch : uint
+		{
+			Neighbors = 0,
+			Cursors = 1,
+			ObjectMetadata = 2,
+			KccDsaConnectFailures = 3,
+			KccDsaLinkFailures = 4,
+			PendingOps = 5,
+			AttributeValueMetadata = 6,
+			Cursors2 = 7,
+			Cursors3 = 8,
+			ObjectMetadata2 = 9,
+			AttributeValueMetadata2 = 10,
+			ServerOutgoingCalls = 0xFFFFFFFA,
+			UpToDateVectorV1 = 0xFFFFFFFB,
+			ClientContexts = 0xFFFFFFFC,
+			RepsTo = 0xFFFFFFFE
+		}
+
+		public async Task<DsrepVector[]> GetUptodateVectors(LdapDistinguishedName? objectDn, CancellationToken cancellationToken)
+		{
+			var reply = await GetReplicationInfo(ReplicationInfoKind.UpToDateVectorV1, objectDn, cancellationToken).ConfigureAwait(false);
+
+			if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.UpToDateVectorV1)
+			{
+				return Array.ConvertAll(reply.value.pUpToDateVec.value.rgCursors, ToVector);
+			}
+			else
+			{
+				throw new NotSupportedException($"The server returned an unsupported reply: {(ReplInfoReplySwitch)reply.value.unionSwitch}");
+			}
+		}
+
+		private DsrepVector ToVector(UPTODATE_CURSOR_V1 r)
+		{
+			return new DsrepVector(
+				r.uuidDsa,
+				r.usnHighPropUpdate
+				);
+		}
+
+		public async Task<DsrepNeighbor[]> GetRepsFromNeighbors(LdapDistinguishedName? objectDn, CancellationToken cancellationToken)
+		{
+			var reply = await GetReplicationInfo(ReplicationInfoKind.Neighbors, objectDn, cancellationToken).ConfigureAwait(false);
+
+			if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.Neighbors)
+			{
+				return Array.ConvertAll(reply.value.pNeighbors.value.rgNeighbor, ToNeighbor);
+			}
+			else
+			{
+				throw new NotSupportedException($"The server returned an unsupported reply: {(ReplInfoReplySwitch)reply.value.unionSwitch}");
+			}
+		}
+
+		public async Task<DsrepNeighbor[]> GetRepsToNeighbors(LdapDistinguishedName? objectDN, CancellationToken cancellationToken)
+		{
+			var reply = await GetReplicationInfo(ReplicationInfoKind.RepsTo, objectDN, cancellationToken).ConfigureAwait(false);
+
+			if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.RepsTo)
+			{
+				return Array.ConvertAll(reply.value.pRepsTo.value.rgNeighbor, ToNeighbor);
+			}
+			else
+			{
+				throw new NotSupportedException($"The server returned an unsupported reply: {(ReplInfoReplySwitch)reply.value.unionSwitch}");
+			}
+		}
+
+		private static DsrepNeighbor ToNeighbor(DS_REPL_NEIGHBORW r)
+		{
+			return new DsrepNeighbor(
+				LdapDistinguishedName.Parse(r.pszNamingContext.value),
+				LdapDistinguishedName.Parse(r.pszSourceDsaDN.value),
+				(r.pszSourceDsaAddress.value != null) ? LdapDistinguishedName.Parse(r.pszSourceDsaAddress.value) : null,
+				LdapDistinguishedName.Parse(r.pszAsyncIntersiteTransportDN?.value),
+				(DrsOptions)r.dwReplicaFlags,
+				r.uuidNamingContextObjGuid,
+				r.uuidSourceDsaObjGuid,
+				r.uuidSourceDsaInvocationID,
+				r.uuidAsyncIntersiteTransportObjGuid,
+				r.usnLastObjChangeSynced,
+				r.usnAttributeFilter,
+				r.ftimeLastSyncSuccess.ToDateTime(),
+				r.ftimeLastSyncAttempt.ToDateTime(),
+				(Win32ErrorCode)r.dwLastSyncResult
+				);
+		}
+
+
+		public async Task<DsrepCursor[]> GetReplicationCursors(LdapDistinguishedName objectDN, DsrepCursorLevel level, CancellationToken cancellationToken)
+		{
+			switch (level)
+			{
+				case DsrepCursorLevel.Cursor:
+				case DsrepCursorLevel.Cursor2:
+				case DsrepCursorLevel.Cursor3:
+					{
+						var reply = await GetReplicationInfo((ReplicationInfoKind)level, objectDN, cancellationToken).ConfigureAwait(false);
+
+						if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.Cursors)
+						{
+							return Array.ConvertAll(reply.value.pCursors.value.rgCursor, ToCursor);
+						}
+						else if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.Cursors2)
+						{
+							return Array.ConvertAll(reply.value.pCursors2.value.rgCursor, ToCursor);
+						}
+						else if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.Cursors3)
+						{
+							return Array.ConvertAll(reply.value.pCursors3.value.rgCursor, ToCursor);
+						}
+						else
+						{
+							throw new NotSupportedException($"The server returned an unsupported reply: {(ReplInfoReplySwitch)reply.value.unionSwitch}");
+						}
+
+					}
+				default:
+					throw new ArgumentException($"Invalid cursor level: {level}.", nameof(level));
+			}
+		}
+
+		private DsrepCursor ToCursor(DS_REPL_CURSOR input)
+		{
+			return new DsrepCursor(
+				input.uuidSourceDsaInvocationID,
+				input.usnAttributeFilter
+				);
+		}
+
+		private DsrepCursor ToCursor(DS_REPL_CURSOR_2 input)
+		{
+			return new DsrepCursor(
+				input.uuidSourceDsaInvocationID,
+				input.usnAttributeFilter,
+				input.ftimeLastSyncSuccess.ToDateTime()
+				);
+		}
+
+		private DsrepCursor ToCursor(DS_REPL_CURSOR_3W input)
+		{
+			return new DsrepCursor(
+				input.uuidSourceDsaInvocationID,
+				input.usnAttributeFilter,
+				input.ftimeLastSyncSuccess.ToDateTime(),
+				(input.pszSourceDsaDN != null) ? LdapDistinguishedName.Parse(input.pszSourceDsaDN.value) : null
+				);
+		}
+
+
+
+
+		public async Task<DsrepObjectMetadata[]> GetObjectMetadata(LdapDistinguishedName objectDN, DsrepObjectMetadataLevel level, CancellationToken cancellationToken)
+		{
+			switch (level)
+			{
+				case DsrepObjectMetadataLevel.Metadata:
+				case DsrepObjectMetadataLevel.Metadata2:
+					{
+						var reply = await GetReplicationInfo((ReplicationInfoKind)level, objectDN, cancellationToken).ConfigureAwait(false);
+
+						if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.ObjectMetadata)
+						{
+							return Array.ConvertAll(reply.value.pObjMetaData.value.rgMetaData, ToObjMetadata);
+						}
+						else if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.ObjectMetadata2)
+						{
+							return Array.ConvertAll(reply.value.pObjMetaData2.value.rgMetaData, ToObjMetadata);
+						}
+						else
+						{
+							throw new NotSupportedException($"The server returned an unsupported reply: {(ReplInfoReplySwitch)reply.value.unionSwitch}");
+						}
+
+					}
+				default:
+					throw new ArgumentException($"Invalid cursor level: {level}.", nameof(level));
+			}
+		}
+
+		private DsrepObjectMetadata ToObjMetadata(DS_REPL_ATTR_META_DATA r)
+		{
+			return new DsrepObjectMetadata(
+				r.pszAttributeName.value,
+				(int)r.dwVersion,
+				r.ftimeLastOriginatingChange.ToDateTime(),
+				r.uuidLastOriginatingDsaInvocationID,
+				r.usnOriginatingChange,
+				r.usnLocalChange
+				);
+		}
+
+		private DsrepObjectMetadata ToObjMetadata(DS_REPL_ATTR_META_DATA_2 r)
+		{
+			return new DsrepObjectMetadata(
+				r.pszAttributeName.value,
+				(int)r.dwVersion,
+				r.ftimeLastOriginatingChange.ToDateTime(),
+				r.uuidLastOriginatingDsaInvocationID,
+				r.usnOriginatingChange,
+				r.usnLocalChange,
+				(r.pszLastOriginatingDsaDN != null) ? LdapDistinguishedName.Parse(r.pszLastOriginatingDsaDN.value) : null
+				);
+		}
+
+
+
+
+		public async Task<DsrepAttributeMetadataResult?> GetAttributeMetadata(LdapDistinguishedName objectDN, string? attributeName, string? value, CancellationToken cancellationToken)
+		{
+			// TODO: Add levels
+
+			var reply = await GetReplicationInfo(ReplicationInfoKind.Metadata2ForAttributeValue, objectDN, attributeName, value, cancellationToken).ConfigureAwait(false);
+
+			if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.AttributeValueMetadata)
+			{
+				if (reply.value.pAttrValueMetaData != null)
+				{
+					return new DsrepAttributeMetadataResult(reply.value.pAttrValueMetaData.value.dwEnumerationContext, Array.ConvertAll(reply.value.pAttrValueMetaData.value.rgMetaData, ToValueMetaedata));
+				}
+				return null;
+			}
+			else if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.AttributeValueMetadata2)
+			{
+				if (reply.value.pAttrValueMetaData2 != null)
+				{
+					return new DsrepAttributeMetadataResult(reply.value.pAttrValueMetaData2.value.dwEnumerationContext, Array.ConvertAll(reply.value.pAttrValueMetaData2.value.rgMetaData, ToValueMetaedata));
+				}
+				return null;
+			}
+			else
+			{
+				throw new NotSupportedException($"The server returned an unsupported reply: {(ReplInfoReplySwitch)reply.value.unionSwitch}");
+			}
+		}
+
+		private DsrepAttributeValueMetadata ToValueMetaedata(DS_REPL_VALUE_META_DATA r)
+		{
+			return new DsrepAttributeValueMetadata(
+				r.pszAttributeName.value,
+				LdapDistinguishedName.Parse(r.pszObjectDn.value),
+				r.pbData?.value,
+				r.ftimeDeleted.ToDateTimeOrNull(),
+				r.ftimeCreated.ToDateTime(),
+				(int)r.dwVersion,
+				r.ftimeLastOriginatingChange.ToDateTime(),
+				r.uuidLastOriginatingDsaInvocationID,
+				r.usnOriginatingChange,
+				r.usnLocalChange
+				);
+		}
+
+		private DsrepAttributeValueMetadata ToValueMetaedata(DS_REPL_VALUE_META_DATA_2 r)
+		{
+			return new DsrepAttributeValueMetadata(
+				r.pszAttributeName.value,
+				LdapDistinguishedName.Parse(r.pszObjectDn.value),
+				r.pbData?.value,
+				r.ftimeDeleted.ToDateTimeOrNull(),
+				r.ftimeCreated.ToDateTime(),
+				(int)r.dwVersion,
+				r.ftimeLastOriginatingChange.ToDateTime(),
+				r.uuidLastOriginatingDsaInvocationID,
+				r.usnOriginatingChange,
+				r.usnLocalChange,
+				LdapDistinguishedName.Parse(r.pszLastOriginatingDsaDN.value)
+				);
+		}
+
+
+
+		public async Task<DsrepPendingOp[]> GetPendingOps(CancellationToken cancellationToken)
+		{
+			var reply = await GetReplicationInfo(ReplicationInfoKind.PendingOps, null, cancellationToken).ConfigureAwait(false);
+
+			if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.PendingOps)
+			{
+				return Array.ConvertAll(reply.value.pPendingOps.value.rgPendingOp, ToPendingOp);
+			}
+			else
+			{
+				throw new NotSupportedException($"The server returned an unsupported reply: {(ReplInfoReplySwitch)reply.value.unionSwitch}");
+			}
+		}
+
+		private DsrepPendingOp ToPendingOp(DS_REPL_OPW r)
+		{
+			return new DsrepPendingOp(
+				r.ftimeEnqueued.ToDateTime(),
+				r.ulSerialNumber,
+				r.ulPriority,
+				r.OpType,
+				r.ulOptions,
+				LdapDistinguishedName.Parse(r.pszNamingContext.value),
+				LdapDistinguishedName.Parse(r.pszDsaDN.value),
+				r.pszDsaAddress.value,
+				r.uuidNamingContextObjGuid,
+				r.uuidDsaObjGuid
+				);
+		}
+
+
+
+		public async Task<DsrepKccFailure[]> GetKccFailures(LdapDistinguishedName? objectDn, DsrepKccFailureKind kind, CancellationToken cancellationToken)
+		{
+			switch (kind)
+			{
+				case DsrepKccFailureKind.Connect:
+				case DsrepKccFailureKind.Link:
+					{
+						var reply = await GetReplicationInfo((ReplicationInfoKind)kind, objectDn, cancellationToken).ConfigureAwait(false);
+
+						if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.KccDsaConnectFailures)
+						{
+							return Array.ConvertAll(reply.value.pConnectFailures.value.rgDsaFailure, ToKccFailure);
+						}
+						else if ((ReplInfoReplySwitch)reply.value.unionSwitch == ReplInfoReplySwitch.KccDsaLinkFailures)
+						{
+							return Array.ConvertAll(reply.value.pLinkFailures.value.rgDsaFailure, ToKccFailure);
+						}
+						else
+						{
+							throw new NotSupportedException($"The server returned an unsupported reply: {(ReplInfoReplySwitch)reply.value.unionSwitch}");
+						}
+					}
+				default:
+					throw new ArgumentException($"Invalid KCC failure kind: {kind}.", nameof(kind));
+			}
+		}
+
+		private DsrepKccFailure ToKccFailure(DS_REPL_KCC_DSA_FAILUREW r)
+		{
+			return new DsrepKccFailure(
+				LdapDistinguishedName.Parse(r.pszDsaDN.value),
+				r.uuidDsaObjGuid,
+				r.ftimeFirstFailure.ToDateTime(),
+				r.cNumFailures,
+				(Win32ErrorCode)r.dwLastResult
+				);
+		}
+
+
+
+		private Task<RpcPointer<DRS_MSG_GETREPLINFO_REPLY>> GetReplicationInfo(ReplicationInfoKind kind, LdapDistinguishedName? objectDn, CancellationToken cancellationToken) => GetReplicationInfo(kind, objectDn, null, null, cancellationToken);
+		private async Task<RpcPointer<DRS_MSG_GETREPLINFO_REPLY>> GetReplicationInfo(ReplicationInfoKind kind, LdapDistinguishedName? objectDn, string? attribute, string? value, CancellationToken cancellationToken)
+		{
+			RpcPointer<uint> pdwOutVersion = new();
+			RpcPointer<DRS_MSG_GETREPLINFO_REPLY> pmsgOut = new();
+			var res = (Win32ErrorCode)await owner.proxy.IDL_DRSGetReplInfo(
+				hbind,
+				2,
+				new DRS_MSG_GETREPLINFO_REQ
+				{
+					unionSwitch = 2,
+					V2 = new DRS_MSG_GETREPLINFO_REQ_V2
+					{
+						InfoType = (uint)kind,
+						pszObjectDN = (objectDn == null) ? null : new RpcPointer<string>(objectDn.ToString()),
+						uuidSourceDsaObjGuid = default,
+						ulFlags = 0,
+						pszAttributeName = string.IsNullOrEmpty(attribute) ? null : new RpcPointer<string>(attribute),
+						pszValueDN = value.ToRpcPointerOrNull(),
+						dwEnumerationContext = 0,
+					}
+				},
+				pdwOutVersion,
+				pmsgOut,
+				cancellationToken).ConfigureAwait(false);
+			res.CheckAndThrow();
+
+			return pmsgOut;
+		}
+		#endregion
 
 		// [MS-DRSR] § 5.16.4 ATTRTYP-to-OID Conversion
 		private static readonly Dictionary<string, int> defaultPrefixLookup = new Dictionary<string, int>()

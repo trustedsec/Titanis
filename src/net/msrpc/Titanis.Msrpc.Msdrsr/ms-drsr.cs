@@ -7587,6 +7587,8 @@ namespace ms_drsr
 		public DRS_MSG_CRACKREQ_V1 V1;
 		public void Encode(IRpcEncoder encoder)
 		{
+			encoder.WriteValue(this.unionSwitch);
+
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -7670,6 +7672,7 @@ namespace ms_drsr
 		public DRS_MSG_CRACKREPLY_V1 V1;
 		public void Encode(IRpcEncoder encoder)
 		{
+			encoder.WriteValue(this.unionSwitch);
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -7680,6 +7683,7 @@ namespace ms_drsr
 
 		public void Decode(IRpcDecoder decoder)
 		{
+			this.unionSwitch = decoder.ReadUInt32();
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -10007,6 +10011,7 @@ namespace ms_drsr
 		public DRS_MSG_GETREPLINFO_REQ_V2 V2;
 		public void Encode(IRpcEncoder encoder)
 		{
+			encoder.WriteValue(this.unionSwitch);
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -10020,6 +10025,7 @@ namespace ms_drsr
 
 		public void Decode(IRpcDecoder decoder)
 		{
+			this.unionSwitch = decoder.ReadUInt32();
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -10079,6 +10085,7 @@ namespace ms_drsr
 		public RpcPointer<DS_REPL_NEIGHBORSW> pRepsTo;
 		public void Encode(IRpcEncoder encoder)
 		{
+			encoder.WriteValue(this.unionSwitch);
 			switch (this.unionSwitch)
 			{
 				case 0U:
@@ -10131,6 +10138,7 @@ namespace ms_drsr
 
 		public void Decode(IRpcDecoder decoder)
 		{
+			this.unionSwitch = decoder.ReadUInt32();
 			switch (this.unionSwitch)
 			{
 				case 0U:
@@ -10614,6 +10622,7 @@ namespace ms_drsr
 		public DRS_MSG_ADDSIDREQ_V1 V1;
 		public void Encode(IRpcEncoder encoder)
 		{
+			encoder.WriteValue(this.unionSwitch);
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -10624,6 +10633,7 @@ namespace ms_drsr
 
 		public void Decode(IRpcDecoder decoder)
 		{
+			this.unionSwitch = decoder.ReadUInt32();
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -10687,6 +10697,7 @@ namespace ms_drsr
 		public DRS_MSG_ADDSIDREPLY_V1 V1;
 		public void Encode(IRpcEncoder encoder)
 		{
+			encoder.WriteValue(this.unionSwitch);
 			switch (this.unionSwitch)
 			{
 				case 1U:
@@ -10697,6 +10708,7 @@ namespace ms_drsr
 
 		public void Decode(IRpcDecoder decoder)
 		{
+			this.unionSwitch = decoder.ReadUInt32();
 			switch (this.unionSwitch)
 			{
 				case 1U:

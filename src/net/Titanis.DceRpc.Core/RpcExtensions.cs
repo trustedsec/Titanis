@@ -8,11 +8,15 @@ using System.Threading.Tasks;
 
 namespace Titanis.DceRpc
 {
-	public static class RpcExtensions
+	public static partial class RpcExtensions
 	{
 		public static string AsUtf8String(this ArraySegment<byte> array)
 		{
 			return Encoding.UTF8.GetString(array.AsSpan());
+		}
+		public static RpcPointer<string>? ToRpcPointerOrNull(this string? str)
+		{
+			return str != null ? new RpcPointer<string>(str) : null;
 		}
 
 		public static RPC_UNICODE_STRING ToRpcUnicodeString(this string? str)
