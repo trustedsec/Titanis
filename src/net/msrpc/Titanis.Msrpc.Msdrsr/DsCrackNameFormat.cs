@@ -9,7 +9,7 @@
 		ListServersForDomainInSite = 0xFFFFFFFC,
 		ListInfoForServer = 0xFFFFFFFB,
 		ListRoles = 0xFFFFFFFA,
-		SamAccountName = 0xFFFFFFF9,
+		SamAccountNameSansDomain = 0xFFFFFFF9,
 		MapSchemaGuid = 0xFFFFFFF8,
 		ListDomains = 0xFFFFFFF7,
 		ListPartitions = 0xFFFFFFF6,
@@ -19,5 +19,17 @@
 		ListGlobalCatalogServers = 0xFFFFFFF1,
 		SamAccountNameEx = 0xFFFFFFF0,
 		UpnAndAltSecId = 0xFFFFFFEF,
+
+		Unknown = 0,
+		Fqdn1779 = 1,
+		SamAccountName = 2,
+		DisplayName = 3,
+		UniqueIdName = 6,
+		CanonicalName = 7,
+		UserPrincipalName = 8,
+		CanonicalNameEx = 9,
+		ServicePrincipalName = 10,
+		SidOrSidHistory = 11,
+		DnsDomainName = 12
 	}
 }

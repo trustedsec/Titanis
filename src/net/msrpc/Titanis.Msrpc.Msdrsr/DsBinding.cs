@@ -16,6 +16,42 @@ namespace Titanis.Msrpc.Msdrsr
 		Task OnError(DsName objectName, Exception exception);
 	}
 
+	// [MS-DRSR] § 4.1.4.1.8 DS_NAME_ERROR
+	public enum DsrepNameError : uint
+	{
+		Success = 0,
+		Resolving = 1,
+		NotFound = 2,
+		NotUnique = 3,
+		NoMapping = 4,
+		DomainOnly = 5,
+		TrustReferral = 7,
+		SidHistoryUnknown = 0xFFFFFFF2,
+		SidHistoryAlias = 0xFFFFFFF3,
+		SidHistoryGroup = 0xFFFFFFF4,
+		SidHistoryUser = 0xFFFFFFF5,
+		SidUnknown = 0xFFFFFFF6,
+		SidAlias = 0xFFFFFFF7,
+		SidGroup = 0xFFFFFFF8,
+		SidUser = 0xFFFFFFF9,
+		SchemaGuidControlRight = 0xFFFFFFFA,
+		SchemaGuidClass = 0xFFFFFFFB,
+		SchemaGuidAttributeSet = 0xFFFFFFFC,
+		SchemaGuidAttribute = 0xFFFFFFFD,
+		SchemaGuidNotFound = 0xFFFFFFFE,
+		ForeignPrincipalObject = 0xFFFFFFFF,
+	}
+
+	public class DsrepCrackedName
+	{
+		public string? OfferedName { get; set; }
+		public DsCrackNameFormat OfferedFormat { get; set; }
+		public string? CrackedDomain { get; set; }
+		public string? CrackedName { get; set; }
+		public DsCrackNameResultFormat ResultFormat { get; set; }
+		public DsrepNameError Status { get; set; }
+	}
+
 	public partial class DsBinding : IDisposable, IAsyncDisposable
 	{
 		internal DsBinding(RpcContextHandle hbind, DirectoryReplicationClient owner, DRS_EXTENSIONS_INT2 serverExt)
@@ -121,11 +157,19 @@ namespace Titanis.Msrpc.Msdrsr
 		public Task<string[]> GetGlobalCatalogServers(DsCrackNameResultFormat format, CancellationToken cancellationToken) =>
 			this.CrackName(DsCrackNameFormat.ListGlobalCatalogServers, format, cancellationToken);
 
-		private Task<string[]> CrackName(DsCrackNameFormat offeredFormat, DsCrackNameResultFormat desiredFormat, CancellationToken cancellationToken) => this.CrackNames(["."], offeredFormat, desiredFormat, cancellationToken);
-		public Task<string[]> CrackName(string name, DsCrackNameFormat offeredFormat, DsCrackNameResultFormat desiredFormat, CancellationToken cancellationToken) =>
-			this.CrackNames([name], offeredFormat, desiredFormat, cancellationToken);
+		private async Task<string[]> CrackName(DsCrackNameFormat offeredFormat, DsCrackNameResultFormat desiredFormat, CancellationToken cancellationToken)
+		{
+			var names = await CrackNames(["."], offeredFormat, desiredFormat, cancellationToken).ConfigureAwait(false);
+			return Array.ConvertAll(names, r => r.CrackedName);
+		}
 
-		public async Task<string[]> CrackNames(string[] names, DsCrackNameFormat offeredFormat, DsCrackNameResultFormat desiredFormat, CancellationToken cancellationToken)
+		public async Task<string[]> CrackName(string name, DsCrackNameFormat offeredFormat, DsCrackNameResultFormat desiredFormat, CancellationToken cancellationToken)
+		{
+			var names=await CrackNames([name], offeredFormat, desiredFormat, cancellationToken).ConfigureAwait(false);
+			return Array.ConvertAll(names, r => r.CrackedName);
+		}
+
+		public async Task<DsrepCrackedName[]> CrackNames(string[] names, DsCrackNameFormat offeredFormat, DsCrackNameResultFormat desiredFormat, CancellationToken cancellationToken)
 		{
 			if (names.IsNullOrEmpty())
 				throw new ArgumentNullException(nameof(names));
@@ -159,8 +203,29 @@ namespace Titanis.Msrpc.Msdrsr
 
 			if (pmsgOut.value.unionSwitch == CrackResponseVersion)
 			{
-				var results = pmsgOut.value.V1.pResult.value.rItems.value?.Select(r => r.pName.value)?.ToArray() ?? [];
-				return results;
+				DS_NAME_RESULT_ITEMW[]? results = pmsgOut.value.V1.pResult.value.rItems.value;
+				if (results != null)
+				{
+					DsrepCrackedName[] cracked = new DsrepCrackedName[results.Length];
+					for (int i = 0; i < results.Length; i++)
+					{
+						DS_NAME_RESULT_ITEMW item = results[i];
+
+						cracked[i] = new DsrepCrackedName
+						{
+							OfferedName = (i < names.Length) ? names[i] : null,
+							OfferedFormat = offeredFormat,
+							ResultFormat = desiredFormat,
+							CrackedDomain = item.pDomain?.value,
+							CrackedName = item.pName?.value,
+							Status = (DsrepNameError)item.status
+						};
+					}
+
+					return cracked;
+				}
+
+				return [];
 			}
 			else
 			{

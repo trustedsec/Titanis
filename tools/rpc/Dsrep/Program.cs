@@ -22,6 +22,7 @@ namespace Titanis.Cli.Dsrep;
 [Subcommand("addsidhist", typeof(AddSidHistoryCommand))]
 [Subcommand("readngckey", typeof(ReadNgcKeyCommand))]
 [Subcommand("writengckey", typeof(WriteNgcKeyCommand))]
+[Subcommand("crackname", typeof(CrackNameCommand))]
 [Description("Interacts with Directory Replication Service")]
 internal class Program : MultiCommand
 {
