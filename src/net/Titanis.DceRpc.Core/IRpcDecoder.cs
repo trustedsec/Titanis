@@ -16,6 +16,7 @@ namespace Titanis.DceRpc
 		ByteMemoryReader GetStubData();
 
 		void Align(NdrAlignment alignment);
+		void AlignUnionTag(NdrAlignment alignment);
 		bool ReadBoolean();
 		sbyte ReadSByte();
 		byte ReadByte();
@@ -100,6 +101,7 @@ namespace Titanis.DceRpc
 
 		string ReadCharString();
 		string ReadWideCharString();
+		short ReadEnumShortValue();
 	}
 
 	/// <summary>

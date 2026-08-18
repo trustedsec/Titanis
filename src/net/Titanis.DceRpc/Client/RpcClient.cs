@@ -79,6 +79,8 @@ namespace Titanis.DceRpc.Client
 		/// Gets a value indicating whether to prefer AUTH3 when possible when binding.
 		/// </summary>
 		public bool PreferAuth3 { get; set; } = true;
+		public bool OfferNdr { get; set; } = true;
+		public bool OfferNdr64 { get; set; } = true;
 
 		/// <summary>
 		/// Binds to a <see cref="Stream"/> to establish a channel.
@@ -342,6 +344,7 @@ namespace Titanis.DceRpc.Client
 				services.GetService<INameResolverService>(),
 				services.GetService<ILog>(),
 				callback);
+
 			return rpcClient;
 		}
 	}

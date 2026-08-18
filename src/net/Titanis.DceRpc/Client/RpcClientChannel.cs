@@ -147,24 +147,28 @@ namespace Titanis.DceRpc.Client
 
 			var contextId0 = this.GetNextContextId();
 
-			ByteWriter writer = RpcPduWriter.Create();
-			var bindPdu = new BindPdu(
-				new PresContext()
+			int transferSyntaxCount = 1;
+			transferSyntaxCount += this._client.OfferNdr ? 1 : 0;
+			transferSyntaxCount += this._client.OfferNdr64 ? 1 : 0;
+
+			PresContext[] presContexts = new PresContext[transferSyntaxCount];
+			transferSyntaxCount = 0;
+			if (this._client.OfferNdr)
+				presContexts[transferSyntaxCount++] = new PresContext()
 				{
 					p_cont_id = contextId0,
 					abstract_syntax = new SyntaxId(interfaceUuid, version),
 					transferSyntaxes = TransferSyntaxes
-				},
-				// HACK: Windows sends these as separate transfer syntaxes
-				//new PresContext(new ContextElement
-				//{
-				//	p_cont_id = this.GetNextContextId(),
-				//	abstract_syntax = new SyntaxId(interfaceUuid, version)
-				//})
-				//{
-				//	transferSyntaxes = TransferSyntaxes64
-				//},
-				new PresContext()
+				};
+			if (this._client.OfferNdr64)
+				presContexts[transferSyntaxCount++] = new PresContext()
+				{
+					p_cont_id = contextId0,
+					abstract_syntax = new SyntaxId(interfaceUuid, version),
+					transferSyntaxes = TransferSyntaxes64
+				};
+
+			presContexts[transferSyntaxCount] = new PresContext()
 				{
 					p_cont_id = this.GetNextContextId(),
 					abstract_syntax = new SyntaxId(interfaceUuid, version),
@@ -174,13 +178,16 @@ namespace Titanis.DceRpc.Client
 							new RpcVersion(1,0)
 							)
 					}
-				})
+			};
+
+			var bindPdu = new BindPdu(presContexts)
 			{
 				max_xmit_frag = (ushort)this.MaxXmitFrag,
 				max_recv_frag = (ushort)this.MaxRecvFrag,
 				assoc_group_id = assocGroupId
 			};
 
+			ByteWriter writer = RpcPduWriter.Create();
 			writer.WritePduStruct(bindPdu);
 			int authLength;
 			if (!existingAuthContext && bindAuthContext != null)
@@ -559,6 +566,15 @@ namespace Titanis.DceRpc.Client
 						ref bind.contextList.contexts[i],
 						contextElem.transfer_syntax,
 						bindreq.authContext);
+					bindreq.bindPdu.contextList.contexts = new PresContext[]
+					{
+						new PresContext()
+						{
+							p_cont_id = (ushort)bindContext.contextId,
+							abstract_syntax = bindContext.interfaceId,
+							transferSyntaxes = [bindContext.transferSyntaxId]
+						}
+					};
 
 					if (auth != null)
 					{
@@ -650,18 +666,17 @@ namespace Titanis.DceRpc.Client
 			var bindContext = bindreq.bindContext;
 
 			ByteWriter writer = RpcPduWriter.Create();
-			var bindPdu = new BindPdu(
-				new PresContext[]
+			bindreq.bindPdu.contextList.contexts = new PresContext[]
+			{
+				new PresContext()
 				{
-					new PresContext()
-					{
-						p_cont_id = (ushort)bindContext.contextId,
-						abstract_syntax = bindreq.bindContext.interfaceId,
-						transferSyntaxes = new SyntaxId[] {
-							new SyntaxId(bindContext.encoding.InterfaceUuid, bindContext.encoding.InterfaceVersion)
-						}
-					}
+					p_cont_id = (ushort)bindContext.contextId,
+					abstract_syntax = bindreq.bindContext.interfaceId,
+					transferSyntaxes = [bindreq.bindContext.transferSyntaxId]
 				}
+			};
+			var bindPdu = new BindPdu(
+				bindreq.bindPdu.contextList.contexts
 			)
 			{
 				max_xmit_frag = (ushort)this.MaxXmitFrag,

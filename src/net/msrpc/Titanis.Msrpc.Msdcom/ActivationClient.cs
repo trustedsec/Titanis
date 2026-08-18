@@ -37,9 +37,9 @@ namespace Titanis.Msrpc.Msdcom
 			RpcPointer<DceRpc.RpcPointer<MInterfacePointer>[]> pInterfaces = new DceRpc.RpcPointer<DceRpc.RpcPointer<MInterfacePointer>[]>();
 			RpcPointer<int[]> pQiResults = new DceRpc.RpcPointer<int[]>(qiResults);
 			var result = (Win32ErrorCode)await this._proxy.RemoteActivation(
-				new RpcPointer<ORPCTHIS>() { value = new ORPCTHIS() { version = version } },
+				new ORPCTHIS() { version = version },
 				pThat,
-				new RpcPointer<Guid>(clsid),
+				clsid,
 				null,
 				null,
 				WindowsClientImplLevel,

@@ -43,7 +43,7 @@ namespace Titanis.DceRpc
 			return refId;
 		}
 
-		private int AllocReferentId()
+		internal int AllocReferentId()
 		{
 			return Interlocked.Increment(ref this._lastReferentId);
 		}

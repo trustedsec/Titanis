@@ -213,13 +213,13 @@ namespace ms_dtyp
 		{
 			encoder.WriteValue(this.Length);
 			encoder.WriteValue(this.MaximumLength);
-			encoder.WritePointer(this.Buffer);
+			encoder.WriteUniquePointer(this.Buffer);
 		}
 		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
 		{
 			this.Length = decoder.ReadUInt16();
 			this.MaximumLength = decoder.ReadUInt16();
-			this.Buffer = decoder.ReadPointer<ArraySegment<char>>();
+			this.Buffer = decoder.ReadUniquePointer<ArraySegment<char>>();
 		}
 		public ushort Length;
 		public ushort MaximumLength;

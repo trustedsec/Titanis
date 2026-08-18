@@ -8,23 +8,23 @@ namespace ms_rrp
 	using Titanis;
 	using Titanis.DceRpc;
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 	public partial struct RVALENT : IRpcFixedStruct
 	{
 		public RpcPointer<ms_dtyp.RPC_UNICODE_STRING> ve_valuename;
 		public uint ve_valuelen;
 		public RpcPointer<uint> ve_valueptr;
 		public uint ve_type;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void Encode(IRpcEncoder encoder)
 		{
-			encoder.WritePointer(this.ve_valuename);
+			encoder.WriteUniquePointer(this.ve_valuename);
 			encoder.WriteValue(this.ve_valuelen);
-			encoder.WritePointer(this.ve_valueptr);
+			encoder.WriteUniquePointer(this.ve_valueptr);
 			encoder.WriteValue(this.ve_type);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.ve_valuename = decoder.ReadUniquePointer<ms_dtyp.RPC_UNICODE_STRING>();
@@ -33,7 +33,7 @@ namespace ms_rrp
 			this.ve_type = decoder.ReadUInt32();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.ve_valuename is not null)
@@ -48,7 +48,7 @@ namespace ms_rrp
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.ve_valuename is not null)
@@ -64,21 +64,21 @@ namespace ms_rrp
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 	public partial struct RPC_SECURITY_DESCRIPTOR : IRpcFixedStruct
 	{
 		public RpcPointer<ArraySegment<byte>> lpSecurityDescriptor;
 		public uint cbInSecurityDescriptor;
 		public uint cbOutSecurityDescriptor;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void Encode(IRpcEncoder encoder)
 		{
-			encoder.WritePointer(this.lpSecurityDescriptor);
+			encoder.WriteUniquePointer(this.lpSecurityDescriptor);
 			encoder.WriteValue(this.cbInSecurityDescriptor);
 			encoder.WriteValue(this.cbOutSecurityDescriptor);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.lpSecurityDescriptor = decoder.ReadUniquePointer<ArraySegment<byte>>();
@@ -86,7 +86,7 @@ namespace ms_rrp
 			this.cbOutSecurityDescriptor = decoder.ReadUInt32();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.lpSecurityDescriptor is not null)
@@ -100,7 +100,7 @@ namespace ms_rrp
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.lpSecurityDescriptor is not null)
@@ -116,13 +116,13 @@ namespace ms_rrp
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 	public partial struct RPC_SECURITY_ATTRIBUTES : IRpcFixedStruct
 	{
 		public uint nLength;
 		public RPC_SECURITY_DESCRIPTOR RpcSecurityDescriptor;
 		public byte bInheritHandle;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.nLength);
@@ -130,7 +130,7 @@ namespace ms_rrp
 			encoder.WriteValue(this.bInheritHandle);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.nLength = decoder.ReadUInt32();
@@ -138,107 +138,105 @@ namespace ms_rrp
 			this.bInheritHandle = decoder.ReadUnsignedChar();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			encoder.WriteStructDeferral(this.RpcSecurityDescriptor);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			decoder.ReadStructDeferral<RPC_SECURITY_DESCRIPTOR>(ref this.RpcSecurityDescriptor);
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8"), GuidAttribute("338cd001-2244-31f1-aaaa-900038001003"), RpcVersionAttribute(1, 0)]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), GuidAttribute("338cd001-2244-31f1-aaaa-900038001003"), RpcVersionAttribute(1, 0)]
 	public partial interface winreg
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> OpenClassesRoot(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> OpenCurrentUser(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> OpenLocalMachine(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> OpenPerformanceData(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> OpenUsers(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegCloseKey(RpcPointer<RpcContextHandle> hKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegCreateKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, ms_dtyp.RPC_UNICODE_STRING lpClass, uint dwOptions, uint samDesired, RpcPointer<RPC_SECURITY_ATTRIBUTES> lpSecurityAttributes, RpcPointer<RpcContextHandle> phkResult, RpcPointer<uint> lpdwDisposition, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegDeleteKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegDeleteValue(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpValueName, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegEnumKey(RpcContextHandle hKey, uint dwIndex, ms_dtyp.RPC_UNICODE_STRING lpNameIn, RpcPointer<ms_dtyp.RPC_UNICODE_STRING> lpNameOut, RpcPointer<ms_dtyp.RPC_UNICODE_STRING> lpClassIn, RpcPointer<RpcPointer<ms_dtyp.RPC_UNICODE_STRING>> lplpClassOut, RpcPointer<ms_dtyp.FILETIME> lpftLastWriteTime, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegEnumValue(RpcContextHandle hKey, uint dwIndex, ms_dtyp.RPC_UNICODE_STRING lpValueNameIn, RpcPointer<ms_dtyp.RPC_UNICODE_STRING> lpValueNameOut, RpcPointer<uint> lpType, RpcPointer<ArraySegment<byte>> lpData, RpcPointer<uint> lpcbData, RpcPointer<uint> lpcbLen, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegFlushKey(RpcContextHandle hKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegGetKeySecurity(RpcContextHandle hKey, uint SecurityInformation, RPC_SECURITY_DESCRIPTOR pRpcSecurityDescriptorIn, RpcPointer<RPC_SECURITY_DESCRIPTOR> pRpcSecurityDescriptorOut, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegLoadKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, ms_dtyp.RPC_UNICODE_STRING lpFile, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task Opnum14NotImplemented(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegOpenKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, uint dwOptions, uint samDesired, RpcPointer<RpcContextHandle> phkResult, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegQueryInfoKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpClassIn, RpcPointer<ms_dtyp.RPC_UNICODE_STRING> lpClassOut, RpcPointer<uint> lpcSubKeys, RpcPointer<uint> lpcbMaxSubKeyLen, RpcPointer<uint> lpcbMaxClassLen, RpcPointer<uint> lpcValues, RpcPointer<uint> lpcbMaxValueNameLen, RpcPointer<uint> lpcbMaxValueLen, RpcPointer<uint> lpcbSecurityDescriptor, RpcPointer<ms_dtyp.FILETIME> lpftLastWriteTime, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegQueryValue(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpValueName, RpcPointer<uint> lpType, RpcPointer<ArraySegment<byte>> lpData, RpcPointer<uint> lpcbData, RpcPointer<uint> lpcbLen, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegReplaceKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, ms_dtyp.RPC_UNICODE_STRING lpNewFile, ms_dtyp.RPC_UNICODE_STRING lpOldFile, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegRestoreKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpFile, uint Flags, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegSaveKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpFile, RpcPointer<RPC_SECURITY_ATTRIBUTES> pSecurityAttributes, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegSetKeySecurity(RpcContextHandle hKey, uint SecurityInformation, RPC_SECURITY_DESCRIPTOR pRpcSecurityDescriptor, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegSetValue(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpValueName, uint dwType, byte[] lpData, uint cbData, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegUnLoadKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task Opnum24NotImplemented(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task Opnum25NotImplemented(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegGetVersion(RpcContextHandle hKey, RpcPointer<uint> lpdwVersion, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> OpenCurrentConfig(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task Opnum28NotImplemented(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegQueryMultipleValues(RpcContextHandle hKey, ArraySegment<RVALENT> val_listIn, RpcPointer<ArraySegment<RVALENT>> val_listOut, uint num_vals, RpcPointer<ArraySegment<byte>> lpvalueBuf, RpcPointer<uint> ldwTotsize, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task Opnum30NotImplemented(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegSaveKeyEx(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpFile, RpcPointer<RPC_SECURITY_ATTRIBUTES> pSecurityAttributes, uint Flags, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> OpenPerformanceText(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> OpenPerformanceNlsText(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegQueryMultipleValues2(RpcContextHandle hKey, ArraySegment<RVALENT> val_listIn, RpcPointer<ArraySegment<RVALENT>> val_listOut, uint num_vals, RpcPointer<ArraySegment<byte>> lpvalueBuf, uint ldwTotsize, RpcPointer<uint> ldwRequiredSize, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		Task<int> BaseRegDeleteKeyEx(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, uint AccessMask, uint Reserved, CancellationToken cancellationToken);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8"), IidAttribute("338cd001-2244-31f1-aaaa-900038001003")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), IidAttribute("338cd001-2244-31f1-aaaa-900038001003")]
 	public partial class winregClientProxy : Titanis.DceRpc.Client.RpcClientProxy, winreg, Titanis.DceRpc.IRpcClientProxy
 	{
-		/// <inheritdoc/>
-		public override Type InterfaceType => typeof(winreg);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> OpenClassesRoot(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(0);
 			IRpcEncoder encoder = req.StubData;
-			encoder.WritePointer(ServerName);
+			encoder.WriteUniquePointer(ServerName);
 			if (ServerName is not null)
 			{
 				encoder.WriteValue(ServerName.value);
@@ -252,12 +250,12 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> OpenCurrentUser(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(1);
 			IRpcEncoder encoder = req.StubData;
-			encoder.WritePointer(ServerName);
+			encoder.WriteUniquePointer(ServerName);
 			if (ServerName is not null)
 			{
 				encoder.WriteValue(ServerName.value);
@@ -271,12 +269,12 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> OpenLocalMachine(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(2);
 			IRpcEncoder encoder = req.StubData;
-			encoder.WritePointer(ServerName);
+			encoder.WriteUniquePointer(ServerName);
 			if (ServerName is not null)
 			{
 				encoder.WriteValue(ServerName.value);
@@ -290,12 +288,12 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> OpenPerformanceData(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(3);
 			IRpcEncoder encoder = req.StubData;
-			encoder.WritePointer(ServerName);
+			encoder.WriteUniquePointer(ServerName);
 			if (ServerName is not null)
 			{
 				encoder.WriteValue(ServerName.value);
@@ -309,12 +307,12 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> OpenUsers(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(4);
 			IRpcEncoder encoder = req.StubData;
-			encoder.WritePointer(ServerName);
+			encoder.WriteUniquePointer(ServerName);
 			if (ServerName is not null)
 			{
 				encoder.WriteValue(ServerName.value);
@@ -328,7 +326,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegCloseKey(RpcPointer<RpcContextHandle> hKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(5);
@@ -341,7 +339,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegCreateKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, ms_dtyp.RPC_UNICODE_STRING lpClass, uint dwOptions, uint samDesired, RpcPointer<RPC_SECURITY_ATTRIBUTES> lpSecurityAttributes, RpcPointer<RpcContextHandle> phkResult, RpcPointer<uint> lpdwDisposition, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(6);
@@ -353,14 +351,14 @@ namespace ms_rrp
 			encoder.WriteStructDeferral(lpClass);
 			encoder.WriteValue(dwOptions);
 			encoder.WriteValue(samDesired);
-			encoder.WritePointer(lpSecurityAttributes);
+			encoder.WriteUniquePointer(lpSecurityAttributes);
 			if (lpSecurityAttributes is not null)
 			{
 				encoder.WriteFixedStruct(lpSecurityAttributes.value, NdrAlignment.NativePtr);
 				encoder.WriteStructDeferral(lpSecurityAttributes.value);
 			}
 
-			encoder.WritePointer(lpdwDisposition);
+			encoder.WriteUniquePointer(lpdwDisposition);
 			if (lpdwDisposition is not null)
 			{
 				encoder.WriteValue(lpdwDisposition.value);
@@ -379,7 +377,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegDeleteKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(7);
@@ -393,7 +391,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegDeleteValue(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpValueName, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(8);
@@ -407,7 +405,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegEnumKey(RpcContextHandle hKey, uint dwIndex, ms_dtyp.RPC_UNICODE_STRING lpNameIn, RpcPointer<ms_dtyp.RPC_UNICODE_STRING> lpNameOut, RpcPointer<ms_dtyp.RPC_UNICODE_STRING> lpClassIn, RpcPointer<RpcPointer<ms_dtyp.RPC_UNICODE_STRING>> lplpClassOut, RpcPointer<ms_dtyp.FILETIME> lpftLastWriteTime, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(9);
@@ -416,14 +414,14 @@ namespace ms_rrp
 			encoder.WriteValue(dwIndex);
 			encoder.WriteFixedStruct(lpNameIn, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(lpNameIn);
-			encoder.WritePointer(lpClassIn);
+			encoder.WriteUniquePointer(lpClassIn);
 			if (lpClassIn is not null)
 			{
 				encoder.WriteFixedStruct(lpClassIn.value, NdrAlignment.NativePtr);
 				encoder.WriteStructDeferral(lpClassIn.value);
 			}
 
-			encoder.WritePointer(lpftLastWriteTime);
+			encoder.WriteUniquePointer(lpftLastWriteTime);
 			if (lpftLastWriteTime is not null)
 			{
 				encoder.WriteFixedStruct(lpftLastWriteTime.value, NdrAlignment._4Byte);
@@ -452,7 +450,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegEnumValue(RpcContextHandle hKey, uint dwIndex, ms_dtyp.RPC_UNICODE_STRING lpValueNameIn, RpcPointer<ms_dtyp.RPC_UNICODE_STRING> lpValueNameOut, RpcPointer<uint> lpType, RpcPointer<ArraySegment<byte>> lpData, RpcPointer<uint> lpcbData, RpcPointer<uint> lpcbLen, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(10);
@@ -461,13 +459,13 @@ namespace ms_rrp
 			encoder.WriteValue(dwIndex);
 			encoder.WriteFixedStruct(lpValueNameIn, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(lpValueNameIn);
-			encoder.WritePointer(lpType);
+			encoder.WriteUniquePointer(lpType);
 			if (lpType is not null)
 			{
 				encoder.WriteValue(lpType.value);
 			}
 
-			encoder.WritePointer(lpData);
+			encoder.WriteUniquePointer(lpData);
 			if (lpData is not null)
 			{
 				encoder.WriteArrayHeader(lpData.value, true);
@@ -478,13 +476,13 @@ namespace ms_rrp
 				}
 			}
 
-			encoder.WritePointer(lpcbData);
+			encoder.WriteUniquePointer(lpcbData);
 			if (lpcbData is not null)
 			{
 				encoder.WriteValue(lpcbData.value);
 			}
 
-			encoder.WritePointer(lpcbLen);
+			encoder.WriteUniquePointer(lpcbLen);
 			if (lpcbLen is not null)
 			{
 				encoder.WriteValue(lpcbLen.value);
@@ -528,7 +526,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegFlushKey(RpcContextHandle hKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(11);
@@ -540,7 +538,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegGetKeySecurity(RpcContextHandle hKey, uint SecurityInformation, RPC_SECURITY_DESCRIPTOR pRpcSecurityDescriptorIn, RpcPointer<RPC_SECURITY_DESCRIPTOR> pRpcSecurityDescriptorOut, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(12);
@@ -557,7 +555,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegLoadKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, ms_dtyp.RPC_UNICODE_STRING lpFile, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(13);
@@ -573,7 +571,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Opnum14NotImplemented(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(14);
@@ -581,7 +579,7 @@ namespace ms_rrp
 			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegOpenKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, uint dwOptions, uint samDesired, RpcPointer<RpcContextHandle> phkResult, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(15);
@@ -598,7 +596,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegQueryInfoKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpClassIn, RpcPointer<ms_dtyp.RPC_UNICODE_STRING> lpClassOut, RpcPointer<uint> lpcSubKeys, RpcPointer<uint> lpcbMaxSubKeyLen, RpcPointer<uint> lpcbMaxClassLen, RpcPointer<uint> lpcValues, RpcPointer<uint> lpcbMaxValueNameLen, RpcPointer<uint> lpcbMaxValueLen, RpcPointer<uint> lpcbSecurityDescriptor, RpcPointer<ms_dtyp.FILETIME> lpftLastWriteTime, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(16);
@@ -623,7 +621,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegQueryValue(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpValueName, RpcPointer<uint> lpType, RpcPointer<ArraySegment<byte>> lpData, RpcPointer<uint> lpcbData, RpcPointer<uint> lpcbLen, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(17);
@@ -631,13 +629,13 @@ namespace ms_rrp
 			encoder.WriteContextHandle(hKey);
 			encoder.WriteFixedStruct(lpValueName, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(lpValueName);
-			encoder.WritePointer(lpType);
+			encoder.WriteUniquePointer(lpType);
 			if (lpType is not null)
 			{
 				encoder.WriteValue(lpType.value);
 			}
 
-			encoder.WritePointer(lpData);
+			encoder.WriteUniquePointer(lpData);
 			if (lpData is not null)
 			{
 				encoder.WriteArrayHeader(lpData.value, true);
@@ -648,13 +646,13 @@ namespace ms_rrp
 				}
 			}
 
-			encoder.WritePointer(lpcbData);
+			encoder.WriteUniquePointer(lpcbData);
 			if (lpcbData is not null)
 			{
 				encoder.WriteValue(lpcbData.value);
 			}
 
-			encoder.WritePointer(lpcbLen);
+			encoder.WriteUniquePointer(lpcbLen);
 			if (lpcbLen is not null)
 			{
 				encoder.WriteValue(lpcbLen.value);
@@ -696,7 +694,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegReplaceKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, ms_dtyp.RPC_UNICODE_STRING lpNewFile, ms_dtyp.RPC_UNICODE_STRING lpOldFile, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(18);
@@ -714,7 +712,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegRestoreKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpFile, uint Flags, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(19);
@@ -729,7 +727,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegSaveKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpFile, RpcPointer<RPC_SECURITY_ATTRIBUTES> pSecurityAttributes, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(20);
@@ -737,7 +735,7 @@ namespace ms_rrp
 			encoder.WriteContextHandle(hKey);
 			encoder.WriteFixedStruct(lpFile, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(lpFile);
-			encoder.WritePointer(pSecurityAttributes);
+			encoder.WriteUniquePointer(pSecurityAttributes);
 			if (pSecurityAttributes is not null)
 			{
 				encoder.WriteFixedStruct(pSecurityAttributes.value, NdrAlignment.NativePtr);
@@ -750,7 +748,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegSetKeySecurity(RpcContextHandle hKey, uint SecurityInformation, RPC_SECURITY_DESCRIPTOR pRpcSecurityDescriptor, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(21);
@@ -765,7 +763,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegSetValue(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpValueName, uint dwType, byte[] lpData, uint cbData, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(22);
@@ -791,7 +789,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegUnLoadKey(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(23);
@@ -805,7 +803,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Opnum24NotImplemented(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(24);
@@ -813,7 +811,7 @@ namespace ms_rrp
 			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Opnum25NotImplemented(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(25);
@@ -821,7 +819,7 @@ namespace ms_rrp
 			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegGetVersion(RpcContextHandle hKey, RpcPointer<uint> lpdwVersion, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(26);
@@ -834,12 +832,12 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> OpenCurrentConfig(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(27);
 			IRpcEncoder encoder = req.StubData;
-			encoder.WritePointer(ServerName);
+			encoder.WriteUniquePointer(ServerName);
 			if (ServerName is not null)
 			{
 				encoder.WriteValue(ServerName.value);
@@ -853,7 +851,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Opnum28NotImplemented(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(28);
@@ -861,20 +859,17 @@ namespace ms_rrp
 			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegQueryMultipleValues(RpcContextHandle hKey, ArraySegment<RVALENT> val_listIn, RpcPointer<ArraySegment<RVALENT>> val_listOut, uint num_vals, RpcPointer<ArraySegment<byte>> lpvalueBuf, RpcPointer<uint> ldwTotsize, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(29);
 			IRpcEncoder encoder = req.StubData;
 			encoder.WriteContextHandle(hKey);
-			if (val_listIn.Array is not null)
+			encoder.WriteArrayHeader(val_listIn, true);
+			for (int i = 0; i < val_listIn.Count; i++)
 			{
-				encoder.WriteArrayHeader(val_listIn, true);
-				for (int i = 0; i < val_listIn.Count; i++)
-				{
-					RVALENT elem_0 = val_listIn.Item(i);
-					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
-				}
+				RVALENT elem_0 = val_listIn.Item(i);
+				encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 			}
 
 			for (int i = 0; i < val_listIn.Count; i++)
@@ -884,7 +879,7 @@ namespace ms_rrp
 			}
 
 			encoder.WriteValue(num_vals);
-			encoder.WritePointer(lpvalueBuf);
+			encoder.WriteUniquePointer(lpvalueBuf);
 			if (lpvalueBuf is not null)
 			{
 				encoder.WriteArrayHeader(lpvalueBuf.value, true);
@@ -930,7 +925,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Opnum30NotImplemented(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(30);
@@ -938,7 +933,7 @@ namespace ms_rrp
 			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegSaveKeyEx(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpFile, RpcPointer<RPC_SECURITY_ATTRIBUTES> pSecurityAttributes, uint Flags, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(31);
@@ -946,7 +941,7 @@ namespace ms_rrp
 			encoder.WriteContextHandle(hKey);
 			encoder.WriteFixedStruct(lpFile, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(lpFile);
-			encoder.WritePointer(pSecurityAttributes);
+			encoder.WriteUniquePointer(pSecurityAttributes);
 			if (pSecurityAttributes is not null)
 			{
 				encoder.WriteFixedStruct(pSecurityAttributes.value, NdrAlignment.NativePtr);
@@ -960,12 +955,12 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> OpenPerformanceText(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(32);
 			IRpcEncoder encoder = req.StubData;
-			encoder.WritePointer(ServerName);
+			encoder.WriteUniquePointer(ServerName);
 			if (ServerName is not null)
 			{
 				encoder.WriteValue(ServerName.value);
@@ -979,12 +974,12 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> OpenPerformanceNlsText(RpcPointer<char> ServerName, uint samDesired, RpcPointer<RpcContextHandle> phKey, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(33);
 			IRpcEncoder encoder = req.StubData;
-			encoder.WritePointer(ServerName);
+			encoder.WriteUniquePointer(ServerName);
 			if (ServerName is not null)
 			{
 				encoder.WriteValue(ServerName.value);
@@ -998,20 +993,17 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegQueryMultipleValues2(RpcContextHandle hKey, ArraySegment<RVALENT> val_listIn, RpcPointer<ArraySegment<RVALENT>> val_listOut, uint num_vals, RpcPointer<ArraySegment<byte>> lpvalueBuf, uint ldwTotsize, RpcPointer<uint> ldwRequiredSize, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(34);
 			IRpcEncoder encoder = req.StubData;
 			encoder.WriteContextHandle(hKey);
-			if (val_listIn.Array is not null)
+			encoder.WriteArrayHeader(val_listIn, true);
+			for (int i = 0; i < val_listIn.Count; i++)
 			{
-				encoder.WriteArrayHeader(val_listIn, true);
-				for (int i = 0; i < val_listIn.Count; i++)
-				{
-					RVALENT elem_0 = val_listIn.Item(i);
-					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
-				}
+				RVALENT elem_0 = val_listIn.Item(i);
+				encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 			}
 
 			for (int i = 0; i < val_listIn.Count; i++)
@@ -1021,7 +1013,7 @@ namespace ms_rrp
 			}
 
 			encoder.WriteValue(num_vals);
-			encoder.WritePointer(lpvalueBuf);
+			encoder.WriteUniquePointer(lpvalueBuf);
 			if (lpvalueBuf is not null)
 			{
 				encoder.WriteArrayHeader(lpvalueBuf.value, true);
@@ -1067,7 +1059,7 @@ namespace ms_rrp
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task<int> BaseRegDeleteKeyEx(RpcContextHandle hKey, ms_dtyp.RPC_UNICODE_STRING lpSubKey, uint AccessMask, uint Reserved, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(35);
@@ -1083,15 +1075,16 @@ namespace ms_rrp
 			return retval;
 		}
 
+		public sealed override Type InterfaceType => typeof(winreg);
 		private static Guid _interfaceUuid = new Guid("338cd001-2244-31f1-aaaa-900038001003");
 		public override Guid InterfaceUuid => _interfaceUuid;
 		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(1, 0);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 	public partial class winregStub : Titanis.DceRpc.Server.RpcServiceStub
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_OpenClassesRoot(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<char> ServerName;
@@ -1110,7 +1103,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_OpenCurrentUser(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<char> ServerName;
@@ -1129,7 +1122,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_OpenLocalMachine(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<char> ServerName;
@@ -1148,7 +1141,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_OpenPerformanceData(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<char> ServerName;
@@ -1167,7 +1160,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_OpenUsers(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<char> ServerName;
@@ -1186,7 +1179,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegCloseKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<RpcContextHandle> hKey;
@@ -1198,7 +1191,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegCreateKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1232,7 +1225,7 @@ namespace ms_rrp
 			var invokeTask = this._obj.BaseRegCreateKey(hKey, lpSubKey, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult, lpdwDisposition, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteContextHandle(phkResult.value);
-			encoder.WritePointer(lpdwDisposition);
+			encoder.WriteUniquePointer(lpdwDisposition);
 			if (lpdwDisposition is not null)
 			{
 				encoder.WriteValue(lpdwDisposition.value);
@@ -1241,7 +1234,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegDeleteKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1254,7 +1247,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegDeleteValue(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1267,7 +1260,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegEnumKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1299,14 +1292,14 @@ namespace ms_rrp
 			var retval = await invokeTask;
 			encoder.WriteFixedStruct(lpNameOut.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(lpNameOut.value);
-			encoder.WritePointer(lplpClassOut.value);
+			encoder.WriteUniquePointer(lplpClassOut.value);
 			if (lplpClassOut.value is not null)
 			{
 				encoder.WriteFixedStruct(lplpClassOut.value.value, NdrAlignment.NativePtr);
 				encoder.WriteStructDeferral(lplpClassOut.value.value);
 			}
 
-			encoder.WritePointer(lpftLastWriteTime);
+			encoder.WriteUniquePointer(lpftLastWriteTime);
 			if (lpftLastWriteTime is not null)
 			{
 				encoder.WriteFixedStruct(lpftLastWriteTime.value, NdrAlignment._4Byte);
@@ -1316,7 +1309,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegEnumValue(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1365,13 +1358,13 @@ namespace ms_rrp
 			var retval = await invokeTask;
 			encoder.WriteFixedStruct(lpValueNameOut.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(lpValueNameOut.value);
-			encoder.WritePointer(lpType);
+			encoder.WriteUniquePointer(lpType);
 			if (lpType is not null)
 			{
 				encoder.WriteValue(lpType.value);
 			}
 
-			encoder.WritePointer(lpData);
+			encoder.WriteUniquePointer(lpData);
 			if (lpData is not null)
 			{
 				encoder.WriteArrayHeader(lpData.value, true);
@@ -1382,13 +1375,13 @@ namespace ms_rrp
 				}
 			}
 
-			encoder.WritePointer(lpcbData);
+			encoder.WriteUniquePointer(lpcbData);
 			if (lpcbData is not null)
 			{
 				encoder.WriteValue(lpcbData.value);
 			}
 
-			encoder.WritePointer(lpcbLen);
+			encoder.WriteUniquePointer(lpcbLen);
 			if (lpcbLen is not null)
 			{
 				encoder.WriteValue(lpcbLen.value);
@@ -1397,7 +1390,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegFlushKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1407,7 +1400,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegGetKeySecurity(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1425,7 +1418,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegLoadKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1441,14 +1434,14 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_Opnum14NotImplemented(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum14NotImplemented(cancellationToken);
 			await invokeTask;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegOpenKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1467,7 +1460,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegQueryInfoKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1500,7 +1493,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegQueryValue(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1544,13 +1537,13 @@ namespace ms_rrp
 
 			var invokeTask = this._obj.BaseRegQueryValue(hKey, lpValueName, lpType, lpData, lpcbData, lpcbLen, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WritePointer(lpType);
+			encoder.WriteUniquePointer(lpType);
 			if (lpType is not null)
 			{
 				encoder.WriteValue(lpType.value);
 			}
 
-			encoder.WritePointer(lpData);
+			encoder.WriteUniquePointer(lpData);
 			if (lpData is not null)
 			{
 				encoder.WriteArrayHeader(lpData.value, true);
@@ -1561,13 +1554,13 @@ namespace ms_rrp
 				}
 			}
 
-			encoder.WritePointer(lpcbData);
+			encoder.WriteUniquePointer(lpcbData);
 			if (lpcbData is not null)
 			{
 				encoder.WriteValue(lpcbData.value);
 			}
 
-			encoder.WritePointer(lpcbLen);
+			encoder.WriteUniquePointer(lpcbLen);
 			if (lpcbLen is not null)
 			{
 				encoder.WriteValue(lpcbLen.value);
@@ -1576,7 +1569,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegReplaceKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1595,7 +1588,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegRestoreKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1610,7 +1603,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegSaveKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1631,7 +1624,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegSetKeySecurity(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1646,7 +1639,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegSetValue(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1672,7 +1665,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegUnLoadKey(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1685,21 +1678,21 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_Opnum24NotImplemented(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum24NotImplemented(cancellationToken);
 			await invokeTask;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_Opnum25NotImplemented(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum25NotImplemented(cancellationToken);
 			await invokeTask;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegGetVersion(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1711,7 +1704,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_OpenCurrentConfig(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<char> ServerName;
@@ -1730,14 +1723,14 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_Opnum28NotImplemented(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum28NotImplemented(cancellationToken);
 			await invokeTask;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegQueryMultipleValues(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1792,7 +1785,7 @@ namespace ms_rrp
 				encoder.WriteStructDeferral(elem_0);
 			}
 
-			encoder.WritePointer(lpvalueBuf);
+			encoder.WriteUniquePointer(lpvalueBuf);
 			if (lpvalueBuf is not null)
 			{
 				encoder.WriteArrayHeader(lpvalueBuf.value, true);
@@ -1807,14 +1800,14 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_Opnum30NotImplemented(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum30NotImplemented(cancellationToken);
 			await invokeTask;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegSaveKeyEx(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1837,7 +1830,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_OpenPerformanceText(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<char> ServerName;
@@ -1856,7 +1849,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_OpenPerformanceNlsText(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<char> ServerName;
@@ -1875,7 +1868,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegQueryMultipleValues2(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1930,7 +1923,7 @@ namespace ms_rrp
 				encoder.WriteStructDeferral(elem_0);
 			}
 
-			encoder.WritePointer(lpvalueBuf);
+			encoder.WriteUniquePointer(lpvalueBuf);
 			if (lpvalueBuf is not null)
 			{
 				encoder.WriteArrayHeader(lpvalueBuf.value, true);
@@ -1945,7 +1938,7 @@ namespace ms_rrp
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public async Task Invoke_BaseRegDeleteKeyEx(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle hKey;
@@ -1965,54 +1958,14 @@ namespace ms_rrp
 		private static Guid _interfaceUuid = new Guid("338cd001-2244-31f1-aaaa-900038001003");
 		public override Guid InterfaceUuid => _interfaceUuid;
 		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(1, 0);
-
 		private Titanis.DceRpc.Server.OperationImplFunc[] _dispatchTable;
 		public override Titanis.DceRpc.Server.OperationImplFunc[] DispatchTable => this._dispatchTable;
-
 		private winreg _obj;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.8")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
 		public winregStub(winreg obj)
 		{
 			this._obj = obj;
-			this._dispatchTable = new Titanis.DceRpc.Server.OperationImplFunc[]
-			{
-				this.Invoke_OpenClassesRoot,
-				this.Invoke_OpenCurrentUser,
-				this.Invoke_OpenLocalMachine,
-				this.Invoke_OpenPerformanceData,
-				this.Invoke_OpenUsers,
-				this.Invoke_BaseRegCloseKey,
-				this.Invoke_BaseRegCreateKey,
-				this.Invoke_BaseRegDeleteKey,
-				this.Invoke_BaseRegDeleteValue,
-				this.Invoke_BaseRegEnumKey,
-				this.Invoke_BaseRegEnumValue,
-				this.Invoke_BaseRegFlushKey,
-				this.Invoke_BaseRegGetKeySecurity,
-				this.Invoke_BaseRegLoadKey,
-				this.Invoke_Opnum14NotImplemented,
-				this.Invoke_BaseRegOpenKey,
-				this.Invoke_BaseRegQueryInfoKey,
-				this.Invoke_BaseRegQueryValue,
-				this.Invoke_BaseRegReplaceKey,
-				this.Invoke_BaseRegRestoreKey,
-				this.Invoke_BaseRegSaveKey,
-				this.Invoke_BaseRegSetKeySecurity,
-				this.Invoke_BaseRegSetValue,
-				this.Invoke_BaseRegUnLoadKey,
-				this.Invoke_Opnum24NotImplemented,
-				this.Invoke_Opnum25NotImplemented,
-				this.Invoke_BaseRegGetVersion,
-				this.Invoke_OpenCurrentConfig,
-				this.Invoke_Opnum28NotImplemented,
-				this.Invoke_BaseRegQueryMultipleValues,
-				this.Invoke_Opnum30NotImplemented,
-				this.Invoke_BaseRegSaveKeyEx,
-				this.Invoke_OpenPerformanceText,
-				this.Invoke_OpenPerformanceNlsText,
-				this.Invoke_BaseRegQueryMultipleValues2,
-				this.Invoke_BaseRegDeleteKeyEx
-			};
+			this._dispatchTable = new Titanis.DceRpc.Server.OperationImplFunc[] { this.Invoke_OpenClassesRoot, this.Invoke_OpenCurrentUser, this.Invoke_OpenLocalMachine, this.Invoke_OpenPerformanceData, this.Invoke_OpenUsers, this.Invoke_BaseRegCloseKey, this.Invoke_BaseRegCreateKey, this.Invoke_BaseRegDeleteKey, this.Invoke_BaseRegDeleteValue, this.Invoke_BaseRegEnumKey, this.Invoke_BaseRegEnumValue, this.Invoke_BaseRegFlushKey, this.Invoke_BaseRegGetKeySecurity, this.Invoke_BaseRegLoadKey, this.Invoke_Opnum14NotImplemented, this.Invoke_BaseRegOpenKey, this.Invoke_BaseRegQueryInfoKey, this.Invoke_BaseRegQueryValue, this.Invoke_BaseRegReplaceKey, this.Invoke_BaseRegRestoreKey, this.Invoke_BaseRegSaveKey, this.Invoke_BaseRegSetKeySecurity, this.Invoke_BaseRegSetValue, this.Invoke_BaseRegUnLoadKey, this.Invoke_Opnum24NotImplemented, this.Invoke_Opnum25NotImplemented, this.Invoke_BaseRegGetVersion, this.Invoke_OpenCurrentConfig, this.Invoke_Opnum28NotImplemented, this.Invoke_BaseRegQueryMultipleValues, this.Invoke_Opnum30NotImplemented, this.Invoke_BaseRegSaveKeyEx, this.Invoke_OpenPerformanceText, this.Invoke_OpenPerformanceNlsText, this.Invoke_BaseRegQueryMultipleValues2, this.Invoke_BaseRegDeleteKeyEx };
 		}
 	}
 }

@@ -14,7 +14,8 @@ namespace Titanis.DceRpc
 		}
 
 		// [C706] § 14.3.11 - Top-level Pointers
-		public virtual int NativeAlignment => 4;
+		public abstract int NativeAlignment { get; }
+		public abstract int EnumAlignment { get; }
 		public sealed override void Align(NdrAlignment alignment)
 		{
 			if (alignment != NdrAlignment.None)
@@ -22,6 +23,10 @@ namespace Titanis.DceRpc
 				if (alignment == NdrAlignment.NativePtr)
 				{
 					this._writer.Align(this.NativeAlignment);
+				}
+				else if (alignment == NdrAlignment.ShortEnum)
+				{
+					this._writer.Align(this.EnumAlignment);
 				}
 				else
 				{
@@ -198,9 +203,16 @@ namespace Titanis.DceRpc
 		// [C706] § 14.3.10 - Pointers
 		protected abstract void WriteReferentId(long refId);
 		// [C706] § 14.3.10 - Pointers
-		public sealed override void WritePointer<T>(RpcPointer<T>? ptr)
+		public sealed override void WritePointer<T>(RpcPointer<T>? ptr) => this.WriteFullPointer(ptr);
+		public sealed override void WriteFullPointer<T>(RpcPointer<T>? ptr)
 		{
 			var refId = this.callContext.GetReferentIdFor(ptr);
+			this.WriteReferentId(refId);
+		}
+		// [C706] § 14.3.10 - Pointers
+		public sealed override void WriteUniquePointer<T>(RpcPointer<T>? ptr)
+		{
+			var refId = (ptr != null) ? this.callContext.AllocReferentId() : 0;
 			this.WriteReferentId(refId);
 		}
 
@@ -279,6 +291,15 @@ namespace Titanis.DceRpc
 		{
 		}
 
+		// [C706] § 14.3.11 - Top-level Pointers
+		public sealed override int NativeAlignment => 4;
+		public sealed override int EnumAlignment => 2;
+
+		public sealed override void AlignUnionTag(NdrAlignment alignment)
+		{
+			// Do nothing
+		}
+
 		// [C706] § 14.3.3.2 - Uni-dimensional Conformant Arrays
 		// [C706] § 14.3.3.3 - Uni-dimensional Varying Arrays
 		// [C706] § 14.3.3.4 - Uni-dimensional Conformant-varying Arrays
@@ -291,6 +312,12 @@ namespace Titanis.DceRpc
 		protected sealed override void WriteReferentId(long refId)
 		{
 			this.WriteValue((int)refId);
+		}
+
+		// [MS-RPCE] § 2.2.4.6 - v1_enum
+		public override void WriteEnumShortValue(short value)
+		{
+			this.WriteValue(value);
 		}
 
 		// [C706] § 14.3.6 - Structures
@@ -308,6 +335,10 @@ namespace Titanis.DceRpc
 		{
 
 		}
+		public sealed override void AlignUnionTag(NdrAlignment alignment)
+		{
+			this.Align(alignment);
+		}
 
 		// [MS-RPCE] § 2.2.5.3.2.1 - Conformant Arrays
 		// [MS-RPCE] § 2.2.5.3.2.2 - Varying Arrays
@@ -319,6 +350,8 @@ namespace Titanis.DceRpc
 
 		// [MS-RPCE] § 2.2.5.3.5 - Pointers
 		public sealed override int NativeAlignment => 8;
+		// [MS-RPCE] § 2.2.4.6 - v1_enum
+		public sealed override int EnumAlignment => 4;
 
 		// [C706] § 14.3.6 - Structures
 		// [MS-RPCE] § 2.2.5.3.4.1 - Structure with Trailing Gap
@@ -334,6 +367,12 @@ namespace Titanis.DceRpc
 		protected sealed override void WriteReferentId(long refId)
 		{
 			this.WriteValue(refId);
+		}
+
+		// [MS-RPCE] § 2.2.4.6 - v1_enum
+		public override void WriteEnumShortValue(short value)
+		{
+			this.WriteValue((int)value);
 		}
 	}
 }

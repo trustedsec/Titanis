@@ -1,79 +1,93 @@
-#pragma warning disable
-
 namespace ms_srvs
 {
 	using System;
+	using System.CodeDom.Compiler;
+	using System.Runtime.InteropServices;
+	using System.Threading;
 	using System.Threading.Tasks;
 	using Titanis;
 	using Titanis.DceRpc;
 
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct CONNECTION_INFO_0 : Titanis.DceRpc.IRpcFixedStruct
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct CONNECTION_INFO_0 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint coni0_id;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.coni0_id);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.coni0_id = decoder.ReadUInt32();
 		}
-		public uint coni0_id;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct CONNECT_INFO_0_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct CONNECT_INFO_0_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<CONNECTION_INFO_0[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<CONNECTION_INFO_0[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<CONNECTION_INFO_0[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					CONNECTION_INFO_0 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment._4Byte);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment._4Byte);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					CONNECTION_INFO_0 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<CONNECTION_INFO_0>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					CONNECTION_INFO_0 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<CONNECTION_INFO_0>(Titanis.DceRpc.NdrAlignment._4Byte);
+					elem_0 = decoder.ReadFixedStruct<CONNECTION_INFO_0>(NdrAlignment._4Byte);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					CONNECTION_INFO_0 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<CONNECTION_INFO_0>(ref elem_0);
@@ -82,29 +96,10 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct CONNECTION_INFO_1 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct CONNECTION_INFO_1 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.coni1_id);
-			encoder.WriteValue(this.coni1_type);
-			encoder.WriteValue(this.coni1_num_opens);
-			encoder.WriteValue(this.coni1_num_users);
-			encoder.WriteValue(this.coni1_time);
-			encoder.WritePointer(this.coni1_username);
-			encoder.WritePointer(this.coni1_netname);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.coni1_id = decoder.ReadUInt32();
-			this.coni1_type = decoder.ReadUInt32();
-			this.coni1_num_opens = decoder.ReadUInt32();
-			this.coni1_num_users = decoder.ReadUInt32();
-			this.coni1_time = decoder.ReadUInt32();
-			this.coni1_username = decoder.ReadPointer<string>();
-			this.coni1_netname = decoder.ReadPointer<string>();
-		}
 		public uint coni1_id;
 		public uint coni1_type;
 		public uint coni1_num_opens;
@@ -112,77 +107,112 @@ namespace ms_srvs
 		public uint coni1_time;
 		public RpcPointer<string> coni1_username;
 		public RpcPointer<string> coni1_netname;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.coni1_username))
+			encoder.WriteValue(this.coni1_id);
+			encoder.WriteValue(this.coni1_type);
+			encoder.WriteValue(this.coni1_num_opens);
+			encoder.WriteValue(this.coni1_num_users);
+			encoder.WriteValue(this.coni1_time);
+			encoder.WriteUniquePointer(this.coni1_username);
+			encoder.WriteUniquePointer(this.coni1_netname);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.coni1_id = decoder.ReadUInt32();
+			this.coni1_type = decoder.ReadUInt32();
+			this.coni1_num_opens = decoder.ReadUInt32();
+			this.coni1_num_users = decoder.ReadUInt32();
+			this.coni1_time = decoder.ReadUInt32();
+			this.coni1_username = decoder.ReadUniquePointer<string>();
+			this.coni1_netname = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.coni1_username is not null)
 			{
 				encoder.WriteWideCharString(this.coni1_username.value);
 			}
-			if ((null != this.coni1_netname))
+
+			if (this.coni1_netname is not null)
 			{
 				encoder.WriteWideCharString(this.coni1_netname.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.coni1_username))
+			if (this.coni1_username is not null)
 			{
 				this.coni1_username.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.coni1_netname))
+
+			if (this.coni1_netname is not null)
 			{
 				this.coni1_netname.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct CONNECT_INFO_1_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct CONNECT_INFO_1_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<CONNECTION_INFO_1[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<CONNECTION_INFO_1[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<CONNECTION_INFO_1[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					CONNECTION_INFO_1 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					CONNECTION_INFO_1 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<CONNECTION_INFO_1>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					CONNECTION_INFO_1 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<CONNECTION_INFO_1>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<CONNECTION_INFO_1>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					CONNECTION_INFO_1 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<CONNECTION_INFO_1>(ref elem_0);
@@ -191,180 +221,202 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct CONNECT_ENUM_UNION : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct CONNECT_ENUM_UNION : IRpcFixedStruct
 	{
 		public uint Level;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.Level);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 0))
-			{
-				encoder.WritePointer(this.Level0);
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					encoder.WritePointer(this.Level1);
-				}
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.Level = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 0))
-			{
-				this.Level0 = decoder.ReadPointer<CONNECT_INFO_0_CONTAINER>();
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					this.Level1 = decoder.ReadPointer<CONNECT_INFO_1_CONTAINER>();
-				}
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.Level)) == 0))
-			{
-				if ((null != this.Level0))
-				{
-					encoder.WriteFixedStruct(this.Level0.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-					encoder.WriteStructDeferral(this.Level0.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					if ((null != this.Level1))
-					{
-						encoder.WriteFixedStruct(this.Level1.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-						encoder.WriteStructDeferral(this.Level1.value);
-					}
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.Level)) == 0))
-			{
-				if ((null != this.Level0))
-				{
-					this.Level0.value = decoder.ReadFixedStruct<CONNECT_INFO_0_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-					decoder.ReadStructDeferral<CONNECT_INFO_0_CONTAINER>(ref this.Level0.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					if ((null != this.Level1))
-					{
-						this.Level1.value = decoder.ReadFixedStruct<CONNECT_INFO_1_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-						decoder.ReadStructDeferral<CONNECT_INFO_1_CONTAINER>(ref this.Level1.value);
-					}
-				}
-			}
-		}
 		public RpcPointer<CONNECT_INFO_0_CONTAINER> Level0;
 		public RpcPointer<CONNECT_INFO_1_CONTAINER> Level1;
+		public void Encode(IRpcEncoder encoder)
+		{
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.Level);
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					encoder.WriteUniquePointer(this.Level0);
+					break;
+				case 1U:
+					encoder.WriteUniquePointer(this.Level1);
+					break;
+			}
+		}
+
+		public void Decode(IRpcDecoder decoder)
+		{
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.Level = decoder.ReadUInt32();
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					this.Level0 = decoder.ReadUniquePointer<CONNECT_INFO_0_CONTAINER>();
+					break;
+				case 1U:
+					this.Level1 = decoder.ReadUniquePointer<CONNECT_INFO_1_CONTAINER>();
+					break;
+			}
+		}
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					if (this.Level0 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level0.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level0.value);
+					}
+
+					break;
+				case 1U:
+					if (this.Level1 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level1.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level1.value);
+					}
+
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					if (this.Level0 is not null)
+					{
+						this.Level0.value = decoder.ReadFixedStruct<CONNECT_INFO_0_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<CONNECT_INFO_0_CONTAINER>(ref this.Level0.value);
+					}
+
+					break;
+				case 1U:
+					if (this.Level1 is not null)
+					{
+						this.Level1.value = decoder.ReadFixedStruct<CONNECT_INFO_1_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<CONNECT_INFO_1_CONTAINER>(ref this.Level1.value);
+					}
+
+					break;
+			}
+		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct CONNECT_ENUM_STRUCT : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct CONNECT_ENUM_STRUCT : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint Level;
+		public CONNECT_ENUM_UNION ConnectInfo;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.Level);
 			encoder.WriteUnion(this.ConnectInfo);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.Level = decoder.ReadUInt32();
 			this.ConnectInfo = decoder.ReadUnion<CONNECT_ENUM_UNION>();
 		}
-		public uint Level;
-		public CONNECT_ENUM_UNION ConnectInfo;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			encoder.WriteStructDeferral(this.ConnectInfo);
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			decoder.ReadStructDeferral<CONNECT_ENUM_UNION>(ref this.ConnectInfo);
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct FILE_INFO_2 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct FILE_INFO_2 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint fi2_id;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.fi2_id);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.fi2_id = decoder.ReadUInt32();
 		}
-		public uint fi2_id;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct FILE_INFO_2_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct FILE_INFO_2_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<FILE_INFO_2[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<FILE_INFO_2[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<FILE_INFO_2[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					FILE_INFO_2 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment._4Byte);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment._4Byte);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					FILE_INFO_2 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<FILE_INFO_2>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					FILE_INFO_2 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<FILE_INFO_2>(Titanis.DceRpc.NdrAlignment._4Byte);
+					elem_0 = decoder.ReadFixedStruct<FILE_INFO_2>(NdrAlignment._4Byte);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					FILE_INFO_2 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<FILE_INFO_2>(ref elem_0);
@@ -373,101 +425,117 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct FILE_INFO_3 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct FILE_INFO_3 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.fi3_id);
-			encoder.WriteValue(this.fi3_permissions);
-			encoder.WriteValue(this.fi3_num_locks);
-			encoder.WritePointer(this.fi3_pathname);
-			encoder.WritePointer(this.fi3_username);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.fi3_id = decoder.ReadUInt32();
-			this.fi3_permissions = decoder.ReadUInt32();
-			this.fi3_num_locks = decoder.ReadUInt32();
-			this.fi3_pathname = decoder.ReadPointer<string>();
-			this.fi3_username = decoder.ReadPointer<string>();
-		}
 		public uint fi3_id;
 		public uint fi3_permissions;
 		public uint fi3_num_locks;
 		public RpcPointer<string> fi3_pathname;
 		public RpcPointer<string> fi3_username;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.fi3_pathname))
+			encoder.WriteValue(this.fi3_id);
+			encoder.WriteValue(this.fi3_permissions);
+			encoder.WriteValue(this.fi3_num_locks);
+			encoder.WriteUniquePointer(this.fi3_pathname);
+			encoder.WriteUniquePointer(this.fi3_username);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.fi3_id = decoder.ReadUInt32();
+			this.fi3_permissions = decoder.ReadUInt32();
+			this.fi3_num_locks = decoder.ReadUInt32();
+			this.fi3_pathname = decoder.ReadUniquePointer<string>();
+			this.fi3_username = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.fi3_pathname is not null)
 			{
 				encoder.WriteWideCharString(this.fi3_pathname.value);
 			}
-			if ((null != this.fi3_username))
+
+			if (this.fi3_username is not null)
 			{
 				encoder.WriteWideCharString(this.fi3_username.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.fi3_pathname))
+			if (this.fi3_pathname is not null)
 			{
 				this.fi3_pathname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.fi3_username))
+
+			if (this.fi3_username is not null)
 			{
 				this.fi3_username.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct FILE_INFO_3_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct FILE_INFO_3_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<FILE_INFO_3[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<FILE_INFO_3[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<FILE_INFO_3[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					FILE_INFO_3 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					FILE_INFO_3 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<FILE_INFO_3>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					FILE_INFO_3 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<FILE_INFO_3>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<FILE_INFO_3>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					FILE_INFO_3 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<FILE_INFO_3>(ref elem_0);
@@ -476,271 +544,293 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct FILE_ENUM_UNION : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct FILE_ENUM_UNION : IRpcFixedStruct
 	{
 		public uint Level;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.Level);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 2))
-			{
-				encoder.WritePointer(this.Level2);
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 3))
-				{
-					encoder.WritePointer(this.Level3);
-				}
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.Level = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 2))
-			{
-				this.Level2 = decoder.ReadPointer<FILE_INFO_2_CONTAINER>();
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 3))
-				{
-					this.Level3 = decoder.ReadPointer<FILE_INFO_3_CONTAINER>();
-				}
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.Level)) == 2))
-			{
-				if ((null != this.Level2))
-				{
-					encoder.WriteFixedStruct(this.Level2.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-					encoder.WriteStructDeferral(this.Level2.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 3))
-				{
-					if ((null != this.Level3))
-					{
-						encoder.WriteFixedStruct(this.Level3.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-						encoder.WriteStructDeferral(this.Level3.value);
-					}
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.Level)) == 2))
-			{
-				if ((null != this.Level2))
-				{
-					this.Level2.value = decoder.ReadFixedStruct<FILE_INFO_2_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-					decoder.ReadStructDeferral<FILE_INFO_2_CONTAINER>(ref this.Level2.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 3))
-				{
-					if ((null != this.Level3))
-					{
-						this.Level3.value = decoder.ReadFixedStruct<FILE_INFO_3_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-						decoder.ReadStructDeferral<FILE_INFO_3_CONTAINER>(ref this.Level3.value);
-					}
-				}
-			}
-		}
 		public RpcPointer<FILE_INFO_2_CONTAINER> Level2;
 		public RpcPointer<FILE_INFO_3_CONTAINER> Level3;
+		public void Encode(IRpcEncoder encoder)
+		{
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.Level);
+			switch ((uint)this.Level)
+			{
+				case 2U:
+					encoder.WriteUniquePointer(this.Level2);
+					break;
+				case 3U:
+					encoder.WriteUniquePointer(this.Level3);
+					break;
+			}
+		}
+
+		public void Decode(IRpcDecoder decoder)
+		{
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.Level = decoder.ReadUInt32();
+			switch ((uint)this.Level)
+			{
+				case 2U:
+					this.Level2 = decoder.ReadUniquePointer<FILE_INFO_2_CONTAINER>();
+					break;
+				case 3U:
+					this.Level3 = decoder.ReadUniquePointer<FILE_INFO_3_CONTAINER>();
+					break;
+			}
+		}
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 2U:
+					if (this.Level2 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level2.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level2.value);
+					}
+
+					break;
+				case 3U:
+					if (this.Level3 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level3.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level3.value);
+					}
+
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 2U:
+					if (this.Level2 is not null)
+					{
+						this.Level2.value = decoder.ReadFixedStruct<FILE_INFO_2_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<FILE_INFO_2_CONTAINER>(ref this.Level2.value);
+					}
+
+					break;
+				case 3U:
+					if (this.Level3 is not null)
+					{
+						this.Level3.value = decoder.ReadFixedStruct<FILE_INFO_3_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<FILE_INFO_3_CONTAINER>(ref this.Level3.value);
+					}
+
+					break;
+			}
+		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct FILE_ENUM_STRUCT : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct FILE_ENUM_STRUCT : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint Level;
+		public FILE_ENUM_UNION FileInfo;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.Level);
 			encoder.WriteUnion(this.FileInfo);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.Level = decoder.ReadUInt32();
 			this.FileInfo = decoder.ReadUnion<FILE_ENUM_UNION>();
 		}
-		public uint Level;
-		public FILE_ENUM_UNION FileInfo;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			encoder.WriteStructDeferral(this.FileInfo);
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			decoder.ReadStructDeferral<FILE_ENUM_UNION>(ref this.FileInfo);
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct FILE_INFO : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct FILE_INFO : IRpcFixedStruct
 	{
 		public uint unionSwitch;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.unionSwitch);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.unionSwitch)) == 2))
-			{
-				encoder.WritePointer(this.FileInfo2);
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 3))
-				{
-					encoder.WritePointer(this.FileInfo3);
-				}
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.unionSwitch = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.unionSwitch)) == 2))
-			{
-				this.FileInfo2 = decoder.ReadPointer<FILE_INFO_2>();
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 3))
-				{
-					this.FileInfo3 = decoder.ReadPointer<FILE_INFO_3>();
-				}
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.unionSwitch)) == 2))
-			{
-				if ((null != this.FileInfo2))
-				{
-					encoder.WriteFixedStruct(this.FileInfo2.value, Titanis.DceRpc.NdrAlignment._4Byte);
-					encoder.WriteStructDeferral(this.FileInfo2.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 3))
-				{
-					if ((null != this.FileInfo3))
-					{
-						encoder.WriteFixedStruct(this.FileInfo3.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-						encoder.WriteStructDeferral(this.FileInfo3.value);
-					}
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.unionSwitch)) == 2))
-			{
-				if ((null != this.FileInfo2))
-				{
-					this.FileInfo2.value = decoder.ReadFixedStruct<FILE_INFO_2>(Titanis.DceRpc.NdrAlignment._4Byte);
-					decoder.ReadStructDeferral<FILE_INFO_2>(ref this.FileInfo2.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 3))
-				{
-					if ((null != this.FileInfo3))
-					{
-						this.FileInfo3.value = decoder.ReadFixedStruct<FILE_INFO_3>(Titanis.DceRpc.NdrAlignment.NativePtr);
-						decoder.ReadStructDeferral<FILE_INFO_3>(ref this.FileInfo3.value);
-					}
-				}
-			}
-		}
 		public RpcPointer<FILE_INFO_2> FileInfo2;
 		public RpcPointer<FILE_INFO_3> FileInfo3;
+		public void Encode(IRpcEncoder encoder)
+		{
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.unionSwitch);
+			switch ((uint)this.unionSwitch)
+			{
+				case 2U:
+					encoder.WriteUniquePointer(this.FileInfo2);
+					break;
+				case 3U:
+					encoder.WriteUniquePointer(this.FileInfo3);
+					break;
+			}
+		}
+
+		public void Decode(IRpcDecoder decoder)
+		{
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.unionSwitch = decoder.ReadUInt32();
+			switch ((uint)this.unionSwitch)
+			{
+				case 2U:
+					this.FileInfo2 = decoder.ReadUniquePointer<FILE_INFO_2>();
+					break;
+				case 3U:
+					this.FileInfo3 = decoder.ReadUniquePointer<FILE_INFO_3>();
+					break;
+			}
+		}
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.unionSwitch)
+			{
+				case 2U:
+					if (this.FileInfo2 is not null)
+					{
+						encoder.WriteFixedStruct(this.FileInfo2.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.FileInfo2.value);
+					}
+
+					break;
+				case 3U:
+					if (this.FileInfo3 is not null)
+					{
+						encoder.WriteFixedStruct(this.FileInfo3.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.FileInfo3.value);
+					}
+
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.unionSwitch)
+			{
+				case 2U:
+					if (this.FileInfo2 is not null)
+					{
+						this.FileInfo2.value = decoder.ReadFixedStruct<FILE_INFO_2>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<FILE_INFO_2>(ref this.FileInfo2.value);
+					}
+
+					break;
+				case 3U:
+					if (this.FileInfo3 is not null)
+					{
+						this.FileInfo3.value = decoder.ReadFixedStruct<FILE_INFO_3>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<FILE_INFO_3>(ref this.FileInfo3.value);
+					}
+
+					break;
+			}
+		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_INFO_0 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_INFO_0 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.sesi0_cname);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.sesi0_cname = decoder.ReadPointer<string>();
-		}
 		public RpcPointer<string> sesi0_cname;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.sesi0_cname))
+			encoder.WriteUniquePointer(this.sesi0_cname);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.sesi0_cname = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.sesi0_cname is not null)
 			{
 				encoder.WriteWideCharString(this.sesi0_cname.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.sesi0_cname))
+			if (this.sesi0_cname is not null)
 			{
 				this.sesi0_cname.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_INFO_0_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_INFO_0_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SESSION_INFO_0[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SESSION_INFO_0[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SESSION_INFO_0[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_0 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_0 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SESSION_INFO_0>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_0 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SESSION_INFO_0>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SESSION_INFO_0>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_0 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SESSION_INFO_0>(ref elem_0);
@@ -749,104 +839,120 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_INFO_1 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_INFO_1 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.sesi1_cname);
-			encoder.WritePointer(this.sesi1_username);
-			encoder.WriteValue(this.sesi1_num_opens);
-			encoder.WriteValue(this.sesi1_time);
-			encoder.WriteValue(this.sesi1_idle_time);
-			encoder.WriteValue(this.sesi1_user_flags);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.sesi1_cname = decoder.ReadPointer<string>();
-			this.sesi1_username = decoder.ReadPointer<string>();
-			this.sesi1_num_opens = decoder.ReadUInt32();
-			this.sesi1_time = decoder.ReadUInt32();
-			this.sesi1_idle_time = decoder.ReadUInt32();
-			this.sesi1_user_flags = decoder.ReadUInt32();
-		}
 		public RpcPointer<string> sesi1_cname;
 		public RpcPointer<string> sesi1_username;
 		public uint sesi1_num_opens;
 		public uint sesi1_time;
 		public uint sesi1_idle_time;
 		public uint sesi1_user_flags;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.sesi1_cname))
+			encoder.WriteUniquePointer(this.sesi1_cname);
+			encoder.WriteUniquePointer(this.sesi1_username);
+			encoder.WriteValue(this.sesi1_num_opens);
+			encoder.WriteValue(this.sesi1_time);
+			encoder.WriteValue(this.sesi1_idle_time);
+			encoder.WriteValue(this.sesi1_user_flags);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.sesi1_cname = decoder.ReadUniquePointer<string>();
+			this.sesi1_username = decoder.ReadUniquePointer<string>();
+			this.sesi1_num_opens = decoder.ReadUInt32();
+			this.sesi1_time = decoder.ReadUInt32();
+			this.sesi1_idle_time = decoder.ReadUInt32();
+			this.sesi1_user_flags = decoder.ReadUInt32();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.sesi1_cname is not null)
 			{
 				encoder.WriteWideCharString(this.sesi1_cname.value);
 			}
-			if ((null != this.sesi1_username))
+
+			if (this.sesi1_username is not null)
 			{
 				encoder.WriteWideCharString(this.sesi1_username.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.sesi1_cname))
+			if (this.sesi1_cname is not null)
 			{
 				this.sesi1_cname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sesi1_username))
+
+			if (this.sesi1_username is not null)
 			{
 				this.sesi1_username.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_INFO_1_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_INFO_1_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SESSION_INFO_1[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SESSION_INFO_1[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SESSION_INFO_1[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_1 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_1 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SESSION_INFO_1>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_1 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SESSION_INFO_1>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SESSION_INFO_1>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_1 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SESSION_INFO_1>(ref elem_0);
@@ -855,29 +961,10 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_INFO_2 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_INFO_2 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.sesi2_cname);
-			encoder.WritePointer(this.sesi2_username);
-			encoder.WriteValue(this.sesi2_num_opens);
-			encoder.WriteValue(this.sesi2_time);
-			encoder.WriteValue(this.sesi2_idle_time);
-			encoder.WriteValue(this.sesi2_user_flags);
-			encoder.WritePointer(this.sesi2_cltype_name);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.sesi2_cname = decoder.ReadPointer<string>();
-			this.sesi2_username = decoder.ReadPointer<string>();
-			this.sesi2_num_opens = decoder.ReadUInt32();
-			this.sesi2_time = decoder.ReadUInt32();
-			this.sesi2_idle_time = decoder.ReadUInt32();
-			this.sesi2_user_flags = decoder.ReadUInt32();
-			this.sesi2_cltype_name = decoder.ReadPointer<string>();
-		}
 		public RpcPointer<string> sesi2_cname;
 		public RpcPointer<string> sesi2_username;
 		public uint sesi2_num_opens;
@@ -885,85 +972,122 @@ namespace ms_srvs
 		public uint sesi2_idle_time;
 		public uint sesi2_user_flags;
 		public RpcPointer<string> sesi2_cltype_name;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.sesi2_cname))
+			encoder.WriteUniquePointer(this.sesi2_cname);
+			encoder.WriteUniquePointer(this.sesi2_username);
+			encoder.WriteValue(this.sesi2_num_opens);
+			encoder.WriteValue(this.sesi2_time);
+			encoder.WriteValue(this.sesi2_idle_time);
+			encoder.WriteValue(this.sesi2_user_flags);
+			encoder.WriteUniquePointer(this.sesi2_cltype_name);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.sesi2_cname = decoder.ReadUniquePointer<string>();
+			this.sesi2_username = decoder.ReadUniquePointer<string>();
+			this.sesi2_num_opens = decoder.ReadUInt32();
+			this.sesi2_time = decoder.ReadUInt32();
+			this.sesi2_idle_time = decoder.ReadUInt32();
+			this.sesi2_user_flags = decoder.ReadUInt32();
+			this.sesi2_cltype_name = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.sesi2_cname is not null)
 			{
 				encoder.WriteWideCharString(this.sesi2_cname.value);
 			}
-			if ((null != this.sesi2_username))
+
+			if (this.sesi2_username is not null)
 			{
 				encoder.WriteWideCharString(this.sesi2_username.value);
 			}
-			if ((null != this.sesi2_cltype_name))
+
+			if (this.sesi2_cltype_name is not null)
 			{
 				encoder.WriteWideCharString(this.sesi2_cltype_name.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.sesi2_cname))
+			if (this.sesi2_cname is not null)
 			{
 				this.sesi2_cname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sesi2_username))
+
+			if (this.sesi2_username is not null)
 			{
 				this.sesi2_username.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sesi2_cltype_name))
+
+			if (this.sesi2_cltype_name is not null)
 			{
 				this.sesi2_cltype_name.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_INFO_2_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_INFO_2_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SESSION_INFO_2[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SESSION_INFO_2[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SESSION_INFO_2[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_2 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_2 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SESSION_INFO_2>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_2 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SESSION_INFO_2>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SESSION_INFO_2>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_2 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SESSION_INFO_2>(ref elem_0);
@@ -972,98 +1096,114 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_INFO_10 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_INFO_10 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.sesi10_cname);
-			encoder.WritePointer(this.sesi10_username);
-			encoder.WriteValue(this.sesi10_time);
-			encoder.WriteValue(this.sesi10_idle_time);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.sesi10_cname = decoder.ReadPointer<string>();
-			this.sesi10_username = decoder.ReadPointer<string>();
-			this.sesi10_time = decoder.ReadUInt32();
-			this.sesi10_idle_time = decoder.ReadUInt32();
-		}
 		public RpcPointer<string> sesi10_cname;
 		public RpcPointer<string> sesi10_username;
 		public uint sesi10_time;
 		public uint sesi10_idle_time;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.sesi10_cname))
+			encoder.WriteUniquePointer(this.sesi10_cname);
+			encoder.WriteUniquePointer(this.sesi10_username);
+			encoder.WriteValue(this.sesi10_time);
+			encoder.WriteValue(this.sesi10_idle_time);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.sesi10_cname = decoder.ReadUniquePointer<string>();
+			this.sesi10_username = decoder.ReadUniquePointer<string>();
+			this.sesi10_time = decoder.ReadUInt32();
+			this.sesi10_idle_time = decoder.ReadUInt32();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.sesi10_cname is not null)
 			{
 				encoder.WriteWideCharString(this.sesi10_cname.value);
 			}
-			if ((null != this.sesi10_username))
+
+			if (this.sesi10_username is not null)
 			{
 				encoder.WriteWideCharString(this.sesi10_username.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.sesi10_cname))
+			if (this.sesi10_cname is not null)
 			{
 				this.sesi10_cname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sesi10_username))
+
+			if (this.sesi10_username is not null)
 			{
 				this.sesi10_username.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_INFO_10_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_INFO_10_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SESSION_INFO_10[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SESSION_INFO_10[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SESSION_INFO_10[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_10 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_10 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SESSION_INFO_10>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_10 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SESSION_INFO_10>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SESSION_INFO_10>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_10 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SESSION_INFO_10>(ref elem_0);
@@ -1072,31 +1212,10 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_INFO_502 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_INFO_502 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.sesi502_cname);
-			encoder.WritePointer(this.sesi502_username);
-			encoder.WriteValue(this.sesi502_num_opens);
-			encoder.WriteValue(this.sesi502_time);
-			encoder.WriteValue(this.sesi502_idle_time);
-			encoder.WriteValue(this.sesi502_user_flags);
-			encoder.WritePointer(this.sesi502_cltype_name);
-			encoder.WritePointer(this.sesi502_transport);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.sesi502_cname = decoder.ReadPointer<string>();
-			this.sesi502_username = decoder.ReadPointer<string>();
-			this.sesi502_num_opens = decoder.ReadUInt32();
-			this.sesi502_time = decoder.ReadUInt32();
-			this.sesi502_idle_time = decoder.ReadUInt32();
-			this.sesi502_user_flags = decoder.ReadUInt32();
-			this.sesi502_cltype_name = decoder.ReadPointer<string>();
-			this.sesi502_transport = decoder.ReadPointer<string>();
-		}
 		public RpcPointer<string> sesi502_cname;
 		public RpcPointer<string> sesi502_username;
 		public uint sesi502_num_opens;
@@ -1105,93 +1224,134 @@ namespace ms_srvs
 		public uint sesi502_user_flags;
 		public RpcPointer<string> sesi502_cltype_name;
 		public RpcPointer<string> sesi502_transport;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.sesi502_cname))
+			encoder.WriteUniquePointer(this.sesi502_cname);
+			encoder.WriteUniquePointer(this.sesi502_username);
+			encoder.WriteValue(this.sesi502_num_opens);
+			encoder.WriteValue(this.sesi502_time);
+			encoder.WriteValue(this.sesi502_idle_time);
+			encoder.WriteValue(this.sesi502_user_flags);
+			encoder.WriteUniquePointer(this.sesi502_cltype_name);
+			encoder.WriteUniquePointer(this.sesi502_transport);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.sesi502_cname = decoder.ReadUniquePointer<string>();
+			this.sesi502_username = decoder.ReadUniquePointer<string>();
+			this.sesi502_num_opens = decoder.ReadUInt32();
+			this.sesi502_time = decoder.ReadUInt32();
+			this.sesi502_idle_time = decoder.ReadUInt32();
+			this.sesi502_user_flags = decoder.ReadUInt32();
+			this.sesi502_cltype_name = decoder.ReadUniquePointer<string>();
+			this.sesi502_transport = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.sesi502_cname is not null)
 			{
 				encoder.WriteWideCharString(this.sesi502_cname.value);
 			}
-			if ((null != this.sesi502_username))
+
+			if (this.sesi502_username is not null)
 			{
 				encoder.WriteWideCharString(this.sesi502_username.value);
 			}
-			if ((null != this.sesi502_cltype_name))
+
+			if (this.sesi502_cltype_name is not null)
 			{
 				encoder.WriteWideCharString(this.sesi502_cltype_name.value);
 			}
-			if ((null != this.sesi502_transport))
+
+			if (this.sesi502_transport is not null)
 			{
 				encoder.WriteWideCharString(this.sesi502_transport.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.sesi502_cname))
+			if (this.sesi502_cname is not null)
 			{
 				this.sesi502_cname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sesi502_username))
+
+			if (this.sesi502_username is not null)
 			{
 				this.sesi502_username.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sesi502_cltype_name))
+
+			if (this.sesi502_cltype_name is not null)
 			{
 				this.sesi502_cltype_name.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sesi502_transport))
+
+			if (this.sesi502_transport is not null)
 			{
 				this.sesi502_transport.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_INFO_502_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_INFO_502_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SESSION_INFO_502[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SESSION_INFO_502[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SESSION_INFO_502[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_502 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_502 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SESSION_INFO_502>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_502 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SESSION_INFO_502>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SESSION_INFO_502>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SESSION_INFO_502 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SESSION_INFO_502>(ref elem_0);
@@ -1200,253 +1360,194 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_ENUM_UNION : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_ENUM_UNION : IRpcFixedStruct
 	{
 		public uint Level;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.Level);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 0))
-			{
-				encoder.WritePointer(this.Level0);
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					encoder.WritePointer(this.Level1);
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						encoder.WritePointer(this.Level2);
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 10))
-						{
-							encoder.WritePointer(this.Level10);
-						}
-						else
-						{
-							if ((((int)(this.Level)) == 502))
-							{
-								encoder.WritePointer(this.Level502);
-							}
-						}
-					}
-				}
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.Level = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 0))
-			{
-				this.Level0 = decoder.ReadPointer<SESSION_INFO_0_CONTAINER>();
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					this.Level1 = decoder.ReadPointer<SESSION_INFO_1_CONTAINER>();
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						this.Level2 = decoder.ReadPointer<SESSION_INFO_2_CONTAINER>();
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 10))
-						{
-							this.Level10 = decoder.ReadPointer<SESSION_INFO_10_CONTAINER>();
-						}
-						else
-						{
-							if ((((int)(this.Level)) == 502))
-							{
-								this.Level502 = decoder.ReadPointer<SESSION_INFO_502_CONTAINER>();
-							}
-						}
-					}
-				}
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.Level)) == 0))
-			{
-				if ((null != this.Level0))
-				{
-					encoder.WriteFixedStruct(this.Level0.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-					encoder.WriteStructDeferral(this.Level0.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					if ((null != this.Level1))
-					{
-						encoder.WriteFixedStruct(this.Level1.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-						encoder.WriteStructDeferral(this.Level1.value);
-					}
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						if ((null != this.Level2))
-						{
-							encoder.WriteFixedStruct(this.Level2.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-							encoder.WriteStructDeferral(this.Level2.value);
-						}
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 10))
-						{
-							if ((null != this.Level10))
-							{
-								encoder.WriteFixedStruct(this.Level10.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-								encoder.WriteStructDeferral(this.Level10.value);
-							}
-						}
-						else
-						{
-							if ((((int)(this.Level)) == 502))
-							{
-								if ((null != this.Level502))
-								{
-									encoder.WriteFixedStruct(this.Level502.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-									encoder.WriteStructDeferral(this.Level502.value);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.Level)) == 0))
-			{
-				if ((null != this.Level0))
-				{
-					this.Level0.value = decoder.ReadFixedStruct<SESSION_INFO_0_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-					decoder.ReadStructDeferral<SESSION_INFO_0_CONTAINER>(ref this.Level0.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					if ((null != this.Level1))
-					{
-						this.Level1.value = decoder.ReadFixedStruct<SESSION_INFO_1_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-						decoder.ReadStructDeferral<SESSION_INFO_1_CONTAINER>(ref this.Level1.value);
-					}
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						if ((null != this.Level2))
-						{
-							this.Level2.value = decoder.ReadFixedStruct<SESSION_INFO_2_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-							decoder.ReadStructDeferral<SESSION_INFO_2_CONTAINER>(ref this.Level2.value);
-						}
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 10))
-						{
-							if ((null != this.Level10))
-							{
-								this.Level10.value = decoder.ReadFixedStruct<SESSION_INFO_10_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-								decoder.ReadStructDeferral<SESSION_INFO_10_CONTAINER>(ref this.Level10.value);
-							}
-						}
-						else
-						{
-							if ((((int)(this.Level)) == 502))
-							{
-								if ((null != this.Level502))
-								{
-									this.Level502.value = decoder.ReadFixedStruct<SESSION_INFO_502_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-									decoder.ReadStructDeferral<SESSION_INFO_502_CONTAINER>(ref this.Level502.value);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 		public RpcPointer<SESSION_INFO_0_CONTAINER> Level0;
 		public RpcPointer<SESSION_INFO_1_CONTAINER> Level1;
 		public RpcPointer<SESSION_INFO_2_CONTAINER> Level2;
 		public RpcPointer<SESSION_INFO_10_CONTAINER> Level10;
 		public RpcPointer<SESSION_INFO_502_CONTAINER> Level502;
+		public void Encode(IRpcEncoder encoder)
+		{
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.Level);
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					encoder.WriteUniquePointer(this.Level0);
+					break;
+				case 1U:
+					encoder.WriteUniquePointer(this.Level1);
+					break;
+				case 2U:
+					encoder.WriteUniquePointer(this.Level2);
+					break;
+				case 10U:
+					encoder.WriteUniquePointer(this.Level10);
+					break;
+				case 502U:
+					encoder.WriteUniquePointer(this.Level502);
+					break;
+			}
+		}
+
+		public void Decode(IRpcDecoder decoder)
+		{
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.Level = decoder.ReadUInt32();
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					this.Level0 = decoder.ReadUniquePointer<SESSION_INFO_0_CONTAINER>();
+					break;
+				case 1U:
+					this.Level1 = decoder.ReadUniquePointer<SESSION_INFO_1_CONTAINER>();
+					break;
+				case 2U:
+					this.Level2 = decoder.ReadUniquePointer<SESSION_INFO_2_CONTAINER>();
+					break;
+				case 10U:
+					this.Level10 = decoder.ReadUniquePointer<SESSION_INFO_10_CONTAINER>();
+					break;
+				case 502U:
+					this.Level502 = decoder.ReadUniquePointer<SESSION_INFO_502_CONTAINER>();
+					break;
+			}
+		}
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					if (this.Level0 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level0.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level0.value);
+					}
+
+					break;
+				case 1U:
+					if (this.Level1 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level1.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level1.value);
+					}
+
+					break;
+				case 2U:
+					if (this.Level2 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level2.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level2.value);
+					}
+
+					break;
+				case 10U:
+					if (this.Level10 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level10.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level10.value);
+					}
+
+					break;
+				case 502U:
+					if (this.Level502 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level502.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level502.value);
+					}
+
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					if (this.Level0 is not null)
+					{
+						this.Level0.value = decoder.ReadFixedStruct<SESSION_INFO_0_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SESSION_INFO_0_CONTAINER>(ref this.Level0.value);
+					}
+
+					break;
+				case 1U:
+					if (this.Level1 is not null)
+					{
+						this.Level1.value = decoder.ReadFixedStruct<SESSION_INFO_1_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SESSION_INFO_1_CONTAINER>(ref this.Level1.value);
+					}
+
+					break;
+				case 2U:
+					if (this.Level2 is not null)
+					{
+						this.Level2.value = decoder.ReadFixedStruct<SESSION_INFO_2_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SESSION_INFO_2_CONTAINER>(ref this.Level2.value);
+					}
+
+					break;
+				case 10U:
+					if (this.Level10 is not null)
+					{
+						this.Level10.value = decoder.ReadFixedStruct<SESSION_INFO_10_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SESSION_INFO_10_CONTAINER>(ref this.Level10.value);
+					}
+
+					break;
+				case 502U:
+					if (this.Level502 is not null)
+					{
+						this.Level502.value = decoder.ReadFixedStruct<SESSION_INFO_502_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SESSION_INFO_502_CONTAINER>(ref this.Level502.value);
+					}
+
+					break;
+			}
+		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SESSION_ENUM_STRUCT : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SESSION_ENUM_STRUCT : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint Level;
+		public SESSION_ENUM_UNION SessionInfo;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.Level);
 			encoder.WriteUnion(this.SessionInfo);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.Level = decoder.ReadUInt32();
 			this.SessionInfo = decoder.ReadUnion<SESSION_ENUM_UNION>();
 		}
-		public uint Level;
-		public SESSION_ENUM_UNION SessionInfo;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			encoder.WriteStructDeferral(this.SessionInfo);
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			decoder.ReadStructDeferral<SESSION_ENUM_UNION>(ref this.SessionInfo);
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_502_I : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_502_I : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.shi502_netname);
-			encoder.WriteValue(this.shi502_type);
-			encoder.WritePointer(this.shi502_remark);
-			encoder.WriteValue(this.shi502_permissions);
-			encoder.WriteValue(this.shi502_max_uses);
-			encoder.WriteValue(this.shi502_current_uses);
-			encoder.WritePointer(this.shi502_path);
-			encoder.WritePointer(this.shi502_passwd);
-			encoder.WriteValue(this.shi502_reserved);
-			encoder.WritePointer(this.shi502_security_descriptor);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.shi502_netname = decoder.ReadPointer<string>();
-			this.shi502_type = decoder.ReadUInt32();
-			this.shi502_remark = decoder.ReadPointer<string>();
-			this.shi502_permissions = decoder.ReadUInt32();
-			this.shi502_max_uses = decoder.ReadUInt32();
-			this.shi502_current_uses = decoder.ReadUInt32();
-			this.shi502_path = decoder.ReadPointer<string>();
-			this.shi502_passwd = decoder.ReadPointer<string>();
-			this.shi502_reserved = decoder.ReadUInt32();
-			this.shi502_security_descriptor = decoder.ReadPointer<byte[]>();
-		}
 		public RpcPointer<string> shi502_netname;
 		public uint shi502_type;
 		public RpcPointer<string> shi502_remark;
@@ -1457,58 +1558,97 @@ namespace ms_srvs
 		public RpcPointer<string> shi502_passwd;
 		public uint shi502_reserved;
 		public RpcPointer<byte[]> shi502_security_descriptor;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.shi502_netname))
+			encoder.WriteUniquePointer(this.shi502_netname);
+			encoder.WriteValue(this.shi502_type);
+			encoder.WriteUniquePointer(this.shi502_remark);
+			encoder.WriteValue(this.shi502_permissions);
+			encoder.WriteValue(this.shi502_max_uses);
+			encoder.WriteValue(this.shi502_current_uses);
+			encoder.WriteUniquePointer(this.shi502_path);
+			encoder.WriteUniquePointer(this.shi502_passwd);
+			encoder.WriteValue(this.shi502_reserved);
+			encoder.WriteUniquePointer(this.shi502_security_descriptor);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.shi502_netname = decoder.ReadUniquePointer<string>();
+			this.shi502_type = decoder.ReadUInt32();
+			this.shi502_remark = decoder.ReadUniquePointer<string>();
+			this.shi502_permissions = decoder.ReadUInt32();
+			this.shi502_max_uses = decoder.ReadUInt32();
+			this.shi502_current_uses = decoder.ReadUInt32();
+			this.shi502_path = decoder.ReadUniquePointer<string>();
+			this.shi502_passwd = decoder.ReadUniquePointer<string>();
+			this.shi502_reserved = decoder.ReadUInt32();
+			this.shi502_security_descriptor = decoder.ReadUniquePointer<byte[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.shi502_netname is not null)
 			{
 				encoder.WriteWideCharString(this.shi502_netname.value);
 			}
-			if ((null != this.shi502_remark))
+
+			if (this.shi502_remark is not null)
 			{
 				encoder.WriteWideCharString(this.shi502_remark.value);
 			}
-			if ((null != this.shi502_path))
+
+			if (this.shi502_path is not null)
 			{
 				encoder.WriteWideCharString(this.shi502_path.value);
 			}
-			if ((null != this.shi502_passwd))
+
+			if (this.shi502_passwd is not null)
 			{
 				encoder.WriteWideCharString(this.shi502_passwd.value);
 			}
-			if ((null != this.shi502_security_descriptor))
+
+			if (this.shi502_security_descriptor is not null)
 			{
 				encoder.WriteArrayHeader(this.shi502_security_descriptor.value);
-				for (int i = 0; (i < this.shi502_security_descriptor.value.Length); i++
-				)
+				for (int i = 0; i < this.shi502_security_descriptor.value.Length; i++)
 				{
 					byte elem_0 = this.shi502_security_descriptor.value[i];
 					encoder.WriteValue(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.shi502_netname))
+			if (this.shi502_netname is not null)
 			{
 				this.shi502_netname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi502_remark))
+
+			if (this.shi502_remark is not null)
 			{
 				this.shi502_remark.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi502_path))
+
+			if (this.shi502_path is not null)
 			{
 				this.shi502_path.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi502_passwd))
+
+			if (this.shi502_passwd is not null)
 			{
 				this.shi502_passwd.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi502_security_descriptor))
+
+			if (this.shi502_security_descriptor is not null)
 			{
 				this.shi502_security_descriptor.value = decoder.ReadArrayHeader<byte>();
-				for (int i = 0; (i < this.shi502_security_descriptor.value.Length); i++
-				)
+				for (int i = 0; i < this.shi502_security_descriptor.value.Length; i++)
 				{
 					byte elem_0 = this.shi502_security_descriptor.value[i];
 					elem_0 = decoder.ReadUnsignedChar();
@@ -1517,37 +1657,10 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_503_I : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_503_I : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.shi503_netname);
-			encoder.WriteValue(this.shi503_type);
-			encoder.WritePointer(this.shi503_remark);
-			encoder.WriteValue(this.shi503_permissions);
-			encoder.WriteValue(this.shi503_max_uses);
-			encoder.WriteValue(this.shi503_current_uses);
-			encoder.WritePointer(this.shi503_path);
-			encoder.WritePointer(this.shi503_passwd);
-			encoder.WritePointer(this.shi503_servername);
-			encoder.WriteValue(this.shi503_reserved);
-			encoder.WritePointer(this.shi503_security_descriptor);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.shi503_netname = decoder.ReadPointer<string>();
-			this.shi503_type = decoder.ReadUInt32();
-			this.shi503_remark = decoder.ReadPointer<string>();
-			this.shi503_permissions = decoder.ReadUInt32();
-			this.shi503_max_uses = decoder.ReadUInt32();
-			this.shi503_current_uses = decoder.ReadUInt32();
-			this.shi503_path = decoder.ReadPointer<string>();
-			this.shi503_passwd = decoder.ReadPointer<string>();
-			this.shi503_servername = decoder.ReadPointer<string>();
-			this.shi503_reserved = decoder.ReadUInt32();
-			this.shi503_security_descriptor = decoder.ReadPointer<byte[]>();
-		}
 		public RpcPointer<string> shi503_netname;
 		public uint shi503_type;
 		public RpcPointer<string> shi503_remark;
@@ -1559,66 +1672,109 @@ namespace ms_srvs
 		public RpcPointer<string> shi503_servername;
 		public uint shi503_reserved;
 		public RpcPointer<byte[]> shi503_security_descriptor;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.shi503_netname))
+			encoder.WriteUniquePointer(this.shi503_netname);
+			encoder.WriteValue(this.shi503_type);
+			encoder.WriteUniquePointer(this.shi503_remark);
+			encoder.WriteValue(this.shi503_permissions);
+			encoder.WriteValue(this.shi503_max_uses);
+			encoder.WriteValue(this.shi503_current_uses);
+			encoder.WriteUniquePointer(this.shi503_path);
+			encoder.WriteUniquePointer(this.shi503_passwd);
+			encoder.WriteUniquePointer(this.shi503_servername);
+			encoder.WriteValue(this.shi503_reserved);
+			encoder.WriteUniquePointer(this.shi503_security_descriptor);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.shi503_netname = decoder.ReadUniquePointer<string>();
+			this.shi503_type = decoder.ReadUInt32();
+			this.shi503_remark = decoder.ReadUniquePointer<string>();
+			this.shi503_permissions = decoder.ReadUInt32();
+			this.shi503_max_uses = decoder.ReadUInt32();
+			this.shi503_current_uses = decoder.ReadUInt32();
+			this.shi503_path = decoder.ReadUniquePointer<string>();
+			this.shi503_passwd = decoder.ReadUniquePointer<string>();
+			this.shi503_servername = decoder.ReadUniquePointer<string>();
+			this.shi503_reserved = decoder.ReadUInt32();
+			this.shi503_security_descriptor = decoder.ReadUniquePointer<byte[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.shi503_netname is not null)
 			{
 				encoder.WriteWideCharString(this.shi503_netname.value);
 			}
-			if ((null != this.shi503_remark))
+
+			if (this.shi503_remark is not null)
 			{
 				encoder.WriteWideCharString(this.shi503_remark.value);
 			}
-			if ((null != this.shi503_path))
+
+			if (this.shi503_path is not null)
 			{
 				encoder.WriteWideCharString(this.shi503_path.value);
 			}
-			if ((null != this.shi503_passwd))
+
+			if (this.shi503_passwd is not null)
 			{
 				encoder.WriteWideCharString(this.shi503_passwd.value);
 			}
-			if ((null != this.shi503_servername))
+
+			if (this.shi503_servername is not null)
 			{
 				encoder.WriteWideCharString(this.shi503_servername.value);
 			}
-			if ((null != this.shi503_security_descriptor))
+
+			if (this.shi503_security_descriptor is not null)
 			{
 				encoder.WriteArrayHeader(this.shi503_security_descriptor.value);
-				for (int i = 0; (i < this.shi503_security_descriptor.value.Length); i++
-				)
+				for (int i = 0; i < this.shi503_security_descriptor.value.Length; i++)
 				{
 					byte elem_0 = this.shi503_security_descriptor.value[i];
 					encoder.WriteValue(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.shi503_netname))
+			if (this.shi503_netname is not null)
 			{
 				this.shi503_netname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi503_remark))
+
+			if (this.shi503_remark is not null)
 			{
 				this.shi503_remark.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi503_path))
+
+			if (this.shi503_path is not null)
 			{
 				this.shi503_path.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi503_passwd))
+
+			if (this.shi503_passwd is not null)
 			{
 				this.shi503_passwd.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi503_servername))
+
+			if (this.shi503_servername is not null)
 			{
 				this.shi503_servername.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi503_security_descriptor))
+
+			if (this.shi503_security_descriptor is not null)
 			{
 				this.shi503_security_descriptor.value = decoder.ReadArrayHeader<byte>();
-				for (int i = 0; (i < this.shi503_security_descriptor.value.Length); i++
-				)
+				for (int i = 0; i < this.shi503_security_descriptor.value.Length; i++)
 				{
 					byte elem_0 = this.shi503_security_descriptor.value[i];
 					elem_0 = decoder.ReadUnsignedChar();
@@ -1627,54 +1783,60 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_503_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_503_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SHARE_INFO_503_I[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SHARE_INFO_503_I[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SHARE_INFO_503_I[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_503_I elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_503_I elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SHARE_INFO_503_I>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_503_I elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_503_I>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_503_I>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_503_I elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SHARE_INFO_503_I>(ref elem_0);
@@ -1683,41 +1845,47 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_1501_I : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_1501_I : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.shi1501_reserved);
-			encoder.WritePointer(this.shi1501_security_descriptor);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.shi1501_reserved = decoder.ReadUInt32();
-			this.shi1501_security_descriptor = decoder.ReadPointer<byte[]>();
-		}
 		public uint shi1501_reserved;
 		public RpcPointer<byte[]> shi1501_security_descriptor;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.shi1501_security_descriptor))
+			encoder.WriteValue(this.shi1501_reserved);
+			encoder.WriteUniquePointer(this.shi1501_security_descriptor);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.shi1501_reserved = decoder.ReadUInt32();
+			this.shi1501_security_descriptor = decoder.ReadUniquePointer<byte[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.shi1501_security_descriptor is not null)
 			{
 				encoder.WriteArrayHeader(this.shi1501_security_descriptor.value);
-				for (int i = 0; (i < this.shi1501_security_descriptor.value.Length); i++
-				)
+				for (int i = 0; i < this.shi1501_security_descriptor.value.Length; i++)
 				{
 					byte elem_0 = this.shi1501_security_descriptor.value[i];
 					encoder.WriteValue(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.shi1501_security_descriptor))
+			if (this.shi1501_security_descriptor is not null)
 			{
 				this.shi1501_security_descriptor.value = decoder.ReadArrayHeader<byte>();
-				for (int i = 0; (i < this.shi1501_security_descriptor.value.Length); i++
-				)
+				for (int i = 0; i < this.shi1501_security_descriptor.value.Length; i++)
 				{
 					byte elem_0 = this.shi1501_security_descriptor.value[i];
 					elem_0 = decoder.ReadUnsignedChar();
@@ -1726,81 +1894,95 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_0 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_0 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.shi0_netname);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.shi0_netname = decoder.ReadPointer<string>();
-		}
 		public RpcPointer<string> shi0_netname;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.shi0_netname))
+			encoder.WriteUniquePointer(this.shi0_netname);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.shi0_netname = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.shi0_netname is not null)
 			{
 				encoder.WriteWideCharString(this.shi0_netname.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.shi0_netname))
+			if (this.shi0_netname is not null)
 			{
 				this.shi0_netname.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_0_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_0_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SHARE_INFO_0[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SHARE_INFO_0[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SHARE_INFO_0[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_0 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_0 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SHARE_INFO_0>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_0 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_0>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_0>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_0 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SHARE_INFO_0>(ref elem_0);
@@ -1809,95 +1991,111 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_1 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_1 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.shi1_netname);
-			encoder.WriteValue(this.shi1_type);
-			encoder.WritePointer(this.shi1_remark);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.shi1_netname = decoder.ReadPointer<string>();
-			this.shi1_type = decoder.ReadUInt32();
-			this.shi1_remark = decoder.ReadPointer<string>();
-		}
 		public RpcPointer<string> shi1_netname;
 		public uint shi1_type;
 		public RpcPointer<string> shi1_remark;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.shi1_netname))
+			encoder.WriteUniquePointer(this.shi1_netname);
+			encoder.WriteValue(this.shi1_type);
+			encoder.WriteUniquePointer(this.shi1_remark);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.shi1_netname = decoder.ReadUniquePointer<string>();
+			this.shi1_type = decoder.ReadUInt32();
+			this.shi1_remark = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.shi1_netname is not null)
 			{
 				encoder.WriteWideCharString(this.shi1_netname.value);
 			}
-			if ((null != this.shi1_remark))
+
+			if (this.shi1_remark is not null)
 			{
 				encoder.WriteWideCharString(this.shi1_remark.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.shi1_netname))
+			if (this.shi1_netname is not null)
 			{
 				this.shi1_netname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi1_remark))
+
+			if (this.shi1_remark is not null)
 			{
 				this.shi1_remark.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_1_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_1_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SHARE_INFO_1[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SHARE_INFO_1[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SHARE_INFO_1[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_1 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_1 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SHARE_INFO_1>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_1 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_1>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_1>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_1 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SHARE_INFO_1>(ref elem_0);
@@ -1906,31 +2104,10 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_2 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_2 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.shi2_netname);
-			encoder.WriteValue(this.shi2_type);
-			encoder.WritePointer(this.shi2_remark);
-			encoder.WriteValue(this.shi2_permissions);
-			encoder.WriteValue(this.shi2_max_uses);
-			encoder.WriteValue(this.shi2_current_uses);
-			encoder.WritePointer(this.shi2_path);
-			encoder.WritePointer(this.shi2_passwd);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.shi2_netname = decoder.ReadPointer<string>();
-			this.shi2_type = decoder.ReadUInt32();
-			this.shi2_remark = decoder.ReadPointer<string>();
-			this.shi2_permissions = decoder.ReadUInt32();
-			this.shi2_max_uses = decoder.ReadUInt32();
-			this.shi2_current_uses = decoder.ReadUInt32();
-			this.shi2_path = decoder.ReadPointer<string>();
-			this.shi2_passwd = decoder.ReadPointer<string>();
-		}
 		public RpcPointer<string> shi2_netname;
 		public uint shi2_type;
 		public RpcPointer<string> shi2_remark;
@@ -1939,93 +2116,134 @@ namespace ms_srvs
 		public uint shi2_current_uses;
 		public RpcPointer<string> shi2_path;
 		public RpcPointer<string> shi2_passwd;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.shi2_netname))
+			encoder.WriteUniquePointer(this.shi2_netname);
+			encoder.WriteValue(this.shi2_type);
+			encoder.WriteUniquePointer(this.shi2_remark);
+			encoder.WriteValue(this.shi2_permissions);
+			encoder.WriteValue(this.shi2_max_uses);
+			encoder.WriteValue(this.shi2_current_uses);
+			encoder.WriteUniquePointer(this.shi2_path);
+			encoder.WriteUniquePointer(this.shi2_passwd);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.shi2_netname = decoder.ReadUniquePointer<string>();
+			this.shi2_type = decoder.ReadUInt32();
+			this.shi2_remark = decoder.ReadUniquePointer<string>();
+			this.shi2_permissions = decoder.ReadUInt32();
+			this.shi2_max_uses = decoder.ReadUInt32();
+			this.shi2_current_uses = decoder.ReadUInt32();
+			this.shi2_path = decoder.ReadUniquePointer<string>();
+			this.shi2_passwd = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.shi2_netname is not null)
 			{
 				encoder.WriteWideCharString(this.shi2_netname.value);
 			}
-			if ((null != this.shi2_remark))
+
+			if (this.shi2_remark is not null)
 			{
 				encoder.WriteWideCharString(this.shi2_remark.value);
 			}
-			if ((null != this.shi2_path))
+
+			if (this.shi2_path is not null)
 			{
 				encoder.WriteWideCharString(this.shi2_path.value);
 			}
-			if ((null != this.shi2_passwd))
+
+			if (this.shi2_passwd is not null)
 			{
 				encoder.WriteWideCharString(this.shi2_passwd.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.shi2_netname))
+			if (this.shi2_netname is not null)
 			{
 				this.shi2_netname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi2_remark))
+
+			if (this.shi2_remark is not null)
 			{
 				this.shi2_remark.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi2_path))
+
+			if (this.shi2_path is not null)
 			{
 				this.shi2_path.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi2_passwd))
+
+			if (this.shi2_passwd is not null)
 			{
 				this.shi2_passwd.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_2_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_2_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SHARE_INFO_2[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SHARE_INFO_2[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SHARE_INFO_2[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_2 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_2 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SHARE_INFO_2>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_2 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_2>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_2>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_2 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SHARE_INFO_2>(ref elem_0);
@@ -2034,98 +2252,114 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_501 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_501 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.shi501_netname);
-			encoder.WriteValue(this.shi501_type);
-			encoder.WritePointer(this.shi501_remark);
-			encoder.WriteValue(this.shi501_flags);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.shi501_netname = decoder.ReadPointer<string>();
-			this.shi501_type = decoder.ReadUInt32();
-			this.shi501_remark = decoder.ReadPointer<string>();
-			this.shi501_flags = decoder.ReadUInt32();
-		}
 		public RpcPointer<string> shi501_netname;
 		public uint shi501_type;
 		public RpcPointer<string> shi501_remark;
 		public uint shi501_flags;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.shi501_netname))
+			encoder.WriteUniquePointer(this.shi501_netname);
+			encoder.WriteValue(this.shi501_type);
+			encoder.WriteUniquePointer(this.shi501_remark);
+			encoder.WriteValue(this.shi501_flags);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.shi501_netname = decoder.ReadUniquePointer<string>();
+			this.shi501_type = decoder.ReadUInt32();
+			this.shi501_remark = decoder.ReadUniquePointer<string>();
+			this.shi501_flags = decoder.ReadUInt32();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.shi501_netname is not null)
 			{
 				encoder.WriteWideCharString(this.shi501_netname.value);
 			}
-			if ((null != this.shi501_remark))
+
+			if (this.shi501_remark is not null)
 			{
 				encoder.WriteWideCharString(this.shi501_remark.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.shi501_netname))
+			if (this.shi501_netname is not null)
 			{
 				this.shi501_netname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.shi501_remark))
+
+			if (this.shi501_remark is not null)
 			{
 				this.shi501_remark.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_501_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_501_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SHARE_INFO_501[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SHARE_INFO_501[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SHARE_INFO_501[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_501 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_501 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SHARE_INFO_501>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_501 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_501>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_501>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_501 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SHARE_INFO_501>(ref elem_0);
@@ -2134,54 +2368,60 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_502_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_502_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SHARE_INFO_502_I[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SHARE_INFO_502_I[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SHARE_INFO_502_I[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_502_I elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_502_I elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SHARE_INFO_502_I>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_502_I elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_502_I>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SHARE_INFO_502_I>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SHARE_INFO_502_I elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SHARE_INFO_502_I>(ref elem_0);
@@ -2190,694 +2430,307 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_ENUM_UNION : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_ENUM_UNION : IRpcFixedStruct
 	{
 		public uint Level;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.Level);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 0))
-			{
-				encoder.WritePointer(this.Level0);
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					encoder.WritePointer(this.Level1);
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						encoder.WritePointer(this.Level2);
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 501))
-						{
-							encoder.WritePointer(this.Level501);
-						}
-						else
-						{
-							if ((((int)(this.Level)) == 502))
-							{
-								encoder.WritePointer(this.Level502);
-							}
-							else
-							{
-								if ((((int)(this.Level)) == 503))
-								{
-									encoder.WritePointer(this.Level503);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.Level = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 0))
-			{
-				this.Level0 = decoder.ReadPointer<SHARE_INFO_0_CONTAINER>();
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					this.Level1 = decoder.ReadPointer<SHARE_INFO_1_CONTAINER>();
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						this.Level2 = decoder.ReadPointer<SHARE_INFO_2_CONTAINER>();
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 501))
-						{
-							this.Level501 = decoder.ReadPointer<SHARE_INFO_501_CONTAINER>();
-						}
-						else
-						{
-							if ((((int)(this.Level)) == 502))
-							{
-								this.Level502 = decoder.ReadPointer<SHARE_INFO_502_CONTAINER>();
-							}
-							else
-							{
-								if ((((int)(this.Level)) == 503))
-								{
-									this.Level503 = decoder.ReadPointer<SHARE_INFO_503_CONTAINER>();
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.Level)) == 0))
-			{
-				if ((null != this.Level0))
-				{
-					encoder.WriteFixedStruct(this.Level0.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-					encoder.WriteStructDeferral(this.Level0.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					if ((null != this.Level1))
-					{
-						encoder.WriteFixedStruct(this.Level1.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-						encoder.WriteStructDeferral(this.Level1.value);
-					}
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						if ((null != this.Level2))
-						{
-							encoder.WriteFixedStruct(this.Level2.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-							encoder.WriteStructDeferral(this.Level2.value);
-						}
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 501))
-						{
-							if ((null != this.Level501))
-							{
-								encoder.WriteFixedStruct(this.Level501.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-								encoder.WriteStructDeferral(this.Level501.value);
-							}
-						}
-						else
-						{
-							if ((((int)(this.Level)) == 502))
-							{
-								if ((null != this.Level502))
-								{
-									encoder.WriteFixedStruct(this.Level502.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-									encoder.WriteStructDeferral(this.Level502.value);
-								}
-							}
-							else
-							{
-								if ((((int)(this.Level)) == 503))
-								{
-									if ((null != this.Level503))
-									{
-										encoder.WriteFixedStruct(this.Level503.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-										encoder.WriteStructDeferral(this.Level503.value);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.Level)) == 0))
-			{
-				if ((null != this.Level0))
-				{
-					this.Level0.value = decoder.ReadFixedStruct<SHARE_INFO_0_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-					decoder.ReadStructDeferral<SHARE_INFO_0_CONTAINER>(ref this.Level0.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					if ((null != this.Level1))
-					{
-						this.Level1.value = decoder.ReadFixedStruct<SHARE_INFO_1_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-						decoder.ReadStructDeferral<SHARE_INFO_1_CONTAINER>(ref this.Level1.value);
-					}
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						if ((null != this.Level2))
-						{
-							this.Level2.value = decoder.ReadFixedStruct<SHARE_INFO_2_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-							decoder.ReadStructDeferral<SHARE_INFO_2_CONTAINER>(ref this.Level2.value);
-						}
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 501))
-						{
-							if ((null != this.Level501))
-							{
-								this.Level501.value = decoder.ReadFixedStruct<SHARE_INFO_501_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-								decoder.ReadStructDeferral<SHARE_INFO_501_CONTAINER>(ref this.Level501.value);
-							}
-						}
-						else
-						{
-							if ((((int)(this.Level)) == 502))
-							{
-								if ((null != this.Level502))
-								{
-									this.Level502.value = decoder.ReadFixedStruct<SHARE_INFO_502_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-									decoder.ReadStructDeferral<SHARE_INFO_502_CONTAINER>(ref this.Level502.value);
-								}
-							}
-							else
-							{
-								if ((((int)(this.Level)) == 503))
-								{
-									if ((null != this.Level503))
-									{
-										this.Level503.value = decoder.ReadFixedStruct<SHARE_INFO_503_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-										decoder.ReadStructDeferral<SHARE_INFO_503_CONTAINER>(ref this.Level503.value);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 		public RpcPointer<SHARE_INFO_0_CONTAINER> Level0;
 		public RpcPointer<SHARE_INFO_1_CONTAINER> Level1;
 		public RpcPointer<SHARE_INFO_2_CONTAINER> Level2;
 		public RpcPointer<SHARE_INFO_501_CONTAINER> Level501;
 		public RpcPointer<SHARE_INFO_502_CONTAINER> Level502;
 		public RpcPointer<SHARE_INFO_503_CONTAINER> Level503;
+		public void Encode(IRpcEncoder encoder)
+		{
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.Level);
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					encoder.WriteUniquePointer(this.Level0);
+					break;
+				case 1U:
+					encoder.WriteUniquePointer(this.Level1);
+					break;
+				case 2U:
+					encoder.WriteUniquePointer(this.Level2);
+					break;
+				case 501U:
+					encoder.WriteUniquePointer(this.Level501);
+					break;
+				case 502U:
+					encoder.WriteUniquePointer(this.Level502);
+					break;
+				case 503U:
+					encoder.WriteUniquePointer(this.Level503);
+					break;
+			}
+		}
+
+		public void Decode(IRpcDecoder decoder)
+		{
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.Level = decoder.ReadUInt32();
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					this.Level0 = decoder.ReadUniquePointer<SHARE_INFO_0_CONTAINER>();
+					break;
+				case 1U:
+					this.Level1 = decoder.ReadUniquePointer<SHARE_INFO_1_CONTAINER>();
+					break;
+				case 2U:
+					this.Level2 = decoder.ReadUniquePointer<SHARE_INFO_2_CONTAINER>();
+					break;
+				case 501U:
+					this.Level501 = decoder.ReadUniquePointer<SHARE_INFO_501_CONTAINER>();
+					break;
+				case 502U:
+					this.Level502 = decoder.ReadUniquePointer<SHARE_INFO_502_CONTAINER>();
+					break;
+				case 503U:
+					this.Level503 = decoder.ReadUniquePointer<SHARE_INFO_503_CONTAINER>();
+					break;
+			}
+		}
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					if (this.Level0 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level0.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level0.value);
+					}
+
+					break;
+				case 1U:
+					if (this.Level1 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level1.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level1.value);
+					}
+
+					break;
+				case 2U:
+					if (this.Level2 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level2.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level2.value);
+					}
+
+					break;
+				case 501U:
+					if (this.Level501 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level501.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level501.value);
+					}
+
+					break;
+				case 502U:
+					if (this.Level502 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level502.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level502.value);
+					}
+
+					break;
+				case 503U:
+					if (this.Level503 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level503.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level503.value);
+					}
+
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					if (this.Level0 is not null)
+					{
+						this.Level0.value = decoder.ReadFixedStruct<SHARE_INFO_0_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_0_CONTAINER>(ref this.Level0.value);
+					}
+
+					break;
+				case 1U:
+					if (this.Level1 is not null)
+					{
+						this.Level1.value = decoder.ReadFixedStruct<SHARE_INFO_1_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_1_CONTAINER>(ref this.Level1.value);
+					}
+
+					break;
+				case 2U:
+					if (this.Level2 is not null)
+					{
+						this.Level2.value = decoder.ReadFixedStruct<SHARE_INFO_2_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_2_CONTAINER>(ref this.Level2.value);
+					}
+
+					break;
+				case 501U:
+					if (this.Level501 is not null)
+					{
+						this.Level501.value = decoder.ReadFixedStruct<SHARE_INFO_501_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_501_CONTAINER>(ref this.Level501.value);
+					}
+
+					break;
+				case 502U:
+					if (this.Level502 is not null)
+					{
+						this.Level502.value = decoder.ReadFixedStruct<SHARE_INFO_502_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_502_CONTAINER>(ref this.Level502.value);
+					}
+
+					break;
+				case 503U:
+					if (this.Level503 is not null)
+					{
+						this.Level503.value = decoder.ReadFixedStruct<SHARE_INFO_503_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_503_CONTAINER>(ref this.Level503.value);
+					}
+
+					break;
+			}
+		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_ENUM_STRUCT : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_ENUM_STRUCT : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint Level;
+		public SHARE_ENUM_UNION ShareInfo;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.Level);
 			encoder.WriteUnion(this.ShareInfo);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.Level = decoder.ReadUInt32();
 			this.ShareInfo = decoder.ReadUnion<SHARE_ENUM_UNION>();
 		}
-		public uint Level;
-		public SHARE_ENUM_UNION ShareInfo;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			encoder.WriteStructDeferral(this.ShareInfo);
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			decoder.ReadStructDeferral<SHARE_ENUM_UNION>(ref this.ShareInfo);
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_1004 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_1004 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.shi1004_remark);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.shi1004_remark = decoder.ReadPointer<string>();
-		}
 		public RpcPointer<string> shi1004_remark;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.shi1004_remark))
+			encoder.WriteUniquePointer(this.shi1004_remark);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.shi1004_remark = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.shi1004_remark is not null)
 			{
 				encoder.WriteWideCharString(this.shi1004_remark.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.shi1004_remark))
+			if (this.shi1004_remark is not null)
 			{
 				this.shi1004_remark.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_1006 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_1006 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint shi1006_max_uses;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.shi1006_max_uses);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.shi1006_max_uses = decoder.ReadUInt32();
 		}
-		public uint shi1006_max_uses;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO_1005 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO_1005 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint shi1005_flags;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.shi1005_flags);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.shi1005_flags = decoder.ReadUInt32();
 		}
-		public uint shi1005_flags;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SHARE_INFO : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SHARE_INFO : IRpcFixedStruct
 	{
 		public uint unionSwitch;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.unionSwitch);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				encoder.WritePointer(this.ShareInfo0);
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 1))
-				{
-					encoder.WritePointer(this.ShareInfo1);
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 2))
-					{
-						encoder.WritePointer(this.ShareInfo2);
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 502))
-						{
-							encoder.WritePointer(this.ShareInfo502);
-						}
-						else
-						{
-							if ((((int)(this.unionSwitch)) == 1004))
-							{
-								encoder.WritePointer(this.ShareInfo1004);
-							}
-							else
-							{
-								if ((((int)(this.unionSwitch)) == 1006))
-								{
-									encoder.WritePointer(this.ShareInfo1006);
-								}
-								else
-								{
-									if ((((int)(this.unionSwitch)) == 1501))
-									{
-										encoder.WritePointer(this.ShareInfo1501);
-									}
-									else
-									{
-										if ((((int)(this.unionSwitch)) == 1005))
-										{
-											encoder.WritePointer(this.ShareInfo1005);
-										}
-										else
-										{
-											if ((((int)(this.unionSwitch)) == 501))
-											{
-												encoder.WritePointer(this.ShareInfo501);
-											}
-											else
-											{
-												if ((((int)(this.unionSwitch)) == 503))
-												{
-													encoder.WritePointer(this.ShareInfo503);
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.unionSwitch = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				this.ShareInfo0 = decoder.ReadPointer<SHARE_INFO_0>();
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 1))
-				{
-					this.ShareInfo1 = decoder.ReadPointer<SHARE_INFO_1>();
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 2))
-					{
-						this.ShareInfo2 = decoder.ReadPointer<SHARE_INFO_2>();
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 502))
-						{
-							this.ShareInfo502 = decoder.ReadPointer<SHARE_INFO_502_I>();
-						}
-						else
-						{
-							if ((((int)(this.unionSwitch)) == 1004))
-							{
-								this.ShareInfo1004 = decoder.ReadPointer<SHARE_INFO_1004>();
-							}
-							else
-							{
-								if ((((int)(this.unionSwitch)) == 1006))
-								{
-									this.ShareInfo1006 = decoder.ReadPointer<SHARE_INFO_1006>();
-								}
-								else
-								{
-									if ((((int)(this.unionSwitch)) == 1501))
-									{
-										this.ShareInfo1501 = decoder.ReadPointer<SHARE_INFO_1501_I>();
-									}
-									else
-									{
-										if ((((int)(this.unionSwitch)) == 1005))
-										{
-											this.ShareInfo1005 = decoder.ReadPointer<SHARE_INFO_1005>();
-										}
-										else
-										{
-											if ((((int)(this.unionSwitch)) == 501))
-											{
-												this.ShareInfo501 = decoder.ReadPointer<SHARE_INFO_501>();
-											}
-											else
-											{
-												if ((((int)(this.unionSwitch)) == 503))
-												{
-													this.ShareInfo503 = decoder.ReadPointer<SHARE_INFO_503_I>();
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				if ((null != this.ShareInfo0))
-				{
-					encoder.WriteFixedStruct(this.ShareInfo0.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-					encoder.WriteStructDeferral(this.ShareInfo0.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 1))
-				{
-					if ((null != this.ShareInfo1))
-					{
-						encoder.WriteFixedStruct(this.ShareInfo1.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-						encoder.WriteStructDeferral(this.ShareInfo1.value);
-					}
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 2))
-					{
-						if ((null != this.ShareInfo2))
-						{
-							encoder.WriteFixedStruct(this.ShareInfo2.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-							encoder.WriteStructDeferral(this.ShareInfo2.value);
-						}
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 502))
-						{
-							if ((null != this.ShareInfo502))
-							{
-								encoder.WriteFixedStruct(this.ShareInfo502.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-								encoder.WriteStructDeferral(this.ShareInfo502.value);
-							}
-						}
-						else
-						{
-							if ((((int)(this.unionSwitch)) == 1004))
-							{
-								if ((null != this.ShareInfo1004))
-								{
-									encoder.WriteFixedStruct(this.ShareInfo1004.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-									encoder.WriteStructDeferral(this.ShareInfo1004.value);
-								}
-							}
-							else
-							{
-								if ((((int)(this.unionSwitch)) == 1006))
-								{
-									if ((null != this.ShareInfo1006))
-									{
-										encoder.WriteFixedStruct(this.ShareInfo1006.value, Titanis.DceRpc.NdrAlignment._4Byte);
-										encoder.WriteStructDeferral(this.ShareInfo1006.value);
-									}
-								}
-								else
-								{
-									if ((((int)(this.unionSwitch)) == 1501))
-									{
-										if ((null != this.ShareInfo1501))
-										{
-											encoder.WriteFixedStruct(this.ShareInfo1501.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-											encoder.WriteStructDeferral(this.ShareInfo1501.value);
-										}
-									}
-									else
-									{
-										if ((((int)(this.unionSwitch)) == 1005))
-										{
-											if ((null != this.ShareInfo1005))
-											{
-												encoder.WriteFixedStruct(this.ShareInfo1005.value, Titanis.DceRpc.NdrAlignment._4Byte);
-												encoder.WriteStructDeferral(this.ShareInfo1005.value);
-											}
-										}
-										else
-										{
-											if ((((int)(this.unionSwitch)) == 501))
-											{
-												if ((null != this.ShareInfo501))
-												{
-													encoder.WriteFixedStruct(this.ShareInfo501.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-													encoder.WriteStructDeferral(this.ShareInfo501.value);
-												}
-											}
-											else
-											{
-												if ((((int)(this.unionSwitch)) == 503))
-												{
-													if ((null != this.ShareInfo503))
-													{
-														encoder.WriteFixedStruct(this.ShareInfo503.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-														encoder.WriteStructDeferral(this.ShareInfo503.value);
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				if ((null != this.ShareInfo0))
-				{
-					this.ShareInfo0.value = decoder.ReadFixedStruct<SHARE_INFO_0>(Titanis.DceRpc.NdrAlignment.NativePtr);
-					decoder.ReadStructDeferral<SHARE_INFO_0>(ref this.ShareInfo0.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 1))
-				{
-					if ((null != this.ShareInfo1))
-					{
-						this.ShareInfo1.value = decoder.ReadFixedStruct<SHARE_INFO_1>(Titanis.DceRpc.NdrAlignment.NativePtr);
-						decoder.ReadStructDeferral<SHARE_INFO_1>(ref this.ShareInfo1.value);
-					}
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 2))
-					{
-						if ((null != this.ShareInfo2))
-						{
-							this.ShareInfo2.value = decoder.ReadFixedStruct<SHARE_INFO_2>(Titanis.DceRpc.NdrAlignment.NativePtr);
-							decoder.ReadStructDeferral<SHARE_INFO_2>(ref this.ShareInfo2.value);
-						}
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 502))
-						{
-							if ((null != this.ShareInfo502))
-							{
-								this.ShareInfo502.value = decoder.ReadFixedStruct<SHARE_INFO_502_I>(Titanis.DceRpc.NdrAlignment.NativePtr);
-								decoder.ReadStructDeferral<SHARE_INFO_502_I>(ref this.ShareInfo502.value);
-							}
-						}
-						else
-						{
-							if ((((int)(this.unionSwitch)) == 1004))
-							{
-								if ((null != this.ShareInfo1004))
-								{
-									this.ShareInfo1004.value = decoder.ReadFixedStruct<SHARE_INFO_1004>(Titanis.DceRpc.NdrAlignment.NativePtr);
-									decoder.ReadStructDeferral<SHARE_INFO_1004>(ref this.ShareInfo1004.value);
-								}
-							}
-							else
-							{
-								if ((((int)(this.unionSwitch)) == 1006))
-								{
-									if ((null != this.ShareInfo1006))
-									{
-										this.ShareInfo1006.value = decoder.ReadFixedStruct<SHARE_INFO_1006>(Titanis.DceRpc.NdrAlignment._4Byte);
-										decoder.ReadStructDeferral<SHARE_INFO_1006>(ref this.ShareInfo1006.value);
-									}
-								}
-								else
-								{
-									if ((((int)(this.unionSwitch)) == 1501))
-									{
-										if ((null != this.ShareInfo1501))
-										{
-											this.ShareInfo1501.value = decoder.ReadFixedStruct<SHARE_INFO_1501_I>(Titanis.DceRpc.NdrAlignment.NativePtr);
-											decoder.ReadStructDeferral<SHARE_INFO_1501_I>(ref this.ShareInfo1501.value);
-										}
-									}
-									else
-									{
-										if ((((int)(this.unionSwitch)) == 1005))
-										{
-											if ((null != this.ShareInfo1005))
-											{
-												this.ShareInfo1005.value = decoder.ReadFixedStruct<SHARE_INFO_1005>(Titanis.DceRpc.NdrAlignment._4Byte);
-												decoder.ReadStructDeferral<SHARE_INFO_1005>(ref this.ShareInfo1005.value);
-											}
-										}
-										else
-										{
-											if ((((int)(this.unionSwitch)) == 501))
-											{
-												if ((null != this.ShareInfo501))
-												{
-													this.ShareInfo501.value = decoder.ReadFixedStruct<SHARE_INFO_501>(Titanis.DceRpc.NdrAlignment.NativePtr);
-													decoder.ReadStructDeferral<SHARE_INFO_501>(ref this.ShareInfo501.value);
-												}
-											}
-											else
-											{
-												if ((((int)(this.unionSwitch)) == 503))
-												{
-													if ((null != this.ShareInfo503))
-													{
-														this.ShareInfo503.value = decoder.ReadFixedStruct<SHARE_INFO_503_I>(Titanis.DceRpc.NdrAlignment.NativePtr);
-														decoder.ReadStructDeferral<SHARE_INFO_503_I>(ref this.ShareInfo503.value);
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 		public RpcPointer<SHARE_INFO_0> ShareInfo0;
 		public RpcPointer<SHARE_INFO_1> ShareInfo1;
 		public RpcPointer<SHARE_INFO_2> ShareInfo2;
@@ -2888,42 +2741,262 @@ namespace ms_srvs
 		public RpcPointer<SHARE_INFO_1005> ShareInfo1005;
 		public RpcPointer<SHARE_INFO_501> ShareInfo501;
 		public RpcPointer<SHARE_INFO_503_I> ShareInfo503;
+		public void Encode(IRpcEncoder encoder)
+		{
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.unionSwitch);
+			switch ((uint)this.unionSwitch)
+			{
+				case 0U:
+					encoder.WriteUniquePointer(this.ShareInfo0);
+					break;
+				case 1U:
+					encoder.WriteUniquePointer(this.ShareInfo1);
+					break;
+				case 2U:
+					encoder.WriteUniquePointer(this.ShareInfo2);
+					break;
+				case 502U:
+					encoder.WriteUniquePointer(this.ShareInfo502);
+					break;
+				case 1004U:
+					encoder.WriteUniquePointer(this.ShareInfo1004);
+					break;
+				case 1006U:
+					encoder.WriteUniquePointer(this.ShareInfo1006);
+					break;
+				case 1501U:
+					encoder.WriteUniquePointer(this.ShareInfo1501);
+					break;
+				case 1005U:
+					encoder.WriteUniquePointer(this.ShareInfo1005);
+					break;
+				case 501U:
+					encoder.WriteUniquePointer(this.ShareInfo501);
+					break;
+				case 503U:
+					encoder.WriteUniquePointer(this.ShareInfo503);
+					break;
+			}
+		}
+
+		public void Decode(IRpcDecoder decoder)
+		{
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.unionSwitch = decoder.ReadUInt32();
+			switch ((uint)this.unionSwitch)
+			{
+				case 0U:
+					this.ShareInfo0 = decoder.ReadUniquePointer<SHARE_INFO_0>();
+					break;
+				case 1U:
+					this.ShareInfo1 = decoder.ReadUniquePointer<SHARE_INFO_1>();
+					break;
+				case 2U:
+					this.ShareInfo2 = decoder.ReadUniquePointer<SHARE_INFO_2>();
+					break;
+				case 502U:
+					this.ShareInfo502 = decoder.ReadUniquePointer<SHARE_INFO_502_I>();
+					break;
+				case 1004U:
+					this.ShareInfo1004 = decoder.ReadUniquePointer<SHARE_INFO_1004>();
+					break;
+				case 1006U:
+					this.ShareInfo1006 = decoder.ReadUniquePointer<SHARE_INFO_1006>();
+					break;
+				case 1501U:
+					this.ShareInfo1501 = decoder.ReadUniquePointer<SHARE_INFO_1501_I>();
+					break;
+				case 1005U:
+					this.ShareInfo1005 = decoder.ReadUniquePointer<SHARE_INFO_1005>();
+					break;
+				case 501U:
+					this.ShareInfo501 = decoder.ReadUniquePointer<SHARE_INFO_501>();
+					break;
+				case 503U:
+					this.ShareInfo503 = decoder.ReadUniquePointer<SHARE_INFO_503_I>();
+					break;
+			}
+		}
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.unionSwitch)
+			{
+				case 0U:
+					if (this.ShareInfo0 is not null)
+					{
+						encoder.WriteFixedStruct(this.ShareInfo0.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ShareInfo0.value);
+					}
+
+					break;
+				case 1U:
+					if (this.ShareInfo1 is not null)
+					{
+						encoder.WriteFixedStruct(this.ShareInfo1.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ShareInfo1.value);
+					}
+
+					break;
+				case 2U:
+					if (this.ShareInfo2 is not null)
+					{
+						encoder.WriteFixedStruct(this.ShareInfo2.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ShareInfo2.value);
+					}
+
+					break;
+				case 502U:
+					if (this.ShareInfo502 is not null)
+					{
+						encoder.WriteFixedStruct(this.ShareInfo502.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ShareInfo502.value);
+					}
+
+					break;
+				case 1004U:
+					if (this.ShareInfo1004 is not null)
+					{
+						encoder.WriteFixedStruct(this.ShareInfo1004.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ShareInfo1004.value);
+					}
+
+					break;
+				case 1006U:
+					if (this.ShareInfo1006 is not null)
+					{
+						encoder.WriteFixedStruct(this.ShareInfo1006.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ShareInfo1006.value);
+					}
+
+					break;
+				case 1501U:
+					if (this.ShareInfo1501 is not null)
+					{
+						encoder.WriteFixedStruct(this.ShareInfo1501.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ShareInfo1501.value);
+					}
+
+					break;
+				case 1005U:
+					if (this.ShareInfo1005 is not null)
+					{
+						encoder.WriteFixedStruct(this.ShareInfo1005.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ShareInfo1005.value);
+					}
+
+					break;
+				case 501U:
+					if (this.ShareInfo501 is not null)
+					{
+						encoder.WriteFixedStruct(this.ShareInfo501.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ShareInfo501.value);
+					}
+
+					break;
+				case 503U:
+					if (this.ShareInfo503 is not null)
+					{
+						encoder.WriteFixedStruct(this.ShareInfo503.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ShareInfo503.value);
+					}
+
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.unionSwitch)
+			{
+				case 0U:
+					if (this.ShareInfo0 is not null)
+					{
+						this.ShareInfo0.value = decoder.ReadFixedStruct<SHARE_INFO_0>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_0>(ref this.ShareInfo0.value);
+					}
+
+					break;
+				case 1U:
+					if (this.ShareInfo1 is not null)
+					{
+						this.ShareInfo1.value = decoder.ReadFixedStruct<SHARE_INFO_1>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_1>(ref this.ShareInfo1.value);
+					}
+
+					break;
+				case 2U:
+					if (this.ShareInfo2 is not null)
+					{
+						this.ShareInfo2.value = decoder.ReadFixedStruct<SHARE_INFO_2>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_2>(ref this.ShareInfo2.value);
+					}
+
+					break;
+				case 502U:
+					if (this.ShareInfo502 is not null)
+					{
+						this.ShareInfo502.value = decoder.ReadFixedStruct<SHARE_INFO_502_I>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_502_I>(ref this.ShareInfo502.value);
+					}
+
+					break;
+				case 1004U:
+					if (this.ShareInfo1004 is not null)
+					{
+						this.ShareInfo1004.value = decoder.ReadFixedStruct<SHARE_INFO_1004>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_1004>(ref this.ShareInfo1004.value);
+					}
+
+					break;
+				case 1006U:
+					if (this.ShareInfo1006 is not null)
+					{
+						this.ShareInfo1006.value = decoder.ReadFixedStruct<SHARE_INFO_1006>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SHARE_INFO_1006>(ref this.ShareInfo1006.value);
+					}
+
+					break;
+				case 1501U:
+					if (this.ShareInfo1501 is not null)
+					{
+						this.ShareInfo1501.value = decoder.ReadFixedStruct<SHARE_INFO_1501_I>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_1501_I>(ref this.ShareInfo1501.value);
+					}
+
+					break;
+				case 1005U:
+					if (this.ShareInfo1005 is not null)
+					{
+						this.ShareInfo1005.value = decoder.ReadFixedStruct<SHARE_INFO_1005>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SHARE_INFO_1005>(ref this.ShareInfo1005.value);
+					}
+
+					break;
+				case 501U:
+					if (this.ShareInfo501 is not null)
+					{
+						this.ShareInfo501.value = decoder.ReadFixedStruct<SHARE_INFO_501>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_501>(ref this.ShareInfo501.value);
+					}
+
+					break;
+				case 503U:
+					if (this.ShareInfo503 is not null)
+					{
+						this.ShareInfo503.value = decoder.ReadFixedStruct<SHARE_INFO_503_I>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SHARE_INFO_503_I>(ref this.ShareInfo503.value);
+					}
+
+					break;
+			}
+		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_102 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_102 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.sv102_platform_id);
-			encoder.WritePointer(this.sv102_name);
-			encoder.WriteValue(this.sv102_version_major);
-			encoder.WriteValue(this.sv102_version_minor);
-			encoder.WriteValue(this.sv102_type);
-			encoder.WritePointer(this.sv102_comment);
-			encoder.WriteValue(this.sv102_users);
-			encoder.WriteValue(this.sv102_disc);
-			encoder.WriteValue(this.sv102_hidden);
-			encoder.WriteValue(this.sv102_announce);
-			encoder.WriteValue(this.sv102_anndelta);
-			encoder.WriteValue(this.sv102_licenses);
-			encoder.WritePointer(this.sv102_userpath);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.sv102_platform_id = decoder.ReadUInt32();
-			this.sv102_name = decoder.ReadPointer<string>();
-			this.sv102_version_major = decoder.ReadUInt32();
-			this.sv102_version_minor = decoder.ReadUInt32();
-			this.sv102_type = decoder.ReadUInt32();
-			this.sv102_comment = decoder.ReadPointer<string>();
-			this.sv102_users = decoder.ReadUInt32();
-			this.sv102_disc = decoder.ReadInt32();
-			this.sv102_hidden = decoder.ReadInt32();
-			this.sv102_announce = decoder.ReadUInt32();
-			this.sv102_anndelta = decoder.ReadUInt32();
-			this.sv102_licenses = decoder.ReadUInt32();
-			this.sv102_userpath = decoder.ReadPointer<string>();
-		}
 		public uint sv102_platform_id;
 		public RpcPointer<string> sv102_name;
 		public uint sv102_version_major;
@@ -2937,74 +3010,84 @@ namespace ms_srvs
 		public uint sv102_anndelta;
 		public uint sv102_licenses;
 		public RpcPointer<string> sv102_userpath;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.sv102_name))
+			encoder.WriteValue(this.sv102_platform_id);
+			encoder.WriteUniquePointer(this.sv102_name);
+			encoder.WriteValue(this.sv102_version_major);
+			encoder.WriteValue(this.sv102_version_minor);
+			encoder.WriteValue(this.sv102_type);
+			encoder.WriteUniquePointer(this.sv102_comment);
+			encoder.WriteValue(this.sv102_users);
+			encoder.WriteValue(this.sv102_disc);
+			encoder.WriteValue(this.sv102_hidden);
+			encoder.WriteValue(this.sv102_announce);
+			encoder.WriteValue(this.sv102_anndelta);
+			encoder.WriteValue(this.sv102_licenses);
+			encoder.WriteUniquePointer(this.sv102_userpath);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.sv102_platform_id = decoder.ReadUInt32();
+			this.sv102_name = decoder.ReadUniquePointer<string>();
+			this.sv102_version_major = decoder.ReadUInt32();
+			this.sv102_version_minor = decoder.ReadUInt32();
+			this.sv102_type = decoder.ReadUInt32();
+			this.sv102_comment = decoder.ReadUniquePointer<string>();
+			this.sv102_users = decoder.ReadUInt32();
+			this.sv102_disc = decoder.ReadInt32();
+			this.sv102_hidden = decoder.ReadInt32();
+			this.sv102_announce = decoder.ReadUInt32();
+			this.sv102_anndelta = decoder.ReadUInt32();
+			this.sv102_licenses = decoder.ReadUInt32();
+			this.sv102_userpath = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.sv102_name is not null)
 			{
 				encoder.WriteWideCharString(this.sv102_name.value);
 			}
-			if ((null != this.sv102_comment))
+
+			if (this.sv102_comment is not null)
 			{
 				encoder.WriteWideCharString(this.sv102_comment.value);
 			}
-			if ((null != this.sv102_userpath))
+
+			if (this.sv102_userpath is not null)
 			{
 				encoder.WriteWideCharString(this.sv102_userpath.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.sv102_name))
+			if (this.sv102_name is not null)
 			{
 				this.sv102_name.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sv102_comment))
+
+			if (this.sv102_comment is not null)
 			{
 				this.sv102_comment.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sv102_userpath))
+
+			if (this.sv102_userpath is not null)
 			{
 				this.sv102_userpath.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_103 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_103 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.sv103_platform_id);
-			encoder.WritePointer(this.sv103_name);
-			encoder.WriteValue(this.sv103_version_major);
-			encoder.WriteValue(this.sv103_version_minor);
-			encoder.WriteValue(this.sv103_type);
-			encoder.WritePointer(this.sv103_comment);
-			encoder.WriteValue(this.sv103_users);
-			encoder.WriteValue(this.sv103_disc);
-			encoder.WriteValue(this.sv103_hidden);
-			encoder.WriteValue(this.sv103_announce);
-			encoder.WriteValue(this.sv103_anndelta);
-			encoder.WriteValue(this.sv103_licenses);
-			encoder.WritePointer(this.sv103_userpath);
-			encoder.WriteValue(this.sv103_capabilities);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.sv103_platform_id = decoder.ReadUInt32();
-			this.sv103_name = decoder.ReadPointer<string>();
-			this.sv103_version_major = decoder.ReadUInt32();
-			this.sv103_version_minor = decoder.ReadUInt32();
-			this.sv103_type = decoder.ReadUInt32();
-			this.sv103_comment = decoder.ReadPointer<string>();
-			this.sv103_users = decoder.ReadUInt32();
-			this.sv103_disc = decoder.ReadInt32();
-			this.sv103_hidden = decoder.ReadInt32();
-			this.sv103_announce = decoder.ReadUInt32();
-			this.sv103_anndelta = decoder.ReadUInt32();
-			this.sv103_licenses = decoder.ReadUInt32();
-			this.sv103_userpath = decoder.ReadPointer<string>();
-			this.sv103_capabilities = decoder.ReadUInt32();
-		}
 		public uint sv103_platform_id;
 		public RpcPointer<string> sv103_name;
 		public uint sv103_version_major;
@@ -3019,41 +3102,106 @@ namespace ms_srvs
 		public uint sv103_licenses;
 		public RpcPointer<string> sv103_userpath;
 		public uint sv103_capabilities;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.sv103_name))
+			encoder.WriteValue(this.sv103_platform_id);
+			encoder.WriteUniquePointer(this.sv103_name);
+			encoder.WriteValue(this.sv103_version_major);
+			encoder.WriteValue(this.sv103_version_minor);
+			encoder.WriteValue(this.sv103_type);
+			encoder.WriteUniquePointer(this.sv103_comment);
+			encoder.WriteValue(this.sv103_users);
+			encoder.WriteValue(this.sv103_disc);
+			encoder.WriteValue(this.sv103_hidden);
+			encoder.WriteValue(this.sv103_announce);
+			encoder.WriteValue(this.sv103_anndelta);
+			encoder.WriteValue(this.sv103_licenses);
+			encoder.WriteUniquePointer(this.sv103_userpath);
+			encoder.WriteValue(this.sv103_capabilities);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.sv103_platform_id = decoder.ReadUInt32();
+			this.sv103_name = decoder.ReadUniquePointer<string>();
+			this.sv103_version_major = decoder.ReadUInt32();
+			this.sv103_version_minor = decoder.ReadUInt32();
+			this.sv103_type = decoder.ReadUInt32();
+			this.sv103_comment = decoder.ReadUniquePointer<string>();
+			this.sv103_users = decoder.ReadUInt32();
+			this.sv103_disc = decoder.ReadInt32();
+			this.sv103_hidden = decoder.ReadInt32();
+			this.sv103_announce = decoder.ReadUInt32();
+			this.sv103_anndelta = decoder.ReadUInt32();
+			this.sv103_licenses = decoder.ReadUInt32();
+			this.sv103_userpath = decoder.ReadUniquePointer<string>();
+			this.sv103_capabilities = decoder.ReadUInt32();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.sv103_name is not null)
 			{
 				encoder.WriteWideCharString(this.sv103_name.value);
 			}
-			if ((null != this.sv103_comment))
+
+			if (this.sv103_comment is not null)
 			{
 				encoder.WriteWideCharString(this.sv103_comment.value);
 			}
-			if ((null != this.sv103_userpath))
+
+			if (this.sv103_userpath is not null)
 			{
 				encoder.WriteWideCharString(this.sv103_userpath.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.sv103_name))
+			if (this.sv103_name is not null)
 			{
 				this.sv103_name.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sv103_comment))
+
+			if (this.sv103_comment is not null)
 			{
 				this.sv103_comment.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.sv103_userpath))
+
+			if (this.sv103_userpath is not null)
 			{
 				this.sv103_userpath.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_502 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_502 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv502_sessopens;
+		public uint sv502_sessvcs;
+		public uint sv502_opensearch;
+		public uint sv502_sizreqbuf;
+		public uint sv502_initworkitems;
+		public uint sv502_maxworkitems;
+		public uint sv502_rawworkitems;
+		public uint sv502_irpstacksize;
+		public uint sv502_maxrawbuflen;
+		public uint sv502_sessusers;
+		public uint sv502_sessconns;
+		public uint sv502_maxpagedmemoryusage;
+		public uint sv502_maxnonpagedmemoryusage;
+		public int sv502_enablesoftcompat;
+		public int sv502_enableforcedlogoff;
+		public int sv502_timesource;
+		public int sv502_acceptdownlevelapis;
+		public int sv502_lmannounce;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv502_sessopens);
 			encoder.WriteValue(this.sv502_sessvcs);
@@ -3074,7 +3222,9 @@ namespace ms_srvs
 			encoder.WriteValue(this.sv502_acceptdownlevelapis);
 			encoder.WriteValue(this.sv502_lmannounce);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv502_sessopens = decoder.ReadUInt32();
 			this.sv502_sessvcs = decoder.ReadUInt32();
@@ -3095,124 +3245,21 @@ namespace ms_srvs
 			this.sv502_acceptdownlevelapis = decoder.ReadInt32();
 			this.sv502_lmannounce = decoder.ReadInt32();
 		}
-		public uint sv502_sessopens;
-		public uint sv502_sessvcs;
-		public uint sv502_opensearch;
-		public uint sv502_sizreqbuf;
-		public uint sv502_initworkitems;
-		public uint sv502_maxworkitems;
-		public uint sv502_rawworkitems;
-		public uint sv502_irpstacksize;
-		public uint sv502_maxrawbuflen;
-		public uint sv502_sessusers;
-		public uint sv502_sessconns;
-		public uint sv502_maxpagedmemoryusage;
-		public uint sv502_maxnonpagedmemoryusage;
-		public int sv502_enablesoftcompat;
-		public int sv502_enableforcedlogoff;
-		public int sv502_timesource;
-		public int sv502_acceptdownlevelapis;
-		public int sv502_lmannounce;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_503 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_503 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.sv503_sessopens);
-			encoder.WriteValue(this.sv503_sessvcs);
-			encoder.WriteValue(this.sv503_opensearch);
-			encoder.WriteValue(this.sv503_sizreqbuf);
-			encoder.WriteValue(this.sv503_initworkitems);
-			encoder.WriteValue(this.sv503_maxworkitems);
-			encoder.WriteValue(this.sv503_rawworkitems);
-			encoder.WriteValue(this.sv503_irpstacksize);
-			encoder.WriteValue(this.sv503_maxrawbuflen);
-			encoder.WriteValue(this.sv503_sessusers);
-			encoder.WriteValue(this.sv503_sessconns);
-			encoder.WriteValue(this.sv503_maxpagedmemoryusage);
-			encoder.WriteValue(this.sv503_maxnonpagedmemoryusage);
-			encoder.WriteValue(this.sv503_enablesoftcompat);
-			encoder.WriteValue(this.sv503_enableforcedlogoff);
-			encoder.WriteValue(this.sv503_timesource);
-			encoder.WriteValue(this.sv503_acceptdownlevelapis);
-			encoder.WriteValue(this.sv503_lmannounce);
-			encoder.WritePointer(this.sv503_domain);
-			encoder.WriteValue(this.sv503_maxcopyreadlen);
-			encoder.WriteValue(this.sv503_maxcopywritelen);
-			encoder.WriteValue(this.sv503_minkeepsearch);
-			encoder.WriteValue(this.sv503_maxkeepsearch);
-			encoder.WriteValue(this.sv503_minkeepcomplsearch);
-			encoder.WriteValue(this.sv503_maxkeepcomplsearch);
-			encoder.WriteValue(this.sv503_threadcountadd);
-			encoder.WriteValue(this.sv503_numblockthreads);
-			encoder.WriteValue(this.sv503_scavtimeout);
-			encoder.WriteValue(this.sv503_minrcvqueue);
-			encoder.WriteValue(this.sv503_minfreeworkitems);
-			encoder.WriteValue(this.sv503_xactmemsize);
-			encoder.WriteValue(this.sv503_threadpriority);
-			encoder.WriteValue(this.sv503_maxmpxct);
-			encoder.WriteValue(this.sv503_oplockbreakwait);
-			encoder.WriteValue(this.sv503_oplockbreakresponsewait);
-			encoder.WriteValue(this.sv503_enableoplocks);
-			encoder.WriteValue(this.sv503_enableoplockforceclose);
-			encoder.WriteValue(this.sv503_enablefcbopens);
-			encoder.WriteValue(this.sv503_enableraw);
-			encoder.WriteValue(this.sv503_enablesharednetdrives);
-			encoder.WriteValue(this.sv503_minfreeconnections);
-			encoder.WriteValue(this.sv503_maxfreeconnections);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.sv503_sessopens = decoder.ReadUInt32();
-			this.sv503_sessvcs = decoder.ReadUInt32();
-			this.sv503_opensearch = decoder.ReadUInt32();
-			this.sv503_sizreqbuf = decoder.ReadUInt32();
-			this.sv503_initworkitems = decoder.ReadUInt32();
-			this.sv503_maxworkitems = decoder.ReadUInt32();
-			this.sv503_rawworkitems = decoder.ReadUInt32();
-			this.sv503_irpstacksize = decoder.ReadUInt32();
-			this.sv503_maxrawbuflen = decoder.ReadUInt32();
-			this.sv503_sessusers = decoder.ReadUInt32();
-			this.sv503_sessconns = decoder.ReadUInt32();
-			this.sv503_maxpagedmemoryusage = decoder.ReadUInt32();
-			this.sv503_maxnonpagedmemoryusage = decoder.ReadUInt32();
-			this.sv503_enablesoftcompat = decoder.ReadInt32();
-			this.sv503_enableforcedlogoff = decoder.ReadInt32();
-			this.sv503_timesource = decoder.ReadInt32();
-			this.sv503_acceptdownlevelapis = decoder.ReadInt32();
-			this.sv503_lmannounce = decoder.ReadInt32();
-			this.sv503_domain = decoder.ReadPointer<string>();
-			this.sv503_maxcopyreadlen = decoder.ReadUInt32();
-			this.sv503_maxcopywritelen = decoder.ReadUInt32();
-			this.sv503_minkeepsearch = decoder.ReadUInt32();
-			this.sv503_maxkeepsearch = decoder.ReadUInt32();
-			this.sv503_minkeepcomplsearch = decoder.ReadUInt32();
-			this.sv503_maxkeepcomplsearch = decoder.ReadUInt32();
-			this.sv503_threadcountadd = decoder.ReadUInt32();
-			this.sv503_numblockthreads = decoder.ReadUInt32();
-			this.sv503_scavtimeout = decoder.ReadUInt32();
-			this.sv503_minrcvqueue = decoder.ReadUInt32();
-			this.sv503_minfreeworkitems = decoder.ReadUInt32();
-			this.sv503_xactmemsize = decoder.ReadUInt32();
-			this.sv503_threadpriority = decoder.ReadUInt32();
-			this.sv503_maxmpxct = decoder.ReadUInt32();
-			this.sv503_oplockbreakwait = decoder.ReadUInt32();
-			this.sv503_oplockbreakresponsewait = decoder.ReadUInt32();
-			this.sv503_enableoplocks = decoder.ReadInt32();
-			this.sv503_enableoplockforceclose = decoder.ReadInt32();
-			this.sv503_enablefcbopens = decoder.ReadInt32();
-			this.sv503_enableraw = decoder.ReadInt32();
-			this.sv503_enablesharednetdrives = decoder.ReadInt32();
-			this.sv503_minfreeconnections = decoder.ReadUInt32();
-			this.sv503_maxfreeconnections = decoder.ReadUInt32();
-		}
 		public uint sv503_sessopens;
 		public uint sv503_sessvcs;
 		public uint sv503_opensearch;
@@ -3255,142 +3302,122 @@ namespace ms_srvs
 		public int sv503_enablesharednetdrives;
 		public uint sv503_minfreeconnections;
 		public uint sv503_maxfreeconnections;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.sv503_domain))
+			encoder.WriteValue(this.sv503_sessopens);
+			encoder.WriteValue(this.sv503_sessvcs);
+			encoder.WriteValue(this.sv503_opensearch);
+			encoder.WriteValue(this.sv503_sizreqbuf);
+			encoder.WriteValue(this.sv503_initworkitems);
+			encoder.WriteValue(this.sv503_maxworkitems);
+			encoder.WriteValue(this.sv503_rawworkitems);
+			encoder.WriteValue(this.sv503_irpstacksize);
+			encoder.WriteValue(this.sv503_maxrawbuflen);
+			encoder.WriteValue(this.sv503_sessusers);
+			encoder.WriteValue(this.sv503_sessconns);
+			encoder.WriteValue(this.sv503_maxpagedmemoryusage);
+			encoder.WriteValue(this.sv503_maxnonpagedmemoryusage);
+			encoder.WriteValue(this.sv503_enablesoftcompat);
+			encoder.WriteValue(this.sv503_enableforcedlogoff);
+			encoder.WriteValue(this.sv503_timesource);
+			encoder.WriteValue(this.sv503_acceptdownlevelapis);
+			encoder.WriteValue(this.sv503_lmannounce);
+			encoder.WriteUniquePointer(this.sv503_domain);
+			encoder.WriteValue(this.sv503_maxcopyreadlen);
+			encoder.WriteValue(this.sv503_maxcopywritelen);
+			encoder.WriteValue(this.sv503_minkeepsearch);
+			encoder.WriteValue(this.sv503_maxkeepsearch);
+			encoder.WriteValue(this.sv503_minkeepcomplsearch);
+			encoder.WriteValue(this.sv503_maxkeepcomplsearch);
+			encoder.WriteValue(this.sv503_threadcountadd);
+			encoder.WriteValue(this.sv503_numblockthreads);
+			encoder.WriteValue(this.sv503_scavtimeout);
+			encoder.WriteValue(this.sv503_minrcvqueue);
+			encoder.WriteValue(this.sv503_minfreeworkitems);
+			encoder.WriteValue(this.sv503_xactmemsize);
+			encoder.WriteValue(this.sv503_threadpriority);
+			encoder.WriteValue(this.sv503_maxmpxct);
+			encoder.WriteValue(this.sv503_oplockbreakwait);
+			encoder.WriteValue(this.sv503_oplockbreakresponsewait);
+			encoder.WriteValue(this.sv503_enableoplocks);
+			encoder.WriteValue(this.sv503_enableoplockforceclose);
+			encoder.WriteValue(this.sv503_enablefcbopens);
+			encoder.WriteValue(this.sv503_enableraw);
+			encoder.WriteValue(this.sv503_enablesharednetdrives);
+			encoder.WriteValue(this.sv503_minfreeconnections);
+			encoder.WriteValue(this.sv503_maxfreeconnections);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.sv503_sessopens = decoder.ReadUInt32();
+			this.sv503_sessvcs = decoder.ReadUInt32();
+			this.sv503_opensearch = decoder.ReadUInt32();
+			this.sv503_sizreqbuf = decoder.ReadUInt32();
+			this.sv503_initworkitems = decoder.ReadUInt32();
+			this.sv503_maxworkitems = decoder.ReadUInt32();
+			this.sv503_rawworkitems = decoder.ReadUInt32();
+			this.sv503_irpstacksize = decoder.ReadUInt32();
+			this.sv503_maxrawbuflen = decoder.ReadUInt32();
+			this.sv503_sessusers = decoder.ReadUInt32();
+			this.sv503_sessconns = decoder.ReadUInt32();
+			this.sv503_maxpagedmemoryusage = decoder.ReadUInt32();
+			this.sv503_maxnonpagedmemoryusage = decoder.ReadUInt32();
+			this.sv503_enablesoftcompat = decoder.ReadInt32();
+			this.sv503_enableforcedlogoff = decoder.ReadInt32();
+			this.sv503_timesource = decoder.ReadInt32();
+			this.sv503_acceptdownlevelapis = decoder.ReadInt32();
+			this.sv503_lmannounce = decoder.ReadInt32();
+			this.sv503_domain = decoder.ReadUniquePointer<string>();
+			this.sv503_maxcopyreadlen = decoder.ReadUInt32();
+			this.sv503_maxcopywritelen = decoder.ReadUInt32();
+			this.sv503_minkeepsearch = decoder.ReadUInt32();
+			this.sv503_maxkeepsearch = decoder.ReadUInt32();
+			this.sv503_minkeepcomplsearch = decoder.ReadUInt32();
+			this.sv503_maxkeepcomplsearch = decoder.ReadUInt32();
+			this.sv503_threadcountadd = decoder.ReadUInt32();
+			this.sv503_numblockthreads = decoder.ReadUInt32();
+			this.sv503_scavtimeout = decoder.ReadUInt32();
+			this.sv503_minrcvqueue = decoder.ReadUInt32();
+			this.sv503_minfreeworkitems = decoder.ReadUInt32();
+			this.sv503_xactmemsize = decoder.ReadUInt32();
+			this.sv503_threadpriority = decoder.ReadUInt32();
+			this.sv503_maxmpxct = decoder.ReadUInt32();
+			this.sv503_oplockbreakwait = decoder.ReadUInt32();
+			this.sv503_oplockbreakresponsewait = decoder.ReadUInt32();
+			this.sv503_enableoplocks = decoder.ReadInt32();
+			this.sv503_enableoplockforceclose = decoder.ReadInt32();
+			this.sv503_enablefcbopens = decoder.ReadInt32();
+			this.sv503_enableraw = decoder.ReadInt32();
+			this.sv503_enablesharednetdrives = decoder.ReadInt32();
+			this.sv503_minfreeconnections = decoder.ReadUInt32();
+			this.sv503_maxfreeconnections = decoder.ReadUInt32();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.sv503_domain is not null)
 			{
 				encoder.WriteWideCharString(this.sv503_domain.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.sv503_domain))
+			if (this.sv503_domain is not null)
 			{
 				this.sv503_domain.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_599 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_599 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.sv599_sessopens);
-			encoder.WriteValue(this.sv599_sessvcs);
-			encoder.WriteValue(this.sv599_opensearch);
-			encoder.WriteValue(this.sv599_sizreqbuf);
-			encoder.WriteValue(this.sv599_initworkitems);
-			encoder.WriteValue(this.sv599_maxworkitems);
-			encoder.WriteValue(this.sv599_rawworkitems);
-			encoder.WriteValue(this.sv599_irpstacksize);
-			encoder.WriteValue(this.sv599_maxrawbuflen);
-			encoder.WriteValue(this.sv599_sessusers);
-			encoder.WriteValue(this.sv599_sessconns);
-			encoder.WriteValue(this.sv599_maxpagedmemoryusage);
-			encoder.WriteValue(this.sv599_maxnonpagedmemoryusage);
-			encoder.WriteValue(this.sv599_enablesoftcompat);
-			encoder.WriteValue(this.sv599_enableforcedlogoff);
-			encoder.WriteValue(this.sv599_timesource);
-			encoder.WriteValue(this.sv599_acceptdownlevelapis);
-			encoder.WriteValue(this.sv599_lmannounce);
-			encoder.WritePointer(this.sv599_domain);
-			encoder.WriteValue(this.sv599_maxcopyreadlen);
-			encoder.WriteValue(this.sv599_maxcopywritelen);
-			encoder.WriteValue(this.sv599_minkeepsearch);
-			encoder.WriteValue(this.sv599_maxkeepsearch);
-			encoder.WriteValue(this.sv599_minkeepcomplsearch);
-			encoder.WriteValue(this.sv599_maxkeepcomplsearch);
-			encoder.WriteValue(this.sv599_threadcountadd);
-			encoder.WriteValue(this.sv599_numblockthreads);
-			encoder.WriteValue(this.sv599_scavtimeout);
-			encoder.WriteValue(this.sv599_minrcvqueue);
-			encoder.WriteValue(this.sv599_minfreeworkitems);
-			encoder.WriteValue(this.sv599_xactmemsize);
-			encoder.WriteValue(this.sv599_threadpriority);
-			encoder.WriteValue(this.sv599_maxmpxct);
-			encoder.WriteValue(this.sv599_oplockbreakwait);
-			encoder.WriteValue(this.sv599_oplockbreakresponsewait);
-			encoder.WriteValue(this.sv599_enableoplocks);
-			encoder.WriteValue(this.sv599_enableoplockforceclose);
-			encoder.WriteValue(this.sv599_enablefcbopens);
-			encoder.WriteValue(this.sv599_enableraw);
-			encoder.WriteValue(this.sv599_enablesharednetdrives);
-			encoder.WriteValue(this.sv599_minfreeconnections);
-			encoder.WriteValue(this.sv599_maxfreeconnections);
-			encoder.WriteValue(this.sv599_initsesstable);
-			encoder.WriteValue(this.sv599_initconntable);
-			encoder.WriteValue(this.sv599_initfiletable);
-			encoder.WriteValue(this.sv599_initsearchtable);
-			encoder.WriteValue(this.sv599_alertschedule);
-			encoder.WriteValue(this.sv599_errorthreshold);
-			encoder.WriteValue(this.sv599_networkerrorthreshold);
-			encoder.WriteValue(this.sv599_diskspacethreshold);
-			encoder.WriteValue(this.sv599_reserved);
-			encoder.WriteValue(this.sv599_maxlinkdelay);
-			encoder.WriteValue(this.sv599_minlinkthroughput);
-			encoder.WriteValue(this.sv599_linkinfovalidtime);
-			encoder.WriteValue(this.sv599_scavqosinfoupdatetime);
-			encoder.WriteValue(this.sv599_maxworkitemidletime);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.sv599_sessopens = decoder.ReadUInt32();
-			this.sv599_sessvcs = decoder.ReadUInt32();
-			this.sv599_opensearch = decoder.ReadUInt32();
-			this.sv599_sizreqbuf = decoder.ReadUInt32();
-			this.sv599_initworkitems = decoder.ReadUInt32();
-			this.sv599_maxworkitems = decoder.ReadUInt32();
-			this.sv599_rawworkitems = decoder.ReadUInt32();
-			this.sv599_irpstacksize = decoder.ReadUInt32();
-			this.sv599_maxrawbuflen = decoder.ReadUInt32();
-			this.sv599_sessusers = decoder.ReadUInt32();
-			this.sv599_sessconns = decoder.ReadUInt32();
-			this.sv599_maxpagedmemoryusage = decoder.ReadUInt32();
-			this.sv599_maxnonpagedmemoryusage = decoder.ReadUInt32();
-			this.sv599_enablesoftcompat = decoder.ReadInt32();
-			this.sv599_enableforcedlogoff = decoder.ReadInt32();
-			this.sv599_timesource = decoder.ReadInt32();
-			this.sv599_acceptdownlevelapis = decoder.ReadInt32();
-			this.sv599_lmannounce = decoder.ReadInt32();
-			this.sv599_domain = decoder.ReadPointer<string>();
-			this.sv599_maxcopyreadlen = decoder.ReadUInt32();
-			this.sv599_maxcopywritelen = decoder.ReadUInt32();
-			this.sv599_minkeepsearch = decoder.ReadUInt32();
-			this.sv599_maxkeepsearch = decoder.ReadUInt32();
-			this.sv599_minkeepcomplsearch = decoder.ReadUInt32();
-			this.sv599_maxkeepcomplsearch = decoder.ReadUInt32();
-			this.sv599_threadcountadd = decoder.ReadUInt32();
-			this.sv599_numblockthreads = decoder.ReadUInt32();
-			this.sv599_scavtimeout = decoder.ReadUInt32();
-			this.sv599_minrcvqueue = decoder.ReadUInt32();
-			this.sv599_minfreeworkitems = decoder.ReadUInt32();
-			this.sv599_xactmemsize = decoder.ReadUInt32();
-			this.sv599_threadpriority = decoder.ReadUInt32();
-			this.sv599_maxmpxct = decoder.ReadUInt32();
-			this.sv599_oplockbreakwait = decoder.ReadUInt32();
-			this.sv599_oplockbreakresponsewait = decoder.ReadUInt32();
-			this.sv599_enableoplocks = decoder.ReadInt32();
-			this.sv599_enableoplockforceclose = decoder.ReadInt32();
-			this.sv599_enablefcbopens = decoder.ReadInt32();
-			this.sv599_enableraw = decoder.ReadInt32();
-			this.sv599_enablesharednetdrives = decoder.ReadInt32();
-			this.sv599_minfreeconnections = decoder.ReadUInt32();
-			this.sv599_maxfreeconnections = decoder.ReadUInt32();
-			this.sv599_initsesstable = decoder.ReadUInt32();
-			this.sv599_initconntable = decoder.ReadUInt32();
-			this.sv599_initfiletable = decoder.ReadUInt32();
-			this.sv599_initsearchtable = decoder.ReadUInt32();
-			this.sv599_alertschedule = decoder.ReadUInt32();
-			this.sv599_errorthreshold = decoder.ReadUInt32();
-			this.sv599_networkerrorthreshold = decoder.ReadUInt32();
-			this.sv599_diskspacethreshold = decoder.ReadUInt32();
-			this.sv599_reserved = decoder.ReadUInt32();
-			this.sv599_maxlinkdelay = decoder.ReadUInt32();
-			this.sv599_minlinkthroughput = decoder.ReadUInt32();
-			this.sv599_linkinfovalidtime = decoder.ReadUInt32();
-			this.sv599_scavqosinfoupdatetime = decoder.ReadUInt32();
-			this.sv599_maxworkitemidletime = decoder.ReadUInt32();
-		}
 		public uint sv599_sessopens;
 		public uint sv599_sessvcs;
 		public uint sv599_opensearch;
@@ -3447,2709 +3474,1347 @@ namespace ms_srvs
 		public uint sv599_linkinfovalidtime;
 		public uint sv599_scavqosinfoupdatetime;
 		public uint sv599_maxworkitemidletime;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.sv599_domain))
+			encoder.WriteValue(this.sv599_sessopens);
+			encoder.WriteValue(this.sv599_sessvcs);
+			encoder.WriteValue(this.sv599_opensearch);
+			encoder.WriteValue(this.sv599_sizreqbuf);
+			encoder.WriteValue(this.sv599_initworkitems);
+			encoder.WriteValue(this.sv599_maxworkitems);
+			encoder.WriteValue(this.sv599_rawworkitems);
+			encoder.WriteValue(this.sv599_irpstacksize);
+			encoder.WriteValue(this.sv599_maxrawbuflen);
+			encoder.WriteValue(this.sv599_sessusers);
+			encoder.WriteValue(this.sv599_sessconns);
+			encoder.WriteValue(this.sv599_maxpagedmemoryusage);
+			encoder.WriteValue(this.sv599_maxnonpagedmemoryusage);
+			encoder.WriteValue(this.sv599_enablesoftcompat);
+			encoder.WriteValue(this.sv599_enableforcedlogoff);
+			encoder.WriteValue(this.sv599_timesource);
+			encoder.WriteValue(this.sv599_acceptdownlevelapis);
+			encoder.WriteValue(this.sv599_lmannounce);
+			encoder.WriteUniquePointer(this.sv599_domain);
+			encoder.WriteValue(this.sv599_maxcopyreadlen);
+			encoder.WriteValue(this.sv599_maxcopywritelen);
+			encoder.WriteValue(this.sv599_minkeepsearch);
+			encoder.WriteValue(this.sv599_maxkeepsearch);
+			encoder.WriteValue(this.sv599_minkeepcomplsearch);
+			encoder.WriteValue(this.sv599_maxkeepcomplsearch);
+			encoder.WriteValue(this.sv599_threadcountadd);
+			encoder.WriteValue(this.sv599_numblockthreads);
+			encoder.WriteValue(this.sv599_scavtimeout);
+			encoder.WriteValue(this.sv599_minrcvqueue);
+			encoder.WriteValue(this.sv599_minfreeworkitems);
+			encoder.WriteValue(this.sv599_xactmemsize);
+			encoder.WriteValue(this.sv599_threadpriority);
+			encoder.WriteValue(this.sv599_maxmpxct);
+			encoder.WriteValue(this.sv599_oplockbreakwait);
+			encoder.WriteValue(this.sv599_oplockbreakresponsewait);
+			encoder.WriteValue(this.sv599_enableoplocks);
+			encoder.WriteValue(this.sv599_enableoplockforceclose);
+			encoder.WriteValue(this.sv599_enablefcbopens);
+			encoder.WriteValue(this.sv599_enableraw);
+			encoder.WriteValue(this.sv599_enablesharednetdrives);
+			encoder.WriteValue(this.sv599_minfreeconnections);
+			encoder.WriteValue(this.sv599_maxfreeconnections);
+			encoder.WriteValue(this.sv599_initsesstable);
+			encoder.WriteValue(this.sv599_initconntable);
+			encoder.WriteValue(this.sv599_initfiletable);
+			encoder.WriteValue(this.sv599_initsearchtable);
+			encoder.WriteValue(this.sv599_alertschedule);
+			encoder.WriteValue(this.sv599_errorthreshold);
+			encoder.WriteValue(this.sv599_networkerrorthreshold);
+			encoder.WriteValue(this.sv599_diskspacethreshold);
+			encoder.WriteValue(this.sv599_reserved);
+			encoder.WriteValue(this.sv599_maxlinkdelay);
+			encoder.WriteValue(this.sv599_minlinkthroughput);
+			encoder.WriteValue(this.sv599_linkinfovalidtime);
+			encoder.WriteValue(this.sv599_scavqosinfoupdatetime);
+			encoder.WriteValue(this.sv599_maxworkitemidletime);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.sv599_sessopens = decoder.ReadUInt32();
+			this.sv599_sessvcs = decoder.ReadUInt32();
+			this.sv599_opensearch = decoder.ReadUInt32();
+			this.sv599_sizreqbuf = decoder.ReadUInt32();
+			this.sv599_initworkitems = decoder.ReadUInt32();
+			this.sv599_maxworkitems = decoder.ReadUInt32();
+			this.sv599_rawworkitems = decoder.ReadUInt32();
+			this.sv599_irpstacksize = decoder.ReadUInt32();
+			this.sv599_maxrawbuflen = decoder.ReadUInt32();
+			this.sv599_sessusers = decoder.ReadUInt32();
+			this.sv599_sessconns = decoder.ReadUInt32();
+			this.sv599_maxpagedmemoryusage = decoder.ReadUInt32();
+			this.sv599_maxnonpagedmemoryusage = decoder.ReadUInt32();
+			this.sv599_enablesoftcompat = decoder.ReadInt32();
+			this.sv599_enableforcedlogoff = decoder.ReadInt32();
+			this.sv599_timesource = decoder.ReadInt32();
+			this.sv599_acceptdownlevelapis = decoder.ReadInt32();
+			this.sv599_lmannounce = decoder.ReadInt32();
+			this.sv599_domain = decoder.ReadUniquePointer<string>();
+			this.sv599_maxcopyreadlen = decoder.ReadUInt32();
+			this.sv599_maxcopywritelen = decoder.ReadUInt32();
+			this.sv599_minkeepsearch = decoder.ReadUInt32();
+			this.sv599_maxkeepsearch = decoder.ReadUInt32();
+			this.sv599_minkeepcomplsearch = decoder.ReadUInt32();
+			this.sv599_maxkeepcomplsearch = decoder.ReadUInt32();
+			this.sv599_threadcountadd = decoder.ReadUInt32();
+			this.sv599_numblockthreads = decoder.ReadUInt32();
+			this.sv599_scavtimeout = decoder.ReadUInt32();
+			this.sv599_minrcvqueue = decoder.ReadUInt32();
+			this.sv599_minfreeworkitems = decoder.ReadUInt32();
+			this.sv599_xactmemsize = decoder.ReadUInt32();
+			this.sv599_threadpriority = decoder.ReadUInt32();
+			this.sv599_maxmpxct = decoder.ReadUInt32();
+			this.sv599_oplockbreakwait = decoder.ReadUInt32();
+			this.sv599_oplockbreakresponsewait = decoder.ReadUInt32();
+			this.sv599_enableoplocks = decoder.ReadInt32();
+			this.sv599_enableoplockforceclose = decoder.ReadInt32();
+			this.sv599_enablefcbopens = decoder.ReadInt32();
+			this.sv599_enableraw = decoder.ReadInt32();
+			this.sv599_enablesharednetdrives = decoder.ReadInt32();
+			this.sv599_minfreeconnections = decoder.ReadUInt32();
+			this.sv599_maxfreeconnections = decoder.ReadUInt32();
+			this.sv599_initsesstable = decoder.ReadUInt32();
+			this.sv599_initconntable = decoder.ReadUInt32();
+			this.sv599_initfiletable = decoder.ReadUInt32();
+			this.sv599_initsearchtable = decoder.ReadUInt32();
+			this.sv599_alertschedule = decoder.ReadUInt32();
+			this.sv599_errorthreshold = decoder.ReadUInt32();
+			this.sv599_networkerrorthreshold = decoder.ReadUInt32();
+			this.sv599_diskspacethreshold = decoder.ReadUInt32();
+			this.sv599_reserved = decoder.ReadUInt32();
+			this.sv599_maxlinkdelay = decoder.ReadUInt32();
+			this.sv599_minlinkthroughput = decoder.ReadUInt32();
+			this.sv599_linkinfovalidtime = decoder.ReadUInt32();
+			this.sv599_scavqosinfoupdatetime = decoder.ReadUInt32();
+			this.sv599_maxworkitemidletime = decoder.ReadUInt32();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.sv599_domain is not null)
 			{
 				encoder.WriteWideCharString(this.sv599_domain.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.sv599_domain))
+			if (this.sv599_domain is not null)
 			{
 				this.sv599_domain.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1005 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1005 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.sv1005_comment);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.sv1005_comment = decoder.ReadPointer<string>();
-		}
 		public RpcPointer<string> sv1005_comment;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.sv1005_comment))
+			encoder.WriteUniquePointer(this.sv1005_comment);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.sv1005_comment = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.sv1005_comment is not null)
 			{
 				encoder.WriteWideCharString(this.sv1005_comment.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.sv1005_comment))
+			if (this.sv1005_comment is not null)
 			{
 				this.sv1005_comment.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1107 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1107 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1107_users;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1107_users);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1107_users = decoder.ReadUInt32();
 		}
-		public uint sv1107_users;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1010 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1010 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1010_disc;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1010_disc);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1010_disc = decoder.ReadInt32();
 		}
-		public int sv1010_disc;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1016 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1016 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1016_hidden;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1016_hidden);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1016_hidden = decoder.ReadInt32();
 		}
-		public int sv1016_hidden;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1017 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1017 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1017_announce;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1017_announce);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1017_announce = decoder.ReadUInt32();
 		}
-		public uint sv1017_announce;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1018 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1018 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1018_anndelta;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1018_anndelta);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1018_anndelta = decoder.ReadUInt32();
 		}
-		public uint sv1018_anndelta;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1501 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1501 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1501_sessopens;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1501_sessopens);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1501_sessopens = decoder.ReadUInt32();
 		}
-		public uint sv1501_sessopens;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1502 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1502 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1502_sessvcs;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1502_sessvcs);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1502_sessvcs = decoder.ReadUInt32();
 		}
-		public uint sv1502_sessvcs;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1503 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1503 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1503_opensearch;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1503_opensearch);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1503_opensearch = decoder.ReadUInt32();
 		}
-		public uint sv1503_opensearch;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1506 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1506 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1506_maxworkitems;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1506_maxworkitems);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1506_maxworkitems = decoder.ReadUInt32();
 		}
-		public uint sv1506_maxworkitems;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1510 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1510 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1510_sessusers;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1510_sessusers);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1510_sessusers = decoder.ReadUInt32();
 		}
-		public uint sv1510_sessusers;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1511 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1511 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1511_sessconns;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1511_sessconns);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1511_sessconns = decoder.ReadUInt32();
 		}
-		public uint sv1511_sessconns;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1512 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1512 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1512_maxnonpagedmemoryusage;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1512_maxnonpagedmemoryusage);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1512_maxnonpagedmemoryusage = decoder.ReadUInt32();
 		}
-		public uint sv1512_maxnonpagedmemoryusage;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1513 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1513 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1513_maxpagedmemoryusage;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1513_maxpagedmemoryusage);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1513_maxpagedmemoryusage = decoder.ReadUInt32();
 		}
-		public uint sv1513_maxpagedmemoryusage;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1514 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1514 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1514_enablesoftcompat;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1514_enablesoftcompat);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1514_enablesoftcompat = decoder.ReadInt32();
 		}
-		public int sv1514_enablesoftcompat;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1515 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1515 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1515_enableforcedlogoff;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1515_enableforcedlogoff);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1515_enableforcedlogoff = decoder.ReadInt32();
 		}
-		public int sv1515_enableforcedlogoff;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1516 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1516 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1516_timesource;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1516_timesource);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1516_timesource = decoder.ReadInt32();
 		}
-		public int sv1516_timesource;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1518 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1518 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1518_lmannounce;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1518_lmannounce);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1518_lmannounce = decoder.ReadInt32();
 		}
-		public int sv1518_lmannounce;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1523 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1523 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1523_maxkeepsearch;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1523_maxkeepsearch);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1523_maxkeepsearch = decoder.ReadUInt32();
 		}
-		public uint sv1523_maxkeepsearch;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1528 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1528 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1528_scavtimeout;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1528_scavtimeout);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1528_scavtimeout = decoder.ReadUInt32();
 		}
-		public uint sv1528_scavtimeout;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1529 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1529 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1529_minrcvqueue;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1529_minrcvqueue);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1529_minrcvqueue = decoder.ReadUInt32();
 		}
-		public uint sv1529_minrcvqueue;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1530 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1530 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1530_minfreeworkitems;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1530_minfreeworkitems);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1530_minfreeworkitems = decoder.ReadUInt32();
 		}
-		public uint sv1530_minfreeworkitems;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1533 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1533 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1533_maxmpxct;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1533_maxmpxct);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1533_maxmpxct = decoder.ReadUInt32();
 		}
-		public uint sv1533_maxmpxct;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1534 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1534 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1534_oplockbreakwait;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1534_oplockbreakwait);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1534_oplockbreakwait = decoder.ReadUInt32();
 		}
-		public uint sv1534_oplockbreakwait;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1535 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1535 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1535_oplockbreakresponsewait;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1535_oplockbreakresponsewait);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1535_oplockbreakresponsewait = decoder.ReadUInt32();
 		}
-		public uint sv1535_oplockbreakresponsewait;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1536 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1536 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1536_enableoplocks;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1536_enableoplocks);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1536_enableoplocks = decoder.ReadInt32();
 		}
-		public int sv1536_enableoplocks;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1538 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1538 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1538_enablefcbopens;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1538_enablefcbopens);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1538_enablefcbopens = decoder.ReadInt32();
 		}
-		public int sv1538_enablefcbopens;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1539 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1539 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1539_enableraw;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1539_enableraw);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1539_enableraw = decoder.ReadInt32();
 		}
-		public int sv1539_enableraw;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1540 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1540 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1540_enablesharednetdrives;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1540_enablesharednetdrives);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1540_enablesharednetdrives = decoder.ReadInt32();
 		}
-		public int sv1540_enablesharednetdrives;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1541 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1541 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1541_minfreeconnections;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1541_minfreeconnections);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1541_minfreeconnections = decoder.ReadInt32();
 		}
-		public int sv1541_minfreeconnections;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1542 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1542 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public int sv1542_maxfreeconnections;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1542_maxfreeconnections);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1542_maxfreeconnections = decoder.ReadInt32();
 		}
-		public int sv1542_maxfreeconnections;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1543 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1543 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1543_initsesstable;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1543_initsesstable);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1543_initsesstable = decoder.ReadUInt32();
 		}
-		public uint sv1543_initsesstable;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1544 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1544 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1544_initconntable;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1544_initconntable);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1544_initconntable = decoder.ReadUInt32();
 		}
-		public uint sv1544_initconntable;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1545 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1545 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1545_initfiletable;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1545_initfiletable);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1545_initfiletable = decoder.ReadUInt32();
 		}
-		public uint sv1545_initfiletable;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1546 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1546 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1546_initsearchtable;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1546_initsearchtable);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1546_initsearchtable = decoder.ReadUInt32();
 		}
-		public uint sv1546_initsearchtable;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1547 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1547 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1547_alertschedule;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1547_alertschedule);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1547_alertschedule = decoder.ReadUInt32();
 		}
-		public uint sv1547_alertschedule;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1548 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1548 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1548_errorthreshold;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1548_errorthreshold);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1548_errorthreshold = decoder.ReadUInt32();
 		}
-		public uint sv1548_errorthreshold;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1549 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1549 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1549_networkerrorthreshold;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1549_networkerrorthreshold);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1549_networkerrorthreshold = decoder.ReadUInt32();
 		}
-		public uint sv1549_networkerrorthreshold;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1550 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1550 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1550_diskspacethreshold;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1550_diskspacethreshold);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1550_diskspacethreshold = decoder.ReadUInt32();
 		}
-		public uint sv1550_diskspacethreshold;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1552 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1552 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1552_maxlinkdelay;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1552_maxlinkdelay);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1552_maxlinkdelay = decoder.ReadUInt32();
 		}
-		public uint sv1552_maxlinkdelay;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1553 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1553 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1553_minlinkthroughput;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1553_minlinkthroughput);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1553_minlinkthroughput = decoder.ReadUInt32();
 		}
-		public uint sv1553_minlinkthroughput;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1554 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1554 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1554_linkinfovalidtime;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1554_linkinfovalidtime);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1554_linkinfovalidtime = decoder.ReadUInt32();
 		}
-		public uint sv1554_linkinfovalidtime;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1555 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1555 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1555_scavqosinfoupdatetime;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1555_scavqosinfoupdatetime);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1555_scavqosinfoupdatetime = decoder.ReadUInt32();
 		}
-		public uint sv1555_scavqosinfoupdatetime;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO_1556 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO_1556 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sv1556_maxworkitemidletime;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sv1556_maxworkitemidletime);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sv1556_maxworkitemidletime = decoder.ReadUInt32();
 		}
-		public uint sv1556_maxworkitemidletime;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_INFO : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_INFO : IRpcFixedStruct
 	{
 		public uint unionSwitch;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.unionSwitch);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.unionSwitch)) == 100))
-			{
-				encoder.WritePointer(this.ServerInfo100);
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 101))
-				{
-					encoder.WritePointer(this.ServerInfo101);
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 102))
-					{
-						encoder.WritePointer(this.ServerInfo102);
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 103))
-						{
-							encoder.WritePointer(this.ServerInfo103);
-						}
-						else
-						{
-							if ((((int)(this.unionSwitch)) == 502))
-							{
-								encoder.WritePointer(this.ServerInfo502);
-							}
-							else
-							{
-								if ((((int)(this.unionSwitch)) == 503))
-								{
-									encoder.WritePointer(this.ServerInfo503);
-								}
-								else
-								{
-									if ((((int)(this.unionSwitch)) == 599))
-									{
-										encoder.WritePointer(this.ServerInfo599);
-									}
-									else
-									{
-										if ((((int)(this.unionSwitch)) == 1005))
-										{
-											encoder.WritePointer(this.ServerInfo1005);
-										}
-										else
-										{
-											if ((((int)(this.unionSwitch)) == 1107))
-											{
-												encoder.WritePointer(this.ServerInfo1107);
-											}
-											else
-											{
-												if ((((int)(this.unionSwitch)) == 1010))
-												{
-													encoder.WritePointer(this.ServerInfo1010);
-												}
-												else
-												{
-													if ((((int)(this.unionSwitch)) == 1016))
-													{
-														encoder.WritePointer(this.ServerInfo1016);
-													}
-													else
-													{
-														if ((((int)(this.unionSwitch)) == 1017))
-														{
-															encoder.WritePointer(this.ServerInfo1017);
-														}
-														else
-														{
-															if ((((int)(this.unionSwitch)) == 1018))
-															{
-																encoder.WritePointer(this.ServerInfo1018);
-															}
-															else
-															{
-																if ((((int)(this.unionSwitch)) == 1501))
-																{
-																	encoder.WritePointer(this.ServerInfo1501);
-																}
-																else
-																{
-																	if ((((int)(this.unionSwitch)) == 1502))
-																	{
-																		encoder.WritePointer(this.ServerInfo1502);
-																	}
-																	else
-																	{
-																		if ((((int)(this.unionSwitch)) == 1503))
-																		{
-																			encoder.WritePointer(this.ServerInfo1503);
-																		}
-																		else
-																		{
-																			if ((((int)(this.unionSwitch)) == 1506))
-																			{
-																				encoder.WritePointer(this.ServerInfo1506);
-																			}
-																			else
-																			{
-																				if ((((int)(this.unionSwitch)) == 1510))
-																				{
-																					encoder.WritePointer(this.ServerInfo1510);
-																				}
-																				else
-																				{
-																					if ((((int)(this.unionSwitch)) == 1511))
-																					{
-																						encoder.WritePointer(this.ServerInfo1511);
-																					}
-																					else
-																					{
-																						if ((((int)(this.unionSwitch)) == 1512))
-																						{
-																							encoder.WritePointer(this.ServerInfo1512);
-																						}
-																						else
-																						{
-																							if ((((int)(this.unionSwitch)) == 1513))
-																							{
-																								encoder.WritePointer(this.ServerInfo1513);
-																							}
-																							else
-																							{
-																								if ((((int)(this.unionSwitch)) == 1514))
-																								{
-																									encoder.WritePointer(this.ServerInfo1514);
-																								}
-																								else
-																								{
-																									if ((((int)(this.unionSwitch)) == 1515))
-																									{
-																										encoder.WritePointer(this.ServerInfo1515);
-																									}
-																									else
-																									{
-																										if ((((int)(this.unionSwitch)) == 1516))
-																										{
-																											encoder.WritePointer(this.ServerInfo1516);
-																										}
-																										else
-																										{
-																											if ((((int)(this.unionSwitch)) == 1518))
-																											{
-																												encoder.WritePointer(this.ServerInfo1518);
-																											}
-																											else
-																											{
-																												if ((((int)(this.unionSwitch)) == 1523))
-																												{
-																													encoder.WritePointer(this.ServerInfo1523);
-																												}
-																												else
-																												{
-																													if ((((int)(this.unionSwitch)) == 1528))
-																													{
-																														encoder.WritePointer(this.ServerInfo1528);
-																													}
-																													else
-																													{
-																														if ((((int)(this.unionSwitch)) == 1529))
-																														{
-																															encoder.WritePointer(this.ServerInfo1529);
-																														}
-																														else
-																														{
-																															if ((((int)(this.unionSwitch)) == 1530))
-																															{
-																																encoder.WritePointer(this.ServerInfo1530);
-																															}
-																															else
-																															{
-																																if ((((int)(this.unionSwitch)) == 1533))
-																																{
-																																	encoder.WritePointer(this.ServerInfo1533);
-																																}
-																																else
-																																{
-																																	if ((((int)(this.unionSwitch)) == 1534))
-																																	{
-																																		encoder.WritePointer(this.ServerInfo1534);
-																																	}
-																																	else
-																																	{
-																																		if ((((int)(this.unionSwitch)) == 1535))
-																																		{
-																																			encoder.WritePointer(this.ServerInfo1535);
-																																		}
-																																		else
-																																		{
-																																			if ((((int)(this.unionSwitch)) == 1536))
-																																			{
-																																				encoder.WritePointer(this.ServerInfo1536);
-																																			}
-																																			else
-																																			{
-																																				if ((((int)(this.unionSwitch)) == 1538))
-																																				{
-																																					encoder.WritePointer(this.ServerInfo1538);
-																																				}
-																																				else
-																																				{
-																																					if ((((int)(this.unionSwitch)) == 1539))
-																																					{
-																																						encoder.WritePointer(this.ServerInfo1539);
-																																					}
-																																					else
-																																					{
-																																						if ((((int)(this.unionSwitch)) == 1540))
-																																						{
-																																							encoder.WritePointer(this.ServerInfo1540);
-																																						}
-																																						else
-																																						{
-																																							if ((((int)(this.unionSwitch)) == 1541))
-																																							{
-																																								encoder.WritePointer(this.ServerInfo1541);
-																																							}
-																																							else
-																																							{
-																																								if ((((int)(this.unionSwitch)) == 1542))
-																																								{
-																																									encoder.WritePointer(this.ServerInfo1542);
-																																								}
-																																								else
-																																								{
-																																									if ((((int)(this.unionSwitch)) == 1543))
-																																									{
-																																										encoder.WritePointer(this.ServerInfo1543);
-																																									}
-																																									else
-																																									{
-																																										if ((((int)(this.unionSwitch)) == 1544))
-																																										{
-																																											encoder.WritePointer(this.ServerInfo1544);
-																																										}
-																																										else
-																																										{
-																																											if ((((int)(this.unionSwitch)) == 1545))
-																																											{
-																																												encoder.WritePointer(this.ServerInfo1545);
-																																											}
-																																											else
-																																											{
-																																												if ((((int)(this.unionSwitch)) == 1546))
-																																												{
-																																													encoder.WritePointer(this.ServerInfo1546);
-																																												}
-																																												else
-																																												{
-																																													if ((((int)(this.unionSwitch)) == 1547))
-																																													{
-																																														encoder.WritePointer(this.ServerInfo1547);
-																																													}
-																																													else
-																																													{
-																																														if ((((int)(this.unionSwitch)) == 1548))
-																																														{
-																																															encoder.WritePointer(this.ServerInfo1548);
-																																														}
-																																														else
-																																														{
-																																															if ((((int)(this.unionSwitch)) == 1549))
-																																															{
-																																																encoder.WritePointer(this.ServerInfo1549);
-																																															}
-																																															else
-																																															{
-																																																if ((((int)(this.unionSwitch)) == 1550))
-																																																{
-																																																	encoder.WritePointer(this.ServerInfo1550);
-																																																}
-																																																else
-																																																{
-																																																	if ((((int)(this.unionSwitch)) == 1552))
-																																																	{
-																																																		encoder.WritePointer(this.ServerInfo1552);
-																																																	}
-																																																	else
-																																																	{
-																																																		if ((((int)(this.unionSwitch)) == 1553))
-																																																		{
-																																																			encoder.WritePointer(this.ServerInfo1553);
-																																																		}
-																																																		else
-																																																		{
-																																																			if ((((int)(this.unionSwitch)) == 1554))
-																																																			{
-																																																				encoder.WritePointer(this.ServerInfo1554);
-																																																			}
-																																																			else
-																																																			{
-																																																				if ((((int)(this.unionSwitch)) == 1555))
-																																																				{
-																																																					encoder.WritePointer(this.ServerInfo1555);
-																																																				}
-																																																				else
-																																																				{
-																																																					if ((((int)(this.unionSwitch)) == 1556))
-																																																					{
-																																																						encoder.WritePointer(this.ServerInfo1556);
-																																																					}
-																																																				}
-																																																			}
-																																																		}
-																																																	}
-																																																}
-																																															}
-																																														}
-																																													}
-																																												}
-																																											}
-																																										}
-																																									}
-																																								}
-																																							}
-																																						}
-																																					}
-																																				}
-																																			}
-																																		}
-																																	}
-																																}
-																															}
-																														}
-																													}
-																												}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.unionSwitch = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.unionSwitch)) == 100))
-			{
-				this.ServerInfo100 = decoder.ReadPointer<ms_dtyp.SERVER_INFO_100>();
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 101))
-				{
-					this.ServerInfo101 = decoder.ReadPointer<ms_dtyp.SERVER_INFO_101>();
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 102))
-					{
-						this.ServerInfo102 = decoder.ReadPointer<SERVER_INFO_102>();
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 103))
-						{
-							this.ServerInfo103 = decoder.ReadPointer<SERVER_INFO_103>();
-						}
-						else
-						{
-							if ((((int)(this.unionSwitch)) == 502))
-							{
-								this.ServerInfo502 = decoder.ReadPointer<SERVER_INFO_502>();
-							}
-							else
-							{
-								if ((((int)(this.unionSwitch)) == 503))
-								{
-									this.ServerInfo503 = decoder.ReadPointer<SERVER_INFO_503>();
-								}
-								else
-								{
-									if ((((int)(this.unionSwitch)) == 599))
-									{
-										this.ServerInfo599 = decoder.ReadPointer<SERVER_INFO_599>();
-									}
-									else
-									{
-										if ((((int)(this.unionSwitch)) == 1005))
-										{
-											this.ServerInfo1005 = decoder.ReadPointer<SERVER_INFO_1005>();
-										}
-										else
-										{
-											if ((((int)(this.unionSwitch)) == 1107))
-											{
-												this.ServerInfo1107 = decoder.ReadPointer<SERVER_INFO_1107>();
-											}
-											else
-											{
-												if ((((int)(this.unionSwitch)) == 1010))
-												{
-													this.ServerInfo1010 = decoder.ReadPointer<SERVER_INFO_1010>();
-												}
-												else
-												{
-													if ((((int)(this.unionSwitch)) == 1016))
-													{
-														this.ServerInfo1016 = decoder.ReadPointer<SERVER_INFO_1016>();
-													}
-													else
-													{
-														if ((((int)(this.unionSwitch)) == 1017))
-														{
-															this.ServerInfo1017 = decoder.ReadPointer<SERVER_INFO_1017>();
-														}
-														else
-														{
-															if ((((int)(this.unionSwitch)) == 1018))
-															{
-																this.ServerInfo1018 = decoder.ReadPointer<SERVER_INFO_1018>();
-															}
-															else
-															{
-																if ((((int)(this.unionSwitch)) == 1501))
-																{
-																	this.ServerInfo1501 = decoder.ReadPointer<SERVER_INFO_1501>();
-																}
-																else
-																{
-																	if ((((int)(this.unionSwitch)) == 1502))
-																	{
-																		this.ServerInfo1502 = decoder.ReadPointer<SERVER_INFO_1502>();
-																	}
-																	else
-																	{
-																		if ((((int)(this.unionSwitch)) == 1503))
-																		{
-																			this.ServerInfo1503 = decoder.ReadPointer<SERVER_INFO_1503>();
-																		}
-																		else
-																		{
-																			if ((((int)(this.unionSwitch)) == 1506))
-																			{
-																				this.ServerInfo1506 = decoder.ReadPointer<SERVER_INFO_1506>();
-																			}
-																			else
-																			{
-																				if ((((int)(this.unionSwitch)) == 1510))
-																				{
-																					this.ServerInfo1510 = decoder.ReadPointer<SERVER_INFO_1510>();
-																				}
-																				else
-																				{
-																					if ((((int)(this.unionSwitch)) == 1511))
-																					{
-																						this.ServerInfo1511 = decoder.ReadPointer<SERVER_INFO_1511>();
-																					}
-																					else
-																					{
-																						if ((((int)(this.unionSwitch)) == 1512))
-																						{
-																							this.ServerInfo1512 = decoder.ReadPointer<SERVER_INFO_1512>();
-																						}
-																						else
-																						{
-																							if ((((int)(this.unionSwitch)) == 1513))
-																							{
-																								this.ServerInfo1513 = decoder.ReadPointer<SERVER_INFO_1513>();
-																							}
-																							else
-																							{
-																								if ((((int)(this.unionSwitch)) == 1514))
-																								{
-																									this.ServerInfo1514 = decoder.ReadPointer<SERVER_INFO_1514>();
-																								}
-																								else
-																								{
-																									if ((((int)(this.unionSwitch)) == 1515))
-																									{
-																										this.ServerInfo1515 = decoder.ReadPointer<SERVER_INFO_1515>();
-																									}
-																									else
-																									{
-																										if ((((int)(this.unionSwitch)) == 1516))
-																										{
-																											this.ServerInfo1516 = decoder.ReadPointer<SERVER_INFO_1516>();
-																										}
-																										else
-																										{
-																											if ((((int)(this.unionSwitch)) == 1518))
-																											{
-																												this.ServerInfo1518 = decoder.ReadPointer<SERVER_INFO_1518>();
-																											}
-																											else
-																											{
-																												if ((((int)(this.unionSwitch)) == 1523))
-																												{
-																													this.ServerInfo1523 = decoder.ReadPointer<SERVER_INFO_1523>();
-																												}
-																												else
-																												{
-																													if ((((int)(this.unionSwitch)) == 1528))
-																													{
-																														this.ServerInfo1528 = decoder.ReadPointer<SERVER_INFO_1528>();
-																													}
-																													else
-																													{
-																														if ((((int)(this.unionSwitch)) == 1529))
-																														{
-																															this.ServerInfo1529 = decoder.ReadPointer<SERVER_INFO_1529>();
-																														}
-																														else
-																														{
-																															if ((((int)(this.unionSwitch)) == 1530))
-																															{
-																																this.ServerInfo1530 = decoder.ReadPointer<SERVER_INFO_1530>();
-																															}
-																															else
-																															{
-																																if ((((int)(this.unionSwitch)) == 1533))
-																																{
-																																	this.ServerInfo1533 = decoder.ReadPointer<SERVER_INFO_1533>();
-																																}
-																																else
-																																{
-																																	if ((((int)(this.unionSwitch)) == 1534))
-																																	{
-																																		this.ServerInfo1534 = decoder.ReadPointer<SERVER_INFO_1534>();
-																																	}
-																																	else
-																																	{
-																																		if ((((int)(this.unionSwitch)) == 1535))
-																																		{
-																																			this.ServerInfo1535 = decoder.ReadPointer<SERVER_INFO_1535>();
-																																		}
-																																		else
-																																		{
-																																			if ((((int)(this.unionSwitch)) == 1536))
-																																			{
-																																				this.ServerInfo1536 = decoder.ReadPointer<SERVER_INFO_1536>();
-																																			}
-																																			else
-																																			{
-																																				if ((((int)(this.unionSwitch)) == 1538))
-																																				{
-																																					this.ServerInfo1538 = decoder.ReadPointer<SERVER_INFO_1538>();
-																																				}
-																																				else
-																																				{
-																																					if ((((int)(this.unionSwitch)) == 1539))
-																																					{
-																																						this.ServerInfo1539 = decoder.ReadPointer<SERVER_INFO_1539>();
-																																					}
-																																					else
-																																					{
-																																						if ((((int)(this.unionSwitch)) == 1540))
-																																						{
-																																							this.ServerInfo1540 = decoder.ReadPointer<SERVER_INFO_1540>();
-																																						}
-																																						else
-																																						{
-																																							if ((((int)(this.unionSwitch)) == 1541))
-																																							{
-																																								this.ServerInfo1541 = decoder.ReadPointer<SERVER_INFO_1541>();
-																																							}
-																																							else
-																																							{
-																																								if ((((int)(this.unionSwitch)) == 1542))
-																																								{
-																																									this.ServerInfo1542 = decoder.ReadPointer<SERVER_INFO_1542>();
-																																								}
-																																								else
-																																								{
-																																									if ((((int)(this.unionSwitch)) == 1543))
-																																									{
-																																										this.ServerInfo1543 = decoder.ReadPointer<SERVER_INFO_1543>();
-																																									}
-																																									else
-																																									{
-																																										if ((((int)(this.unionSwitch)) == 1544))
-																																										{
-																																											this.ServerInfo1544 = decoder.ReadPointer<SERVER_INFO_1544>();
-																																										}
-																																										else
-																																										{
-																																											if ((((int)(this.unionSwitch)) == 1545))
-																																											{
-																																												this.ServerInfo1545 = decoder.ReadPointer<SERVER_INFO_1545>();
-																																											}
-																																											else
-																																											{
-																																												if ((((int)(this.unionSwitch)) == 1546))
-																																												{
-																																													this.ServerInfo1546 = decoder.ReadPointer<SERVER_INFO_1546>();
-																																												}
-																																												else
-																																												{
-																																													if ((((int)(this.unionSwitch)) == 1547))
-																																													{
-																																														this.ServerInfo1547 = decoder.ReadPointer<SERVER_INFO_1547>();
-																																													}
-																																													else
-																																													{
-																																														if ((((int)(this.unionSwitch)) == 1548))
-																																														{
-																																															this.ServerInfo1548 = decoder.ReadPointer<SERVER_INFO_1548>();
-																																														}
-																																														else
-																																														{
-																																															if ((((int)(this.unionSwitch)) == 1549))
-																																															{
-																																																this.ServerInfo1549 = decoder.ReadPointer<SERVER_INFO_1549>();
-																																															}
-																																															else
-																																															{
-																																																if ((((int)(this.unionSwitch)) == 1550))
-																																																{
-																																																	this.ServerInfo1550 = decoder.ReadPointer<SERVER_INFO_1550>();
-																																																}
-																																																else
-																																																{
-																																																	if ((((int)(this.unionSwitch)) == 1552))
-																																																	{
-																																																		this.ServerInfo1552 = decoder.ReadPointer<SERVER_INFO_1552>();
-																																																	}
-																																																	else
-																																																	{
-																																																		if ((((int)(this.unionSwitch)) == 1553))
-																																																		{
-																																																			this.ServerInfo1553 = decoder.ReadPointer<SERVER_INFO_1553>();
-																																																		}
-																																																		else
-																																																		{
-																																																			if ((((int)(this.unionSwitch)) == 1554))
-																																																			{
-																																																				this.ServerInfo1554 = decoder.ReadPointer<SERVER_INFO_1554>();
-																																																			}
-																																																			else
-																																																			{
-																																																				if ((((int)(this.unionSwitch)) == 1555))
-																																																				{
-																																																					this.ServerInfo1555 = decoder.ReadPointer<SERVER_INFO_1555>();
-																																																				}
-																																																				else
-																																																				{
-																																																					if ((((int)(this.unionSwitch)) == 1556))
-																																																					{
-																																																						this.ServerInfo1556 = decoder.ReadPointer<SERVER_INFO_1556>();
-																																																					}
-																																																				}
-																																																			}
-																																																		}
-																																																	}
-																																																}
-																																															}
-																																														}
-																																													}
-																																												}
-																																											}
-																																										}
-																																									}
-																																								}
-																																							}
-																																						}
-																																					}
-																																				}
-																																			}
-																																		}
-																																	}
-																																}
-																															}
-																														}
-																													}
-																												}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.unionSwitch)) == 100))
-			{
-				if ((null != this.ServerInfo100))
-				{
-					encoder.WriteFixedStruct(this.ServerInfo100.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-					encoder.WriteStructDeferral(this.ServerInfo100.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 101))
-				{
-					if ((null != this.ServerInfo101))
-					{
-						encoder.WriteFixedStruct(this.ServerInfo101.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-						encoder.WriteStructDeferral(this.ServerInfo101.value);
-					}
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 102))
-					{
-						if ((null != this.ServerInfo102))
-						{
-							encoder.WriteFixedStruct(this.ServerInfo102.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-							encoder.WriteStructDeferral(this.ServerInfo102.value);
-						}
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 103))
-						{
-							if ((null != this.ServerInfo103))
-							{
-								encoder.WriteFixedStruct(this.ServerInfo103.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-								encoder.WriteStructDeferral(this.ServerInfo103.value);
-							}
-						}
-						else
-						{
-							if ((((int)(this.unionSwitch)) == 502))
-							{
-								if ((null != this.ServerInfo502))
-								{
-									encoder.WriteFixedStruct(this.ServerInfo502.value, Titanis.DceRpc.NdrAlignment._4Byte);
-									encoder.WriteStructDeferral(this.ServerInfo502.value);
-								}
-							}
-							else
-							{
-								if ((((int)(this.unionSwitch)) == 503))
-								{
-									if ((null != this.ServerInfo503))
-									{
-										encoder.WriteFixedStruct(this.ServerInfo503.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-										encoder.WriteStructDeferral(this.ServerInfo503.value);
-									}
-								}
-								else
-								{
-									if ((((int)(this.unionSwitch)) == 599))
-									{
-										if ((null != this.ServerInfo599))
-										{
-											encoder.WriteFixedStruct(this.ServerInfo599.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-											encoder.WriteStructDeferral(this.ServerInfo599.value);
-										}
-									}
-									else
-									{
-										if ((((int)(this.unionSwitch)) == 1005))
-										{
-											if ((null != this.ServerInfo1005))
-											{
-												encoder.WriteFixedStruct(this.ServerInfo1005.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-												encoder.WriteStructDeferral(this.ServerInfo1005.value);
-											}
-										}
-										else
-										{
-											if ((((int)(this.unionSwitch)) == 1107))
-											{
-												if ((null != this.ServerInfo1107))
-												{
-													encoder.WriteFixedStruct(this.ServerInfo1107.value, Titanis.DceRpc.NdrAlignment._4Byte);
-													encoder.WriteStructDeferral(this.ServerInfo1107.value);
-												}
-											}
-											else
-											{
-												if ((((int)(this.unionSwitch)) == 1010))
-												{
-													if ((null != this.ServerInfo1010))
-													{
-														encoder.WriteFixedStruct(this.ServerInfo1010.value, Titanis.DceRpc.NdrAlignment._4Byte);
-														encoder.WriteStructDeferral(this.ServerInfo1010.value);
-													}
-												}
-												else
-												{
-													if ((((int)(this.unionSwitch)) == 1016))
-													{
-														if ((null != this.ServerInfo1016))
-														{
-															encoder.WriteFixedStruct(this.ServerInfo1016.value, Titanis.DceRpc.NdrAlignment._4Byte);
-															encoder.WriteStructDeferral(this.ServerInfo1016.value);
-														}
-													}
-													else
-													{
-														if ((((int)(this.unionSwitch)) == 1017))
-														{
-															if ((null != this.ServerInfo1017))
-															{
-																encoder.WriteFixedStruct(this.ServerInfo1017.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																encoder.WriteStructDeferral(this.ServerInfo1017.value);
-															}
-														}
-														else
-														{
-															if ((((int)(this.unionSwitch)) == 1018))
-															{
-																if ((null != this.ServerInfo1018))
-																{
-																	encoder.WriteFixedStruct(this.ServerInfo1018.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																	encoder.WriteStructDeferral(this.ServerInfo1018.value);
-																}
-															}
-															else
-															{
-																if ((((int)(this.unionSwitch)) == 1501))
-																{
-																	if ((null != this.ServerInfo1501))
-																	{
-																		encoder.WriteFixedStruct(this.ServerInfo1501.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																		encoder.WriteStructDeferral(this.ServerInfo1501.value);
-																	}
-																}
-																else
-																{
-																	if ((((int)(this.unionSwitch)) == 1502))
-																	{
-																		if ((null != this.ServerInfo1502))
-																		{
-																			encoder.WriteFixedStruct(this.ServerInfo1502.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																			encoder.WriteStructDeferral(this.ServerInfo1502.value);
-																		}
-																	}
-																	else
-																	{
-																		if ((((int)(this.unionSwitch)) == 1503))
-																		{
-																			if ((null != this.ServerInfo1503))
-																			{
-																				encoder.WriteFixedStruct(this.ServerInfo1503.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																				encoder.WriteStructDeferral(this.ServerInfo1503.value);
-																			}
-																		}
-																		else
-																		{
-																			if ((((int)(this.unionSwitch)) == 1506))
-																			{
-																				if ((null != this.ServerInfo1506))
-																				{
-																					encoder.WriteFixedStruct(this.ServerInfo1506.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																					encoder.WriteStructDeferral(this.ServerInfo1506.value);
-																				}
-																			}
-																			else
-																			{
-																				if ((((int)(this.unionSwitch)) == 1510))
-																				{
-																					if ((null != this.ServerInfo1510))
-																					{
-																						encoder.WriteFixedStruct(this.ServerInfo1510.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																						encoder.WriteStructDeferral(this.ServerInfo1510.value);
-																					}
-																				}
-																				else
-																				{
-																					if ((((int)(this.unionSwitch)) == 1511))
-																					{
-																						if ((null != this.ServerInfo1511))
-																						{
-																							encoder.WriteFixedStruct(this.ServerInfo1511.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																							encoder.WriteStructDeferral(this.ServerInfo1511.value);
-																						}
-																					}
-																					else
-																					{
-																						if ((((int)(this.unionSwitch)) == 1512))
-																						{
-																							if ((null != this.ServerInfo1512))
-																							{
-																								encoder.WriteFixedStruct(this.ServerInfo1512.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																								encoder.WriteStructDeferral(this.ServerInfo1512.value);
-																							}
-																						}
-																						else
-																						{
-																							if ((((int)(this.unionSwitch)) == 1513))
-																							{
-																								if ((null != this.ServerInfo1513))
-																								{
-																									encoder.WriteFixedStruct(this.ServerInfo1513.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																									encoder.WriteStructDeferral(this.ServerInfo1513.value);
-																								}
-																							}
-																							else
-																							{
-																								if ((((int)(this.unionSwitch)) == 1514))
-																								{
-																									if ((null != this.ServerInfo1514))
-																									{
-																										encoder.WriteFixedStruct(this.ServerInfo1514.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																										encoder.WriteStructDeferral(this.ServerInfo1514.value);
-																									}
-																								}
-																								else
-																								{
-																									if ((((int)(this.unionSwitch)) == 1515))
-																									{
-																										if ((null != this.ServerInfo1515))
-																										{
-																											encoder.WriteFixedStruct(this.ServerInfo1515.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																											encoder.WriteStructDeferral(this.ServerInfo1515.value);
-																										}
-																									}
-																									else
-																									{
-																										if ((((int)(this.unionSwitch)) == 1516))
-																										{
-																											if ((null != this.ServerInfo1516))
-																											{
-																												encoder.WriteFixedStruct(this.ServerInfo1516.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																												encoder.WriteStructDeferral(this.ServerInfo1516.value);
-																											}
-																										}
-																										else
-																										{
-																											if ((((int)(this.unionSwitch)) == 1518))
-																											{
-																												if ((null != this.ServerInfo1518))
-																												{
-																													encoder.WriteFixedStruct(this.ServerInfo1518.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																													encoder.WriteStructDeferral(this.ServerInfo1518.value);
-																												}
-																											}
-																											else
-																											{
-																												if ((((int)(this.unionSwitch)) == 1523))
-																												{
-																													if ((null != this.ServerInfo1523))
-																													{
-																														encoder.WriteFixedStruct(this.ServerInfo1523.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																														encoder.WriteStructDeferral(this.ServerInfo1523.value);
-																													}
-																												}
-																												else
-																												{
-																													if ((((int)(this.unionSwitch)) == 1528))
-																													{
-																														if ((null != this.ServerInfo1528))
-																														{
-																															encoder.WriteFixedStruct(this.ServerInfo1528.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																															encoder.WriteStructDeferral(this.ServerInfo1528.value);
-																														}
-																													}
-																													else
-																													{
-																														if ((((int)(this.unionSwitch)) == 1529))
-																														{
-																															if ((null != this.ServerInfo1529))
-																															{
-																																encoder.WriteFixedStruct(this.ServerInfo1529.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																encoder.WriteStructDeferral(this.ServerInfo1529.value);
-																															}
-																														}
-																														else
-																														{
-																															if ((((int)(this.unionSwitch)) == 1530))
-																															{
-																																if ((null != this.ServerInfo1530))
-																																{
-																																	encoder.WriteFixedStruct(this.ServerInfo1530.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																	encoder.WriteStructDeferral(this.ServerInfo1530.value);
-																																}
-																															}
-																															else
-																															{
-																																if ((((int)(this.unionSwitch)) == 1533))
-																																{
-																																	if ((null != this.ServerInfo1533))
-																																	{
-																																		encoder.WriteFixedStruct(this.ServerInfo1533.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																		encoder.WriteStructDeferral(this.ServerInfo1533.value);
-																																	}
-																																}
-																																else
-																																{
-																																	if ((((int)(this.unionSwitch)) == 1534))
-																																	{
-																																		if ((null != this.ServerInfo1534))
-																																		{
-																																			encoder.WriteFixedStruct(this.ServerInfo1534.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																			encoder.WriteStructDeferral(this.ServerInfo1534.value);
-																																		}
-																																	}
-																																	else
-																																	{
-																																		if ((((int)(this.unionSwitch)) == 1535))
-																																		{
-																																			if ((null != this.ServerInfo1535))
-																																			{
-																																				encoder.WriteFixedStruct(this.ServerInfo1535.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																				encoder.WriteStructDeferral(this.ServerInfo1535.value);
-																																			}
-																																		}
-																																		else
-																																		{
-																																			if ((((int)(this.unionSwitch)) == 1536))
-																																			{
-																																				if ((null != this.ServerInfo1536))
-																																				{
-																																					encoder.WriteFixedStruct(this.ServerInfo1536.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																					encoder.WriteStructDeferral(this.ServerInfo1536.value);
-																																				}
-																																			}
-																																			else
-																																			{
-																																				if ((((int)(this.unionSwitch)) == 1538))
-																																				{
-																																					if ((null != this.ServerInfo1538))
-																																					{
-																																						encoder.WriteFixedStruct(this.ServerInfo1538.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																						encoder.WriteStructDeferral(this.ServerInfo1538.value);
-																																					}
-																																				}
-																																				else
-																																				{
-																																					if ((((int)(this.unionSwitch)) == 1539))
-																																					{
-																																						if ((null != this.ServerInfo1539))
-																																						{
-																																							encoder.WriteFixedStruct(this.ServerInfo1539.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																							encoder.WriteStructDeferral(this.ServerInfo1539.value);
-																																						}
-																																					}
-																																					else
-																																					{
-																																						if ((((int)(this.unionSwitch)) == 1540))
-																																						{
-																																							if ((null != this.ServerInfo1540))
-																																							{
-																																								encoder.WriteFixedStruct(this.ServerInfo1540.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																								encoder.WriteStructDeferral(this.ServerInfo1540.value);
-																																							}
-																																						}
-																																						else
-																																						{
-																																							if ((((int)(this.unionSwitch)) == 1541))
-																																							{
-																																								if ((null != this.ServerInfo1541))
-																																								{
-																																									encoder.WriteFixedStruct(this.ServerInfo1541.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																									encoder.WriteStructDeferral(this.ServerInfo1541.value);
-																																								}
-																																							}
-																																							else
-																																							{
-																																								if ((((int)(this.unionSwitch)) == 1542))
-																																								{
-																																									if ((null != this.ServerInfo1542))
-																																									{
-																																										encoder.WriteFixedStruct(this.ServerInfo1542.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																										encoder.WriteStructDeferral(this.ServerInfo1542.value);
-																																									}
-																																								}
-																																								else
-																																								{
-																																									if ((((int)(this.unionSwitch)) == 1543))
-																																									{
-																																										if ((null != this.ServerInfo1543))
-																																										{
-																																											encoder.WriteFixedStruct(this.ServerInfo1543.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																											encoder.WriteStructDeferral(this.ServerInfo1543.value);
-																																										}
-																																									}
-																																									else
-																																									{
-																																										if ((((int)(this.unionSwitch)) == 1544))
-																																										{
-																																											if ((null != this.ServerInfo1544))
-																																											{
-																																												encoder.WriteFixedStruct(this.ServerInfo1544.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																												encoder.WriteStructDeferral(this.ServerInfo1544.value);
-																																											}
-																																										}
-																																										else
-																																										{
-																																											if ((((int)(this.unionSwitch)) == 1545))
-																																											{
-																																												if ((null != this.ServerInfo1545))
-																																												{
-																																													encoder.WriteFixedStruct(this.ServerInfo1545.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																													encoder.WriteStructDeferral(this.ServerInfo1545.value);
-																																												}
-																																											}
-																																											else
-																																											{
-																																												if ((((int)(this.unionSwitch)) == 1546))
-																																												{
-																																													if ((null != this.ServerInfo1546))
-																																													{
-																																														encoder.WriteFixedStruct(this.ServerInfo1546.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																														encoder.WriteStructDeferral(this.ServerInfo1546.value);
-																																													}
-																																												}
-																																												else
-																																												{
-																																													if ((((int)(this.unionSwitch)) == 1547))
-																																													{
-																																														if ((null != this.ServerInfo1547))
-																																														{
-																																															encoder.WriteFixedStruct(this.ServerInfo1547.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																															encoder.WriteStructDeferral(this.ServerInfo1547.value);
-																																														}
-																																													}
-																																													else
-																																													{
-																																														if ((((int)(this.unionSwitch)) == 1548))
-																																														{
-																																															if ((null != this.ServerInfo1548))
-																																															{
-																																																encoder.WriteFixedStruct(this.ServerInfo1548.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																																encoder.WriteStructDeferral(this.ServerInfo1548.value);
-																																															}
-																																														}
-																																														else
-																																														{
-																																															if ((((int)(this.unionSwitch)) == 1549))
-																																															{
-																																																if ((null != this.ServerInfo1549))
-																																																{
-																																																	encoder.WriteFixedStruct(this.ServerInfo1549.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																																	encoder.WriteStructDeferral(this.ServerInfo1549.value);
-																																																}
-																																															}
-																																															else
-																																															{
-																																																if ((((int)(this.unionSwitch)) == 1550))
-																																																{
-																																																	if ((null != this.ServerInfo1550))
-																																																	{
-																																																		encoder.WriteFixedStruct(this.ServerInfo1550.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																																		encoder.WriteStructDeferral(this.ServerInfo1550.value);
-																																																	}
-																																																}
-																																																else
-																																																{
-																																																	if ((((int)(this.unionSwitch)) == 1552))
-																																																	{
-																																																		if ((null != this.ServerInfo1552))
-																																																		{
-																																																			encoder.WriteFixedStruct(this.ServerInfo1552.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																																			encoder.WriteStructDeferral(this.ServerInfo1552.value);
-																																																		}
-																																																	}
-																																																	else
-																																																	{
-																																																		if ((((int)(this.unionSwitch)) == 1553))
-																																																		{
-																																																			if ((null != this.ServerInfo1553))
-																																																			{
-																																																				encoder.WriteFixedStruct(this.ServerInfo1553.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																																				encoder.WriteStructDeferral(this.ServerInfo1553.value);
-																																																			}
-																																																		}
-																																																		else
-																																																		{
-																																																			if ((((int)(this.unionSwitch)) == 1554))
-																																																			{
-																																																				if ((null != this.ServerInfo1554))
-																																																				{
-																																																					encoder.WriteFixedStruct(this.ServerInfo1554.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																																					encoder.WriteStructDeferral(this.ServerInfo1554.value);
-																																																				}
-																																																			}
-																																																			else
-																																																			{
-																																																				if ((((int)(this.unionSwitch)) == 1555))
-																																																				{
-																																																					if ((null != this.ServerInfo1555))
-																																																					{
-																																																						encoder.WriteFixedStruct(this.ServerInfo1555.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																																						encoder.WriteStructDeferral(this.ServerInfo1555.value);
-																																																					}
-																																																				}
-																																																				else
-																																																				{
-																																																					if ((((int)(this.unionSwitch)) == 1556))
-																																																					{
-																																																						if ((null != this.ServerInfo1556))
-																																																						{
-																																																							encoder.WriteFixedStruct(this.ServerInfo1556.value, Titanis.DceRpc.NdrAlignment._4Byte);
-																																																							encoder.WriteStructDeferral(this.ServerInfo1556.value);
-																																																						}
-																																																					}
-																																																				}
-																																																			}
-																																																		}
-																																																	}
-																																																}
-																																															}
-																																														}
-																																													}
-																																												}
-																																											}
-																																										}
-																																									}
-																																								}
-																																							}
-																																						}
-																																					}
-																																				}
-																																			}
-																																		}
-																																	}
-																																}
-																															}
-																														}
-																													}
-																												}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.unionSwitch)) == 100))
-			{
-				if ((null != this.ServerInfo100))
-				{
-					this.ServerInfo100.value = decoder.ReadFixedStruct<ms_dtyp.SERVER_INFO_100>(Titanis.DceRpc.NdrAlignment.NativePtr);
-					decoder.ReadStructDeferral<ms_dtyp.SERVER_INFO_100>(ref this.ServerInfo100.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 101))
-				{
-					if ((null != this.ServerInfo101))
-					{
-						this.ServerInfo101.value = decoder.ReadFixedStruct<ms_dtyp.SERVER_INFO_101>(Titanis.DceRpc.NdrAlignment.NativePtr);
-						decoder.ReadStructDeferral<ms_dtyp.SERVER_INFO_101>(ref this.ServerInfo101.value);
-					}
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 102))
-					{
-						if ((null != this.ServerInfo102))
-						{
-							this.ServerInfo102.value = decoder.ReadFixedStruct<SERVER_INFO_102>(Titanis.DceRpc.NdrAlignment.NativePtr);
-							decoder.ReadStructDeferral<SERVER_INFO_102>(ref this.ServerInfo102.value);
-						}
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 103))
-						{
-							if ((null != this.ServerInfo103))
-							{
-								this.ServerInfo103.value = decoder.ReadFixedStruct<SERVER_INFO_103>(Titanis.DceRpc.NdrAlignment.NativePtr);
-								decoder.ReadStructDeferral<SERVER_INFO_103>(ref this.ServerInfo103.value);
-							}
-						}
-						else
-						{
-							if ((((int)(this.unionSwitch)) == 502))
-							{
-								if ((null != this.ServerInfo502))
-								{
-									this.ServerInfo502.value = decoder.ReadFixedStruct<SERVER_INFO_502>(Titanis.DceRpc.NdrAlignment._4Byte);
-									decoder.ReadStructDeferral<SERVER_INFO_502>(ref this.ServerInfo502.value);
-								}
-							}
-							else
-							{
-								if ((((int)(this.unionSwitch)) == 503))
-								{
-									if ((null != this.ServerInfo503))
-									{
-										this.ServerInfo503.value = decoder.ReadFixedStruct<SERVER_INFO_503>(Titanis.DceRpc.NdrAlignment.NativePtr);
-										decoder.ReadStructDeferral<SERVER_INFO_503>(ref this.ServerInfo503.value);
-									}
-								}
-								else
-								{
-									if ((((int)(this.unionSwitch)) == 599))
-									{
-										if ((null != this.ServerInfo599))
-										{
-											this.ServerInfo599.value = decoder.ReadFixedStruct<SERVER_INFO_599>(Titanis.DceRpc.NdrAlignment.NativePtr);
-											decoder.ReadStructDeferral<SERVER_INFO_599>(ref this.ServerInfo599.value);
-										}
-									}
-									else
-									{
-										if ((((int)(this.unionSwitch)) == 1005))
-										{
-											if ((null != this.ServerInfo1005))
-											{
-												this.ServerInfo1005.value = decoder.ReadFixedStruct<SERVER_INFO_1005>(Titanis.DceRpc.NdrAlignment.NativePtr);
-												decoder.ReadStructDeferral<SERVER_INFO_1005>(ref this.ServerInfo1005.value);
-											}
-										}
-										else
-										{
-											if ((((int)(this.unionSwitch)) == 1107))
-											{
-												if ((null != this.ServerInfo1107))
-												{
-													this.ServerInfo1107.value = decoder.ReadFixedStruct<SERVER_INFO_1107>(Titanis.DceRpc.NdrAlignment._4Byte);
-													decoder.ReadStructDeferral<SERVER_INFO_1107>(ref this.ServerInfo1107.value);
-												}
-											}
-											else
-											{
-												if ((((int)(this.unionSwitch)) == 1010))
-												{
-													if ((null != this.ServerInfo1010))
-													{
-														this.ServerInfo1010.value = decoder.ReadFixedStruct<SERVER_INFO_1010>(Titanis.DceRpc.NdrAlignment._4Byte);
-														decoder.ReadStructDeferral<SERVER_INFO_1010>(ref this.ServerInfo1010.value);
-													}
-												}
-												else
-												{
-													if ((((int)(this.unionSwitch)) == 1016))
-													{
-														if ((null != this.ServerInfo1016))
-														{
-															this.ServerInfo1016.value = decoder.ReadFixedStruct<SERVER_INFO_1016>(Titanis.DceRpc.NdrAlignment._4Byte);
-															decoder.ReadStructDeferral<SERVER_INFO_1016>(ref this.ServerInfo1016.value);
-														}
-													}
-													else
-													{
-														if ((((int)(this.unionSwitch)) == 1017))
-														{
-															if ((null != this.ServerInfo1017))
-															{
-																this.ServerInfo1017.value = decoder.ReadFixedStruct<SERVER_INFO_1017>(Titanis.DceRpc.NdrAlignment._4Byte);
-																decoder.ReadStructDeferral<SERVER_INFO_1017>(ref this.ServerInfo1017.value);
-															}
-														}
-														else
-														{
-															if ((((int)(this.unionSwitch)) == 1018))
-															{
-																if ((null != this.ServerInfo1018))
-																{
-																	this.ServerInfo1018.value = decoder.ReadFixedStruct<SERVER_INFO_1018>(Titanis.DceRpc.NdrAlignment._4Byte);
-																	decoder.ReadStructDeferral<SERVER_INFO_1018>(ref this.ServerInfo1018.value);
-																}
-															}
-															else
-															{
-																if ((((int)(this.unionSwitch)) == 1501))
-																{
-																	if ((null != this.ServerInfo1501))
-																	{
-																		this.ServerInfo1501.value = decoder.ReadFixedStruct<SERVER_INFO_1501>(Titanis.DceRpc.NdrAlignment._4Byte);
-																		decoder.ReadStructDeferral<SERVER_INFO_1501>(ref this.ServerInfo1501.value);
-																	}
-																}
-																else
-																{
-																	if ((((int)(this.unionSwitch)) == 1502))
-																	{
-																		if ((null != this.ServerInfo1502))
-																		{
-																			this.ServerInfo1502.value = decoder.ReadFixedStruct<SERVER_INFO_1502>(Titanis.DceRpc.NdrAlignment._4Byte);
-																			decoder.ReadStructDeferral<SERVER_INFO_1502>(ref this.ServerInfo1502.value);
-																		}
-																	}
-																	else
-																	{
-																		if ((((int)(this.unionSwitch)) == 1503))
-																		{
-																			if ((null != this.ServerInfo1503))
-																			{
-																				this.ServerInfo1503.value = decoder.ReadFixedStruct<SERVER_INFO_1503>(Titanis.DceRpc.NdrAlignment._4Byte);
-																				decoder.ReadStructDeferral<SERVER_INFO_1503>(ref this.ServerInfo1503.value);
-																			}
-																		}
-																		else
-																		{
-																			if ((((int)(this.unionSwitch)) == 1506))
-																			{
-																				if ((null != this.ServerInfo1506))
-																				{
-																					this.ServerInfo1506.value = decoder.ReadFixedStruct<SERVER_INFO_1506>(Titanis.DceRpc.NdrAlignment._4Byte);
-																					decoder.ReadStructDeferral<SERVER_INFO_1506>(ref this.ServerInfo1506.value);
-																				}
-																			}
-																			else
-																			{
-																				if ((((int)(this.unionSwitch)) == 1510))
-																				{
-																					if ((null != this.ServerInfo1510))
-																					{
-																						this.ServerInfo1510.value = decoder.ReadFixedStruct<SERVER_INFO_1510>(Titanis.DceRpc.NdrAlignment._4Byte);
-																						decoder.ReadStructDeferral<SERVER_INFO_1510>(ref this.ServerInfo1510.value);
-																					}
-																				}
-																				else
-																				{
-																					if ((((int)(this.unionSwitch)) == 1511))
-																					{
-																						if ((null != this.ServerInfo1511))
-																						{
-																							this.ServerInfo1511.value = decoder.ReadFixedStruct<SERVER_INFO_1511>(Titanis.DceRpc.NdrAlignment._4Byte);
-																							decoder.ReadStructDeferral<SERVER_INFO_1511>(ref this.ServerInfo1511.value);
-																						}
-																					}
-																					else
-																					{
-																						if ((((int)(this.unionSwitch)) == 1512))
-																						{
-																							if ((null != this.ServerInfo1512))
-																							{
-																								this.ServerInfo1512.value = decoder.ReadFixedStruct<SERVER_INFO_1512>(Titanis.DceRpc.NdrAlignment._4Byte);
-																								decoder.ReadStructDeferral<SERVER_INFO_1512>(ref this.ServerInfo1512.value);
-																							}
-																						}
-																						else
-																						{
-																							if ((((int)(this.unionSwitch)) == 1513))
-																							{
-																								if ((null != this.ServerInfo1513))
-																								{
-																									this.ServerInfo1513.value = decoder.ReadFixedStruct<SERVER_INFO_1513>(Titanis.DceRpc.NdrAlignment._4Byte);
-																									decoder.ReadStructDeferral<SERVER_INFO_1513>(ref this.ServerInfo1513.value);
-																								}
-																							}
-																							else
-																							{
-																								if ((((int)(this.unionSwitch)) == 1514))
-																								{
-																									if ((null != this.ServerInfo1514))
-																									{
-																										this.ServerInfo1514.value = decoder.ReadFixedStruct<SERVER_INFO_1514>(Titanis.DceRpc.NdrAlignment._4Byte);
-																										decoder.ReadStructDeferral<SERVER_INFO_1514>(ref this.ServerInfo1514.value);
-																									}
-																								}
-																								else
-																								{
-																									if ((((int)(this.unionSwitch)) == 1515))
-																									{
-																										if ((null != this.ServerInfo1515))
-																										{
-																											this.ServerInfo1515.value = decoder.ReadFixedStruct<SERVER_INFO_1515>(Titanis.DceRpc.NdrAlignment._4Byte);
-																											decoder.ReadStructDeferral<SERVER_INFO_1515>(ref this.ServerInfo1515.value);
-																										}
-																									}
-																									else
-																									{
-																										if ((((int)(this.unionSwitch)) == 1516))
-																										{
-																											if ((null != this.ServerInfo1516))
-																											{
-																												this.ServerInfo1516.value = decoder.ReadFixedStruct<SERVER_INFO_1516>(Titanis.DceRpc.NdrAlignment._4Byte);
-																												decoder.ReadStructDeferral<SERVER_INFO_1516>(ref this.ServerInfo1516.value);
-																											}
-																										}
-																										else
-																										{
-																											if ((((int)(this.unionSwitch)) == 1518))
-																											{
-																												if ((null != this.ServerInfo1518))
-																												{
-																													this.ServerInfo1518.value = decoder.ReadFixedStruct<SERVER_INFO_1518>(Titanis.DceRpc.NdrAlignment._4Byte);
-																													decoder.ReadStructDeferral<SERVER_INFO_1518>(ref this.ServerInfo1518.value);
-																												}
-																											}
-																											else
-																											{
-																												if ((((int)(this.unionSwitch)) == 1523))
-																												{
-																													if ((null != this.ServerInfo1523))
-																													{
-																														this.ServerInfo1523.value = decoder.ReadFixedStruct<SERVER_INFO_1523>(Titanis.DceRpc.NdrAlignment._4Byte);
-																														decoder.ReadStructDeferral<SERVER_INFO_1523>(ref this.ServerInfo1523.value);
-																													}
-																												}
-																												else
-																												{
-																													if ((((int)(this.unionSwitch)) == 1528))
-																													{
-																														if ((null != this.ServerInfo1528))
-																														{
-																															this.ServerInfo1528.value = decoder.ReadFixedStruct<SERVER_INFO_1528>(Titanis.DceRpc.NdrAlignment._4Byte);
-																															decoder.ReadStructDeferral<SERVER_INFO_1528>(ref this.ServerInfo1528.value);
-																														}
-																													}
-																													else
-																													{
-																														if ((((int)(this.unionSwitch)) == 1529))
-																														{
-																															if ((null != this.ServerInfo1529))
-																															{
-																																this.ServerInfo1529.value = decoder.ReadFixedStruct<SERVER_INFO_1529>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																decoder.ReadStructDeferral<SERVER_INFO_1529>(ref this.ServerInfo1529.value);
-																															}
-																														}
-																														else
-																														{
-																															if ((((int)(this.unionSwitch)) == 1530))
-																															{
-																																if ((null != this.ServerInfo1530))
-																																{
-																																	this.ServerInfo1530.value = decoder.ReadFixedStruct<SERVER_INFO_1530>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																	decoder.ReadStructDeferral<SERVER_INFO_1530>(ref this.ServerInfo1530.value);
-																																}
-																															}
-																															else
-																															{
-																																if ((((int)(this.unionSwitch)) == 1533))
-																																{
-																																	if ((null != this.ServerInfo1533))
-																																	{
-																																		this.ServerInfo1533.value = decoder.ReadFixedStruct<SERVER_INFO_1533>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																		decoder.ReadStructDeferral<SERVER_INFO_1533>(ref this.ServerInfo1533.value);
-																																	}
-																																}
-																																else
-																																{
-																																	if ((((int)(this.unionSwitch)) == 1534))
-																																	{
-																																		if ((null != this.ServerInfo1534))
-																																		{
-																																			this.ServerInfo1534.value = decoder.ReadFixedStruct<SERVER_INFO_1534>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																			decoder.ReadStructDeferral<SERVER_INFO_1534>(ref this.ServerInfo1534.value);
-																																		}
-																																	}
-																																	else
-																																	{
-																																		if ((((int)(this.unionSwitch)) == 1535))
-																																		{
-																																			if ((null != this.ServerInfo1535))
-																																			{
-																																				this.ServerInfo1535.value = decoder.ReadFixedStruct<SERVER_INFO_1535>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																				decoder.ReadStructDeferral<SERVER_INFO_1535>(ref this.ServerInfo1535.value);
-																																			}
-																																		}
-																																		else
-																																		{
-																																			if ((((int)(this.unionSwitch)) == 1536))
-																																			{
-																																				if ((null != this.ServerInfo1536))
-																																				{
-																																					this.ServerInfo1536.value = decoder.ReadFixedStruct<SERVER_INFO_1536>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																					decoder.ReadStructDeferral<SERVER_INFO_1536>(ref this.ServerInfo1536.value);
-																																				}
-																																			}
-																																			else
-																																			{
-																																				if ((((int)(this.unionSwitch)) == 1538))
-																																				{
-																																					if ((null != this.ServerInfo1538))
-																																					{
-																																						this.ServerInfo1538.value = decoder.ReadFixedStruct<SERVER_INFO_1538>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																						decoder.ReadStructDeferral<SERVER_INFO_1538>(ref this.ServerInfo1538.value);
-																																					}
-																																				}
-																																				else
-																																				{
-																																					if ((((int)(this.unionSwitch)) == 1539))
-																																					{
-																																						if ((null != this.ServerInfo1539))
-																																						{
-																																							this.ServerInfo1539.value = decoder.ReadFixedStruct<SERVER_INFO_1539>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																							decoder.ReadStructDeferral<SERVER_INFO_1539>(ref this.ServerInfo1539.value);
-																																						}
-																																					}
-																																					else
-																																					{
-																																						if ((((int)(this.unionSwitch)) == 1540))
-																																						{
-																																							if ((null != this.ServerInfo1540))
-																																							{
-																																								this.ServerInfo1540.value = decoder.ReadFixedStruct<SERVER_INFO_1540>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																								decoder.ReadStructDeferral<SERVER_INFO_1540>(ref this.ServerInfo1540.value);
-																																							}
-																																						}
-																																						else
-																																						{
-																																							if ((((int)(this.unionSwitch)) == 1541))
-																																							{
-																																								if ((null != this.ServerInfo1541))
-																																								{
-																																									this.ServerInfo1541.value = decoder.ReadFixedStruct<SERVER_INFO_1541>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																									decoder.ReadStructDeferral<SERVER_INFO_1541>(ref this.ServerInfo1541.value);
-																																								}
-																																							}
-																																							else
-																																							{
-																																								if ((((int)(this.unionSwitch)) == 1542))
-																																								{
-																																									if ((null != this.ServerInfo1542))
-																																									{
-																																										this.ServerInfo1542.value = decoder.ReadFixedStruct<SERVER_INFO_1542>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																										decoder.ReadStructDeferral<SERVER_INFO_1542>(ref this.ServerInfo1542.value);
-																																									}
-																																								}
-																																								else
-																																								{
-																																									if ((((int)(this.unionSwitch)) == 1543))
-																																									{
-																																										if ((null != this.ServerInfo1543))
-																																										{
-																																											this.ServerInfo1543.value = decoder.ReadFixedStruct<SERVER_INFO_1543>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																											decoder.ReadStructDeferral<SERVER_INFO_1543>(ref this.ServerInfo1543.value);
-																																										}
-																																									}
-																																									else
-																																									{
-																																										if ((((int)(this.unionSwitch)) == 1544))
-																																										{
-																																											if ((null != this.ServerInfo1544))
-																																											{
-																																												this.ServerInfo1544.value = decoder.ReadFixedStruct<SERVER_INFO_1544>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																												decoder.ReadStructDeferral<SERVER_INFO_1544>(ref this.ServerInfo1544.value);
-																																											}
-																																										}
-																																										else
-																																										{
-																																											if ((((int)(this.unionSwitch)) == 1545))
-																																											{
-																																												if ((null != this.ServerInfo1545))
-																																												{
-																																													this.ServerInfo1545.value = decoder.ReadFixedStruct<SERVER_INFO_1545>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																													decoder.ReadStructDeferral<SERVER_INFO_1545>(ref this.ServerInfo1545.value);
-																																												}
-																																											}
-																																											else
-																																											{
-																																												if ((((int)(this.unionSwitch)) == 1546))
-																																												{
-																																													if ((null != this.ServerInfo1546))
-																																													{
-																																														this.ServerInfo1546.value = decoder.ReadFixedStruct<SERVER_INFO_1546>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																														decoder.ReadStructDeferral<SERVER_INFO_1546>(ref this.ServerInfo1546.value);
-																																													}
-																																												}
-																																												else
-																																												{
-																																													if ((((int)(this.unionSwitch)) == 1547))
-																																													{
-																																														if ((null != this.ServerInfo1547))
-																																														{
-																																															this.ServerInfo1547.value = decoder.ReadFixedStruct<SERVER_INFO_1547>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																															decoder.ReadStructDeferral<SERVER_INFO_1547>(ref this.ServerInfo1547.value);
-																																														}
-																																													}
-																																													else
-																																													{
-																																														if ((((int)(this.unionSwitch)) == 1548))
-																																														{
-																																															if ((null != this.ServerInfo1548))
-																																															{
-																																																this.ServerInfo1548.value = decoder.ReadFixedStruct<SERVER_INFO_1548>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																																decoder.ReadStructDeferral<SERVER_INFO_1548>(ref this.ServerInfo1548.value);
-																																															}
-																																														}
-																																														else
-																																														{
-																																															if ((((int)(this.unionSwitch)) == 1549))
-																																															{
-																																																if ((null != this.ServerInfo1549))
-																																																{
-																																																	this.ServerInfo1549.value = decoder.ReadFixedStruct<SERVER_INFO_1549>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																																	decoder.ReadStructDeferral<SERVER_INFO_1549>(ref this.ServerInfo1549.value);
-																																																}
-																																															}
-																																															else
-																																															{
-																																																if ((((int)(this.unionSwitch)) == 1550))
-																																																{
-																																																	if ((null != this.ServerInfo1550))
-																																																	{
-																																																		this.ServerInfo1550.value = decoder.ReadFixedStruct<SERVER_INFO_1550>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																																		decoder.ReadStructDeferral<SERVER_INFO_1550>(ref this.ServerInfo1550.value);
-																																																	}
-																																																}
-																																																else
-																																																{
-																																																	if ((((int)(this.unionSwitch)) == 1552))
-																																																	{
-																																																		if ((null != this.ServerInfo1552))
-																																																		{
-																																																			this.ServerInfo1552.value = decoder.ReadFixedStruct<SERVER_INFO_1552>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																																			decoder.ReadStructDeferral<SERVER_INFO_1552>(ref this.ServerInfo1552.value);
-																																																		}
-																																																	}
-																																																	else
-																																																	{
-																																																		if ((((int)(this.unionSwitch)) == 1553))
-																																																		{
-																																																			if ((null != this.ServerInfo1553))
-																																																			{
-																																																				this.ServerInfo1553.value = decoder.ReadFixedStruct<SERVER_INFO_1553>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																																				decoder.ReadStructDeferral<SERVER_INFO_1553>(ref this.ServerInfo1553.value);
-																																																			}
-																																																		}
-																																																		else
-																																																		{
-																																																			if ((((int)(this.unionSwitch)) == 1554))
-																																																			{
-																																																				if ((null != this.ServerInfo1554))
-																																																				{
-																																																					this.ServerInfo1554.value = decoder.ReadFixedStruct<SERVER_INFO_1554>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																																					decoder.ReadStructDeferral<SERVER_INFO_1554>(ref this.ServerInfo1554.value);
-																																																				}
-																																																			}
-																																																			else
-																																																			{
-																																																				if ((((int)(this.unionSwitch)) == 1555))
-																																																				{
-																																																					if ((null != this.ServerInfo1555))
-																																																					{
-																																																						this.ServerInfo1555.value = decoder.ReadFixedStruct<SERVER_INFO_1555>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																																						decoder.ReadStructDeferral<SERVER_INFO_1555>(ref this.ServerInfo1555.value);
-																																																					}
-																																																				}
-																																																				else
-																																																				{
-																																																					if ((((int)(this.unionSwitch)) == 1556))
-																																																					{
-																																																						if ((null != this.ServerInfo1556))
-																																																						{
-																																																							this.ServerInfo1556.value = decoder.ReadFixedStruct<SERVER_INFO_1556>(Titanis.DceRpc.NdrAlignment._4Byte);
-																																																							decoder.ReadStructDeferral<SERVER_INFO_1556>(ref this.ServerInfo1556.value);
-																																																						}
-																																																					}
-																																																				}
-																																																			}
-																																																		}
-																																																	}
-																																																}
-																																															}
-																																														}
-																																													}
-																																												}
-																																											}
-																																										}
-																																									}
-																																								}
-																																							}
-																																						}
-																																					}
-																																				}
-																																			}
-																																		}
-																																	}
-																																}
-																															}
-																														}
-																													}
-																												}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 		public RpcPointer<ms_dtyp.SERVER_INFO_100> ServerInfo100;
 		public RpcPointer<ms_dtyp.SERVER_INFO_101> ServerInfo101;
 		public RpcPointer<SERVER_INFO_102> ServerInfo102;
@@ -6201,86 +4866,1251 @@ namespace ms_srvs
 		public RpcPointer<SERVER_INFO_1554> ServerInfo1554;
 		public RpcPointer<SERVER_INFO_1555> ServerInfo1555;
 		public RpcPointer<SERVER_INFO_1556> ServerInfo1556;
-	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct DISK_INFO : Titanis.DceRpc.IRpcFixedStruct
-	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public void Encode(IRpcEncoder encoder)
 		{
-			for (int i = 0; (i < this.Disk.Count); i++
-			)
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.unionSwitch);
+			switch ((uint)this.unionSwitch)
+			{
+				case 100U:
+					encoder.WriteUniquePointer(this.ServerInfo100);
+					break;
+				case 101U:
+					encoder.WriteUniquePointer(this.ServerInfo101);
+					break;
+				case 102U:
+					encoder.WriteUniquePointer(this.ServerInfo102);
+					break;
+				case 103U:
+					encoder.WriteUniquePointer(this.ServerInfo103);
+					break;
+				case 502U:
+					encoder.WriteUniquePointer(this.ServerInfo502);
+					break;
+				case 503U:
+					encoder.WriteUniquePointer(this.ServerInfo503);
+					break;
+				case 599U:
+					encoder.WriteUniquePointer(this.ServerInfo599);
+					break;
+				case 1005U:
+					encoder.WriteUniquePointer(this.ServerInfo1005);
+					break;
+				case 1107U:
+					encoder.WriteUniquePointer(this.ServerInfo1107);
+					break;
+				case 1010U:
+					encoder.WriteUniquePointer(this.ServerInfo1010);
+					break;
+				case 1016U:
+					encoder.WriteUniquePointer(this.ServerInfo1016);
+					break;
+				case 1017U:
+					encoder.WriteUniquePointer(this.ServerInfo1017);
+					break;
+				case 1018U:
+					encoder.WriteUniquePointer(this.ServerInfo1018);
+					break;
+				case 1501U:
+					encoder.WriteUniquePointer(this.ServerInfo1501);
+					break;
+				case 1502U:
+					encoder.WriteUniquePointer(this.ServerInfo1502);
+					break;
+				case 1503U:
+					encoder.WriteUniquePointer(this.ServerInfo1503);
+					break;
+				case 1506U:
+					encoder.WriteUniquePointer(this.ServerInfo1506);
+					break;
+				case 1510U:
+					encoder.WriteUniquePointer(this.ServerInfo1510);
+					break;
+				case 1511U:
+					encoder.WriteUniquePointer(this.ServerInfo1511);
+					break;
+				case 1512U:
+					encoder.WriteUniquePointer(this.ServerInfo1512);
+					break;
+				case 1513U:
+					encoder.WriteUniquePointer(this.ServerInfo1513);
+					break;
+				case 1514U:
+					encoder.WriteUniquePointer(this.ServerInfo1514);
+					break;
+				case 1515U:
+					encoder.WriteUniquePointer(this.ServerInfo1515);
+					break;
+				case 1516U:
+					encoder.WriteUniquePointer(this.ServerInfo1516);
+					break;
+				case 1518U:
+					encoder.WriteUniquePointer(this.ServerInfo1518);
+					break;
+				case 1523U:
+					encoder.WriteUniquePointer(this.ServerInfo1523);
+					break;
+				case 1528U:
+					encoder.WriteUniquePointer(this.ServerInfo1528);
+					break;
+				case 1529U:
+					encoder.WriteUniquePointer(this.ServerInfo1529);
+					break;
+				case 1530U:
+					encoder.WriteUniquePointer(this.ServerInfo1530);
+					break;
+				case 1533U:
+					encoder.WriteUniquePointer(this.ServerInfo1533);
+					break;
+				case 1534U:
+					encoder.WriteUniquePointer(this.ServerInfo1534);
+					break;
+				case 1535U:
+					encoder.WriteUniquePointer(this.ServerInfo1535);
+					break;
+				case 1536U:
+					encoder.WriteUniquePointer(this.ServerInfo1536);
+					break;
+				case 1538U:
+					encoder.WriteUniquePointer(this.ServerInfo1538);
+					break;
+				case 1539U:
+					encoder.WriteUniquePointer(this.ServerInfo1539);
+					break;
+				case 1540U:
+					encoder.WriteUniquePointer(this.ServerInfo1540);
+					break;
+				case 1541U:
+					encoder.WriteUniquePointer(this.ServerInfo1541);
+					break;
+				case 1542U:
+					encoder.WriteUniquePointer(this.ServerInfo1542);
+					break;
+				case 1543U:
+					encoder.WriteUniquePointer(this.ServerInfo1543);
+					break;
+				case 1544U:
+					encoder.WriteUniquePointer(this.ServerInfo1544);
+					break;
+				case 1545U:
+					encoder.WriteUniquePointer(this.ServerInfo1545);
+					break;
+				case 1546U:
+					encoder.WriteUniquePointer(this.ServerInfo1546);
+					break;
+				case 1547U:
+					encoder.WriteUniquePointer(this.ServerInfo1547);
+					break;
+				case 1548U:
+					encoder.WriteUniquePointer(this.ServerInfo1548);
+					break;
+				case 1549U:
+					encoder.WriteUniquePointer(this.ServerInfo1549);
+					break;
+				case 1550U:
+					encoder.WriteUniquePointer(this.ServerInfo1550);
+					break;
+				case 1552U:
+					encoder.WriteUniquePointer(this.ServerInfo1552);
+					break;
+				case 1553U:
+					encoder.WriteUniquePointer(this.ServerInfo1553);
+					break;
+				case 1554U:
+					encoder.WriteUniquePointer(this.ServerInfo1554);
+					break;
+				case 1555U:
+					encoder.WriteUniquePointer(this.ServerInfo1555);
+					break;
+				case 1556U:
+					encoder.WriteUniquePointer(this.ServerInfo1556);
+					break;
+			}
+		}
+
+		public void Decode(IRpcDecoder decoder)
+		{
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.unionSwitch = decoder.ReadUInt32();
+			switch ((uint)this.unionSwitch)
+			{
+				case 100U:
+					this.ServerInfo100 = decoder.ReadUniquePointer<ms_dtyp.SERVER_INFO_100>();
+					break;
+				case 101U:
+					this.ServerInfo101 = decoder.ReadUniquePointer<ms_dtyp.SERVER_INFO_101>();
+					break;
+				case 102U:
+					this.ServerInfo102 = decoder.ReadUniquePointer<SERVER_INFO_102>();
+					break;
+				case 103U:
+					this.ServerInfo103 = decoder.ReadUniquePointer<SERVER_INFO_103>();
+					break;
+				case 502U:
+					this.ServerInfo502 = decoder.ReadUniquePointer<SERVER_INFO_502>();
+					break;
+				case 503U:
+					this.ServerInfo503 = decoder.ReadUniquePointer<SERVER_INFO_503>();
+					break;
+				case 599U:
+					this.ServerInfo599 = decoder.ReadUniquePointer<SERVER_INFO_599>();
+					break;
+				case 1005U:
+					this.ServerInfo1005 = decoder.ReadUniquePointer<SERVER_INFO_1005>();
+					break;
+				case 1107U:
+					this.ServerInfo1107 = decoder.ReadUniquePointer<SERVER_INFO_1107>();
+					break;
+				case 1010U:
+					this.ServerInfo1010 = decoder.ReadUniquePointer<SERVER_INFO_1010>();
+					break;
+				case 1016U:
+					this.ServerInfo1016 = decoder.ReadUniquePointer<SERVER_INFO_1016>();
+					break;
+				case 1017U:
+					this.ServerInfo1017 = decoder.ReadUniquePointer<SERVER_INFO_1017>();
+					break;
+				case 1018U:
+					this.ServerInfo1018 = decoder.ReadUniquePointer<SERVER_INFO_1018>();
+					break;
+				case 1501U:
+					this.ServerInfo1501 = decoder.ReadUniquePointer<SERVER_INFO_1501>();
+					break;
+				case 1502U:
+					this.ServerInfo1502 = decoder.ReadUniquePointer<SERVER_INFO_1502>();
+					break;
+				case 1503U:
+					this.ServerInfo1503 = decoder.ReadUniquePointer<SERVER_INFO_1503>();
+					break;
+				case 1506U:
+					this.ServerInfo1506 = decoder.ReadUniquePointer<SERVER_INFO_1506>();
+					break;
+				case 1510U:
+					this.ServerInfo1510 = decoder.ReadUniquePointer<SERVER_INFO_1510>();
+					break;
+				case 1511U:
+					this.ServerInfo1511 = decoder.ReadUniquePointer<SERVER_INFO_1511>();
+					break;
+				case 1512U:
+					this.ServerInfo1512 = decoder.ReadUniquePointer<SERVER_INFO_1512>();
+					break;
+				case 1513U:
+					this.ServerInfo1513 = decoder.ReadUniquePointer<SERVER_INFO_1513>();
+					break;
+				case 1514U:
+					this.ServerInfo1514 = decoder.ReadUniquePointer<SERVER_INFO_1514>();
+					break;
+				case 1515U:
+					this.ServerInfo1515 = decoder.ReadUniquePointer<SERVER_INFO_1515>();
+					break;
+				case 1516U:
+					this.ServerInfo1516 = decoder.ReadUniquePointer<SERVER_INFO_1516>();
+					break;
+				case 1518U:
+					this.ServerInfo1518 = decoder.ReadUniquePointer<SERVER_INFO_1518>();
+					break;
+				case 1523U:
+					this.ServerInfo1523 = decoder.ReadUniquePointer<SERVER_INFO_1523>();
+					break;
+				case 1528U:
+					this.ServerInfo1528 = decoder.ReadUniquePointer<SERVER_INFO_1528>();
+					break;
+				case 1529U:
+					this.ServerInfo1529 = decoder.ReadUniquePointer<SERVER_INFO_1529>();
+					break;
+				case 1530U:
+					this.ServerInfo1530 = decoder.ReadUniquePointer<SERVER_INFO_1530>();
+					break;
+				case 1533U:
+					this.ServerInfo1533 = decoder.ReadUniquePointer<SERVER_INFO_1533>();
+					break;
+				case 1534U:
+					this.ServerInfo1534 = decoder.ReadUniquePointer<SERVER_INFO_1534>();
+					break;
+				case 1535U:
+					this.ServerInfo1535 = decoder.ReadUniquePointer<SERVER_INFO_1535>();
+					break;
+				case 1536U:
+					this.ServerInfo1536 = decoder.ReadUniquePointer<SERVER_INFO_1536>();
+					break;
+				case 1538U:
+					this.ServerInfo1538 = decoder.ReadUniquePointer<SERVER_INFO_1538>();
+					break;
+				case 1539U:
+					this.ServerInfo1539 = decoder.ReadUniquePointer<SERVER_INFO_1539>();
+					break;
+				case 1540U:
+					this.ServerInfo1540 = decoder.ReadUniquePointer<SERVER_INFO_1540>();
+					break;
+				case 1541U:
+					this.ServerInfo1541 = decoder.ReadUniquePointer<SERVER_INFO_1541>();
+					break;
+				case 1542U:
+					this.ServerInfo1542 = decoder.ReadUniquePointer<SERVER_INFO_1542>();
+					break;
+				case 1543U:
+					this.ServerInfo1543 = decoder.ReadUniquePointer<SERVER_INFO_1543>();
+					break;
+				case 1544U:
+					this.ServerInfo1544 = decoder.ReadUniquePointer<SERVER_INFO_1544>();
+					break;
+				case 1545U:
+					this.ServerInfo1545 = decoder.ReadUniquePointer<SERVER_INFO_1545>();
+					break;
+				case 1546U:
+					this.ServerInfo1546 = decoder.ReadUniquePointer<SERVER_INFO_1546>();
+					break;
+				case 1547U:
+					this.ServerInfo1547 = decoder.ReadUniquePointer<SERVER_INFO_1547>();
+					break;
+				case 1548U:
+					this.ServerInfo1548 = decoder.ReadUniquePointer<SERVER_INFO_1548>();
+					break;
+				case 1549U:
+					this.ServerInfo1549 = decoder.ReadUniquePointer<SERVER_INFO_1549>();
+					break;
+				case 1550U:
+					this.ServerInfo1550 = decoder.ReadUniquePointer<SERVER_INFO_1550>();
+					break;
+				case 1552U:
+					this.ServerInfo1552 = decoder.ReadUniquePointer<SERVER_INFO_1552>();
+					break;
+				case 1553U:
+					this.ServerInfo1553 = decoder.ReadUniquePointer<SERVER_INFO_1553>();
+					break;
+				case 1554U:
+					this.ServerInfo1554 = decoder.ReadUniquePointer<SERVER_INFO_1554>();
+					break;
+				case 1555U:
+					this.ServerInfo1555 = decoder.ReadUniquePointer<SERVER_INFO_1555>();
+					break;
+				case 1556U:
+					this.ServerInfo1556 = decoder.ReadUniquePointer<SERVER_INFO_1556>();
+					break;
+			}
+		}
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.unionSwitch)
+			{
+				case 100U:
+					if (this.ServerInfo100 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo100.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ServerInfo100.value);
+					}
+
+					break;
+				case 101U:
+					if (this.ServerInfo101 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo101.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ServerInfo101.value);
+					}
+
+					break;
+				case 102U:
+					if (this.ServerInfo102 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo102.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ServerInfo102.value);
+					}
+
+					break;
+				case 103U:
+					if (this.ServerInfo103 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo103.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ServerInfo103.value);
+					}
+
+					break;
+				case 502U:
+					if (this.ServerInfo502 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo502.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo502.value);
+					}
+
+					break;
+				case 503U:
+					if (this.ServerInfo503 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo503.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ServerInfo503.value);
+					}
+
+					break;
+				case 599U:
+					if (this.ServerInfo599 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo599.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ServerInfo599.value);
+					}
+
+					break;
+				case 1005U:
+					if (this.ServerInfo1005 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1005.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ServerInfo1005.value);
+					}
+
+					break;
+				case 1107U:
+					if (this.ServerInfo1107 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1107.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1107.value);
+					}
+
+					break;
+				case 1010U:
+					if (this.ServerInfo1010 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1010.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1010.value);
+					}
+
+					break;
+				case 1016U:
+					if (this.ServerInfo1016 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1016.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1016.value);
+					}
+
+					break;
+				case 1017U:
+					if (this.ServerInfo1017 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1017.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1017.value);
+					}
+
+					break;
+				case 1018U:
+					if (this.ServerInfo1018 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1018.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1018.value);
+					}
+
+					break;
+				case 1501U:
+					if (this.ServerInfo1501 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1501.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1501.value);
+					}
+
+					break;
+				case 1502U:
+					if (this.ServerInfo1502 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1502.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1502.value);
+					}
+
+					break;
+				case 1503U:
+					if (this.ServerInfo1503 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1503.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1503.value);
+					}
+
+					break;
+				case 1506U:
+					if (this.ServerInfo1506 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1506.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1506.value);
+					}
+
+					break;
+				case 1510U:
+					if (this.ServerInfo1510 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1510.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1510.value);
+					}
+
+					break;
+				case 1511U:
+					if (this.ServerInfo1511 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1511.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1511.value);
+					}
+
+					break;
+				case 1512U:
+					if (this.ServerInfo1512 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1512.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1512.value);
+					}
+
+					break;
+				case 1513U:
+					if (this.ServerInfo1513 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1513.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1513.value);
+					}
+
+					break;
+				case 1514U:
+					if (this.ServerInfo1514 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1514.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1514.value);
+					}
+
+					break;
+				case 1515U:
+					if (this.ServerInfo1515 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1515.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1515.value);
+					}
+
+					break;
+				case 1516U:
+					if (this.ServerInfo1516 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1516.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1516.value);
+					}
+
+					break;
+				case 1518U:
+					if (this.ServerInfo1518 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1518.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1518.value);
+					}
+
+					break;
+				case 1523U:
+					if (this.ServerInfo1523 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1523.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1523.value);
+					}
+
+					break;
+				case 1528U:
+					if (this.ServerInfo1528 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1528.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1528.value);
+					}
+
+					break;
+				case 1529U:
+					if (this.ServerInfo1529 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1529.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1529.value);
+					}
+
+					break;
+				case 1530U:
+					if (this.ServerInfo1530 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1530.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1530.value);
+					}
+
+					break;
+				case 1533U:
+					if (this.ServerInfo1533 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1533.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1533.value);
+					}
+
+					break;
+				case 1534U:
+					if (this.ServerInfo1534 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1534.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1534.value);
+					}
+
+					break;
+				case 1535U:
+					if (this.ServerInfo1535 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1535.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1535.value);
+					}
+
+					break;
+				case 1536U:
+					if (this.ServerInfo1536 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1536.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1536.value);
+					}
+
+					break;
+				case 1538U:
+					if (this.ServerInfo1538 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1538.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1538.value);
+					}
+
+					break;
+				case 1539U:
+					if (this.ServerInfo1539 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1539.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1539.value);
+					}
+
+					break;
+				case 1540U:
+					if (this.ServerInfo1540 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1540.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1540.value);
+					}
+
+					break;
+				case 1541U:
+					if (this.ServerInfo1541 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1541.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1541.value);
+					}
+
+					break;
+				case 1542U:
+					if (this.ServerInfo1542 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1542.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1542.value);
+					}
+
+					break;
+				case 1543U:
+					if (this.ServerInfo1543 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1543.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1543.value);
+					}
+
+					break;
+				case 1544U:
+					if (this.ServerInfo1544 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1544.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1544.value);
+					}
+
+					break;
+				case 1545U:
+					if (this.ServerInfo1545 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1545.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1545.value);
+					}
+
+					break;
+				case 1546U:
+					if (this.ServerInfo1546 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1546.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1546.value);
+					}
+
+					break;
+				case 1547U:
+					if (this.ServerInfo1547 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1547.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1547.value);
+					}
+
+					break;
+				case 1548U:
+					if (this.ServerInfo1548 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1548.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1548.value);
+					}
+
+					break;
+				case 1549U:
+					if (this.ServerInfo1549 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1549.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1549.value);
+					}
+
+					break;
+				case 1550U:
+					if (this.ServerInfo1550 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1550.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1550.value);
+					}
+
+					break;
+				case 1552U:
+					if (this.ServerInfo1552 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1552.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1552.value);
+					}
+
+					break;
+				case 1553U:
+					if (this.ServerInfo1553 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1553.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1553.value);
+					}
+
+					break;
+				case 1554U:
+					if (this.ServerInfo1554 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1554.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1554.value);
+					}
+
+					break;
+				case 1555U:
+					if (this.ServerInfo1555 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1555.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1555.value);
+					}
+
+					break;
+				case 1556U:
+					if (this.ServerInfo1556 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerInfo1556.value, NdrAlignment._4Byte);
+						encoder.WriteStructDeferral(this.ServerInfo1556.value);
+					}
+
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.unionSwitch)
+			{
+				case 100U:
+					if (this.ServerInfo100 is not null)
+					{
+						this.ServerInfo100.value = decoder.ReadFixedStruct<ms_dtyp.SERVER_INFO_100>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<ms_dtyp.SERVER_INFO_100>(ref this.ServerInfo100.value);
+					}
+
+					break;
+				case 101U:
+					if (this.ServerInfo101 is not null)
+					{
+						this.ServerInfo101.value = decoder.ReadFixedStruct<ms_dtyp.SERVER_INFO_101>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<ms_dtyp.SERVER_INFO_101>(ref this.ServerInfo101.value);
+					}
+
+					break;
+				case 102U:
+					if (this.ServerInfo102 is not null)
+					{
+						this.ServerInfo102.value = decoder.ReadFixedStruct<SERVER_INFO_102>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_INFO_102>(ref this.ServerInfo102.value);
+					}
+
+					break;
+				case 103U:
+					if (this.ServerInfo103 is not null)
+					{
+						this.ServerInfo103.value = decoder.ReadFixedStruct<SERVER_INFO_103>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_INFO_103>(ref this.ServerInfo103.value);
+					}
+
+					break;
+				case 502U:
+					if (this.ServerInfo502 is not null)
+					{
+						this.ServerInfo502.value = decoder.ReadFixedStruct<SERVER_INFO_502>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_502>(ref this.ServerInfo502.value);
+					}
+
+					break;
+				case 503U:
+					if (this.ServerInfo503 is not null)
+					{
+						this.ServerInfo503.value = decoder.ReadFixedStruct<SERVER_INFO_503>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_INFO_503>(ref this.ServerInfo503.value);
+					}
+
+					break;
+				case 599U:
+					if (this.ServerInfo599 is not null)
+					{
+						this.ServerInfo599.value = decoder.ReadFixedStruct<SERVER_INFO_599>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_INFO_599>(ref this.ServerInfo599.value);
+					}
+
+					break;
+				case 1005U:
+					if (this.ServerInfo1005 is not null)
+					{
+						this.ServerInfo1005.value = decoder.ReadFixedStruct<SERVER_INFO_1005>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_INFO_1005>(ref this.ServerInfo1005.value);
+					}
+
+					break;
+				case 1107U:
+					if (this.ServerInfo1107 is not null)
+					{
+						this.ServerInfo1107.value = decoder.ReadFixedStruct<SERVER_INFO_1107>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1107>(ref this.ServerInfo1107.value);
+					}
+
+					break;
+				case 1010U:
+					if (this.ServerInfo1010 is not null)
+					{
+						this.ServerInfo1010.value = decoder.ReadFixedStruct<SERVER_INFO_1010>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1010>(ref this.ServerInfo1010.value);
+					}
+
+					break;
+				case 1016U:
+					if (this.ServerInfo1016 is not null)
+					{
+						this.ServerInfo1016.value = decoder.ReadFixedStruct<SERVER_INFO_1016>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1016>(ref this.ServerInfo1016.value);
+					}
+
+					break;
+				case 1017U:
+					if (this.ServerInfo1017 is not null)
+					{
+						this.ServerInfo1017.value = decoder.ReadFixedStruct<SERVER_INFO_1017>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1017>(ref this.ServerInfo1017.value);
+					}
+
+					break;
+				case 1018U:
+					if (this.ServerInfo1018 is not null)
+					{
+						this.ServerInfo1018.value = decoder.ReadFixedStruct<SERVER_INFO_1018>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1018>(ref this.ServerInfo1018.value);
+					}
+
+					break;
+				case 1501U:
+					if (this.ServerInfo1501 is not null)
+					{
+						this.ServerInfo1501.value = decoder.ReadFixedStruct<SERVER_INFO_1501>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1501>(ref this.ServerInfo1501.value);
+					}
+
+					break;
+				case 1502U:
+					if (this.ServerInfo1502 is not null)
+					{
+						this.ServerInfo1502.value = decoder.ReadFixedStruct<SERVER_INFO_1502>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1502>(ref this.ServerInfo1502.value);
+					}
+
+					break;
+				case 1503U:
+					if (this.ServerInfo1503 is not null)
+					{
+						this.ServerInfo1503.value = decoder.ReadFixedStruct<SERVER_INFO_1503>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1503>(ref this.ServerInfo1503.value);
+					}
+
+					break;
+				case 1506U:
+					if (this.ServerInfo1506 is not null)
+					{
+						this.ServerInfo1506.value = decoder.ReadFixedStruct<SERVER_INFO_1506>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1506>(ref this.ServerInfo1506.value);
+					}
+
+					break;
+				case 1510U:
+					if (this.ServerInfo1510 is not null)
+					{
+						this.ServerInfo1510.value = decoder.ReadFixedStruct<SERVER_INFO_1510>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1510>(ref this.ServerInfo1510.value);
+					}
+
+					break;
+				case 1511U:
+					if (this.ServerInfo1511 is not null)
+					{
+						this.ServerInfo1511.value = decoder.ReadFixedStruct<SERVER_INFO_1511>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1511>(ref this.ServerInfo1511.value);
+					}
+
+					break;
+				case 1512U:
+					if (this.ServerInfo1512 is not null)
+					{
+						this.ServerInfo1512.value = decoder.ReadFixedStruct<SERVER_INFO_1512>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1512>(ref this.ServerInfo1512.value);
+					}
+
+					break;
+				case 1513U:
+					if (this.ServerInfo1513 is not null)
+					{
+						this.ServerInfo1513.value = decoder.ReadFixedStruct<SERVER_INFO_1513>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1513>(ref this.ServerInfo1513.value);
+					}
+
+					break;
+				case 1514U:
+					if (this.ServerInfo1514 is not null)
+					{
+						this.ServerInfo1514.value = decoder.ReadFixedStruct<SERVER_INFO_1514>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1514>(ref this.ServerInfo1514.value);
+					}
+
+					break;
+				case 1515U:
+					if (this.ServerInfo1515 is not null)
+					{
+						this.ServerInfo1515.value = decoder.ReadFixedStruct<SERVER_INFO_1515>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1515>(ref this.ServerInfo1515.value);
+					}
+
+					break;
+				case 1516U:
+					if (this.ServerInfo1516 is not null)
+					{
+						this.ServerInfo1516.value = decoder.ReadFixedStruct<SERVER_INFO_1516>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1516>(ref this.ServerInfo1516.value);
+					}
+
+					break;
+				case 1518U:
+					if (this.ServerInfo1518 is not null)
+					{
+						this.ServerInfo1518.value = decoder.ReadFixedStruct<SERVER_INFO_1518>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1518>(ref this.ServerInfo1518.value);
+					}
+
+					break;
+				case 1523U:
+					if (this.ServerInfo1523 is not null)
+					{
+						this.ServerInfo1523.value = decoder.ReadFixedStruct<SERVER_INFO_1523>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1523>(ref this.ServerInfo1523.value);
+					}
+
+					break;
+				case 1528U:
+					if (this.ServerInfo1528 is not null)
+					{
+						this.ServerInfo1528.value = decoder.ReadFixedStruct<SERVER_INFO_1528>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1528>(ref this.ServerInfo1528.value);
+					}
+
+					break;
+				case 1529U:
+					if (this.ServerInfo1529 is not null)
+					{
+						this.ServerInfo1529.value = decoder.ReadFixedStruct<SERVER_INFO_1529>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1529>(ref this.ServerInfo1529.value);
+					}
+
+					break;
+				case 1530U:
+					if (this.ServerInfo1530 is not null)
+					{
+						this.ServerInfo1530.value = decoder.ReadFixedStruct<SERVER_INFO_1530>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1530>(ref this.ServerInfo1530.value);
+					}
+
+					break;
+				case 1533U:
+					if (this.ServerInfo1533 is not null)
+					{
+						this.ServerInfo1533.value = decoder.ReadFixedStruct<SERVER_INFO_1533>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1533>(ref this.ServerInfo1533.value);
+					}
+
+					break;
+				case 1534U:
+					if (this.ServerInfo1534 is not null)
+					{
+						this.ServerInfo1534.value = decoder.ReadFixedStruct<SERVER_INFO_1534>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1534>(ref this.ServerInfo1534.value);
+					}
+
+					break;
+				case 1535U:
+					if (this.ServerInfo1535 is not null)
+					{
+						this.ServerInfo1535.value = decoder.ReadFixedStruct<SERVER_INFO_1535>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1535>(ref this.ServerInfo1535.value);
+					}
+
+					break;
+				case 1536U:
+					if (this.ServerInfo1536 is not null)
+					{
+						this.ServerInfo1536.value = decoder.ReadFixedStruct<SERVER_INFO_1536>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1536>(ref this.ServerInfo1536.value);
+					}
+
+					break;
+				case 1538U:
+					if (this.ServerInfo1538 is not null)
+					{
+						this.ServerInfo1538.value = decoder.ReadFixedStruct<SERVER_INFO_1538>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1538>(ref this.ServerInfo1538.value);
+					}
+
+					break;
+				case 1539U:
+					if (this.ServerInfo1539 is not null)
+					{
+						this.ServerInfo1539.value = decoder.ReadFixedStruct<SERVER_INFO_1539>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1539>(ref this.ServerInfo1539.value);
+					}
+
+					break;
+				case 1540U:
+					if (this.ServerInfo1540 is not null)
+					{
+						this.ServerInfo1540.value = decoder.ReadFixedStruct<SERVER_INFO_1540>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1540>(ref this.ServerInfo1540.value);
+					}
+
+					break;
+				case 1541U:
+					if (this.ServerInfo1541 is not null)
+					{
+						this.ServerInfo1541.value = decoder.ReadFixedStruct<SERVER_INFO_1541>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1541>(ref this.ServerInfo1541.value);
+					}
+
+					break;
+				case 1542U:
+					if (this.ServerInfo1542 is not null)
+					{
+						this.ServerInfo1542.value = decoder.ReadFixedStruct<SERVER_INFO_1542>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1542>(ref this.ServerInfo1542.value);
+					}
+
+					break;
+				case 1543U:
+					if (this.ServerInfo1543 is not null)
+					{
+						this.ServerInfo1543.value = decoder.ReadFixedStruct<SERVER_INFO_1543>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1543>(ref this.ServerInfo1543.value);
+					}
+
+					break;
+				case 1544U:
+					if (this.ServerInfo1544 is not null)
+					{
+						this.ServerInfo1544.value = decoder.ReadFixedStruct<SERVER_INFO_1544>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1544>(ref this.ServerInfo1544.value);
+					}
+
+					break;
+				case 1545U:
+					if (this.ServerInfo1545 is not null)
+					{
+						this.ServerInfo1545.value = decoder.ReadFixedStruct<SERVER_INFO_1545>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1545>(ref this.ServerInfo1545.value);
+					}
+
+					break;
+				case 1546U:
+					if (this.ServerInfo1546 is not null)
+					{
+						this.ServerInfo1546.value = decoder.ReadFixedStruct<SERVER_INFO_1546>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1546>(ref this.ServerInfo1546.value);
+					}
+
+					break;
+				case 1547U:
+					if (this.ServerInfo1547 is not null)
+					{
+						this.ServerInfo1547.value = decoder.ReadFixedStruct<SERVER_INFO_1547>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1547>(ref this.ServerInfo1547.value);
+					}
+
+					break;
+				case 1548U:
+					if (this.ServerInfo1548 is not null)
+					{
+						this.ServerInfo1548.value = decoder.ReadFixedStruct<SERVER_INFO_1548>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1548>(ref this.ServerInfo1548.value);
+					}
+
+					break;
+				case 1549U:
+					if (this.ServerInfo1549 is not null)
+					{
+						this.ServerInfo1549.value = decoder.ReadFixedStruct<SERVER_INFO_1549>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1549>(ref this.ServerInfo1549.value);
+					}
+
+					break;
+				case 1550U:
+					if (this.ServerInfo1550 is not null)
+					{
+						this.ServerInfo1550.value = decoder.ReadFixedStruct<SERVER_INFO_1550>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1550>(ref this.ServerInfo1550.value);
+					}
+
+					break;
+				case 1552U:
+					if (this.ServerInfo1552 is not null)
+					{
+						this.ServerInfo1552.value = decoder.ReadFixedStruct<SERVER_INFO_1552>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1552>(ref this.ServerInfo1552.value);
+					}
+
+					break;
+				case 1553U:
+					if (this.ServerInfo1553 is not null)
+					{
+						this.ServerInfo1553.value = decoder.ReadFixedStruct<SERVER_INFO_1553>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1553>(ref this.ServerInfo1553.value);
+					}
+
+					break;
+				case 1554U:
+					if (this.ServerInfo1554 is not null)
+					{
+						this.ServerInfo1554.value = decoder.ReadFixedStruct<SERVER_INFO_1554>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1554>(ref this.ServerInfo1554.value);
+					}
+
+					break;
+				case 1555U:
+					if (this.ServerInfo1555 is not null)
+					{
+						this.ServerInfo1555.value = decoder.ReadFixedStruct<SERVER_INFO_1555>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1555>(ref this.ServerInfo1555.value);
+					}
+
+					break;
+				case 1556U:
+					if (this.ServerInfo1556 is not null)
+					{
+						this.ServerInfo1556.value = decoder.ReadFixedStruct<SERVER_INFO_1556>(NdrAlignment._4Byte);
+						decoder.ReadStructDeferral<SERVER_INFO_1556>(ref this.ServerInfo1556.value);
+					}
+
+					break;
+			}
+		}
+	}
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct DISK_INFO : IRpcFixedStruct
+	{
+		public ArraySegment<char> Disk;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
+		{
+			for (int i = 0; i < this.Disk.Count; i++)
 			{
 				char elem_0 = this.Disk.Item(i);
 				encoder.WriteValue(elem_0);
 			}
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.Disk = decoder.ReadArraySegmentHeader<char>(3);
-			for (int i = 0; (i < this.Disk.Count); i++
-			)
+			for (int i = 0; i < this.Disk.Count; i++)
 			{
 				char elem_0 = this.Disk.Item(i);
 				elem_0 = decoder.ReadWideChar();
 				this.Disk.Item(i) = elem_0;
 			}
 		}
-		public ArraySegment<char> Disk;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct DISK_ENUM_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct DISK_ENUM_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<ArraySegment<DISK_INFO>>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<ArraySegment<DISK_INFO>> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<ArraySegment<DISK_INFO>>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value, true);
-				for (int i = 0; (i < this.Buffer.value.Count); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Count; i++)
 				{
 					DISK_INFO elem_0 = this.Buffer.value.Item(i);
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment._2Byte);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment._2Byte);
 				}
-				for (int i = 0; (i < this.Buffer.value.Count); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Count; i++)
 				{
 					DISK_INFO elem_0 = this.Buffer.value.Item(i);
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArraySegmentHeader<DISK_INFO>();
-				for (int i = 0; (i < this.Buffer.value.Count); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Count; i++)
 				{
 					DISK_INFO elem_0 = this.Buffer.value.Item(i);
-					elem_0 = decoder.ReadFixedStruct<DISK_INFO>(Titanis.DceRpc.NdrAlignment._2Byte);
+					elem_0 = decoder.ReadFixedStruct<DISK_INFO>(NdrAlignment._2Byte);
 					this.Buffer.value.Item(i) = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Count); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Count; i++)
 				{
 					DISK_INFO elem_0 = this.Buffer.value.Item(i);
 					decoder.ReadStructDeferral<DISK_INFO>(ref elem_0);
@@ -6289,122 +6119,138 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_TRANSPORT_INFO_0 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_TRANSPORT_INFO_0 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.svti0_numberofvcs);
-			encoder.WritePointer(this.svti0_transportname);
-			encoder.WritePointer(this.svti0_transportaddress);
-			encoder.WriteValue(this.svti0_transportaddresslength);
-			encoder.WritePointer(this.svti0_networkaddress);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.svti0_numberofvcs = decoder.ReadUInt32();
-			this.svti0_transportname = decoder.ReadPointer<string>();
-			this.svti0_transportaddress = decoder.ReadPointer<byte[]>();
-			this.svti0_transportaddresslength = decoder.ReadUInt32();
-			this.svti0_networkaddress = decoder.ReadPointer<string>();
-		}
 		public uint svti0_numberofvcs;
 		public RpcPointer<string> svti0_transportname;
 		public RpcPointer<byte[]> svti0_transportaddress;
 		public uint svti0_transportaddresslength;
 		public RpcPointer<string> svti0_networkaddress;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.svti0_transportname))
+			encoder.WriteValue(this.svti0_numberofvcs);
+			encoder.WriteUniquePointer(this.svti0_transportname);
+			encoder.WriteUniquePointer(this.svti0_transportaddress);
+			encoder.WriteValue(this.svti0_transportaddresslength);
+			encoder.WriteUniquePointer(this.svti0_networkaddress);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.svti0_numberofvcs = decoder.ReadUInt32();
+			this.svti0_transportname = decoder.ReadUniquePointer<string>();
+			this.svti0_transportaddress = decoder.ReadUniquePointer<byte[]>();
+			this.svti0_transportaddresslength = decoder.ReadUInt32();
+			this.svti0_networkaddress = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.svti0_transportname is not null)
 			{
 				encoder.WriteWideCharString(this.svti0_transportname.value);
 			}
-			if ((null != this.svti0_transportaddress))
+
+			if (this.svti0_transportaddress is not null)
 			{
 				encoder.WriteArrayHeader(this.svti0_transportaddress.value);
-				for (int i = 0; (i < this.svti0_transportaddress.value.Length); i++
-				)
+				for (int i = 0; i < this.svti0_transportaddress.value.Length; i++)
 				{
 					byte elem_0 = this.svti0_transportaddress.value[i];
 					encoder.WriteValue(elem_0);
 				}
 			}
-			if ((null != this.svti0_networkaddress))
+
+			if (this.svti0_networkaddress is not null)
 			{
 				encoder.WriteWideCharString(this.svti0_networkaddress.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.svti0_transportname))
+			if (this.svti0_transportname is not null)
 			{
 				this.svti0_transportname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.svti0_transportaddress))
+
+			if (this.svti0_transportaddress is not null)
 			{
 				this.svti0_transportaddress.value = decoder.ReadArrayHeader<byte>();
-				for (int i = 0; (i < this.svti0_transportaddress.value.Length); i++
-				)
+				for (int i = 0; i < this.svti0_transportaddress.value.Length; i++)
 				{
 					byte elem_0 = this.svti0_transportaddress.value[i];
 					elem_0 = decoder.ReadUnsignedChar();
 					this.svti0_transportaddress.value[i] = elem_0;
 				}
 			}
-			if ((null != this.svti0_networkaddress))
+
+			if (this.svti0_networkaddress is not null)
 			{
 				this.svti0_networkaddress.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_XPORT_INFO_0_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_XPORT_INFO_0_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SERVER_TRANSPORT_INFO_0[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SERVER_TRANSPORT_INFO_0[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SERVER_TRANSPORT_INFO_0[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_0 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_0 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SERVER_TRANSPORT_INFO_0>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_0 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_0>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_0>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_0 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_0>(ref elem_0);
@@ -6413,133 +6259,151 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_TRANSPORT_INFO_1 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_TRANSPORT_INFO_1 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.svti1_numberofvcs);
-			encoder.WritePointer(this.svti1_transportname);
-			encoder.WritePointer(this.svti1_transportaddress);
-			encoder.WriteValue(this.svti1_transportaddresslength);
-			encoder.WritePointer(this.svti1_networkaddress);
-			encoder.WritePointer(this.svti1_domain);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.svti1_numberofvcs = decoder.ReadUInt32();
-			this.svti1_transportname = decoder.ReadPointer<string>();
-			this.svti1_transportaddress = decoder.ReadPointer<byte[]>();
-			this.svti1_transportaddresslength = decoder.ReadUInt32();
-			this.svti1_networkaddress = decoder.ReadPointer<string>();
-			this.svti1_domain = decoder.ReadPointer<string>();
-		}
 		public uint svti1_numberofvcs;
 		public RpcPointer<string> svti1_transportname;
 		public RpcPointer<byte[]> svti1_transportaddress;
 		public uint svti1_transportaddresslength;
 		public RpcPointer<string> svti1_networkaddress;
 		public RpcPointer<string> svti1_domain;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.svti1_transportname))
+			encoder.WriteValue(this.svti1_numberofvcs);
+			encoder.WriteUniquePointer(this.svti1_transportname);
+			encoder.WriteUniquePointer(this.svti1_transportaddress);
+			encoder.WriteValue(this.svti1_transportaddresslength);
+			encoder.WriteUniquePointer(this.svti1_networkaddress);
+			encoder.WriteUniquePointer(this.svti1_domain);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.svti1_numberofvcs = decoder.ReadUInt32();
+			this.svti1_transportname = decoder.ReadUniquePointer<string>();
+			this.svti1_transportaddress = decoder.ReadUniquePointer<byte[]>();
+			this.svti1_transportaddresslength = decoder.ReadUInt32();
+			this.svti1_networkaddress = decoder.ReadUniquePointer<string>();
+			this.svti1_domain = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.svti1_transportname is not null)
 			{
 				encoder.WriteWideCharString(this.svti1_transportname.value);
 			}
-			if ((null != this.svti1_transportaddress))
+
+			if (this.svti1_transportaddress is not null)
 			{
 				encoder.WriteArrayHeader(this.svti1_transportaddress.value);
-				for (int i = 0; (i < this.svti1_transportaddress.value.Length); i++
-				)
+				for (int i = 0; i < this.svti1_transportaddress.value.Length; i++)
 				{
 					byte elem_0 = this.svti1_transportaddress.value[i];
 					encoder.WriteValue(elem_0);
 				}
 			}
-			if ((null != this.svti1_networkaddress))
+
+			if (this.svti1_networkaddress is not null)
 			{
 				encoder.WriteWideCharString(this.svti1_networkaddress.value);
 			}
-			if ((null != this.svti1_domain))
+
+			if (this.svti1_domain is not null)
 			{
 				encoder.WriteWideCharString(this.svti1_domain.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.svti1_transportname))
+			if (this.svti1_transportname is not null)
 			{
 				this.svti1_transportname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.svti1_transportaddress))
+
+			if (this.svti1_transportaddress is not null)
 			{
 				this.svti1_transportaddress.value = decoder.ReadArrayHeader<byte>();
-				for (int i = 0; (i < this.svti1_transportaddress.value.Length); i++
-				)
+				for (int i = 0; i < this.svti1_transportaddress.value.Length; i++)
 				{
 					byte elem_0 = this.svti1_transportaddress.value[i];
 					elem_0 = decoder.ReadUnsignedChar();
 					this.svti1_transportaddress.value[i] = elem_0;
 				}
 			}
-			if ((null != this.svti1_networkaddress))
+
+			if (this.svti1_networkaddress is not null)
 			{
 				this.svti1_networkaddress.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.svti1_domain))
+
+			if (this.svti1_domain is not null)
 			{
 				this.svti1_domain.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_XPORT_INFO_1_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_XPORT_INFO_1_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SERVER_TRANSPORT_INFO_1[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SERVER_TRANSPORT_INFO_1[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SERVER_TRANSPORT_INFO_1[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_1 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_1 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SERVER_TRANSPORT_INFO_1>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_1 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_1>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_1>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_1 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_1>(ref elem_0);
@@ -6548,29 +6412,10 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_TRANSPORT_INFO_2 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_TRANSPORT_INFO_2 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.svti2_numberofvcs);
-			encoder.WritePointer(this.svti2_transportname);
-			encoder.WritePointer(this.svti2_transportaddress);
-			encoder.WriteValue(this.svti2_transportaddresslength);
-			encoder.WritePointer(this.svti2_networkaddress);
-			encoder.WritePointer(this.svti2_domain);
-			encoder.WriteValue(this.svti2_flags);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.svti2_numberofvcs = decoder.ReadUInt32();
-			this.svti2_transportname = decoder.ReadPointer<string>();
-			this.svti2_transportaddress = decoder.ReadPointer<byte[]>();
-			this.svti2_transportaddresslength = decoder.ReadUInt32();
-			this.svti2_networkaddress = decoder.ReadPointer<string>();
-			this.svti2_domain = decoder.ReadPointer<string>();
-			this.svti2_flags = decoder.ReadUInt32();
-		}
 		public uint svti2_numberofvcs;
 		public RpcPointer<string> svti2_transportname;
 		public RpcPointer<byte[]> svti2_transportaddress;
@@ -6578,106 +6423,143 @@ namespace ms_srvs
 		public RpcPointer<string> svti2_networkaddress;
 		public RpcPointer<string> svti2_domain;
 		public uint svti2_flags;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.svti2_transportname))
+			encoder.WriteValue(this.svti2_numberofvcs);
+			encoder.WriteUniquePointer(this.svti2_transportname);
+			encoder.WriteUniquePointer(this.svti2_transportaddress);
+			encoder.WriteValue(this.svti2_transportaddresslength);
+			encoder.WriteUniquePointer(this.svti2_networkaddress);
+			encoder.WriteUniquePointer(this.svti2_domain);
+			encoder.WriteValue(this.svti2_flags);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.svti2_numberofvcs = decoder.ReadUInt32();
+			this.svti2_transportname = decoder.ReadUniquePointer<string>();
+			this.svti2_transportaddress = decoder.ReadUniquePointer<byte[]>();
+			this.svti2_transportaddresslength = decoder.ReadUInt32();
+			this.svti2_networkaddress = decoder.ReadUniquePointer<string>();
+			this.svti2_domain = decoder.ReadUniquePointer<string>();
+			this.svti2_flags = decoder.ReadUInt32();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.svti2_transportname is not null)
 			{
 				encoder.WriteWideCharString(this.svti2_transportname.value);
 			}
-			if ((null != this.svti2_transportaddress))
+
+			if (this.svti2_transportaddress is not null)
 			{
 				encoder.WriteArrayHeader(this.svti2_transportaddress.value);
-				for (int i = 0; (i < this.svti2_transportaddress.value.Length); i++
-				)
+				for (int i = 0; i < this.svti2_transportaddress.value.Length; i++)
 				{
 					byte elem_0 = this.svti2_transportaddress.value[i];
 					encoder.WriteValue(elem_0);
 				}
 			}
-			if ((null != this.svti2_networkaddress))
+
+			if (this.svti2_networkaddress is not null)
 			{
 				encoder.WriteWideCharString(this.svti2_networkaddress.value);
 			}
-			if ((null != this.svti2_domain))
+
+			if (this.svti2_domain is not null)
 			{
 				encoder.WriteWideCharString(this.svti2_domain.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.svti2_transportname))
+			if (this.svti2_transportname is not null)
 			{
 				this.svti2_transportname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.svti2_transportaddress))
+
+			if (this.svti2_transportaddress is not null)
 			{
 				this.svti2_transportaddress.value = decoder.ReadArrayHeader<byte>();
-				for (int i = 0; (i < this.svti2_transportaddress.value.Length); i++
-				)
+				for (int i = 0; i < this.svti2_transportaddress.value.Length; i++)
 				{
 					byte elem_0 = this.svti2_transportaddress.value[i];
 					elem_0 = decoder.ReadUnsignedChar();
 					this.svti2_transportaddress.value[i] = elem_0;
 				}
 			}
-			if ((null != this.svti2_networkaddress))
+
+			if (this.svti2_networkaddress is not null)
 			{
 				this.svti2_networkaddress.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.svti2_domain))
+
+			if (this.svti2_domain is not null)
 			{
 				this.svti2_domain.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_XPORT_INFO_2_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_XPORT_INFO_2_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SERVER_TRANSPORT_INFO_2[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SERVER_TRANSPORT_INFO_2[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SERVER_TRANSPORT_INFO_2[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_2 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_2 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SERVER_TRANSPORT_INFO_2>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_2 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_2>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_2>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_2 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_2>(ref elem_0);
@@ -6686,52 +6568,10 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_TRANSPORT_INFO_3 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_TRANSPORT_INFO_3 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.svti3_numberofvcs);
-			encoder.WritePointer(this.svti3_transportname);
-			encoder.WritePointer(this.svti3_transportaddress);
-			encoder.WriteValue(this.svti3_transportaddresslength);
-			encoder.WritePointer(this.svti3_networkaddress);
-			encoder.WritePointer(this.svti3_domain);
-			encoder.WriteValue(this.svti3_flags);
-			encoder.WriteValue(this.svti3_passwordlength);
-			if ((this.svti3_password == null))
-			{
-				this.svti3_password = new byte[256];
-			}
-			for (int i = 0; (i < 256); i++
-			)
-			{
-				byte elem_0 = this.svti3_password[i];
-				encoder.WriteValue(elem_0);
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.svti3_numberofvcs = decoder.ReadUInt32();
-			this.svti3_transportname = decoder.ReadPointer<string>();
-			this.svti3_transportaddress = decoder.ReadPointer<byte[]>();
-			this.svti3_transportaddresslength = decoder.ReadUInt32();
-			this.svti3_networkaddress = decoder.ReadPointer<string>();
-			this.svti3_domain = decoder.ReadPointer<string>();
-			this.svti3_flags = decoder.ReadUInt32();
-			this.svti3_passwordlength = decoder.ReadUInt32();
-			if ((this.svti3_password == null))
-			{
-				this.svti3_password = new byte[256];
-			}
-			for (int i = 0; (i < 256); i++
-			)
-			{
-				byte elem_0 = this.svti3_password[i];
-				elem_0 = decoder.ReadUnsignedChar();
-				this.svti3_password[i] = elem_0;
-			}
-		}
 		public uint svti3_numberofvcs;
 		public RpcPointer<string> svti3_transportname;
 		public RpcPointer<byte[]> svti3_transportaddress;
@@ -6741,106 +6581,160 @@ namespace ms_srvs
 		public uint svti3_flags;
 		public uint svti3_passwordlength;
 		public byte[] svti3_password;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.svti3_transportname))
+			encoder.WriteValue(this.svti3_numberofvcs);
+			encoder.WriteUniquePointer(this.svti3_transportname);
+			encoder.WriteUniquePointer(this.svti3_transportaddress);
+			encoder.WriteValue(this.svti3_transportaddresslength);
+			encoder.WriteUniquePointer(this.svti3_networkaddress);
+			encoder.WriteUniquePointer(this.svti3_domain);
+			encoder.WriteValue(this.svti3_flags);
+			encoder.WriteValue(this.svti3_passwordlength);
+			if (this.svti3_password == null)
+				this.svti3_password = new byte[256];
+			for (int i = 0; i < 256; i++)
+			{
+				byte elem_0 = this.svti3_password[i];
+				encoder.WriteValue(elem_0);
+			}
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.svti3_numberofvcs = decoder.ReadUInt32();
+			this.svti3_transportname = decoder.ReadUniquePointer<string>();
+			this.svti3_transportaddress = decoder.ReadUniquePointer<byte[]>();
+			this.svti3_transportaddresslength = decoder.ReadUInt32();
+			this.svti3_networkaddress = decoder.ReadUniquePointer<string>();
+			this.svti3_domain = decoder.ReadUniquePointer<string>();
+			this.svti3_flags = decoder.ReadUInt32();
+			this.svti3_passwordlength = decoder.ReadUInt32();
+			if (this.svti3_password == null)
+				this.svti3_password = new byte[256];
+			for (int i = 0; i < 256; i++)
+			{
+				byte elem_0 = this.svti3_password[i];
+				elem_0 = decoder.ReadUnsignedChar();
+				this.svti3_password[i] = elem_0;
+			}
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.svti3_transportname is not null)
 			{
 				encoder.WriteWideCharString(this.svti3_transportname.value);
 			}
-			if ((null != this.svti3_transportaddress))
+
+			if (this.svti3_transportaddress is not null)
 			{
 				encoder.WriteArrayHeader(this.svti3_transportaddress.value);
-				for (int i = 0; (i < this.svti3_transportaddress.value.Length); i++
-				)
+				for (int i = 0; i < this.svti3_transportaddress.value.Length; i++)
 				{
 					byte elem_0 = this.svti3_transportaddress.value[i];
 					encoder.WriteValue(elem_0);
 				}
 			}
-			if ((null != this.svti3_networkaddress))
+
+			if (this.svti3_networkaddress is not null)
 			{
 				encoder.WriteWideCharString(this.svti3_networkaddress.value);
 			}
-			if ((null != this.svti3_domain))
+
+			if (this.svti3_domain is not null)
 			{
 				encoder.WriteWideCharString(this.svti3_domain.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.svti3_transportname))
+			if (this.svti3_transportname is not null)
 			{
 				this.svti3_transportname.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.svti3_transportaddress))
+
+			if (this.svti3_transportaddress is not null)
 			{
 				this.svti3_transportaddress.value = decoder.ReadArrayHeader<byte>();
-				for (int i = 0; (i < this.svti3_transportaddress.value.Length); i++
-				)
+				for (int i = 0; i < this.svti3_transportaddress.value.Length; i++)
 				{
 					byte elem_0 = this.svti3_transportaddress.value[i];
 					elem_0 = decoder.ReadUnsignedChar();
 					this.svti3_transportaddress.value[i] = elem_0;
 				}
 			}
-			if ((null != this.svti3_networkaddress))
+
+			if (this.svti3_networkaddress is not null)
 			{
 				this.svti3_networkaddress.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.svti3_domain))
+
+			if (this.svti3_domain is not null)
 			{
 				this.svti3_domain.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_XPORT_INFO_3_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_XPORT_INFO_3_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SERVER_TRANSPORT_INFO_3[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SERVER_TRANSPORT_INFO_3[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SERVER_TRANSPORT_INFO_3[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_3 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_3 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SERVER_TRANSPORT_INFO_3>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_3 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_3>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_3>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_TRANSPORT_INFO_3 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_3>(ref elem_0);
@@ -6849,347 +6743,297 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct TRANSPORT_INFO : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct TRANSPORT_INFO : IRpcFixedStruct
 	{
 		public uint unionSwitch;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.unionSwitch);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				encoder.WriteFixedStruct(this.Transport0, Titanis.DceRpc.NdrAlignment.NativePtr);
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 1))
-				{
-					encoder.WriteFixedStruct(this.Transport1, Titanis.DceRpc.NdrAlignment.NativePtr);
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 2))
-					{
-						encoder.WriteFixedStruct(this.Transport2, Titanis.DceRpc.NdrAlignment.NativePtr);
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 3))
-						{
-							encoder.WriteFixedStruct(this.Transport3, Titanis.DceRpc.NdrAlignment.NativePtr);
-						}
-					}
-				}
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.unionSwitch = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				this.Transport0 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_0>(Titanis.DceRpc.NdrAlignment.NativePtr);
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 1))
-				{
-					this.Transport1 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_1>(Titanis.DceRpc.NdrAlignment.NativePtr);
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 2))
-					{
-						this.Transport2 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_2>(Titanis.DceRpc.NdrAlignment.NativePtr);
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 3))
-						{
-							this.Transport3 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_3>(Titanis.DceRpc.NdrAlignment.NativePtr);
-						}
-					}
-				}
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				encoder.WriteStructDeferral(this.Transport0);
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 1))
-				{
-					encoder.WriteStructDeferral(this.Transport1);
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 2))
-					{
-						encoder.WriteStructDeferral(this.Transport2);
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 3))
-						{
-							encoder.WriteStructDeferral(this.Transport3);
-						}
-					}
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_0>(ref this.Transport0);
-			}
-			else
-			{
-				if ((((int)(this.unionSwitch)) == 1))
-				{
-					decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_1>(ref this.Transport1);
-				}
-				else
-				{
-					if ((((int)(this.unionSwitch)) == 2))
-					{
-						decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_2>(ref this.Transport2);
-					}
-					else
-					{
-						if ((((int)(this.unionSwitch)) == 3))
-						{
-							decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_3>(ref this.Transport3);
-						}
-					}
-				}
-			}
-		}
 		public SERVER_TRANSPORT_INFO_0 Transport0;
 		public SERVER_TRANSPORT_INFO_1 Transport1;
 		public SERVER_TRANSPORT_INFO_2 Transport2;
 		public SERVER_TRANSPORT_INFO_3 Transport3;
+		public void Encode(IRpcEncoder encoder)
+		{
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.unionSwitch);
+			switch ((uint)this.unionSwitch)
+			{
+				case 0U:
+					encoder.WriteFixedStruct(this.Transport0, NdrAlignment.NativePtr);
+					break;
+				case 1U:
+					encoder.WriteFixedStruct(this.Transport1, NdrAlignment.NativePtr);
+					break;
+				case 2U:
+					encoder.WriteFixedStruct(this.Transport2, NdrAlignment.NativePtr);
+					break;
+				case 3U:
+					encoder.WriteFixedStruct(this.Transport3, NdrAlignment.NativePtr);
+					break;
+			}
+		}
+
+		public void Decode(IRpcDecoder decoder)
+		{
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.unionSwitch = decoder.ReadUInt32();
+			switch ((uint)this.unionSwitch)
+			{
+				case 0U:
+					this.Transport0 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_0>(NdrAlignment.NativePtr);
+					break;
+				case 1U:
+					this.Transport1 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_1>(NdrAlignment.NativePtr);
+					break;
+				case 2U:
+					this.Transport2 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_2>(NdrAlignment.NativePtr);
+					break;
+				case 3U:
+					this.Transport3 = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_3>(NdrAlignment.NativePtr);
+					break;
+			}
+		}
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.unionSwitch)
+			{
+				case 0U:
+					encoder.WriteStructDeferral(this.Transport0);
+					break;
+				case 1U:
+					encoder.WriteStructDeferral(this.Transport1);
+					break;
+				case 2U:
+					encoder.WriteStructDeferral(this.Transport2);
+					break;
+				case 3U:
+					encoder.WriteStructDeferral(this.Transport3);
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.unionSwitch)
+			{
+				case 0U:
+					decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_0>(ref this.Transport0);
+					break;
+				case 1U:
+					decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_1>(ref this.Transport1);
+					break;
+				case 2U:
+					decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_2>(ref this.Transport2);
+					break;
+				case 3U:
+					decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_3>(ref this.Transport3);
+					break;
+			}
+		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_XPORT_ENUM_UNION : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_XPORT_ENUM_UNION : IRpcFixedStruct
 	{
 		public uint Level;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.Level);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 0))
-			{
-				encoder.WritePointer(this.Level0);
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					encoder.WritePointer(this.Level1);
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						encoder.WritePointer(this.Level2);
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 3))
-						{
-							encoder.WritePointer(this.Level3);
-						}
-					}
-				}
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.Level = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 0))
-			{
-				this.Level0 = decoder.ReadPointer<SERVER_XPORT_INFO_0_CONTAINER>();
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					this.Level1 = decoder.ReadPointer<SERVER_XPORT_INFO_1_CONTAINER>();
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						this.Level2 = decoder.ReadPointer<SERVER_XPORT_INFO_2_CONTAINER>();
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 3))
-						{
-							this.Level3 = decoder.ReadPointer<SERVER_XPORT_INFO_3_CONTAINER>();
-						}
-					}
-				}
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.Level)) == 0))
-			{
-				if ((null != this.Level0))
-				{
-					encoder.WriteFixedStruct(this.Level0.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-					encoder.WriteStructDeferral(this.Level0.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					if ((null != this.Level1))
-					{
-						encoder.WriteFixedStruct(this.Level1.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-						encoder.WriteStructDeferral(this.Level1.value);
-					}
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						if ((null != this.Level2))
-						{
-							encoder.WriteFixedStruct(this.Level2.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-							encoder.WriteStructDeferral(this.Level2.value);
-						}
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 3))
-						{
-							if ((null != this.Level3))
-							{
-								encoder.WriteFixedStruct(this.Level3.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-								encoder.WriteStructDeferral(this.Level3.value);
-							}
-						}
-					}
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.Level)) == 0))
-			{
-				if ((null != this.Level0))
-				{
-					this.Level0.value = decoder.ReadFixedStruct<SERVER_XPORT_INFO_0_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-					decoder.ReadStructDeferral<SERVER_XPORT_INFO_0_CONTAINER>(ref this.Level0.value);
-				}
-			}
-			else
-			{
-				if ((((int)(this.Level)) == 1))
-				{
-					if ((null != this.Level1))
-					{
-						this.Level1.value = decoder.ReadFixedStruct<SERVER_XPORT_INFO_1_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-						decoder.ReadStructDeferral<SERVER_XPORT_INFO_1_CONTAINER>(ref this.Level1.value);
-					}
-				}
-				else
-				{
-					if ((((int)(this.Level)) == 2))
-					{
-						if ((null != this.Level2))
-						{
-							this.Level2.value = decoder.ReadFixedStruct<SERVER_XPORT_INFO_2_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-							decoder.ReadStructDeferral<SERVER_XPORT_INFO_2_CONTAINER>(ref this.Level2.value);
-						}
-					}
-					else
-					{
-						if ((((int)(this.Level)) == 3))
-						{
-							if ((null != this.Level3))
-							{
-								this.Level3.value = decoder.ReadFixedStruct<SERVER_XPORT_INFO_3_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-								decoder.ReadStructDeferral<SERVER_XPORT_INFO_3_CONTAINER>(ref this.Level3.value);
-							}
-						}
-					}
-				}
-			}
-		}
 		public RpcPointer<SERVER_XPORT_INFO_0_CONTAINER> Level0;
 		public RpcPointer<SERVER_XPORT_INFO_1_CONTAINER> Level1;
 		public RpcPointer<SERVER_XPORT_INFO_2_CONTAINER> Level2;
 		public RpcPointer<SERVER_XPORT_INFO_3_CONTAINER> Level3;
+		public void Encode(IRpcEncoder encoder)
+		{
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.Level);
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					encoder.WriteUniquePointer(this.Level0);
+					break;
+				case 1U:
+					encoder.WriteUniquePointer(this.Level1);
+					break;
+				case 2U:
+					encoder.WriteUniquePointer(this.Level2);
+					break;
+				case 3U:
+					encoder.WriteUniquePointer(this.Level3);
+					break;
+			}
+		}
+
+		public void Decode(IRpcDecoder decoder)
+		{
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.Level = decoder.ReadUInt32();
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					this.Level0 = decoder.ReadUniquePointer<SERVER_XPORT_INFO_0_CONTAINER>();
+					break;
+				case 1U:
+					this.Level1 = decoder.ReadUniquePointer<SERVER_XPORT_INFO_1_CONTAINER>();
+					break;
+				case 2U:
+					this.Level2 = decoder.ReadUniquePointer<SERVER_XPORT_INFO_2_CONTAINER>();
+					break;
+				case 3U:
+					this.Level3 = decoder.ReadUniquePointer<SERVER_XPORT_INFO_3_CONTAINER>();
+					break;
+			}
+		}
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					if (this.Level0 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level0.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level0.value);
+					}
+
+					break;
+				case 1U:
+					if (this.Level1 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level1.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level1.value);
+					}
+
+					break;
+				case 2U:
+					if (this.Level2 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level2.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level2.value);
+					}
+
+					break;
+				case 3U:
+					if (this.Level3 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level3.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level3.value);
+					}
+
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					if (this.Level0 is not null)
+					{
+						this.Level0.value = decoder.ReadFixedStruct<SERVER_XPORT_INFO_0_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_XPORT_INFO_0_CONTAINER>(ref this.Level0.value);
+					}
+
+					break;
+				case 1U:
+					if (this.Level1 is not null)
+					{
+						this.Level1.value = decoder.ReadFixedStruct<SERVER_XPORT_INFO_1_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_XPORT_INFO_1_CONTAINER>(ref this.Level1.value);
+					}
+
+					break;
+				case 2U:
+					if (this.Level2 is not null)
+					{
+						this.Level2.value = decoder.ReadFixedStruct<SERVER_XPORT_INFO_2_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_XPORT_INFO_2_CONTAINER>(ref this.Level2.value);
+					}
+
+					break;
+				case 3U:
+					if (this.Level3 is not null)
+					{
+						this.Level3.value = decoder.ReadFixedStruct<SERVER_XPORT_INFO_3_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_XPORT_INFO_3_CONTAINER>(ref this.Level3.value);
+					}
+
+					break;
+			}
+		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_XPORT_ENUM_STRUCT : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_XPORT_ENUM_STRUCT : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint Level;
+		public SERVER_XPORT_ENUM_UNION XportInfo;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.Level);
 			encoder.WriteUnion(this.XportInfo);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.Level = decoder.ReadUInt32();
 			this.XportInfo = decoder.ReadUnion<SERVER_XPORT_ENUM_UNION>();
 		}
-		public uint Level;
-		public SERVER_XPORT_ENUM_UNION XportInfo;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			encoder.WriteStructDeferral(this.XportInfo);
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			decoder.ReadStructDeferral<SERVER_XPORT_ENUM_UNION>(ref this.XportInfo);
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct ADT_SECURITY_DESCRIPTOR : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct ADT_SECURITY_DESCRIPTOR : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.Length);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.Length = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<byte[]>();
-		}
 		public uint Length;
 		public RpcPointer<byte[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.Length);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.Length = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<byte[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					byte elem_0 = this.Buffer.value[i];
 					encoder.WriteValue(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<byte>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					byte elem_0 = this.Buffer.value[i];
 					elem_0 = decoder.ReadUnsignedChar();
@@ -7198,10 +7042,29 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct STAT_SERVER_0 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct STAT_SERVER_0 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint sts0_start;
+		public uint sts0_fopens;
+		public uint sts0_devopens;
+		public uint sts0_jobsqueued;
+		public uint sts0_sopens;
+		public uint sts0_stimedout;
+		public uint sts0_serrorout;
+		public uint sts0_pwerrors;
+		public uint sts0_permerrors;
+		public uint sts0_syserrors;
+		public uint sts0_bytessent_low;
+		public uint sts0_bytessent_high;
+		public uint sts0_bytesrcvd_low;
+		public uint sts0_bytesrcvd_high;
+		public uint sts0_avresponse;
+		public uint sts0_reqbufneed;
+		public uint sts0_bigbufneed;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.sts0_start);
 			encoder.WriteValue(this.sts0_fopens);
@@ -7221,7 +7084,9 @@ namespace ms_srvs
 			encoder.WriteValue(this.sts0_reqbufneed);
 			encoder.WriteValue(this.sts0_bigbufneed);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.sts0_start = decoder.ReadUInt32();
 			this.sts0_fopens = decoder.ReadUInt32();
@@ -7241,34 +7106,35 @@ namespace ms_srvs
 			this.sts0_reqbufneed = decoder.ReadUInt32();
 			this.sts0_bigbufneed = decoder.ReadUInt32();
 		}
-		public uint sts0_start;
-		public uint sts0_fopens;
-		public uint sts0_devopens;
-		public uint sts0_jobsqueued;
-		public uint sts0_sopens;
-		public uint sts0_stimedout;
-		public uint sts0_serrorout;
-		public uint sts0_pwerrors;
-		public uint sts0_permerrors;
-		public uint sts0_syserrors;
-		public uint sts0_bytessent_low;
-		public uint sts0_bytessent_high;
-		public uint sts0_bytesrcvd_low;
-		public uint sts0_bytesrcvd_high;
-		public uint sts0_avresponse;
-		public uint sts0_reqbufneed;
-		public uint sts0_bigbufneed;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct TIME_OF_DAY_INFO : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct TIME_OF_DAY_INFO : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint tod_elapsedt;
+		public uint tod_msecs;
+		public uint tod_hours;
+		public uint tod_mins;
+		public uint tod_secs;
+		public uint tod_hunds;
+		public int tod_timezone;
+		public uint tod_tinterval;
+		public uint tod_day;
+		public uint tod_month;
+		public uint tod_year;
+		public uint tod_weekday;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.tod_elapsedt);
 			encoder.WriteValue(this.tod_msecs);
@@ -7283,7 +7149,9 @@ namespace ms_srvs
 			encoder.WriteValue(this.tod_year);
 			encoder.WriteValue(this.tod_weekday);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.tod_elapsedt = decoder.ReadUInt32();
 			this.tod_msecs = decoder.ReadUInt32();
@@ -7298,103 +7166,109 @@ namespace ms_srvs
 			this.tod_year = decoder.ReadUInt32();
 			this.tod_weekday = decoder.ReadUInt32();
 		}
-		public uint tod_elapsedt;
-		public uint tod_msecs;
-		public uint tod_hours;
-		public uint tod_mins;
-		public uint tod_secs;
-		public uint tod_hunds;
-		public int tod_timezone;
-		public uint tod_tinterval;
-		public uint tod_day;
-		public uint tod_month;
-		public uint tod_year;
-		public uint tod_weekday;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct NET_DFS_ENTRY_ID : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct NET_DFS_ENTRY_ID : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public Guid Uid;
+		public RpcPointer<string> Prefix;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.Uid);
-			encoder.WritePointer(this.Prefix);
+			encoder.WriteUniquePointer(this.Prefix);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.Uid = decoder.ReadUuid();
-			this.Prefix = decoder.ReadPointer<string>();
+			this.Prefix = decoder.ReadUniquePointer<string>();
 		}
-		public System.Guid Uid;
-		public RpcPointer<string> Prefix;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
-			if ((null != this.Prefix))
+			if (this.Prefix is not null)
 			{
 				encoder.WriteWideCharString(this.Prefix.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Prefix))
+			if (this.Prefix is not null)
 			{
 				this.Prefix.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct NET_DFS_ENTRY_ID_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct NET_DFS_ENTRY_ID_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.Count);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.Count = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<NET_DFS_ENTRY_ID[]>();
-		}
 		public uint Count;
 		public RpcPointer<NET_DFS_ENTRY_ID[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.Count);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.Count = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<NET_DFS_ENTRY_ID[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					NET_DFS_ENTRY_ID elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					NET_DFS_ENTRY_ID elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<NET_DFS_ENTRY_ID>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					NET_DFS_ENTRY_ID elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<NET_DFS_ENTRY_ID>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<NET_DFS_ENTRY_ID>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					NET_DFS_ENTRY_ID elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<NET_DFS_ENTRY_ID>(ref elem_0);
@@ -7403,89 +7277,109 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct DFS_SITENAME_INFO : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct DFS_SITENAME_INFO : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.SiteFlags);
-			encoder.WritePointer(this.SiteName);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.SiteFlags = decoder.ReadUInt32();
-			this.SiteName = decoder.ReadPointer<string>();
-		}
 		public uint SiteFlags;
 		public RpcPointer<string> SiteName;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.SiteName))
+			encoder.WriteValue(this.SiteFlags);
+			encoder.WriteUniquePointer(this.SiteName);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.SiteFlags = decoder.ReadUInt32();
+			this.SiteName = decoder.ReadUniquePointer<string>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.SiteName is not null)
 			{
 				encoder.WriteWideCharString(this.SiteName.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.SiteName))
+			if (this.SiteName is not null)
 			{
 				this.SiteName.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct DFS_SITELIST_INFO : Titanis.DceRpc.IRpcConformantStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct DFS_SITELIST_INFO : IRpcConformantStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.cSites);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.cSites = decoder.ReadUInt32();
-		}
-		public void EncodeHeader(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeHeader(IRpcEncoder encoder)
 		{
 			encoder.WriteArrayHeader(this.Site);
 		}
-		public void DecodeHeader(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeHeader(IRpcDecoder decoder)
 		{
 			this.Site = decoder.ReadArrayHeader<DFS_SITENAME_INFO>();
 		}
-		public void EncodeConformantArrayField(Titanis.DceRpc.IRpcEncoder encoder)
+
+		public uint cSites;
+		public DFS_SITENAME_INFO[] Site;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeConformantArrayField(IRpcEncoder encoder)
 		{
-			for (int i = 0; (i < this.Site.Length); i++
-			)
+			for (int i = 0; i < this.Site.Length; i++)
 			{
 				DFS_SITENAME_INFO elem_0 = this.Site[i];
-				encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+				encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 			}
 		}
-		public void DecodeConformantArrayField(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeConformantArrayField(IRpcDecoder decoder)
 		{
-			for (int i = 0; (i < this.Site.Length); i++
-			)
+			for (int i = 0; i < this.Site.Length; i++)
 			{
 				DFS_SITENAME_INFO elem_0 = this.Site[i];
-				elem_0 = decoder.ReadFixedStruct<DFS_SITENAME_INFO>(Titanis.DceRpc.NdrAlignment.NativePtr);
+				elem_0 = decoder.ReadFixedStruct<DFS_SITENAME_INFO>(NdrAlignment.NativePtr);
 				this.Site[i] = elem_0;
 			}
 		}
-		public uint cSites;
-		public DFS_SITENAME_INFO[] Site;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			for (int i = 0; (i < this.Site.Length); i++
-			)
+			encoder.WriteValue(this.cSites);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.cSites = decoder.ReadUInt32();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			for (int i = 0; i < this.Site.Length; i++)
 			{
 				DFS_SITENAME_INFO elem_0 = this.Site[i];
 				encoder.WriteStructDeferral(elem_0);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			for (int i = 0; (i < this.Site.Length); i++
-			)
+			for (int i = 0; i < this.Site.Length; i++)
 			{
 				DFS_SITENAME_INFO elem_0 = this.Site[i];
 				decoder.ReadStructDeferral<DFS_SITENAME_INFO>(ref elem_0);
@@ -7493,98 +7387,114 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_ALIAS_INFO_0 : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_ALIAS_INFO_0 : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WritePointer(this.srvai0_alias);
-			encoder.WritePointer(this.srvai0_target);
-			encoder.WriteValue(this.srvai0_default);
-			encoder.WriteValue(this.srvai0_reserved);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.srvai0_alias = decoder.ReadPointer<string>();
-			this.srvai0_target = decoder.ReadPointer<string>();
-			this.srvai0_default = decoder.ReadUnsignedChar();
-			this.srvai0_reserved = decoder.ReadUInt32();
-		}
 		public RpcPointer<string> srvai0_alias;
 		public RpcPointer<string> srvai0_target;
 		public byte srvai0_default;
 		public uint srvai0_reserved;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.srvai0_alias))
+			encoder.WriteUniquePointer(this.srvai0_alias);
+			encoder.WriteUniquePointer(this.srvai0_target);
+			encoder.WriteValue(this.srvai0_default);
+			encoder.WriteValue(this.srvai0_reserved);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.srvai0_alias = decoder.ReadUniquePointer<string>();
+			this.srvai0_target = decoder.ReadUniquePointer<string>();
+			this.srvai0_default = decoder.ReadUnsignedChar();
+			this.srvai0_reserved = decoder.ReadUInt32();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.srvai0_alias is not null)
 			{
 				encoder.WriteWideCharString(this.srvai0_alias.value);
 			}
-			if ((null != this.srvai0_target))
+
+			if (this.srvai0_target is not null)
 			{
 				encoder.WriteWideCharString(this.srvai0_target.value);
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.srvai0_alias))
+			if (this.srvai0_alias is not null)
 			{
 				this.srvai0_alias.value = decoder.ReadWideCharString();
 			}
-			if ((null != this.srvai0_target))
+
+			if (this.srvai0_target is not null)
 			{
 				this.srvai0_target.value = decoder.ReadWideCharString();
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_ALIAS_INFO_0_CONTAINER : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_ALIAS_INFO_0_CONTAINER : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.EntriesRead);
-			encoder.WritePointer(this.Buffer);
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.EntriesRead = decoder.ReadUInt32();
-			this.Buffer = decoder.ReadPointer<SERVER_ALIAS_INFO_0[]>();
-		}
 		public uint EntriesRead;
 		public RpcPointer<SERVER_ALIAS_INFO_0[]> Buffer;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
-			if ((null != this.Buffer))
+			encoder.WriteValue(this.EntriesRead);
+			encoder.WriteUniquePointer(this.Buffer);
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
+		{
+			this.EntriesRead = decoder.ReadUInt32();
+			this.Buffer = decoder.ReadUniquePointer<SERVER_ALIAS_INFO_0[]>();
+		}
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			if (this.Buffer is not null)
 			{
 				encoder.WriteArrayHeader(this.Buffer.value);
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_ALIAS_INFO_0 elem_0 = this.Buffer.value[i];
-					encoder.WriteFixedStruct(elem_0, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteFixedStruct(elem_0, NdrAlignment.NativePtr);
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_ALIAS_INFO_0 elem_0 = this.Buffer.value[i];
 					encoder.WriteStructDeferral(elem_0);
 				}
 			}
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
-			if ((null != this.Buffer))
+			if (this.Buffer is not null)
 			{
 				this.Buffer.value = decoder.ReadArrayHeader<SERVER_ALIAS_INFO_0>();
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_ALIAS_INFO_0 elem_0 = this.Buffer.value[i];
-					elem_0 = decoder.ReadFixedStruct<SERVER_ALIAS_INFO_0>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					elem_0 = decoder.ReadFixedStruct<SERVER_ALIAS_INFO_0>(NdrAlignment.NativePtr);
 					this.Buffer.value[i] = elem_0;
 				}
-				for (int i = 0; (i < this.Buffer.value.Length); i++
-				)
+
+				for (int i = 0; i < this.Buffer.value.Length; i++)
 				{
 					SERVER_ALIAS_INFO_0 elem_0 = this.Buffer.value[i];
 					decoder.ReadStructDeferral<SERVER_ALIAS_INFO_0>(ref elem_0);
@@ -7593,1504 +7503,1488 @@ namespace ms_srvs
 			}
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct _SERVER_ALIAS_ENUM_UNION : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct _SERVER_ALIAS_ENUM_UNION : IRpcFixedStruct
 	{
 		public uint Level;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.Level);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 0))
-			{
-				encoder.WritePointer(this.Level0);
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.Level = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.Level)) == 0))
-			{
-				this.Level0 = decoder.ReadPointer<SERVER_ALIAS_INFO_0_CONTAINER>();
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.Level)) == 0))
-			{
-				if ((null != this.Level0))
-				{
-					encoder.WriteFixedStruct(this.Level0.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-					encoder.WriteStructDeferral(this.Level0.value);
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.Level)) == 0))
-			{
-				if ((null != this.Level0))
-				{
-					this.Level0.value = decoder.ReadFixedStruct<SERVER_ALIAS_INFO_0_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-					decoder.ReadStructDeferral<SERVER_ALIAS_INFO_0_CONTAINER>(ref this.Level0.value);
-				}
-			}
-		}
 		public RpcPointer<SERVER_ALIAS_INFO_0_CONTAINER> Level0;
+		public void Encode(IRpcEncoder encoder)
+		{
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.Level);
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					encoder.WriteUniquePointer(this.Level0);
+					break;
+			}
+		}
+
+		public void Decode(IRpcDecoder decoder)
+		{
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.Level = decoder.ReadUInt32();
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					this.Level0 = decoder.ReadUniquePointer<SERVER_ALIAS_INFO_0_CONTAINER>();
+					break;
+			}
+		}
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					if (this.Level0 is not null)
+					{
+						encoder.WriteFixedStruct(this.Level0.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.Level0.value);
+					}
+
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.Level)
+			{
+				case 0U:
+					if (this.Level0 is not null)
+					{
+						this.Level0.value = decoder.ReadFixedStruct<SERVER_ALIAS_INFO_0_CONTAINER>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_ALIAS_INFO_0_CONTAINER>(ref this.Level0.value);
+					}
+
+					break;
+			}
+		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_ALIAS_ENUM_STRUCT : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_ALIAS_ENUM_STRUCT : IRpcFixedStruct
 	{
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
+		public uint Level;
+		public _SERVER_ALIAS_ENUM_UNION ServerAliasInfo;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.Level);
 			encoder.WriteUnion(this.ServerAliasInfo);
 		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void Decode(IRpcDecoder decoder)
 		{
 			this.Level = decoder.ReadUInt32();
 			this.ServerAliasInfo = decoder.ReadUnion<_SERVER_ALIAS_ENUM_UNION>();
 		}
-		public uint Level;
-		public _SERVER_ALIAS_ENUM_UNION ServerAliasInfo;
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			encoder.WriteStructDeferral(this.ServerAliasInfo);
 		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			decoder.ReadStructDeferral<_SERVER_ALIAS_ENUM_UNION>(ref this.ServerAliasInfo);
 		}
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public struct SERVER_ALIAS_INFO : Titanis.DceRpc.IRpcFixedStruct
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial struct SERVER_ALIAS_INFO : IRpcFixedStruct
 	{
 		public uint unionSwitch;
-		public void Encode(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			encoder.WriteValue(this.unionSwitch);
-			encoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				encoder.WritePointer(this.ServerAliasInfo0);
-			}
-		}
-		public void Decode(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			this.unionSwitch = decoder.ReadUInt32();
-			decoder.Align(Titanis.DceRpc.NdrAlignment.NativePtr);
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				this.ServerAliasInfo0 = decoder.ReadPointer<SERVER_ALIAS_INFO_0>();
-			}
-		}
-		public void EncodeDeferrals(Titanis.DceRpc.IRpcEncoder encoder)
-		{
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				if ((null != this.ServerAliasInfo0))
-				{
-					encoder.WriteFixedStruct(this.ServerAliasInfo0.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-					encoder.WriteStructDeferral(this.ServerAliasInfo0.value);
-				}
-			}
-		}
-		public void DecodeDeferrals(Titanis.DceRpc.IRpcDecoder decoder)
-		{
-			if ((((int)(this.unionSwitch)) == 0))
-			{
-				if ((null != this.ServerAliasInfo0))
-				{
-					this.ServerAliasInfo0.value = decoder.ReadFixedStruct<SERVER_ALIAS_INFO_0>(Titanis.DceRpc.NdrAlignment.NativePtr);
-					decoder.ReadStructDeferral<SERVER_ALIAS_INFO_0>(ref this.ServerAliasInfo0.value);
-				}
-			}
-		}
 		public RpcPointer<SERVER_ALIAS_INFO_0> ServerAliasInfo0;
-	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	[System.Runtime.InteropServices.GuidAttribute("4b324fc8-1670-01d3-1278-5a47bf6ee188")]
-	[Titanis.DceRpc.RpcVersionAttribute(3, 0)]
-	public interface srvsvc
-	{
-		Task Opnum0NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task Opnum1NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task Opnum2NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task Opnum3NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task Opnum4NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task Opnum5NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task Opnum6NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task Opnum7NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrConnectionEnum(string ServerName, string Qualifier, RpcPointer<CONNECT_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrFileEnum(string ServerName, string BasePath, string UserName, RpcPointer<FILE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrFileGetInfo(string ServerName, uint FileId, uint Level, RpcPointer<FILE_INFO> InfoStruct, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrFileClose(string ServerName, uint FileId, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrSessionEnum(string ServerName, string ClientName, string UserName, RpcPointer<SESSION_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrSessionDel(string ServerName, string ClientName, string UserName, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareAdd(string ServerName, uint Level, RpcPointer<SHARE_INFO> InfoStruct, RpcPointer<uint> ParmErr, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareEnum(string ServerName, RpcPointer<SHARE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareGetInfo(string ServerName, string NetName, uint Level, RpcPointer<SHARE_INFO> InfoStruct, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareSetInfo(string ServerName, string NetName, uint Level, RpcPointer<SHARE_INFO> ShareInfo, RpcPointer<uint> ParmErr, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareDel(string ServerName, string NetName, uint Reserved, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareDelSticky(string ServerName, string NetName, uint Reserved, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareCheck(string ServerName, string Device, RpcPointer<uint> Type, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerGetInfo(string ServerName, uint Level, RpcPointer<SERVER_INFO> InfoStruct, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerSetInfo(string ServerName, uint Level, RpcPointer<SERVER_INFO> ServerInfo, RpcPointer<uint> ParmErr, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerDiskEnum(string ServerName, uint Level, RpcPointer<DISK_ENUM_CONTAINER> DiskInfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerStatisticsGet(string ServerName, string Service, uint Level, uint Options, RpcPointer<RpcPointer<STAT_SERVER_0>> InfoStruct, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerTransportAdd(string ServerName, uint Level, RpcPointer<SERVER_TRANSPORT_INFO_0> Buffer, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerTransportEnum(string ServerName, RpcPointer<SERVER_XPORT_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerTransportDel(string ServerName, uint Level, RpcPointer<SERVER_TRANSPORT_INFO_0> Buffer, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrRemoteTOD(string ServerName, RpcPointer<RpcPointer<TIME_OF_DAY_INFO>> BufferPtr, System.Threading.CancellationToken cancellationToken);
-		Task Opnum29NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetprPathType(string ServerName, string PathName, RpcPointer<uint> PathType, uint Flags, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetprPathCanonicalize(string ServerName, string PathName, RpcPointer<byte[]> Outbuf, uint OutbufLen, string Prefix, RpcPointer<uint> PathType, uint Flags, System.Threading.CancellationToken cancellationToken);
-		Task<int> NetprPathCompare(string ServerName, string PathName1, string PathName2, uint PathType, uint Flags, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetprNameValidate(string ServerName, string Name, uint NameType, uint Flags, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetprNameCanonicalize(string ServerName, string Name, RpcPointer<char[]> Outbuf, uint OutbufLen, uint NameType, uint Flags, System.Threading.CancellationToken cancellationToken);
-		Task<int> NetprNameCompare(string ServerName, string Name1, string Name2, uint NameType, uint Flags, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareEnumSticky(string ServerName, RpcPointer<SHARE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareDelStart(string ServerName, string NetName, uint Reserved, RpcPointer<Titanis.DceRpc.RpcContextHandle> ContextHandle, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareDelCommit(RpcPointer<Titanis.DceRpc.RpcContextHandle> ContextHandle, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrpGetFileSecurity(string ServerName, string ShareName, string lpFileName, uint RequestedInformation, RpcPointer<RpcPointer<ADT_SECURITY_DESCRIPTOR>> SecurityDescriptor, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrpSetFileSecurity(string ServerName, string ShareName, string lpFileName, uint SecurityInformation, RpcPointer<ADT_SECURITY_DESCRIPTOR> SecurityDescriptor, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerTransportAddEx(string ServerName, uint Level, RpcPointer<TRANSPORT_INFO> Buffer, System.Threading.CancellationToken cancellationToken);
-		Task Opnum42NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrDfsGetVersion(string ServerName, RpcPointer<uint> Version, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrDfsCreateLocalPartition(string ServerName, string ShareName, RpcPointer<System.Guid> EntryUid, string EntryPrefix, string ShortName, RpcPointer<NET_DFS_ENTRY_ID_CONTAINER> RelationInfo, int Force, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrDfsDeleteLocalPartition(string ServerName, RpcPointer<System.Guid> Uid, string Prefix, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrDfsSetLocalVolumeState(string ServerName, RpcPointer<System.Guid> Uid, string Prefix, uint State, System.Threading.CancellationToken cancellationToken);
-		Task Opnum47NotUsedOnWire(System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrDfsCreateExitPoint(string ServerName, RpcPointer<System.Guid> Uid, string Prefix, uint Type, uint ShortPrefixLen, RpcPointer<char[]> ShortPrefix, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrDfsDeleteExitPoint(string ServerName, RpcPointer<System.Guid> Uid, string Prefix, uint Type, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrDfsModifyPrefix(string ServerName, RpcPointer<System.Guid> Uid, string Prefix, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrDfsFixLocalVolume(string ServerName, string VolumeName, uint EntryType, uint ServiceType, string StgId, RpcPointer<System.Guid> EntryUid, string EntryPrefix, RpcPointer<NET_DFS_ENTRY_ID_CONTAINER> RelationInfo, uint CreateDisposition, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrDfsManagerReportSiteInfo(string ServerName, RpcPointer<RpcPointer<DFS_SITELIST_INFO>> ppSiteInfo, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerTransportDelEx(string ServerName, uint Level, RpcPointer<TRANSPORT_INFO> Buffer, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerAliasAdd(string ServerName, uint Level, RpcPointer<SERVER_ALIAS_INFO> InfoStruct, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerAliasEnum(string ServerName, RpcPointer<SERVER_ALIAS_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrServerAliasDel(string ServerName, uint Level, RpcPointer<SERVER_ALIAS_INFO> InfoStruct, System.Threading.CancellationToken cancellationToken);
-		Task<uint> NetrShareDelEx(string ServerName, uint Level, RpcPointer<SHARE_INFO> ShareInfo, System.Threading.CancellationToken cancellationToken);
-	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	[Titanis.DceRpc.IidAttribute("4b324fc8-1670-01d3-1278-5a47bf6ee188")]
-	public class srvsvcClientProxy : Titanis.DceRpc.Client.RpcClientProxy, srvsvc, Titanis.DceRpc.IRpcClientProxy
-	{
-		/// <inheritdoc/>
-		public override Type InterfaceType => typeof(srvsvc);
-		private static System.Guid _interfaceUuid = new System.Guid("4b324fc8-1670-01d3-1278-5a47bf6ee188");
-		public override System.Guid InterfaceUuid
+		public void Encode(IRpcEncoder encoder)
 		{
-			get
+			encoder.AlignUnionTag(NdrAlignment.NativePtr);
+			encoder.WriteValue(this.unionSwitch);
+			switch ((uint)this.unionSwitch)
 			{
-				return _interfaceUuid;
+				case 0U:
+					encoder.WriteUniquePointer(this.ServerAliasInfo0);
+					break;
 			}
 		}
-		public override Titanis.DceRpc.RpcVersion InterfaceVersion
+
+		public void Decode(IRpcDecoder decoder)
 		{
-			get
+			decoder.AlignUnionTag(NdrAlignment.NativePtr);
+			this.unionSwitch = decoder.ReadUInt32();
+			switch ((uint)this.unionSwitch)
 			{
-				return new Titanis.DceRpc.RpcVersion(3, 0);
+				case 0U:
+					this.ServerAliasInfo0 = decoder.ReadUniquePointer<SERVER_ALIAS_INFO_0>();
+					break;
 			}
 		}
-		public virtual async Task Opnum0NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		public void EncodeDeferrals(IRpcEncoder encoder)
+		{
+			switch ((uint)this.unionSwitch)
+			{
+				case 0U:
+					if (this.ServerAliasInfo0 is not null)
+					{
+						encoder.WriteFixedStruct(this.ServerAliasInfo0.value, NdrAlignment.NativePtr);
+						encoder.WriteStructDeferral(this.ServerAliasInfo0.value);
+					}
+
+					break;
+			}
+		}
+
+		public void DecodeDeferrals(IRpcDecoder decoder)
+		{
+			switch ((uint)this.unionSwitch)
+			{
+				case 0U:
+					if (this.ServerAliasInfo0 is not null)
+					{
+						this.ServerAliasInfo0.value = decoder.ReadFixedStruct<SERVER_ALIAS_INFO_0>(NdrAlignment.NativePtr);
+						decoder.ReadStructDeferral<SERVER_ALIAS_INFO_0>(ref this.ServerAliasInfo0.value);
+					}
+
+					break;
+			}
+		}
+	}
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), GuidAttribute("4b324fc8-1670-01d3-1278-5a47bf6ee188"), RpcVersionAttribute(3, 0)]
+	public partial interface srvsvc
+	{
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum0NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum1NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum2NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum3NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum4NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum5NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum6NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum7NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrConnectionEnum(string ServerName, string Qualifier, RpcPointer<CONNECT_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrFileEnum(string ServerName, string BasePath, string UserName, RpcPointer<FILE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrFileGetInfo(string ServerName, uint FileId, uint Level, RpcPointer<FILE_INFO> InfoStruct, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrFileClose(string ServerName, uint FileId, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrSessionEnum(string ServerName, string ClientName, string UserName, RpcPointer<SESSION_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrSessionDel(string ServerName, string ClientName, string UserName, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareAdd(string ServerName, uint Level, SHARE_INFO InfoStruct, RpcPointer<uint> ParmErr, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareEnum(string ServerName, RpcPointer<SHARE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareGetInfo(string ServerName, string NetName, uint Level, RpcPointer<SHARE_INFO> InfoStruct, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareSetInfo(string ServerName, string NetName, uint Level, SHARE_INFO ShareInfo, RpcPointer<uint> ParmErr, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareDel(string ServerName, string NetName, uint Reserved, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareDelSticky(string ServerName, string NetName, uint Reserved, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareCheck(string ServerName, string Device, RpcPointer<uint> Type, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerGetInfo(string ServerName, uint Level, RpcPointer<SERVER_INFO> InfoStruct, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerSetInfo(string ServerName, uint Level, SERVER_INFO ServerInfo, RpcPointer<uint> ParmErr, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerDiskEnum(string ServerName, uint Level, RpcPointer<DISK_ENUM_CONTAINER> DiskInfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerStatisticsGet(string ServerName, string Service, uint Level, uint Options, RpcPointer<RpcPointer<STAT_SERVER_0>> InfoStruct, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerTransportAdd(string ServerName, uint Level, SERVER_TRANSPORT_INFO_0 Buffer, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerTransportEnum(string ServerName, RpcPointer<SERVER_XPORT_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerTransportDel(string ServerName, uint Level, SERVER_TRANSPORT_INFO_0 Buffer, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrRemoteTOD(string ServerName, RpcPointer<RpcPointer<TIME_OF_DAY_INFO>> BufferPtr, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum29NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetprPathType(string ServerName, string PathName, RpcPointer<uint> PathType, uint Flags, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetprPathCanonicalize(string ServerName, string PathName, RpcPointer<byte[]> Outbuf, uint OutbufLen, string Prefix, RpcPointer<uint> PathType, uint Flags, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<int> NetprPathCompare(string ServerName, string PathName1, string PathName2, uint PathType, uint Flags, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetprNameValidate(string ServerName, string Name, uint NameType, uint Flags, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetprNameCanonicalize(string ServerName, string Name, RpcPointer<char[]> Outbuf, uint OutbufLen, uint NameType, uint Flags, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<int> NetprNameCompare(string ServerName, string Name1, string Name2, uint NameType, uint Flags, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareEnumSticky(string ServerName, RpcPointer<SHARE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareDelStart(string ServerName, string NetName, uint Reserved, RpcPointer<RpcContextHandle> ContextHandle, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareDelCommit(RpcPointer<RpcContextHandle> ContextHandle, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrpGetFileSecurity(string ServerName, string ShareName, string lpFileName, uint RequestedInformation, RpcPointer<RpcPointer<ADT_SECURITY_DESCRIPTOR>> SecurityDescriptor, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrpSetFileSecurity(string ServerName, string ShareName, string lpFileName, uint SecurityInformation, ADT_SECURITY_DESCRIPTOR SecurityDescriptor, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerTransportAddEx(string ServerName, uint Level, TRANSPORT_INFO Buffer, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum42NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrDfsGetVersion(string ServerName, RpcPointer<uint> Version, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrDfsCreateLocalPartition(string ServerName, string ShareName, Guid EntryUid, string EntryPrefix, string ShortName, NET_DFS_ENTRY_ID_CONTAINER RelationInfo, int Force, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrDfsDeleteLocalPartition(string ServerName, Guid Uid, string Prefix, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrDfsSetLocalVolumeState(string ServerName, Guid Uid, string Prefix, uint State, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task Opnum47NotUsedOnWire(CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrDfsCreateExitPoint(string ServerName, Guid Uid, string Prefix, uint Type, uint ShortPrefixLen, RpcPointer<char[]> ShortPrefix, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrDfsDeleteExitPoint(string ServerName, Guid Uid, string Prefix, uint Type, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrDfsModifyPrefix(string ServerName, Guid Uid, string Prefix, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrDfsFixLocalVolume(string ServerName, string VolumeName, uint EntryType, uint ServiceType, string StgId, Guid EntryUid, string EntryPrefix, NET_DFS_ENTRY_ID_CONTAINER RelationInfo, uint CreateDisposition, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrDfsManagerReportSiteInfo(string ServerName, RpcPointer<RpcPointer<DFS_SITELIST_INFO>> ppSiteInfo, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerTransportDelEx(string ServerName, uint Level, TRANSPORT_INFO Buffer, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerAliasAdd(string ServerName, uint Level, SERVER_ALIAS_INFO InfoStruct, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerAliasEnum(string ServerName, RpcPointer<SERVER_ALIAS_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrServerAliasDel(string ServerName, uint Level, SERVER_ALIAS_INFO InfoStruct, CancellationToken cancellationToken);
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		Task<uint> NetrShareDelEx(string ServerName, uint Level, SHARE_INFO ShareInfo, CancellationToken cancellationToken);
+	}
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), IidAttribute("4b324fc8-1670-01d3-1278-5a47bf6ee188")]
+	public partial class srvsvcClientProxy : Titanis.DceRpc.Client.RpcClientProxy, srvsvc, Titanis.DceRpc.IRpcClientProxy
+	{
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum0NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(0);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task Opnum1NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum1NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(1);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task Opnum2NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum2NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(2);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task Opnum3NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum3NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(3);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task Opnum4NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum4NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(4);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task Opnum5NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum5NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(5);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task Opnum6NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum6NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(6);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task Opnum7NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum7NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(7);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task<uint> NetrConnectionEnum(string ServerName, string Qualifier, RpcPointer<CONNECT_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrConnectionEnum(string ServerName, string Qualifier, RpcPointer<CONNECT_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(8);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteUniqueReferentId((Qualifier == null));
-			if ((Qualifier != null))
-			{
+			encoder.WriteUniqueReferentId(Qualifier is null);
+			if (Qualifier is not null)
 				encoder.WriteWideCharString(Qualifier);
-			}
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(PreferedMaximumLength);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			InfoStruct.value = decoder.ReadFixedStruct<CONNECT_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			InfoStruct.value = decoder.ReadFixedStruct<CONNECT_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<CONNECT_ENUM_STRUCT>(ref InfoStruct.value);
 			TotalEntries.value = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadOutPointer<uint>(ResumeHandle);
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadOutUniquePointer<uint>(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrFileEnum(string ServerName, string BasePath, string UserName, RpcPointer<FILE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrFileEnum(string ServerName, string BasePath, string UserName, RpcPointer<FILE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(9);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteUniqueReferentId((BasePath == null));
-			if ((BasePath != null))
-			{
+			encoder.WriteUniqueReferentId(BasePath is null);
+			if (BasePath is not null)
 				encoder.WriteWideCharString(BasePath);
-			}
-			encoder.WriteUniqueReferentId((UserName == null));
-			if ((UserName != null))
-			{
+			encoder.WriteUniqueReferentId(UserName is null);
+			if (UserName is not null)
 				encoder.WriteWideCharString(UserName);
-			}
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(PreferedMaximumLength);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			InfoStruct.value = decoder.ReadFixedStruct<FILE_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			InfoStruct.value = decoder.ReadFixedStruct<FILE_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<FILE_ENUM_STRUCT>(ref InfoStruct.value);
 			TotalEntries.value = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadOutPointer<uint>(ResumeHandle);
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadOutUniquePointer<uint>(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrFileGetInfo(string ServerName, uint FileId, uint Level, RpcPointer<FILE_INFO> InfoStruct, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrFileGetInfo(string ServerName, uint FileId, uint Level, RpcPointer<FILE_INFO> InfoStruct, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(10);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(FileId);
 			encoder.WriteValue(Level);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			InfoStruct.value = decoder.ReadUnion<FILE_INFO>();
 			decoder.ReadStructDeferral<FILE_INFO>(ref InfoStruct.value);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrFileClose(string ServerName, uint FileId, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrFileClose(string ServerName, uint FileId, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(11);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(FileId);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrSessionEnum(string ServerName, string ClientName, string UserName, RpcPointer<SESSION_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrSessionEnum(string ServerName, string ClientName, string UserName, RpcPointer<SESSION_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(12);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteUniqueReferentId((ClientName == null));
-			if ((ClientName != null))
-			{
+			encoder.WriteUniqueReferentId(ClientName is null);
+			if (ClientName is not null)
 				encoder.WriteWideCharString(ClientName);
-			}
-			encoder.WriteUniqueReferentId((UserName == null));
-			if ((UserName != null))
-			{
+			encoder.WriteUniqueReferentId(UserName is null);
+			if (UserName is not null)
 				encoder.WriteWideCharString(UserName);
-			}
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(PreferedMaximumLength);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			InfoStruct.value = decoder.ReadFixedStruct<SESSION_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			InfoStruct.value = decoder.ReadFixedStruct<SESSION_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<SESSION_ENUM_STRUCT>(ref InfoStruct.value);
 			TotalEntries.value = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadOutPointer<uint>(ResumeHandle);
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadOutUniquePointer<uint>(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrSessionDel(string ServerName, string ClientName, string UserName, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrSessionDel(string ServerName, string ClientName, string UserName, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(13);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteUniqueReferentId((ClientName == null));
-			if ((ClientName != null))
-			{
+			encoder.WriteUniqueReferentId(ClientName is null);
+			if (ClientName is not null)
 				encoder.WriteWideCharString(ClientName);
-			}
-			encoder.WriteUniqueReferentId((UserName == null));
-			if ((UserName != null))
-			{
+			encoder.WriteUniqueReferentId(UserName is null);
+			if (UserName is not null)
 				encoder.WriteWideCharString(UserName);
-			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareAdd(string ServerName, uint Level, RpcPointer<SHARE_INFO> InfoStruct, RpcPointer<uint> ParmErr, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareAdd(string ServerName, uint Level, SHARE_INFO InfoStruct, RpcPointer<uint> ParmErr, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(14);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			encoder.WriteUnion(InfoStruct.value);
-			encoder.WriteStructDeferral(InfoStruct.value);
-			encoder.WritePointer(ParmErr);
-			if ((null != ParmErr))
+			encoder.WriteUnion(InfoStruct);
+			encoder.WriteStructDeferral(InfoStruct);
+			encoder.WriteUniquePointer(ParmErr);
+			if (ParmErr is not null)
 			{
 				encoder.WriteValue(ParmErr.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			ParmErr = decoder.ReadOutPointer<uint>(ParmErr);
-			if ((null != ParmErr))
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			ParmErr = decoder.ReadOutUniquePointer<uint>(ParmErr);
+			if (ParmErr is not null)
 			{
 				ParmErr.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareEnum(string ServerName, RpcPointer<SHARE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareEnum(string ServerName, RpcPointer<SHARE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(15);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(PreferedMaximumLength);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			InfoStruct.value = decoder.ReadFixedStruct<SHARE_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			InfoStruct.value = decoder.ReadFixedStruct<SHARE_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<SHARE_ENUM_STRUCT>(ref InfoStruct.value);
 			TotalEntries.value = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadOutPointer<uint>(ResumeHandle);
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadOutUniquePointer<uint>(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareGetInfo(string ServerName, string NetName, uint Level, RpcPointer<SHARE_INFO> InfoStruct, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareGetInfo(string ServerName, string NetName, uint Level, RpcPointer<SHARE_INFO> InfoStruct, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(16);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(NetName);
 			encoder.WriteValue(Level);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			InfoStruct.value = decoder.ReadUnion<SHARE_INFO>();
 			decoder.ReadStructDeferral<SHARE_INFO>(ref InfoStruct.value);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareSetInfo(string ServerName, string NetName, uint Level, RpcPointer<SHARE_INFO> ShareInfo, RpcPointer<uint> ParmErr, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareSetInfo(string ServerName, string NetName, uint Level, SHARE_INFO ShareInfo, RpcPointer<uint> ParmErr, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(17);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(NetName);
 			encoder.WriteValue(Level);
-			encoder.WriteUnion(ShareInfo.value);
-			encoder.WriteStructDeferral(ShareInfo.value);
-			encoder.WritePointer(ParmErr);
-			if ((null != ParmErr))
+			encoder.WriteUnion(ShareInfo);
+			encoder.WriteStructDeferral(ShareInfo);
+			encoder.WriteUniquePointer(ParmErr);
+			if (ParmErr is not null)
 			{
 				encoder.WriteValue(ParmErr.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			ParmErr = decoder.ReadOutPointer<uint>(ParmErr);
-			if ((null != ParmErr))
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			ParmErr = decoder.ReadOutUniquePointer<uint>(ParmErr);
+			if (ParmErr is not null)
 			{
 				ParmErr.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareDel(string ServerName, string NetName, uint Reserved, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareDel(string ServerName, string NetName, uint Reserved, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(18);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(NetName);
 			encoder.WriteValue(Reserved);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareDelSticky(string ServerName, string NetName, uint Reserved, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareDelSticky(string ServerName, string NetName, uint Reserved, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(19);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(NetName);
 			encoder.WriteValue(Reserved);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareCheck(string ServerName, string Device, RpcPointer<uint> Type, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareCheck(string ServerName, string Device, RpcPointer<uint> Type, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(20);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(Device);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			Type.value = decoder.ReadUInt32();
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerGetInfo(string ServerName, uint Level, RpcPointer<SERVER_INFO> InfoStruct, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerGetInfo(string ServerName, uint Level, RpcPointer<SERVER_INFO> InfoStruct, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(21);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			InfoStruct.value = decoder.ReadUnion<SERVER_INFO>();
 			decoder.ReadStructDeferral<SERVER_INFO>(ref InfoStruct.value);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerSetInfo(string ServerName, uint Level, RpcPointer<SERVER_INFO> ServerInfo, RpcPointer<uint> ParmErr, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerSetInfo(string ServerName, uint Level, SERVER_INFO ServerInfo, RpcPointer<uint> ParmErr, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(22);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			encoder.WriteUnion(ServerInfo.value);
-			encoder.WriteStructDeferral(ServerInfo.value);
-			encoder.WritePointer(ParmErr);
-			if ((null != ParmErr))
+			encoder.WriteUnion(ServerInfo);
+			encoder.WriteStructDeferral(ServerInfo);
+			encoder.WriteUniquePointer(ParmErr);
+			if (ParmErr is not null)
 			{
 				encoder.WriteValue(ParmErr.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			ParmErr = decoder.ReadOutPointer<uint>(ParmErr);
-			if ((null != ParmErr))
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			ParmErr = decoder.ReadOutUniquePointer<uint>(ParmErr);
+			if (ParmErr is not null)
 			{
 				ParmErr.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerDiskEnum(string ServerName, uint Level, RpcPointer<DISK_ENUM_CONTAINER> DiskInfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerDiskEnum(string ServerName, uint Level, RpcPointer<DISK_ENUM_CONTAINER> DiskInfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(23);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			encoder.WriteFixedStruct(DiskInfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(DiskInfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(DiskInfoStruct.value);
 			encoder.WriteValue(PreferedMaximumLength);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			DiskInfoStruct.value = decoder.ReadFixedStruct<DISK_ENUM_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			DiskInfoStruct.value = decoder.ReadFixedStruct<DISK_ENUM_CONTAINER>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<DISK_ENUM_CONTAINER>(ref DiskInfoStruct.value);
 			TotalEntries.value = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadOutPointer<uint>(ResumeHandle);
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadOutUniquePointer<uint>(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerStatisticsGet(string ServerName, string Service, uint Level, uint Options, RpcPointer<RpcPointer<STAT_SERVER_0>> InfoStruct, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerStatisticsGet(string ServerName, string Service, uint Level, uint Options, RpcPointer<RpcPointer<STAT_SERVER_0>> InfoStruct, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(24);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteUniqueReferentId((Service == null));
-			if ((Service != null))
-			{
+			encoder.WriteUniqueReferentId(Service is null);
+			if (Service is not null)
 				encoder.WriteWideCharString(Service);
-			}
 			encoder.WriteValue(Level);
 			encoder.WriteValue(Options);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			InfoStruct.value = decoder.ReadOutPointer<STAT_SERVER_0>(InfoStruct.value);
-			if ((null != InfoStruct.value))
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			InfoStruct.value = decoder.ReadOutUniquePointer<STAT_SERVER_0>(InfoStruct.value);
+			if (InfoStruct.value is not null)
 			{
-				InfoStruct.value.value = decoder.ReadFixedStruct<STAT_SERVER_0>(Titanis.DceRpc.NdrAlignment._4Byte);
+				InfoStruct.value.value = decoder.ReadFixedStruct<STAT_SERVER_0>(NdrAlignment._4Byte);
 				decoder.ReadStructDeferral<STAT_SERVER_0>(ref InfoStruct.value.value);
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerTransportAdd(string ServerName, uint Level, RpcPointer<SERVER_TRANSPORT_INFO_0> Buffer, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerTransportAdd(string ServerName, uint Level, SERVER_TRANSPORT_INFO_0 Buffer, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(25);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			encoder.WriteFixedStruct(Buffer.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-			encoder.WriteStructDeferral(Buffer.value);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			encoder.WriteFixedStruct(Buffer, NdrAlignment.NativePtr);
+			encoder.WriteStructDeferral(Buffer);
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerTransportEnum(string ServerName, RpcPointer<SERVER_XPORT_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerTransportEnum(string ServerName, RpcPointer<SERVER_XPORT_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(26);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(PreferedMaximumLength);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			InfoStruct.value = decoder.ReadFixedStruct<SERVER_XPORT_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			InfoStruct.value = decoder.ReadFixedStruct<SERVER_XPORT_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<SERVER_XPORT_ENUM_STRUCT>(ref InfoStruct.value);
 			TotalEntries.value = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadOutPointer<uint>(ResumeHandle);
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadOutUniquePointer<uint>(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerTransportDel(string ServerName, uint Level, RpcPointer<SERVER_TRANSPORT_INFO_0> Buffer, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerTransportDel(string ServerName, uint Level, SERVER_TRANSPORT_INFO_0 Buffer, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(27);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			encoder.WriteFixedStruct(Buffer.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-			encoder.WriteStructDeferral(Buffer.value);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			encoder.WriteFixedStruct(Buffer, NdrAlignment.NativePtr);
+			encoder.WriteStructDeferral(Buffer);
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrRemoteTOD(string ServerName, RpcPointer<RpcPointer<TIME_OF_DAY_INFO>> BufferPtr, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrRemoteTOD(string ServerName, RpcPointer<RpcPointer<TIME_OF_DAY_INFO>> BufferPtr, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(28);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			BufferPtr.value = decoder.ReadOutPointer<TIME_OF_DAY_INFO>(BufferPtr.value);
-			if ((null != BufferPtr.value))
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			BufferPtr.value = decoder.ReadOutUniquePointer<TIME_OF_DAY_INFO>(BufferPtr.value);
+			if (BufferPtr.value is not null)
 			{
-				BufferPtr.value.value = decoder.ReadFixedStruct<TIME_OF_DAY_INFO>(Titanis.DceRpc.NdrAlignment._4Byte);
+				BufferPtr.value.value = decoder.ReadFixedStruct<TIME_OF_DAY_INFO>(NdrAlignment._4Byte);
 				decoder.ReadStructDeferral<TIME_OF_DAY_INFO>(ref BufferPtr.value.value);
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task Opnum29NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum29NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(29);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task<uint> NetprPathType(string ServerName, string PathName, RpcPointer<uint> PathType, uint Flags, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetprPathType(string ServerName, string PathName, RpcPointer<uint> PathType, uint Flags, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(30);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(PathName);
 			encoder.WriteValue(Flags);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			PathType.value = decoder.ReadUInt32();
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetprPathCanonicalize(string ServerName, string PathName, RpcPointer<byte[]> Outbuf, uint OutbufLen, string Prefix, RpcPointer<uint> PathType, uint Flags, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetprPathCanonicalize(string ServerName, string PathName, RpcPointer<byte[]> Outbuf, uint OutbufLen, string Prefix, RpcPointer<uint> PathType, uint Flags, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(31);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(PathName);
 			encoder.WriteValue(OutbufLen);
 			encoder.WriteWideCharString(Prefix);
 			encoder.WriteValue(PathType.value);
 			encoder.WriteValue(Flags);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			Outbuf.value = decoder.ReadArrayHeader<byte>();
-			for (int i = 0; (i < Outbuf.value.Length); i++
-			)
+			for (int i = 0; i < Outbuf.value.Length; i++)
 			{
 				byte elem_0 = Outbuf.value[i];
 				elem_0 = decoder.ReadUnsignedChar();
 				Outbuf.value[i] = elem_0;
 			}
+
 			PathType.value = decoder.ReadUInt32();
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<int> NetprPathCompare(string ServerName, string PathName1, string PathName2, uint PathType, uint Flags, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<int> NetprPathCompare(string ServerName, string PathName1, string PathName2, uint PathType, uint Flags, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(32);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(PathName1);
 			encoder.WriteWideCharString(PathName2);
 			encoder.WriteValue(PathType);
 			encoder.WriteValue(Flags);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			int retval;
 			retval = decoder.ReadInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetprNameValidate(string ServerName, string Name, uint NameType, uint Flags, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetprNameValidate(string ServerName, string Name, uint NameType, uint Flags, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(33);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(Name);
 			encoder.WriteValue(NameType);
 			encoder.WriteValue(Flags);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetprNameCanonicalize(string ServerName, string Name, RpcPointer<char[]> Outbuf, uint OutbufLen, uint NameType, uint Flags, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetprNameCanonicalize(string ServerName, string Name, RpcPointer<char[]> Outbuf, uint OutbufLen, uint NameType, uint Flags, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(34);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(Name);
 			encoder.WriteValue(OutbufLen);
 			encoder.WriteValue(NameType);
 			encoder.WriteValue(Flags);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			Outbuf.value = decoder.ReadArrayHeader<char>();
-			for (int i = 0; (i < Outbuf.value.Length); i++
-			)
+			for (int i = 0; i < Outbuf.value.Length; i++)
 			{
 				char elem_0 = Outbuf.value[i];
 				elem_0 = decoder.ReadWideChar();
 				Outbuf.value[i] = elem_0;
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<int> NetprNameCompare(string ServerName, string Name1, string Name2, uint NameType, uint Flags, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<int> NetprNameCompare(string ServerName, string Name1, string Name2, uint NameType, uint Flags, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(35);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(Name1);
 			encoder.WriteWideCharString(Name2);
 			encoder.WriteValue(NameType);
 			encoder.WriteValue(Flags);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			int retval;
 			retval = decoder.ReadInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareEnumSticky(string ServerName, RpcPointer<SHARE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareEnumSticky(string ServerName, RpcPointer<SHARE_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(36);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(PreferedMaximumLength);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			InfoStruct.value = decoder.ReadFixedStruct<SHARE_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			InfoStruct.value = decoder.ReadFixedStruct<SHARE_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<SHARE_ENUM_STRUCT>(ref InfoStruct.value);
 			TotalEntries.value = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadOutPointer<uint>(ResumeHandle);
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadOutUniquePointer<uint>(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareDelStart(string ServerName, string NetName, uint Reserved, RpcPointer<Titanis.DceRpc.RpcContextHandle> ContextHandle, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareDelStart(string ServerName, string NetName, uint Reserved, RpcPointer<RpcContextHandle> ContextHandle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(37);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(NetName);
 			encoder.WriteValue(Reserved);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			ContextHandle.value = decoder.ReadContextHandle();
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareDelCommit(RpcPointer<Titanis.DceRpc.RpcContextHandle> ContextHandle, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareDelCommit(RpcPointer<RpcContextHandle> ContextHandle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(38);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
+			IRpcEncoder encoder = req.StubData;
 			encoder.WriteContextHandle(ContextHandle.value);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			ContextHandle.value = decoder.ReadContextHandle();
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrpGetFileSecurity(string ServerName, string ShareName, string lpFileName, uint RequestedInformation, RpcPointer<RpcPointer<ADT_SECURITY_DESCRIPTOR>> SecurityDescriptor, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrpGetFileSecurity(string ServerName, string ShareName, string lpFileName, uint RequestedInformation, RpcPointer<RpcPointer<ADT_SECURITY_DESCRIPTOR>> SecurityDescriptor, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(39);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteUniqueReferentId((ShareName == null));
-			if ((ShareName != null))
-			{
+			encoder.WriteUniqueReferentId(ShareName is null);
+			if (ShareName is not null)
 				encoder.WriteWideCharString(ShareName);
-			}
 			encoder.WriteWideCharString(lpFileName);
 			encoder.WriteValue(RequestedInformation);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			SecurityDescriptor.value = decoder.ReadOutPointer<ADT_SECURITY_DESCRIPTOR>(SecurityDescriptor.value);
-			if ((null != SecurityDescriptor.value))
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			SecurityDescriptor.value = decoder.ReadOutUniquePointer<ADT_SECURITY_DESCRIPTOR>(SecurityDescriptor.value);
+			if (SecurityDescriptor.value is not null)
 			{
-				SecurityDescriptor.value.value = decoder.ReadFixedStruct<ADT_SECURITY_DESCRIPTOR>(Titanis.DceRpc.NdrAlignment.NativePtr);
+				SecurityDescriptor.value.value = decoder.ReadFixedStruct<ADT_SECURITY_DESCRIPTOR>(NdrAlignment.NativePtr);
 				decoder.ReadStructDeferral<ADT_SECURITY_DESCRIPTOR>(ref SecurityDescriptor.value.value);
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrpSetFileSecurity(string ServerName, string ShareName, string lpFileName, uint SecurityInformation, RpcPointer<ADT_SECURITY_DESCRIPTOR> SecurityDescriptor, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrpSetFileSecurity(string ServerName, string ShareName, string lpFileName, uint SecurityInformation, ADT_SECURITY_DESCRIPTOR SecurityDescriptor, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(40);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteUniqueReferentId((ShareName == null));
-			if ((ShareName != null))
-			{
+			encoder.WriteUniqueReferentId(ShareName is null);
+			if (ShareName is not null)
 				encoder.WriteWideCharString(ShareName);
-			}
 			encoder.WriteWideCharString(lpFileName);
 			encoder.WriteValue(SecurityInformation);
-			encoder.WriteFixedStruct(SecurityDescriptor.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-			encoder.WriteStructDeferral(SecurityDescriptor.value);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			encoder.WriteFixedStruct(SecurityDescriptor, NdrAlignment.NativePtr);
+			encoder.WriteStructDeferral(SecurityDescriptor);
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerTransportAddEx(string ServerName, uint Level, RpcPointer<TRANSPORT_INFO> Buffer, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerTransportAddEx(string ServerName, uint Level, TRANSPORT_INFO Buffer, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(41);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			encoder.WriteUnion(Buffer.value);
-			encoder.WriteStructDeferral(Buffer.value);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			encoder.WriteUnion(Buffer);
+			encoder.WriteStructDeferral(Buffer);
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task Opnum42NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum42NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(42);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task<uint> NetrDfsGetVersion(string ServerName, RpcPointer<uint> Version, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrDfsGetVersion(string ServerName, RpcPointer<uint> Version, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(43);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			Version.value = decoder.ReadUInt32();
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrDfsCreateLocalPartition(string ServerName, string ShareName, RpcPointer<System.Guid> EntryUid, string EntryPrefix, string ShortName, RpcPointer<NET_DFS_ENTRY_ID_CONTAINER> RelationInfo, int Force, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrDfsCreateLocalPartition(string ServerName, string ShareName, Guid EntryUid, string EntryPrefix, string ShortName, NET_DFS_ENTRY_ID_CONTAINER RelationInfo, int Force, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(44);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(ShareName);
-			encoder.WriteValue(EntryUid.value);
+			encoder.WriteValue(EntryUid);
 			encoder.WriteWideCharString(EntryPrefix);
 			encoder.WriteWideCharString(ShortName);
-			encoder.WriteFixedStruct(RelationInfo.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-			encoder.WriteStructDeferral(RelationInfo.value);
+			encoder.WriteFixedStruct(RelationInfo, NdrAlignment.NativePtr);
+			encoder.WriteStructDeferral(RelationInfo);
 			encoder.WriteValue(Force);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrDfsDeleteLocalPartition(string ServerName, RpcPointer<System.Guid> Uid, string Prefix, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrDfsDeleteLocalPartition(string ServerName, Guid Uid, string Prefix, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(45);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteValue(Uid.value);
+			encoder.WriteValue(Uid);
 			encoder.WriteWideCharString(Prefix);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrDfsSetLocalVolumeState(string ServerName, RpcPointer<System.Guid> Uid, string Prefix, uint State, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrDfsSetLocalVolumeState(string ServerName, Guid Uid, string Prefix, uint State, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(46);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteValue(Uid.value);
+			encoder.WriteValue(Uid);
 			encoder.WriteWideCharString(Prefix);
 			encoder.WriteValue(State);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task Opnum47NotUsedOnWire(System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Opnum47NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(47);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcEncoder encoder = req.StubData;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
-		public virtual async Task<uint> NetrDfsCreateExitPoint(string ServerName, RpcPointer<System.Guid> Uid, string Prefix, uint Type, uint ShortPrefixLen, RpcPointer<char[]> ShortPrefix, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrDfsCreateExitPoint(string ServerName, Guid Uid, string Prefix, uint Type, uint ShortPrefixLen, RpcPointer<char[]> ShortPrefix, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(48);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteValue(Uid.value);
+			encoder.WriteValue(Uid);
 			encoder.WriteWideCharString(Prefix);
 			encoder.WriteValue(Type);
 			encoder.WriteValue(ShortPrefixLen);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			ShortPrefix.value = decoder.ReadArrayHeader<char>();
-			for (int i = 0; (i < ShortPrefix.value.Length); i++
-			)
+			for (int i = 0; i < ShortPrefix.value.Length; i++)
 			{
 				char elem_0 = ShortPrefix.value[i];
 				elem_0 = decoder.ReadWideChar();
 				ShortPrefix.value[i] = elem_0;
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrDfsDeleteExitPoint(string ServerName, RpcPointer<System.Guid> Uid, string Prefix, uint Type, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrDfsDeleteExitPoint(string ServerName, Guid Uid, string Prefix, uint Type, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(49);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteValue(Uid.value);
+			encoder.WriteValue(Uid);
 			encoder.WriteWideCharString(Prefix);
 			encoder.WriteValue(Type);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrDfsModifyPrefix(string ServerName, RpcPointer<System.Guid> Uid, string Prefix, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrDfsModifyPrefix(string ServerName, Guid Uid, string Prefix, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(50);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteValue(Uid.value);
+			encoder.WriteValue(Uid);
 			encoder.WriteWideCharString(Prefix);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrDfsFixLocalVolume(string ServerName, string VolumeName, uint EntryType, uint ServiceType, string StgId, RpcPointer<System.Guid> EntryUid, string EntryPrefix, RpcPointer<NET_DFS_ENTRY_ID_CONTAINER> RelationInfo, uint CreateDisposition, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrDfsFixLocalVolume(string ServerName, string VolumeName, uint EntryType, uint ServiceType, string StgId, Guid EntryUid, string EntryPrefix, NET_DFS_ENTRY_ID_CONTAINER RelationInfo, uint CreateDisposition, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(51);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteWideCharString(VolumeName);
 			encoder.WriteValue(EntryType);
 			encoder.WriteValue(ServiceType);
 			encoder.WriteWideCharString(StgId);
-			encoder.WriteValue(EntryUid.value);
+			encoder.WriteValue(EntryUid);
 			encoder.WriteWideCharString(EntryPrefix);
-			encoder.WriteFixedStruct(RelationInfo.value, Titanis.DceRpc.NdrAlignment.NativePtr);
-			encoder.WriteStructDeferral(RelationInfo.value);
+			encoder.WriteFixedStruct(RelationInfo, NdrAlignment.NativePtr);
+			encoder.WriteStructDeferral(RelationInfo);
 			encoder.WriteValue(CreateDisposition);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrDfsManagerReportSiteInfo(string ServerName, RpcPointer<RpcPointer<DFS_SITELIST_INFO>> ppSiteInfo, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrDfsManagerReportSiteInfo(string ServerName, RpcPointer<RpcPointer<DFS_SITELIST_INFO>> ppSiteInfo, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(52);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WritePointer(ppSiteInfo);
-			if ((null != ppSiteInfo))
+			encoder.WriteUniquePointer(ppSiteInfo);
+			if (ppSiteInfo is not null)
 			{
-				encoder.WritePointer(ppSiteInfo.value);
-				if ((null != ppSiteInfo.value))
+				encoder.WriteUniquePointer(ppSiteInfo.value);
+				if (ppSiteInfo.value is not null)
 				{
-					encoder.WriteConformantStruct(ppSiteInfo.value.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteConformantStruct(ppSiteInfo.value.value, NdrAlignment.NativePtr);
 					encoder.WriteStructDeferral(ppSiteInfo.value.value);
 				}
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			ppSiteInfo = decoder.ReadOutPointer<RpcPointer<DFS_SITELIST_INFO>>(ppSiteInfo);
-			if ((null != ppSiteInfo))
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			ppSiteInfo = decoder.ReadOutUniquePointer<RpcPointer<DFS_SITELIST_INFO>>(ppSiteInfo);
+			if (ppSiteInfo is not null)
 			{
-				ppSiteInfo.value = decoder.ReadPointer<DFS_SITELIST_INFO>();
-				if ((null != ppSiteInfo.value))
+				ppSiteInfo.value = decoder.ReadUniquePointer<DFS_SITELIST_INFO>();
+				if (ppSiteInfo.value is not null)
 				{
-					ppSiteInfo.value.value = decoder.ReadConformantStruct<DFS_SITELIST_INFO>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					ppSiteInfo.value.value = decoder.ReadConformantStruct<DFS_SITELIST_INFO>(NdrAlignment.NativePtr);
 					decoder.ReadStructDeferral<DFS_SITELIST_INFO>(ref ppSiteInfo.value.value);
 				}
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerTransportDelEx(string ServerName, uint Level, RpcPointer<TRANSPORT_INFO> Buffer, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerTransportDelEx(string ServerName, uint Level, TRANSPORT_INFO Buffer, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(53);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			encoder.WriteUnion(Buffer.value);
-			encoder.WriteStructDeferral(Buffer.value);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			encoder.WriteUnion(Buffer);
+			encoder.WriteStructDeferral(Buffer);
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerAliasAdd(string ServerName, uint Level, RpcPointer<SERVER_ALIAS_INFO> InfoStruct, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerAliasAdd(string ServerName, uint Level, SERVER_ALIAS_INFO InfoStruct, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(54);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			encoder.WriteUnion(InfoStruct.value);
-			encoder.WriteStructDeferral(InfoStruct.value);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			encoder.WriteUnion(InfoStruct);
+			encoder.WriteStructDeferral(InfoStruct);
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerAliasEnum(string ServerName, RpcPointer<SERVER_ALIAS_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerAliasEnum(string ServerName, RpcPointer<SERVER_ALIAS_ENUM_STRUCT> InfoStruct, uint PreferedMaximumLength, RpcPointer<uint> TotalEntries, RpcPointer<uint> ResumeHandle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(55);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(PreferedMaximumLength);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
-			InfoStruct.value = decoder.ReadFixedStruct<SERVER_ALIAS_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
+			InfoStruct.value = decoder.ReadFixedStruct<SERVER_ALIAS_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<SERVER_ALIAS_ENUM_STRUCT>(ref InfoStruct.value);
 			TotalEntries.value = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadOutPointer<uint>(ResumeHandle);
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadOutUniquePointer<uint>(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrServerAliasDel(string ServerName, uint Level, RpcPointer<SERVER_ALIAS_INFO> InfoStruct, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrServerAliasDel(string ServerName, uint Level, SERVER_ALIAS_INFO InfoStruct, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(56);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			encoder.WriteUnion(InfoStruct.value);
-			encoder.WriteStructDeferral(InfoStruct.value);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			encoder.WriteUnion(InfoStruct);
+			encoder.WriteStructDeferral(InfoStruct);
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
-		public virtual async Task<uint> NetrShareDelEx(string ServerName, uint Level, RpcPointer<SHARE_INFO> ShareInfo, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task<uint> NetrShareDelEx(string ServerName, uint Level, SHARE_INFO ShareInfo, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(57);
-			Titanis.DceRpc.IRpcEncoder encoder = req.StubData;
-			encoder.WriteUniqueReferentId((ServerName == null));
-			if ((ServerName != null))
-			{
+			IRpcEncoder encoder = req.StubData;
+			encoder.WriteUniqueReferentId(ServerName is null);
+			if (ServerName is not null)
 				encoder.WriteWideCharString(ServerName);
-			}
 			encoder.WriteValue(Level);
-			encoder.WriteUnion(ShareInfo.value);
-			encoder.WriteStructDeferral(ShareInfo.value);
-			var sendTask = this.SendRequestAsync(req, cancellationToken);
-			Titanis.DceRpc.IRpcDecoder decoder = await sendTask;
+			encoder.WriteUnion(ShareInfo);
+			encoder.WriteStructDeferral(ShareInfo);
+			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 			uint retval;
 			retval = decoder.ReadUInt32();
 			return retval;
 		}
+
+		public sealed override Type InterfaceType => typeof(srvsvc);
+		private static Guid _interfaceUuid = new Guid("4b324fc8-1670-01d3-1278-5a47bf6ee188");
+		public override Guid InterfaceUuid => _interfaceUuid;
+		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(3, 0);
 	}
-	[System.CodeDom.Compiler.GeneratedCodeAttribute("Animus IDL Compiler", "0.9.2")]
-	public class srvsvcStub : Titanis.DceRpc.Server.RpcServiceStub
+
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	public partial class srvsvcStub : Titanis.DceRpc.Server.RpcServiceStub
 	{
-		private static System.Guid _interfaceUuid = new System.Guid("4b324fc8-1670-01d3-1278-5a47bf6ee188");
-		public override System.Guid InterfaceUuid
-		{
-			get
-			{
-				return _interfaceUuid;
-			}
-		}
-		public override Titanis.DceRpc.RpcVersion InterfaceVersion
-		{
-			get
-			{
-				return new Titanis.DceRpc.RpcVersion(3, 0);
-			}
-		}
-		private Titanis.DceRpc.Server.OperationImplFunc[] _dispatchTable;
-		public override Titanis.DceRpc.Server.OperationImplFunc[] DispatchTable
-		{
-			get
-			{
-				return this._dispatchTable;
-			}
-		}
-		private srvsvc _obj;
-		public srvsvcStub(srvsvc obj)
-		{
-			this._obj = obj;
-			this._dispatchTable = new Titanis.DceRpc.Server.OperationImplFunc[] {
-					this.Invoke_Opnum0NotUsedOnWire,
-					this.Invoke_Opnum1NotUsedOnWire,
-					this.Invoke_Opnum2NotUsedOnWire,
-					this.Invoke_Opnum3NotUsedOnWire,
-					this.Invoke_Opnum4NotUsedOnWire,
-					this.Invoke_Opnum5NotUsedOnWire,
-					this.Invoke_Opnum6NotUsedOnWire,
-					this.Invoke_Opnum7NotUsedOnWire,
-					this.Invoke_NetrConnectionEnum,
-					this.Invoke_NetrFileEnum,
-					this.Invoke_NetrFileGetInfo,
-					this.Invoke_NetrFileClose,
-					this.Invoke_NetrSessionEnum,
-					this.Invoke_NetrSessionDel,
-					this.Invoke_NetrShareAdd,
-					this.Invoke_NetrShareEnum,
-					this.Invoke_NetrShareGetInfo,
-					this.Invoke_NetrShareSetInfo,
-					this.Invoke_NetrShareDel,
-					this.Invoke_NetrShareDelSticky,
-					this.Invoke_NetrShareCheck,
-					this.Invoke_NetrServerGetInfo,
-					this.Invoke_NetrServerSetInfo,
-					this.Invoke_NetrServerDiskEnum,
-					this.Invoke_NetrServerStatisticsGet,
-					this.Invoke_NetrServerTransportAdd,
-					this.Invoke_NetrServerTransportEnum,
-					this.Invoke_NetrServerTransportDel,
-					this.Invoke_NetrRemoteTOD,
-					this.Invoke_Opnum29NotUsedOnWire,
-					this.Invoke_NetprPathType,
-					this.Invoke_NetprPathCanonicalize,
-					this.Invoke_NetprPathCompare,
-					this.Invoke_NetprNameValidate,
-					this.Invoke_NetprNameCanonicalize,
-					this.Invoke_NetprNameCompare,
-					this.Invoke_NetrShareEnumSticky,
-					this.Invoke_NetrShareDelStart,
-					this.Invoke_NetrShareDelCommit,
-					this.Invoke_NetrpGetFileSecurity,
-					this.Invoke_NetrpSetFileSecurity,
-					this.Invoke_NetrServerTransportAddEx,
-					this.Invoke_Opnum42NotUsedOnWire,
-					this.Invoke_NetrDfsGetVersion,
-					this.Invoke_NetrDfsCreateLocalPartition,
-					this.Invoke_NetrDfsDeleteLocalPartition,
-					this.Invoke_NetrDfsSetLocalVolumeState,
-					this.Invoke_Opnum47NotUsedOnWire,
-					this.Invoke_NetrDfsCreateExitPoint,
-					this.Invoke_NetrDfsDeleteExitPoint,
-					this.Invoke_NetrDfsModifyPrefix,
-					this.Invoke_NetrDfsFixLocalVolume,
-					this.Invoke_NetrDfsManagerReportSiteInfo,
-					this.Invoke_NetrServerTransportDelEx,
-					this.Invoke_NetrServerAliasAdd,
-					this.Invoke_NetrServerAliasEnum,
-					this.Invoke_NetrServerAliasDel,
-					this.Invoke_NetrShareDelEx};
-		}
-		private async Task Invoke_Opnum0NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum0NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum0NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_Opnum1NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum1NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum1NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_Opnum2NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum2NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum2NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_Opnum3NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum3NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum3NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_Opnum4NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum4NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum4NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_Opnum5NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum5NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum5NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_Opnum6NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum6NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum6NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_Opnum7NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum7NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum7NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_NetrConnectionEnum(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrConnectionEnum(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string Qualifier;
@@ -9098,44 +8992,40 @@ namespace ms_srvs
 			uint PreferedMaximumLength;
 			RpcPointer<uint> TotalEntries = new RpcPointer<uint>();
 			RpcPointer<uint> ResumeHandle;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				Qualifier = null;
-			}
 			else
-			{
 				Qualifier = decoder.ReadWideCharString();
-			}
 			InfoStruct = new RpcPointer<CONNECT_ENUM_STRUCT>();
-			InfoStruct.value = decoder.ReadFixedStruct<CONNECT_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+			InfoStruct.value = decoder.ReadFixedStruct<CONNECT_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<CONNECT_ENUM_STRUCT>(ref InfoStruct.value);
 			PreferedMaximumLength = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadPointer<uint>();
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadUniquePointer<uint>();
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrConnectionEnum(ServerName, Qualifier, InfoStruct, PreferedMaximumLength, TotalEntries, ResumeHandle, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(TotalEntries.value);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrFileEnum(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrFileEnum(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string BasePath;
@@ -9144,65 +9034,53 @@ namespace ms_srvs
 			uint PreferedMaximumLength;
 			RpcPointer<uint> TotalEntries = new RpcPointer<uint>();
 			RpcPointer<uint> ResumeHandle;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				BasePath = null;
-			}
 			else
-			{
 				BasePath = decoder.ReadWideCharString();
-			}
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				UserName = null;
-			}
 			else
-			{
 				UserName = decoder.ReadWideCharString();
-			}
 			InfoStruct = new RpcPointer<FILE_ENUM_STRUCT>();
-			InfoStruct.value = decoder.ReadFixedStruct<FILE_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+			InfoStruct.value = decoder.ReadFixedStruct<FILE_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<FILE_ENUM_STRUCT>(ref InfoStruct.value);
 			PreferedMaximumLength = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadPointer<uint>();
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadUniquePointer<uint>();
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrFileEnum(ServerName, BasePath, UserName, InfoStruct, PreferedMaximumLength, TotalEntries, ResumeHandle, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(TotalEntries.value);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrFileGetInfo(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrFileGetInfo(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint FileId;
 			uint Level;
 			RpcPointer<FILE_INFO> InfoStruct = new RpcPointer<FILE_INFO>();
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			FileId = decoder.ReadUInt32();
 			Level = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrFileGetInfo(ServerName, FileId, Level, InfoStruct, cancellationToken);
@@ -9211,24 +9089,24 @@ namespace ms_srvs
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrFileClose(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrFileClose(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint FileId;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			FileId = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrFileClose(ServerName, FileId, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrSessionEnum(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrSessionEnum(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string ClientName;
@@ -9237,166 +9115,143 @@ namespace ms_srvs
 			uint PreferedMaximumLength;
 			RpcPointer<uint> TotalEntries = new RpcPointer<uint>();
 			RpcPointer<uint> ResumeHandle;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ClientName = null;
-			}
 			else
-			{
 				ClientName = decoder.ReadWideCharString();
-			}
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				UserName = null;
-			}
 			else
-			{
 				UserName = decoder.ReadWideCharString();
-			}
 			InfoStruct = new RpcPointer<SESSION_ENUM_STRUCT>();
-			InfoStruct.value = decoder.ReadFixedStruct<SESSION_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+			InfoStruct.value = decoder.ReadFixedStruct<SESSION_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<SESSION_ENUM_STRUCT>(ref InfoStruct.value);
 			PreferedMaximumLength = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadPointer<uint>();
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadUniquePointer<uint>();
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrSessionEnum(ServerName, ClientName, UserName, InfoStruct, PreferedMaximumLength, TotalEntries, ResumeHandle, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(TotalEntries.value);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrSessionDel(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrSessionDel(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string ClientName;
 			string UserName;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ClientName = null;
-			}
 			else
-			{
 				ClientName = decoder.ReadWideCharString();
-			}
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				UserName = null;
-			}
 			else
-			{
 				UserName = decoder.ReadWideCharString();
-			}
 			var invokeTask = this._obj.NetrSessionDel(ServerName, ClientName, UserName, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareAdd(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareAdd(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
-			RpcPointer<SHARE_INFO> InfoStruct;
+			SHARE_INFO InfoStruct;
 			RpcPointer<uint> ParmErr;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
-			InfoStruct = new RpcPointer<SHARE_INFO>();
-			InfoStruct.value = decoder.ReadUnion<SHARE_INFO>();
-			decoder.ReadStructDeferral<SHARE_INFO>(ref InfoStruct.value);
-			ParmErr = decoder.ReadPointer<uint>();
-			if ((null != ParmErr))
+			InfoStruct = decoder.ReadUnion<SHARE_INFO>();
+			decoder.ReadStructDeferral<SHARE_INFO>(ref InfoStruct);
+			ParmErr = decoder.ReadUniquePointer<uint>();
+			if (ParmErr is not null)
 			{
 				ParmErr.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrShareAdd(ServerName, Level, InfoStruct, ParmErr, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WritePointer(ParmErr);
-			if ((null != ParmErr))
+			encoder.WriteUniquePointer(ParmErr);
+			if (ParmErr is not null)
 			{
 				encoder.WriteValue(ParmErr.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareEnum(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareEnum(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			RpcPointer<SHARE_ENUM_STRUCT> InfoStruct;
 			uint PreferedMaximumLength;
 			RpcPointer<uint> TotalEntries = new RpcPointer<uint>();
 			RpcPointer<uint> ResumeHandle;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			InfoStruct = new RpcPointer<SHARE_ENUM_STRUCT>();
-			InfoStruct.value = decoder.ReadFixedStruct<SHARE_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+			InfoStruct.value = decoder.ReadFixedStruct<SHARE_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<SHARE_ENUM_STRUCT>(ref InfoStruct.value);
 			PreferedMaximumLength = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadPointer<uint>();
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadUniquePointer<uint>();
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrShareEnum(ServerName, InfoStruct, PreferedMaximumLength, TotalEntries, ResumeHandle, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(TotalEntries.value);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareGetInfo(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareGetInfo(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string NetName;
 			uint Level;
 			RpcPointer<SHARE_INFO> InfoStruct = new RpcPointer<SHARE_INFO>();
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			NetName = decoder.ReadWideCharString();
 			Level = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrShareGetInfo(ServerName, NetName, Level, InfoStruct, cancellationToken);
@@ -9405,110 +9260,101 @@ namespace ms_srvs
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareSetInfo(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareSetInfo(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string NetName;
 			uint Level;
-			RpcPointer<SHARE_INFO> ShareInfo;
+			SHARE_INFO ShareInfo;
 			RpcPointer<uint> ParmErr;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			NetName = decoder.ReadWideCharString();
 			Level = decoder.ReadUInt32();
-			ShareInfo = new RpcPointer<SHARE_INFO>();
-			ShareInfo.value = decoder.ReadUnion<SHARE_INFO>();
-			decoder.ReadStructDeferral<SHARE_INFO>(ref ShareInfo.value);
-			ParmErr = decoder.ReadPointer<uint>();
-			if ((null != ParmErr))
+			ShareInfo = decoder.ReadUnion<SHARE_INFO>();
+			decoder.ReadStructDeferral<SHARE_INFO>(ref ShareInfo);
+			ParmErr = decoder.ReadUniquePointer<uint>();
+			if (ParmErr is not null)
 			{
 				ParmErr.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrShareSetInfo(ServerName, NetName, Level, ShareInfo, ParmErr, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WritePointer(ParmErr);
-			if ((null != ParmErr))
+			encoder.WriteUniquePointer(ParmErr);
+			if (ParmErr is not null)
 			{
 				encoder.WriteValue(ParmErr.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareDel(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareDel(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string NetName;
 			uint Reserved;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			NetName = decoder.ReadWideCharString();
 			Reserved = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrShareDel(ServerName, NetName, Reserved, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareDelSticky(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareDelSticky(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string NetName;
 			uint Reserved;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			NetName = decoder.ReadWideCharString();
 			Reserved = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrShareDelSticky(ServerName, NetName, Reserved, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareCheck(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareCheck(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string Device;
 			RpcPointer<uint> Type = new RpcPointer<uint>();
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Device = decoder.ReadWideCharString();
 			var invokeTask = this._obj.NetrShareCheck(ServerName, Device, Type, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(Type.value);
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerGetInfo(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerGetInfo(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
 			RpcPointer<SERVER_INFO> InfoStruct = new RpcPointer<SERVER_INFO>();
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrServerGetInfo(ServerName, Level, InfoStruct, cancellationToken);
 			var retval = await invokeTask;
@@ -9516,39 +9362,40 @@ namespace ms_srvs
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerSetInfo(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerSetInfo(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
-			RpcPointer<SERVER_INFO> ServerInfo;
+			SERVER_INFO ServerInfo;
 			RpcPointer<uint> ParmErr;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
-			ServerInfo = new RpcPointer<SERVER_INFO>();
-			ServerInfo.value = decoder.ReadUnion<SERVER_INFO>();
-			decoder.ReadStructDeferral<SERVER_INFO>(ref ServerInfo.value);
-			ParmErr = decoder.ReadPointer<uint>();
-			if ((null != ParmErr))
+			ServerInfo = decoder.ReadUnion<SERVER_INFO>();
+			decoder.ReadStructDeferral<SERVER_INFO>(ref ServerInfo);
+			ParmErr = decoder.ReadUniquePointer<uint>();
+			if (ParmErr is not null)
 			{
 				ParmErr.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrServerSetInfo(ServerName, Level, ServerInfo, ParmErr, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WritePointer(ParmErr);
-			if ((null != ParmErr))
+			encoder.WriteUniquePointer(ParmErr);
+			if (ParmErr is not null)
 			{
 				encoder.WriteValue(ParmErr.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerDiskEnum(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerDiskEnum(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
@@ -9556,190 +9403,176 @@ namespace ms_srvs
 			uint PreferedMaximumLength;
 			RpcPointer<uint> TotalEntries = new RpcPointer<uint>();
 			RpcPointer<uint> ResumeHandle;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
 			DiskInfoStruct = new RpcPointer<DISK_ENUM_CONTAINER>();
-			DiskInfoStruct.value = decoder.ReadFixedStruct<DISK_ENUM_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
+			DiskInfoStruct.value = decoder.ReadFixedStruct<DISK_ENUM_CONTAINER>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<DISK_ENUM_CONTAINER>(ref DiskInfoStruct.value);
 			PreferedMaximumLength = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadPointer<uint>();
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadUniquePointer<uint>();
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrServerDiskEnum(ServerName, Level, DiskInfoStruct, PreferedMaximumLength, TotalEntries, ResumeHandle, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WriteFixedStruct(DiskInfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(DiskInfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(DiskInfoStruct.value);
 			encoder.WriteValue(TotalEntries.value);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerStatisticsGet(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerStatisticsGet(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string Service;
 			uint Level;
 			uint Options;
 			RpcPointer<RpcPointer<STAT_SERVER_0>> InfoStruct = new RpcPointer<RpcPointer<STAT_SERVER_0>>();
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				Service = null;
-			}
 			else
-			{
 				Service = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
 			Options = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrServerStatisticsGet(ServerName, Service, Level, Options, InfoStruct, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WritePointer(InfoStruct.value);
-			if ((null != InfoStruct.value))
+			encoder.WriteUniquePointer(InfoStruct.value);
+			if (InfoStruct.value is not null)
 			{
-				encoder.WriteFixedStruct(InfoStruct.value.value, Titanis.DceRpc.NdrAlignment._4Byte);
+				encoder.WriteFixedStruct(InfoStruct.value.value, NdrAlignment._4Byte);
 				encoder.WriteStructDeferral(InfoStruct.value.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerTransportAdd(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerTransportAdd(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
-			RpcPointer<SERVER_TRANSPORT_INFO_0> Buffer;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			SERVER_TRANSPORT_INFO_0 Buffer;
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
-			Buffer = new RpcPointer<SERVER_TRANSPORT_INFO_0>();
-			Buffer.value = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_0>(Titanis.DceRpc.NdrAlignment.NativePtr);
-			decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_0>(ref Buffer.value);
+			Buffer = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_0>(NdrAlignment.NativePtr);
+			decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_0>(ref Buffer);
 			var invokeTask = this._obj.NetrServerTransportAdd(ServerName, Level, Buffer, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerTransportEnum(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerTransportEnum(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			RpcPointer<SERVER_XPORT_ENUM_STRUCT> InfoStruct;
 			uint PreferedMaximumLength;
 			RpcPointer<uint> TotalEntries = new RpcPointer<uint>();
 			RpcPointer<uint> ResumeHandle;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			InfoStruct = new RpcPointer<SERVER_XPORT_ENUM_STRUCT>();
-			InfoStruct.value = decoder.ReadFixedStruct<SERVER_XPORT_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+			InfoStruct.value = decoder.ReadFixedStruct<SERVER_XPORT_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<SERVER_XPORT_ENUM_STRUCT>(ref InfoStruct.value);
 			PreferedMaximumLength = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadPointer<uint>();
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadUniquePointer<uint>();
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrServerTransportEnum(ServerName, InfoStruct, PreferedMaximumLength, TotalEntries, ResumeHandle, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(TotalEntries.value);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerTransportDel(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerTransportDel(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
-			RpcPointer<SERVER_TRANSPORT_INFO_0> Buffer;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			SERVER_TRANSPORT_INFO_0 Buffer;
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
-			Buffer = new RpcPointer<SERVER_TRANSPORT_INFO_0>();
-			Buffer.value = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_0>(Titanis.DceRpc.NdrAlignment.NativePtr);
-			decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_0>(ref Buffer.value);
+			Buffer = decoder.ReadFixedStruct<SERVER_TRANSPORT_INFO_0>(NdrAlignment.NativePtr);
+			decoder.ReadStructDeferral<SERVER_TRANSPORT_INFO_0>(ref Buffer);
 			var invokeTask = this._obj.NetrServerTransportDel(ServerName, Level, Buffer, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrRemoteTOD(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrRemoteTOD(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			RpcPointer<RpcPointer<TIME_OF_DAY_INFO>> BufferPtr = new RpcPointer<RpcPointer<TIME_OF_DAY_INFO>>();
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			var invokeTask = this._obj.NetrRemoteTOD(ServerName, BufferPtr, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WritePointer(BufferPtr.value);
-			if ((null != BufferPtr.value))
+			encoder.WriteUniquePointer(BufferPtr.value);
+			if (BufferPtr.value is not null)
 			{
-				encoder.WriteFixedStruct(BufferPtr.value.value, Titanis.DceRpc.NdrAlignment._4Byte);
+				encoder.WriteFixedStruct(BufferPtr.value.value, NdrAlignment._4Byte);
 				encoder.WriteStructDeferral(BufferPtr.value.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_Opnum29NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum29NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum29NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_NetprPathType(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetprPathType(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string PathName;
 			RpcPointer<uint> PathType = new RpcPointer<uint>();
 			uint Flags;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			PathName = decoder.ReadWideCharString();
 			Flags = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetprPathType(ServerName, PathName, PathType, Flags, cancellationToken);
@@ -9747,7 +9580,9 @@ namespace ms_srvs
 			encoder.WriteValue(PathType.value);
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetprPathCanonicalize(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetprPathCanonicalize(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string PathName;
@@ -9756,14 +9591,10 @@ namespace ms_srvs
 			string Prefix;
 			RpcPointer<uint> PathType;
 			uint Flags;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			PathName = decoder.ReadWideCharString();
 			OutbufLen = decoder.ReadUInt32();
 			Prefix = decoder.ReadWideCharString();
@@ -9773,30 +9604,28 @@ namespace ms_srvs
 			var invokeTask = this._obj.NetprPathCanonicalize(ServerName, PathName, Outbuf, OutbufLen, Prefix, PathType, Flags, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteArrayHeader(Outbuf.value);
-			for (int i = 0; (i < Outbuf.value.Length); i++
-			)
+			for (int i = 0; i < Outbuf.value.Length; i++)
 			{
 				byte elem_0 = Outbuf.value[i];
 				encoder.WriteValue(elem_0);
 			}
+
 			encoder.WriteValue(PathType.value);
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetprPathCompare(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetprPathCompare(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string PathName1;
 			string PathName2;
 			uint PathType;
 			uint Flags;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			PathName1 = decoder.ReadWideCharString();
 			PathName2 = decoder.ReadWideCharString();
 			PathType = decoder.ReadUInt32();
@@ -9805,20 +9634,18 @@ namespace ms_srvs
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetprNameValidate(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetprNameValidate(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string Name;
 			uint NameType;
 			uint Flags;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Name = decoder.ReadWideCharString();
 			NameType = decoder.ReadUInt32();
 			Flags = decoder.ReadUInt32();
@@ -9826,7 +9653,9 @@ namespace ms_srvs
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetprNameCanonicalize(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetprNameCanonicalize(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string Name;
@@ -9834,14 +9663,10 @@ namespace ms_srvs
 			uint OutbufLen;
 			uint NameType;
 			uint Flags;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Name = decoder.ReadWideCharString();
 			OutbufLen = decoder.ReadUInt32();
 			NameType = decoder.ReadUInt32();
@@ -9849,29 +9674,27 @@ namespace ms_srvs
 			var invokeTask = this._obj.NetprNameCanonicalize(ServerName, Name, Outbuf, OutbufLen, NameType, Flags, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteArrayHeader(Outbuf.value);
-			for (int i = 0; (i < Outbuf.value.Length); i++
-			)
+			for (int i = 0; i < Outbuf.value.Length; i++)
 			{
 				char elem_0 = Outbuf.value[i];
 				encoder.WriteValue(elem_0);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetprNameCompare(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetprNameCompare(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string Name1;
 			string Name2;
 			uint NameType;
 			uint Flags;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Name1 = decoder.ReadWideCharString();
 			Name2 = decoder.ReadWideCharString();
 			NameType = decoder.ReadUInt32();
@@ -9880,56 +9703,54 @@ namespace ms_srvs
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareEnumSticky(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareEnumSticky(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			RpcPointer<SHARE_ENUM_STRUCT> InfoStruct;
 			uint PreferedMaximumLength;
 			RpcPointer<uint> TotalEntries = new RpcPointer<uint>();
 			RpcPointer<uint> ResumeHandle;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			InfoStruct = new RpcPointer<SHARE_ENUM_STRUCT>();
-			InfoStruct.value = decoder.ReadFixedStruct<SHARE_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+			InfoStruct.value = decoder.ReadFixedStruct<SHARE_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<SHARE_ENUM_STRUCT>(ref InfoStruct.value);
 			PreferedMaximumLength = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadPointer<uint>();
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadUniquePointer<uint>();
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrShareEnumSticky(ServerName, InfoStruct, PreferedMaximumLength, TotalEntries, ResumeHandle, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(TotalEntries.value);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareDelStart(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareDelStart(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string NetName;
 			uint Reserved;
-			RpcPointer<Titanis.DceRpc.RpcContextHandle> ContextHandle = new RpcPointer<Titanis.DceRpc.RpcContextHandle>();
-			if ((decoder.ReadReferentId() == 0))
-			{
+			RpcPointer<RpcContextHandle> ContextHandle = new RpcPointer<RpcContextHandle>();
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			NetName = decoder.ReadWideCharString();
 			Reserved = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrShareDelStart(ServerName, NetName, Reserved, ContextHandle, cancellationToken);
@@ -9937,466 +9758,433 @@ namespace ms_srvs
 			encoder.WriteContextHandle(ContextHandle.value);
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareDelCommit(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareDelCommit(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
-			RpcPointer<Titanis.DceRpc.RpcContextHandle> ContextHandle;
-			ContextHandle = new RpcPointer<Titanis.DceRpc.RpcContextHandle>();
+			RpcPointer<RpcContextHandle> ContextHandle;
+			ContextHandle = new RpcPointer<RpcContextHandle>();
 			ContextHandle.value = decoder.ReadContextHandle();
 			var invokeTask = this._obj.NetrShareDelCommit(ContextHandle, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteContextHandle(ContextHandle.value);
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrpGetFileSecurity(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrpGetFileSecurity(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string ShareName;
 			string lpFileName;
 			uint RequestedInformation;
 			RpcPointer<RpcPointer<ADT_SECURITY_DESCRIPTOR>> SecurityDescriptor = new RpcPointer<RpcPointer<ADT_SECURITY_DESCRIPTOR>>();
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ShareName = null;
-			}
 			else
-			{
 				ShareName = decoder.ReadWideCharString();
-			}
 			lpFileName = decoder.ReadWideCharString();
 			RequestedInformation = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrpGetFileSecurity(ServerName, ShareName, lpFileName, RequestedInformation, SecurityDescriptor, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WritePointer(SecurityDescriptor.value);
-			if ((null != SecurityDescriptor.value))
+			encoder.WriteUniquePointer(SecurityDescriptor.value);
+			if (SecurityDescriptor.value is not null)
 			{
-				encoder.WriteFixedStruct(SecurityDescriptor.value.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+				encoder.WriteFixedStruct(SecurityDescriptor.value.value, NdrAlignment.NativePtr);
 				encoder.WriteStructDeferral(SecurityDescriptor.value.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrpSetFileSecurity(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrpSetFileSecurity(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string ShareName;
 			string lpFileName;
 			uint SecurityInformation;
-			RpcPointer<ADT_SECURITY_DESCRIPTOR> SecurityDescriptor;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			ADT_SECURITY_DESCRIPTOR SecurityDescriptor;
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ShareName = null;
-			}
 			else
-			{
 				ShareName = decoder.ReadWideCharString();
-			}
 			lpFileName = decoder.ReadWideCharString();
 			SecurityInformation = decoder.ReadUInt32();
-			SecurityDescriptor = new RpcPointer<ADT_SECURITY_DESCRIPTOR>();
-			SecurityDescriptor.value = decoder.ReadFixedStruct<ADT_SECURITY_DESCRIPTOR>(Titanis.DceRpc.NdrAlignment.NativePtr);
-			decoder.ReadStructDeferral<ADT_SECURITY_DESCRIPTOR>(ref SecurityDescriptor.value);
+			SecurityDescriptor = decoder.ReadFixedStruct<ADT_SECURITY_DESCRIPTOR>(NdrAlignment.NativePtr);
+			decoder.ReadStructDeferral<ADT_SECURITY_DESCRIPTOR>(ref SecurityDescriptor);
 			var invokeTask = this._obj.NetrpSetFileSecurity(ServerName, ShareName, lpFileName, SecurityInformation, SecurityDescriptor, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerTransportAddEx(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerTransportAddEx(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
-			RpcPointer<TRANSPORT_INFO> Buffer;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			TRANSPORT_INFO Buffer;
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
-			Buffer = new RpcPointer<TRANSPORT_INFO>();
-			Buffer.value = decoder.ReadUnion<TRANSPORT_INFO>();
-			decoder.ReadStructDeferral<TRANSPORT_INFO>(ref Buffer.value);
+			Buffer = decoder.ReadUnion<TRANSPORT_INFO>();
+			decoder.ReadStructDeferral<TRANSPORT_INFO>(ref Buffer);
 			var invokeTask = this._obj.NetrServerTransportAddEx(ServerName, Level, Buffer, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_Opnum42NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum42NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum42NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_NetrDfsGetVersion(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrDfsGetVersion(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			RpcPointer<uint> Version = new RpcPointer<uint>();
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			var invokeTask = this._obj.NetrDfsGetVersion(ServerName, Version, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(Version.value);
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrDfsCreateLocalPartition(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrDfsCreateLocalPartition(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string ShareName;
-			RpcPointer<System.Guid> EntryUid;
+			Guid EntryUid;
 			string EntryPrefix;
 			string ShortName;
-			RpcPointer<NET_DFS_ENTRY_ID_CONTAINER> RelationInfo;
+			NET_DFS_ENTRY_ID_CONTAINER RelationInfo;
 			int Force;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			ShareName = decoder.ReadWideCharString();
-			EntryUid = new RpcPointer<System.Guid>();
-			EntryUid.value = decoder.ReadUuid();
+			EntryUid = decoder.ReadUuid();
 			EntryPrefix = decoder.ReadWideCharString();
 			ShortName = decoder.ReadWideCharString();
-			RelationInfo = new RpcPointer<NET_DFS_ENTRY_ID_CONTAINER>();
-			RelationInfo.value = decoder.ReadFixedStruct<NET_DFS_ENTRY_ID_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-			decoder.ReadStructDeferral<NET_DFS_ENTRY_ID_CONTAINER>(ref RelationInfo.value);
+			RelationInfo = decoder.ReadFixedStruct<NET_DFS_ENTRY_ID_CONTAINER>(NdrAlignment.NativePtr);
+			decoder.ReadStructDeferral<NET_DFS_ENTRY_ID_CONTAINER>(ref RelationInfo);
 			Force = decoder.ReadInt32();
 			var invokeTask = this._obj.NetrDfsCreateLocalPartition(ServerName, ShareName, EntryUid, EntryPrefix, ShortName, RelationInfo, Force, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrDfsDeleteLocalPartition(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrDfsDeleteLocalPartition(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
-			RpcPointer<System.Guid> Uid;
+			Guid Uid;
 			string Prefix;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			Uid = new RpcPointer<System.Guid>();
-			Uid.value = decoder.ReadUuid();
+			Uid = decoder.ReadUuid();
 			Prefix = decoder.ReadWideCharString();
 			var invokeTask = this._obj.NetrDfsDeleteLocalPartition(ServerName, Uid, Prefix, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrDfsSetLocalVolumeState(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrDfsSetLocalVolumeState(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
-			RpcPointer<System.Guid> Uid;
+			Guid Uid;
 			string Prefix;
 			uint State;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			Uid = new RpcPointer<System.Guid>();
-			Uid.value = decoder.ReadUuid();
+			Uid = decoder.ReadUuid();
 			Prefix = decoder.ReadWideCharString();
 			State = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrDfsSetLocalVolumeState(ServerName, Uid, Prefix, State, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_Opnum47NotUsedOnWire(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_Opnum47NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum47NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
-		private async Task Invoke_NetrDfsCreateExitPoint(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrDfsCreateExitPoint(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
-			RpcPointer<System.Guid> Uid;
+			Guid Uid;
 			string Prefix;
 			uint Type;
 			uint ShortPrefixLen;
 			RpcPointer<char[]> ShortPrefix = new RpcPointer<char[]>();
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			Uid = new RpcPointer<System.Guid>();
-			Uid.value = decoder.ReadUuid();
+			Uid = decoder.ReadUuid();
 			Prefix = decoder.ReadWideCharString();
 			Type = decoder.ReadUInt32();
 			ShortPrefixLen = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrDfsCreateExitPoint(ServerName, Uid, Prefix, Type, ShortPrefixLen, ShortPrefix, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteArrayHeader(ShortPrefix.value);
-			for (int i = 0; (i < ShortPrefix.value.Length); i++
-			)
+			for (int i = 0; i < ShortPrefix.value.Length; i++)
 			{
 				char elem_0 = ShortPrefix.value[i];
 				encoder.WriteValue(elem_0);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrDfsDeleteExitPoint(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrDfsDeleteExitPoint(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
-			RpcPointer<System.Guid> Uid;
+			Guid Uid;
 			string Prefix;
 			uint Type;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			Uid = new RpcPointer<System.Guid>();
-			Uid.value = decoder.ReadUuid();
+			Uid = decoder.ReadUuid();
 			Prefix = decoder.ReadWideCharString();
 			Type = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrDfsDeleteExitPoint(ServerName, Uid, Prefix, Type, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrDfsModifyPrefix(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrDfsModifyPrefix(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
-			RpcPointer<System.Guid> Uid;
+			Guid Uid;
 			string Prefix;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			Uid = new RpcPointer<System.Guid>();
-			Uid.value = decoder.ReadUuid();
+			Uid = decoder.ReadUuid();
 			Prefix = decoder.ReadWideCharString();
 			var invokeTask = this._obj.NetrDfsModifyPrefix(ServerName, Uid, Prefix, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrDfsFixLocalVolume(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrDfsFixLocalVolume(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			string VolumeName;
 			uint EntryType;
 			uint ServiceType;
 			string StgId;
-			RpcPointer<System.Guid> EntryUid;
+			Guid EntryUid;
 			string EntryPrefix;
-			RpcPointer<NET_DFS_ENTRY_ID_CONTAINER> RelationInfo;
+			NET_DFS_ENTRY_ID_CONTAINER RelationInfo;
 			uint CreateDisposition;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			VolumeName = decoder.ReadWideCharString();
 			EntryType = decoder.ReadUInt32();
 			ServiceType = decoder.ReadUInt32();
 			StgId = decoder.ReadWideCharString();
-			EntryUid = new RpcPointer<System.Guid>();
-			EntryUid.value = decoder.ReadUuid();
+			EntryUid = decoder.ReadUuid();
 			EntryPrefix = decoder.ReadWideCharString();
-			RelationInfo = new RpcPointer<NET_DFS_ENTRY_ID_CONTAINER>();
-			RelationInfo.value = decoder.ReadFixedStruct<NET_DFS_ENTRY_ID_CONTAINER>(Titanis.DceRpc.NdrAlignment.NativePtr);
-			decoder.ReadStructDeferral<NET_DFS_ENTRY_ID_CONTAINER>(ref RelationInfo.value);
+			RelationInfo = decoder.ReadFixedStruct<NET_DFS_ENTRY_ID_CONTAINER>(NdrAlignment.NativePtr);
+			decoder.ReadStructDeferral<NET_DFS_ENTRY_ID_CONTAINER>(ref RelationInfo);
 			CreateDisposition = decoder.ReadUInt32();
 			var invokeTask = this._obj.NetrDfsFixLocalVolume(ServerName, VolumeName, EntryType, ServiceType, StgId, EntryUid, EntryPrefix, RelationInfo, CreateDisposition, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrDfsManagerReportSiteInfo(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrDfsManagerReportSiteInfo(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			RpcPointer<RpcPointer<DFS_SITELIST_INFO>> ppSiteInfo;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
-			ppSiteInfo = decoder.ReadPointer<RpcPointer<DFS_SITELIST_INFO>>();
-			if ((null != ppSiteInfo))
+			ppSiteInfo = decoder.ReadUniquePointer<RpcPointer<DFS_SITELIST_INFO>>();
+			if (ppSiteInfo is not null)
 			{
-				ppSiteInfo.value = decoder.ReadPointer<DFS_SITELIST_INFO>();
-				if ((null != ppSiteInfo.value))
+				ppSiteInfo.value = decoder.ReadUniquePointer<DFS_SITELIST_INFO>();
+				if (ppSiteInfo.value is not null)
 				{
-					ppSiteInfo.value.value = decoder.ReadConformantStruct<DFS_SITELIST_INFO>(Titanis.DceRpc.NdrAlignment.NativePtr);
+					ppSiteInfo.value.value = decoder.ReadConformantStruct<DFS_SITELIST_INFO>(NdrAlignment.NativePtr);
 					decoder.ReadStructDeferral<DFS_SITELIST_INFO>(ref ppSiteInfo.value.value);
 				}
 			}
+
 			var invokeTask = this._obj.NetrDfsManagerReportSiteInfo(ServerName, ppSiteInfo, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WritePointer(ppSiteInfo);
-			if ((null != ppSiteInfo))
+			encoder.WriteUniquePointer(ppSiteInfo);
+			if (ppSiteInfo is not null)
 			{
-				encoder.WritePointer(ppSiteInfo.value);
-				if ((null != ppSiteInfo.value))
+				encoder.WriteUniquePointer(ppSiteInfo.value);
+				if (ppSiteInfo.value is not null)
 				{
-					encoder.WriteConformantStruct(ppSiteInfo.value.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+					encoder.WriteConformantStruct(ppSiteInfo.value.value, NdrAlignment.NativePtr);
 					encoder.WriteStructDeferral(ppSiteInfo.value.value);
 				}
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerTransportDelEx(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerTransportDelEx(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
-			RpcPointer<TRANSPORT_INFO> Buffer;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			TRANSPORT_INFO Buffer;
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
-			Buffer = new RpcPointer<TRANSPORT_INFO>();
-			Buffer.value = decoder.ReadUnion<TRANSPORT_INFO>();
-			decoder.ReadStructDeferral<TRANSPORT_INFO>(ref Buffer.value);
+			Buffer = decoder.ReadUnion<TRANSPORT_INFO>();
+			decoder.ReadStructDeferral<TRANSPORT_INFO>(ref Buffer);
 			var invokeTask = this._obj.NetrServerTransportDelEx(ServerName, Level, Buffer, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerAliasAdd(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerAliasAdd(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
-			RpcPointer<SERVER_ALIAS_INFO> InfoStruct;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			SERVER_ALIAS_INFO InfoStruct;
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
-			InfoStruct = new RpcPointer<SERVER_ALIAS_INFO>();
-			InfoStruct.value = decoder.ReadUnion<SERVER_ALIAS_INFO>();
-			decoder.ReadStructDeferral<SERVER_ALIAS_INFO>(ref InfoStruct.value);
+			InfoStruct = decoder.ReadUnion<SERVER_ALIAS_INFO>();
+			decoder.ReadStructDeferral<SERVER_ALIAS_INFO>(ref InfoStruct);
 			var invokeTask = this._obj.NetrServerAliasAdd(ServerName, Level, InfoStruct, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerAliasEnum(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerAliasEnum(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			RpcPointer<SERVER_ALIAS_ENUM_STRUCT> InfoStruct;
 			uint PreferedMaximumLength;
 			RpcPointer<uint> TotalEntries = new RpcPointer<uint>();
 			RpcPointer<uint> ResumeHandle;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			InfoStruct = new RpcPointer<SERVER_ALIAS_ENUM_STRUCT>();
-			InfoStruct.value = decoder.ReadFixedStruct<SERVER_ALIAS_ENUM_STRUCT>(Titanis.DceRpc.NdrAlignment.NativePtr);
+			InfoStruct.value = decoder.ReadFixedStruct<SERVER_ALIAS_ENUM_STRUCT>(NdrAlignment.NativePtr);
 			decoder.ReadStructDeferral<SERVER_ALIAS_ENUM_STRUCT>(ref InfoStruct.value);
 			PreferedMaximumLength = decoder.ReadUInt32();
-			ResumeHandle = decoder.ReadPointer<uint>();
-			if ((null != ResumeHandle))
+			ResumeHandle = decoder.ReadUniquePointer<uint>();
+			if (ResumeHandle is not null)
 			{
 				ResumeHandle.value = decoder.ReadUInt32();
 			}
+
 			var invokeTask = this._obj.NetrServerAliasEnum(ServerName, InfoStruct, PreferedMaximumLength, TotalEntries, ResumeHandle, cancellationToken);
 			var retval = await invokeTask;
-			encoder.WriteFixedStruct(InfoStruct.value, Titanis.DceRpc.NdrAlignment.NativePtr);
+			encoder.WriteFixedStruct(InfoStruct.value, NdrAlignment.NativePtr);
 			encoder.WriteStructDeferral(InfoStruct.value);
 			encoder.WriteValue(TotalEntries.value);
-			encoder.WritePointer(ResumeHandle);
-			if ((null != ResumeHandle))
+			encoder.WriteUniquePointer(ResumeHandle);
+			if (ResumeHandle is not null)
 			{
 				encoder.WriteValue(ResumeHandle.value);
 			}
+
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrServerAliasDel(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrServerAliasDel(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
-			RpcPointer<SERVER_ALIAS_INFO> InfoStruct;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			SERVER_ALIAS_INFO InfoStruct;
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
-			InfoStruct = new RpcPointer<SERVER_ALIAS_INFO>();
-			InfoStruct.value = decoder.ReadUnion<SERVER_ALIAS_INFO>();
-			decoder.ReadStructDeferral<SERVER_ALIAS_INFO>(ref InfoStruct.value);
+			InfoStruct = decoder.ReadUnion<SERVER_ALIAS_INFO>();
+			decoder.ReadStructDeferral<SERVER_ALIAS_INFO>(ref InfoStruct);
 			var invokeTask = this._obj.NetrServerAliasDel(ServerName, Level, InfoStruct, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
 		}
-		private async Task Invoke_NetrShareDelEx(Titanis.DceRpc.IRpcDecoder decoder, Titanis.DceRpc.IRpcEncoder encoder, System.Threading.CancellationToken cancellationToken)
+
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public async Task Invoke_NetrShareDelEx(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string ServerName;
 			uint Level;
-			RpcPointer<SHARE_INFO> ShareInfo;
-			if ((decoder.ReadReferentId() == 0))
-			{
+			SHARE_INFO ShareInfo;
+			if (decoder.ReadReferentId() == 0)
 				ServerName = null;
-			}
 			else
-			{
 				ServerName = decoder.ReadWideCharString();
-			}
 			Level = decoder.ReadUInt32();
-			ShareInfo = new RpcPointer<SHARE_INFO>();
-			ShareInfo.value = decoder.ReadUnion<SHARE_INFO>();
-			decoder.ReadStructDeferral<SHARE_INFO>(ref ShareInfo.value);
+			ShareInfo = decoder.ReadUnion<SHARE_INFO>();
+			decoder.ReadStructDeferral<SHARE_INFO>(ref ShareInfo);
 			var invokeTask = this._obj.NetrShareDelEx(ServerName, Level, ShareInfo, cancellationToken);
 			var retval = await invokeTask;
 			encoder.WriteValue(retval);
+		}
+
+		private static Guid _interfaceUuid = new Guid("4b324fc8-1670-01d3-1278-5a47bf6ee188");
+		public override Guid InterfaceUuid => _interfaceUuid;
+		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(3, 0);
+		private Titanis.DceRpc.Server.OperationImplFunc[] _dispatchTable;
+		public override Titanis.DceRpc.Server.OperationImplFunc[] DispatchTable => this._dispatchTable;
+		private srvsvc _obj;
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		public srvsvcStub(srvsvc obj)
+		{
+			this._obj = obj;
+			this._dispatchTable = new Titanis.DceRpc.Server.OperationImplFunc[]{this.Invoke_Opnum0NotUsedOnWire, this.Invoke_Opnum1NotUsedOnWire, this.Invoke_Opnum2NotUsedOnWire, this.Invoke_Opnum3NotUsedOnWire, this.Invoke_Opnum4NotUsedOnWire, this.Invoke_Opnum5NotUsedOnWire, this.Invoke_Opnum6NotUsedOnWire, this.Invoke_Opnum7NotUsedOnWire, this.Invoke_NetrConnectionEnum, this.Invoke_NetrFileEnum, this.Invoke_NetrFileGetInfo, this.Invoke_NetrFileClose, this.Invoke_NetrSessionEnum, this.Invoke_NetrSessionDel, this.Invoke_NetrShareAdd, this.Invoke_NetrShareEnum, this.Invoke_NetrShareGetInfo, this.Invoke_NetrShareSetInfo, this.Invoke_NetrShareDel, this.Invoke_NetrShareDelSticky, this.Invoke_NetrShareCheck, this.Invoke_NetrServerGetInfo, this.Invoke_NetrServerSetInfo, this.Invoke_NetrServerDiskEnum, this.Invoke_NetrServerStatisticsGet, this.Invoke_NetrServerTransportAdd, this.Invoke_NetrServerTransportEnum, this.Invoke_NetrServerTransportDel, this.Invoke_NetrRemoteTOD, this.Invoke_Opnum29NotUsedOnWire, this.Invoke_NetprPathType, this.Invoke_NetprPathCanonicalize, this.Invoke_NetprPathCompare, this.Invoke_NetprNameValidate, this.Invoke_NetprNameCanonicalize, this.Invoke_NetprNameCompare, this.Invoke_NetrShareEnumSticky, this.Invoke_NetrShareDelStart, this.Invoke_NetrShareDelCommit, this.Invoke_NetrpGetFileSecurity, this.Invoke_NetrpSetFileSecurity, this.Invoke_NetrServerTransportAddEx, this.Invoke_Opnum42NotUsedOnWire, this.Invoke_NetrDfsGetVersion, this.Invoke_NetrDfsCreateLocalPartition, this.Invoke_NetrDfsDeleteLocalPartition, this.Invoke_NetrDfsSetLocalVolumeState, this.Invoke_Opnum47NotUsedOnWire, this.Invoke_NetrDfsCreateExitPoint, this.Invoke_NetrDfsDeleteExitPoint, this.Invoke_NetrDfsModifyPrefix, this.Invoke_NetrDfsFixLocalVolume, this.Invoke_NetrDfsManagerReportSiteInfo, this.Invoke_NetrServerTransportDelEx, this.Invoke_NetrServerAliasAdd, this.Invoke_NetrServerAliasEnum, this.Invoke_NetrServerAliasDel, this.Invoke_NetrShareDelEx};
 		}
 	}
 }

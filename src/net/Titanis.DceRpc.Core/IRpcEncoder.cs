@@ -16,6 +16,7 @@ namespace Titanis.DceRpc
 		ByteWriter GetWriter();
 
 		void Align(NdrAlignment alignment);
+		void AlignUnionTag(NdrAlignment alignment);
 		void WriteValue(bool v);
 		void WriteValue(sbyte v);
 		void WriteValue(byte v);
@@ -33,9 +34,13 @@ namespace Titanis.DceRpc
 		void WriteValue(Guid v);
 		//void WriteValue(Tower2 v);
 		void WriteValue(RpcInterfaceId v);
+		void WriteEnumShortValue(short value);
 
 		void WriteContextHandle(RpcContextHandle hctx);
+		[Obsolete("Use WriteUniquePointer or WriteFullPointer", false)]
 		void WritePointer<T>(RpcPointer<T>? ptr);
+		void WriteUniquePointer<T>(RpcPointer<T>? ptr);
+		void WriteFullPointer<T>(RpcPointer<T>? ptr);
 		void WriteInterfacePointer<T>(TypedObjref<T>? ptr) where T : class, IRpcObject;
 		void WriteInterfacePointerBody<T>(TypedObjref<T>? ptr) where T : class, IRpcObject;
 		void WriteArrayHeader<T>(T[] array);

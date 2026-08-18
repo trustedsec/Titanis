@@ -146,7 +146,7 @@ namespace Titanis.Msrpc.Msdcom
 			RpcPointer<MInterfacePointer> pActProperties = new RpcPointer<MInterfacePointer>(classRef.AsMInterfacePtr());
 			RpcPointer<RpcPointer<MInterfacePointer>> ppActProperties = new();
 			var res = (Hresult)await this._proxy.RemoteCreateInstance(
-				new RpcPointer<ORPCTHIS>() { value = new ORPCTHIS() { version = version } },
+				new ORPCTHIS() { version = version },
 				pThat,
 				null,
 				pActProperties,

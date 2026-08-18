@@ -17,6 +17,7 @@ namespace Titanis.DceRpc
 		None = 0,
 		_1Byte = 1,
 		_2Byte = 2,
+		ShortEnum = 3,
 		_4Byte = 4,
 		NativePtr = 5,
 		_8Byte = 8,

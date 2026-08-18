@@ -20,7 +20,7 @@ public class AddSidHistoryCommand : DsbindCommand
 	[Description("Source user (must include domain)")]
 	public UserPrincipalName SourceUser { get; set; }
 
-	[Parameter(After = nameof(DestinationUser))]
+	[Parameter(After = nameof(SourceUser))]
 	[Mandatory]
 	[Description("Destination user (must include domain)")]
 	public UserPrincipalName DestinationUser { get; set; }

@@ -480,7 +480,7 @@ namespace Titanis.Msrpc.Msdcom
 			{
 				RpcPointer<RpcPointer<REMQIRESULT[]>> ppQIResults = new RpcPointer<RpcPointer<REMQIRESULT[]>>();
 				var res = (Win32ErrorCode)await exporter.remunk.RemQueryInterface(
-					new RpcPointer<Guid>(proxy.Ipid),
+					proxy.Ipid,
 					1,
 					1,
 					new Guid[] { iid },

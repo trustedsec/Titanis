@@ -71,7 +71,7 @@ namespace Titanis.Msrpc.Msdrsr
 			var res = (Win32ErrorCode)await drsr.proxy.IDL_DRSDomainControllerInfo(
 				this.hbind,
 				1,
-				new RpcPointer<ms_drsr.DRS_MSG_DCINFOREQ>(new ms_drsr.DRS_MSG_DCINFOREQ
+				new ms_drsr.DRS_MSG_DCINFOREQ
 				{
 					unionSwitch = 1,
 					V1 = new ms_drsr.DRS_MSG_DCINFOREQ_V1
@@ -79,7 +79,7 @@ namespace Titanis.Msrpc.Msdrsr
 						Domain = new RpcPointer<string>(domainName),
 						InfoLevel = 2,
 					},
-				}),
+				},
 				pdwOutVersion,
 				pmsgOut,
 				cancellationToken
@@ -157,7 +157,7 @@ namespace Titanis.Msrpc.Msdrsr
 				).ConfigureAwait(false);
 			res.CheckAndThrow();
 
-			if (pmsgOut.value.unionSwitch != CrackResponseVersion)
+			if (pmsgOut.value.unionSwitch == CrackResponseVersion)
 			{
 				var results = pmsgOut.value.V1.pResult.value.rItems.value?.Select(r => r.pName.value)?.ToArray() ?? [];
 				return results;
@@ -796,18 +796,18 @@ namespace Titanis.Msrpc.Msdrsr
 								uuidInvocIdSrc = invocIdSrc,
 								pNC = objectName.ToRpcDsName(),
 								usnvecFrom = usnvecFrom,
-								pUpToDateVecDest = new RpcPointer<UPTODATE_VECTOR_V1_EXT>(new UPTODATE_VECTOR_V1_EXT
-								{
-									cNumCursors = 1,
-									dwVersion = 1,
-									rgCursors = new UPTODATE_CURSOR_V1[1]
-									{
-										new UPTODATE_CURSOR_V1
-										{
-											uuidDsa=invocIdSrc
-										}
-									}
-								}),
+								//pUpToDateVecDest = new RpcPointer<UPTODATE_VECTOR_V1_EXT>(new UPTODATE_VECTOR_V1_EXT
+								//{
+								//	cNumCursors = 1,
+								//	dwVersion = 1,
+								//	rgCursors = new UPTODATE_CURSOR_V1[1]
+								//	{
+								//		new UPTODATE_CURSOR_V1
+								//		{
+								//			uuidDsa=invocIdSrc
+								//		}
+								//	}
+								//}),
 								ulFlags = (uint)options,
 								cMaxObjects = (uint)maxObjCount,
 								cMaxBytes = (uint)maxByteCount,

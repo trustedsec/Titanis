@@ -149,6 +149,6 @@ namespace Titanis.DceRpc
 	partial struct PrivateHeader
 	{
 		internal uint objectBufferLength;
-		internal WindowsBuiltInRole filler;
+		internal int filler;
 	}
 }

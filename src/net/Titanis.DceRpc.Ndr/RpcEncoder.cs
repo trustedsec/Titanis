@@ -21,6 +21,7 @@ namespace Titanis.DceRpc
 		public ByteWriter GetWriter() => this._writer;
 
 		public abstract void Align(NdrAlignment alignment);
+		public abstract void AlignUnionTag(NdrAlignment alignment);
 		public abstract void WriteValue(bool v);
 		public abstract void WriteValue(sbyte v);
 		public abstract void WriteValue(byte v);
@@ -40,6 +41,8 @@ namespace Titanis.DceRpc
 
 		public abstract void WriteContextHandle(RpcContextHandle hctx);
 		public abstract void WritePointer<T>(RpcPointer<T>? ptr);
+		public abstract void WriteFullPointer<T>(RpcPointer<T>? ptr);
+		public abstract void WriteUniquePointer<T>(RpcPointer<T>? ptr);
 		public abstract void WriteInterfacePointer<T>(TypedObjref<T>? ptr) where T : class, IRpcObject;
 		public abstract void WriteInterfacePointerBody<T>(TypedObjref<T>? ptr) where T : class, IRpcObject;
 		public abstract void WriteArrayHeader<T>(T[] array);
@@ -59,6 +62,7 @@ namespace Titanis.DceRpc
 			where T : IRpcStruct;
 
 		public abstract void WriteUniqueReferentId(bool isNull);
+		public abstract void WriteEnumShortValue(short value);
 
 		public abstract void WriteCharString(string str);
 		public abstract void WriteWideCharString(string str);

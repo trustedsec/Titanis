@@ -378,7 +378,7 @@ namespace Titanis.Msrpc.Mswkst
 			Win32ErrorCode res = (Win32ErrorCode)await this._proxy.NetrShareAdd(
 				LocalName,
 				2,
-				new RpcPointer<SHARE_INFO>(new SHARE_INFO
+				new SHARE_INFO
 				{
 					unionSwitch = 2,
 					ShareInfo2 = new RpcPointer<SHARE_INFO_2>(new SHARE_INFO_2
@@ -389,7 +389,7 @@ namespace Titanis.Msrpc.Mswkst
 						shi2_permissions = (uint)permissions,
 						shi2_path = new RpcPointer<string>(path),
 					})
-				}),
+				},
 				pParmErr,
 				cancellationToken
 				).ConfigureAwait(false);
@@ -410,7 +410,7 @@ namespace Titanis.Msrpc.Mswkst
 			var res = (Win32ErrorCode)await this._proxy.NetrShareAdd(
 				LocalName,
 				2,
-				new RpcPointer<SHARE_INFO>(new SHARE_INFO
+				new SHARE_INFO
 				{
 					unionSwitch = 2,
 					ShareInfo2 = new RpcPointer<SHARE_INFO_2>(new SHARE_INFO_2
@@ -424,7 +424,7 @@ namespace Titanis.Msrpc.Mswkst
 						shi2_path = StringToPointer(shareInfo.Path),
 						shi2_passwd = StringToPointer(shareInfo.Password)
 					})
-				}),
+				},
 				pParmErr,
 				cancellationToken
 				).ConfigureAwait(false);

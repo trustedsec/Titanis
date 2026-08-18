@@ -33,34 +33,55 @@ namespace Titanis.Cli
 		[Parameter]
 		[Advanced]
 		[Description("Time to wait for RPC connections")]
+		[Category(ParameterCategories.Rpc)]
 		public Duration? RpcConnectTimeout { get; set; }
 
 		[Parameter]
 		[Advanced]
 		[Description("Time to wait for RPC calls")]
+		[Category(ParameterCategories.Rpc)]
 		public Duration? RpcCallTimeout { get; set; }
 
 		[Parameter]
 		[Advanced]
 		[Description("Uses SP-NEGO for authentication")]
+		[Category(ParameterCategories.Rpc)]
 		public SwitchParam Spnego { get; set; }
 
 		[Parameter]
 		[Advanced]
 		[Description("Authenticates EP mapper requests")]
+		[Category(ParameterCategories.Rpc)]
 		public SwitchParam AuthEpm { get; set; }
 
 		[Parameter]
 		[Advanced]
 		[Description("Encrypts EP mappend requests")]
+		[Category(ParameterCategories.Rpc)]
 		public SwitchParam EncryptEpm { get; set; }
 
 		[Parameter]
 		[Description("Encrypts RPC messages")]
+		[Category(ParameterCategories.Rpc)]
 		public SwitchParam EncryptRpc { get; set; }
 
 		[Parameter]
+		[Description("Offers the NDR transfer syntax")]
+		[DefaultValue(true)]
+		[Advanced]
+		[Category(ParameterCategories.Rpc)]
+		public SwitchParam OfferNdr { get; set; }
+
+		[Parameter]
+		[Description("Offers the NDR64 transfer syntax")]
+		[DefaultValue(true)]
+		[Advanced]
+		[Category(ParameterCategories.Rpc)]
+		public SwitchParam OfferNdr64 { get; set; }
+
+		[Parameter]
 		[Description("If the interface supports named pipes, attempt to connect over the named pipe instead of TCP")]
+		[Category(ParameterCategories.Rpc)]
 		public SwitchParam PreferSmb { get; set; }
 
 		protected override void Initialize(IServiceContainer services)
@@ -110,6 +131,11 @@ namespace Titanis.Cli
 			if (this.RpcCallTimeout != null)
 				rpcClient.DefaultCallTimeout = this.RpcCallTimeout.TimeSpan;
 
+			if (this.OfferNdr.IsSpecified)
+				rpcClient.OfferNdr = this.OfferNdr.IsSet;
+			if (this.OfferNdr64.IsSpecified)
+				rpcClient.OfferNdr64 = this.OfferNdr64.IsSet;
+
 			RpcAuthLevel authLevel;
 			if (this.EncryptRpc.IsSet)
 				authLevel = RpcAuthLevel.PacketPrivacy;
@@ -134,6 +160,7 @@ namespace Titanis.Cli
 			ArgumentNullException.ThrowIfNull(svcClient);
 
 			RpcClient rpcClient = this.Services.CreateRpcClient();
+			this.ApplyTo(rpcClient);
 			var net = this.NetParameters;
 
 			var credService = this.Services.RequireService<IClientCredentialService>();

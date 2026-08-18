@@ -22,6 +22,7 @@ namespace Titanis.DceRpc
 		public abstract ByteMemoryReader GetStubData();
 
 		public abstract void Align(NdrAlignment alignment);
+		public abstract void AlignUnionTag(NdrAlignment alignment);
 		public abstract bool ReadBoolean();
 		public abstract sbyte ReadSByte();
 		public abstract byte ReadByte();
@@ -43,6 +44,7 @@ namespace Titanis.DceRpc
 
 		/// <inheritdoc/>
 		public abstract long ReadReferentId();
+		public abstract short ReadEnumShortValue();
 		public abstract RpcPointer<T>? ReadUniquePointer<T>();
 		public abstract RpcPointer<T>? ReadFullPointer<T>();
 		public abstract TypedObjref<T>? ReadInterfacePointer<T>() where T : class, IRpcObject;

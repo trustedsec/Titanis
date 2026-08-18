@@ -27,7 +27,8 @@ namespace Titanis.DceRpc
 		public override ByteMemoryReader GetStubData() => this.stubData;
 
 		// [C706] § 14.3.11 - Top-level Pointers
-		public virtual int NativeAlignment => 4;
+		public abstract int NativeAlignment { get; }
+		public abstract int EnumAlignment { get; }
 		public sealed override void Align(NdrAlignment alignment)
 		{
 			if (alignment != NdrAlignment.None)
@@ -35,6 +36,10 @@ namespace Titanis.DceRpc
 				if (alignment == NdrAlignment.NativePtr)
 				{
 					this.stubData.Align(this.NativeAlignment);
+				}
+				else if (alignment == NdrAlignment.ShortEnum)
+				{
+					this.stubData.Align(this.EnumAlignment);
 				}
 				else
 				{
@@ -414,11 +419,26 @@ namespace Titanis.DceRpc
 		{
 		}
 
+		// [C706] § 14.3.11 - Top-level Pointers
+		public sealed override int NativeAlignment => 4;
+		public sealed override int EnumAlignment => 2;
+
+		public sealed override void AlignUnionTag(NdrAlignment alignment)
+		{
+			// Do nothing
+		}
+
 		// [C706] § 14.3.10 - Pointers
 		public sealed override long ReadReferentId()
 		{
 			var id = this.ReadInt32();
 			return id;
+		}
+
+		// [MS-RPCE] § 2.2.4.6 - v1_enum
+		public override short ReadEnumShortValue()
+		{
+			return this.ReadInt16();
 		}
 
 		// [C706] § 14.3.6 - Structures
@@ -442,7 +462,14 @@ namespace Titanis.DceRpc
 		{
 		}
 		// [MS-RPCE] § 2.2.5.3.5 - Pointers
-		public override int NativeAlignment => 8;
+		public sealed override int NativeAlignment => 8;
+		// [MS-RPCE] § 2.2.4.6 - v1_enum
+		public sealed override int EnumAlignment => 4;
+
+		public sealed override void AlignUnionTag(NdrAlignment alignment)
+		{
+			this.Align(alignment);
+		}
 
 		// [MS-RPCE] § 2.2.5.3.2.1 - Conformant Arrays
 		// [MS-RPCE] § 2.2.5.3.2.2 - Varying Arrays
@@ -460,6 +487,12 @@ namespace Titanis.DceRpc
 		public override long ReadReferentId()
 		{
 			return this.ReadInt64();
+		}
+
+		// [MS-RPCE] § 2.2.4.6 - v1_enum
+		public override short ReadEnumShortValue()
+		{
+			return (short)this.ReadUInt32();
 		}
 
 
