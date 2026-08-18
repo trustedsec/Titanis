@@ -179,9 +179,17 @@ namespace Titanis.Cli
 		public bool IsFieldInOutput(string fieldName)
 			=> this._outputFieldProvider?.IncludesField(fieldName) ?? true;
 
+
+
+		private List<ICommandResultHook>? _resultHooks;
+		public void AddResultHook(ICommandResultHook hook)
+		{
+			(this._resultHooks ??= new List<ICommandResultHook>()).Add(hook);
+		}
+
 		protected virtual void OnRecordWritten(object? record)
 		{
-
+			this._resultHooks?.ForEach(r => r.OnResult(record));
 		}
 
 		public void WriteRecords(System.Collections.IEnumerable records)
@@ -287,7 +295,7 @@ namespace Titanis.Cli
 						if (fields != null && record is not null)
 						{
 							if (_includeHeaders)
-							{ 
+							{
 								//TODO: Properly handle array like values
 								var sep = this._outputStyle switch { OutputStyle.Csv => ",", OutputStyle.Tsv => "\t" };
 								string line = string.Join(sep, fields.Select(r => FormatValue(sep, r.FormatValue(r.GetValue(record), this._outputStyle))));
@@ -326,7 +334,10 @@ namespace Titanis.Cli
 		#endregion
 
 
-		public abstract ILog Log { get; }
+		private LogBroadcaster _log = new LogBroadcaster();
+		public ILog Log => this._log;
+		public void AddLogListener(ILog listener) => this._log.AddListener(listener);
+
 		public abstract void WriteOutput(string? message);
 		public abstract void WriteOutputLine(string? message);
 		protected abstract void PrintTable(TextTable table);

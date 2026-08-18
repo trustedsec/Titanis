@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace Titanis.Cli
 {
+	public interface ICommandResultHook
+	{
+		void OnResult(object? record);
+	}
+
 	public interface ICommandContext
 	{
 		ITerminal Terminal { get; }
@@ -30,6 +35,7 @@ namespace Titanis.Cli
 		string Prompt(string prompt);
 
 		ILog Log { get; }
+		void AddLogListener(ILog listener);
 
 		Task ExecuteFrameAsync(Func<CancellationToken, Task> func);
 
@@ -46,6 +52,8 @@ namespace Titanis.Cli
 		/// <returns><see langword="true"/> if the field will be in the output; otherwise, <see langword="false"/>.</returns>
 		bool IsFieldInOutput(string fieldName);
 		void SetOutputFormat(OutputStyle style, IOutputFieldProvider? fields, bool includeHeaders);
+
+		void AddResultHook(ICommandResultHook hook);
 		void WriteRecords(IEnumerable records);
 		void WriteRecord(object? record);
 	}

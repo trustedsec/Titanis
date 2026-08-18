@@ -17,6 +17,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Titanis.Info;
 using Titanis.Reflection;
 
 namespace Titanis.Cli
@@ -82,6 +83,13 @@ namespace Titanis.Cli
 		[Description("Print headers for table/list/CSV/TSV styles")]
 		[DefaultValue(true)]
 		public SwitchParam OutputHeaders { get; set; }
+
+
+		[Parameter]
+		[Advanced]
+		[Category(ParameterCategories.Output)]
+		[Description("Infobase file to log results to")]
+		public FileSpec? LogBase { get; set; }
 
 		protected void SetOutputFormat(OutputStyle style)
 		{
@@ -216,7 +224,7 @@ namespace Titanis.Cli
 				this.Context = null;
 			}
 		}
-		private Task<int> InvokeAsync(CommandMetadata metadata, Dictionary<ParameterMetadata, object?>? paramValues, CancellationToken cancellationToken)
+		private async Task<int> InvokeAsync(CommandMetadata metadata, Dictionary<ParameterMetadata, object?>? paramValues, CancellationToken cancellationToken)
 		{
 			Debug.Assert(this.Context != null);
 			var context = this.Context;
@@ -224,6 +232,8 @@ namespace Titanis.Cli
 
 			this.DefaultOutputStyle = metadata.DefaultOutputStyle;
 			ApplyValues(paramValues, context, metadata);
+
+			await this.LogInvocation(this.GetType().Name, paramValues, cancellationToken).ConfigureAwait(false);
 
 			var validateContext = new ParameterValidationContext();
 			foreach (var group in metadata.ParameterGroups)
@@ -251,7 +261,100 @@ namespace Titanis.Cli
 			catch { }
 
 			this.PrintBanner();
-			return this.RunAsync(cancellationToken);
+			try
+			{
+				var retval = await this.RunAsync(cancellationToken);
+				await this.LogReturnValue(retval, cancellationToken);
+				return retval;
+			}
+			catch (Exception ex)
+			{
+				await this.LogError(ex, cancellationToken);
+				throw;
+			}
+		}
+
+		private InfoBase? _infobase;
+		private InvocationLog? _invocLog;
+		class LogResultHook : ICommandResultHook
+		{
+			private readonly InvocationLog log;
+
+			internal LogResultHook(InvocationLog log)
+			{
+				this.log = log;
+			}
+
+			public void OnResult(object? record)
+			{
+				CancellationToken cx = CancellationToken.None;
+				Task.Factory.StartNew(async () =>
+				{
+					try
+					{
+						await this.log.WriteItem(record, cx);
+					}
+					catch
+					{
+
+					}
+				}).Unwrap().Wait();
+			}
+		}
+		private async Task LogInvocation(string name, Dictionary<ParameterMetadata, object?> paramValues, CancellationToken cancellationToken)
+		{
+			try
+			{
+				if (this.LogBase != null)
+				{
+					var logBase = this.ResolveFsPath(this.LogBase);
+
+					if (!File.Exists(logBase))
+					{
+						this._infobase = await InfoBase.CreateAsync(logBase, cancellationToken);
+					}
+					else
+					{
+						this._infobase = await InfoBase.OpenAsync(logBase, cancellationToken);
+					}
+
+					var args = paramValues.ToDictionary(r => r.Key.Name, r => r.Value);
+					this._invocLog = await this._infobase.LogCommand(name, args, cancellationToken);
+					this.Context.AddLogListener(this._invocLog);
+					this.Context.AddResultHook(new LogResultHook(this._invocLog));
+				}
+			}
+			catch
+			{
+				// Do not report errors
+			}
+		}
+
+
+		private Task LogError(Exception ex, CancellationToken cancellationToken)
+		{
+			if (this._invocLog != null)
+			{
+				try
+				{
+					return this._invocLog.LogError(ex, cancellationToken);
+				}
+				catch { }
+			}
+			return Task.CompletedTask;
+		}
+
+		private Task LogReturnValue(int retval, CancellationToken cancellationToken)
+		{
+			if (this._invocLog != null)
+			{
+				try
+				{
+					return this._invocLog.LogReturnValue(retval, cancellationToken);
+				}
+				catch { }
+			}
+			return Task.CompletedTask;
 		}
 
 #if DEBUG
