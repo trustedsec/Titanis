@@ -17,9 +17,6 @@ Sends RPC calls to coerce a system to authenticate to a remote system
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Techniques**||&lt;*ComponentSelector`1[]*&gt;|List of coercion techniques to attempt|
 ||||Possible values:|
 ||||  *****|
@@ -44,9 +41,11 @@ Sends RPC calls to coerce a system to authenticate to a remote system
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -64,6 +63,7 @@ Sends RPC calls to coerce a system to authenticate to a remote system
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -86,6 +86,7 @@ Sends RPC calls to coerce a system to authenticate to a remote system
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 

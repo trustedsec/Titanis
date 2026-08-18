@@ -47,21 +47,16 @@ Queries the server for a list of network interfaces.
 ## Options
 
 
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
-
-
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -79,6 +74,7 @@ Queries the server for a list of network interfaces.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -123,6 +119,7 @@ Queries the server for a list of network interfaces.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -210,24 +207,13 @@ Lists files open on the server.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-BasePath**||&lt;*String*&gt;|Select files starting with this path|
 |    **-BufferSize**||&lt;*Int32*&gt;|Max size for response buffer|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Level**||&lt;*OpenFileInfoLevel*&gt;|Which level of detail to query|
 ||||Possible values:|
 ||||  **Level2**|
 ||||  **Level3**|
 |    **-OpenBy**||&lt;*String*&gt;|Select files open by this user|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -235,9 +221,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -255,6 +243,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -297,6 +286,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -345,6 +335,24 @@ instead of TCP|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
+
 ## Details
 
 Use -OpenBy to filter the results by the name of the user that has the file
@@ -378,13 +386,9 @@ Lists active sessions on the server.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |**-B**, **-BufferSize**||&lt;*Int32*&gt;|Max size for response buffer|
 |    **-ClientComputer**||&lt;*String*&gt;|Select sessions belonging to this user|
 |    **-ClientUserName**||&lt;*String*&gt;|Select sessions connected to by this computer|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Level**||&lt;*SessionInfoLevel*&gt;|Which level of detail to query|
 ||||Possible values:|
 ||||  **Level0**|
@@ -392,13 +396,6 @@ Lists active sessions on the server.
 ||||  **Level2**|
 ||||  **Level10**|
 ||||  **Level502**|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -406,9 +403,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -426,6 +425,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -468,6 +468,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -519,6 +520,24 @@ instead of TCP|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
+
 ## Details
 
 Use -ClientComputer and -ClientUserName to filter the results.  The filtering
@@ -546,11 +565,7 @@ Lists shares on the server
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |**-B**, **-BufferSize**||&lt;*Int32*&gt;|Max size for response buffer|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Level**||&lt;*ShareInfoLevel[]*&gt;|Which level(s) of detail to query|
 ||||Possible values:|
 ||||  **Level0**|
@@ -559,13 +574,6 @@ Lists shares on the server
 ||||  **Level501**|
 ||||  **Level502**|
 ||||  **Level503**|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -573,9 +581,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -593,6 +603,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -635,6 +646,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -688,6 +700,24 @@ instead of TCP|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
+
 ## Details
 
 The Server service returns different levels of share information.  Anything
@@ -736,21 +766,16 @@ Lists the available snapshots for a file or directory.
 ## Options
 
 
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
-
-
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -768,6 +793,7 @@ Lists the available snapshots for a file or directory.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -812,6 +838,7 @@ Lists the available snapshots for a file or directory.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -894,21 +921,16 @@ Lists the data streams of a file or directory.
 ## Options
 
 
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
-
-
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -926,6 +948,7 @@ Lists the data streams of a file or directory.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -970,6 +993,7 @@ Lists the data streams of a file or directory.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1054,31 +1078,16 @@ Gets the contents of a file.
 ## Options
 
 
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-ChunkSize**||&lt;*Int32*&gt;|Size of chunks to copy|
-|    **-Compress**||&lt;*SwitchParam*&gt;|Requests the server compress the data|
-|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues copying after an error occurs|
-|    **-Depth**||&lt;*Int32*&gt;|Depth of directory tree to traverse (default = 0 [no recursion], -1 = no limit)|
-|    **-Overwrite**||&lt;*SwitchParam*&gt;|Overwrites existing local files|
-|**-Q**, **-QueryBufferSize**||&lt;*Int32*&gt;|Specifies the buffer size for querying the directory listing (for recursive
-operations).|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
-|    **-TimeWarpToken**||&lt;*TimeWarpToken*&gt;|Snapshot version, either as a date/time or a @GMT token|
-|    **-TreeOnly**||&lt;*SwitchParam*&gt;|Only copies the directory structure, but not the files.|
-|    **-Unbuffered**||&lt;*SwitchParam*&gt;|Reads the data directly from storage|
-
-
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1096,6 +1105,7 @@ operations).|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -1118,10 +1128,20 @@ operations).|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |**-B**, **-BackupSemantics**|**-UseBackupSemantics**|&lt;*SwitchParam*&gt;|Opens remote resource with backup semantics|
+|    **-ChunkSize**||&lt;*Int32*&gt;|Size of chunks to copy|
+|    **-Compress**||&lt;*SwitchParam*&gt;|Requests the server compress the data|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues copying after an error occurs|
+|    **-Depth**||&lt;*Int32*&gt;|Depth of directory tree to traverse (default = 0 [no recursion], -1 = no limit)|
 |    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 ||||  Default: 4096|
 |**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
 ||||  Default: True|
+|    **-Overwrite**||&lt;*SwitchParam*&gt;|Overwrites existing local files|
+|**-Q**, **-QueryBufferSize**||&lt;*Int32*&gt;|Specifies the buffer size for querying the directory listing (for recursive
+operations).|
+|    **-TimeWarpToken**||&lt;*TimeWarpToken*&gt;|Snapshot version, either as a date/time or a @GMT token|
+|    **-TreeOnly**||&lt;*SwitchParam*&gt;|Only copies the directory structure, but not the files.|
+|    **-Unbuffered**||&lt;*SwitchParam*&gt;|Reads the data directly from storage|
 
 
 ### Connection
@@ -1140,6 +1160,7 @@ operations).|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1275,25 +1296,16 @@ Lists the contents of a directory (including named pipes).
 ## Options
 
 
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-Depth**||&lt;*Int32*&gt;|Sets the depth limit for a recursive listing (default = 0 [no recursion], -1 =
-no limit)|
-|**-Q**, **-QueryBufferSize**||&lt;*Int32*&gt;|Specifies the buffer size for querying the directory listing.|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
-|    **-TimeWarpToken**||&lt;*TimeWarpToken*&gt;|Snapshot version, either as a date/time or a @GMT token|
-
-
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1311,6 +1323,7 @@ no limit)|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -1333,10 +1346,14 @@ no limit)|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |**-B**, **-BackupSemantics**|**-UseBackupSemantics**|&lt;*SwitchParam*&gt;|Opens remote resource with backup semantics|
+|    **-Depth**||&lt;*Int32*&gt;|Sets the depth limit for a recursive listing (default = 0 [no recursion], -1 =
+no limit)|
 |    **-DfsReferralBufferSize**||&lt;*Int32*&gt;|Specifies the size for the DFS referral buffer (default=4096)|
 ||||  Default: 4096|
 |**-F**, **-FollowDfs**||&lt;*SwitchParam*&gt;|Checks for and follows DFS referrals (default=true)|
 ||||  Default: True|
+|**-Q**, **-QueryBufferSize**||&lt;*Int32*&gt;|Specifies the buffer size for querying the directory listing.|
+|    **-TimeWarpToken**||&lt;*TimeWarpToken*&gt;|Snapshot version, either as a date/time or a @GMT token|
 
 
 ### Connection
@@ -1355,6 +1372,7 @@ no limit)|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1536,10 +1554,7 @@ Creates a directory.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Parents**||&lt;*SwitchParam*&gt;|Create parent directories|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -1547,9 +1562,11 @@ Creates a directory.
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1567,6 +1584,7 @@ Creates a directory.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -1611,6 +1629,7 @@ Creates a directory.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1703,13 +1722,10 @@ Creates a symbolic link.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Directory**||&lt;*SwitchParam*&gt;|Creates the symlink as a directory|
 |    **-PrintPath**||&lt;*String*&gt;|The path to display to the user in directory listings (defaults to
 &lt;TargetPath&gt;)|
 |    **-Relative**||&lt;*SwitchParam*&gt;|Create the link as a relative path|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -1717,9 +1733,11 @@ Creates a symbolic link.
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1737,6 +1755,7 @@ Creates a symbolic link.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -1781,6 +1800,7 @@ Creates a symbolic link.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1905,11 +1925,8 @@ Creates a mount point or junction.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-PrintPath**||&lt;*String*&gt;|The path to display to the user in directory listings (defaults to
 &lt;TargetPath&gt;)|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -1917,9 +1934,11 @@ Creates a mount point or junction.
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1937,6 +1956,7 @@ Creates a mount point or junction.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -1981,6 +2001,7 @@ Creates a mount point or junction.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -2105,12 +2126,9 @@ Mounts an SMB2 server or share to the local file system.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |**-B**, **-BackupSemantics**||&lt;*SwitchParam*&gt;|Mount the file system using backup semantics|
 |**-G**, **-Gid**||&lt;*UInt32*&gt;|GID of mount|
 |    **-ReadWrite**||&lt;*SwitchParam*&gt;|Mount as read/write|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Uid**||&lt;*UInt32*&gt;|UID of mount|
 
 
@@ -2119,9 +2137,11 @@ Mounts an SMB2 server or share to the local file system.
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -2139,6 +2159,7 @@ Mounts an SMB2 server or share to the local file system.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -2181,6 +2202,7 @@ Mounts an SMB2 server or share to the local file system.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -2259,7 +2281,6 @@ Sends a file to the server.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-ChangeTimestamp**||&lt;*DateTime*&gt;|Change time to set on the file (UTC).  If specified, overrides any timestamps
 copied from source or remote file.|
 |    **-ChunkSize**||&lt;*Int32*&gt;|Size of chunks to copy|
@@ -2270,8 +2291,6 @@ copied from source or remote file.|
 timestamps copied from source or remote file.|
 |    **-LastWriteTimestamp**||&lt;*DateTime*&gt;|Last write time to set on the file (UTC).  If specified, overrides any
 timestamps copied from source or remote file.|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-TimestampsFrom**||&lt;*UncPath*&gt;|UNC Path of remote file to copy Creation, LastAccess, LastWrite and Change Time
 from.|
 
@@ -2281,9 +2300,11 @@ from.|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -2301,6 +2322,7 @@ from.|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -2345,6 +2367,7 @@ from.|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -2435,21 +2458,16 @@ Deletes a file.
 ## Options
 
 
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
-
-
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -2467,6 +2485,7 @@ Deletes a file.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -2511,6 +2530,7 @@ Deletes a file.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -2589,21 +2609,16 @@ Deletes a directory.
 ## Options
 
 
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
-
-
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -2621,6 +2636,7 @@ Deletes a directory.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -2665,6 +2681,7 @@ Deletes a directory.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -2745,7 +2762,6 @@ Updates the timestamps or attributes of a file or directory on an SMB share.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-ChangeTimestamp**||&lt;*DateTime*&gt;|Change time to set on the file (UTC)|
 |    **-CopyFileAttributes**||&lt;*SwitchParam*&gt;|If specified, also copy file attributes from TimestampsFrom|
 |    **-CreateTimestamp**||&lt;*DateTime*&gt;|Create time to set on the file (UTC)|
@@ -2753,8 +2769,6 @@ Updates the timestamps or attributes of a file or directory on an SMB share.
 |    **-LastWriteTimestamp**||&lt;*DateTime*&gt;|Last write time to set on the file (UTC)|
 |    **-SetAttributes**||&lt;*FileAttributeSpec*&gt;|File attributes to set on the file or directory. Accepts Formats: RHSATFMCOIEVX
 (string), 28312 (int), 0x80 (hex). See Detailed help for meaning|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-TimestampsFrom**||&lt;*UncPath*&gt;|UNC Path of remote file to copy timestamps from|
 |    **-UpdateAttributes**||&lt;*String*&gt;|File attributes modifications|
 
@@ -2764,9 +2778,11 @@ Updates the timestamps or attributes of a file or directory on an SMB share.
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -2784,6 +2800,7 @@ Updates the timestamps or attributes of a file or directory on an SMB share.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -2828,6 +2845,7 @@ Updates the timestamps or attributes of a file or directory on an SMB share.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -3011,10 +3029,7 @@ Unmounts a mount point.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-RemoveDirectory**||&lt;*SwitchParam*&gt;|Deletes the directory after unmounting|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -3022,9 +3037,11 @@ Unmounts a mount point.
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -3042,6 +3059,7 @@ Unmounts a mount point.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -3086,6 +3104,7 @@ Unmounts a mount point.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -3173,12 +3192,9 @@ Watches for modifications to a directory or subtree.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-BufferSize**||&lt;*Int32*&gt;|Buffer size (default = 2048)|
 |    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continue watching for changes if an error occurs|
 |    **-Recursive**||&lt;*SwitchParam*&gt;|Watches the entire subtree|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -3186,9 +3202,11 @@ Watches for modifications to a directory or subtree.
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -3206,6 +3224,7 @@ Watches for modifications to a directory or subtree.
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -3250,6 +3269,7 @@ Watches for modifications to a directory or subtree.
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 

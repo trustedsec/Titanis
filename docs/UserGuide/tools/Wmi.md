@@ -43,29 +43,16 @@ Backs up the WMI repository
 ## Options
 
 
-|Name|Aliases|Value|Description|
-|-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
-
-
 ### Authentication
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -83,6 +70,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -125,6 +113,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -166,6 +155,24 @@ instead of TCP|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
+
 ## Examples
 
 ### Example 1 - Back up to C:\wmibackup.bak
@@ -192,22 +199,11 @@ Deletes a WMI object
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continue even if errors occur|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
 ||||  Default: root\cimv2|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-WithQualifiers**||&lt;*String[]*&gt;|Filter qualifiers|
 
 
@@ -216,9 +212,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -236,6 +234,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -278,6 +277,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -317,6 +317,24 @@ instead of TCP|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
+
+
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
 
 
 ## Examples
@@ -351,24 +369,13 @@ Executes a command on a remote system via WMI
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-CaptureOutput**||&lt;*SwitchParam*&gt;|Redirects STDOUR and STDERR to a file|
 ||||  Default: True|
 |    **-CmdCall**||&lt;*SwitchParam*&gt;|Prepends 'cmd /q /c' to the command|
 ||||  Default: True|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-EnvironmentVariables**||&lt;*String[]*&gt;|Environment variables to pass to the command|
 |    **-PollInterval**||&lt;*Duration*&gt;|Polling interval|
 ||||  Default: 1s|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Wait**||&lt;*SwitchParam*&gt;|Waits for the command to complete|
 ||||  Default: True|
 |    **-WorkingDir**||&lt;*String*&gt;|Sets the working directory for the new process|
@@ -379,9 +386,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -399,6 +408,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -441,6 +451,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -480,6 +491,24 @@ instead of TCP|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
+
+
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
 
 
 ## Details
@@ -554,21 +583,10 @@ Gets an object with a WMI path
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
 ||||  Default: root\cimv2|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-WithQualifiers**||&lt;*String[]*&gt;|Filter qualifiers|
 
 
@@ -577,9 +595,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -597,6 +617,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -639,6 +660,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -684,6 +706,24 @@ instead of TCP|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
+
 ## Details
 
 The object path is specified relative to the namespace.
@@ -727,23 +767,12 @@ Invokes a method on a WMI class or object
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continue even if errors occur|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
 ||||  Default: root\cimv2|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
 |    **-SkipParams**||&lt;*String[]*&gt;|List of parameters to skip|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-WithQualifiers**||&lt;*String[]*&gt;|Filter qualifiers|
 
 
@@ -752,9 +781,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -772,6 +803,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -814,6 +846,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -853,6 +886,24 @@ instead of TCP|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
+
+
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
 
 
 ## Details
@@ -910,23 +961,12 @@ Lists the classes within a namespace.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
 ||||  Default: root\cimv2|
 |    **-PageSize**||&lt;*Int32*&gt;|Number of results to fetch at a time|
 ||||  Default: 10|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-WithQualifiers**||&lt;*String[]*&gt;|Filter qualifiers|
 
 
@@ -935,9 +975,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -955,6 +997,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -997,6 +1040,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1046,6 +1090,24 @@ instead of TCP|
 ||||  Default: True|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
+
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
 # Wmi lsmethod
 Lists the methods of a class or object.
 
@@ -1065,22 +1127,11 @@ Lists the methods of a class or object.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continue even if errors occur|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
 ||||  Default: root\cimv2|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-WithQualifiers**||&lt;*String[]*&gt;|Filter qualifiers|
 
 
@@ -1089,9 +1140,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1109,6 +1162,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -1151,6 +1205,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1208,6 +1263,24 @@ instead of TCP|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
+
 ## Details
 
 You may specify multiple object paths.  Each object path may be a class or an
@@ -1258,23 +1331,12 @@ Lists the available namespaces within a namespace.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
 ||||  Default: root\cimv2|
 |    **-PageSize**||&lt;*Int32*&gt;|Number of results to fetch at a time|
 ||||  Default: 10|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-WithQualifiers**||&lt;*String[]*&gt;|Filter qualifiers|
 
 
@@ -1283,9 +1345,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1303,6 +1367,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -1345,6 +1410,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1386,6 +1452,24 @@ instead of TCP|
 ||||  Default: True|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
+
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
 # Wmi lsprop
 Lists the properties of a class or object.
 
@@ -1405,21 +1489,10 @@ Lists the properties of a class or object.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
 ||||  Default: root\cimv2|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-WithQualifiers**||&lt;*String[]*&gt;|Filter qualifiers|
 
 
@@ -1428,9 +1501,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1448,6 +1523,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -1490,6 +1566,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1550,6 +1627,24 @@ instead of TCP|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
+
 ## Details
 
 You may specify multiple object paths.  Each object path may be a class or an
@@ -1595,23 +1690,12 @@ Mounts a WMI namespace as a file system
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |**-G**, **-Gid**||&lt;*UInt32*&gt;|GID of mount|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
 ||||  Default: root\cimv2|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
 |    **-ReadWrite**||&lt;*SwitchParam*&gt;|Mount as read/write|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Uid**||&lt;*UInt32*&gt;|UID of mount|
 |    **-WithQualifiers**||&lt;*String[]*&gt;|Filter qualifiers|
 
@@ -1621,9 +1705,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1641,6 +1727,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -1683,6 +1770,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1722,6 +1810,24 @@ instead of TCP|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
+
+
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
 
 # Wmi query
 Executes a WMI query
@@ -1742,23 +1848,12 @@ Executes a WMI query
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
 ||||  Default: root\cimv2|
 |    **-PageSize**||&lt;*Int32*&gt;|Number of results to fetch at a time|
 ||||  Default: 10|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-WithQualifiers**||&lt;*String[]*&gt;|Filter qualifiers|
 
 
@@ -1767,9 +1862,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1787,6 +1884,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -1829,6 +1927,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -1868,6 +1967,24 @@ instead of TCP|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
+
+
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
 
 
 ## Examples
@@ -1921,18 +2038,7 @@ Restores the WMI repository
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-ForceShutdown**||&lt;*SwitchParam*&gt;|Forces any active clients to shut down|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -1940,9 +2046,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -1960,6 +2068,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -2002,6 +2111,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -2043,6 +2153,24 @@ instead of TCP|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
+
 ## Examples
 
 ### Example 1 - Restore from C:\wmibackup.bak
@@ -2076,21 +2204,10 @@ Deletes one or more registry keys and/or values
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continue even if a deletion fails|
 |    **-DeleteKeys**||&lt;*SwitchParam*&gt;|Delete keys that have no values specified|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -2098,9 +2215,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -2118,6 +2237,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -2160,6 +2280,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -2199,6 +2320,24 @@ instead of TCP|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
+
+
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
 
 
 ## Details
@@ -2277,12 +2416,8 @@ Export registry values to file
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-CaseSensitive**|**-c**|&lt;*SwitchParam*&gt;|Specifies that the search is case sensitive|
 |    **-DataSearch**|**-d**|&lt;*SwitchParam*&gt;|Specifies to search in data.|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Exact**|**-e**|&lt;*SwitchParam*&gt;|Specifies to return only exact matches.|
 |    **-KeySearch**|**-k**|&lt;*SwitchParam*&gt;|Specifies to search in key names.|
 |    **-Locale**||&lt;*String*&gt;|Locale|
@@ -2291,16 +2426,9 @@ Export registry values to file
 ||||  Default: 0|
 |    **-OutputFile**||&lt;*FileSpec*&gt;|Name of output file|
 |    **-Overwrite**||&lt;*SwitchParam*&gt;|Overwrites existing output file|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
 |**-Q**, **-QueryDefaultValue**|**-ve**|&lt;*SwitchParam*&gt;|Limits results to default value of registry key.|
 |    **-Recursive**|**-s**|&lt;*SwitchParam*&gt;|Queries all subkeys and values recursively.|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
 |    **-SearchPatterns**|**-f**|&lt;*String[]*&gt;|Data or patterns to search for.|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Types**|**-t**|&lt;*RegistryValueType[]*&gt;|Specifies registry value data types.|
 ||||Possible values:|
 ||||  **None**|
@@ -2319,9 +2447,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -2339,6 +2469,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -2381,6 +2512,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -2420,6 +2552,24 @@ instead of TCP|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
+
+
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
 
 
 ## Examples
@@ -2467,28 +2617,17 @@ Query registry values
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-CaseSensitive**|**-c**|&lt;*SwitchParam*&gt;|Specifies that the search is case sensitive|
 |    **-DataSearch**|**-d**|&lt;*SwitchParam*&gt;|Specifies to search in data.|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Exact**|**-e**|&lt;*SwitchParam*&gt;|Specifies to return only exact matches.|
 |    **-KeySearch**|**-k**|&lt;*SwitchParam*&gt;|Specifies to search in key names.|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |**-M**, **-MaxDepth**||&lt;*Int32*&gt;|Limit recursion to the depth specified|
 ||||  Default: 0|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
 |**-Q**, **-QueryDefaultValue**|**-ve**|&lt;*SwitchParam*&gt;|Limits results to default value of registry key.|
 |    **-Recursive**|**-s**|&lt;*SwitchParam*&gt;|Queries all subkeys and values recursively.|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
 |    **-SearchPatterns**|**-f**|&lt;*String[]*&gt;|Data or patterns to search for.|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Types**|**-t**|&lt;*RegistryValueType[]*&gt;|Specifies registry value data types.|
 ||||Possible values:|
 ||||  **None**|
@@ -2507,9 +2646,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -2527,6 +2668,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -2569,6 +2711,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -2619,6 +2762,24 @@ instead of TCP|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
 
 
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
+
+
 ## Examples
 
 ### Example 1 - Query all values and direct subkeys of HKLM\Software\MyApp
@@ -2664,19 +2825,8 @@ Sets one or more values in a registry key
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
-|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
-|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
-|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
-|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
-instead of TCP|
-|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
-|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
-|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
-|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
-|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 
 
 ### Authentication
@@ -2684,9 +2834,11 @@ instead of TCP|
 |Name|Aliases|Value|Description|
 |-|-|-|-|
 |    **-Anonymous**||&lt;*SwitchParam*&gt;|Uses anonymous login|
+|    **-AuthProxy**||&lt;*EndPoint*&gt;|Endpoint of auth proxy|
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
 
@@ -2704,6 +2856,7 @@ instead of TCP|
 |    **-S4ProxyService**||&lt;*SecurityPrincipalName*&gt;|Name of service to proxy through|
 |    **-S4UserCert**||&lt;*FileSpec*&gt;|Name of file containing a certificate of a user to impersonate with S4U|
 |    **-S4UserName**||&lt;*UserPrincipalName*&gt;|Name of user to impersonate with S4U|
+|    **-SpnOverride**||&lt;*SpnMapping[]*&gt;|Specifies an SPN override|
 |    **-Tgt**||&lt;*FileSpec*&gt;|Name of file containing a ticket-granting ticket (.kirbi or ccache)|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |    **-Tickets**|**-Ticket**|&lt;*FileSpec[]*&gt;|Name of file containing service tickets (.kirbi or ccache)|
@@ -2746,6 +2899,7 @@ instead of TCP|
 |    **-HostAddress**|**-ha**|&lt;*String[]*&gt;|Network address(es) of the server|
 |    **-RequireSecureNegotiate**||&lt;*SwitchParam*&gt;|Requires the client to authenticate the negotiation|
 |    **-RequireSigning**|**-signreq**|&lt;*SwitchParam*&gt;|Requires packets to be signed|
+|    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
@@ -2785,6 +2939,24 @@ instead of TCP|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
 |    **-Verbose**|**-V**|&lt;*SwitchParam*&gt;|Prints verbose messages|
+
+
+### RPC
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-AuthEpm**||&lt;*SwitchParam*&gt;|Authenticates EP mapper requests|
+|    **-EncryptEpm**||&lt;*SwitchParam*&gt;|Encrypts EP mappend requests|
+|    **-EncryptRpc**||&lt;*SwitchParam*&gt;|Encrypts RPC messages|
+|    **-OfferNdr**||&lt;*SwitchParam*&gt;|Offers the NDR transfer syntax|
+||||  Default: True|
+|    **-OfferNdr64**||&lt;*SwitchParam*&gt;|Offers the NDR64 transfer syntax|
+||||  Default: True|
+|    **-PreferSmb**||&lt;*SwitchParam*&gt;|If the interface supports named pipes, attempt to connect over the named pipe
+instead of TCP|
+|    **-RpcCallTimeout**||&lt;*Duration*&gt;|Time to wait for RPC calls|
+|    **-RpcConnectTimeout**||&lt;*Duration*&gt;|Time to wait for RPC connections|
+|    **-Spnego**||&lt;*SwitchParam*&gt;|Uses SP-NEGO for authentication|
 
 
 ## Details
