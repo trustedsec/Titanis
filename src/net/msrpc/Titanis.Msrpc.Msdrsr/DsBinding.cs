@@ -169,6 +169,78 @@ namespace Titanis.Msrpc.Msdrsr
 		}
 		#endregion
 
+		#region Keys
+		public async Task WriteNgcKey(
+			LdapDistinguishedName accountDn,
+			byte[] key,
+			CancellationToken cancellationToken)
+		{
+			ArgumentNullException.ThrowIfNull(accountDn);
+			ArgumentNullException.ThrowIfNull(key);
+
+			RpcPointer<uint> pdwOutVersion = new();
+			RpcPointer<DRS_MSG_WRITENGCKEYREPLY> pmsgOut = new();
+			var res = (Win32ErrorCode)await owner.proxy.IDL_DRSWriteNgcKey(
+				hbind,
+				1,
+				new DRS_MSG_WRITENGCKEYREQ
+				{
+					unionSwitch = 1,
+					V1 = new DRS_MSG_WRITENGCKEYREQ_V1
+					{
+						pwszAccount = new RpcPointer<string>(accountDn.ToString()),
+						cNgcKey = (uint)key.Length,
+						pNgcKey = new RpcPointer<byte[]>(key)
+					}
+				},
+				pdwOutVersion,
+				pmsgOut,
+				cancellationToken
+				).ConfigureAwait(false);
+			res.CheckAndThrow();
+
+			if (pmsgOut.value.unionSwitch == 1)
+			{
+				((Win32ErrorCode)pmsgOut.value.V1.retVal).CheckAndThrow();
+			}
+			else
+			{
+				throw new NotSupportedException($"Server returned with unsupported version: {pmsgOut.value.unionSwitch}");
+			}
+		}
+		public async Task<byte[]> ReadNgcKey(LdapDistinguishedName accountDn, CancellationToken cancellationToken)
+		{
+			ArgumentNullException.ThrowIfNull(accountDn);
+			RpcPointer<uint> pdwOutVersion = new();
+			RpcPointer<DRS_MSG_READNGCKEYREPLY> pmsgOut = new();
+			var res = (Win32ErrorCode)(await owner.proxy.IDL_DRSReadNgcKey(
+				hbind,
+				1,
+				new DRS_MSG_READNGCKEYREQ
+				{
+					unionSwitch = 1,
+					V1 = new DRS_MSG_READNGCKEYREQ_V1
+					{
+						pwszAccount = new RpcPointer<string>(accountDn.ToString())
+					}
+				},
+				pdwOutVersion,
+				pmsgOut,
+				cancellationToken
+				).ConfigureAwait(false));
+
+			if (pmsgOut.value.unionSwitch == 1)
+			{
+				((Win32ErrorCode)pmsgOut.value.V1.retVal).CheckAndThrow();
+				return pmsgOut.value.V1.pNgcKey.value;
+			}
+			else
+			{
+				throw new NotSupportedException($"Server returned with unsupported version: {pmsgOut.value.unionSwitch}");
+			}
+		}
+		#endregion
+
 		public async Task AddSidHistory(
 			DsrepAddSidHistoryOptions options,
 			string sourceDomain,

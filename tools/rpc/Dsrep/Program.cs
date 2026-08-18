@@ -20,6 +20,8 @@ namespace Titanis.Cli.Dsrep;
 [Subcommand("kccfailures", typeof(KccFailuresCommand))]
 [Subcommand("utdvec", typeof(UptodateVectorsCommand))]
 [Subcommand("addsidhist", typeof(AddSidHistoryCommand))]
+[Subcommand("readngckey", typeof(ReadNgcKeyCommand))]
+[Subcommand("writengckey", typeof(WriteNgcKeyCommand))]
 [Description("Interacts with Directory Replication Service")]
 internal class Program : MultiCommand
 {
