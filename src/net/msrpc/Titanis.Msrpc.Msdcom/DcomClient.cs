@@ -170,7 +170,13 @@ namespace Titanis.Msrpc.Msdcom
 			// SCMActivator
 			if (info.Version.MinorVersion >= 6)
 			{
-				var scmClient = new ScmActivatorClient(dcom, host);
+				// COSERVERINFO.pwszName for RemoteCreateInstance must be the target IP, not the FQDN:
+				// an FQDN there is rejected with E_FAIL (0x80004005) by the SCM (both NTLM and Kerberos),
+				// while null/empty yields E_INVALIDARG. The RPC bind/SPN still use the FQDN endpoint, so
+				// Kerberos is unaffected. See issue #11.
+				string activationName = host;
+				try { var addrs = System.Net.Dns.GetHostAddresses(host); if (addrs.Length > 0) activationName = addrs[0].ToString(); } catch { }
+				var scmClient = new ScmActivatorClient(dcom, activationName);
 				dcom._scmActivator = scmClient;
 				await scmClient.BindToAsync(rpcChannel, false, exporter.Proxy.BoundAuthContext?.AuthContext, exporter.Proxy.BoundAuthContext?.AuthLevel ?? RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
 			}
