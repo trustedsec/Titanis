@@ -1,5 +1,35 @@
 Change Log
 
+# Prerelease
+
+* Dsrep
+	* addsidhist
+	* writengckey, readngckey
+	* crackname
+	* Topology and replicaiton:
+		* sites
+		* roles
+		* domains
+		* partitions
+		* gcs
+		* neighbors
+		* repsto
+		* cursors
+		* objmetadata
+		* attrmetadata
+		* queue
+* SSPI support (Windows only)
+* NDR64 enabled by default across the toolset
+	* Use `-OfferNdr64:no` to disable
+
+## Minor Enhancements
+* CSV supports multi-value output (semicolon-delimited)
+* LDAP
+	* If no -OutputFields, it requests 1.1 to prevent all attributes from being returned
+	* Filter attributes optionally replaced with OIDs (for evasion)
+* Enum argument parser is case-insensitive
+
+
 # 2026-08-05
 * Usability enhancements
 	* Distribution includes .deb package
