@@ -75,6 +75,11 @@ namespace Titanis.DceRpc
 			}
 		}
 
+		public static T[]? UnwrapArray<T>(this RpcPointer<T>[] pointer)
+		{
+			return (pointer is null) ? null : Array.ConvertAll(pointer, r => r.value);
+		}
+
 		public static DateTime? ToDateTimeOrNull(this FILETIME ft)
 			=> (
 				((ft.dwLowDateTime == uint.MaxValue) && (ft.dwHighDateTime == int.MaxValue))
