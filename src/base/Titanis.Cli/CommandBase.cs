@@ -443,10 +443,23 @@ namespace Titanis.Cli
 		protected void WriteRecords(System.Collections.IEnumerable records)
 		{
 			if (records != null)
+			{
+				foreach (var rec in records)
+					this.OnWritingRecord(rec);
+
 				this.VerifyContext().WriteRecords(records);
+			}
 		}
 
-		protected void WriteRecord(object? record, RecordInfo? info = null) => this.VerifyContext().WriteRecord(record, info);
+		protected virtual void OnWritingRecord(object? record, RecordInfo? info = null)
+		{
+		}
+
+		protected void WriteRecord(object? record, RecordInfo? info = null)
+		{
+			this.OnWritingRecord(record, info);
+			this.VerifyContext().WriteRecord(record, info);
+		}
 
 		protected Stream OpenRawOutputStream()
 		{

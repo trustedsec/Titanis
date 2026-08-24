@@ -43,10 +43,6 @@ By default, deletion stops on the first encountered error. There is no automated
 		[Description("Delete keys that have no values specified")]
 		public SwitchParam DeleteKeys { get; set; }
 
-		[Parameter]
-		[Description("Continue even if a deletion fails")]
-		public SwitchParam ContinueOnError { get; set; }
-
 		private List<RegistryKeyGroup> _keys;
 		private uint _keysDeleted = 0;
 		private uint _valuesDeleted = 0;

@@ -11,7 +11,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Winterop.SamServer
 {
-	public class SamUserHash
+	public class SamUserHash : IWantServerName
 	{
 		private readonly SamUserRegistryObject _userObj;
 
@@ -21,6 +21,7 @@ namespace Titanis.Winterop.SamServer
 		}
 
 		public string AccountName => this._userObj.AccountName;
+		public string? ServerName { get; set; }
 		public string FullName => this._userObj.FullName;
 		public uint Rid => this._userObj.Rid;
 		[Browsable(false)]

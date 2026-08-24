@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Titanis.Cli
+namespace Titanis
 {
 	/// <summary>
-	/// Provides a server name.
+	/// Wants a server name.
 	/// </summary>
-	public interface IHaveServerName
+	public interface IWantServerName
 	{
 		/// <summary>
-		/// Gets the target server name.
+		/// Sets the target server name.
 		/// </summary>
-		public string? ServerName { get; }
+		public string? ServerName { get; set; }
 	}
 }

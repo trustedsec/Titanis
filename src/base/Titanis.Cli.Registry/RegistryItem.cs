@@ -8,7 +8,7 @@ namespace Titanis.Cli.Registry
 		Key,
 		Value,
 	}
-	public class RegistryItem
+	public class RegistryItem : IWantServerName
 	{
 		public RegistryItem(string? parentKey, string keyName, string? className)
 		{
@@ -37,6 +37,7 @@ namespace Titanis.Cli.Registry
 		}
 		public string? ParentKeyName { get; }
 		public string Name { get; }
+		public string? ServerName { get; set; }
 		public RegistryItemType ItemType { get; }
 		public RegistryValueType? ValueType { get; }
 		public string? ClassName { get; }

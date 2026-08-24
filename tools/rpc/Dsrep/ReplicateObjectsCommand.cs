@@ -40,7 +40,7 @@ public class ReplicateObjectsCommand : ReplicateCommand
 			}
 			else
 			{
-				ldapClient ??= await LdapClient.Connect(new DnsEndPoint(this.ServerName, 389), null, this.RequireService<ISocketService>(), this.RequireService<IClientCredentialService>(), cancellationToken);
+				ldapClient ??= await LdapClient.Connect(new DnsEndPoint(this.CurrentServerName, 389), null, this.RequireService<ISocketService>(), this.RequireService<IClientCredentialService>(), cancellationToken);
 
 				var filter = objSpec.Filter ?? LdapFilter.Parse($"(samAccountName={objSpec.Name})");
 				LdapQuery query = new(ldapClient.DomainRoot, LdapSearchScope.Subtree, filter, [])

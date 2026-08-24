@@ -90,7 +90,7 @@ namespace Titanis.Cli
 			services.AddService(typeof(IRpcBinder), this);
 		}
 
-		public void ValidateParameters(ParameterValidationContext context, RpcServiceClient svcClient, ref string? serverName)
+		public void ValidateParameters(ParameterValidationContext context, RpcServiceClient svcClient)
 		{
 			this.NetParameters?.ValidateParameters(context);
 			this.Authentication?.Validate(false, context);
@@ -101,12 +101,6 @@ namespace Titanis.Cli
 				if (this.EncryptEpm.IsSet) context.LogError(nameof(EncryptEpm), $"-{nameof(EncryptEpm)} requires authentication, but no authentication information is provided.");
 				if (this.EncryptRpc.IsSet) context.LogError(nameof(EncryptRpc), $"-{nameof(EncryptRpc)} requires authentication, but no authentication information is provided.");
 			}
-
-			if (NetParameters.HostAddress.IsNullOrEmpty())
-				NetParameters.HostAddress = new string[] { serverName };
-
-			if (serverName.StartsWith(@"\\"))
-				serverName = serverName.Substring(2);
 
 			if (this.PreferSmb.IsSet)
 			{
@@ -155,9 +149,13 @@ namespace Titanis.Cli
 		public async Task<RpcBindInfo> BindServiceClient(
 			RpcServiceClient svcClient,
 			string serverName,
+			bool preferSmb,
 			CancellationToken cancellationToken)
 		{
 			ArgumentNullException.ThrowIfNull(svcClient);
+
+			if (this.PreferSmb.IsSpecified)
+				preferSmb = this.PreferSmb.IsSet;
 
 			RpcClient rpcClient = this.Services.CreateRpcClient();
 			this.ApplyTo(rpcClient);
@@ -169,7 +167,7 @@ namespace Titanis.Cli
 			IPAddress.TryParse(serverName, out var remoteAddr);
 
 			var port = svcClient.WellKnownTcpPort;
-			if (!this.PreferSmb.IsSet && (port != 0 || svcClient.SupportsDynamicTcp))
+			if (!preferSmb && (port != 0 || svcClient.SupportsDynamicTcp))
 			{
 				// If the endpoint doesn't have a well-known port, use the EP mapper
 				EndPoint? remoteEP;

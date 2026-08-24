@@ -3,9 +3,10 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Mslsar
 {
-	public class LsaAccountMapping
+	public class LsaAccountMapping : IWantServerName
 	{
 		public string AccountName { get; set; }
+		public string? ServerName { get; set; }
 		public LsaNameType NameType { get; internal set; }
 		public string? DomainName { get; internal set; }
 		public SecurityIdentifier? DomainSid { get; internal set; }

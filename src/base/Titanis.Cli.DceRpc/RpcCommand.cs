@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel;
-using System.Security.Cryptography;
 using Titanis.DceRpc.Client;
-using Titanis.Smb2;
 
 namespace Titanis.Cli
 {
@@ -11,18 +9,32 @@ namespace Titanis.Cli
 	/// <remarks>
 	/// Implementors should use <see cref="RpcCommand{TClient}"/>.
 	/// </remarks>
-	public abstract class RpcCommand : Command
+	public abstract class RpcCommand : Command, IHaveServerName
 	{
 
 		[ParameterGroup(ParameterGroupOptions.Required)]
 		public RpcParameterGroup RpcParameters { get; set; }
 
-		private string _serverName;
+		private string[] _serverName;
 		[Parameter(0)]
 		[Mandatory]
 		[Description("RPC server to interact with")]
-		public string ServerName { get => _serverName; set => _serverName = value; }
+		public string[] ServerName { get => _serverName; set => _serverName = value; }
 
+		public string? CurrentServerName { get; set; }
+		string? IHaveServerName.ServerName => this.CurrentServerName;
+
+		[Parameter]
+		[Category(ParameterCategories.ErrorHandling)]
+		[Description("Continues executing even if an error occurs")]
+		public virtual SwitchParam ContinueOnError { get; set; }
+
+		protected override void OnWritingRecord(object? record, RecordInfo? info = null)
+		{
+			base.OnWritingRecord(record, info);
+			if (record is IWantServerName wantsServer && wantsServer.ServerName is null)
+				wantsServer.ServerName = this.CurrentServerName;
+		}
 
 		private RpcServiceClient _svcClient;
 		protected override void ValidateParameters(ParameterValidationContext context)
@@ -31,22 +43,71 @@ namespace Titanis.Cli
 			this._svcClient = svcClient;
 
 			base.ValidateParameters(context);
-			this.RpcParameters.ValidateParameters(context, svcClient, ref this._serverName);
+			this.RpcParameters.ValidateParameters(context, svcClient);
+		}
+
+		protected override OutputField[] FilterOutputFields(OutputField[] fields)
+		{
+			fields = base.FilterOutputFields(fields);
+			if (!this.OutputFieldsSpecified && (this.ServerName?.Length ?? 0) <= 1)
+			{
+				fields = Array.FindAll(fields, r => r.Name != nameof(IWantServerName.ServerName));
+			}
+			return fields;
 		}
 
 		protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
 		{
-			var svcClient = this._svcClient;
-			var bindInfo = await RpcParameters.BindServiceClient(
-				svcClient,
-				ServerName,
-				cancellationToken
-				).ConfigureAwait(false);
-
-			using (bindInfo.SmbClient)
+			int lastError = 0;
+			int lastExitCode = 0;
+			bool multiServer = this.ServerName.Length > 0;
+			foreach (var serverName_ in this.ServerName)
 			{
-				return await RunAsync(svcClient, cancellationToken).ConfigureAwait(false);
+				string serverName = serverName_;
+				bool isSmb = serverName.StartsWith("//") || serverName.StartsWith(@"\\");
+				if (isSmb)
+					serverName = serverName.Substring(2);
+
+				if (multiServer)
+					this.WriteMessage($"Running on server {serverName}.");
+
+				try
+				{
+					this.CurrentServerName = serverName;
+
+					var svcClient = this._svcClient;
+					var bindInfo = await RpcParameters.BindServiceClient(
+						svcClient,
+						serverName,
+						isSmb,
+						cancellationToken
+						).ConfigureAwait(false);
+
+					using (bindInfo.SmbClient)
+					{
+						lastExitCode = await RunAsync(svcClient, cancellationToken).ConfigureAwait(false);
+					}
+				}
+				catch (Exception ex)
+				{
+					if (this.ContinueOnError.IsSet)
+						this.WriteError($"Error occurred with server {serverName}: {ex.Message}");
+					else
+						throw;
+
+					while (ex is AggregateException agg)
+						ex = agg.InnerException;
+
+					if (ex is IHaveErrorCode err)
+						lastError = err.ErrorCode;
+					else
+						lastError = ex.HResult;
+				}
+
+				this.Context.FlushOutput();
 			}
+
+			return (lastError != 0) ? lastError : lastExitCode;
 		}
 
 		protected abstract RpcServiceClient CreateServiceClient();

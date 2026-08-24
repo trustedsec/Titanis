@@ -193,7 +193,7 @@ namespace Titanis.DceRpc.Epm
 		UpTo = 5
 	}
 
-	public sealed class EndpointEntry
+	public sealed class EndpointEntry : IWantServerName
 	{
 		internal EndpointEntry(ref readonly ept_entry_t entry)
 		{
@@ -207,6 +207,7 @@ namespace Titanis.DceRpc.Epm
 			return $"Tower: {{{this.Tower}}}; {(this.ObjectGuid != Guid.Empty ? $"Object ID: {this.ObjectGuid}; " : null)}Annotation: {this.annotation}";
 		}
 
+		public string? ServerName { get; set; }
 		public Guid ObjectGuid => this._entry.@object;
 		public string? annotation => this._entry.annotation.AsUtf8String();
 		public Tower Tower => new Tower(this._entry.tower.value);

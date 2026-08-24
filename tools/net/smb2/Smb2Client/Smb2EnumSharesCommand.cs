@@ -40,7 +40,7 @@ namespace Titanis.Smb2.Cli
 				(ShareInfo r) => r.ShareName,
 				(level, cx) =>
 				{
-					return srvs.GetShares(@"\\" + this.ServerName, level, this.BufferSize, cancellationToken);
+					return srvs.GetShares(@"\\" + this.CurrentServerName, level, this.BufferSize, cancellationToken);
 				},
 				cancellationToken);
 

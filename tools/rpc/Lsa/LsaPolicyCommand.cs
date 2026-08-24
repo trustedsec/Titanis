@@ -25,19 +25,26 @@ public abstract class LsaPolicyCommand : LsaCommand
 
 	protected async Task<LsaAccountInfo[]> SidsToAccountInfos(LsaPolicy policy, SecurityIdentifier[] sids, CancellationToken cancellationToken)
 	{
-		var accounts = Array.ConvertAll(sids, r => new LsaAccountInfo() { Sid = r });
+		var accounts = Array.ConvertAll(sids, r => new LsaAccountInfo() { AccountSid = r });
 
 		if (this.IsFieldInOutput(nameof(LsaAccountInfo.AccountName)) || this.IsFieldInOutput(nameof(LsaAccountInfo.DomainName)))
 		{
 			LsaAccountMapping[] mappings;
-			try
+			if (sids.Length == 0)
 			{
-				mappings = await policy.ResolveSidsAsync(sids, cancellationToken);
+				mappings = [];
 			}
-			catch (LsaAccountMappingException ex)
+			else
 			{
-				mappings = ex.Mappings;
-				this.WriteWarning("Not all accounts could be mapped.");
+				try
+				{
+					mappings = await policy.ResolveSidsAsync(sids, cancellationToken);
+				}
+				catch (LsaAccountMappingException ex)
+				{
+					mappings = ex.Mappings;
+					this.WriteWarning("Not all accounts could be mapped.");
+				}
 			}
 
 			for (int i = 0; i < mappings.Length; i++)
@@ -47,7 +54,7 @@ public abstract class LsaPolicyCommand : LsaCommand
 					continue;
 
 				var account = accounts[i];
-				account.ServerName = this.ServerName;
+				account.ServerName = this.CurrentServerName;
 				account.AccountName = mapping.AccountName;
 				account.DomainName = mapping.DomainName;
 			}
@@ -67,17 +74,17 @@ public abstract class LsaPolicyCommand : LsaCommand
 		{
 			var privSpec = privilegeSpecs[i];
 			if (Enum.TryParse(privSpec, out Privilege priv))
-				privs.Add(new PrivilegeInfo(priv, attrs));
+				privs.Add(new PrivilegeInfo(null, priv, attrs));
 			else if (Enum.TryParse(privSpec + "Privilege", out priv))
-				privs.Add(new PrivilegeInfo(priv, attrs));
+				privs.Add(new PrivilegeInfo(null, priv, attrs));
 			else if (long.TryParse(privSpec, out var privInt))
-				privs.Add(new PrivilegeInfo((Privilege)privInt, attrs));
+				privs.Add(new PrivilegeInfo(null, (Privilege)privInt, attrs));
 			else
 			{
 				try
 				{
 					var privInfo = await policy.LookupPrivilege(privSpec, cancellationToken);
-					privs.Add(new PrivilegeInfo(privInfo, attrs));
+					privs.Add(new PrivilegeInfo(null, privInfo, attrs));
 				}
 				catch (Exception ex)
 				{

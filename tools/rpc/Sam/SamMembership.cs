@@ -11,9 +11,10 @@ namespace Titanis.Cli.SamTool;
 /// <summary>
 /// Describes a SAM membership.
 /// </summary>
-public class SamMembership
+public class SamMembership : IWantServerName
 {
 	public string? DomainName { get; set; }
+	public string? ServerName { get; set; }
 	public SecurityIdentifier? DomainSid { get; set; }
 	public string? GroupName { get; set; }
 	public uint GroupRid { get; set; }

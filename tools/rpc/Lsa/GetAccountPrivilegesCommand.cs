@@ -6,7 +6,7 @@ namespace Titanis.Cli.LsaTool;
 
 /// <task category="LSA;Enumeration">Enumerate the privileges granted to an account</task>
 [Command]
-[OutputRecordType(typeof(PrivilegeInfo), DefaultFields = new string[] { nameof(PrivilegeInfo.Privilege) })]
+[OutputRecordType(typeof(PrivilegeInfo), DefaultFields = new string[] { nameof(PrivilegeInfo.ServerName), nameof(PrivilegeInfo.Privilege) })]
 [Description("Gets the privileges assigned to an account.")]
 [DetailedHelpText(@"One of -BySid or -ByName is required to specify the account to get the privileges for.  The account may be a user or group.
 

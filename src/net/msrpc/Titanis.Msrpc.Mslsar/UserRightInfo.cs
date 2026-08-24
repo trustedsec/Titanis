@@ -1,13 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Mslsar
 {
-	public class UserRightInfo
+	public class UserRightInfo : IWantServerName
 	{
+		public UserRightInfo(SecurityIdentifier? accountSid, string name)
+		{
+			this.AccountSid = accountSid;
+			this.Name = name;
+		}
+
+		public string? ServerName { get; set; }
+		public SecurityIdentifier? AccountSid { get; }
 		public string? Name { get; set; }
 	}
 }

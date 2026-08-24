@@ -27,7 +27,7 @@ public sealed class ReplicateNcCommand : ReplicateCommand
 	{
 		if (this.NamingContext is null)
 		{
-			var ldapClient = await LdapClient.Connect(new DnsEndPoint(this.ServerName, 389), null, this.RequireService<ISocketService>(), this.RequireService<IClientCredentialService>(), cancellationToken);
+			var ldapClient = await LdapClient.Connect(new DnsEndPoint(this.CurrentServerName, 389), null, this.RequireService<ISocketService>(), this.RequireService<IClientCredentialService>(), cancellationToken);
 
 			yield return new DsName(Guid.Empty, null, ldapClient.DomainRoot);
 		}

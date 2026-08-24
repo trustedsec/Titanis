@@ -11,6 +11,7 @@ namespace Titanis.Msrpc
 		Task<RpcBindInfo> BindServiceClient(
 			RpcServiceClient svcClient,
 			string serverName,
+			bool preferSmb,
 			CancellationToken cancellationToken);
 	}
 }

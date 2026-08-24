@@ -50,7 +50,7 @@ public class InvokeCommand : Command, IHaveServerName
 	protected override void ValidateParameters(ParameterValidationContext context)
 	{
 		base.ValidateParameters(context);
-		this.RpcParameters.ValidateParameters(context, null, ref this._serverName);
+		this.RpcParameters.ValidateParameters(context, null);
 	}
 
 	protected override async Task<int> RunAsync(CancellationToken cancellationToken)

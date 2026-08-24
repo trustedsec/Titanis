@@ -5,19 +5,19 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.LsaTool;
 
-public class LsaAccountInfo
+public class LsaAccountInfo : IWantServerName
 {
 	[InfoKey]
 	public string ServerName { get; set; }
 	[InfoKey]
-	public SecurityIdentifier Sid { get; set; }
+	public SecurityIdentifier AccountSid { get; set; }
 	public string? AccountName { get; set; }
 	public string? DomainName { get; set; }
 }
 
 /// <task category="LSA;Enumeration">Enumerate policy accounts</task>
 [Command]
-[OutputRecordType(typeof(LsaAccountInfo), DefaultFields = new string[] { nameof(LsaAccountInfo.Sid) })]
+[OutputRecordType(typeof(LsaAccountInfo), DefaultFields = new string[] { nameof(LsaAccountInfo.ServerName), nameof(LsaAccountInfo.AccountSid) })]
 [Description("Enumerates accounts")]
 [DetailedHelpText("By default, the output only includes the SIDs of the accounts.  Use -OutputFields if you want additional information such as the account or domain name.  The additional fields require another RPC call to the server.")]
 [Example("Get account SIDs", "{0} LUMON-FS1 -UserName milchick -Password Br3@kr00m!")]

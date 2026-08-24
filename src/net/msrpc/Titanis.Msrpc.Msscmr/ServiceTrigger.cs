@@ -93,7 +93,7 @@ namespace Titanis.Msrpc.Msscmr
 		public static bool TryGetSubtypeInfo(Guid type, out TriggerTypeInfo info) => triggerTypeLookup.TryGetValue(type, out info);
 	}
 
-	public class ServiceTrigger
+	public class ServiceTrigger : IWantServerName
 	{
 		internal ServiceTrigger(
 			string serviceName,
@@ -113,6 +113,7 @@ namespace Titanis.Msrpc.Msscmr
 		}
 
 		public string ServiceName { get; }
+		public string? ServerName { get; set; }
 		public ServiceTriggerType TriggerType { get; }
 		[Browsable(false)]
 		public Guid TriggerSubtype { get; }

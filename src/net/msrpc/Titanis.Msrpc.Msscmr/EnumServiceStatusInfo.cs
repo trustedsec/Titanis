@@ -2,7 +2,7 @@
 
 namespace Titanis.Msrpc.Msscmr
 {
-	public class EnumServiceStatusInfo
+	public class EnumServiceStatusInfo : IWantServerName
 	{
 		public EnumServiceStatusInfo(string serviceName, string displayName, ServiceStatus status)
 		{
@@ -12,6 +12,7 @@ namespace Titanis.Msrpc.Msscmr
 		}
 
 		public string ServiceName { get; }
+		public string? ServerName { get; set; }
 		public string DisplayName { get; }
 		[Browsable(false)]
 		public ServiceStatus Status { get; }

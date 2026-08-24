@@ -14,7 +14,7 @@ namespace Titanis.Cli.SamTool
 		/// <inheritdoc/>
 		protected sealed override async Task<int> RunAsync(SamClient client, CancellationToken cancellationToken)
 		{
-			using (var sam = await client.Connect(this.RequiredSamAccess, this.ServerName, cancellationToken))
+			using (var sam = await client.Connect(this.RequiredSamAccess, this.CurrentServerName, cancellationToken))
 			{
 				return await this.RunAsync(sam, cancellationToken);
 			}

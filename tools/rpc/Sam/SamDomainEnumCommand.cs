@@ -6,10 +6,8 @@ namespace Titanis.Cli.SamTool;
 
 public abstract class SamDomainEnumCommand : SamCommand
 {
-	[Parameter]
 	[DefaultValue(true)]
-	[Description("Continue even if errors occur")]
-	public SwitchParam ContinueOnError { get; set; }
+	public override SwitchParam ContinueOnError { get; set; }
 
 	protected sealed override SamServerAccessRights RequiredSamAccess => SamServerAccessRights.EnumerateDomains | SamServerAccessRights.LookupDomain;
 

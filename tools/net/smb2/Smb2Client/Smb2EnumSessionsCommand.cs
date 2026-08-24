@@ -48,7 +48,7 @@ namespace Titanis.Smb2.Cli
 		protected sealed override async Task<int> RunAsync(ServerServiceClient srvs, CancellationToken cancellationToken)
 		{
 			var shares = await srvs.GetSessions(
-				@"\\" + this.ServerName,
+				@"\\" + this.CurrentServerName,
 				this.ClientComputer,
 				this.ClientUserName,
 				this.Level,

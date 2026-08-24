@@ -35,7 +35,7 @@ In addition to the standard attributes defined by Active Directory, you may quer
 [Example("Query for all objects with all attributes", "{0} -UserName milchick@LUMON -Password Br3@kr00m! LUMON-DC1", Tag = "milchick_all")]
 [Example("Query credentials for krbtgt and milchick", "{0} -UserName milchick@LUMON -Password Br3@kr00m! LUMON-DC1 krbtgt, \"CN=Seth Milchick,OU=Severed Floor,OU=Kier\\, PE,DC=lumon,DC=ind\" -OutputFields samAccountName, objectSid,  kerberosKeys, kerberosOldKeys, cleartextPassword, unicodePwd, lmPwdHistory, ntPwdHistory", Tag = "milchick_name_dn")]
 [Example("Query credentials for all administrators", "{0} -UserName milchick@LUMON -Password Br3@kr00m! LUMON-DC1 (memberOf*=<SID=S-1-5-32-544>) -OutputFields samAccountName, objectSid,  kerberosKeys, kerberosOldKeys, cleartextPassword, unicodePwd, lmPwdHistory, ntPwdHistory", Tag = "milchick_LdapQuery")]
-public abstract class ReplicateCommand : DsbindCommand, IDrsChangeCallback, IHaveServerName
+public abstract class ReplicateCommand : DsbindCommand, IDrsChangeCallback
 {
 	[Parameter]
 	[Description("Name of keytab file to export to")]

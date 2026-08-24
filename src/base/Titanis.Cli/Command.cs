@@ -116,21 +116,67 @@ namespace Titanis.Cli
 
 
 
+		private OutputField[]? _lastTypeFields;
+		private Type? _lastRecordType;
+
+		protected virtual OutputField[] FilterOutputFields(OutputField[] fields)
+		{
+			return fields;
+		}
 		OutputField[] IOutputFieldProvider.GetFieldsForType(Type recordType)
 		{
-			var fields = this.OutputFields;
-			if (fields != null && fields.Length == 1 && fields[0] == "*")
-				fields = null;
-
-			return this.ApplyFormatting(OutputField.GetFieldsFor(recordType, this.Context.MetadataContext, fields, typeof(ICustomTypeDescriptor).IsAssignableFrom(recordType)));
+			if (this._lastTypeFields is null || this._lastRecordType != recordType)
+			{
+				this._lastTypeFields = this.GetOutputFieldsForType(recordType);
+				this._lastRecordType = recordType;
+			}
+			return GetOutputFieldsForType(recordType);
 		}
-		OutputField[] IOutputFieldProvider.GetFieldsForRecord(object record)
+
+		protected virtual OutputField[] GetOutputFieldsForType(Type recordType)
 		{
 			var fields = this.OutputFields;
 			if (fields != null && fields.Length == 1 && fields[0] == "*")
 				fields = null;
 
-			return this.ApplyFormatting(OutputField.GetFieldsFor(record, fields, record is ICustomTypeDescriptor));
+			return this.FilterOutputFields(this.ApplyFormatting(OutputField.GetFieldsFor(recordType, this.Context.MetadataContext, fields, typeof(ICustomTypeDescriptor).IsAssignableFrom(recordType))));
+		}
+
+		OutputField[] IOutputFieldProvider.GetFieldsForRecord(object record)
+		{
+			Type recordType = record?.GetType();
+			ICustomTypeDescriptor cust = record as ICustomTypeDescriptor;
+			if (
+				(record != null)
+				&& (
+					(cust != null)
+					|| (this._lastTypeFields is null)
+					|| (this._lastRecordType != recordType)
+					)
+				)
+			{
+				var fields = this.GetOutputFieldsForRecord(record);
+				if (cust is null)
+				{
+					this._lastRecordType = recordType;
+					this._lastTypeFields = fields;
+				}
+				return fields;
+			}
+			else if (recordType == this._lastRecordType)
+				return this._lastTypeFields;
+			else
+				return this.GetOutputFieldsForRecord(record);
+
+		}
+
+		protected virtual OutputField[] GetOutputFieldsForRecord(object record)
+		{
+			var fields = this.OutputFields;
+			if (fields != null && fields.Length == 1 && fields[0] == "*")
+				fields = null;
+
+			return this.FilterOutputFields(this.ApplyFormatting(OutputField.GetFieldsFor(record, fields, record is ICustomTypeDescriptor)));
 		}
 
 		bool IOutputFieldProvider.IncludesField(string fieldName)

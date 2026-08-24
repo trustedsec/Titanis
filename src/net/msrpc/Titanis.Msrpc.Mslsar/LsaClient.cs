@@ -36,6 +36,8 @@ namespace Titanis.Msrpc.Mslsar
 		/// <inheritdoc/>
 		public sealed override bool SupportsReauthOverNamedPipes => true;
 
+		internal lsarpcClientProxy ClientProxy => this._proxy;
+
 		public async Task<LsaPolicy> OpenPolicy(LsaPolicyAccess access, CancellationToken cancellationToken)
 		{
 			RpcPointer<RpcContextHandle> phPolicy = new RpcPointer<RpcContextHandle>();
@@ -303,10 +305,13 @@ namespace Titanis.Msrpc.Mslsar
 				if (res == Ntstatus.STATUS_NO_MORE_ENTRIES)
 					break;
 				res.CheckAndThrow();
-				var entries = enumBuffer.value.Information.value;
-				for (int i = 0; i < entries.Length; i++)
+				if (enumBuffer.value.EntriesRead > 0)
 				{
-					sids.Add(entries[i].Sid.value.ToSid());
+					var entries = enumBuffer.value.Information.value;
+					for (int i = 0; i < entries.Length; i++)
+					{
+						sids.Add(entries[i].Sid.value.ToSid());
+					}
 				}
 			} while (res == Ntstatus.STATUS_MORE_ENTRIES);
 
@@ -324,16 +329,7 @@ namespace Titanis.Msrpc.Mslsar
 			var res = (Ntstatus)await _proxy.LsarCreateAccount(handle, sid.ToRpcSid(), (uint)LsaAccountAccess.View, pUserAccount, cancellationToken).ConfigureAwait(false);
 			res.CheckAndThrow();
 
-			return new LsaAccount(this, pUserAccount.value);
-		}
-
-		internal async Task<PrivilegeInfo[]> GetAccountPrivileges(RpcContextHandle handle, CancellationToken cancellationToken)
-		{
-			RpcPointer<RpcPointer<LSAPR_PRIVILEGE_SET>> privileges = new();
-			var res = (Ntstatus)await _proxy.LsarEnumeratePrivilegesAccount(handle, privileges, cancellationToken).ConfigureAwait(false);
-			res.CheckAndThrow();
-
-			return Array.ConvertAll(privileges.value.value.Privilege, r => new PrivilegeInfo(r.Luid.AsPrivilege(), (PrivilegeAttributes)r.Attributes));
+			return new LsaAccount(this, pUserAccount.value, sid);
 		}
 
 		internal async Task<UserRightInfo[]> GetAccountRights(RpcContextHandle handle, SecurityIdentifier sid, CancellationToken cancellationToken)
@@ -344,15 +340,17 @@ namespace Titanis.Msrpc.Mslsar
 			var res = (Ntstatus)await _proxy.LsarEnumerateAccountRights(handle, sid.ToRpcSid(), userRights, cancellationToken).ConfigureAwait(false);
 			res.CheckAndThrow();
 
-			return (userRights.value.UserRights is null) ? [] : Array.ConvertAll(userRights.value.UserRights.value, r =>
+			if (userRights.value.Entries > 0)
 			{
-				string name = r.AsString();
-
-				return new UserRightInfo()
+				return (userRights.value.UserRights is null) ? [] : Array.ConvertAll(userRights.value.UserRights.value, r =>
 				{
-					Name = name
-				};
-			});
+					string name = r.AsString();
+
+					return new UserRightInfo(sid, name);
+				});
+			}
+			else
+				return [];
 		}
 
 		internal async Task<LsaAccount> OpenAccount(RpcContextHandle handle, SecurityIdentifier sid, LsaAccountAccess access, CancellationToken cancellationToken)
@@ -362,7 +360,7 @@ namespace Titanis.Msrpc.Mslsar
 			var res = (Ntstatus)await _proxy.LsarOpenAccount(handle, sid.ToRpcSid(), (uint)access, accountHandle, cancellationToken).ConfigureAwait(false);
 			res.CheckAndThrow();
 
-			return new LsaAccount(this, accountHandle.value);
+			return new LsaAccount(this, accountHandle.value, sid);
 		}
 
 		internal async Task<string> LookupPrivilege(RpcContextHandle handle, long luid, CancellationToken cancellationToken)
@@ -399,10 +397,13 @@ namespace Titanis.Msrpc.Mslsar
 				res = Ntstatus.STATUS_SUCCESS;
 
 			res.CheckAndThrow();
-
-			var entries = enumerationBuffer.value.Information.value;
-
-			return Array.ConvertAll(entries, r => r.Sid.value.ToSid());
+			if (enumerationBuffer.value.EntriesRead > 0)
+			{
+				var entries = enumerationBuffer.value.Information.value;
+				return Array.ConvertAll(entries, r => r.Sid.value.ToSid());
+			}
+			else
+				return [];
 		}
 
 		internal async Task AddPrivileges(RpcContextHandle handle, IList<PrivilegeInfo> privileges, CancellationToken cancellationToken)

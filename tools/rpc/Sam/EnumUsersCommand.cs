@@ -4,7 +4,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.SamTool;
 
-public class UserInfo
+public class UserInfo : IWantServerName
 {
 	internal UserInfo(
 		SamEntry entry,
@@ -24,6 +24,7 @@ public class UserInfo
 	[Browsable(false)]
 	public SamEntry Entry { get; }
 	[Browsable(false)]
+	public string? ServerName { get; set; }
 	public SamUserGeneralInfo? General { get; }
 	[Browsable(false)]
 	public SamUserAccountInfo? AccountInfo { get; }

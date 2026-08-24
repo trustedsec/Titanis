@@ -1,20 +1,33 @@
-﻿using System;
+﻿using ms_lsar;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Titanis.DceRpc;
+using Titanis.Winterop;
+using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Mslsar
 {
 	public class LsaAccount : LsaObject
 	{
-		public LsaAccount(LsaClient lsaClient, RpcContextHandle handle)
+		internal LsaAccount(LsaClient lsaClient, RpcContextHandle handle, SecurityIdentifier sid)
 			: base(lsaClient, handle)
 		{
+			this.Sid = sid;
 		}
 
-		public Task<PrivilegeInfo[]> GetPrivileges(CancellationToken cancellationToken)
-			=> this._lsaClient.GetAccountPrivileges(this._handle, cancellationToken);
+		public SecurityIdentifier Sid { get; }
+
+		public async Task<PrivilegeInfo[]> GetPrivileges(CancellationToken cancellationToken)
+		{
+			RpcPointer<RpcPointer<LSAPR_PRIVILEGE_SET>> privileges = new();
+			var res = (Ntstatus)await this._lsaClient.ClientProxy.LsarEnumeratePrivilegesAccount(this._handle, privileges, cancellationToken).ConfigureAwait(false);
+			res.CheckAndThrow();
+
+			return Array.ConvertAll(privileges.value.value.Privilege, r => new PrivilegeInfo(this.Sid, r.Luid.AsPrivilege(), (PrivilegeAttributes)r.Attributes));
+		}
+
 		public Task AddPrivileges(IList<PrivilegeInfo> privs, CancellationToken cancellationToken)
 			=> this._lsaClient.AddPrivileges(this._handle, privs, cancellationToken);
 		public Task RemoveAllPrivileges(CancellationToken cancellationToken)

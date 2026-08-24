@@ -280,7 +280,7 @@ namespace Titanis.Winterop.Lsa
 	/// <summary>
 	/// Describes an LSA secret
 	/// </summary>
-	public class LsaSecret
+	public class LsaSecret : IWantServerName
 	{
 		internal LsaSecret(
 			string name,
@@ -299,6 +299,7 @@ namespace Titanis.Winterop.Lsa
 		}
 
 		public string Name { get; }
+		public string? ServerName { get; set; }
 		[Browsable(false)]
 		public byte[]? CurrentValue { get; }
 		public string? CurrentValueHex => this.CurrentValue?.ToHexString();

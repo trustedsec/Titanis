@@ -18,5 +18,6 @@ namespace Titanis.Cli
 		public const string Removal = "Removal";
 		public const string Rpc = "RPC";
 		public const string Logging = "Logging";
+		public const string ErrorHandling = "Error Handling";
 	}
 }

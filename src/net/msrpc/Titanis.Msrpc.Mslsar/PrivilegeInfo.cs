@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 using Titanis.Winterop.Security;
 
 namespace Titanis.Msrpc.Mslsar
@@ -16,25 +11,33 @@ namespace Titanis.Msrpc.Mslsar
 		Enabled = 2,
 	}
 
-	public class PrivilegeInfo
+	public class PrivilegeInfo : IWantServerName
 	{
-		public PrivilegeInfo(Privilege privilege, PrivilegeAttributes attributes)
+		public PrivilegeInfo(SecurityIdentifier? accountSid, Privilege privilege, PrivilegeAttributes attributes)
 		{
+			this.AccountSid = accountSid;
 			this.Privilege = privilege;
 			this.Attributes = attributes;
 		}
-		public PrivilegeInfo(Privilege privilege, string privilegeName, PrivilegeAttributes attributes)
+		public PrivilegeInfo(SecurityIdentifier? accountSid, Privilege privilege, string privilegeName, PrivilegeAttributes attributes)
 		{
+			this.AccountSid = accountSid;
 			this.Privilege = privilege;
 			this.Attributes = attributes;
 			this.PrivilegeName = privilegeName;
 		}
+
+		public string? ServerName { get; set; }
+		public SecurityIdentifier AccountSid { get; set; }
 		public Privilege Privilege { get; }
 		public PrivilegeAttributes Attributes { get; }
 		public string? PrivilegeName { get; }
 		public PrivilegeInfo WithPrivilegeName(string? privilegeName)
 		{
-			return new PrivilegeInfo(this.Privilege, privilegeName, this.Attributes);
+			return new PrivilegeInfo(this.AccountSid, this.Privilege, privilegeName, this.Attributes)
+			{
+				ServerName = this.ServerName
+			};
 		}
 	}
 }

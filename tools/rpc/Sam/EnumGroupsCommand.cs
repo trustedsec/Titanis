@@ -4,7 +4,7 @@ using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.SamTool;
 
-public class GroupInfo
+public class GroupInfo : IWantServerName
 {
 	internal GroupInfo(
 		SamEntry entry,
@@ -25,6 +25,7 @@ public class GroupInfo
 	public SamGroupGeneralInfo? General { get; }
 
 	public string AccountName => this.Entry.Name;
+	public string? ServerName { get; set; }
 	public string Domain { get; }
 	public SamEntryType AccountType => this.Entry.EntryType;
 	public uint Id => this.Entry.Id;
@@ -40,7 +41,7 @@ public class GroupInfo
 [Description("Enumerates groups")]
 [OutputRecordType(typeof(GroupInfo))]
 [DetailedHelpText(@"{0} attempts to query the general info for the groups returned by the server.")]
-[Example("Enumerate all groups", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!", Tag ="milchickNtlm_enum")]
+[Example("Enumerate all groups", "{0} LUMON-DC1 -UserName milchick -Password Br3@kr00m!", Tag = "milchickNtlm_enum")]
 public sealed class EnumGroupsCommand : SamDomainEnumCommand
 {
 	protected sealed override SamDomainAccessRights RequiredDomainAccess => SamDomainAccessRights.ListAccounts | SamDomainAccessRights.Read | SamDomainAccessRights.Lookup;

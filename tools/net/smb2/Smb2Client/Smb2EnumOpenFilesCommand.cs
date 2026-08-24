@@ -52,7 +52,7 @@ namespace Titanis.Smb2.Cli
 
 		protected sealed override async Task<int> RunAsync(ServerServiceClient client, CancellationToken cancellationToken)
 		{
-			var shares = await client.GetOpenFiles(@"\\" + this.ServerName, this.BasePath, this.OpenBy, this.Level, this.BufferSize, cancellationToken);
+			var shares = await client.GetOpenFiles(@"\\" + this.CurrentServerName, this.BasePath, this.OpenBy, this.Level, this.BufferSize, cancellationToken);
 
 			this.WriteRecords(shares);
 
