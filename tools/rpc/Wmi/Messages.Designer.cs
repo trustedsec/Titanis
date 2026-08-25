@@ -69,7 +69,7 @@ namespace Titanis.Cli.WmiTool {
         ///Unless -Exact is specified a -SearchPattern will match on partial data within a given value. 
         ///
         ///Specifying -ValueName with -Recursive will find exact matches of that value name under the key.
-        ///Specifying -ValueEmpty with -Recursive will find any non-empty (default) value under the key [rest of string was truncated]&quot;;.
+        ///Specifying -ValueEmpty with -Recursive will find any non-empty (default) value under [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string wmi_base_query_Detailed {
             get {

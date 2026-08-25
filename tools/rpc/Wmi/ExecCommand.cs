@@ -149,7 +149,7 @@ internal class ExecCommand : WmiCommand
 
 			smbClient = this.RpcParameters.SmbParameters.CreateClient();
 
-			tempFilePath = new UncPath(this.ServerName, 445, "ADMIN$", $"Temp\\{tempFileName}");
+			tempFilePath = new UncPath(this.CurrentServerName, 445, "ADMIN$", $"Temp\\{tempFileName}");
 			outFile = (Smb2OpenFile)await smbClient.CreateFileAsync(tempFilePath, new Smb2CreateInfo
 			{
 				CreateDisposition = Smb2CreateDisposition.Supersede,

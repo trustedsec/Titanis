@@ -16,10 +16,6 @@ internal abstract class WmiObjectCommandBase : WmiNamespaceCommandBase
 	public string[] ObjectPathOrWqlQuery { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-	[Parameter]
-	[Description("Continue even if errors occur")]
-	public SwitchParam ContinueOnError { get; set; }
-
 	/// <summary>
 	/// Called for each object selected by the user.
 	/// </summary>

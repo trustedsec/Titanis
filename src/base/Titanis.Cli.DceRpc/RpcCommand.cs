@@ -15,11 +15,11 @@ namespace Titanis.Cli
 		[ParameterGroup(ParameterGroupOptions.Required)]
 		public RpcParameterGroup RpcParameters { get; set; }
 
-		private string[] _serverName;
+		private ServerSpec[] _serverName;
 		[Parameter(0)]
 		[Mandatory]
 		[Description("RPC server to interact with")]
-		public string[] ServerName { get => _serverName; set => _serverName = value; }
+		public ServerSpec[] ServerName { get => _serverName; set => _serverName = value; }
 
 		public string? CurrentServerName { get; set; }
 		string? IHaveServerName.ServerName => this.CurrentServerName;
@@ -37,6 +37,7 @@ namespace Titanis.Cli
 		}
 
 		private RpcServiceClient _svcClient;
+		private bool _hasMultiServers;
 		protected override void ValidateParameters(ParameterValidationContext context)
 		{
 			var svcClient = this.CreateServiceClient();
@@ -44,6 +45,8 @@ namespace Titanis.Cli
 
 			base.ValidateParameters(context);
 			this.RpcParameters.ValidateParameters(context, svcClient);
+
+			this._hasMultiServers = (this.ServerName.Length > 1) || this.ServerName[0].HasMultiple;
 		}
 
 		protected override OutputField[] FilterOutputFields(OutputField[] fields)
@@ -60,51 +63,54 @@ namespace Titanis.Cli
 		{
 			int lastError = 0;
 			int lastExitCode = 0;
-			bool multiServer = this.ServerName.Length > 0;
-			foreach (var serverName_ in this.ServerName)
+			bool multiServer = this._hasMultiServers;
+			foreach (var serverSpec in this.ServerName)
 			{
-				string serverName = serverName_;
-				bool isSmb = serverName.StartsWith("//") || serverName.StartsWith(@"\\");
-				if (isSmb)
-					serverName = serverName.Substring(2);
-
-				if (multiServer)
-					this.WriteMessage($"Running on server {serverName}.");
-
-				try
+				foreach (var serverName_ in serverSpec.GetTargets())
 				{
-					this.CurrentServerName = serverName;
+					string serverName = serverName_;
+					bool isSmb = serverName.StartsWith("//") || serverName.StartsWith(@"\\");
+					if (isSmb)
+						serverName = serverName.Substring(2);
 
-					var svcClient = this._svcClient;
-					var bindInfo = await RpcParameters.BindServiceClient(
-						svcClient,
-						serverName,
-						isSmb,
-						cancellationToken
-						).ConfigureAwait(false);
+					if (multiServer)
+						this.WriteMessage($"Running on server {serverName}.");
 
-					using (bindInfo.SmbClient)
+					try
 					{
-						lastExitCode = await RunAsync(svcClient, cancellationToken).ConfigureAwait(false);
+						this.CurrentServerName = serverName;
+
+						var svcClient = this._svcClient;
+						var bindInfo = await RpcParameters.BindServiceClient(
+							svcClient,
+							serverName,
+							isSmb,
+							cancellationToken
+							).ConfigureAwait(false);
+
+						using (bindInfo.SmbClient)
+						{
+							lastExitCode = await RunAsync(svcClient, cancellationToken).ConfigureAwait(false);
+						}
 					}
+					catch (Exception ex)
+					{
+						if (this.ContinueOnError.IsSet)
+							this.WriteError($"Error occurred with server {serverName}: {ex.Message}");
+						else
+							throw;
+
+						while (ex is AggregateException agg)
+							ex = agg.InnerException;
+
+						if (ex is IHaveErrorCode err)
+							lastError = err.ErrorCode;
+						else
+							lastError = ex.HResult;
+					}
+
+					this.Context.FlushOutput();
 				}
-				catch (Exception ex)
-				{
-					if (this.ContinueOnError.IsSet)
-						this.WriteError($"Error occurred with server {serverName}: {ex.Message}");
-					else
-						throw;
-
-					while (ex is AggregateException agg)
-						ex = agg.InnerException;
-
-					if (ex is IHaveErrorCode err)
-						lastError = err.ErrorCode;
-					else
-						lastError = ex.HResult;
-				}
-
-				this.Context.FlushOutput();
 			}
 
 			return (lastError != 0) ? lastError : lastExitCode;
