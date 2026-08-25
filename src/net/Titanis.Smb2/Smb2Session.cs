@@ -44,6 +44,10 @@ namespace Titanis.Smb2
 			this.MustEncryptData = mustEncryptData;
 			this._preauthIntegrityValue = preauthIntegrityValue;
 
+			// Anonymous/guest sessions have no session key and cannot sign [MS-SMB2 §3.2.5.2]
+			bool canSign = authContext.HasSessionKey;
+			this._canSign = canSign;
+
 			if (authContext.HasSessionKey)
 			{
 				var authSessionKey = authContext.GetSessionKey();
@@ -110,7 +114,7 @@ namespace Titanis.Smb2
 						Sp800_108.KdfCtr(decLabel, decContext, cipherKeySize, new HMACSHA256(kdk)),
 						signingAlgo,
 						cipher,
-						this.SigningRequired && !mustEncryptData
+						this.SigningRequired && !mustEncryptData && canSign
 						);
 
 					// App key
@@ -125,7 +129,7 @@ namespace Titanis.Smb2
 				}
 				else
 				{
-					this.CryptInfo = new Smb2SessionCryptInfo(this.SigningRequired);
+					this.CryptInfo = new Smb2SessionCryptInfo(this.SigningRequired && canSign);
 					this._sessionAppKey = smb2SessionBaseKey;
 				}
 			}
@@ -135,8 +139,11 @@ namespace Titanis.Smb2
 			this.primaryChannelBinding = new Smb2ChannelBindingInfo(0, conn, signingKey, validateNegotiateInfo);
 		}
 
-		private byte[] DeriveSigningKey(Smb2Dialect dialect, byte[] preauthIntegrityValue, bool binding)
+		private byte[]? DeriveSigningKey(Smb2Dialect dialect, byte[] preauthIntegrityValue, bool binding)
 		{
+			if (this._sessionBaseKey is null)
+				return null;
+
 			byte[] signingKey;
 			if (dialect >= Smb2Dialect.Smb3_0)
 			{
@@ -268,12 +275,13 @@ namespace Titanis.Smb2
 		}
 
 		private bool _firstPdu = true;
+		private readonly bool _canSign;
 		internal Task<Smb2Pdu> SendSyncPduAsync(Pdus.Smb2Pdu req, bool encrypt, CancellationToken cancellationToken)
 		{
-			if (this._firstPdu || req.Command == Smb2Command.TreeConnect)
+			if ((this._firstPdu || req.Command == Smb2Command.TreeConnect)
+				&& !encrypt && this._canSign)
 			{
-				if (!encrypt)
-					req.pduhdr.flags |= Smb2PduFlags.Signed;
+				req.pduhdr.flags |= Smb2PduFlags.Signed;
 				this._firstPdu = false;
 			}
 
