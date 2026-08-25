@@ -735,6 +735,16 @@ namespace Titanis.Security.Kerberos
 			TicketInfo ticketInfo = new TicketInfo(GetNextTicketSeqnbr(), rep.ticket, this.CreateSessionKeyFor(encPart.key), encPart, rep.cname.name_string[0].Value, rep.crealm.Value, context.Tgt?.AsrepKey, ticketKey);
 			ticketInfo.Comment = context.ticketParameters?.TicketComment;
 
+			// surface KERB-KEY-LIST-REP ([MS-KILE] § 2.2.12) to callers
+			var atlasKeyListRep = encPart.padata?.FirstOrDefault(r => r.padata_type == (int)PadataType.KerbKeyListRep);
+			if (atlasKeyListRep is not null)
+			{
+				var atlasKeys = Asn1DerDecoder.DecodeTlv<Asn1SequenceOf<EncryptionKey>>(atlasKeyListRep.padata_value);
+				ticketInfo.KeyListKeys = atlasKeys.Values
+					.Select(k => ((int)k.keytype, key: k.keyvalue))
+					.ToArray();
+			}
+
 			this._callback?.OnReceivedTicket(ticketParams.CorrelationId, new KdcRepInfo(context, rep, encPart, null, ticketInfo.SessionKey));
 
 			return ticketInfo;
@@ -1037,7 +1047,9 @@ namespace Titanis.Security.Kerberos
 				padatas.Add(Structs.PAData_FastReq(padata_fastreq));
 			}
 
-			// padatas.Add(Structs.PAData_KerbKeyListReq([EType.Rc4Hmac]));
+			// emit KERB-KEY-LIST-REQ when requested ([MS-KILE] § 2.2.11)
+			if (ticketParameters.KeyListEtypes is not null)
+				padatas.Add(Structs.PAData_KerbKeyListReq(ticketParameters.KeyListEtypes));
 
 
 
@@ -1659,7 +1671,8 @@ namespace Titanis.Security.Kerberos
 			DateTime? renewTill,
 			LogonInfo? logonInfo,
 			UpnDnsInfo? upnDnsInfo,
-			SessionKey? kdcKey
+			SessionKey? kdcKey,
+			uint? encPartKvno = null
 			)
 		{
 			byte[]? ticketChecksum;
@@ -1720,6 +1733,10 @@ namespace Titanis.Security.Kerberos
 					serverKey,
 					[adelem]
 					);
+
+				// allow setting the ticket enc-part kvno (e.g. RODC krbtgt number)
+				if (encPartKvno.HasValue)
+					ticket.ticket.enc_part.kvno = encPartKvno.Value;
 
 				return ticket;
 			}
