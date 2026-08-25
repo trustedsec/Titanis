@@ -14,35 +14,24 @@ namespace Titanis.DceRpc.Client
 		public RpcEncoder StubData => this._stubData;
 		IRpcEncoder IRpcRequestBuilder.StubData => this.StubData;
 		internal readonly RpcCallContext callContext;
-		private Guid _objectId;
+		public Guid? ObjectId { get; }
 		private int _offCallData;
-
-		internal bool HasObjectId { get; }
 
 		internal RpcRequestBuilder(
 			ushort opnum,
 			RpcEncoding encoding,
 			RpcCallContext callContext,
-			bool withObjectId = false)
+			Guid? objectId)
 		{
 			this._opnum = opnum;
 			this._stubData = encoding.CreateEncoder(callContext);
 			this.callContext = callContext;
 
-			int cbReserve = PduHeader.PduStructSize + (withObjectId ? RequestPduHeader.StructSizeWithObjectId : RequestPduHeader.StructSize);
+			this.ObjectId = objectId;
+
+			int cbReserve = PduHeader.PduStructSize + (objectId.HasValue ? RequestPduHeader.StructSizeWithObjectId : RequestPduHeader.StructSize);
 			this._offCallData = cbReserve;
 			this._stubData.GetWriter().Advance(cbReserve);
-		}
-
-		internal RpcRequestBuilder(
-			ushort opnum,
-			RpcEncoding encoding,
-			RpcCallContext callContext,
-			Guid objectId)
-			: this(opnum, encoding, callContext, true)
-		{
-			this._objectId = objectId;
-			this.HasObjectId = true;
 		}
 
 		private Span<byte> GetCallData()
@@ -66,8 +55,8 @@ namespace Titanis.DceRpc.Client
 				p_cont_id = (ushort)context.contextId,
 				opnum = this._opnum
 			});
-			if (this.HasObjectId)
-				writer.WriteGuid(this._objectId);
+			if (this.ObjectId.HasValue)
+				writer.WriteGuid(this.ObjectId.Value);
 
 			writer.SetPosition(pos);
 

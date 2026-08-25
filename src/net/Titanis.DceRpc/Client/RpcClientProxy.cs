@@ -80,6 +80,8 @@ namespace Titanis.DceRpc.Client
 		/// </remarks>
 		public RpcVersion? OverrideInterfaceVersion { get; set; }
 
+		public Guid? ObjectId { get; set; }
+
 		/// <summary>
 		/// Binds the proxy.
 		/// </summary>
@@ -152,7 +154,7 @@ namespace Titanis.DceRpc.Client
 				}
 
 				//if (bindAuthContext.authLevel < RpcAuthLevel.PacketIntegrity)
-					this._shouldSendPContext = true;
+				this._shouldSendPContext = true;
 			}
 			else
 			{
@@ -178,7 +180,7 @@ namespace Titanis.DceRpc.Client
 		protected virtual RpcRequestBuilder CreateRequest(ushort opnum)
 		{
 			this.EnsureBound();
-			return new RpcRequestBuilder(opnum, this._bindContext.encoding, new RpcCallContext(null));
+			return new RpcRequestBuilder(opnum, this._bindContext.encoding, new RpcCallContext(null), this.ObjectId);
 		}
 
 		// TODO: Use switch to determine whether to write verificationTrailer

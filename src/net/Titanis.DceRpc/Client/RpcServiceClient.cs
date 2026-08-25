@@ -102,6 +102,8 @@ namespace Titanis.DceRpc.Client
 		}
 		#endregion
 
+		public virtual Guid? ObjectId => null;
+
 		/// <summary>
 		/// Binds this object to a <see cref="RpcClientChannel"/>.
 		/// </summary>
@@ -194,17 +196,22 @@ namespace Titanis.DceRpc.Client
 	public abstract class RpcServiceClient<TProxy> : RpcServiceClient
 		where TProxy : RpcClientProxy, new()
 	{
-		protected TProxy _proxy;
-
-		/// <inheritdoc/>
-		public sealed override RpcClientProxy Proxy => (this._proxy ??= new TProxy());
-
 		/// <summary>
 		/// Initializes a new <see cref="RpcServiceClient"/>.
 		/// </summary>
 		public RpcServiceClient()
 		{
-			this._proxy = new TProxy();
+			this._proxy = this.CreateProxy();
+		}
+
+		protected TProxy _proxy;
+
+		/// <inheritdoc/>
+		public sealed override RpcClientProxy Proxy => (this._proxy ??= CreateProxy());
+
+		private TProxy CreateProxy()
+		{
+			return new TProxy() { ObjectId = this.ObjectId };
 		}
 
 		/// <summary>

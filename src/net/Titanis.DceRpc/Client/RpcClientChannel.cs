@@ -298,7 +298,7 @@ namespace Titanis.DceRpc.Client
 				int authLength = (context.authContext != null)
 					? context.authContext.GetMessageAuthTokenSize()
 					: 0;
-				PfcFlags flags = (stubData.HasObjectId)
+				PfcFlags flags = (stubData.ObjectId.HasValue)
 					? PfcFlags.ObjectUuid
 					: PfcFlags.None
 					;

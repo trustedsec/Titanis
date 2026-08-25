@@ -40,32 +40,37 @@ namespace Titanis.DceRpc.Epm
 
 		public Task<IPEndPoint?> TryMapTcp(
 			RpcInterfaceId interfaceId,
+			Guid? objectId,
 			CancellationToken cancellationToken)
 		{
-			return this.TryMapIpv4(interfaceId, ProtocolId.Tcp4, IPAddress.None, cancellationToken);
+			return this.TryMapIpv4(interfaceId, objectId, ProtocolId.Tcp4, IPAddress.None, cancellationToken);
 		}
 		public Task<IPEndPoint?> TryMapTcp(
 			RpcInterfaceId interfaceId,
+			Guid? objectId,
 			IPAddress? hostAddress,
 			CancellationToken cancellationToken)
 		{
-			return this.TryMapIpv4(interfaceId, ProtocolId.Tcp4, hostAddress ?? IPAddress.None, cancellationToken);
+			return this.TryMapIpv4(interfaceId, objectId, ProtocolId.Tcp4, hostAddress ?? IPAddress.None, cancellationToken);
 		}
 		public Task<IPEndPoint?> TryMapUdp(
 			RpcInterfaceId interfaceId,
+			Guid? objectId,
 			CancellationToken cancellationToken)
 		{
-			return this.TryMapIpv4(interfaceId, ProtocolId.Udp4, IPAddress.None, cancellationToken);
+			return this.TryMapIpv4(interfaceId, objectId, ProtocolId.Udp4, IPAddress.None, cancellationToken);
 		}
 		public Task<IPEndPoint?> TryMapUdp(
 			RpcInterfaceId interfaceId,
+			Guid? objectId,
 			IPAddress? hostAddress,
 			CancellationToken cancellationToken)
 		{
-			return this.TryMapIpv4(interfaceId, ProtocolId.Udp4, hostAddress, cancellationToken);
+			return this.TryMapIpv4(interfaceId, objectId, ProtocolId.Udp4, hostAddress, cancellationToken);
 		}
 		internal async Task<IPEndPoint?> TryMapIpv4(
 			RpcInterfaceId interfaceId,
+			Guid? objectId,
 			ProtocolId protocol,
 			IPAddress? address,
 			CancellationToken cancellationToken)
@@ -80,7 +85,7 @@ namespace Titanis.DceRpc.Epm
 				protocol,
 				new System.Net.IPEndPoint(address ?? IPAddress.Any, 135)
 				)._twr);
-			var towers = await MapTower(pTower, cancellationToken).ConfigureAwait(false);
+			var towers = await MapTower(pTower, objectId, cancellationToken).ConfigureAwait(false);
 
 			foreach (var tower in towers)
 			{
@@ -145,14 +150,14 @@ namespace Titanis.DceRpc.Epm
 			return entries;
 		}
 
-		public async Task<IPEndPoint?> MapNamedPipe(RpcInterfaceId interfaceId, CancellationToken cancellationToken)
+		public async Task<IPEndPoint?> MapNamedPipe(RpcInterfaceId interfaceId, Guid? objectId, CancellationToken cancellationToken)
 		{
 			RpcPointer<twr_t> pTower = new RpcPointer<twr_t>(Tower.EncodeNamedPipe(
 				interfaceId,
 				RpcEncoding.MsrpcSyntaxId,
 				null
 				)._twr);
-			var towers = await MapTower(pTower, cancellationToken).ConfigureAwait(false);
+			var towers = await MapTower(pTower, objectId, cancellationToken).ConfigureAwait(false);
 
 			foreach (var tower in towers)
 			{
@@ -163,13 +168,13 @@ namespace Titanis.DceRpc.Epm
 			return null;
 		}
 
-		private async Task<Tower[]> MapTower(RpcPointer<twr_t> pTower, CancellationToken cancellationToken)
+		private async Task<Tower[]> MapTower(RpcPointer<twr_t> pTower, Guid? objectId, CancellationToken cancellationToken)
 		{
 			RpcPointer<uint> pNumTowers = new RpcPointer<uint>();
 			RpcPointer<ArraySegment<RpcPointer<twr_t>>> pTowers = new RpcPointer<ArraySegment<RpcPointer<twr_t>>>();
 			RpcPointer<int> pStatus = new RpcPointer<int>();
 			await this._proxy.ept_map(
-				new RpcPointer<Guid>(),
+				objectId.HasValue ? new RpcPointer<Guid>(objectId.Value) : new RpcPointer<Guid>(),
 				pTower,
 				new RpcPointer<RpcContextHandle>(new RpcContextHandle()),
 				4, /* This value is used by MSRPC */

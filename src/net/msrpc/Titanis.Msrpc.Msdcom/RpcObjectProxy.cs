@@ -18,7 +18,7 @@ namespace Titanis.DceRpc.Client
 		{
 		}
 
-		public Guid Ipid { get; private set; }
+		public Guid Ipid { get => this.ObjectId ?? default; private set => this.ObjectId = value; }
 		public COMVERSION ComVersion { get; private set; }
 		internal IObjrefMarshal? Dcom { get; private set; }
 

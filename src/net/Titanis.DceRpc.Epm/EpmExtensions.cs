@@ -19,6 +19,7 @@ namespace Titanis.DceRpc.Client
 	{
 		public static async Task<TClient> Map<TClient>(
 			this RpcClient client,
+			Guid? objectId,
 			string remoteHost,
 			CancellationToken cancelTlationToken
 			)
@@ -26,7 +27,7 @@ namespace Titanis.DceRpc.Client
 		{
 			TClient svc = new TClient();
 			// TODO: Pass EPM auth context
-			IPEndPoint? serviceEP = await client.TryMapViaTcp(svc.Proxy.AbstractSyntaxId, remoteHost, cancelTlationToken).ConfigureAwait(false);
+			IPEndPoint? serviceEP = await client.TryMapViaTcp(svc.Proxy.AbstractSyntaxId, objectId, remoteHost, cancelTlationToken).ConfigureAwait(false);
 
 			if (serviceEP == null)
 				throw new InvalidOperationException(Epm.Messages.Epm_NoEndpoint);
@@ -39,6 +40,7 @@ namespace Titanis.DceRpc.Client
 		public static async Task<IPEndPoint?> TryMapViaTcp(
 			this RpcClient client,
 			RpcInterfaceId abstractSyntaxId,
+			Guid? objectId,
 			string remoteHost,
 			CancellationToken cancellationToken
 			)
@@ -46,12 +48,13 @@ namespace Titanis.DceRpc.Client
 			var nameResolver = client._resolver ?? new PlatformNameResolverService(log: client._log);
 
 			var addr = await nameResolver.ResolveAsync(remoteHost, cancellationToken).ConfigureAwait(false);
-			return await TryMapViaTcp(client, abstractSyntaxId, addr[0], cancellationToken).ConfigureAwait(false);
+			return await TryMapViaTcp(client, abstractSyntaxId, objectId, addr[0], cancellationToken).ConfigureAwait(false);
 		}
 
 		public static async Task<IPEndPoint?> TryMapViaTcp(
 			this RpcClient client,
 			RpcInterfaceId abstractSyntaxId,
+			Guid? objectId,
 			IPAddress addr,
 			CancellationToken cancellationToken
 			)
@@ -79,7 +82,7 @@ namespace Titanis.DceRpc.Client
 							// TODO: Enable EPM auth context
 							await epm.BindToAsync(channel, true, cancellationToken).ConfigureAwait(false);
 							channel = null;
-							IPEndPoint? serviceEP = await epm.TryMapTcp(abstractSyntaxId, cancellationToken).ConfigureAwait(false);
+							IPEndPoint? serviceEP = await epm.TryMapTcp(abstractSyntaxId, objectId, cancellationToken).ConfigureAwait(false);
 							return serviceEP;
 						}
 					}
