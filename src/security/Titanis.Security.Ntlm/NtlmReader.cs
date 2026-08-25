@@ -140,25 +140,28 @@ namespace Titanis.Security.Ntlm
 						eol = true;
 						break;
 					case AvId.NbComputerName:
-						av.NbComputerName = reader.ReadStringUni(avh.avLen);
+						// Preserve empty-valued pairs (e.g. Samba sends MsvAvDnsDomainName with len 0);
+						// they must be echoed back or servers such as Samba reject the session.
+						av.NbComputerName = reader.ReadStringUni(avh.avLen) ?? string.Empty;
 						break;
 					case AvId.NbDomainName:
-						av.NbDomainName = reader.ReadStringUni(avh.avLen);
+						av.NbDomainName = reader.ReadStringUni(avh.avLen) ?? string.Empty;
 						break;
 					case AvId.DnsComputerName:
-						av.DnsComputerName = reader.ReadStringUni(avh.avLen);
+						av.DnsComputerName = reader.ReadStringUni(avh.avLen) ?? string.Empty;
 						break;
 					case AvId.DnsDomainName:
-						av.DnsDomainName = reader.ReadStringUni(avh.avLen);
+						av.DnsDomainName = reader.ReadStringUni(avh.avLen) ?? string.Empty;
 						break;
 					case AvId.DnsTreeName:
-						av.DnsTreeName = reader.ReadStringUni(avh.avLen);
+						av.DnsTreeName = reader.ReadStringUni(avh.avLen) ?? string.Empty;
 						break;
 					case AvId.Flags:
 						av.flags = (NtlmAuthFlags)reader.ReadInt32LE();
 						break;
 					case AvId.Timestamp:
-						av.timestamp = new DateTime(reader.ReadInt64LE());
+						// FILETIME is relative to 1601-01-01 UTC
+						av.timestamp = DateTime.FromFileTimeUtc(reader.ReadInt64LE());
 						break;
 					case AvId.SingleHost:
 						av.singleHost = reader.ReadSingleHostData(avh.avLen);
