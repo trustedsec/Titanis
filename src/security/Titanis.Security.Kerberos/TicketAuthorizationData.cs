@@ -951,6 +951,7 @@ namespace Titanis.Security.Kerberos
 	partial struct PAC_CREDENTIAL_INFO
 	{
 		internal int version;
-		internal EType encryptionType;
+		private int _encryptionType;
+		public EType EncryptionType => (EType)this._encryptionType;
 	}
 }
