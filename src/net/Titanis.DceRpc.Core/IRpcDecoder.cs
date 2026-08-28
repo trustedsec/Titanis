@@ -17,6 +17,7 @@ namespace Titanis.DceRpc
 
 		void Align(NdrAlignment alignment);
 		void AlignUnionTag(NdrAlignment alignment);
+		void AlignUnionArm(NdrAlignment alignment);
 		bool ReadBoolean();
 		sbyte ReadSByte();
 		byte ReadByte();

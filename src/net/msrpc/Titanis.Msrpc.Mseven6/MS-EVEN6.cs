@@ -8,13 +8,13 @@ namespace MS_EVEN6
 	using Titanis;
 	using Titanis.DceRpc;
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct RpcInfo : IRpcFixedStruct
 	{
 		public uint m_error;
 		public uint m_subErr;
 		public uint m_subErrParam;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.m_error);
@@ -22,7 +22,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(this.m_subErrParam);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.m_error = decoder.ReadUInt32();
@@ -30,37 +30,37 @@ namespace MS_EVEN6
 			this.m_subErrParam = decoder.ReadUInt32();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct BooleanArray : IRpcFixedStruct
 	{
 		public uint count;
 		public RpcPointer<bool[]> ptr;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.count);
 			encoder.WriteUniquePointer(this.ptr);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.count = decoder.ReadUInt32();
 			this.ptr = decoder.ReadUniquePointer<bool[]>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.ptr is not null)
@@ -74,7 +74,7 @@ namespace MS_EVEN6
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.ptr is not null)
@@ -90,26 +90,26 @@ namespace MS_EVEN6
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct UInt32Array : IRpcFixedStruct
 	{
 		public uint count;
 		public RpcPointer<uint[]> ptr;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.count);
 			encoder.WriteUniquePointer(this.ptr);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.count = decoder.ReadUInt32();
 			this.ptr = decoder.ReadUniquePointer<uint[]>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.ptr is not null)
@@ -123,7 +123,7 @@ namespace MS_EVEN6
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.ptr is not null)
@@ -139,26 +139,26 @@ namespace MS_EVEN6
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct UInt64Array : IRpcFixedStruct
 	{
 		public uint count;
 		public RpcPointer<ulong[]> ptr;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.count);
 			encoder.WriteUniquePointer(this.ptr);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.count = decoder.ReadUInt32();
 			this.ptr = decoder.ReadUniquePointer<ulong[]>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.ptr is not null)
@@ -172,7 +172,7 @@ namespace MS_EVEN6
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.ptr is not null)
@@ -188,26 +188,26 @@ namespace MS_EVEN6
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct StringArray : IRpcFixedStruct
 	{
 		public uint count;
 		public RpcPointer<RpcPointer<string>[]> ptr;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.count);
 			encoder.WriteUniquePointer(this.ptr);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.count = decoder.ReadUInt32();
 			this.ptr = decoder.ReadUniquePointer<RpcPointer<string>[]>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.ptr is not null)
@@ -230,7 +230,7 @@ namespace MS_EVEN6
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.ptr is not null)
@@ -257,26 +257,26 @@ namespace MS_EVEN6
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct GuidArray : IRpcFixedStruct
 	{
 		public uint count;
 		public RpcPointer<Guid[]> ptr;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.count);
 			encoder.WriteUniquePointer(this.ptr);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.count = decoder.ReadUInt32();
 			this.ptr = decoder.ReadUniquePointer<Guid[]>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.ptr is not null)
@@ -290,7 +290,7 @@ namespace MS_EVEN6
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.ptr is not null)
@@ -306,7 +306,7 @@ namespace MS_EVEN6
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public enum EvtRpcVariantType : int
 	{
 		EvtRpcVarTypeNull = 0,
@@ -322,14 +322,14 @@ namespace MS_EVEN6
 		EvtRpcVarTypeGuidArray = 10
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public enum EvtRpcAssertConfigFlags : int
 	{
 		EvtRpcChannelPath = 0,
 		EvtRpcPublisherName = 1
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct Unnamed_1 : IRpcFixedStruct
 	{
 		public EvtRpcVariantType type;
@@ -348,6 +348,7 @@ namespace MS_EVEN6
 		{
 			encoder.AlignUnionTag(NdrAlignment._8Byte);
 			encoder.WriteValue((int)this.type);
+			encoder.AlignUnionArm(NdrAlignment._8Byte);
 			switch ((int)this.type)
 			{
 				case 0:
@@ -390,6 +391,7 @@ namespace MS_EVEN6
 		{
 			decoder.AlignUnionTag(NdrAlignment._8Byte);
 			this.type = (EvtRpcVariantType)decoder.ReadInt32();
+			decoder.AlignUnionArm(NdrAlignment._8Byte);
 			switch ((int)this.type)
 			{
 				case 0:
@@ -517,13 +519,13 @@ namespace MS_EVEN6
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct EvtRpcVariant : IRpcFixedStruct
 	{
 		public EvtRpcVariantType type;
 		public uint flags;
 		public Unnamed_1 unnamed_1;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue((int)this.type);
@@ -531,7 +533,7 @@ namespace MS_EVEN6
 			encoder.WriteUnion(this.unnamed_1);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.type = (EvtRpcVariantType)decoder.ReadInt32();
@@ -539,39 +541,39 @@ namespace MS_EVEN6
 			this.unnamed_1 = decoder.ReadUnion<Unnamed_1>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			encoder.WriteStructDeferral(this.unnamed_1);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			decoder.ReadStructDeferral<Unnamed_1>(ref this.unnamed_1);
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct EvtRpcVariantList : IRpcFixedStruct
 	{
 		public uint count;
 		public RpcPointer<EvtRpcVariant[]> props;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.count);
 			encoder.WriteUniquePointer(this.props);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.count = decoder.ReadUInt32();
 			this.props = decoder.ReadUniquePointer<EvtRpcVariant[]>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.props is not null)
@@ -591,7 +593,7 @@ namespace MS_EVEN6
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.props is not null)
@@ -614,26 +616,26 @@ namespace MS_EVEN6
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct EvtRpcQueryChannelInfo : IRpcFixedStruct
 	{
 		public RpcPointer<char> name;
 		public uint status;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteUniquePointer(this.name);
 			encoder.WriteValue(this.status);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.name = decoder.ReadUniquePointer<char>();
 			this.status = decoder.ReadUInt32();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.name is not null)
@@ -642,7 +644,7 @@ namespace MS_EVEN6
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.name is not null)
@@ -652,73 +654,73 @@ namespace MS_EVEN6
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), GuidAttribute("f6beaff7-1e19-4fbb-9f8f-b89e2018337c"), RpcVersionAttribute(1, 0)]
-	public partial interface IEventService
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), GuidAttribute("f6beaff7-1e19-4fbb-9f8f-b89e2018337c"), RpcVersionAttribute(1, 0)]
+	partial interface IEventService
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcRegisterRemoteSubscription(string channelPath, string query, string bookmarkXml, uint flags, RpcPointer<RpcContextHandle> handle, RpcPointer<RpcContextHandle> control, RpcPointer<uint> queryChannelInfoSize, RpcPointer<RpcPointer<EvtRpcQueryChannelInfo[]>> queryChannelInfo, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcRemoteSubscriptionNextAsync(RpcContextHandle handle, uint numRequestedRecords, uint flags, RpcPointer<uint> numActualRecords, RpcPointer<RpcPointer<uint[]>> eventDataIndices, RpcPointer<RpcPointer<uint[]>> eventDataSizes, RpcPointer<uint> resultBufferSize, RpcPointer<RpcPointer<byte[]>> resultBuffer, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcRemoteSubscriptionNext(RpcContextHandle handle, uint numRequestedRecords, uint timeOut, uint flags, RpcPointer<uint> numActualRecords, RpcPointer<RpcPointer<uint[]>> eventDataIndices, RpcPointer<RpcPointer<uint[]>> eventDataSizes, RpcPointer<uint> resultBufferSize, RpcPointer<RpcPointer<byte[]>> resultBuffer, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcRemoteSubscriptionWaitAsync(RpcContextHandle handle, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcRegisterControllableOperation(RpcPointer<RpcContextHandle> handle, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcRegisterLogQuery(string path, string query, uint flags, RpcPointer<RpcContextHandle> handle, RpcPointer<RpcContextHandle> opControl, RpcPointer<uint> queryChannelInfoSize, RpcPointer<RpcPointer<EvtRpcQueryChannelInfo[]>> queryChannelInfo, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcClearLog(RpcContextHandle control, string channelPath, string backupPath, uint flags, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcExportLog(RpcContextHandle control, string channelPath, string query, string backupPath, uint flags, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcLocalizeExportLog(RpcContextHandle control, string logFilePath, uint locale, uint flags, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcMessageRender(RpcContextHandle pubCfgObj, uint sizeEventId, byte[] eventId, uint messageId, EvtRpcVariantList values, uint flags, uint maxSizeString, RpcPointer<uint> actualSizeString, RpcPointer<uint> neededSizeString, RpcPointer<RpcPointer<byte[]>> @string, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcMessageRenderDefault(uint sizeEventId, byte[] eventId, uint messageId, EvtRpcVariantList values, uint flags, uint maxSizeString, RpcPointer<uint> actualSizeString, RpcPointer<uint> neededSizeString, RpcPointer<RpcPointer<byte[]>> @string, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcQueryNext(RpcContextHandle logQuery, uint numRequestedRecords, uint timeOutEnd, uint flags, RpcPointer<uint> numActualRecords, RpcPointer<RpcPointer<uint[]>> eventDataIndices, RpcPointer<RpcPointer<uint[]>> eventDataSizes, RpcPointer<uint> resultBufferSize, RpcPointer<RpcPointer<byte[]>> resultBuffer, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcQuerySeek(RpcContextHandle logQuery, long pos, string bookmarkXml, uint timeOut, uint flags, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcClose(RpcPointer<RpcContextHandle> handle, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcCancel(RpcContextHandle handle, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcAssertConfig(string path, uint flags, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcRetractConfig(string path, uint flags, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcOpenLogHandle(string channel, uint flags, RpcPointer<RpcContextHandle> handle, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcGetLogFileInfo(RpcContextHandle logHandle, uint propertyId, uint propertyValueBufferSize, RpcPointer<byte[]> propertyValueBuffer, RpcPointer<uint> propertyValueBufferLength, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcGetChannelList(uint flags, RpcPointer<uint> numChannelPaths, RpcPointer<RpcPointer<RpcPointer<string>[]>> channelPaths, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcGetChannelConfig(string channelPath, uint flags, RpcPointer<EvtRpcVariantList> props, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcPutChannelConfig(string channelPath, uint flags, EvtRpcVariantList props, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcGetPublisherList(uint flags, RpcPointer<uint> numPublisherIds, RpcPointer<RpcPointer<RpcPointer<string>[]>> publisherIds, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcGetPublisherListForChannel(char channelName, uint flags, RpcPointer<uint> numPublisherIds, RpcPointer<RpcPointer<RpcPointer<string>[]>> publisherIds, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcGetPublisherMetadata(string publisherId, string logFilePath, uint locale, uint flags, RpcPointer<EvtRpcVariantList> pubMetadataProps, RpcPointer<RpcContextHandle> pubMetadata, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcGetPublisherResourceMetadata(RpcContextHandle handle, uint propertyId, uint flags, RpcPointer<EvtRpcVariantList> pubMetadataProps, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcGetEventMetadataEnum(RpcContextHandle pubMetadata, uint flags, string reservedForFilter, RpcPointer<RpcContextHandle> eventMetaDataEnum, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcGetNextEventMetadata(RpcContextHandle eventMetaDataEnum, uint flags, uint numRequested, RpcPointer<uint> numReturned, RpcPointer<RpcPointer<EvtRpcVariantList[]>> eventMetadataInstances, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcGetClassicLogDisplayName(string logName, uint locale, uint flags, RpcPointer<RpcPointer<string>> displayName, CancellationToken cancellationToken);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), IidAttribute("f6beaff7-1e19-4fbb-9f8f-b89e2018337c")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), IidAttribute("f6beaff7-1e19-4fbb-9f8f-b89e2018337c")]
 	public partial class IEventServiceClientProxy : Titanis.DceRpc.Client.RpcClientProxy, IEventService, Titanis.DceRpc.IRpcClientProxy
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcRegisterRemoteSubscription(string channelPath, string query, string bookmarkXml, uint flags, RpcPointer<RpcContextHandle> handle, RpcPointer<RpcContextHandle> control, RpcPointer<uint> queryChannelInfoSize, RpcPointer<RpcPointer<EvtRpcQueryChannelInfo[]>> queryChannelInfo, RpcPointer<RpcInfo> error, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(0);
@@ -761,7 +763,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcRemoteSubscriptionNextAsync(RpcContextHandle handle, uint numRequestedRecords, uint flags, RpcPointer<uint> numActualRecords, RpcPointer<RpcPointer<uint[]>> eventDataIndices, RpcPointer<RpcPointer<uint[]>> eventDataSizes, RpcPointer<uint> resultBufferSize, RpcPointer<RpcPointer<byte[]>> resultBuffer, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(1);
@@ -813,7 +815,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcRemoteSubscriptionNext(RpcContextHandle handle, uint numRequestedRecords, uint timeOut, uint flags, RpcPointer<uint> numActualRecords, RpcPointer<RpcPointer<uint[]>> eventDataIndices, RpcPointer<RpcPointer<uint[]>> eventDataSizes, RpcPointer<uint> resultBufferSize, RpcPointer<RpcPointer<byte[]>> resultBuffer, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(2);
@@ -866,7 +868,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcRemoteSubscriptionWaitAsync(RpcContextHandle handle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(3);
@@ -878,7 +880,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcRegisterControllableOperation(RpcPointer<RpcContextHandle> handle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(4);
@@ -890,7 +892,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcRegisterLogQuery(string path, string query, uint flags, RpcPointer<RpcContextHandle> handle, RpcPointer<RpcContextHandle> opControl, RpcPointer<uint> queryChannelInfoSize, RpcPointer<RpcPointer<EvtRpcQueryChannelInfo[]>> queryChannelInfo, RpcPointer<RpcInfo> error, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(5);
@@ -930,7 +932,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcClearLog(RpcContextHandle control, string channelPath, string backupPath, uint flags, RpcPointer<RpcInfo> error, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(6);
@@ -949,7 +951,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcExportLog(RpcContextHandle control, string channelPath, string query, string backupPath, uint flags, RpcPointer<RpcInfo> error, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(7);
@@ -969,7 +971,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcLocalizeExportLog(RpcContextHandle control, string logFilePath, uint locale, uint flags, RpcPointer<RpcInfo> error, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(8);
@@ -986,7 +988,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcMessageRender(RpcContextHandle pubCfgObj, uint sizeEventId, byte[] eventId, uint messageId, EvtRpcVariantList values, uint flags, uint maxSizeString, RpcPointer<uint> actualSizeString, RpcPointer<uint> neededSizeString, RpcPointer<RpcPointer<byte[]>> @string, RpcPointer<RpcInfo> error, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(9);
@@ -1030,7 +1032,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcMessageRenderDefault(uint sizeEventId, byte[] eventId, uint messageId, EvtRpcVariantList values, uint flags, uint maxSizeString, RpcPointer<uint> actualSizeString, RpcPointer<uint> neededSizeString, RpcPointer<RpcPointer<byte[]>> @string, RpcPointer<RpcInfo> error, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(10);
@@ -1073,7 +1075,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcQueryNext(RpcContextHandle logQuery, uint numRequestedRecords, uint timeOutEnd, uint flags, RpcPointer<uint> numActualRecords, RpcPointer<RpcPointer<uint[]>> eventDataIndices, RpcPointer<RpcPointer<uint[]>> eventDataSizes, RpcPointer<uint> resultBufferSize, RpcPointer<RpcPointer<byte[]>> resultBuffer, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(11);
@@ -1126,7 +1128,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcQuerySeek(RpcContextHandle logQuery, long pos, string bookmarkXml, uint timeOut, uint flags, RpcPointer<RpcInfo> error, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(12);
@@ -1146,7 +1148,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcClose(RpcPointer<RpcContextHandle> handle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(13);
@@ -1159,7 +1161,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcCancel(RpcContextHandle handle, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(14);
@@ -1171,7 +1173,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcAssertConfig(string path, uint flags, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(15);
@@ -1184,7 +1186,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcRetractConfig(string path, uint flags, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(16);
@@ -1197,7 +1199,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcOpenLogHandle(string channel, uint flags, RpcPointer<RpcContextHandle> handle, RpcPointer<RpcInfo> error, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(17);
@@ -1213,7 +1215,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcGetLogFileInfo(RpcContextHandle logHandle, uint propertyId, uint propertyValueBufferSize, RpcPointer<byte[]> propertyValueBuffer, RpcPointer<uint> propertyValueBufferLength, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(18);
@@ -1236,7 +1238,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcGetChannelList(uint flags, RpcPointer<uint> numChannelPaths, RpcPointer<RpcPointer<RpcPointer<string>[]>> channelPaths, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(19);
@@ -1272,7 +1274,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcGetChannelConfig(string channelPath, uint flags, RpcPointer<EvtRpcVariantList> props, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(20);
@@ -1287,7 +1289,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcPutChannelConfig(string channelPath, uint flags, EvtRpcVariantList props, RpcPointer<RpcInfo> error, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(21);
@@ -1304,7 +1306,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcGetPublisherList(uint flags, RpcPointer<uint> numPublisherIds, RpcPointer<RpcPointer<RpcPointer<string>[]>> publisherIds, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(22);
@@ -1340,7 +1342,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcGetPublisherListForChannel(char channelName, uint flags, RpcPointer<uint> numPublisherIds, RpcPointer<RpcPointer<RpcPointer<string>[]>> publisherIds, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(23);
@@ -1377,7 +1379,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcGetPublisherMetadata(string publisherId, string logFilePath, uint locale, uint flags, RpcPointer<EvtRpcVariantList> pubMetadataProps, RpcPointer<RpcContextHandle> pubMetadata, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(24);
@@ -1399,7 +1401,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcGetPublisherResourceMetadata(RpcContextHandle handle, uint propertyId, uint flags, RpcPointer<EvtRpcVariantList> pubMetadataProps, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(25);
@@ -1415,7 +1417,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcGetEventMetadataEnum(RpcContextHandle pubMetadata, uint flags, string reservedForFilter, RpcPointer<RpcContextHandle> eventMetaDataEnum, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(26);
@@ -1432,7 +1434,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcGetNextEventMetadata(RpcContextHandle eventMetaDataEnum, uint flags, uint numRequested, RpcPointer<uint> numReturned, RpcPointer<RpcPointer<EvtRpcVariantList[]>> eventMetadataInstances, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(27);
@@ -1466,7 +1468,7 @@ namespace MS_EVEN6
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> EvtRpcGetClassicLogDisplayName(string logName, uint locale, uint flags, RpcPointer<RpcPointer<string>> displayName, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(28);
@@ -1492,10 +1494,10 @@ namespace MS_EVEN6
 		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(1, 0);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial class IEventServiceStub : Titanis.DceRpc.Server.RpcServiceStub
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcRegisterRemoteSubscription(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string channelPath;
@@ -1544,7 +1546,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcRemoteSubscriptionNextAsync(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle handle;
@@ -1598,7 +1600,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcRemoteSubscriptionNext(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle handle;
@@ -1654,7 +1656,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcRemoteSubscriptionWaitAsync(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle handle;
@@ -1664,7 +1666,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcRegisterControllableOperation(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<RpcContextHandle> handle = new RpcPointer<RpcContextHandle>();
@@ -1674,7 +1676,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcRegisterLogQuery(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string path;
@@ -1718,7 +1720,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcClearLog(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle control;
@@ -1740,7 +1742,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcExportLog(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle control;
@@ -1764,7 +1766,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcLocalizeExportLog(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle control;
@@ -1783,7 +1785,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcMessageRender(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle pubCfgObj;
@@ -1832,7 +1834,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcMessageRenderDefault(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			uint sizeEventId;
@@ -1879,7 +1881,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcQueryNext(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle logQuery;
@@ -1935,7 +1937,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcQuerySeek(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle logQuery;
@@ -1959,7 +1961,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcClose(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<RpcContextHandle> handle;
@@ -1971,7 +1973,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcCancel(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle handle;
@@ -1981,7 +1983,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcAssertConfig(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string path;
@@ -1993,7 +1995,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcRetractConfig(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string path;
@@ -2005,7 +2007,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcOpenLogHandle(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string channel;
@@ -2022,7 +2024,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcGetLogFileInfo(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle logHandle;
@@ -2046,7 +2048,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcGetChannelList(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			uint flags;
@@ -2079,7 +2081,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcGetChannelConfig(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string channelPath;
@@ -2094,7 +2096,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcPutChannelConfig(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string channelPath;
@@ -2112,7 +2114,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcGetPublisherList(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			uint flags;
@@ -2145,7 +2147,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcGetPublisherListForChannel(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			char channelName;
@@ -2180,7 +2182,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcGetPublisherMetadata(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string publisherId;
@@ -2207,7 +2209,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcGetPublisherResourceMetadata(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle handle;
@@ -2224,7 +2226,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcGetEventMetadataEnum(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle pubMetadata;
@@ -2243,7 +2245,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcGetNextEventMetadata(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcContextHandle eventMetaDataEnum;
@@ -2277,7 +2279,7 @@ namespace MS_EVEN6
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_EvtRpcGetClassicLogDisplayName(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			string logName;
@@ -2304,7 +2306,7 @@ namespace MS_EVEN6
 		private Titanis.DceRpc.Server.OperationImplFunc[] _dispatchTable;
 		public override Titanis.DceRpc.Server.OperationImplFunc[] DispatchTable => this._dispatchTable;
 		private IEventService _obj;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public IEventServiceStub(IEventService obj)
 		{
 			this._obj = obj;

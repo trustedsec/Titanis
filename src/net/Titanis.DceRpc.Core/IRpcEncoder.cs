@@ -17,6 +17,7 @@ namespace Titanis.DceRpc
 
 		void Align(NdrAlignment alignment);
 		void AlignUnionTag(NdrAlignment alignment);
+		void AlignUnionArm(NdrAlignment alignment);
 		void WriteValue(bool v);
 		void WriteValue(sbyte v);
 		void WriteValue(byte v);

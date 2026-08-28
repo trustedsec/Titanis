@@ -428,6 +428,11 @@ namespace Titanis.DceRpc
 			// Do nothing
 		}
 
+		public sealed override void AlignUnionArm(NdrAlignment alignment)
+		{
+			// Do nothing
+		}
+
 		// [C706] § 14.3.10 - Pointers
 		public sealed override long ReadReferentId()
 		{
@@ -467,6 +472,11 @@ namespace Titanis.DceRpc
 		public sealed override int EnumAlignment => 4;
 
 		public sealed override void AlignUnionTag(NdrAlignment alignment)
+		{
+			this.Align(alignment);
+		}
+
+		public sealed override void AlignUnionArm(NdrAlignment alignment)
 		{
 			this.Align(alignment);
 		}

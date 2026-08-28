@@ -300,6 +300,11 @@ namespace Titanis.DceRpc
 			// Do nothing
 		}
 
+		public sealed override void AlignUnionArm(NdrAlignment alignment)
+		{
+			// Do nothing
+		}
+
 		// [C706] § 14.3.3.2 - Uni-dimensional Conformant Arrays
 		// [C706] § 14.3.3.3 - Uni-dimensional Varying Arrays
 		// [C706] § 14.3.3.4 - Uni-dimensional Conformant-varying Arrays
@@ -336,6 +341,10 @@ namespace Titanis.DceRpc
 
 		}
 		public sealed override void AlignUnionTag(NdrAlignment alignment)
+		{
+			this.Align(alignment);
+		}
+		public sealed override void AlignUnionArm(NdrAlignment alignment)
 		{
 			this.Align(alignment);
 		}
