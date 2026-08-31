@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Authentication.ExtendedProtection;
 using System.Security.Cryptography;
@@ -113,6 +114,8 @@ namespace Titanis.Smb2
 
 				this.SupportedCiphers = pdu.cipherAlgs;
 			}
+
+			this._negotiated = true;
 		}
 
 		/// <summary>
@@ -251,8 +254,10 @@ namespace Titanis.Smb2
 				if (preauthHashAlg != null)
 					preauthIntegrityValue = UpdatePreauthHash(preauthIntegrityValue!, preauthHashAlg, negReqPduInfo.pduBytes.Span);
 
+				await channel.Start().ConfigureAwait(false);
+
 				// Read NEGOTIATE_RESPONSE
-				var resp = await channel.ReadFrameAsync(cancellationToken).ConfigureAwait(false);
+				var resp = await conn._negotiateResp.Task.ConfigureAwait(false);
 				if (
 					(resp.pdu.Command != Smb2Command.Negotiate)
 					)
@@ -283,7 +288,6 @@ namespace Titanis.Smb2
 				conn._preauthHashAlg = preauthHashAlg;
 				conn._preauthIntegrityValue = preauthIntegrityValue;
 
-				await channel.Start().ConfigureAwait(false);
 				channel = null;
 
 				return conn;
@@ -994,8 +998,17 @@ namespace Titanis.Smb2
 			return pdu;
 		}
 
+		private bool _negotiated;
+		private TaskCompletionSource<Smb2Message> _negotiateResp = new TaskCompletionSource<Smb2Message>();
 		internal Task HandlePdu(Smb2Message msg)
 		{
+			if (!this._negotiated)
+			{
+				this._negotiateResp.SetResult(msg);
+				return Task.CompletedTask;
+			}
+
+
 			if (msg.hdr.command == Smb2Command.OplockBreak && msg.pdu != null)
 			{
 				// TODO: Once leasing functionality is supported, take the appropriate steps

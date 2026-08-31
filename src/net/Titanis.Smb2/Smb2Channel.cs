@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq.Expressions;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Titanis.Crypto;
-using Titanis.IO;
+using Titanis.Net;
 using Titanis.Smb2.Pdus;
-using static Titanis.Smb2.Smb2Connection;
 
 namespace Titanis.Smb2
 {
@@ -53,7 +44,7 @@ namespace Titanis.Smb2
 	/// <remarks>
 	/// Generally, this represents the underlying TCP connection.
 	/// </remarks>
-	partial class Smb2Channel : Runnable
+	partial class Smb2Channel : Runnable, IStreamTransportHandler
 	{
 		internal Smb2Channel(Stream stream, int receiveBufferSize)
 		{
@@ -61,67 +52,22 @@ namespace Titanis.Smb2
 				throw new ArgumentOutOfRangeException(nameof(receiveBufferSize), Messages.Smb2Channel_InsufficientReceiveBuffer);
 
 			this._stream = stream;
-			this._recvBuffer = new byte[receiveBufferSize];
+			this._receiveBufferSize = receiveBufferSize;
+			var transport = new StreamTransport(this._stream);
+			this._transport = transport;
 		}
 
+		const int NbssHeaderSize = 4;
 		private Smb2Connection? _attachedConnection;
+
+		private readonly Stream _stream;
+		private readonly int _receiveBufferSize;
+		private readonly StreamTransport _transport;
 
 		internal void OnAttaching(Smb2Connection connection)
 		{
 			Debug.Assert(this._attachedConnection == null);
 			this._attachedConnection = connection;
-		}
-
-		private byte[] _recvBuffer;
-		private int _readIndex;
-
-		private readonly Stream _stream;
-
-		/// <summary>
-		/// Reads a frame.
-		/// </summary>
-		/// <param name="cancellationToken"></param>
-		/// <returns>The <see cref="Smb2Message"/> read from the channel</returns>
-		/// <exception cref="InvalidOperationException"></exception>
-		internal async Task<Smb2Message> ReadFrameAsync(CancellationToken cancellationToken)
-		{
-			int cbRead = this._readIndex;
-
-			var recvBuf = this._recvBuffer;
-
-			const int NbssHeaderSize = 4;
-			if (cbRead < NbssHeaderSize)
-				cbRead += await this._stream.ReadAtLeastAsync(recvBuf, cbRead, recvBuf.Length - cbRead, NbssHeaderSize - cbRead, cancellationToken).ConfigureAwait(false);
-
-			int cbPdu = (int)BinaryPrimitives.ReverseEndianness(BitConverter.ToUInt32(recvBuf, 0) & ~(uint)0xFF);
-			if (cbPdu > (recvBuf.Length - NbssHeaderSize))
-			{
-				// Expand receive buffer
-				byte[] newbuf = new byte[cbPdu + NbssHeaderSize];
-				Buffer.BlockCopy(recvBuf, 0, newbuf, 0, cbRead);
-				this._recvBuffer = newbuf;
-				recvBuf = newbuf;
-			}
-
-			int cbFrame = cbPdu + 4;
-			if (cbRead < cbFrame)
-			{
-				await this._stream.ReadAllAsync(recvBuf, cbRead, cbFrame - cbRead, cancellationToken).ConfigureAwait(false);
-				cbRead = cbFrame;
-			}
-
-			var pduBytes = new Memory<byte>(recvBuf, NbssHeaderSize, cbPdu);
-			Smb2Message msg = this._attachedConnection.ParsePdu(pduBytes);
-
-			cbRead -= cbFrame;
-			if (cbRead > 0)
-			{
-				// Multiple frames were read
-				Buffer.BlockCopy(recvBuf, cbFrame, recvBuf, 0, cbRead);
-			}
-			this._readIndex = cbRead;
-
-			return msg;
 		}
 
 		protected sealed override Task OnStarting(CancellationToken cancellationToken)
@@ -131,14 +77,7 @@ namespace Titanis.Smb2
 		}
 
 		/// <inheritdoc/>
-		protected override async Task Run(CancellationToken cancellationToken)
-		{
-			while (!cancellationToken.IsCancellationRequested)
-			{
-				Smb2Message msg = await this.ReadFrameAsync(cancellationToken).ConfigureAwait(false);
-				await this._attachedConnection.HandlePdu(msg).ConfigureAwait(false);
-			}
-		}
+		protected override Task Run(CancellationToken cancellationToken) => this._transport.Run(this, this._receiveBufferSize, NbssHeaderSize, cancellationToken);
 
 		protected override Task OnStopping()
 		{
@@ -154,6 +93,21 @@ namespace Titanis.Smb2
 
 		internal ValueTask SendFrameAsync(Memory<byte> frameBytes)
 			=> this._stream.WriteAsync(frameBytes);
+
+
+
+		int IStreamTransportHandler.ExtractMessageFrameSize(ReadOnlySpan<byte> buffer)
+		{
+			int cbPdu = (int)(BinaryPrimitives.ReadUInt32BigEndian(buffer) & 0x00FF_FFFF);
+			return cbPdu + 4;
+		}
+
+		async Task IStreamTransportHandler.HandleFrame(Memory<byte> frame)
+		{
+			var pduBytes = frame.Slice(NbssHeaderSize);
+			Smb2Message msg = this._attachedConnection.ParsePdu(pduBytes);
+			await this._attachedConnection.HandlePdu(msg).ConfigureAwait(false);
+		}
 	}
 
 	partial class Smb2Channel : IDisposable, IAsyncDisposable

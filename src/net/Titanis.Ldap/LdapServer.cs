@@ -115,6 +115,8 @@ namespace Titanis.Ldap
 			{
 				BindResponse = new BindResponse_Tagged1(authContext.IsComplete ? LDAPResult_ResultCode.Success : LDAPResult_ResultCode.SaslBindInProgress, Array.Empty<byte>(), Array.Empty<byte>(), serverSaslCreds: responseToken)
 			}, null, request.messageID, cancellationToken).ConfigureAwait(false);
+
+			this.ShouldSealMessages = authContext.SupportsEncryption;
 		}
 
 		private async Task HandleSearchRequest(LDAPMessage request, CancellationToken cancellationToken)

@@ -73,6 +73,8 @@ namespace Titanis.Ldap
 				authContext.IncrementRecvSeqNbr();
 			this._authContext = authContext;
 
+			this.ShouldSealMessages = authContext.IsComplete && authContext.SupportsEncryption;
+
 			return resp;
 		}
 
