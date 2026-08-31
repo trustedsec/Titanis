@@ -155,11 +155,40 @@ public abstract class LdapGenericSearchCommandBase : LdapCommandBase, ILdapClien
 		} while ((!query.PagingBookmark.IsNullOrEmpty() || !query.DirSyncCookie.IsNullOrEmpty()) && this._pageHasResult && !cancellationToken.IsCancellationRequested);
 	}
 
+	private static string[] sensitiveAttributes = [
+		LdapAttributeTypes.ServicePrincipalName.Name,
+		LdapAttributeTypes.MsDSAllowedToActOnBehalfOfOtherIdentity.Name,
+		LdapAttributeTypes.UserCert.Name,
+		LdapAttributeTypes.MsDSKeyCredentialLink.Name
+		];
+
 	private bool _pageHasResult;
 	void ILdapClientSearchCallback.OnEntry(LdapEntry entry)
 	{
 		this._pageHasResult = true;
-		this.WriteRecord(entry);
+
+		// Check access
+		var alerts = ImmutableArray.CreateBuilder<RecordAlert>();
+
+
+		var attrs = entry[LdapAttributeTypes.AllowedAttributesEffective]?.Values;
+		if (attrs != null)
+		{
+			for (int i = 0; i < attrs.Length; i++)
+			{
+				object? attr = attrs[i];
+				if (attr is string str && sensitiveAttributes.Contains(str))
+					alerts.Add(new RecordAlert(LdapAttributeTypes.AllowedAttributesEffective.Name, i));
+			}
+		}
+
+		var sdRights = entry[LdapAttributeTypes.SDRightsEffective]?.Value as int?;
+		//if (sdRights.HasValue && sdRights.Value != 0)
+		//	alerts.Add(new RecordAlert(null));
+
+		RecordInfo? info = new RecordInfo(alerts.ToImmutable());
+
+		this.WriteRecord(entry, info);
 	}
 
 	protected readonly ConcurrentQueue<string> referralQueue = new ConcurrentQueue<string>();
