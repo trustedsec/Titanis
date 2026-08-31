@@ -69,6 +69,25 @@ namespace Titanis.DceRpc.Client
 			return req;
 		}
 
+		protected RpcRequestBuilder CreateRequest2(ushort opnum)
+		{
+			// HACK: This is used exclusively for IRemUnknown::RemQueryInterface
+
+			this.EnsureBound();
+			var req = new RpcRequestBuilder(opnum, this._bindContext.encoding, new RpcCallContext(this.Dcom), this.Ipid);
+
+			// [MS-DCOM] § 2.2.13.3
+			var orpcThis = new ms_dcom.ORPCTHIS2()
+			{
+				version = this.ComVersion,
+				cid = Guid.NewGuid(),
+			};
+			req.StubData.WriteFixedStruct(orpcThis, NdrAlignment.NativePtr);
+			req.StubData.WriteStructDeferral(orpcThis);
+
+			return req;
+		}
+
 		private static readonly Guid clsidErrorExtension = new Guid("0000031c-0000-0000-c000-000000000046");
 		private static readonly Guid clsidErrorInfo = new Guid("0000031b-0000-0000-c000-000000000046");
 		protected sealed override async Task<RpcDecoder> SendRequestAsync(IRpcRequestBuilder stubData, CancellationToken cancellationToken)
@@ -99,6 +118,39 @@ namespace Titanis.DceRpc.Client
 					}
 				}
 			}
+
+			return req;
+		}
+		protected async Task<RpcDecoder> SendRequestAsync2(IRpcRequestBuilder stubData, CancellationToken cancellationToken)
+		{
+			// HACK: This is used exclusively for IRemUnknown::RemQueryInterface
+
+			var req = await base.SendRequestAsync(stubData, cancellationToken).ConfigureAwait(false);
+			var that = req.ReadFixedStruct<ms_dcom.ORPCTHAT2>(NdrAlignment.NativePtr);
+			that.DecodeDeferrals(req);
+
+			DcomClient.ClearLastError();
+
+			//var exts = that.extensions?.value.extent?.value;
+			//if (exts != null)
+			//{
+			//	foreach (var pExt in exts)
+			//	{
+			//		if (pExt != null)
+			//		{
+			//			if (pExt.value.id == clsidErrorExtension)
+			//			{
+			//				var bytes = pExt.value.data;
+			//				var unwrapped = await new TypedObjref<IRpcObject>(bytes).Unwrap(this.Dcom, cancellationToken).ConfigureAwait(false);
+			//				DcomClient.SetLastError(unwrapped);
+			//			}
+			//			else
+			//			{
+			//				;
+			//			}
+			//		}
+			//	}
+			//}
 
 			return req;
 		}

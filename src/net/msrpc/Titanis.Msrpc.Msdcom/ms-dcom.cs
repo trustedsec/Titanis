@@ -8,16 +8,16 @@ namespace ms_dcom
 	using Titanis;
 	using Titanis.DceRpc;
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct ORPC_EXTENT : IRpcConformantStruct
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeHeader(IRpcEncoder encoder)
 		{
 			encoder.WriteArrayHeader(this.data);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeHeader(IRpcDecoder decoder)
 		{
 			this.data = decoder.ReadArrayHeader<byte>();
@@ -26,7 +26,7 @@ namespace ms_dcom
 		public Guid id;
 		public uint size;
 		public byte[] data;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeConformantArrayField(IRpcEncoder encoder)
 		{
 			for (int i = 0; i < this.data.Length; i++)
@@ -36,7 +36,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeConformantArrayField(IRpcDecoder decoder)
 		{
 			for (int i = 0; i < this.data.Length; i++)
@@ -47,38 +47,38 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.id);
 			encoder.WriteValue(this.size);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.id = decoder.ReadUuid();
 			this.size = decoder.ReadUInt32();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct ORPC_EXTENT_ARRAY : IRpcFixedStruct
 	{
 		public uint size;
 		public uint reserved;
 		public RpcPointer<RpcPointer<ORPC_EXTENT>[]> extent;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.size);
@@ -86,7 +86,7 @@ namespace ms_dcom
 			encoder.WriteUniquePointer(this.extent);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.size = decoder.ReadUInt32();
@@ -94,7 +94,7 @@ namespace ms_dcom
 			this.extent = decoder.ReadUniquePointer<RpcPointer<ORPC_EXTENT>[]>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.extent is not null)
@@ -118,7 +118,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.extent is not null)
@@ -146,7 +146,7 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct ORPCTHIS : IRpcFixedStruct
 	{
 		public COMVERSION version;
@@ -154,7 +154,7 @@ namespace ms_dcom
 		public uint reserved1;
 		public Guid cid;
 		public RpcPointer<ORPC_EXTENT_ARRAY> extensions;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteFixedStruct(this.version, NdrAlignment._2Byte);
@@ -164,7 +164,7 @@ namespace ms_dcom
 			encoder.WriteUniquePointer(this.extensions);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.version = decoder.ReadFixedStruct<COMVERSION>(NdrAlignment._2Byte);
@@ -174,7 +174,7 @@ namespace ms_dcom
 			this.extensions = decoder.ReadUniquePointer<ORPC_EXTENT_ARRAY>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			encoder.WriteStructDeferral(this.version);
@@ -185,7 +185,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			decoder.ReadStructDeferral<COMVERSION>(ref this.version);
@@ -197,26 +197,26 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct ORPCTHAT : IRpcFixedStruct
 	{
 		public uint flags;
 		public RpcPointer<ORPC_EXTENT_ARRAY> extensions;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.flags);
 			encoder.WriteUniquePointer(this.extensions);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.flags = decoder.ReadUInt32();
 			this.extensions = decoder.ReadUniquePointer<ORPC_EXTENT_ARRAY>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.extensions is not null)
@@ -226,7 +226,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.extensions is not null)
@@ -237,16 +237,16 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct DUALSTRINGARRAY : IRpcConformantStruct
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeHeader(IRpcEncoder encoder)
 		{
 			encoder.WriteArrayHeader(this.aStringArray);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeHeader(IRpcDecoder decoder)
 		{
 			this.aStringArray = decoder.ReadArrayHeader<ushort>();
@@ -255,7 +255,7 @@ namespace ms_dcom
 		public ushort wNumEntries;
 		public ushort wSecurityOffset;
 		public ushort[] aStringArray;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeConformantArrayField(IRpcEncoder encoder)
 		{
 			for (int i = 0; i < this.aStringArray.Length; i++)
@@ -265,7 +265,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeConformantArrayField(IRpcDecoder decoder)
 		{
 			for (int i = 0; i < this.aStringArray.Length; i++)
@@ -276,32 +276,32 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.wNumEntries);
 			encoder.WriteValue(this.wSecurityOffset);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.wNumEntries = decoder.ReadUInt16();
 			this.wSecurityOffset = decoder.ReadUInt16();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public enum tagCPFLAGS : int
 	{
 		CPFLAG_PROPAGATE = 1,
@@ -309,16 +309,16 @@ namespace ms_dcom
 		CPFLAG_ENVOY = 4
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct MInterfacePointer : IRpcConformantStruct
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeHeader(IRpcEncoder encoder)
 		{
 			encoder.WriteArrayHeader(this.abData);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeHeader(IRpcDecoder decoder)
 		{
 			this.abData = decoder.ReadArrayHeader<byte>();
@@ -326,7 +326,7 @@ namespace ms_dcom
 
 		public uint ulCntData;
 		public byte[] abData;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeConformantArrayField(IRpcEncoder encoder)
 		{
 			for (int i = 0; i < this.abData.Length; i++)
@@ -336,7 +336,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeConformantArrayField(IRpcDecoder decoder)
 		{
 			for (int i = 0; i < this.abData.Length; i++)
@@ -347,30 +347,30 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.ulCntData);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.ulCntData = decoder.ReadUInt32();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct ErrorObjectData : IRpcFixedStruct
 	{
 		public uint dwVersion;
@@ -379,7 +379,7 @@ namespace ms_dcom
 		public RpcPointer<string> pszSource;
 		public RpcPointer<string> pszDescription;
 		public RpcPointer<string> pszHelpFile;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.dwVersion);
@@ -390,7 +390,7 @@ namespace ms_dcom
 			encoder.WriteUniquePointer(this.pszHelpFile);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.dwVersion = decoder.ReadUInt32();
@@ -401,7 +401,7 @@ namespace ms_dcom
 			this.pszHelpFile = decoder.ReadUniquePointer<string>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.pszSource is not null)
@@ -420,7 +420,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.pszSource is not null)
@@ -440,7 +440,7 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct STDOBJREF : IRpcFixedStruct
 	{
 		public uint flags;
@@ -448,7 +448,7 @@ namespace ms_dcom
 		public ulong oxid;
 		public ulong oid;
 		public Guid ipid;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.flags);
@@ -458,7 +458,7 @@ namespace ms_dcom
 			encoder.WriteValue(this.ipid);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.flags = decoder.ReadUInt32();
@@ -468,56 +468,56 @@ namespace ms_dcom
 			this.ipid = decoder.ReadUuid();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct REMQIRESULT : IRpcFixedStruct
 	{
 		public int hResult;
 		public STDOBJREF std;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.hResult);
 			encoder.WriteFixedStruct(this.std, NdrAlignment._8Byte);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.hResult = decoder.ReadInt32();
 			this.std = decoder.ReadFixedStruct<STDOBJREF>(NdrAlignment._8Byte);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			encoder.WriteStructDeferral(this.std);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			decoder.ReadStructDeferral<STDOBJREF>(ref this.std);
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct REMINTERFACEREF : IRpcFixedStruct
 	{
 		public Guid ipid;
 		public uint cPublicRefs;
 		public uint cPrivateRefs;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.ipid);
@@ -525,7 +525,7 @@ namespace ms_dcom
 			encoder.WriteValue(this.cPrivateRefs);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.ipid = decoder.ReadUuid();
@@ -533,25 +533,25 @@ namespace ms_dcom
 			this.cPrivateRefs = decoder.ReadUInt32();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct COSERVERINFO : IRpcFixedStruct
 	{
 		public uint dwReserved1;
 		public RpcPointer<string> pwszName;
 		public RpcPointer<uint> pdwReserved;
 		public uint dwReserved2;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.dwReserved1);
@@ -560,7 +560,7 @@ namespace ms_dcom
 			encoder.WriteValue(this.dwReserved2);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.dwReserved1 = decoder.ReadUInt32();
@@ -569,7 +569,7 @@ namespace ms_dcom
 			this.dwReserved2 = decoder.ReadUInt32();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.pwszName is not null)
@@ -583,7 +583,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.pwszName is not null)
@@ -598,13 +598,13 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct customREMOTE_REQUEST_SCM_INFO : IRpcFixedStruct
 	{
 		public uint ClientImpLevel;
 		public ushort cRequestedProtseqs;
 		public RpcPointer<ushort[]> pRequestedProtseqs;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.ClientImpLevel);
@@ -612,7 +612,7 @@ namespace ms_dcom
 			encoder.WriteUniquePointer(this.pRequestedProtseqs);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.ClientImpLevel = decoder.ReadUInt32();
@@ -620,7 +620,7 @@ namespace ms_dcom
 			this.pRequestedProtseqs = decoder.ReadUniquePointer<ushort[]>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.pRequestedProtseqs is not null)
@@ -634,7 +634,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.pRequestedProtseqs is not null)
@@ -650,7 +650,7 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct customREMOTE_REPLY_SCM_INFO : IRpcFixedStruct
 	{
 		public ulong Oxid;
@@ -658,7 +658,7 @@ namespace ms_dcom
 		public Guid ipidRemUnknown;
 		public uint authnHint;
 		public COMVERSION serverVersion;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.Oxid);
@@ -668,7 +668,7 @@ namespace ms_dcom
 			encoder.WriteFixedStruct(this.serverVersion, NdrAlignment._2Byte);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.Oxid = decoder.ReadUInt64();
@@ -678,7 +678,7 @@ namespace ms_dcom
 			this.serverVersion = decoder.ReadFixedStruct<COMVERSION>(NdrAlignment._2Byte);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.pdsaOxidBindings is not null)
@@ -690,7 +690,7 @@ namespace ms_dcom
 			encoder.WriteStructDeferral(this.serverVersion);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.pdsaOxidBindings is not null)
@@ -703,7 +703,7 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct InstantiationInfoData : IRpcFixedStruct
 	{
 		public Guid classId;
@@ -715,7 +715,7 @@ namespace ms_dcom
 		public RpcPointer<Guid[]> pIID;
 		public uint thisSize;
 		public COMVERSION clientCOMVersion;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.classId);
@@ -729,7 +729,7 @@ namespace ms_dcom
 			encoder.WriteFixedStruct(this.clientCOMVersion, NdrAlignment._2Byte);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.classId = decoder.ReadUuid();
@@ -743,7 +743,7 @@ namespace ms_dcom
 			this.clientCOMVersion = decoder.ReadFixedStruct<COMVERSION>(NdrAlignment._2Byte);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.pIID is not null)
@@ -759,7 +759,7 @@ namespace ms_dcom
 			encoder.WriteStructDeferral(this.clientCOMVersion);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.pIID is not null)
@@ -777,14 +777,14 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct LocationInfoData : IRpcFixedStruct
 	{
 		public RpcPointer<string> machineName;
 		public uint processId;
 		public uint apartmentId;
 		public uint contextId;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteUniquePointer(this.machineName);
@@ -793,7 +793,7 @@ namespace ms_dcom
 			encoder.WriteValue(this.contextId);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.machineName = decoder.ReadUniquePointer<string>();
@@ -802,7 +802,7 @@ namespace ms_dcom
 			this.contextId = decoder.ReadUInt32();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.machineName is not null)
@@ -811,7 +811,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.machineName is not null)
@@ -821,7 +821,7 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct ActivationContextInfoData : IRpcFixedStruct
 	{
 		public int clientOK;
@@ -830,7 +830,7 @@ namespace ms_dcom
 		public uint dwReserved2;
 		public RpcPointer<MInterfacePointer> pIFDClientCtx;
 		public RpcPointer<MInterfacePointer> pIFDPrototypeCtx;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.clientOK);
@@ -841,7 +841,7 @@ namespace ms_dcom
 			encoder.WriteUniquePointer(this.pIFDPrototypeCtx);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.clientOK = decoder.ReadInt32();
@@ -852,7 +852,7 @@ namespace ms_dcom
 			this.pIFDPrototypeCtx = decoder.ReadUniquePointer<MInterfacePointer>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.pIFDClientCtx is not null)
@@ -868,7 +868,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.pIFDClientCtx is not null)
@@ -885,7 +885,7 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct CustomHeader : IRpcFixedStruct
 	{
 		public uint totalSize;
@@ -897,7 +897,7 @@ namespace ms_dcom
 		public RpcPointer<Guid[]> pclsid;
 		public RpcPointer<uint[]> pSizes;
 		public RpcPointer<uint> pdwReserved;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.totalSize);
@@ -911,7 +911,7 @@ namespace ms_dcom
 			encoder.WriteUniquePointer(this.pdwReserved);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.totalSize = decoder.ReadUInt32();
@@ -925,7 +925,7 @@ namespace ms_dcom
 			this.pdwReserved = decoder.ReadUniquePointer<uint>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.pclsid is not null)
@@ -954,7 +954,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.pclsid is not null)
@@ -986,14 +986,14 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct PropsOutInfo : IRpcFixedStruct
 	{
 		public uint cIfs;
 		public RpcPointer<Guid[]> piid;
 		public RpcPointer<int[]> phresults;
 		public RpcPointer<RpcPointer<MInterfacePointer>[]> ppIntfData;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.cIfs);
@@ -1002,7 +1002,7 @@ namespace ms_dcom
 			encoder.WriteUniquePointer(this.ppIntfData);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.cIfs = decoder.ReadUInt32();
@@ -1011,7 +1011,7 @@ namespace ms_dcom
 			this.ppIntfData = decoder.ReadUniquePointer<RpcPointer<MInterfacePointer>[]>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.piid is not null)
@@ -1055,7 +1055,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.piid is not null)
@@ -1105,13 +1105,13 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct SecurityInfoData : IRpcFixedStruct
 	{
 		public uint dwAuthnFlags;
 		public RpcPointer<COSERVERINFO> pServerInfo;
 		public RpcPointer<uint> pdwReserved;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.dwAuthnFlags);
@@ -1119,7 +1119,7 @@ namespace ms_dcom
 			encoder.WriteUniquePointer(this.pdwReserved);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.dwAuthnFlags = decoder.ReadUInt32();
@@ -1127,7 +1127,7 @@ namespace ms_dcom
 			this.pdwReserved = decoder.ReadUniquePointer<uint>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.pServerInfo is not null)
@@ -1142,7 +1142,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.pServerInfo is not null)
@@ -1158,26 +1158,26 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct ScmRequestInfoData : IRpcFixedStruct
 	{
 		public RpcPointer<uint> pdwReserved;
 		public RpcPointer<customREMOTE_REQUEST_SCM_INFO> remoteRequest;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteUniquePointer(this.pdwReserved);
 			encoder.WriteUniquePointer(this.remoteRequest);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.pdwReserved = decoder.ReadUniquePointer<uint>();
 			this.remoteRequest = decoder.ReadUniquePointer<customREMOTE_REQUEST_SCM_INFO>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.pdwReserved is not null)
@@ -1192,7 +1192,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.pdwReserved is not null)
@@ -1208,26 +1208,26 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct ScmReplyInfoData : IRpcFixedStruct
 	{
 		public RpcPointer<uint> pdwReserved;
 		public RpcPointer<customREMOTE_REPLY_SCM_INFO> remoteReply;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteUniquePointer(this.pdwReserved);
 			encoder.WriteUniquePointer(this.remoteReply);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.pdwReserved = decoder.ReadUniquePointer<uint>();
 			this.remoteReply = decoder.ReadUniquePointer<customREMOTE_REPLY_SCM_INFO>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.pdwReserved is not null)
@@ -1242,7 +1242,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.pdwReserved is not null)
@@ -1258,14 +1258,14 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct InstanceInfoData : IRpcFixedStruct
 	{
 		public RpcPointer<string> fileName;
 		public uint mode;
 		public RpcPointer<MInterfacePointer> ifdROT;
 		public RpcPointer<MInterfacePointer> ifdStg;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteUniquePointer(this.fileName);
@@ -1274,7 +1274,7 @@ namespace ms_dcom
 			encoder.WriteUniquePointer(this.ifdStg);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.fileName = decoder.ReadUniquePointer<string>();
@@ -1283,7 +1283,7 @@ namespace ms_dcom
 			this.ifdStg = decoder.ReadUniquePointer<MInterfacePointer>();
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 			if (this.fileName is not null)
@@ -1304,7 +1304,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 			if (this.fileName is not null)
@@ -1326,14 +1326,14 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public enum SPD_FLAGS : int
 	{
 		SPD_FLAG_USE_CONSOLE_SESSION = 1,
 		SPD_FLAG_USE_DEFAULT_AUTHN_LVL = 2
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct SpecialPropertiesData : IRpcFixedStruct
 	{
 		public uint dwSessionId;
@@ -1348,7 +1348,7 @@ namespace ms_dcom
 		public uint Reserved1;
 		public ulong Reserved2;
 		public uint[] Reserved3;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.dwSessionId);
@@ -1371,7 +1371,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.dwSessionId = decoder.ReadUInt32();
@@ -1395,18 +1395,18 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct SpecialPropertiesData_Alternate : IRpcFixedStruct
 	{
 		public uint dwSessionId;
@@ -1419,7 +1419,7 @@ namespace ms_dcom
 		public uint dwOrigClsctx;
 		public uint dwFlags;
 		public uint[] Reserved3;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
 		{
 			encoder.WriteValue(this.dwSessionId);
@@ -1440,7 +1440,7 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
 			this.dwSessionId = decoder.ReadUInt32();
@@ -1462,28 +1462,28 @@ namespace ms_dcom
 			}
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void EncodeDeferrals(IRpcEncoder encoder)
 		{
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void DecodeDeferrals(IRpcDecoder decoder)
 		{
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), GuidAttribute("4d9f4ab8-7d1c-11cf-861e-0020af6e7c57"), RpcVersionAttribute(0, 0)]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), GuidAttribute("4d9f4ab8-7d1c-11cf-861e-0020af6e7c57"), RpcVersionAttribute(0, 0)]
 	public partial interface IActivation
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> RemoteActivation(ORPCTHIS ORPCthis, RpcPointer<ORPCTHAT> ORPCthat, Guid Clsid, string pwszObjectName, RpcPointer<MInterfacePointer> pObjectStorage, uint ClientImpLevel, uint Mode, uint Interfaces, Guid[] pIIDs, ushort cRequestedProtseqs, ushort[] aRequestedProtseqs, RpcPointer<ulong> pOxid, RpcPointer<RpcPointer<DUALSTRINGARRAY>> ppdsaOxidBindings, RpcPointer<Guid> pipidRemUnknown, RpcPointer<uint> pAuthnHint, RpcPointer<COMVERSION> pServerVersion, RpcPointer<int> phr, RpcPointer<RpcPointer<MInterfacePointer>[]> ppInterfaceData, RpcPointer<int[]> pResults, CancellationToken cancellationToken);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), IidAttribute("4d9f4ab8-7d1c-11cf-861e-0020af6e7c57")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), IidAttribute("4d9f4ab8-7d1c-11cf-861e-0020af6e7c57")]
 	public partial class IActivationClientProxy : Titanis.DceRpc.Client.RpcClientProxy, IActivation, Titanis.DceRpc.IRpcClientProxy
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> RemoteActivation(ORPCTHIS ORPCthis, RpcPointer<ORPCTHAT> ORPCthat, Guid Clsid, string pwszObjectName, RpcPointer<MInterfacePointer> pObjectStorage, uint ClientImpLevel, uint Mode, uint Interfaces, Guid[] pIIDs, ushort cRequestedProtseqs, ushort[] aRequestedProtseqs, RpcPointer<ulong> pOxid, RpcPointer<RpcPointer<DUALSTRINGARRAY>> ppdsaOxidBindings, RpcPointer<Guid> pipidRemUnknown, RpcPointer<uint> pAuthnHint, RpcPointer<COMVERSION> pServerVersion, RpcPointer<int> phr, RpcPointer<RpcPointer<MInterfacePointer>[]> ppInterfaceData, RpcPointer<int[]> pResults, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(0);
@@ -1578,10 +1578,10 @@ namespace ms_dcom
 		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(0, 0);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial class IActivationStub : Titanis.DceRpc.Server.RpcServiceStub
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_RemoteActivation(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			ORPCTHIS ORPCthis;
@@ -1687,7 +1687,7 @@ namespace ms_dcom
 		private Titanis.DceRpc.Server.OperationImplFunc[] _dispatchTable;
 		public override Titanis.DceRpc.Server.OperationImplFunc[] DispatchTable => this._dispatchTable;
 		private IActivation _obj;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public IActivationStub(IActivation obj)
 		{
 			this._obj = obj;
@@ -1695,25 +1695,25 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), GuidAttribute("000001a0-0000-0000-c000-000000000046"), RpcVersionAttribute(0, 0)]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), GuidAttribute("000001a0-0000-0000-c000-000000000046"), RpcVersionAttribute(0, 0)]
 	public partial interface IRemoteSCMActivator
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task Opnum0NotUsedOnWire(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task Opnum1NotUsedOnWire(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task Opnum2NotUsedOnWire(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> RemoteGetClassObject(ORPCTHIS orpcthis, RpcPointer<ORPCTHAT> orpcthat, RpcPointer<MInterfacePointer> pActProperties, RpcPointer<RpcPointer<MInterfacePointer>> ppActProperties, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> RemoteCreateInstance(ORPCTHIS orpcthis, RpcPointer<ORPCTHAT> orpcthat, RpcPointer<MInterfacePointer> pUnkOuter, RpcPointer<MInterfacePointer> pActProperties, RpcPointer<RpcPointer<MInterfacePointer>> ppActProperties, CancellationToken cancellationToken);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), IidAttribute("000001a0-0000-0000-c000-000000000046")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), IidAttribute("000001a0-0000-0000-c000-000000000046")]
 	public partial class IRemoteSCMActivatorClientProxy : Titanis.DceRpc.Client.RpcClientProxy, IRemoteSCMActivator, Titanis.DceRpc.IRpcClientProxy
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Opnum0NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(0);
@@ -1721,7 +1721,7 @@ namespace ms_dcom
 			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Opnum1NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(1);
@@ -1729,7 +1729,7 @@ namespace ms_dcom
 			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Opnum2NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(2);
@@ -1737,7 +1737,7 @@ namespace ms_dcom
 			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> RemoteGetClassObject(ORPCTHIS orpcthis, RpcPointer<ORPCTHAT> orpcthat, RpcPointer<MInterfacePointer> pActProperties, RpcPointer<RpcPointer<MInterfacePointer>> ppActProperties, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(3);
@@ -1766,7 +1766,7 @@ namespace ms_dcom
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> RemoteCreateInstance(ORPCTHIS orpcthis, RpcPointer<ORPCTHAT> orpcthat, RpcPointer<MInterfacePointer> pUnkOuter, RpcPointer<MInterfacePointer> pActProperties, RpcPointer<RpcPointer<MInterfacePointer>> ppActProperties, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(4);
@@ -1808,31 +1808,31 @@ namespace ms_dcom
 		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(0, 0);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial class IRemoteSCMActivatorStub : Titanis.DceRpc.Server.RpcServiceStub
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum0NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum0NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum1NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum1NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum2NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum2NotUsedOnWire(cancellationToken);
 			await invokeTask;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_RemoteGetClassObject(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			ORPCTHIS orpcthis;
@@ -1862,7 +1862,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_RemoteCreateInstance(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			ORPCTHIS orpcthis;
@@ -1906,7 +1906,7 @@ namespace ms_dcom
 		private Titanis.DceRpc.Server.OperationImplFunc[] _dispatchTable;
 		public override Titanis.DceRpc.Server.OperationImplFunc[] DispatchTable => this._dispatchTable;
 		private IRemoteSCMActivator _obj;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public IRemoteSCMActivatorStub(IRemoteSCMActivator obj)
 		{
 			this._obj = obj;
@@ -1914,27 +1914,27 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), GuidAttribute("99fcfec4-5260-101b-bbcb-00aa0021347a"), RpcVersionAttribute(0, 0)]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), GuidAttribute("99fcfec4-5260-101b-bbcb-00aa0021347a"), RpcVersionAttribute(0, 0)]
 	public partial interface IObjectExporter
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		Task<int> ResolveOxid(ulong pOxid, ushort cRequestedProtseqs, ushort[] arRequestedProtseqs, RpcPointer<RpcPointer<DUALSTRINGARRAY>> ppdsaOxidBindings, RpcPointer<Guid> pipidRemUnknown, RpcPointer<uint> pAuthnHint, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		Task<int> SimplePing(ulong pSetId, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		Task<int> ComplexPing(RpcPointer<ulong> pSetId, ushort SequenceNum, ushort cAddToSet, ushort cDelFromSet, ulong[] AddToSet, ulong[] DelFromSet, RpcPointer<ushort> pPingBackoffFactor, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		Task<int> ServerAlive(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		Task<int> ResolveOxid2(ulong pOxid, ushort cRequestedProtseqs, ushort[] arRequestedProtseqs, RpcPointer<RpcPointer<DUALSTRINGARRAY>> ppdsaOxidBindings, RpcPointer<Guid> pipidRemUnknown, RpcPointer<uint> pAuthnHint, RpcPointer<COMVERSION> pComVersion, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		Task<int> ServerAlive2(RpcPointer<COMVERSION> pComVersion, RpcPointer<RpcPointer<DUALSTRINGARRAY>> ppdsaOrBindings, RpcPointer<uint> pReserved, CancellationToken cancellationToken);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), IidAttribute("99fcfec4-5260-101b-bbcb-00aa0021347a")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), IidAttribute("99fcfec4-5260-101b-bbcb-00aa0021347a")]
 	public partial class IObjectExporterClientProxy : Titanis.DceRpc.Client.RpcClientProxy, IObjectExporter, Titanis.DceRpc.IRpcClientProxy
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		public async Task<int> ResolveOxid(ulong pOxid, ushort cRequestedProtseqs, ushort[] arRequestedProtseqs, RpcPointer<RpcPointer<DUALSTRINGARRAY>> ppdsaOxidBindings, RpcPointer<Guid> pipidRemUnknown, RpcPointer<uint> pAuthnHint, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(0);
@@ -1963,7 +1963,7 @@ namespace ms_dcom
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		public async Task<int> SimplePing(ulong pSetId, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(1);
@@ -1975,7 +1975,7 @@ namespace ms_dcom
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		public async Task<int> ComplexPing(RpcPointer<ulong> pSetId, ushort SequenceNum, ushort cAddToSet, ushort cDelFromSet, ulong[] AddToSet, ulong[] DelFromSet, RpcPointer<ushort> pPingBackoffFactor, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(2);
@@ -2006,7 +2006,7 @@ namespace ms_dcom
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		public async Task<int> ServerAlive(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(3);
@@ -2017,7 +2017,7 @@ namespace ms_dcom
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		public async Task<int> ResolveOxid2(ulong pOxid, ushort cRequestedProtseqs, ushort[] arRequestedProtseqs, RpcPointer<RpcPointer<DUALSTRINGARRAY>> ppdsaOxidBindings, RpcPointer<Guid> pipidRemUnknown, RpcPointer<uint> pAuthnHint, RpcPointer<COMVERSION> pComVersion, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(4);
@@ -2048,7 +2048,7 @@ namespace ms_dcom
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), Titanis.DceRpc.IdempotentAttribute()]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), Titanis.DceRpc.IdempotentAttribute()]
 		public async Task<int> ServerAlive2(RpcPointer<COMVERSION> pComVersion, RpcPointer<RpcPointer<DUALSTRINGARRAY>> ppdsaOrBindings, RpcPointer<uint> pReserved, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(5);
@@ -2075,10 +2075,10 @@ namespace ms_dcom
 		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(0, 0);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial class IObjectExporterStub : Titanis.DceRpc.Server.RpcServiceStub
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_ResolveOxid(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			ulong pOxid;
@@ -2111,7 +2111,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_SimplePing(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			ulong pSetId;
@@ -2121,7 +2121,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_ComplexPing(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<ulong> pSetId;
@@ -2159,7 +2159,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_ServerAlive(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.ServerAlive(cancellationToken);
@@ -2167,7 +2167,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_ResolveOxid2(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			ulong pOxid;
@@ -2203,7 +2203,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_ServerAlive2(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			RpcPointer<COMVERSION> pComVersion = new RpcPointer<COMVERSION>();
@@ -2230,7 +2230,7 @@ namespace ms_dcom
 		private Titanis.DceRpc.Server.OperationImplFunc[] _dispatchTable;
 		public override Titanis.DceRpc.Server.OperationImplFunc[] DispatchTable => this._dispatchTable;
 		private IObjectExporter _obj;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public IObjectExporterStub(IObjectExporter obj)
 		{
 			this._obj = obj;
@@ -2238,21 +2238,21 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), GuidAttribute("00000000-0000-0000-c000-000000000046"), RpcVersionAttribute(0, 0)]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), GuidAttribute("00000000-0000-0000-c000-000000000046"), RpcVersionAttribute(0, 0)]
 	public partial interface IUnknown : Titanis.DceRpc.IRpcObject
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> Opnum0NotUsedOnWire(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> Opnum1NotUsedOnWire(CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> Opnum2NotUsedOnWire(CancellationToken cancellationToken);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), IidAttribute("00000000-0000-0000-c000-000000000046")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), IidAttribute("00000000-0000-0000-c000-000000000046")]
 	public partial class IUnknownClientProxy : Titanis.DceRpc.Client.RpcObjectProxy, IUnknown, Titanis.DceRpc.IRpcObjectProxy
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> Opnum0NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(0);
@@ -2263,7 +2263,7 @@ namespace ms_dcom
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> Opnum1NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(1);
@@ -2274,7 +2274,7 @@ namespace ms_dcom
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> Opnum2NotUsedOnWire(CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(2);
@@ -2291,10 +2291,10 @@ namespace ms_dcom
 		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(0, 0);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial class IUnknownStub : Titanis.DceRpc.Server.RpcObjectStub
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum0NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum0NotUsedOnWire(cancellationToken);
@@ -2302,7 +2302,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum1NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum1NotUsedOnWire(cancellationToken);
@@ -2310,7 +2310,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum2NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum2NotUsedOnWire(cancellationToken);
@@ -2324,7 +2324,7 @@ namespace ms_dcom
 		private Titanis.DceRpc.Server.OperationImplFunc[] _dispatchTable;
 		public override Titanis.DceRpc.Server.OperationImplFunc[] DispatchTable => this._dispatchTable;
 		private IUnknown _obj;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public IUnknownStub(IUnknown obj)
 		{
 			this._obj = obj;
@@ -2332,64 +2332,21 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), GuidAttribute("00000131-0000-0000-c000-000000000046"), RpcVersionAttribute(0, 0)]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), GuidAttribute("00000131-0000-0000-c000-000000000046"), RpcVersionAttribute(0, 0)]
 	public partial interface IRemUnknown : IUnknown
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> RemQueryInterface(Guid ripid, uint cRefs, ushort cIids, Guid[] iids, RpcPointer<RpcPointer<REMQIRESULT[]>> ppQIResults, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> RemAddRef(ushort cInterfaceRefs, REMINTERFACEREF[] InterfaceRefs, RpcPointer<int[]> pResults, CancellationToken cancellationToken);
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> RemRelease(ushort cInterfaceRefs, REMINTERFACEREF[] InterfaceRefs, CancellationToken cancellationToken);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), IidAttribute("00000131-0000-0000-c000-000000000046")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), IidAttribute("00000131-0000-0000-c000-000000000046")]
 	public partial class IRemUnknownClientProxy : IUnknownClientProxy, IRemUnknown
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
-		public async Task<int> RemQueryInterface(Guid ripid, uint cRefs, ushort cIids, Guid[] iids, RpcPointer<RpcPointer<REMQIRESULT[]>> ppQIResults, CancellationToken cancellationToken)
-		{
-			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(3);
-			IRpcEncoder encoder = req.StubData;
-			encoder.WriteValue(ripid);
-			encoder.WriteValue(cRefs);
-			encoder.WriteValue(cIids);
-			if (iids is not null)
-			{
-				encoder.WriteArrayHeader(iids);
-				for (int i = 0; i < iids.Length; i++)
-				{
-					Guid elem_0 = iids[i];
-					encoder.WriteValue(elem_0);
-				}
-			}
-
-			IRpcDecoder decoder = await this.SendRequestAsync(req, cancellationToken);
-			ppQIResults.value = decoder.ReadOutUniquePointer<REMQIRESULT[]>(ppQIResults.value);
-			if (ppQIResults.value is not null)
-			{
-				ppQIResults.value.value = decoder.ReadArrayHeader<REMQIRESULT>();
-				for (int i = 0; i < ppQIResults.value.value.Length; i++)
-				{
-					REMQIRESULT elem_0 = ppQIResults.value.value[i];
-					elem_0 = decoder.ReadFixedStruct<REMQIRESULT>(NdrAlignment._8Byte);
-					ppQIResults.value.value[i] = elem_0;
-				}
-
-				for (int i = 0; i < ppQIResults.value.value.Length; i++)
-				{
-					REMQIRESULT elem_0 = ppQIResults.value.value[i];
-					decoder.ReadStructDeferral<REMQIRESULT>(ref elem_0);
-					ppQIResults.value.value[i] = elem_0;
-				}
-			}
-
-			int retval;
-			retval = decoder.ReadInt32();
-			return retval;
-		}
-
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> RemAddRef(ushort cInterfaceRefs, REMINTERFACEREF[] InterfaceRefs, RpcPointer<int[]> pResults, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(4);
@@ -2422,7 +2379,7 @@ namespace ms_dcom
 			return retval;
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> RemRelease(ushort cInterfaceRefs, REMINTERFACEREF[] InterfaceRefs, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(5);
@@ -2453,10 +2410,10 @@ namespace ms_dcom
 		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(0, 0);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial class IRemUnknownStub : Titanis.DceRpc.Server.RpcObjectStub
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum0NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum0NotUsedOnWire(cancellationToken);
@@ -2464,7 +2421,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum1NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum1NotUsedOnWire(cancellationToken);
@@ -2472,7 +2429,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum2NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum2NotUsedOnWire(cancellationToken);
@@ -2480,7 +2437,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_RemQueryInterface(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			Guid ripid;
@@ -2521,7 +2478,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_RemAddRef(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			ushort cInterfaceRefs;
@@ -2555,7 +2512,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_RemRelease(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			ushort cInterfaceRefs;
@@ -2587,7 +2544,7 @@ namespace ms_dcom
 		private Titanis.DceRpc.Server.OperationImplFunc[] _dispatchTable;
 		public override Titanis.DceRpc.Server.OperationImplFunc[] DispatchTable => this._dispatchTable;
 		private IRemUnknown _obj;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public IRemUnknownStub(IRemUnknown obj)
 		{
 			this._obj = obj;
@@ -2595,17 +2552,17 @@ namespace ms_dcom
 		}
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), GuidAttribute("00000143-0000-0000-c000-000000000046"), RpcVersionAttribute(0, 0)]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), GuidAttribute("00000143-0000-0000-c000-000000000046"), RpcVersionAttribute(0, 0)]
 	public partial interface IRemUnknown2 : IRemUnknown
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> RemQueryInterface2(Guid ripid, ushort cIids, Guid[] iids, RpcPointer<int[]> phr, RpcPointer<RpcPointer<MInterfacePointer>[]> ppMIF, CancellationToken cancellationToken);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9"), IidAttribute("00000143-0000-0000-c000-000000000046")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), IidAttribute("00000143-0000-0000-c000-000000000046")]
 	public partial class IRemUnknown2ClientProxy : IRemUnknownClientProxy, IRemUnknown2
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task<int> RemQueryInterface2(Guid ripid, ushort cIids, Guid[] iids, RpcPointer<int[]> phr, RpcPointer<RpcPointer<MInterfacePointer>[]> ppMIF, CancellationToken cancellationToken)
 		{
 			Titanis.DceRpc.Client.IRpcRequestBuilder req = this.CreateRequest(6);
@@ -2662,10 +2619,10 @@ namespace ms_dcom
 		public override Titanis.DceRpc.RpcVersion InterfaceVersion => new Titanis.DceRpc.RpcVersion(0, 0);
 	}
 
-	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial class IRemUnknown2Stub : Titanis.DceRpc.Server.RpcObjectStub
 	{
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum0NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum0NotUsedOnWire(cancellationToken);
@@ -2673,7 +2630,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum1NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum1NotUsedOnWire(cancellationToken);
@@ -2681,7 +2638,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_Opnum2NotUsedOnWire(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			var invokeTask = this._obj.Opnum2NotUsedOnWire(cancellationToken);
@@ -2689,7 +2646,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_RemQueryInterface(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			Guid ripid;
@@ -2730,7 +2687,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_RemAddRef(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			ushort cInterfaceRefs;
@@ -2764,7 +2721,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_RemRelease(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			ushort cInterfaceRefs;
@@ -2790,7 +2747,7 @@ namespace ms_dcom
 			encoder.WriteValue(retval);
 		}
 
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public async Task Invoke_RemQueryInterface2(IRpcDecoder decoder, IRpcEncoder encoder, CancellationToken cancellationToken)
 		{
 			Guid ripid;
@@ -2843,7 +2800,7 @@ namespace ms_dcom
 		private Titanis.DceRpc.Server.OperationImplFunc[] _dispatchTable;
 		public override Titanis.DceRpc.Server.OperationImplFunc[] DispatchTable => this._dispatchTable;
 		private IRemUnknown2 _obj;
-		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.9")]
+		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public IRemUnknown2Stub(IRemUnknown2 obj)
 		{
 			this._obj = obj;
