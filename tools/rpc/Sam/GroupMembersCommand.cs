@@ -24,6 +24,7 @@ public class GroupMembersCommand : SamDomainEnumCommand
 	;
 
 	[Parameter(After = nameof(ServerName))]
+	[Description("Name or RID of group")]
 	public string[] GroupRidOrName { get; set; }
 
 	private HashSet<uint>? _rids;
