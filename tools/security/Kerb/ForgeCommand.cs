@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Titanis.PduStruct;
@@ -36,6 +37,15 @@ public class ForgeCommand : TicketRequestCommand
 	[Parameter]
 	[Description("Key to sign the ticket and PAC with")]
 	public HexString KdcKey { get; set; }
+
+	[Parameter]
+	[Description("Session encryption type")]
+	[DefaultValue(EType.Aes256CtsHmacSha1_96)]
+	public EType SessionEType { get; set; }
+
+	[Parameter]
+	[Description("Session key")]
+	public HexString? SessionKey { get; set; }
 
 	[Parameter(0)]
 	[Mandatory]
@@ -215,10 +225,6 @@ public class ForgeCommand : TicketRequestCommand
 			PasswordMustChange = null,
 			EffectiveName = accountName,
 			FullName = fullName,
-			//LogonScript = string.Empty,
-			//ProfilePath = string.Empty,
-			//HomeDirectory = string.Empty,
-			//HomeDirectoryDrive = string.Empty,
 			LogonScript = this.LogonScript ?? string.Empty,
 			ProfilePath = this.ProfilePath ?? string.Empty,
 			HomeDirectory = this.HomeDirectory ?? string.Empty,
@@ -263,7 +269,18 @@ public class ForgeCommand : TicketRequestCommand
 		{
 		};
 
-		SessionKey sessionKey = new(krb.GetEncProfile(EType.Aes128CtsHmacSha1_96), new byte[128 / 8]);
+		var sessionEncProf = krb.GetEncProfile(this.SessionEType);
+		SessionKey sessionKey;
+		if (this.SessionKey != null)
+		{
+			sessionKey = sessionEncProf.RandomToKey(this.SessionKey.Bytes);
+		}
+		else
+		{
+			byte[] keyBytes = new byte[sessionEncProf.KeySizeBytes];
+			RandomNumberGenerator.Create().GetBytes(keyBytes);
+			sessionKey = new(sessionEncProf, keyBytes);
+		}
 
 		List<TicketInfo> tickets = new List<TicketInfo>();
 		foreach (var target in this.Target)
