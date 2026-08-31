@@ -177,44 +177,51 @@ By default, all supported encryption types are sent in the request.  To limit th
 			List<TicketInfo> newTickets = new List<TicketInfo>(this.Target.Length);
 			foreach (var spn in this.Target)
 			{
-				var ticket = await krb.RequestTicket(sourceTicket, spn, this.Realm ?? sourceTicket.TicketRealm, this.EncTypes, ticketParams, cancellationToken).ConfigureAwait(false);
-
-				SessionKey? ticketKey;
-				if (serviceKey != null)
-					ticketKey = serviceKey;
-				else if (this._serviceCredential != null && this._serviceCredential.SupportsProfile(ticket.TicketEType))
+				try
 				{
-					var encProf = krb.TryGetEncProfile(ticket.TicketEType);
-					if (encProf != null)
-						ticketKey = this._serviceCredential.DeriveProtocolKeyFor(encProf, this._serviceSalt);
+					var ticket = await krb.RequestTicket(sourceTicket, spn, this.Realm ?? sourceTicket.TicketRealm, this.EncTypes, ticketParams, cancellationToken).ConfigureAwait(false);
+
+					SessionKey? ticketKey;
+					if (serviceKey != null)
+						ticketKey = serviceKey;
+					else if (this._serviceCredential != null && this._serviceCredential.SupportsProfile(ticket.TicketEType))
+					{
+						var encProf = krb.TryGetEncProfile(ticket.TicketEType);
+						if (encProf != null)
+							ticketKey = this._serviceCredential.DeriveProtocolKeyFor(encProf, this._serviceSalt);
+						else
+							ticketKey = null;
+					}
 					else
+					{
 						ticketKey = null;
-				}
-				else
-				{
-					ticketKey = null;
-				}
-
-				if (ticketKey != null)
-				{
-					// Verify the key
-					try
-					{
-						var asrepKey = ticket.AsrepKey;
-						//var asrepKey = krb.CreateSessionKeyFor(this.AsrepKey);
-						var authzData = ticket.DecryptAuthorizationData(ticketKey, asrepKey);
-						ticket.TicketKey = ticketKey;
-					}
-					catch (Exception ex)
-					{
-						this.WriteError($"Faild to extract authorization data: {ex.Message}");
 					}
 
-					if (ticket.TicketKey != null)
-						Program.TryPrintAuthorizationData(ticket, "Ticket authorization data:", this.Log);
-				}
+					if (ticketKey != null)
+					{
+						// Verify the key
+						try
+						{
+							var asrepKey = ticket.AsrepKey;
+							//var asrepKey = krb.CreateSessionKeyFor(this.AsrepKey);
+							var authzData = ticket.DecryptAuthorizationData(ticketKey, asrepKey);
+							ticket.TicketKey = ticketKey;
+						}
+						catch (Exception ex)
+						{
+							this.WriteError($"Faild to extract authorization data: {ex.Message}");
+						}
 
-				newTickets.Add(ticket);
+						if (ticket.TicketKey != null)
+							Program.TryPrintAuthorizationData(ticket, "Ticket authorization data:", this.Log);
+					}
+
+					newTickets.Add(ticket);
+				}
+				catch (Exception ex)
+				{
+					this.WriteError($"An error occurred requesting a ticket for {spn}: {ex.Message}");
+				}
 			}
 
 			return newTickets;
