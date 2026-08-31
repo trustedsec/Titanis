@@ -119,7 +119,7 @@ namespace Titanis.Cli
 				table.RightMargin
 				);
 			table.Render(formatter);
-			formatter.Complete(new StringDocWriter(this.Terminal, 80, string.Empty));
+			formatter.Complete(new StringDocWriter(this.Terminal, int.MaxValue, string.Empty));
 		}
 	}
 }
