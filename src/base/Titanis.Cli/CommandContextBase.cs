@@ -271,17 +271,27 @@ namespace Titanis.Cli
 
 						if (record is not null)
 						{
-							foreach (var field in fields!)
+							bool recordHasAlert = info?.HasAlertOnField(null) ?? false;
+							for (int fieldIndex = 0; fieldIndex < fields!.Length; fieldIndex++)
 							{
+								OutputField? field = fields![fieldIndex];
 								var value = field.GetValue(record);
 								if (value is not null)
 								{
+									bool fieldHasAlert = (recordHasAlert && (fieldIndex == 0)) || (info?.HasAlertOnField(field.Name) ?? false);
+
 									if (!(value is System.Collections.IList array))
 										array = new object[] { value };
 
-									foreach (var elem in array)
+									for (int valueIndex = 0; valueIndex < array.Count; valueIndex++)
 									{
+										bool cellHasAlert = fieldHasAlert || (info?.HasAlertOnField(field.Name, valueIndex) ?? false);
+
+										object? elem = array[valueIndex];
 										var formatted = field.FormatValue(elem, this._outputStyle);
+
+										if (cellHasAlert)
+											formatted = formatted?.Wrap(ConsoleColor.Magenta);
 
 										if (this._includeHeaders)
 											this.WriteOutput($"{field.Caption}: ");
