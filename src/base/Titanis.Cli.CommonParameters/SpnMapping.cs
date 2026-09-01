@@ -12,20 +12,20 @@ namespace Titanis.Cli
 		Revert = 1,
 	}
 
-    [TypeConverter(typeof(SpnMappingConverter))]
+	[TypeConverter(typeof(SpnMappingConverter))]
 	public class SpnMapping
 	{
-		public SpnMapping(SecurityPrincipalName matchName, SecurityPrincipalName replaceName, SpnMappingOptions options)
+		public SpnMapping(SecurityPrincipalName matchName, SecurityPrincipalName? replaceName, SpnMappingOptions options)
 		{
 			ArgumentNullException.ThrowIfNull(matchName);
-			ArgumentNullException.ThrowIfNull(replaceName);
+
 			this.MatchName = matchName;
 			this.ReplaceName = replaceName;
 			this.Options = options;
 		}
 
 		public SecurityPrincipalName MatchName { get; }
-		public SecurityPrincipalName ReplaceName { get; }
+		public SecurityPrincipalName? ReplaceName { get; }
 		public SpnMappingOptions Options { get; }
 
 		public override string ToString() => $"{this.MatchName} => {this.ReplaceName}";
@@ -50,8 +50,11 @@ namespace Titanis.Cli
 					);
 			return matches;
 		}
-		public SecurityPrincipalName Map(SecurityPrincipalName spn)
+		public SecurityPrincipalName? Map(SecurityPrincipalName spn)
 		{
+			if (this.ReplaceName is null)
+				return null;
+
 			ArgumentNullException.ThrowIfNull(spn);
 			if ((spn is ServicePrincipalName svcpn))
 			{
@@ -89,10 +92,12 @@ namespace Titanis.Cli
 			if (value is string str)
 			{
 				var match = rgxMapping.Match(str);
+				string replace;
 				if (
 					match.Success
 					&& SecurityPrincipalName.TryParse(match.Groups["match"].Value, out var matchName)
-					&& SecurityPrincipalName.TryParse(match.Groups["replace"].Value, out var replaceName))
+					&& (SecurityPrincipalName.TryParse((replace = match.Groups["replace"].Value), out var replaceName) || string.IsNullOrEmpty(replace))
+					)
 				{
 					SpnMappingOptions options = SpnMappingOptions.None;
 					if (match.Groups["r"].Success)
