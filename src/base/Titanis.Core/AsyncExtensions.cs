@@ -17,6 +17,7 @@ namespace Titanis
 		/// <typeparam name="T"></typeparam>
 		/// <param name="enumerable"></param>
 		/// <returns></returns>
+		#pragma warning disable CS1998
 		public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IEnumerable<T> enumerable)
 		{
 			foreach (var item in enumerable)
@@ -24,6 +25,7 @@ namespace Titanis
 				yield return item;
 			}
 		}
+		#pragma warning restore CS1998
 		public static async Task<T[]> ToArray<T>(this IAsyncEnumerable<T> enumerable, CancellationToken cancellationToken)
 		{
 			List<T> list = new List<T>();
