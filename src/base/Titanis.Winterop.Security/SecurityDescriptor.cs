@@ -443,65 +443,42 @@ namespace Titanis.Winterop.Security
 	{
 		internal SddlParseContext(ReadOnlySpan<char> chars)
 		{
-			this.chars = chars;
+			this.chars = SpanReadContext.FromSpan(chars);
 		}
 
+		internal SpanReadContext<char> chars;
 		internal bool domainSpecific;
 
-		private ReadOnlySpan<char> chars;
-		private int offset;
 
-		internal int LengthRemaining => this.chars.Length;
 
-		internal char this[int index] => this.chars[index];
+		internal char this[int index] => this.chars.span[index + this.chars.readIndex];
 
-		internal void Advance(int count)
-		{
-			this.chars = this.chars.Slice(count);
-		}
-		internal bool AdvanceIf(char c)
-		{
-			if (this.LengthRemaining > 0 && this[0] == c)
-			{
-				this.Advance(1);
-				return true;
-			}
-			else
-				return false;
-		}
-		internal void Expect(char c)
-		{
-			if (this.LengthRemaining > 0 && this[0] == c)
-			{
-				this.Advance(1);
-			}
-			else
-				throw MakeUnexpectedCharException($"Expected '{c}'.");
-		}
+		public int LengthRemaining => this.chars.LengthRemaining;
 
-		internal ReadOnlySpan<char> Remaining(int length)
-		{
-			return this.chars.Slice(0, length);
-		}
-
+		internal int PeekChar() => this.chars.Peek();
+		internal int PeekChar(int offset) => this.chars.Peek(offset);
+		internal void Advance(int count) => this.chars.Advance(count);
+		internal bool AdvanceIf(char c) => this.chars.AdvanceIf(c);
+		internal void Expect(char c) => this.chars.Expect(c);
+		internal ReadOnlySpan<char> Remaining(int length) => this.chars.Remaining(length);
 		internal Exception MakeUnexpectedCharException(string reason)
 		{
 			return this.MakeUnexpectedCharException(this.UnexpectedToken(), reason);
 		}
 		internal Exception MakeUnexpectedCharException(string token, string reason)
 		{
-			string message = $"Unexpected character	'{token}' @ {this.offset}";
+			string message = $"Unexpected character	'{token}' @ {this.chars.readIndex}";
 			return new FormatException(message);
 		}
 
 		private string UnexpectedToken()
 		{
-			return (this.LengthRemaining > 0 ? this[0].ToString() : "<end>");
+			return (!this.chars.IsEof ? this[0].ToString() : "<end>");
 		}
 
 		internal Exception MakeException(string reason)
 		{
-			string message = $"Error at character	'{UnexpectedToken()}' @ {this.offset}: {reason}";
+			string message = $"Error at character	'{UnexpectedToken()}' @ {this.chars.readIndex}: {reason}";
 			return new FormatException(message);
 		}
 	}

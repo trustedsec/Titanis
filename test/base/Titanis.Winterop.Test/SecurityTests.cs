@@ -184,6 +184,13 @@ public class SecurityTests
 	}
 
 	[TestMethod]
+	public void TestParseSd()
+	{
+		const string sddl = "O:S-1-5-21-1718252288-3416168337-1457700507-1104G:DUD:AI(XA;;RCFRFX;;;WD;(((@Device.ad://ext/department:88dee1cc2d28ced0 Any_of@Resource.Department_MS)&&(@User.ad://ext/department:88dee1cc2d28ced0==@Resource.Department_MS))))(D;ID;FA;;;SS)(A;ID;FA;;;S-1-5-21-1718252288-3416168337-1457700507-1104)(A;ID;FA;;;SY)(A;ID;FA;;;S-1-5-21-1752138614-393460150-3098146133-1103)(XA;ID;RCFRFX;;;BU;(Member_of_Any({S-1-18-3})))";
+		var sd = SecurityDescriptor.ParseSddl(sddl, SecurityDescriptorConverter.PlaceholderDomainSid);
+	}
+
+	[TestMethod]
 	public void ParseRealSD()
 	{
 		SecurityDescriptor sd = new SecurityDescriptor(bytes);

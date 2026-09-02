@@ -2,6 +2,8 @@
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -41,33 +43,22 @@ namespace Titanis
 		/// Converts a span of bytes to a string of hexadecimal digits.
 		/// </summary>
 		/// <param name="bytes">Array of bytes</param>
-		/// <param name="options">Options affecting how to create the string</param>
 		/// <returns>A string of hexadecimal digits</returns>
-		public static string ToHexString(this byte[] bytes, HexStringOptions options) => ToHexString(bytes.AsSpan(), options);
-		/// <summary>
-		/// Converts a span of bytes to a string of hexadecimal digits.
-		/// </summary>
-		/// <param name="bytes">Array of bytes</param>
-		/// <param name="startIndex">Index of first byte to convert</param>
-		/// <param name="count">Number of bytes to convert</param>
-		/// <returns>A string of hexadecimal digits</returns>
-		public static string ToHexString(this byte[] bytes, int startIndex, int count) => ToHexString(bytes.AsSpan(startIndex, count), HexStringOptions.Default);
-		/// <summary>
-		/// Converts a span of bytes to a string of hexadecimal digits.
-		/// </summary>
-		/// <param name="bytes">Array of bytes</param>
-		/// <param name="startIndex">Index of first byte to convert</param>
-		/// <param name="count">Number of bytes to convert</param>
-		/// <param name="options">Options affecting how to create the string</param>
-		/// <returns>A string of hexadecimal digits</returns>
-		public static string ToHexString(this byte[] bytes, int startIndex, int count, HexStringOptions options) => ToHexString(bytes.AsSpan(startIndex, count), options);
+		public static string ToHexString(this Span<byte> bytes) => ToHexString(bytes, HexStringOptions.Default);
 		/// <summary>
 		/// Converts a span of bytes to a string of hexadecimal digits.
 		/// </summary>
 		/// <param name="bytes">Span of bytes</param>
 		/// <returns>A string of hexadecimal digits</returns>
-		public static string ToHexString(this Span<byte> bytes) => ToHexString(bytes, HexStringOptions.Default);
-		public static string ToHexDump(this Span<byte> bytes, bool includeAscii, int maxWidth = 16)
+		public static string ToHexString(this ReadOnlySpan<byte> bytes) => ToHexString(bytes, HexStringOptions.Default);
+		/// <summary>
+		/// Converts a span of bytes to a string of hexadecimal digits.
+		/// </summary>
+		/// <param name="bytes">Array of bytes</param>
+		/// <param name="options">Options affecting how to create the string</param>
+		/// <returns>A string of hexadecimal digits</returns>
+		public static string ToHexString(this byte[] bytes, HexStringOptions options) => ToHexString(bytes.AsSpan(), options);
+		public static string ToHexDump(this ReadOnlySpan<byte> bytes, bool includeAscii, int maxWidth = 16)
 		{
 			if (maxWidth <= 0)
 				throw new ArgumentOutOfRangeException(nameof(maxWidth));
@@ -113,27 +104,26 @@ namespace Titanis
 		/// Converts a span of bytes to a string of hexadecimal digits.
 		/// </summary>
 		/// <param name="bytes">Span of bytes</param>
-		/// <returns>A string of hexadecimal digits</returns>
-		public static string ToHexString(this ReadOnlySpan<byte> bytes) => ToHexString(bytes, HexStringOptions.Default);
-		/// <summary>
-		/// Converts a span of bytes to a string of hexadecimal digits.
-		/// </summary>
-		/// <param name="bytes">Span of bytes</param>
 		/// <param name="options">Options affecting how to create the string</param>
 		/// <returns>A string of hexadecimal digits</returns>
 		public static string ToHexString(this ReadOnlySpan<byte> bytes, HexStringOptions options)
 		{
+			StringBuilder sb = new StringBuilder(bytes.Length * 2);
+			bytes.ToHexString(options, sb);
+			return sb.ToString();
+		}
+		public static void ToHexString(this ReadOnlySpan<byte> bytes, HexStringOptions options, StringBuilder sb)
+		{
+			if (sb is null) throw new ArgumentNullException(nameof(sb));
+
 			bool isUpper = (0 != (options & HexStringOptions.Uppercase));
 			string charset = isUpper ? UppercaseHex : LowercaseHex;
-			StringBuilder sb = new StringBuilder(bytes.Length * 2);
 			for (int i = 0; i < bytes.Length; i++)
 			{
 				byte b = bytes[i];
 				sb.Append(charset[(b >> 4)]);
 				sb.Append(charset[(b % 16)]);
 			}
-
-			return sb.ToString();
 		}
 
 		public static bool IsHexChar(char c)

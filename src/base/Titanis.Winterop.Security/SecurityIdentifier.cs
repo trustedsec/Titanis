@@ -356,25 +356,32 @@ namespace Titanis.Winterop.Security
 		// [MS-DTYP] § 2.4.2.1 SID String Format Syntax
 		private string BuildString()
 		{
-			if (this.IsDomainPlaceholder)
-				return $"{DomainPlaceholderPrefix}{this.Rid}";
-
 			StringBuilder sb = new StringBuilder();
-			sb.Append("S-1-");
-			if ((long)IdentifierAuthority <= uint.MaxValue)
-				sb.Append((long)IdentifierAuthority);
-			else
-				sb.Append("0x").AppendFormat("{0:X}", (long)IdentifierAuthority);
-
-			int cSubauth = SubauthorityCount;
-			for (int i = 0; i < cSubauth; i++)
-			{
-				var subauth = GetSubauthority(i);
-
-				sb.Append('-').Append(subauth);
-			}
-
+			this.BuildString(sb);
 			return sb.ToString();
+		}
+		internal void BuildString(StringBuilder sb)
+		{
+			if (this.IsDomainPlaceholder)
+			{
+				sb.Append($"{DomainPlaceholderPrefix}{this.Rid}");
+			}
+			else
+			{
+				sb.Append("S-1-");
+				if ((long)IdentifierAuthority <= uint.MaxValue)
+					sb.Append((long)IdentifierAuthority);
+				else
+					sb.Append("0x").AppendFormat("{0:X}", (long)IdentifierAuthority);
+
+				int cSubauth = SubauthorityCount;
+				for (int i = 0; i < cSubauth; i++)
+				{
+					var subauth = GetSubauthority(i);
+
+					sb.Append('-').Append(subauth);
+				}
+			}
 		}
 
 		#region Equality

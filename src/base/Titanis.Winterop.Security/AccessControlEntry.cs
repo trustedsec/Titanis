@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using Titanis.Winterop.Security.Conditions;
 
 namespace Titanis.Winterop.Security
 {
@@ -170,7 +171,8 @@ namespace Titanis.Winterop.Security
 			Dictionary<uint, string> accessRightCodes,
 			Guid? objectGuid,
 			Guid? inheritGuid,
-			SecurityIdentifier? trustee)
+			SecurityIdentifier? trustee,
+			Conditions.Condition? condition = null)
 		{
 			sb.Append(GetAceTypeString(aceType))
 				.Append(';')
@@ -187,6 +189,12 @@ namespace Titanis.Winterop.Security
 			sb.Append(';');
 			if (trustee != null)
 				sb.Append(trustee.ToSddlString());
+			if (condition != null)
+			{
+				sb.Append(";(");
+				condition.ToSddlString(sb);
+				sb.Append(")");
+			}
 		}
 
 		#endregion
@@ -241,10 +249,19 @@ namespace Titanis.Winterop.Security
 			inheritType = ParseGuid(ref ctx);
 
 			ctx.Expect(';');
-
 			var trustee = SecurityIdentifier.Parse(ref ctx, domainSid);
 
-			byte[] callbackData = Array.Empty<byte>();
+			Condition? cond;
+			if (ctx.AdvanceIf(';'))
+			{
+				// Looks like a condition
+				cond = Condition.Parse(ref ctx);
+			}
+			else
+			{
+				cond = null;
+			}
+			byte[] callbackData = cond?.ToBytes() ?? Array.Empty<byte>();
 
 			var ace = aceType switch
 			{
@@ -705,6 +722,7 @@ namespace Titanis.Winterop.Security
 	public interface ICallbackAce
 	{
 		byte[] ApplicationData { get; }
+		Conditions.Condition? Condition { get; }
 	}
 
 	// [MS-DTYP] § 2.4.4.6 ACCESS_ALLOWED_CALLBACK_ACE
@@ -721,10 +739,13 @@ namespace Titanis.Winterop.Security
 			if (applicationData is null) throw new ArgumentNullException(nameof(applicationData));
 			this.AccessMask = accessMask;
 			this.ApplicationData = applicationData;
+
+			this.Condition = Conditions.Condition.TryParse(applicationData);
 		}
 
 		public sealed override uint AccessMask { get; }
 		public byte[] ApplicationData { get; }
+		public Conditions.Condition? Condition { get; }
 
 		public override void BuildSddl(StringBuilder sb)
 		{
@@ -735,7 +756,8 @@ namespace Titanis.Winterop.Security
 				this.AccessMask,
 				fileAccessRightCodes,
 				null, null,
-				this.Trustee);
+				this.Trustee,
+				this.Condition);
 		}
 
 		internal override int BinaryLength => 8 + this.Trustee.BinaryLength + SecurityDescriptor.Align4(this.ApplicationData.Length);
@@ -839,12 +861,14 @@ namespace Titanis.Winterop.Security
 			this.ObjectType = objectType;
 			this.InheritedObjectType = inheritedObjectType;
 			this.ApplicationData = applicationData;
+			this.Condition = Conditions.Condition.TryParse(applicationData);
 		}
 
 		public Guid? ObjectType { get; }
 		public Guid? InheritedObjectType { get; }
 		public sealed override uint AccessMask { get; }
 		public byte[] ApplicationData { get; }
+		public Conditions.Condition? Condition { get; }
 
 		public override void BuildSddl(StringBuilder sb)
 		{
@@ -855,7 +879,8 @@ namespace Titanis.Winterop.Security
 				this.AccessMask,
 				fileAccessRightCodes,
 				this.ObjectType, this.InheritedObjectType,
-				this.Trustee);
+				this.Trustee,
+				this.Condition);
 		}
 
 		internal override int BinaryLength => 12 + 16 + 16 + this.Trustee.BinaryLength + this.ApplicationData.Length;
@@ -908,6 +933,7 @@ namespace Titanis.Winterop.Security
 		public sealed override uint AccessMask { get; }
 		public byte[] AttributeData { get; }
 		byte[] ICallbackAce.ApplicationData => this.AttributeData;
+		Conditions.Condition? ICallbackAce.Condition => null;
 
 		public override void BuildSddl(StringBuilder sb)
 		{
