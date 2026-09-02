@@ -135,6 +135,11 @@ namespace Titanis.Msrpc.Mstsch
 
 		public async Task<Guid> RunTask(string path, string[]? args, uint flags, CancellationToken cancellationToken)
 		{
+			return await RunTask(path, args, flags, 0, null, cancellationToken).ConfigureAwait(false);
+		}
+
+		public async Task<Guid> RunTask(string path, string[]? args, uint flags, uint sessionId, string? user, CancellationToken cancellationToken)
+		{
 			uint cArgs = (uint)(args?.Length ?? 0);
 			RpcPointer<string>[]? pArgs = null;
 			if (args != null && args.Length > 0)
@@ -144,10 +149,11 @@ namespace Titanis.Msrpc.Mstsch
 					pArgs[i] = new RpcPointer<string>(args[i]);
 			}
 
+			RpcPointer<string> pUser = user != null ? new RpcPointer<string>(user) : null;
 			RpcPointer<Guid> pGuid = new RpcPointer<Guid>();
 			int hr = await this._proxy.SchRpcRun(
 				path, cArgs, pArgs ?? Array.Empty<RpcPointer<string>>(),
-				flags, 0, null,
+				flags, sessionId, pUser,
 				pGuid, cancellationToken).ConfigureAwait(false);
 			ThrowOnFailure(hr);
 			return pGuid.value;

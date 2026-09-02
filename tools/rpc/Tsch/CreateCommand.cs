@@ -10,8 +10,8 @@ namespace Titanis.Cli.TschTool;
 /// <task category="TSCH;Lateral Movement">Create or update a scheduled task</task>
 [Command]
 [Description("Creates or updates a scheduled task from XML")]
-[Example("Create a task from XML file", "{0} ecorp-dc -UserName veeam-admin@ecorp.local -Password B@ckupP@ssw0rd -TaskPath \\\\MyTask -XmlFile task.xml")]
-[Example("Create a task with inline command", "{0} ecorp-dc -UserName veeam-admin@ecorp.local -Password B@ckupP@ssw0rd -TaskPath \\\\MyTask -Command cmd.exe -Arguments \"/c whoami > C:\\\\out.txt\"")]
+[Example("Create a task running as SYSTEM", "{0} ecorp-dc -UserName veeam-admin@ecorp.local -Password B@ckupP@ssw0rd -TaskPath \\\\MyTask -Command cmd.exe -Arguments \"/c whoami > C:\\\\out.txt\"")]
+[Example("Create a task running as a specific user", "{0} ecorp-dc -UserName veeam-admin@ecorp.local -Password B@ckupP@ssw0rd -TaskPath \\\\MyTask -Command cmd.exe -RunAs ECORP\\\\someuser -RunAsLogon InteractiveToken")]
 public class CreateCommand : TschCommand
 {
 	[Parameter]
@@ -32,6 +32,14 @@ public class CreateCommand : TschCommand
 	public string? Arguments { get; set; }
 
 	[Parameter]
+	[Description("Run task as this user (default: S-1-5-18 / SYSTEM). Use DOMAIN\\\\user format.")]
+	public string? RunAs { get; set; }
+
+	[Parameter]
+	[Description("Logon type for the principal: Password, S4U, InteractiveToken, Group, ServiceAccount")]
+	public string? RunAsLogon { get; set; }
+
+	[Parameter]
 	[Description("Update existing task if it already exists")]
 	public SwitchParam Update { get; set; }
 
@@ -44,7 +52,7 @@ public class CreateCommand : TschCommand
 		}
 		else if (!string.IsNullOrEmpty(Command))
 		{
-			xml = BuildExecXml(Command, Arguments);
+			xml = BuildExecXml(Command, Arguments, RunAs, RunAsLogon);
 		}
 		else
 		{
@@ -52,21 +60,51 @@ public class CreateCommand : TschCommand
 			return 1;
 		}
 
+		TaskLogonType logonType = ResolveLogonType(RunAsLogon, RunAs);
 		TaskCreationFlags flags = Update.IsSet ? TaskCreationFlags.CreateOrUpdate : TaskCreationFlags.Create;
 
 		var actualPath = await client.RegisterTask(
-			TaskPath, xml, flags, null, TaskLogonType.S4U,
+			TaskPath, xml, flags, null, logonType,
 			cancellationToken);
 
 		this.WriteMessage($"Task registered: {actualPath}");
 		return 0;
 	}
 
-	private static string BuildExecXml(string command, string? arguments)
+	private static TaskLogonType ResolveLogonType(string? logonStr, string? runAs)
+	{
+		if (!string.IsNullOrEmpty(logonStr))
+		{
+			return logonStr.ToLowerInvariant() switch
+			{
+				"password" => TaskLogonType.Password,
+				"s4u" => TaskLogonType.S4U,
+				"interactivetoken" or "interactive" => TaskLogonType.InteractiveToken,
+				"group" => TaskLogonType.Group,
+				"serviceaccount" or "service" => TaskLogonType.ServiceAccount,
+				_ => TaskLogonType.S4U
+			};
+		}
+		if (string.IsNullOrEmpty(runAs) || runAs == "S-1-5-18" || runAs!.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase))
+			return TaskLogonType.S4U;
+		return TaskLogonType.Password;
+	}
+
+	private static string BuildExecXml(string command, string? arguments, string? runAs, string? logonType)
 	{
 		string argsElement = string.IsNullOrEmpty(arguments)
 			? ""
 			: $"\r\n        <Arguments>{EscapeXml(arguments)}</Arguments>";
+
+		string userId = string.IsNullOrEmpty(runAs) ? "S-1-5-18" : EscapeXml(runAs);
+		string xmlLogonType = ResolveXmlLogonType(logonType, runAs);
+		string logonElement = string.IsNullOrEmpty(xmlLogonType)
+			? ""
+			: $"\r\n      <LogonType>{xmlLogonType}</LogonType>";
+		string runLevel = (string.IsNullOrEmpty(runAs) || runAs == "S-1-5-18"
+			|| runAs!.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase))
+			? "\r\n      <RunLevel>HighestAvailable</RunLevel>"
+			: "";
 
 		return
 $@"<?xml version=""1.0"" encoding=""UTF-16""?>
@@ -82,8 +120,7 @@ $@"<?xml version=""1.0"" encoding=""UTF-16""?>
   </Triggers>
   <Principals>
     <Principal id=""Author"">
-      <UserId>S-1-5-18</UserId>
-      <RunLevel>HighestAvailable</RunLevel>
+      <UserId>{userId}</UserId>{logonElement}{runLevel}
     </Principal>
   </Principals>
   <Settings>
@@ -101,6 +138,26 @@ $@"<?xml version=""1.0"" encoding=""UTF-16""?>
     </Exec>
   </Actions>
 </Task>";
+	}
+
+	private static string ResolveXmlLogonType(string? logonStr, string? runAs)
+	{
+		if (!string.IsNullOrEmpty(logonStr))
+		{
+			return logonStr.ToLowerInvariant() switch
+			{
+				"password" => "Password",
+				"s4u" => "S4U",
+				"interactivetoken" or "interactive" => "InteractiveToken",
+				"group" => "Group",
+				"serviceaccount" or "service" => "ServiceAccount",
+				_ => ""
+			};
+		}
+		if (!string.IsNullOrEmpty(runAs) && runAs != "S-1-5-18"
+			&& !runAs!.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase))
+			return "Password";
+		return "";
 	}
 
 	private static string EscapeXml(string s)
