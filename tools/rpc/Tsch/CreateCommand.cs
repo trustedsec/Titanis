@@ -11,7 +11,8 @@ namespace Titanis.Cli.TschTool;
 [Command]
 [Description("Creates or updates a scheduled task from XML")]
 [Example("Create a task running as SYSTEM", "{0} ecorp-dc -UserName veeam-admin@ecorp.local -Password B@ckupP@ssw0rd -TaskPath \\\\MyTask -Command cmd.exe -Arguments \"/c whoami > C:\\\\out.txt\"")]
-[Example("Create a task running as a specific user", "{0} ecorp-dc -UserName veeam-admin@ecorp.local -Password B@ckupP@ssw0rd -TaskPath \\\\MyTask -Command cmd.exe -RunAs ECORP\\\\someuser -RunAsLogon InteractiveToken")]
+[Example("Create a task as a user (runs in their session)", "{0} ecorp-dc -UserName veeam-admin@ecorp.local -Password B@ckupP@ssw0rd -TaskPath \\\\MyTask -Command cmd.exe -RunAs ECORP\\\\someuser")]
+[Example("Create a task that fires on user logon", "{0} ecorp-dc -UserName veeam-admin@ecorp.local -Password B@ckupP@ssw0rd -TaskPath \\\\MyTask -Command cmd.exe -RunAs ECORP\\\\someuser -OnLogon")]
 public class CreateCommand : TschCommand
 {
 	[Parameter]
@@ -32,12 +33,16 @@ public class CreateCommand : TschCommand
 	public string? Arguments { get; set; }
 
 	[Parameter]
-	[Description("Run task as this user (default: S-1-5-18 / SYSTEM). Use DOMAIN\\\\user format.")]
+	[Description("Run task as this user (default: SYSTEM). Uses InteractiveToken logon.")]
 	public string? RunAs { get; set; }
 
 	[Parameter]
-	[Description("Logon type for the principal: Password, S4U, InteractiveToken, Group, ServiceAccount")]
+	[Description("Logon type: InteractiveToken (default with -RunAs), Password (batch, no desktop), S4U")]
 	public string? RunAsLogon { get; set; }
+
+	[Parameter]
+	[Description("Trigger on user logon instead of on-demand only")]
+	public SwitchParam OnLogon { get; set; }
 
 	[Parameter]
 	[Description("Update existing task if it already exists")]
@@ -52,7 +57,7 @@ public class CreateCommand : TschCommand
 		}
 		else if (!string.IsNullOrEmpty(Command))
 		{
-			xml = BuildExecXml(Command, Arguments, RunAs, RunAsLogon);
+			xml = BuildExecXml(Command, Arguments, RunAs, RunAsLogon, OnLogon.IsSet);
 		}
 		else
 		{
@@ -80,31 +85,60 @@ public class CreateCommand : TschCommand
 				"password" => TaskLogonType.Password,
 				"s4u" => TaskLogonType.S4U,
 				"interactivetoken" or "interactive" => TaskLogonType.InteractiveToken,
-				"group" => TaskLogonType.Group,
-				"serviceaccount" or "service" => TaskLogonType.ServiceAccount,
-				_ => TaskLogonType.S4U
+				_ => TaskLogonType.None
 			};
 		}
 		if (string.IsNullOrEmpty(runAs) || runAs == "S-1-5-18" || runAs!.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase))
 			return TaskLogonType.S4U;
-		return TaskLogonType.Password;
+		return TaskLogonType.None;
 	}
 
-	private static string BuildExecXml(string command, string? arguments, string? runAs, string? logonType)
+	private static string BuildExecXml(string command, string? arguments, string? runAs, string? logonType, bool onLogon)
 	{
 		string argsElement = string.IsNullOrEmpty(arguments)
 			? ""
 			: $"\r\n        <Arguments>{EscapeXml(arguments)}</Arguments>";
 
 		string userId = string.IsNullOrEmpty(runAs) ? "S-1-5-18" : EscapeXml(runAs);
+		bool isSystem = string.IsNullOrEmpty(runAs) || runAs == "S-1-5-18"
+			|| runAs!.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase);
+
 		string xmlLogonType = ResolveXmlLogonType(logonType, runAs);
 		string logonElement = string.IsNullOrEmpty(xmlLogonType)
 			? ""
 			: $"\r\n      <LogonType>{xmlLogonType}</LogonType>";
-		string runLevel = (string.IsNullOrEmpty(runAs) || runAs == "S-1-5-18"
-			|| runAs!.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase))
-			? "\r\n      <RunLevel>HighestAvailable</RunLevel>"
-			: "";
+		string runLevel = "\r\n      <RunLevel>HighestAvailable</RunLevel>";
+
+		string triggers;
+		if (onLogon && !isSystem)
+		{
+			triggers =
+$@"  <Triggers>
+    <LogonTrigger>
+      <UserId>{userId}</UserId>
+      <Enabled>true</Enabled>
+    </LogonTrigger>
+  </Triggers>";
+		}
+		else if (!isSystem && !onLogon)
+		{
+			triggers =
+@"  <Triggers>
+    <RegistrationTrigger>
+      <Enabled>true</Enabled>
+    </RegistrationTrigger>
+  </Triggers>";
+		}
+		else
+		{
+			triggers =
+@"  <Triggers>
+    <TimeTrigger>
+      <StartBoundary>2099-01-01T00:00:00</StartBoundary>
+      <Enabled>true</Enabled>
+    </TimeTrigger>
+  </Triggers>";
+		}
 
 		return
 $@"<?xml version=""1.0"" encoding=""UTF-16""?>
@@ -112,12 +146,7 @@ $@"<?xml version=""1.0"" encoding=""UTF-16""?>
   <RegistrationInfo>
     <Description>Titanis scheduled task</Description>
   </RegistrationInfo>
-  <Triggers>
-    <TimeTrigger>
-      <StartBoundary>2099-01-01T00:00:00</StartBoundary>
-      <Enabled>true</Enabled>
-    </TimeTrigger>
-  </Triggers>
+{triggers}
   <Principals>
     <Principal id=""Author"">
       <UserId>{userId}</UserId>{logonElement}{runLevel}
@@ -149,14 +178,9 @@ $@"<?xml version=""1.0"" encoding=""UTF-16""?>
 				"password" => "Password",
 				"s4u" => "S4U",
 				"interactivetoken" or "interactive" => "InteractiveToken",
-				"group" => "Group",
-				"serviceaccount" or "service" => "ServiceAccount",
 				_ => ""
 			};
 		}
-		if (!string.IsNullOrEmpty(runAs) && runAs != "S-1-5-18"
-			&& !runAs!.Equals("SYSTEM", StringComparison.OrdinalIgnoreCase))
-			return "Password";
 		return "";
 	}
 
