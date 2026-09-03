@@ -15,6 +15,7 @@ namespace Titanis.Msrpc.Mstsch
 		public sealed override string? WellKnownPipeName => TschPipeName;
 		public sealed override bool SupportsDynamicTcp => true;
 		public sealed override bool SupportsNdr64 => true;
+		public sealed override bool SupportsReauthOverNamedPipes => true;
 
 		public async Task<uint> GetHighestVersion(CancellationToken cancellationToken)
 		{

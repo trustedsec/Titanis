@@ -207,8 +207,8 @@ namespace Titanis.Cli
 			{
 				var smbClient = CreateSmbClient();
 
-				RpcAuthLevel authLevel = (this.EncryptRpc.IsSet) ? RpcAuthLevel.PacketPrivacy : RpcAuthLevel.None;
-				rpcClient.DefaultAuthLevel = authLevel;
+				RpcAuthLevel authLevel = (this.EncryptRpc.IsSet) ? RpcAuthLevel.PacketPrivacy : (svcClient.SupportsReauthOverNamedPipes && this.Authentication.HasAuthInfo) ? RpcAuthLevel.PacketIntegrity : RpcAuthLevel.None;
+				rpcClient.DefaultAuthLevel = (RpcAuthLevel)Math.Max((int)rpcClient.DefaultAuthLevel, (int)authLevel);
 
 				var pipePath = new UncPath(serverName, Smb2Client.IpcName, pipeName);
 				await rpcClient.ConnectPipe(svcClient, smbClient, pipePath, cancellationToken).ConfigureAwait(false);
