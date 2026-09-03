@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\crypto\Titanis.Crypto.Md5\Titanis.Crypto.Md5.csproj" />
+    <ProjectReference Include="..\..\..\crypto\Titanis.Crypto.Rc4\Titanis.Crypto.Rc4.csproj" />
+    <ProjectReference Include="..\..\Titanis.DceRpc\Titanis.DceRpc.csproj" />
+  </ItemGroup>
+
+</Project>
