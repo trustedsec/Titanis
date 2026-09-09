@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Titanis.Cli.Tsch</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\base\Titanis.Cli.DceRpc\Titanis.Cli.DceRpc.csproj" />
+    <ProjectReference Include="..\..\..\src\net\msrpc\Titanis.Msrpc.Mslsar\Titanis.Msrpc.Mslsar.csproj" />
+    <ProjectReference Include="..\..\..\src\net\msrpc\Titanis.Msrpc.Mstsch\Titanis.Msrpc.Mstsch.csproj" />
+  </ItemGroup>
+
+</Project>

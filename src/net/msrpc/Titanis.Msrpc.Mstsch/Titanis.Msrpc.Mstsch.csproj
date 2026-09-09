@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Xml\Task.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\base\Titanis.Winterop.Security\Titanis.Winterop.Security.csproj" />
+    <ProjectReference Include="..\..\Titanis.DceRpc\Titanis.DceRpc.csproj" />
+  </ItemGroup>
+
+</Project>
