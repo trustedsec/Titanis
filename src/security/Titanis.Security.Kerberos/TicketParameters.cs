@@ -22,6 +22,9 @@ namespace Titanis.Security.Kerberos
 		public bool IndicatesS4User => this.S4UserName is not null || this.S4UserCertificate is not null;
 		public SecurityPrincipalName? S4ProxyService { get; set; }
 
+		// KERB-KEY-LIST-REQ support ([MS-KILE] § 2.2.11)
+		public EType[]? KeyListEtypes { get; set; }
+
 		private TicketInfo? _additionalTicket;
 		public TicketInfo? AdditionalTicket
 		{

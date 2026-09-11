@@ -449,6 +449,48 @@ namespace Titanis.Msrpc.Mswkst
 		public Task<IList<ShareInfo>> GetStickyShares(string serverName, ShareInfoLevel level, int bufferSize, CancellationToken cancellationToken)
 			=> EnumShares(serverName, level, bufferSize, this._proxy.NetrShareEnumSticky, cancellationToken);
 
+		// disk enumeration (NetrServerDiskEnum, level 0)
+		public async Task<IList<string>> GetDisks(string serverName, int bufferSize, CancellationToken cancellationToken)
+		{
+			var disks = new List<string>();
+			RpcPointer<uint> pTotal = new RpcPointer<uint>();
+			RpcPointer<uint> pResumeHandle = new RpcPointer<uint>();
+
+			Win32ErrorCode res;
+			do
+			{
+				var pContainer = new RpcPointer<DISK_ENUM_CONTAINER>(new DISK_ENUM_CONTAINER());
+				res = (Win32ErrorCode)await this._proxy.NetrServerDiskEnum(
+					serverName,
+					0,
+					pContainer,
+					(uint)bufferSize,
+					pTotal,
+					pResumeHandle,
+					cancellationToken
+					).ConfigureAwait(false);
+
+				var buffer = pContainer.value.Buffer?.value;
+				if (buffer.HasValue)
+				{
+					var seg = buffer.Value;
+					for (int i = 0; i < pContainer.value.EntriesRead && i < seg.Count; i++)
+					{
+						var dseg = seg.Array![i].Disk;
+						string name = new string(dseg.Array!, dseg.Offset, dseg.Count).TrimEnd('\0');
+						if (name.Length > 0)
+							disks.Add(name);
+					}
+				}
+			}
+			while (res == Win32ErrorCode.ERROR_MORE_DATA);
+
+			if (res != Win32ErrorCode.ERROR_SUCCESS)
+				res.CheckAndThrow();
+
+			return disks;
+		}
+
 		public const int DefaultReturnBufferSize = -1;
 		private static async Task<IList<ShareInfo>> EnumShares(
 			string? serverName,

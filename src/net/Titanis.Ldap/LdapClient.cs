@@ -187,6 +187,12 @@ namespace Titanis.Ldap
 			return ldap;
 		}
 
+		// RFC 4511 simple bind
+		public async Task BindSimple(string distinguishedName, string password, CancellationToken cancellationToken)
+		{
+			await this._channel.BindSimple(distinguishedName, password, cancellationToken).ConfigureAwait(false);
+		}
+
 		private static readonly Regex rgxLdapServiceName = LdapServiceRegex();
 		[GeneratedRegex(@"^(?<forest>[^:]*):(?<computer>[^@]*)@(?<domain>.*)$")]
 		private static partial Regex LdapServiceRegex();

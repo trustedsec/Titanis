@@ -53,7 +53,7 @@ namespace Titanis.Security.Ntlm
 		{
 			writer.WriteUInt16LE((ushort)avid);
 			writer.WriteUInt16LE(8);
-			writer.WriteInt64LE(timestamp.Ticks);
+			writer.WriteInt64LE(timestamp.ToFileTimeUtc());
 		}
 
 		internal static void WriteAv(this ByteWriter writer, AvId avid, NtlmAuthFlags flags)

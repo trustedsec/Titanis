@@ -18,6 +18,22 @@ namespace Titanis.Ldap
 		private AuthClientContext? _authContext;
 		protected override AuthContext? AuthContext => this._authContext;
 
+		// RFC 4511 simple bind support
+		internal async Task<LdapResponse> BindSimple(string? distinguishedName, string? password, CancellationToken cancellationToken)
+		{
+			var resp = await this.SendRequest(new LDAPMessage_ProtocolOp()
+			{
+				BindRequest = new BindRequest_Tagged0(3, Encoding.UTF8.GetBytes(distinguishedName ?? string.Empty), new AuthenticationChoice()
+				{
+					Simple = Encoding.UTF8.GetBytes(password ?? string.Empty)
+				})
+			}, cancellationToken).ConfigureAwait(false);
+			var resultCode = resp.message.protocolOp.BindResponse.resultCode;
+			if (resultCode != LDAPResult_ResultCode.Success)
+				throw new LdapException((LdapResultCode)resultCode, Encoding.UTF8.GetString(resp.message.protocolOp.BindResponse.diagnosticMessage));
+			return resp;
+		}
+
 		internal async Task<LdapResponse> Bind(AuthClientContext authContext, CancellationToken cancellationToken)
 		{
 			var resp = await this.SendRequest(new LDAPMessage_ProtocolOp()
