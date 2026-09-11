@@ -2,6 +2,7 @@
 <logSchema xmlns="xsd://titanis/LogSchema.xsd">
 	<source ns="Titanis.Msrpc.Msdcom" name="DcomClient">
 		<using ns="Titanis.DceRpc"/>
+		<using ns="Titanis.Security"/>
 		<message name="Connected" severity="Diagnostic">
 			<param name="correlationId" type="Guid"/>
 			<param name="versionMajor" type="int"/>

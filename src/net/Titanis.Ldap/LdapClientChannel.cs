@@ -69,7 +69,7 @@ namespace Titanis.Ldap
 				throw new LdapException((LdapResultCode)saslResult, Encoding.UTF8.GetString(resp.message.protocolOp.BindResponse.diagnosticMessage));
 			// TODO: Why?  I didn't see anything in the spec, but the first message received in NTLM has seq# 1
 			authContext = authContext.GetMechContext();
-			if (authContext.RpcAuthType == NtlmRpcAuthType)
+			if (authContext.RpcAuthType == RpcAuthType.Ntlm)
 				authContext.IncrementRecvSeqNbr();
 			this._authContext = authContext;
 

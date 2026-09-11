@@ -31,7 +31,7 @@ namespace Titanis.AuthProxy
 		private readonly ISocket _authSocket;
 
 		/// <remarks>Returns a value indicating SP-NEGO</remarks>
-		public override byte RpcAuthType => 0x09;
+		public override RpcAuthType RpcAuthType => RpcAuthType.Spnego;
 		public static readonly Asn1Oid SpnegoOid = new Asn1Oid("1.3.6.1.5.5.2");
 		/// <remarks>Returns a value indicating SP-NEGO</remarks>
 		public override Asn1Oid MechOid => SpnegoOid;

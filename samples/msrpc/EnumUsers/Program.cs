@@ -49,7 +49,7 @@ namespace EnumUsers
 			// Query endpoint
 			var hostAddress = entry.AddressList[0];
 			var epm = await rpcClient.ConnectTcp<EpmClient>(new IPEndPoint(hostAddress, EpmClient.EPMapperPort), null, cancellationToken);
-			var remoteEP = await epm.TryMapTcp(RpcInterfaceId.GetForType(typeof(samr)), cancellationToken);
+			var remoteEP = await epm.TryMapTcp(RpcInterfaceId.GetForType(typeof(samr)), null, cancellationToken);
 
 			SamClient sam = new SamClient();
 			await rpcClient.ConnectTcp(sam, remoteEP, null, cancellationToken);

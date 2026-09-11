@@ -71,10 +71,6 @@ namespace Titanis.Security
 		/// If there is no user (e.g., guest or anonymous), implementations must return an empty string.
 		/// </remarks>
 		public abstract string UserName { get; }
-		/// <summary>
-		/// Gets the identifier to use for this authentication type within an RPC negotiation.
-		/// </summary>
-		public virtual byte RpcAuthType { get; } = 0;
 
 		/// <summary>
 		/// Gets or sets the target service principal name.

@@ -22,8 +22,8 @@ namespace Titanis.DceRpc.Client
 	/// <seealso cref="RpcClient.BindTo(Stream)"/>
 	public partial class RpcClientChannel : RpcChannel
 	{
-		internal RpcClientChannel(RpcClient client, RpcTransport transport, IRpcCallback? callback)
-			: base(transport, client.DefaultCallTimeout, callback)
+		internal RpcClientChannel(RpcClient client, in RpcChannelParams parms)
+			: base(parms)
 		{
 			this._client = client;
 		}
@@ -163,21 +163,21 @@ namespace Titanis.DceRpc.Client
 			if (this._client.OfferNdr64)
 				presContexts[transferSyntaxCount++] = new PresContext()
 				{
-					p_cont_id = contextId0,
+					p_cont_id = this.GetNextContextId(),
 					abstract_syntax = new SyntaxId(interfaceUuid, version),
 					transferSyntaxes = TransferSyntaxes64
 				};
 
 			presContexts[transferSyntaxCount] = new PresContext()
-				{
-					p_cont_id = this.GetNextContextId(),
-					abstract_syntax = new SyntaxId(interfaceUuid, version),
-					transferSyntaxes = new SyntaxId[] {
-						new SyntaxId(
-							MakeBindTimeFeatureGuid(BindTimeFeatures.KeepConnectionOnOrphanSupported | BindTimeFeatures.SecurityContextMultiplexingSupported),
-							new RpcVersion(1,0)
-							)
-					}
+			{
+				p_cont_id = this.GetNextContextId(),
+				abstract_syntax = new SyntaxId(interfaceUuid, version),
+				transferSyntaxes = new SyntaxId[] {
+					new SyntaxId(
+						MakeBindTimeFeatureGuid(BindTimeFeatures.KeepConnectionOnOrphanSupported | BindTimeFeatures.SecurityContextMultiplexingSupported),
+						new RpcVersion(1,0)
+						)
+				}
 			};
 
 			var bindPdu = new BindPdu(presContexts)
@@ -219,10 +219,10 @@ namespace Titanis.DceRpc.Client
 		private static int WriteBindAuthToken(BindAuthContext bindAuthContext, ByteWriter writer)
 		{
 			int authLength;
-			int pad = writer.Align(AuthVerifierHeader.Alignment);
+			int pad = writer.Align(4);
 			AuthVerifierHeader hdr = new AuthVerifierHeader
 			{
-				auth_type = (RpcAuthType)bindAuthContext.AuthContext.RpcAuthType,
+				auth_type = bindAuthContext.AuthContext.RpcAuthType,
 				auth_level = bindAuthContext.AuthLevel,
 				auth_pad_length = (byte)pad,
 				auth_context_id = bindAuthContext.ContextId
@@ -576,29 +576,36 @@ namespace Titanis.DceRpc.Client
 						}
 					};
 
-					if (auth != null)
+					try
 					{
-						AuthClientContext? authContext = bindreq.authContext?.AuthContext;
-						Debug.Assert(authContext != null);
-						authContext.Initialize(auth.token);
-						bindreq.bindContext = bindContext;
-
-						bool hasToken = authContext.Token.Length > 0;
-						if (hasToken)
+						if (auth != null)
 						{
-							bool preferAuth3 = (authContext.Legs == 3) && this.Client.PreferAuth3;
-							if (authContext.IsComplete && preferAuth3)
-								_ = this.SendAuth3(bindreq, cancellationToken);
-							else
+							AuthClientContext? authContext = (AuthClientContext)bindreq.authContext?.AuthContext;
+							Debug.Assert(authContext != null);
+							authContext.Initialize(auth.token);
+							bindreq.bindContext = bindContext;
+
+							bool hasToken = authContext.Token.Length > 0;
+							if (hasToken)
 							{
-								_ = this.SendAlterContext(bindreq, cancellationToken);
-								return;
+								bool preferAuth3 = (authContext.Legs == 3) && this.Client.PreferAuth3;
+								if (authContext.IsComplete && preferAuth3)
+									_ = this.SendAuth3(bindreq, cancellationToken);
+								else
+								{
+									_ = this.SendAlterContext(bindreq, cancellationToken);
+									return;
+								}
 							}
 						}
-					}
 
-					bindreq._taskSource.SetResult(bindContext);
-					return;
+						bindreq._taskSource.SetResult(bindContext);
+						return;
+					}
+					catch (Exception ex)
+					{
+						bindreq._taskSource.SetException(ex);
+					}
 				}
 			}
 
@@ -644,7 +651,7 @@ namespace Titanis.DceRpc.Client
 
 			if (auth != null)
 			{
-				AuthClientContext? authContext = bindreq.authContext?.AuthContext;
+				AuthClientContext? authContext = (AuthClientContext)bindreq.authContext?.AuthContext;
 				Debug.Assert(authContext != null);
 				authContext.Initialize(auth.token);
 				//if (!authContext.IsComplete)
@@ -666,15 +673,6 @@ namespace Titanis.DceRpc.Client
 			var bindContext = bindreq.bindContext;
 
 			ByteWriter writer = RpcPduWriter.Create();
-			bindreq.bindPdu.contextList.contexts = new PresContext[]
-			{
-				new PresContext()
-				{
-					p_cont_id = (ushort)bindContext.contextId,
-					abstract_syntax = bindreq.bindContext.interfaceId,
-					transferSyntaxes = [bindreq.bindContext.transferSyntaxId]
-				}
-			};
 			var bindPdu = new BindPdu(
 				bindreq.bindPdu.contextList.contexts
 			)
@@ -754,7 +752,7 @@ namespace Titanis.DceRpc.Client
 	public class BindAuthContext
 	{
 		internal BindAuthContext(
-			AuthClientContext authContext,
+			AuthContext authContext,
 			uint contextId,
 			RpcAuthLevel authLevel
 			)
@@ -768,7 +766,7 @@ namespace Titanis.DceRpc.Client
 		/// Gets the ID of the bound authentication context.
 		/// </summary>
 		public uint ContextId { get; }
-		public AuthClientContext AuthContext { get; }
+		public AuthContext AuthContext { get; }
 		public RpcAuthLevel AuthLevel { get; set; }
 
 		internal int GetMessageAuthTokenSize()

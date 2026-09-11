@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\net\msrpc\Titanis.Msrpc.Msdcom\Titanis.Msrpc.Msdcom.csproj" />
     <ProjectReference Include="..\..\net\Titanis.DceRpc.Core\Titanis.DceRpc.Core.csproj" />
     <ProjectReference Include="..\..\net\Titanis.DceRpc.Epm\Titanis.DceRpc.Epm.csproj" />
     <ProjectReference Include="..\..\net\Titanis.DceRpc\Titanis.DceRpc.csproj" />

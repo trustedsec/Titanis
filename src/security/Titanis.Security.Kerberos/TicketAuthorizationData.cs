@@ -124,7 +124,7 @@ namespace Titanis.Security.Kerberos
 			if (kdcKey != null)
 			{
 				// KDC
-				checksum = serverKey.Checksum(KeyUsage.NonKerbChecksumSalt, bytes);
+				checksum = kdcKey.Checksum(KeyUsage.NonKerbChecksumSalt, bytes);
 				checksum.checksum.CopyTo(bytes.Slice(offKdcChecksum));
 			}
 
@@ -807,6 +807,7 @@ namespace Titanis.Security.Kerberos
 
 		private int SignatureSize => this.SignatureType switch
 		{
+			EncChecksumType.RsaMd4 => 128 / 8,
 			EncChecksumType.HmacMd5String => 128 / 8,
 			EncChecksumType.HmacSha1_96_Aes128 => 96 / 8,
 			EncChecksumType.HmacSha1_96_Aes256 => 96 / 8,

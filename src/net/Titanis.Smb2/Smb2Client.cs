@@ -255,10 +255,9 @@ namespace Titanis.Smb2
 
 			var authContext = await credentialService.GetAuthContextForService(new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClass, serverName), SecurityCapabilities.Integrity).ConfigureAwait(false);
 
-			const int SpnegoRpcType = 9;
 			if (authContext == null)
 				throw new InvalidOperationException($"No credential is available for server `{serverName}`.");
-			else if (authContext.RpcAuthType != SpnegoRpcType)
+			else if (authContext.RpcAuthType != RpcAuthType.Spnego)
 			{
 				SpnegoClientContext spnego = new SpnegoClientContext()
 				{

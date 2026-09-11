@@ -69,7 +69,7 @@ namespace WeakServices
 
 			// Query endpoint for SCM
 			var epm = await rpcClient.ConnectTcp<EpmClient>(new DnsEndPoint(targetServer, EpmClient.EPMapperPort), null, cancellationToken);
-			var scmEP = await epm.TryMapTcp(RpcInterfaceId.GetForType(typeof(svcctl)), cancellationToken);
+			var scmEP = await epm.TryMapTcp(RpcInterfaceId.GetForType(typeof(svcctl)), null, cancellationToken);
 
 			rpcClient.DefaultAuthLevel = RpcAuthLevel.PacketPrivacy;
 

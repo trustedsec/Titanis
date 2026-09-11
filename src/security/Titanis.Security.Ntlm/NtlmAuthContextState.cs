@@ -32,6 +32,7 @@ namespace Titanis.Security.Ntlm
 		internal string? domainName;
 		internal string? dnsServerName;
 		internal string? dnsDomainName;
+		internal string? dnsTreeName;
 
 		internal void UpdateWithNegotiate(NtlmNegotiateMessage neg)
 		{
@@ -44,7 +45,7 @@ namespace Titanis.Security.Ntlm
 			this.negAuthFlags = auth.hdr.negotiatedFlags;
 			this.challengeFromClient = auth.clientChallenge.clientChallenge;
 			this.clientVersion = auth.hdr.version;
-			this.timestamp = DateTime.FromFileTime(auth.clientChallenge.time);
+			this.timestamp = DateTime.FromFileTimeUtc(auth.clientChallenge.time);
 		}
 		internal void UpdateWithChallenge(NtlmChallenge msg)
 		{
@@ -61,6 +62,7 @@ namespace Titanis.Security.Ntlm
 				this.domainName = targetInfo.NbDomainName;
 				this.dnsServerName = targetInfo.DnsComputerName;
 				this.dnsDomainName = targetInfo.DnsDomainName;
+				this.dnsTreeName = targetInfo.DnsTreeName;
 			}
 		}
 	}

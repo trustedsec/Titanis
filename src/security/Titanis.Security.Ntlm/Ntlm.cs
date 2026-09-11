@@ -17,7 +17,7 @@ namespace Titanis.Security.Ntlm
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct Buffer128 : IEquatable<Buffer128>
 	{
-		public static unsafe int StructSize => sizeof(Buffer128);
+		public const int StructSize = 128 / 8;
 
 		public Buffer128(ReadOnlySpan<byte> bytes)
 			: this()
@@ -35,20 +35,8 @@ namespace Titanis.Security.Ntlm
 
 		public bool IsEmpty => (this.k1 == 0 && this.k2 == 0);
 
-		public readonly unsafe ReadOnlySpan<byte> AsReadOnlySpan()
-		{
-			fixed (ulong* pBuf = &this.k1)
-			{
-				return new ReadOnlySpan<byte>((byte*)pBuf, StructSize);
-			}
-		}
-		public unsafe Span<byte> AsSpan()
-		{
-			fixed (ulong* pBuf = &this.k1)
-			{
-				return new Span<byte>((byte*)pBuf, StructSize);
-			}
-		}
+		public readonly ReadOnlySpan<byte> AsReadOnlySpan() => MemoryMarshal.AsBytes(MemoryMarshal.CreateReadOnlySpan(in this, 1));
+		public Span<byte> AsSpan() => MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this, 1));
 
 		/// <inheritdoc/>
 		public override bool Equals(object? obj)
@@ -85,7 +73,7 @@ namespace Titanis.Security.Ntlm
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct Buffer192 : IEquatable<Buffer192>
 	{
-		internal static unsafe int StructSize => sizeof(Buffer192);
+		internal const int StructSize = 192 / 8;
 
 		internal static Buffer192 EmptyLMResponse => new Buffer192();
 
@@ -109,13 +97,7 @@ namespace Titanis.Security.Ntlm
 
 		public int Length => (this.IsEmpty) ? 0 : StructSize;
 
-		internal unsafe Span<byte> AsSpan()
-		{
-			fixed (ulong* pBuf = &this.k1)
-			{
-				return new Span<byte>((byte*)pBuf, StructSize);
-			}
-		}
+		internal Span<byte> AsSpan() => MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this, 1));
 
 		public override bool Equals(object obj)
 		{
@@ -149,24 +131,6 @@ namespace Titanis.Security.Ntlm
 			return !(left == right);
 		}
 	}
-
-	//[StructLayout(LayoutKind.Sequential, Pack = 1)]
-	//struct DeslResult
-	//{
-	//	internal static unsafe int StructSize => sizeof(DeslResult);
-
-	//	internal ulong c1;
-	//	internal ulong c2;
-	//	internal ulong c3;
-
-	//	internal unsafe Span<byte> AsSpan()
-	//	{
-	//		fixed (ulong* pBuf = &this.c1)
-	//		{
-	//			return new Span<byte>((byte*)pBuf, StructSize);
-	//		}
-	//	}
-	//}
 
 	static class Ntlm
 	{
@@ -225,7 +189,7 @@ namespace Titanis.Security.Ntlm
 		/// <remarks>
 		/// Used for computing the NTLM MIC during authentication.
 		/// </remarks>
-		internal static unsafe Buffer128 ComputeHmacMd5(
+		internal static Buffer128 ComputeHmacMd5(
 			in Buffer128 key,
 			in SecBufferList buffers
 			)
@@ -295,7 +259,7 @@ namespace Titanis.Security.Ntlm
 		}
 
 		const ulong Mask56 = 0x00FFFFFFFFFFFFFF;
-		public static unsafe Buffer128 DeriveLMKey(string password)
+		public static Buffer128 DeriveLMKey(string password)
 		{
 			int cch = Math.Min(14, password.Length);
 
@@ -482,7 +446,7 @@ namespace Titanis.Security.Ntlm
 			return ComputeHmacMd5(responseKeyNT, ntProofStr.AsSpan());
 		}
 
-		internal static unsafe void BuildTempV2(
+		internal static void BuildTempV2(
 			ByteWriter tempWriter,
 			DateTime time,
 			ulong clientChallenge,
@@ -492,23 +456,22 @@ namespace Titanis.Security.Ntlm
 			const int Responserversion = 1;
 			const int HiResponserversion = 1;
 
-			fixed (byte* pTemp = tempWriter.Consume(NtlmClientChallenge.StructSize))
-			{
-				NtlmClientChallenge* pTempBuf = (NtlmClientChallenge*)pTemp;
-				*(NtlmClientChallenge*)pTemp = new NtlmClientChallenge
+			MemoryMarshal.Write<NtlmClientChallenge>(
+				tempWriter.Consume(NtlmClientChallenge.StructSize),
+				new NtlmClientChallenge
 				{
 					Responserversion = Responserversion,
 					HiResponserversion = HiResponserversion,
 					time = time.Ticks,
 					clientChallenge = clientChallenge,
-				};
-			}
+				}
+				);
 
 			tempWriter.WriteBytes(targetInfo);
 			tempWriter.Advance(4);    // Add Z(4)
 		}
 
-		internal static unsafe NtlmResponse ComputeResponseV2(
+		internal static NtlmResponse ComputeResponseV2(
 			ref NtlmAuthContextState state,
 			in Buffer128 responseKeyNT,
 			ReadOnlySpan<byte> targetInfo
@@ -528,29 +491,26 @@ namespace Titanis.Security.Ntlm
 				targetInfo);
 
 			byte[] tempBuf = tempWriter.GetBuffer();
-			fixed (byte* pTemp = tempBuf)
-			{
-				ref Buffer128 ntProofStr = ref *(Buffer128*)pTemp;
-				ntProofStr = ComputeHmacMd5(
-					responseKeyNT,
-					tempBuf.SliceReadOnly(PrehashStartIndex, tempWriter.Length - PrehashStartIndex)
-					);
+			ref Buffer128 ntProofStr = ref MemoryMarshal.AsRef<Buffer128>(tempBuf);
+			ntProofStr = ComputeHmacMd5(
+				responseKeyNT,
+				tempBuf.SliceReadOnly(PrehashStartIndex, tempWriter.Length - PrehashStartIndex)
+				);
 
-				return new NtlmResponse
-				{
-					NTProofStr = ntProofStr,
-					NtChallengeResponse = tempWriter.GetData(),
-					// responseKeyLM == responseKeyNT
-					LmChallengeResponse = Ntlm.ComputeLMChallengeResponseV2(
-						responseKeyNT,
-						state.serverChallenge,
-						state.challengeFromClient),
-					SessionBaseKey = Ntlm.ComputeSessionBaseKeyV2(responseKeyNT, ntProofStr)
-				};
-			}
+			return new NtlmResponse
+			{
+				NTProofStr = ntProofStr,
+				NtChallengeResponse = tempWriter.GetData(),
+				// responseKeyLM == responseKeyNT
+				LmChallengeResponse = Ntlm.ComputeLMChallengeResponseV2(
+					responseKeyNT,
+					state.serverChallenge,
+					state.challengeFromClient),
+				SessionBaseKey = Ntlm.ComputeSessionBaseKeyV2(responseKeyNT, ntProofStr)
+			};
 		}
 
-		internal static unsafe Buffer192 ComputeLMChallengeResponseV2(
+		internal static Buffer192 ComputeLMChallengeResponseV2(
 			in Buffer128 responseKeyLM,
 			ulong serverChallenge,
 			ulong clientChallenge)
@@ -700,11 +660,11 @@ LmChallengeResponse [0..7]))
 			return exportedSessionKey;
 		}
 
-		internal unsafe static ulong GenerateChallenge()
+		internal static ulong GenerateChallenge()
 		{
-			ulong challenge;
-			byte* pChallenge = (byte*)&challenge;
-			GetRandomData(new Span<byte>(pChallenge, 8));
+			ulong challenge = 0;
+			Span<byte> pChallenge = MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref challenge, 1));
+			GetRandomData(pChallenge);
 			return challenge;
 		}
 
@@ -738,7 +698,7 @@ LmChallengeResponse [0..7]))
 				sealingKey.Transform(buf.Span, buf.Span);
 		}
 
-		internal static unsafe void UnsealV1(
+		internal static void UnsealV1(
 			in MessageSealParams unsealParams,
 			ref Rc4Context sealingKey,
 			uint seqNbr
@@ -773,7 +733,7 @@ LmChallengeResponse [0..7]))
 				throw new SecurityException(Messages.Ntlm_BadMessageSignature);
 		}
 
-		internal static unsafe void SealV2(
+		internal static void SealV2(
 			in MessageSealParams sealParams,
 			ref Rc4Context sealingKey,
 			in Buffer128 signingKey,
@@ -812,7 +772,7 @@ LmChallengeResponse [0..7]))
 			}
 		}
 
-		internal static unsafe void UnsealV2(
+		internal static void UnsealV2(
 			in MessageSealParams unsealParams,
 			ref Rc4Context sealingKey,
 			in Buffer128 signingKey,
@@ -851,19 +811,13 @@ LmChallengeResponse [0..7]))
 		[StructLayout(LayoutKind.Sequential, Pack = 1)]
 		struct NtlmMacRandom
 		{
-			internal unsafe static int StructSize => sizeof(NtlmMacRandom);
+			internal const int StructSize = 12;
 
 			internal uint n1;
 			internal uint n2;
 			internal uint n3;
 
-			internal unsafe Span<byte> AsSpan()
-			{
-				fixed (uint* pStruc = &this.n1)
-				{
-					return new Span<byte>((byte*)pStruc, StructSize);
-				}
-			}
+			internal Span<byte> AsSpan() => MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this, 1));
 		}
 
 
@@ -1111,7 +1065,7 @@ LmChallengeResponse [0..7]))
 			}
 		}
 
-		internal static unsafe void SignMessage(
+		internal static void SignMessage(
 			in MessageSignParams signParams,
 			uint seqNbr,
 			NegotiateFlags negFlags,
@@ -1126,34 +1080,28 @@ LmChallengeResponse [0..7]))
 
 			if (fExtended)
 			{
-				fixed (byte* pMac = signParams.MacBuffer)
-				{
-					ref NtlmMessageSignatureV2 sig = ref *(NtlmMessageSignatureV2*)pMac;
-					Ntlm.MacV2(
-						in signParams.bufferList,
-						signKey,
-						ref sealKey,
-						(0 != (negFlags & NegotiateFlags.V_NegotiateKeyExchange)),
-						seqNbr,
-						out sig);
-				}
+				ref var sig = ref MemoryMarshal.AsRef<NtlmMessageSignatureV2>(signParams.MacBuffer);
+				Ntlm.MacV2(
+					in signParams.bufferList,
+					signKey,
+					ref sealKey,
+					(0 != (negFlags & NegotiateFlags.V_NegotiateKeyExchange)),
+					seqNbr,
+					out sig);
 			}
 			else
 			{
-				fixed (byte* pMac = signParams.MacBuffer)
-				{
-					ref NtlmMessageSignatureV1 sig = ref *(NtlmMessageSignatureV1*)pMac;
-					Ntlm.MacV1(
-						in signParams.bufferList,
-						ref sealKey,
-						0,
-						seqNbr,
-						out sig);
-				}
+				ref var sig = ref MemoryMarshal.AsRef<NtlmMessageSignatureV1>(signParams.MacBuffer);
+				Ntlm.MacV1(
+					in signParams.bufferList,
+					ref sealKey,
+					0,
+					seqNbr,
+					out sig);
 			}
 		}
 
-		internal static unsafe void VerifyMessage(
+		internal static void VerifyMessage(
 			in MessageVerifyParams verifyParams,
 			uint seqNbr,
 			NegotiateFlags negFlags,
@@ -1176,12 +1124,9 @@ LmChallengeResponse [0..7]))
 					seqNbr,
 					out NtlmMessageSignatureV2 expectedSignature
 					);
-				fixed (byte* pMac = verifyParams.MacBuffer)
-				{
-					ref NtlmMessageSignatureV2 sig = ref *(NtlmMessageSignatureV2*)pMac;
-					if (sig != expectedSignature)
-						throw new SecurityException(Messages.Ntlm_BadMessageSignature);
-				}
+				ref readonly var sig = ref MemoryMarshal.AsRef<NtlmMessageSignatureV2>(verifyParams.MacBuffer);
+				if (sig != expectedSignature)
+					throw new SecurityException(Messages.Ntlm_BadMessageSignature);
 			}
 			else
 			{
@@ -1192,12 +1137,9 @@ LmChallengeResponse [0..7]))
 					seqNbr,
 					out NtlmMessageSignatureV1 expectedSignature
 					);
-				fixed (byte* pMac = verifyParams.MacBuffer)
-				{
-					ref NtlmMessageSignatureV1 sig = ref *(NtlmMessageSignatureV1*)pMac;
-					if (sig != expectedSignature)
-						throw new SecurityException(Messages.Ntlm_BadMessageSignature);
-				}
+				ref readonly var sig = ref MemoryMarshal.AsRef<NtlmMessageSignatureV1>(verifyParams.MacBuffer);
+				if (sig != expectedSignature)
+					throw new SecurityException(Messages.Ntlm_BadMessageSignature);
 			}
 		}
 
@@ -1206,7 +1148,7 @@ LmChallengeResponse [0..7]))
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	struct LMChallengeInput
 	{
-		internal static unsafe int StructSize = sizeof(LMChallengeInput);
+		internal const int StructSize = 2 * 8;
 
 		internal ulong serverChallenge;
 		internal ulong clientChallenge;
@@ -1222,13 +1164,7 @@ LmChallengeResponse [0..7]))
 		internal uint checksum;
 		internal uint seqnbr;
 
-		internal unsafe Span<byte> AsSpan()
-		{
-			fixed (uint* pStruc = &this.version)
-			{
-				return new Span<byte>((byte*)pStruc, StructSize);
-			}
-		}
+		internal Span<byte> AsSpan() => MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this, 1));
 
 		public override bool Equals(object obj)
 		{
@@ -1267,26 +1203,14 @@ LmChallengeResponse [0..7]))
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	internal struct NtlmMessageSignatureV2 : IEquatable<NtlmMessageSignatureV2>
 	{
-		internal unsafe static int StructSize => sizeof(NtlmMessageSignatureV2);
+		internal const int StructSize = 16;
 
 		internal uint version;
 		internal ulong checksum;
 		internal uint seqnbr;
 
-		internal unsafe Span<byte> ChecksumAsSpan()
-		{
-			fixed (ulong* pStruc = &this.checksum)
-			{
-				return new Span<byte>((byte*)pStruc, sizeof(ulong));
-			}
-		}
-		internal unsafe Span<byte> AsSpan()
-		{
-			fixed (uint* pStruc = &this.version)
-			{
-				return new Span<byte>((byte*)pStruc, StructSize);
-			}
-		}
+		internal Span<byte> ChecksumAsSpan() => MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this.checksum, 1));
+		internal Span<byte> AsSpan() => MemoryMarshal.AsBytes(MemoryMarshal.CreateSpan(ref this, 1));
 
 		public override bool Equals(object obj)
 		{

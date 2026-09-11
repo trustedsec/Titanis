@@ -93,6 +93,11 @@ namespace Titanis.Security.Ntlm
 			get => this._state.dnsDomainName;
 			set => this._state.dnsDomainName = value;
 		}
+		public string DnsTreeName
+		{
+			get => this._state.dnsTreeName;
+			set => this._state.dnsTreeName = value;
+		}
 
 		protected override ReadOnlySpan<byte> AcceptImpl(ReadOnlySpan<byte> token)
 		{
@@ -161,7 +166,7 @@ namespace Titanis.Security.Ntlm
 					&& (string.IsNullOrEmpty(state.domainName) || avInfo.NbDomainName == state.domainName)
 					&& (string.IsNullOrEmpty(state.dnsServerName) || avInfo.DnsComputerName == state.dnsServerName)
 					&& (string.IsNullOrEmpty(state.dnsDomainName) || avInfo.DnsDomainName == state.dnsDomainName)
-					&& (new DateTime(msg.clientChallenge.time) == state.timestamp)
+					&& (DateTime.FromFileTimeUtc(msg.clientChallenge.time) == state.timestamp)
 					;
 				if (!isValid)
 					throw new AuthenticationException();
@@ -257,10 +262,11 @@ namespace Titanis.Security.Ntlm
 			{
 				targetInfo = new NtlmAvInfo
 				{
-					NbComputerName = serverName,
 					NbDomainName = state.domainName,
-					DnsComputerName = state.dnsServerName,
+					NbComputerName = serverName,
 					DnsDomainName = state.dnsDomainName,
+					DnsComputerName = state.dnsServerName,
+					DnsTreeName = state.dnsTreeName,
 					timestamp = timestamp
 				};
 

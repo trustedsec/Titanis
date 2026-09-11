@@ -16,10 +16,6 @@ namespace Titanis.DceRpc.WireProtocol
 		[PduArraySize(nameof(n_context_elem))]
 		public PresContext[] contexts;
 
-		private const int mystrLen = 5;
-		[PduString(CharSet.Ansi, mystrLen)]
-		public string mystr;
-
 		partial void OnBeforeWritePdu(ByteWriter writer)
 		{
 			this.n_context_elem = (byte)this.contexts.Length;

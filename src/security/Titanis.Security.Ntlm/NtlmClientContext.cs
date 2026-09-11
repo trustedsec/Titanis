@@ -65,7 +65,7 @@ namespace Titanis.Security.Ntlm
 		public sealed override bool IsAnonymous => this.Credential.IsAnonymous;
 
 		/// <inheritdoc/>
-		public sealed override byte RpcAuthType => 0x0A;
+		public sealed override RpcAuthType RpcAuthType => RpcAuthType.Ntlm;
 
 		/// Mechanism ID
 		public static readonly Asn1Oid NtlmOid = new Asn1Oid("1.3.6.1.4.1.311.2.2.10");
@@ -370,7 +370,7 @@ namespace Titanis.Security.Ntlm
 			get => this._state.clientVersion;
 			set => this._state.clientVersion = value;
 		}
-		private unsafe static byte[] WriteNegotiate(
+		private static byte[] WriteNegotiate(
 			NegotiateFlags flags,
 			NtlmVersion version,
 			string? workstationName,
@@ -387,10 +387,9 @@ namespace Titanis.Security.Ntlm
 			int bufferSize = NegotiateHeader.StructSize + cbWorkstation + cbDomain;
 			byte[] buf = new byte[bufferSize];
 
-			fixed (byte* pBuf = buf)
-			{
-				ref NegotiateHeader hdr = ref *(NegotiateHeader*)pBuf;
-				hdr = new NegotiateHeader
+			MemoryMarshal.Write<NegotiateHeader>(
+				buf,
+				new NegotiateHeader
 				{
 					signature = NegotiateHeader.ValidSignature,
 					messageType = NtlmMessageType.Negotiate,
@@ -398,8 +397,7 @@ namespace Titanis.Security.Ntlm
 					domain = new NtlmStringInfo((ushort)cbDomain, offDomainName),
 					workstation = new NtlmStringInfo((ushort)cbWorkstation, offWorkstation),
 					version = version
-				};
-			}
+				});
 
 			if (cbWorkstation > 0)
 				encoding.GetBytes(workstationName, buf.Slice(offWorkstation, cbWorkstation));
@@ -588,7 +586,7 @@ namespace Titanis.Security.Ntlm
 			return authResult.authMessage;
 		}
 
-		private unsafe byte[] BuildAuth_V2(
+		private byte[] BuildAuth_V2(
 			NtlmAvInfo? targetInfo
 			)
 		{
@@ -695,7 +693,7 @@ namespace Titanis.Security.Ntlm
 			return this.HandleAuthResult(authResult);
 		}
 
-		internal static unsafe NtlmAuthResult BuildAuthMessage(
+		internal static NtlmAuthResult BuildAuthMessage(
 			ref NtlmAuthInfo authInfo,
 			ref NtlmAuthContextState state
 			)
@@ -745,10 +743,9 @@ namespace Titanis.Security.Ntlm
 			int offSessionKey = offNTChallengeResponse + cbNT;
 
 			byte[] buf = new byte[bufferSize];
-			fixed (byte* pBuf = buf)
-			{
-				ref NtlmAuthenticateHeader hdr = ref *(NtlmAuthenticateHeader*)pBuf;
-				hdr = new NtlmAuthenticateHeader
+			MemoryMarshal.Write(
+				buf,
+				new NtlmAuthenticateHeader
 				{
 					signature = NegotiateHeader.ValidSignature,
 					messageType = NtlmMessageType.Authenticate,
@@ -762,8 +759,7 @@ namespace Titanis.Security.Ntlm
 
 					negotiatedFlags = authInfo.negotiateFlags,
 					version = authInfo.version
-				};
-			}
+				});
 
 			if (cbUserDomain > 0)
 				encoding.GetBytes(authInfo.userDomain, buf.Slice(offUserDomain, cbUserDomain));
@@ -791,17 +787,16 @@ namespace Titanis.Security.Ntlm
 
 			if (cbMic > 0)
 			{
-				fixed (byte* pBuf = buf)
-				{
-					ref Buffer128 mic = ref *(Buffer128*)(pBuf + offMic);
-					mic = Ntlm.ComputeHmacMd5(
+				MemoryMarshal.Write(
+					buf.Slice(offMic),
+					Ntlm.ComputeHmacMd5(
 						authResult.exportedSessionKey,
 						SecBufferList.Create(
 							SecBuffer.Integrity(state.negToken),
 							SecBuffer.Integrity(state.challengeToken),
 							SecBuffer.Integrity(buf)
-						));
-				}
+						))
+					);
 			}
 
 			authResult.authMessage = buf;
@@ -929,7 +924,7 @@ namespace Titanis.Security.Ntlm
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct NtlmClientChallenge
 	{
-		public static unsafe int StructSize => sizeof(NtlmClientChallenge);
+		public const int StructSize = 28;
 
 		public byte Responserversion;
 		public byte HiResponserversion;

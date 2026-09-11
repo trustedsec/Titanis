@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using Titanis.IO;
 
@@ -27,41 +29,35 @@ namespace Titanis.Security.Ntlm
 			return reader.ReadStringUni(length);
 		}
 
-		internal unsafe static SingleHostData ReadSingleHostData(this ByteMemoryReader reader, int cb)
+		internal static T ReadBlittableStruct<T>(this ByteMemoryReader reader, int cb)
+			where T : struct
 		{
-			if (cb != SingleHostData.StructSize)
-				throw new FormatException(Messages.Ntlm_InvalidSingleHostData);
+			if (cb < Unsafe.SizeOf<T>())
+				throw new InvalidCastException($"The buffer size is too small.  The caller passed size {cb}, but the size required for {typeof(T).Name} is {Unsafe.SizeOf<T>()}.");
 
-			fixed (byte* pBuf = reader.Consume(SingleHostData.StructSize))
-			{
-				return *(SingleHostData*)pBuf;
-			}
+			return MemoryMarshal.Read<T>(reader.Consume(cb));
 		}
 
-		internal unsafe static Guid ReadChannelBinding(this ByteMemoryReader reader, int cb)
+		internal static T ReadBlittableStruct<T>(this ByteMemoryReader reader)
+			where T : struct
+			{
+			return MemoryMarshal.Read<T>(reader.Consume(Unsafe.SizeOf<T>()));
+			}
+
+		internal static T ReadBlittableStructAt<T>(this ByteMemoryReader reader, int position)
+			where T : struct
+		{
+			reader.Position = position;
+			return reader.ReadBlittableStruct<T>();
+		}
+
+		internal static Guid ReadChannelBinding(this ByteMemoryReader reader, int cb)
 		{
 			if (cb != 0x10)
 				throw new FormatException(Messages.Ntlm_InvalidSingleHostData);
 
 			return reader.ReadGuid();
 		}
-
-		internal unsafe static NtlmChallengeHeader ReadChallengeHeader(this ByteMemoryReader reader)
-		{
-			fixed (byte* pBuf = reader.Consume(NtlmChallengeHeader.StructSize))
-			{
-				return *(NtlmChallengeHeader*)pBuf;
-			}
-		}
-
-		internal unsafe static AvHeader ReadAvHeader(this ByteMemoryReader reader)
-		{
-			fixed (byte* pBuf = reader.Consume(AvHeader.StructSize))
-			{
-				return *(AvHeader*)pBuf;
-			}
-		}
-
 
 		internal static NtlmNegotiateMessage ReadNegotiate(this ByteMemoryReader reader)
 		{
@@ -72,7 +68,7 @@ namespace Titanis.Security.Ntlm
 
 			NtlmNegotiateMessage msg = new NtlmNegotiateMessage
 			{
-				hdr = reader.ReadNegotiateHeader()
+				hdr = reader.ReadBlittableStruct<NegotiateHeader>()
 			};
 
 			bool isValid =
@@ -88,14 +84,6 @@ namespace Titanis.Security.Ntlm
 			return msg;
 		}
 
-		internal static unsafe NegotiateHeader ReadNegotiateHeader(this ByteMemoryReader reader)
-		{
-			fixed (byte* pBuf = reader.Consume(NegotiateHeader.StructSize))
-			{
-				return *(NegotiateHeader*)pBuf;
-			}
-		}
-
 		internal static NtlmChallenge ReadChallenge(this ByteMemoryReader reader)
 		{
 			if (reader.Remaining.Length < NtlmChallengeHeader.StructSize)
@@ -105,7 +93,7 @@ namespace Titanis.Security.Ntlm
 
 			NtlmChallenge challenge = new NtlmChallenge
 			{
-				hdr = reader.ReadChallengeHeader()
+				hdr = reader.ReadBlittableStruct<NtlmChallengeHeader>()
 			};
 			bool isValid =
 				(challenge.hdr.signature == NegotiateHeader.ValidSignature)
@@ -132,7 +120,7 @@ namespace Titanis.Security.Ntlm
 			bool eol = false;
 			while (!eol && reader.Position < infoEndPos)
 			{
-				AvHeader avh = reader.ReadAvHeader();
+				AvHeader avh = reader.ReadBlittableStruct<AvHeader>();
 				int avEndPos = reader.Position + avh.avLen;
 				switch (avh.id)
 				{
@@ -164,7 +152,7 @@ namespace Titanis.Security.Ntlm
 						av.timestamp = DateTime.FromFileTimeUtc(reader.ReadInt64LE());
 						break;
 					case AvId.SingleHost:
-						av.singleHost = reader.ReadSingleHostData(avh.avLen);
+						av.singleHost = reader.ReadBlittableStruct<SingleHostData>(avh.avLen);
 						break;
 					case AvId.TargetName:
 						av.targetName = reader.ReadStringUni(avh.avLen);
@@ -193,7 +181,7 @@ namespace Titanis.Security.Ntlm
 
 			NtlmAuthenticate c = new NtlmAuthenticate
 			{
-				hdr = reader.ReadAuthenticateHeader()
+				hdr = reader.ReadBlittableStruct<NtlmAuthenticateHeader>()
 			};
 			bool isValid =
 				(c.hdr.signature == NegotiateHeader.ValidSignature)
@@ -206,64 +194,30 @@ namespace Titanis.Security.Ntlm
 				throw new FormatException(Messages.Ntlm_InvalidMessage);
 
 			if (c.hdr.lmChallengeResponse.len > 0)
-				c.lmResponse = reader.ReadBuffer192(pos + c.hdr.lmChallengeResponse.offset);
+				c.lmResponse = reader.ReadBlittableStructAt<Buffer192>(pos + c.hdr.lmChallengeResponse.offset);
 			if (c.hdr.ntChallengeResponse.len > 0)
 			{
 				bool isNtlmV2 = (c.hdr.ntChallengeResponse.len > Buffer192.StructSize);
 
-				c.ntResponse = new Buffer192(reader.ReadBuffer128(pos + c.hdr.ntChallengeResponse.offset));
+				c.ntResponse = new Buffer192(reader.ReadBlittableStructAt<Buffer128>(pos + c.hdr.ntChallengeResponse.offset));
 				if (isNtlmV2)
 				{
-					c.ntResponse = new Buffer192(reader.ReadBuffer128(pos + c.hdr.ntChallengeResponse.offset));
-					c.clientChallenge = reader.ReadClientChallenge();
+					c.ntResponse = new Buffer192(reader.ReadBlittableStructAt<Buffer128>(pos + c.hdr.ntChallengeResponse.offset));
+					c.clientChallenge = reader.ReadBlittableStruct<NtlmClientChallenge>();
 					c.avInfo = reader.ReadAvInfo(pos + c.hdr.ntChallengeResponse.len);
 				}
 				else
 				{
-					c.ntResponse = reader.ReadBuffer192(pos + c.hdr.ntChallengeResponse.offset);
+					c.ntResponse = reader.ReadBlittableStructAt<Buffer192>(pos + c.hdr.ntChallengeResponse.offset);
 				}
 			}
 			if (c.hdr.sessionKey.len > 0)
-				c.sessionKey = reader.ReadBuffer128(pos + c.hdr.sessionKey.offset);
+				c.sessionKey = reader.ReadBlittableStructAt<Buffer128>(pos + c.hdr.sessionKey.offset);
 			c.domain = reader.ReadStringUni(pos + c.hdr.domain.offset, c.hdr.domain.len);
 			c.userName = reader.ReadStringUni(pos + c.hdr.userName.offset, c.hdr.userName.len);
 			c.workstation = reader.ReadStringUni(pos + c.hdr.workstation.offset, c.hdr.workstation.len);
 
 			return c;
 		}
-
-		internal static unsafe NtlmClientChallenge ReadClientChallenge(this ByteMemoryReader reader)
-		{
-			fixed (byte* pBuf = reader.Consume(NtlmClientChallenge.StructSize))
-			{
-				return *(NtlmClientChallenge*)pBuf;
 			}
 		}
-
-		internal static unsafe Buffer128 ReadBuffer128(this ByteMemoryReader reader, int pos)
-		{
-			reader.Position = pos;
-			fixed (byte* pBuf = reader.Consume(Buffer128.StructSize))
-			{
-				return *(Buffer128*)pBuf;
-			}
-		}
-
-		internal static unsafe Buffer192 ReadBuffer192(this ByteMemoryReader reader, int pos)
-		{
-			reader.Position = pos;
-			fixed (byte* pBuf = reader.Consume(Buffer192.StructSize))
-			{
-				return *(Buffer192*)pBuf;
-			}
-		}
-
-		internal static unsafe NtlmAuthenticateHeader ReadAuthenticateHeader(this ByteMemoryReader reader)
-		{
-			fixed (byte* pBuf = reader.Consume(NtlmAuthenticateHeader.StructSize))
-			{
-				return *(NtlmAuthenticateHeader*)pBuf;
-			}
-		}
-	}
-}

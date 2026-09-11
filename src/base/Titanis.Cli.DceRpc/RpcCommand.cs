@@ -3,13 +3,7 @@ using Titanis.DceRpc.Client;
 
 namespace Titanis.Cli
 {
-	/// <summary>
-	/// Base class for commands that use RPC.
-	/// </summary>
-	/// <remarks>
-	/// Implementors should use <see cref="RpcCommand{TClient}"/>.
-	/// </remarks>
-	public abstract class RpcCommand : Command, IHaveServerName
+	public abstract class RpcCommandBase : Command, IHaveServerName
 	{
 
 		[ParameterGroup(ParameterGroupOptions.Required)]
@@ -36,19 +30,6 @@ namespace Titanis.Cli
 				wantsServer.ServerName = this.CurrentServerName;
 		}
 
-		private RpcServiceClient _svcClient;
-		private bool _hasMultiServers;
-		protected override void ValidateParameters(ParameterValidationContext context)
-		{
-			var svcClient = this.CreateServiceClient();
-			this._svcClient = svcClient;
-
-			base.ValidateParameters(context);
-			this.RpcParameters.ValidateParameters(context, svcClient);
-
-			this._hasMultiServers = (this.ServerName.Length > 1) || this.ServerName[0].HasMultiple;
-		}
-
 		protected override OutputField[] FilterOutputFields(OutputField[] fields)
 		{
 			fields = base.FilterOutputFields(fields);
@@ -57,6 +38,13 @@ namespace Titanis.Cli
 				fields = Array.FindAll(fields, r => r.Name != nameof(IWantServerName.ServerName));
 			}
 			return fields;
+		}
+
+		private bool _hasMultiServers;
+		protected override void ValidateParameters(ParameterValidationContext context)
+		{
+			base.ValidateParameters(context);
+			this._hasMultiServers = (this.ServerName.Length > 1) || this.ServerName[0].HasMultiple;
 		}
 
 		protected sealed override async Task<int> RunAsync(CancellationToken cancellationToken)
@@ -69,8 +57,8 @@ namespace Titanis.Cli
 				foreach (var serverName_ in serverSpec.GetTargets())
 				{
 					string serverName = serverName_;
-					bool isSmb = serverName.StartsWith("//") || serverName.StartsWith(@"\\");
-					if (isSmb)
+					bool wantsSmb = serverName.StartsWith("//") || serverName.StartsWith(@"\\");
+					if (wantsSmb)
 						serverName = serverName.Substring(2);
 
 					if (multiServer)
@@ -80,18 +68,7 @@ namespace Titanis.Cli
 					{
 						this.CurrentServerName = serverName;
 
-						var svcClient = this._svcClient;
-						var bindInfo = await RpcParameters.BindServiceClient(
-							svcClient,
-							serverName,
-							isSmb,
-							cancellationToken
-							).ConfigureAwait(false);
-
-						using (bindInfo.SmbClient)
-						{
-							lastExitCode = await RunAsync(svcClient, cancellationToken).ConfigureAwait(false);
-						}
+						lastExitCode = await RunOverServer(serverName, wantsSmb, cancellationToken).ConfigureAwait(false);
 					}
 					catch (Exception ex)
 					{
@@ -114,6 +91,44 @@ namespace Titanis.Cli
 			}
 
 			return (lastError != 0) ? lastError : lastExitCode;
+		}
+
+		protected abstract Task<int> RunOverServer(string serverName, bool wantsSmb, CancellationToken cancellationToken);
+	}
+
+	/// <summary>
+	/// Base class for commands that use RPC.
+	/// </summary>
+	/// <remarks>
+	/// Implementors should use <see cref="RpcCommand{TClient}"/>.
+	/// </remarks>
+	public abstract class RpcCommand : RpcCommandBase
+	{
+
+		private RpcServiceClient _svcClient;
+
+		protected override void ValidateParameters(ParameterValidationContext context)
+		{
+			var svcClient = this.CreateServiceClient();
+			this._svcClient = svcClient;
+			this.RpcParameters.ValidateParameters(context, svcClient);
+			base.ValidateParameters(context);
+		}
+
+		protected override async Task<int> RunOverServer(string serverName, bool wantsSmb, CancellationToken cancellationToken)
+		{
+			var svcClient = this._svcClient;
+			var bindInfo = await RpcParameters.BindServiceClient(
+				svcClient,
+				serverName,
+				wantsSmb,
+				cancellationToken
+				).ConfigureAwait(false);
+
+			using (bindInfo.SmbClient)
+			{
+				return await RunAsync(svcClient, cancellationToken).ConfigureAwait(false);
+			}
 		}
 
 		protected abstract RpcServiceClient CreateServiceClient();

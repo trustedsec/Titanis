@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using Titanis.Security;
 
 namespace Titanis.DceRpc.WireProtocol
 {
 	internal partial class AuthVerifier
 	{
-		internal readonly AuthVerifierHeader hdr;
+		internal AuthVerifierHeader hdr;
 		internal readonly byte[] token;
 
 		public AuthVerifier(in AuthVerifierHeader hdr, byte[] token)

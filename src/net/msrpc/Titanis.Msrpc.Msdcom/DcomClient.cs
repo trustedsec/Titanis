@@ -165,14 +165,14 @@ namespace Titanis.Msrpc.Msdcom
 			// IActivation
 			var actClient = new ActivationClient();
 			dcom._activator = actClient;
-			await actClient.BindToAsync(rpcChannel, false, exporter.Proxy.BoundAuthContext?.AuthContext, exporter.Proxy.BoundAuthContext?.AuthLevel ?? RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
+			await actClient.BindToAsync(rpcChannel, false, (AuthClientContext)exporter.Proxy.BoundAuthContext?.AuthContext, exporter.Proxy.BoundAuthContext?.AuthLevel ?? RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
 
 			// SCMActivator
 			if (info.Version.MinorVersion >= 6)
 			{
 				var scmClient = new ScmActivatorClient(dcom, host);
 				dcom._scmActivator = scmClient;
-				await scmClient.BindToAsync(rpcChannel, false, exporter.Proxy.BoundAuthContext?.AuthContext, exporter.Proxy.BoundAuthContext?.AuthLevel ?? RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
+				await scmClient.BindToAsync(rpcChannel, false, (AuthClientContext)exporter.Proxy.BoundAuthContext?.AuthContext, exporter.Proxy.BoundAuthContext?.AuthLevel ?? RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
 			}
 
 			return dcom;
@@ -565,7 +565,7 @@ namespace Titanis.Msrpc.Msdcom
 							await objProxy.BindToAsync(
 								exporter.channel,
 								false,
-								exporter.remunk.BoundAuthContext?.AuthContext,
+								(AuthClientContext)exporter.remunk.BoundAuthContext?.AuthContext,
 								exporter.authLevel,
 								//(RpcAuthLevel)result.AuthLevelHint,
 								null,

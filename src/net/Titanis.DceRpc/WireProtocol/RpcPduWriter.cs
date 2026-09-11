@@ -67,8 +67,6 @@ namespace Titanis.DceRpc.WireProtocol
 
 			writer.Align(4);
 			writer.WriteContextResults(bindack.contextResults);
-
-			// TODO: Write auth token
 		}
 
 		private static void WriteContextResults(this ByteWriter writer, PresContextResult[] contextResults)

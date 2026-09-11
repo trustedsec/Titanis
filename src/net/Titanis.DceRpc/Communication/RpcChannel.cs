@@ -21,19 +21,31 @@ namespace Titanis.DceRpc.Communication
 		ExpectsResponse = 1,
 	}
 
+	struct RpcChannelParams
+	{
+		internal RpcChannelParams(RpcTransport transport, TimeSpan callTimeout)
+		{
+			this.transport = transport;
+			this.callTimeout = callTimeout;
+		}
+		internal readonly RpcTransport transport;
+		internal readonly TimeSpan callTimeout;
+		internal IRpcCallback? callback;
+	}
+
 	/// <summary>
 	/// Implements a channel for RPC.
 	/// </summary>
 	public abstract partial class RpcChannel : Runnable
 	{
-		private protected RpcChannel(RpcTransport transport, TimeSpan callTimeout, IRpcCallback? callback)
+		private protected RpcChannel(in RpcChannelParams parms)
 		{
-			Debug.Assert(transport != null);
-			this._transport = transport;
+			Debug.Assert(parms.transport != null);
+			this._transport = parms.transport;
 			this._transport.AttachTo(this);
 
-			this.CallTimeout = callTimeout;
-			this._callback = callback;
+			this.CallTimeout = parms.callTimeout;
+			this._callback = parms.callback;
 		}
 
 		private RpcTransport _transport;
@@ -75,6 +87,12 @@ namespace Titanis.DceRpc.Communication
 			{
 				this._bindAuthContexts.Add(authContextId, authContext);
 			}
+		}
+
+		private protected BindAuthContext? TryGetAuthContext(uint authContextId)
+		{
+			this._bindAuthContexts.TryGetValue(authContextId, out var bindAuthCtx);
+			return bindAuthCtx;
 		}
 		#endregion
 
@@ -187,7 +205,7 @@ namespace Titanis.DceRpc.Communication
 				PduType.Request => RequestPduHeader.StructSize,
 				PduType.Response => ResponsePduHeader.StructSize,
 				PduType.Bind
-				or PduType.AlterContext => PduHeader.PduStructSize,
+				or PduType.AlterContext or PduType.Auth3 => PduHeader.PduStructSize,
 				PduType.BindAck
 				or PduType.AlterContextResp => BindAckPduHeader.StructSize,
 				PduType.BindNak => BindNakPduHeader.StructSize,
@@ -287,9 +305,21 @@ namespace Titanis.DceRpc.Communication
 			=> header.ptype switch
 			{
 				PduType.Bind => this.DispatchBind(header, message, cancellationToken),
+				PduType.Auth3 => this.DispatchAuth3(header, message, cancellationToken),
 				PduType.Request => this.DispatchRequest(header, message, cancellationToken),
 				_ => throw new NotImplementedException()
 			};
+
+		private AuthVerifier ReadAuthVerifier(ByteMemoryReader reader, int authLength)
+		{
+			int pad = reader.Align(4);
+			var authVerifier = reader.ReadAuthVerifier(authLength);
+			if (authVerifier.hdr.auth_pad_length != pad)
+				// TODO: Send actual error
+				throw new NotImplementedException();
+			return authVerifier;
+
+		}
 
 		private async Task DispatchBind(
 			PduHeader header,
@@ -298,15 +328,29 @@ namespace Titanis.DceRpc.Communication
 		{
 			ByteMemoryReader reader = new ByteMemoryReader(message);
 			BindPdu bind = reader.ReadPduStruct<BindPdu>();
-			AuthVerifier? authVerifier = null;
-			if (header.authLength > 0)
-			{
-				int pad = (int)reader.Align(4);
-				authVerifier = reader.ReadAuthVerifier(header.authLength);
-				// TODO: Process auth token
-			}
+			AuthVerifier? authVerifier =
+				(header.authLength > 0) ? ReadAuthVerifier(reader, header.authLength)
+				: null;
 
 			await this.HandleBind(header, message, bind, authVerifier, cancellationToken).ConfigureAwait(false);
+		}
+
+		private async Task DispatchAuth3(
+			PduHeader header,
+			Memory<byte> message,
+			CancellationToken cancellationToken)
+		{
+			ByteMemoryReader reader = new ByteMemoryReader(message);
+			var randomPad = reader.ReadUInt32LE();
+			// READ TOKEN
+			AuthVerifier? authVerifier =
+				(header.authLength > 0) ? ReadAuthVerifier(reader, header.authLength)
+				: null;
+
+			var bindAuthContext = this.TryGetAuthContext(authVerifier.hdr.auth_context_id);
+
+			var authContext = (AuthServerContext)bindAuthContext.AuthContext;
+			authContext.Accept(authVerifier.token);
 		}
 
 		private protected virtual Task HandleBind(

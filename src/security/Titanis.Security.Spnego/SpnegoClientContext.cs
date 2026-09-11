@@ -43,7 +43,7 @@ namespace Titanis.Security.Spnego
 		public sealed override Asn1Oid MechOid => SpnegoOid;
 
 		/// <inheritdoc/>
-		public sealed override byte RpcAuthType => 0x09;
+		public sealed override RpcAuthType RpcAuthType => RpcAuthType.Spnego;
 
 		private SecurityPrincipalName? _targetSpn;
 		/// <inheritdoc/>

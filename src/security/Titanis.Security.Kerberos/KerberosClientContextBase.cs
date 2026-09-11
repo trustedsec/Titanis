@@ -94,7 +94,7 @@ namespace Titanis.Security.Kerberos
 		public bool NegotiatedIntegrity => 0 != (this.NegotiatedCapabilities & SecurityCapabilities.Integrity);
 
 		/// <inheritdoc/>
-		public sealed override byte RpcAuthType => 0x10;
+		public sealed override RpcAuthType RpcAuthType => RpcAuthType.Kerberos;
 
 		/// <summary>
 		/// Gets the OID for Kerberos.

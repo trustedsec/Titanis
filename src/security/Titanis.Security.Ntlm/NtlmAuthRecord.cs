@@ -16,6 +16,12 @@
 		public bool HasLmKey => (0 != (this.Options & NtlmAuthRecordOptions.HasLmKey));
 		public bool HasNtKey => (0 != (this.Options & NtlmAuthRecordOptions.HasNtKey));
 
+		public NtlmAuthRecord(string password)
+		{
+			this.LmKey = Ntlm.LmowfV1(password);
+			this.NtKey = Ntlm.NtowfV1(password);
+			this.Options = NtlmAuthRecordOptions.HasLmKey | NtlmAuthRecordOptions.HasNtKey;
+		}
 		public NtlmAuthRecord(Buffer128 lmkey, Buffer128 ntkey)
 		{
 			this.LmKey = lmkey;

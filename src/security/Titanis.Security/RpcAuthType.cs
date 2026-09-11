@@ -1,4 +1,4 @@
-﻿namespace Titanis.DceRpc
+﻿namespace Titanis.Security
 {
 	// [MS-RPCE] § 2.2.1.1.7 - Security Providers
 	public enum RpcAuthType : byte

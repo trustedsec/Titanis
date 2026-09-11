@@ -16,7 +16,7 @@ namespace Titanis.Security.Sspi
 		internal SspiClientContext(
 			string userName,
 			SecHandle hcred,
-			byte rpcAuthType
+			RpcAuthType rpcAuthType
 			)
 		{
 			this.UserName = userName;
@@ -45,7 +45,7 @@ namespace Titanis.Security.Sspi
 				out var hcred,
 				out var expiry
 				).CheckAndThrow();
-			return new SspiClientContext(userName, hcred, 10);
+			return new SspiClientContext(userName, hcred, RpcAuthType.Ntlm);
 		}
 
 		public static SspiClientContext ForNegotiate(string? userName)
@@ -63,7 +63,7 @@ namespace Titanis.Security.Sspi
 				out var hcred,
 				out var expiry
 				).CheckAndThrow();
-			return new SspiClientContext(userName, hcred, 9);
+			return new SspiClientContext(userName, hcred, RpcAuthType.Spnego);
 		}
 
 		private static void EnsureWindows()
@@ -74,13 +74,13 @@ namespace Titanis.Security.Sspi
 
 
 		/// <remarks>Returns a value indicating SP-NEGO</remarks>
-		public override byte RpcAuthType { get; }
+		public override RpcAuthType RpcAuthType { get; }
 		public static readonly Asn1Oid SpnegoOid = new Asn1Oid("1.3.6.1.5.5.2");
 
 		/// <remarks>Returns a value indicating SP-NEGO</remarks>
 		public override Asn1Oid MechOid => SpnegoOid;
 
-		public override int Legs => (this.RpcAuthType == 10) ? 3 : base.Legs;
+		public override int Legs => (this.RpcAuthType == RpcAuthType.Ntlm) ? 3 : base.Legs;
 
 
 		public override string UserName { get; }

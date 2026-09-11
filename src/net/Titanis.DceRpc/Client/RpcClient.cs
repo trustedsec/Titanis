@@ -99,10 +99,14 @@ namespace Titanis.DceRpc.Client
 
 			RpcClientChannel channel = new RpcClientChannel(
 				this,
-				(stream is IAsyncPipeStream) ? new RpcPipeTransport(stream, RpcChannel.WindowsDefaultMaxFragCO)
-				: new RpcStreamTransport(stream, RpcChannel.WindowsDefaultMaxFragCO),
-				this._callback
-				);
+				new RpcChannelParams(
+					(stream is IAsyncPipeStream) ? new RpcPipeTransport(stream, RpcChannel.WindowsDefaultMaxFragCO)
+					: new RpcStreamTransport(stream, RpcChannel.WindowsDefaultMaxFragCO),
+					this.DefaultCallTimeout
+					)
+				{
+					callback = this._callback,
+				});
 			channel.Start();
 			return channel;
 		}

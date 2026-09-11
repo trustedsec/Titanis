@@ -21,6 +21,10 @@ namespace Titanis.Security
 	public abstract class AuthContext : IDisposable
 	{
 		/// <summary>
+		/// Gets the identifier to use for this authentication type within an RPC negotiation.
+		/// </summary>
+		public virtual RpcAuthType RpcAuthType { get; } = RpcAuthType.None;
+		/// <summary>
 		/// Provides a unique identifier to correlate this authentication context with a higher-level operation.
 		/// </summary>
 		public Guid CorrelationId { get; set; } = Guid.NewGuid();

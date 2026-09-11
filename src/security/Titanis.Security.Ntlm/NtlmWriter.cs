@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using Titanis.IO;
 
@@ -26,7 +26,7 @@ namespace Titanis.Security.Ntlm
 			if (av.singleHost.HasValue)
 				writer.WriteAv(AvId.SingleHost, av.singleHost.Value);
 			//if (av.channelBindingHashed != null)
-				writer.WriteAv(AvId.ChannelBindings, av.channelBindingHashed);
+			writer.WriteAv(AvId.ChannelBindings, av.channelBindingHashed);
 			if (av.targetName != null)
 				writer.WriteAv(AvId.TargetName, av.targetName);
 
@@ -63,14 +63,11 @@ namespace Titanis.Security.Ntlm
 			writer.WriteUInt32LE((uint)flags);
 		}
 
-		internal unsafe static void WriteAv(this ByteWriter writer, AvId avid, SingleHostData data)
+		internal static void WriteAv(this ByteWriter writer, AvId avid, SingleHostData data)
 		{
 			writer.WriteUInt16LE((ushort)avid);
 			writer.WriteUInt16LE((ushort)SingleHostData.StructSize);
-			fixed (byte* pBuf = writer.Consume(SingleHostData.StructSize))
-			{
-				*(SingleHostData*)pBuf = data;
-			}
+			MemoryMarshal.Write(writer.Consume(SingleHostData.StructSize), in data);
 		}
 
 		internal static void WriteAv(this ByteWriter writer, AvId avid, Guid value)
@@ -90,12 +87,9 @@ namespace Titanis.Security.Ntlm
 		}
 
 
-		internal unsafe static void WriteChallengeHeader(this ByteWriter writer, in NtlmChallengeHeader hdr)
+		internal static void WriteChallengeHeader(this ByteWriter writer, in NtlmChallengeHeader hdr)
 		{
-			fixed (byte* pBuf = writer.Consume(NtlmChallengeHeader.StructSize))
-			{
-				*(NtlmChallengeHeader*)pBuf = hdr;
-			}
+			MemoryMarshal.Write(writer.Consume(NtlmChallengeHeader.StructSize), in hdr);
 		}
 	}
 }

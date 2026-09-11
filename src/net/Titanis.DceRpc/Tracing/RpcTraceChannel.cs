@@ -11,7 +11,12 @@ namespace Titanis.DceRpc.Tracing
 {
 	public class RpcTraceChannel : RpcChannel
 	{
-		public RpcTraceChannel() : base(new RpcTraceTransport(), Timeout.InfiniteTimeSpan, null)
+		public RpcTraceChannel() : base(new RpcChannelParams(
+			new RpcTraceTransport(),
+			Timeout.InfiniteTimeSpan)
+		{
+			callback = null
+		})
 		{
 		}
 
