@@ -158,10 +158,17 @@ namespace Titanis.Security.Ntlm
 			out ReadOnlySpan<byte> targetInfoBytes)
 		{
 			var msg = Parse(bytes);
-			targetInfoBytes = bytes.Slice(
-				msg.hdr.ntChallengeResponse.offset + 16 + NtlmClientChallenge.StructSize,
-				msg.hdr.ntChallengeResponse.len - 16 - NtlmClientChallenge.StructSize - 4 /* Z4 */
-				);
+			if (msg.IsNtlmv2)
+			{
+				targetInfoBytes = bytes.Slice(
+					msg.hdr.ntChallengeResponse.offset + 16 + NtlmClientChallenge.StructSize,
+					msg.hdr.ntChallengeResponse.len - 16 - NtlmClientChallenge.StructSize - 4 /* Z4 */
+					);
+			}
+			else
+			{
+				targetInfoBytes = ReadOnlySpan<byte>.Empty;
+			}
 			return msg;
 		}
 		public static NtlmAuthenticate Parse(
