@@ -619,7 +619,7 @@ namespace MS_EVEN6
 	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 	public partial struct EvtRpcQueryChannelInfo : IRpcFixedStruct
 	{
-		public RpcPointer<char> name;
+		public RpcPointer<string> name;
 		public uint status;
 		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Encode(IRpcEncoder encoder)
@@ -631,7 +631,7 @@ namespace MS_EVEN6
 		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		public void Decode(IRpcDecoder decoder)
 		{
-			this.name = decoder.ReadUniquePointer<char>();
+			this.name = decoder.ReadUniquePointer<string>();
 			this.status = decoder.ReadUInt32();
 		}
 
@@ -640,7 +640,7 @@ namespace MS_EVEN6
 		{
 			if (this.name is not null)
 			{
-				encoder.WriteValue(this.name.value);
+				encoder.WriteWideCharString(this.name.value);
 			}
 		}
 
@@ -649,13 +649,13 @@ namespace MS_EVEN6
 		{
 			if (this.name is not null)
 			{
-				this.name.value = decoder.ReadWideChar();
+				this.name.value = decoder.ReadWideCharString();
 			}
 		}
 	}
 
 	[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10"), GuidAttribute("f6beaff7-1e19-4fbb-9f8f-b89e2018337c"), RpcVersionAttribute(1, 0)]
-	partial interface IEventService
+	public partial interface IEventService
 	{
 		[GeneratedCodeAttribute("Animus IDL Compiler", "0.9.10")]
 		Task<int> EvtRpcRegisterRemoteSubscription(string channelPath, string query, string bookmarkXml, uint flags, RpcPointer<RpcContextHandle> handle, RpcPointer<RpcContextHandle> control, RpcPointer<uint> queryChannelInfoSize, RpcPointer<RpcPointer<EvtRpcQueryChannelInfo[]>> queryChannelInfo, RpcPointer<RpcInfo> error, CancellationToken cancellationToken);
