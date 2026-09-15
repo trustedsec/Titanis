@@ -295,7 +295,7 @@ namespace Titanis.Ldap
 		}
 	}
 
-	[InfoValue(typeof(DateTime?))]
+	[InfoValue(typeof(DateTime))]
 	public struct AdTimestamp : IInfoValue
 	{
 		public AdTimestamp(long value)
