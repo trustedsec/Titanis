@@ -9,6 +9,7 @@ using Titanis.Msrpc.Msscmr;
 using Titanis.Winterop.Security;
 
 namespace Titanis.Cli.ScmTool;
+
 public abstract class ServiceCommand : ScmCommand
 {
 	protected abstract ServiceAccessRights RequiredServiceAccess { get; }
@@ -16,14 +17,28 @@ public abstract class ServiceCommand : ScmCommand
 	[Parameter(10)]
 	[Mandatory]
 	[Description("Name of the service")]
-	public string ServiceName { get; set; }
+	public string[] ServiceName { get; set; }
 
 	protected sealed override async Task<int> RunAsync(Scm scm, CancellationToken cancellationToken)
 	{
-		using (var service = await scm.OpenServiceAsync(this.ServiceName, this.RequiredServiceAccess, cancellationToken))
+		foreach (var serviceName in this.ServiceName)
 		{
-			return await this.RunAsync(scm, service, cancellationToken);
+			try
+			{
+				using (var service = await scm.OpenServiceAsync(serviceName, this.RequiredServiceAccess, cancellationToken))
+				{
+					return await this.RunAsync(scm, service, cancellationToken);
+				}
+			}
+			catch (Exception ex)
+			{
+				this.WriteError($"Failed for service {serviceName}: {ex.ToString()}");
+				if (!this.ContinueOnError.IsSet)
+					throw;
+			}
 		}
+
+		return 0;
 	}
 
 	protected abstract Task<int> RunAsync(Scm scm, Service service, CancellationToken cancellationToken);

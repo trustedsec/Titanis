@@ -59,7 +59,7 @@ namespace Titanis.Msrpc.Msscmr
 				res.CheckAndThrow();
 				return new Scm(pHandle.value, this);
 			}
-			catch (RpcFaultException ex) when(ex.Status == RpcFaultCode.OpnumRange)
+			catch (RpcFaultException ex) when (ex.Status == RpcFaultCode.OpnumRange)
 			{
 				RpcPointer<RpcContextHandle> pHandle = new RpcPointer<RpcContextHandle>();
 				var res = (Win32ErrorCode)await this._proxy.ROpenSCManagerW(null, null, (uint)access, pHandle, cancellationToken).ConfigureAwait(false);
@@ -85,6 +85,7 @@ namespace Titanis.Msrpc.Msscmr
 				: Encoding.Unicode.GetBytes(string.Join("\0", config.Dependencies) + "\0\0")
 				;
 
+			// TODO: Encrypt if required
 			byte[]? passwordBytes = (config.StartPassword == null)
 				? null
 				: Encoding.Unicode.GetBytes(config.StartPassword);
@@ -201,6 +202,7 @@ namespace Titanis.Msrpc.Msscmr
 				? new RpcPointer<uint>((uint)config.TagId)
 				: null;
 
+			// TODO: Encrypt if required
 			byte[] passwordBytes = (!string.IsNullOrEmpty(config.StartPassword)
 				? Encoding.Unicode.GetBytes(config.StartPassword)
 				: null);

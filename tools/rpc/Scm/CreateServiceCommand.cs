@@ -16,6 +16,7 @@ internal class CreateServiceCommand : ScmCommand
 
 	[Parameter(20)]
 	[Description("Service command line")]
+	[Mandatory]
 	public string BinPath { get; set; }
 
 	[Parameter]
