@@ -340,23 +340,16 @@ namespace Titanis.Cli
 
 		private InfoBase? _infobase;
 		private InvocationLog? _invocLog;
-		class LogResultHook : ICommandResultHook
+		protected override void OnWritingRecord(object? record, RecordInfo? info = null)
 		{
-			private readonly InvocationLog log;
-
-			internal LogResultHook(InvocationLog log)
+			CancellationToken cx = CancellationToken.None;
+			if (_invocLog != null)
 			{
-				this.log = log;
-			}
-
-			public void OnResult(object? record, RecordInfo? info)
-			{
-				CancellationToken cx = CancellationToken.None;
 				Task.Factory.StartNew(async () =>
 				{
 					try
 					{
-						await this.log.WriteItem(record, cx);
+						await this._invocLog.WriteItem(record, cx);
 					}
 					catch
 					{
@@ -385,7 +378,6 @@ namespace Titanis.Cli
 					var args = paramValues.ToDictionary(r => r.Key.Name, r => r.Value);
 					this._invocLog = await this._infobase.LogCommand(name, version, args, this.LogPartition, this.LogComment, null, cancellationToken);
 					this.Context.AddLogListener(this._invocLog);
-					this.Context.AddResultHook(new LogResultHook(this._invocLog));
 				}
 			}
 			catch

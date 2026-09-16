@@ -83,7 +83,6 @@ namespace Titanis.Cli
 		bool IsFieldInOutput(string fieldName);
 		void SetOutputFormat(OutputStyle style, IOutputFieldProvider? fields, bool includeHeaders);
 
-		void AddResultHook(ICommandResultHook hook);
 		void WriteRecords(IEnumerable records);
 		void WriteRecord(object? record);
 		void WriteRecord(object? record, RecordInfo? info);
