@@ -704,6 +704,36 @@ namespace Titanis.Ldap
 		}
 	}
 
+	partial class LdapClient : IDisposable, IAsyncDisposable
+	{
+		private bool disposedValue;
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+					this._channel.Stop();
+				}
+
+				disposedValue = true;
+			}
+		}
+
+		public void Dispose()
+		{
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+
+		public async ValueTask DisposeAsync()
+		{
+			await this._channel.Stop().ConfigureAwait(false);
+		}
+	}
+
 	internal interface ILdapChannelSearchCallback
 	{
 		void OnEntry(SearchResultEntry_Tagged4 result);

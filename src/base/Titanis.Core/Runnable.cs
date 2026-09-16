@@ -138,7 +138,7 @@ namespace Titanis
 			{
 				this.Exception = ex;
 				// Transition to stopped state
-				_ = this.Stop(TimeSpan.MaxValue);
+				_ = this.Stop();
 			}
 		}
 
@@ -181,6 +181,7 @@ namespace Titanis
 		protected virtual Task OnAborting()
 			=> this.OnStopping();
 
+		public Task Stop() => this.Stop(Timeout.InfiniteTimeSpan);
 		/// <summary>
 		/// Stops the <see cref="Runnable"/>.
 		/// </summary>
