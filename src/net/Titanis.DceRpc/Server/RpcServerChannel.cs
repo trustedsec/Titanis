@@ -3,21 +3,25 @@ using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Titanis.DceRpc.Client;
 using Titanis.DceRpc.Communication;
 using Titanis.DceRpc.WireProtocol;
 using Titanis.IO;
+using Titanis.Security;
 
 namespace Titanis.DceRpc.Server
 {
 	public sealed class RpcServerChannel : Communication.RpcChannel
 	{
-		internal RpcServerChannel(RpcServer server, RpcTransport transport, IRpcCallback? callback)
-			: base(transport, Timeout.InfiniteTimeSpan, callback)
+		internal RpcServerChannel(RpcServer server, in RpcChannelParams parms, IAuthServer authServer)
+			: base(parms)
 		{
 			this.Server = server;
+			this._authServer = authServer;
 		}
 
 		public RpcServer Server { get; private set; }
@@ -55,7 +59,7 @@ namespace Titanis.DceRpc.Server
 				);
 
 			RpcAssocGroup assocGroup = this.Server.GetOrCreateAssocGroup(bind.assoc_group_id);
-			RpcBindContext bindContext = null;
+			RpcBindContext? bindContext = null;
 
 			var contextElems = bind.contextList.contexts;
 			var contextResults = new PresContextResult[contextElems.Length];
@@ -114,25 +118,67 @@ namespace Titanis.DceRpc.Server
 				}
 			}
 
+			if (bindContext == null)
+			{
+				// TODO: Determine actual error value
+				await this.SendBindNak(header.callId, BindRejectReason.DefaultContextNotSupported, cancellationToken).ConfigureAwait(false);
+				return;
+			}
+
+			ReadOnlySpan<byte> authToken;
+			if (authVerifier != null)
+			{
+				var bindAuthContext = this.TryGetAuthContext(authVerifier.hdr.auth_context_id);
+				if (bindAuthContext == null)
+				{
+					bindAuthContext = new BindAuthContext(
+						this.CreateAuthContext(authVerifier.hdr.auth_type, authVerifier.hdr.auth_level),
+						authVerifier.hdr.auth_context_id,
+						authVerifier.hdr.auth_level);
+					this.RegisterAuthContext(authVerifier.hdr.auth_context_id, bindAuthContext);
+				}
+
+				var authContext = (AuthServerContext)bindAuthContext.AuthContext;
+				authToken = authContext.Accept(authVerifier.token);
+			}
+			else
+			{
+				authToken = default;
+			}
+			// TODO: Process auth token
+
+
 			ByteWriter writer = RpcPduWriter.Create();
 			BindAckPdu bindack = new BindAckPdu(new BindAckPduHeader()
 			{
 				max_xmit_frag = (ushort)this.MaxXmitFrag,
 				max_recv_frag = (ushort)this.MaxRecvFrag,
-				assoc_group_id = assocGroup.GroupId
+				assoc_group_id = assocGroup.GroupId,
 			}, new PortAny())
 			{
 				contextResults = contextResults
 			};
 			writer.WriteBindAck(bindack);
+			if (authVerifier != null)
+			{
+				authVerifier.hdr.auth_pad_length = (byte)writer.Align(4);
+				writer.WriteAuthVerifier(authVerifier.hdr, authToken);
+			}
+
 			// TODO: Add support for auth tokens
 			await this.SendPduAsync(
 				PduType.BindAck,
 				PfcFlags.SupportHeaderSigning,
 				header.callId,
 				writer,
-				0,
+				authToken.Length,
 				cancellationToken).ConfigureAwait(false);
+		}
+
+		private IAuthServer _authServer;
+		private AuthServerContext CreateAuthContext(RpcAuthType authType, RpcAuthLevel authLevel)
+		{
+			return this._authServer.CreateContext(authType);
 		}
 
 		private ConcurrentDictionary<int, CancellationTokenSource> _ongoingRequests = new ConcurrentDictionary<int, CancellationTokenSource>();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,10 +15,11 @@ namespace Titanis.DceRpc.Server
 	// TODO: Add endpoint functionality
 	public class RpcServer : Runnable
 	{
-		public RpcServer()
+		public RpcServer(IAuthServer authServer)
 		{
 			this.AddEncoding(RpcEncoding.MsrpcNdr);
 			this.AddEncoding(RpcEncoding.MsrpcNdr64);
+			this._authServer = authServer;
 		}
 
 		private List<RpcServerChannel> _activeChannels = new List<RpcServerChannel>();
@@ -28,6 +30,15 @@ namespace Titanis.DceRpc.Server
 			{
 				this._activeChannels.Remove(channel);
 			}
+		}
+
+		private List<RpcEndpoint> _endpoints = new List<RpcEndpoint>();
+		public void AddEndpoint(RpcEndpoint ep)
+		{
+			ArgumentNullException.ThrowIfNull(ep);
+
+			ep.OnBinding(this);
+			this._endpoints.Add(ep);
 		}
 
 		#region Bindings
@@ -69,6 +80,8 @@ namespace Titanis.DceRpc.Server
 		#endregion
 		#region Encodings
 		private Dictionary<RpcInterfaceKey, RpcEncoding> _encodings = new Dictionary<RpcInterfaceKey, RpcEncoding>();
+		private readonly IAuthServer _authServer;
+
 		internal RpcEncoding TryGetEncoding(SyntaxId syntaxId)
 		{
 			return this._encodings.TryGetValue(new RpcInterfaceKey(syntaxId));
@@ -82,5 +95,41 @@ namespace Titanis.DceRpc.Server
 				this._encodings.Add(new RpcInterfaceKey(new SyntaxId(encoding.InterfaceUuid, encoding.InterfaceVersion)), encoding);
 		}
 		#endregion
+
+		protected override async Task OnStarting(CancellationToken cancellationToken)
+		{
+			if (this._endpoints.Count == 0)
+				throw new InvalidOperationException("There are no endpoints registered.");
+
+			foreach (var ep in this._endpoints)
+			{
+				await ep.Start().ConfigureAwait(false);
+			}
+
+			// TODO: Handle partial startup failures
+
+			await base.OnStarting(cancellationToken).ConfigureAwait(false);
+		}
+
+		protected override Task Run(CancellationToken cancellationToken)
+		{
+			return base.Run(cancellationToken);
+		}
+
+		internal void OnClientConnected(Socket client)
+		{
+			var stream = new NetworkStream(client, true);
+			var transport = new RpcStreamTransport(stream, RpcChannel.WindowsDefaultMaxFragCO);
+			var channel = new RpcServerChannel(this, new RpcChannelParams(
+				transport,
+				Timeout.InfiniteTimeSpan
+				), this._authServer);
+			_ = channel.Start();
+
+			lock (this._activeChannels)
+			{
+				this._activeChannels.Add(channel);
+			}
+		}
 	}
 }
