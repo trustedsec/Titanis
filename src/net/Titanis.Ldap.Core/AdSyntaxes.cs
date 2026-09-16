@@ -313,39 +313,14 @@ namespace Titanis.Ldap
 
 		public override string ToString() => $"{this.Value:N0} ({this.AsDateTimeUtc():O})";
 
-		private static Regex rgxRelative = new Regex(@"^((?<t>today)|(?<n>now))\s*((?<s>\+|-)\s*(?<d>.*))?$", RegexOptions.IgnoreCase);
 		public static AdTimestamp Parse(string text)
 		{
 			if (long.TryParse(text, NumberStyles.AllowThousands, null, out var n))
 			{
 				return new AdTimestamp(n);
 			}
-			else if (DateTime.TryParse(text, out var dt))
-			{
-				return new AdTimestamp(dt);
-			}
 			else
-			{
-				var m = rgxRelative.Match(text);
-				if (m.Success)
-				{
-					dt = m.Groups["t"].Success ? DateTime.UtcNow.Date : DateTime.UtcNow;
-					Group signGroup = m.Groups["s"];
-					if (signGroup.Success)
-					{
-						var sign = signGroup.Value[0];
-						var duration = Duration.Parse(m.Groups["d"].Value).TimeSpan;
-						dt = sign switch
-						{
-							'-' => dt - duration,
-							'+' => dt + duration
-						};
-					}
-					return new AdTimestamp(dt);
-				}
-
-				throw new ArgumentException($"Could not parse timestamp as either a numeric value or date/time.");
-			}
+				return new AdTimestamp(RelativeTimeConverter.Parse(text));
 		}
 
 		public object? GetValue() => this.AsDateTimeUtc();

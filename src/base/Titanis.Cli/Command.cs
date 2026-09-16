@@ -723,6 +723,8 @@ namespace Titanis.Cli
 				// The built-in enum converter is overly strict and cannot handle undefined values like 0.
 				return new EnumConverter(paramType);
 
+			if (paramType == typeof(DateTime))
+				return RelativeTimeConverter.Instance;
 			var converter = TypeDescriptor.GetConverter(paramType);
 			if (converter != null)
 			{
@@ -731,7 +733,7 @@ namespace Titanis.Cli
 					// This is the default converter, which probably won't work
 					if (paramType == typeof(EndPoint))
 					{
-						return new EndPointConverter();
+						return EndPointConverter.Instance;
 					}
 				}
 				return converter;

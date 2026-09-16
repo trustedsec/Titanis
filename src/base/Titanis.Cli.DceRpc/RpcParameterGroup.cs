@@ -178,6 +178,11 @@ namespace Titanis.Cli
 						new ServicePrincipalName(PrincipalNameType.ServiceInstance, ServiceClassNames.Rpc, serverName),
 						this.EncryptEpm.IsSet ? RpcAuthLevel.PacketPrivacy : this.AuthEpm.IsSet ? RpcAuthLevel.PacketIntegrity : RpcAuthLevel.None, cancellationToken).ConfigureAwait(false);
 					remoteEP = await epm.TryMapTcp(RpcInterfaceId.GetForType(svcClient.Proxy.InterfaceType), svcClient.ObjectId, remoteAddr, cancellationToken).ConfigureAwait(false);
+					if (remoteEP is IPEndPoint ipep && ipep.Address.Address == 0)
+					{
+						// When querying from localhost, EPM may return 0.0.0.0
+						remoteEP = new DnsEndPoint(serverName, ipep.Port);
+					}
 				}
 				else
 					remoteEP = new DnsEndPoint(serverName, port);

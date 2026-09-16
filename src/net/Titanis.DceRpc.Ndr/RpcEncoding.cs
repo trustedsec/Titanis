@@ -117,7 +117,7 @@ namespace Titanis.DceRpc
 	{
 		internal MsrpcNdr64Encoding() { }
 
-		public sealed override Guid InterfaceUuid => RpcEncoding.NdrUuid;
+		public sealed override Guid InterfaceUuid => RpcEncoding.Ndr64Uuid;
 		public sealed override RpcVersion InterfaceVersion => new RpcVersion(2, 0);
 
 		public sealed override RpcDecoder CreateDecoder(ByteMemoryReader stubData, RpcCallContext callContext)

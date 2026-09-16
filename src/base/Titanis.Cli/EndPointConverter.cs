@@ -25,6 +25,8 @@ namespace Titanis.Cli
 
 	public class EndPointConverter : TypeConverter
 	{
+		public static readonly EndPointConverter Instance = new EndPointConverter();
+
 		public sealed override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
 		{
 			if (sourceType == typeof(string))
