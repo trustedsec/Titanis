@@ -127,6 +127,11 @@ public class TestFileAccess : IFileAccess
 		return info != null;
 	}
 
+	public bool DirectoryExists(FileSpec path)
+	{
+		return false;
+	}
+
 	public Stream OpenRead(FileSpec path) => throw new NotImplementedException();
 
 	private Dictionary<string, byte[]> _writtenFiles = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
@@ -141,5 +146,10 @@ public class TestFileAccess : IFileAccess
 	{
 		var path = this.ResolveFsPath(fileName);
 		this._writtenFiles[path] = contents;
+	}
+
+	public void CreateDirectory(FileSpec path)
+	{
+		throw new NotImplementedException();
 	}
 }

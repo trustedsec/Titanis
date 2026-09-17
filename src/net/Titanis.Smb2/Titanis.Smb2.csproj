@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.IO.Hashing" />
     <PackageReference Include="Titanis.Core" />
     <PackageReference Include="Titanis.Crypto.Aes128Cmac" />
     <PackageReference Include="Titanis.Crypto.Rc4" />

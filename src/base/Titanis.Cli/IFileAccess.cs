@@ -58,6 +58,19 @@ namespace Titanis.Cli
 		bool FileExists(FileSpec path);
 
 		/// <summary>
+		/// Determines whether a directory exists.
+		/// </summary>
+		/// <param name="path">Directory name to check</param>
+		/// <returns><see langword="true"/> if <paramref name="path"/> names an existing directory; otherwise, <see langword="false"/></returns>
+		bool DirectoryExists(FileSpec path);
+
+		/// <summary>
+		/// Creates a directory.
+		/// </summary>
+		/// <param name="path">Directory path</param>
+		void CreateDirectory(FileSpec path);
+
+		/// <summary>
 		/// Opens a file for read access.
 		/// </summary>
 		/// <param name="path">File name to open</param>

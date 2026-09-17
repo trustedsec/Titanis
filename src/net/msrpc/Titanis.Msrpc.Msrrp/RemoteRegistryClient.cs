@@ -34,7 +34,7 @@ namespace Titanis.Msrpc.Msrrp
 			var res = (Win32ErrorCode)await func(null, (uint)access, hkey, cancellationToken).ConfigureAwait(false);
 			res.CheckAndThrow();
 
-			string name = RegistryRootKey.GetRootName(rootKey);
+			string name = RegistryRootKeys.GetRootName(rootKey);
 			return new RegistryKey(name, name, hkey.value, this);
 		}
 		public Task<RegistryKey> OpenClassesRoot(RegistryAccessRights access, CancellationToken cancellationToken)

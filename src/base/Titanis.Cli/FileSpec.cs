@@ -25,6 +25,11 @@ namespace Titanis.Cli
 
 		public string? Extension => Path.GetExtension(this.FileName);
 
+		public FileSpec Combine(string path)
+		{
+			return new FileSpec(Path.Combine(this.FileName, path), this.IsResolved);
+		}
+
 		/// <inheritdoc/>
 		public sealed override string ToString() => this.FileName;
 	}

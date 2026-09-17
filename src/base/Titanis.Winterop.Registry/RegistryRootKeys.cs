@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,11 +25,10 @@ namespace Titanis.Winterop.Registry
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}
 
-	public class RegistryRootKey
+	public static class RegistryRootKeys
 	{
 		// [MS-RRP] § 3.1.1.7 Predefined Keys
-		public static readonly string[] RootNames = new string[]
-		{
+		public static readonly ImmutableArray<string> RootNames = [
 			"HKEY_CLASSES_ROOT",
 			"HKEY_CURRENT_USER",
 			"HKEY_LOCAL_MACHINE",
@@ -37,10 +37,9 @@ namespace Titanis.Winterop.Registry
 			"HKEY_CURRENT_CONFIG",
 			"HKEY_PERFORMANCE_TEXT",
 			"HKEY_PERFORMANCE_NLS_TEXT"
-		};
+		];
 
-		public static readonly string[] RootShortNames = new string[]
-		{
+		public static readonly ImmutableArray<string> RootShortNames = [
 			"HKCR",
 			"HKCU",
 			"HKLM",
@@ -49,7 +48,7 @@ namespace Titanis.Winterop.Registry
 			"HKCC",
 			"HKPT",
 			"HKPNT"
-		};
+		];
 
 		public static string GetRootName(PredefinedKey rootKey, bool getShortName = false)
 		{
@@ -70,8 +69,8 @@ namespace Titanis.Winterop.Registry
 		public static PredefinedKey ResolveRootKey(string rootName)
 		{
 			if (rootName.StartsWith("0x") && uint.TryParse(rootName.AsSpan(2), System.Globalization.NumberStyles.HexNumber, null, out var ul)
-	|| uint.TryParse(rootName, out ul)
-	)
+				|| uint.TryParse(rootName, out ul)
+				)
 			{
 				if ((ul >= (uint)PredefinedKey.ClassesRoot && ul <= (uint)PredefinedKey.CurrentConfig)
 					|| ul == (uint)PredefinedKey.PerformanceText

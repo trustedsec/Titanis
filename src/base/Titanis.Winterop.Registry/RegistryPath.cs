@@ -40,7 +40,7 @@ namespace Titanis.Winterop.Registry
 		/// <inheritdoc/>
 		public override string ToString()
 		{
-			return $"{RegistryRootKey.GetRootName(Root)}{((KeyPath.Length != 0) ? '\\' + KeyPath : String.Empty)}";
+			return $"{RegistryRootKeys.GetRootName(Root)}{((KeyPath.Length != 0) ? '\\' + KeyPath : String.Empty)}";
 		}
 
 		public bool IsRootPath => (KeyPath == string.Empty);
@@ -77,9 +77,9 @@ namespace Titanis.Winterop.Registry
 			{
 
 
-				int i = Array.IndexOf(RegistryRootKey.RootNames, rootName.ToUpper());
+				int i = RegistryRootKeys.RootNames.IndexOf(rootName.ToUpper());
 				if (i < 0)
-					i = Array.IndexOf(RegistryRootKey.RootShortNames, rootName.ToUpper());
+					i = RegistryRootKeys.RootShortNames.IndexOf(rootName.ToUpper());
 				if (i >= 0)
 				{
 					uint rootval = (uint)((uint)PredefinedKey.ClassesRoot + i);
@@ -108,7 +108,7 @@ namespace Titanis.Winterop.Registry
 		public static RegistryPath Parse(string path)
 		{
 			if (string.IsNullOrEmpty(path)) throw new ArgumentException($"'{nameof(path)}' cannot be null or empty.", nameof(path));
-			var validRootNames = RegistryRootKey.RootNames.Concat(RegistryRootKey.RootShortNames);
+			var validRootNames = RegistryRootKeys.RootNames.Concat(RegistryRootKeys.RootShortNames);
 			var rootName = validRootNames.FirstOrDefault(name => path.StartsWith(name, StringComparison.OrdinalIgnoreCase));
 			PredefinedKey root;
 			if (rootName is null)

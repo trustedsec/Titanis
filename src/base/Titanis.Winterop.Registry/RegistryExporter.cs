@@ -56,7 +56,7 @@ namespace Titanis.Winterop.Registry
 		private void WriteKeySectionHeader(RegistryPath keyPath, bool forDeletion = false)
 		{
 			this._writer.WriteLine();
-			this._writer.WriteLine($"[{(forDeletion ? "-" : "")}{RegistryRootKey.GetRootName(keyPath.Root)}\\{keyPath.KeyPath}]");
+			this._writer.WriteLine($"[{(forDeletion ? "-" : "")}{RegistryRootKeys.GetRootName(keyPath.Root)}\\{keyPath.KeyPath}]");
 		}
 
 		public void Close()

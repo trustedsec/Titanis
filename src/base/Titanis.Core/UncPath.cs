@@ -171,6 +171,17 @@ namespace Titanis
 		}
 
 		/// <summary>
+		/// Gets the directory name portion of a path.
+		/// </summary>
+		/// <param name="path">Path</param>
+		/// <returns>The directory name without the file.</returns>
+		public static string GetDirectoryName(string? path)
+		{
+			SplitPath(path, out var dirName, out _);
+			return dirName;
+		}
+
+		/// <summary>
 		/// Gets the file name portion of the path.
 		/// </summary>
 		/// <returns>The file name without the directory.</returns>
@@ -180,6 +191,20 @@ namespace Titanis
 				return string.Empty;
 
 			SplitPath(this.ShareRelativePath, out _, out var fileName);
+			return fileName;
+		}
+
+		/// <summary>
+		/// Gets the file name portion of a path.
+		/// </summary>
+		/// <param name="path">Path</param>
+		/// <returns>The file name without the directory.</returns>
+		public static string GetFileName(string? path)
+		{
+			if (string.IsNullOrEmpty(path))
+				return string.Empty;
+
+			SplitPath(path, out _, out var fileName);
 			return fileName;
 		}
 
