@@ -144,7 +144,7 @@ $@"  <Triggers>
 $@"<?xml version=""1.0"" encoding=""UTF-16""?>
 <Task version=""1.2"" xmlns=""http://schemas.microsoft.com/windows/2004/02/mit/task"">
   <RegistrationInfo>
-    <Description>Titanis scheduled task</Description>
+    <Description></Description>
   </RegistrationInfo>
 {triggers}
   <Principals>
