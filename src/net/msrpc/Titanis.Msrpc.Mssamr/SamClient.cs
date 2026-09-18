@@ -1057,7 +1057,7 @@ namespace Titanis.Msrpc.Mssamr
 
 
 			NtstatusException.CheckAndThrow((Ntstatus)await this._proxy.SamrUnicodeChangePasswordUser2(
-				new RpcPointer<RPC_UNICODE_STRING>("".AsRpcString()),
+				new RpcPointer<RPC_UNICODE_STRING>(),
 				user.AsRpcString(),
 				new RpcPointer<SAMPR_ENCRYPTED_USER_PASSWORD>(newNtPass),
 				new RpcPointer<ENCRYPTED_LM_OWF_PASSWORD>(oldNtPass),

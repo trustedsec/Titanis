@@ -46,7 +46,7 @@ namespace Titanis.Cli
 		public UserPrincipalName? UserName { get => _userName; set => _userName = value; }
 
 		[Parameter]
-		[Alias("ud")]
+		[Alias("ud", "d")]
 		[Description("Domain of user to authenticate with")]
 		[Category(ParameterCategories.Authentication)]
 		public string? UserDomain { get; set; }
@@ -58,6 +58,7 @@ namespace Titanis.Cli
 		public string? Password { get; set; }
 
 		[Parameter]
+		[Alias("H", "hash")]
 		[Description("NTLM hash for NTLM authentication")]
 		[Category(ParameterCategories.Authentication)]
 		[Placeholder("hexadecimal hash")]
@@ -138,6 +139,7 @@ namespace Titanis.Cli
 		}
 
 		[Parameter]
+		[Alias("kdcHost")]
 		[Description("KDC endpoint")]
 		[Category(ParameterCategories.AuthenticationKerberos)]
 		[DefaultPort(KerberosClient.KdcTcpPort)]
