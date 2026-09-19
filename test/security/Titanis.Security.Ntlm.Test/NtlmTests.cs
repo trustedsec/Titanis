@@ -12,6 +12,24 @@ namespace Titanis.Security.Ntlm.Test
 	[TestClass]
 	public class NtlmTests
 	{
+		[TestMethod]
+		public void TestServerAcceptsNtlmv1Authentication()
+		{
+			NtlmAuthStore authStore = new NtlmAuthStore(new Dictionary<string, NtlmAuthRecord>
+			{
+				{ TestInputValues.UserName, new NtlmAuthRecord(Ntlm.LmowfV1(TestInputValues.Password), Ntlm.NtowfV1(TestInputValues.Password)) }
+			});
+			NtlmServerContext context = new NtlmServerContext(authStore)
+			{
+				ServerName = TestInputValues.ServerName,
+				DomainName = TestInputValues.Domain
+			};
+			context.SetAuthState(TestValues.ChallengeFlagsV1, TestInputValues.ServerChallenge, TestInputValues.Time);
+
+			context.Accept(TestValues.AuthMessage_V1);
+
+			Assert.IsTrue(context.HasSessionKey);
+		}
 
 		// [MS-NLMP] § 4.2.2.1.1 - LMOWFv1()
 		[TestMethod("[MS-NLMP] § 4.2.2.1.1 - LMOWFv1()")]
