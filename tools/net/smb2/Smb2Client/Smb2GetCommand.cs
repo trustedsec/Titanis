@@ -113,6 +113,8 @@ namespace Titanis.Smb2.Cli
 			if (destPath != null && (destPath.FileName.StartsWith(@"\\") || destPath.FileName.StartsWith(@"//")))
 				this.WriteWarning("The destination part appears to be a UNC path.  Note that the destination is resolved using the OS functions and not using configured parameters.");
 
+			bool sourceIsMultiple = false;
+
 			// Determine whether the source is a directory
 			var rootObjectPath = this.UncPath;
 			WildcardPattern? pattern = null;
@@ -124,6 +126,7 @@ namespace Titanis.Smb2.Cli
 				{
 					rootObjectPath = this.UncPath.GetDirectoryPath();
 					pattern = new WildcardPattern(fileNamePart);
+					sourceIsMultiple = true;
 				}
 			}
 
@@ -153,15 +156,23 @@ namespace Titanis.Smb2.Cli
 
 				if (rootObject.IsDirectory)
 				{
-					var dir = (Smb2Directory)rootObject;
+					sourceIsMultiple = true;
 
 					if (destPath is null)
 						throw new InvalidOperationException($"The source path is a directory, but no destination path was specified.");
+				}
+
+				if (sourceIsMultiple)
+				{
 					if (this.FileAccessService.FileExists(destPath))
 						throw new InvalidOperationException($"The source path is a directory but the destination path identifies a file.  The destination for a directory copy operation must be a directory.");
 
-					Directory.CreateDirectory(this.FileAccessService.ResolveFsPath(destPath));
+					this.FileAccessService.CreateDirectory(destPath);
+				}
 
+				if (rootObject.IsDirectory)
+				{
+					var dir = (Smb2Directory)rootObject;
 					await CopyDirectory(
 						client,
 						dir,
@@ -179,6 +190,8 @@ namespace Titanis.Smb2.Cli
 					if (this.TreeOnly.IsSpecified)
 						this.WriteVerbose("-TreeOnly ignored since the source is a file");
 
+					if ((destPath != null) && this.FileAccessService.DirectoryExists(destPath))
+						destPath = destPath.Combine(UncPath.GetFileName(file.ShareRelativePath));
 					await CopyFile(file, destPath, readOptions, cancellationToken);
 				}
 			}
@@ -296,7 +309,7 @@ namespace Titanis.Smb2.Cli
 
 				// Determine paths of item
 				UncPath itemPath = dirPath.Append(entry.FileName);
-				var destItemPath = new FileSpec(Path.Combine(this.FileAccessService.ResolveFsPath(destPath), entry.FileName),true);
+				var destItemPath = new FileSpec(Path.Combine(this.FileAccessService.ResolveFsPath(destPath), entry.FileName), true);
 
 				try
 				{

@@ -188,7 +188,7 @@ namespace Titanis.Smb2.Cli
 			if (isFailure)
 			{
 				var dirPath = node.TraversalRootPath.Append(node.Entry.RelativePath);
-				this._context.Log.WriteError($"Error traversing {dirPath}: {ex.Message}");
+				this._context.Log.WriteError($"Error traversing {dirPath}: {ex}");
 			}
 		}
 
