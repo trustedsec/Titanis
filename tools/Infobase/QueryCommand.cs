@@ -14,17 +14,17 @@ namespace Infobase;
 [OutputRecordType(typeof(Item))]
 public class QueryCommand : InfobaseCommand
 {
-	[Parameter(After = nameof(InfoBase))]
+	[Parameter(0)]
 	[Description("Object class to query for")]
 	public string? ObjectClass { get; set; }
 
 	[Parameter]
 	[Description("Command to query results for")]
-	public int? CommandId { get; set; }
+	public int? ActionId { get; set; }
 
 	protected override async Task<int> RunAsync(InfoBase infobase, CancellationToken cancellationToken)
 	{
-		var items = await infobase.GetItems(this.ObjectClass, this.CommandId ?? 0, cancellationToken);
+		var items = await infobase.GetItems(this.ObjectClass, this.ActionId ?? 0, cancellationToken);
 		this.WriteRecords(items);
 
 		return 0;

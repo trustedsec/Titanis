@@ -44,6 +44,8 @@ namespace Titanis.Info
 		{
 			this.propdata = propdata;
 			this.PropertyType = DataHelpers.GetTypeFromCode(propdata.ClrTypeCode);
+			if (0 != (propdata.Flags & ItemPropertyFlags.Multi))
+				this.PropertyType = this.PropertyType.MakeArrayType();
 		}
 
 		private readonly ItemProperty propdata;
@@ -63,9 +65,10 @@ namespace Titanis.Info
 		public override bool CanResetValue(object component) => false;
 
 		private Item AsItem(object component) => (Item)component;
-		public override object GetValue(object component)
+		public override object? GetValue(object component)
 		{
-			return this.AsItem(component).GetProp(this.Name);
+			Item item = this.AsItem(component);
+			return this.IsMultiValued ? item.GetMultiProp(this.Id) : item.GetProp(this.Name);
 		}
 
 		public override void ResetValue(object component)

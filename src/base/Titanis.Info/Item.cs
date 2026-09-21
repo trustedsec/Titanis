@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
 using Titanis.Info.Schema;
 
@@ -11,21 +12,29 @@ namespace Titanis.Info
 		private readonly InfoBase owner;
 		private readonly ItemInfo info;
 		private readonly ItemClassInfo itemClass;
+		private readonly Dictionary<int, object?[]> multiValues;
 
 		internal Item(
 			InfoBase owner,
-			ItemInfo info,
-			ItemClassInfo itemClass
+			ItemInfo info
 			)
 		{
+			Debug.Assert(info.ItemClass != null);
 			this.owner = owner;
 			this.info = info;
-			this.itemClass = itemClass;
+			this.itemClass = info.ItemClass;
+			this.multiValues = info.multiValues.GroupBy(r => r.PropertyId, r => DataHelpers.GetMultiValue(r)).ToDictionary(r => r.Key, r => r.ToArray());
 		}
 
 		internal object? GetProp(string propertyName)
 		{
 			this.info.ExtraFields.TryGetValue(propertyName, out var value);
+			return value;
+		}
+
+		internal Array? GetMultiProp(int propId)
+		{
+			this.multiValues.TryGetValue(propId, out var value);
 			return value;
 		}
 	}
@@ -55,9 +64,10 @@ namespace Titanis.Info
 
 	internal class ItemInfo : IWantExtraFields
 	{
-		internal IList<ItemMultiValue> multiValues;
+		internal IList<ItemMultiValue> multiValues = [];
 
 		public long ItemId { get; set; }
+		public int ItemClassId { get; set; }
 		public ItemClassInfo ItemClass { get; set; }
 		public int Version { get; set; }
 		public Dictionary<string, object?> ExtraFields { get; set; }

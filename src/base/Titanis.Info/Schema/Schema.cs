@@ -15,13 +15,14 @@ namespace Titanis.Info.Schema
 		public long Id { get; set; }
 		public string Name { get; set; }
 	}
-	class CommandLog
+	class ActionLog
 	{
 		[PrimaryKey]
 		public long Id { get; set; }
-		public string CommandName { get; set; }
-		public string Version { get; set; }
 		public int PartitionId { get; set; }
+		public ActionKind Kind { get; set; }
+		public string ActionName { get; set; }
+		public string Version { get; set; }
 		public string? LogComment { get; set; }
 		public string? RunningAsUser { get; set; }
 		public string? RunningOnComputer { get; set; }
@@ -31,11 +32,11 @@ namespace Titanis.Info.Schema
 		public int? ExitCode { get; set; }
 		public string? ErrorDetails { get; set; }
 	}
-	class CommandArg
+	class ActionArg
 	{
 		[PrimaryKey]
 		public long Id { get; set; }
-		public long CommandId { get; set; }
+		public long ActionId { get; set; }
 		public int Seq { get; set; }
 		public string Name { get; set; }
 		public string Value { get; set; }
@@ -44,7 +45,7 @@ namespace Titanis.Info.Schema
 	{
 		[PrimaryKey]
 		public long Id { get; set; }
-		public long CommandId { get; set; }
+		public long ActionId { get; set; }
 		public int Seq { get; set; }
 		public int MessageId { get; set; }
 		public DateTime LoggedAt { get; set; }
@@ -73,7 +74,7 @@ namespace Titanis.Info.Schema
 		[PrimaryKey]
 		public long Id { get; set; }
 		public int Version { get; set; }
-		public int SourceCommandId { get; set; }
+		public int SourceActionId { get; set; }
 		public int ItemClassId { get; set; }
 		public int PartitionId { get; set; }
 		public byte[] PropIdList { get; set; }
@@ -87,7 +88,7 @@ namespace Titanis.Info.Schema
 		public int Version { get; set; }
 		public DateTime InsertedAt { get; set; }
 		public byte[] PropIdList { get; set; }
-		public int SourceCommandId { get; set; }
+		public int SourceActionId { get; set; }
 		public int Seq { get; set; }
 		public ItemFlags ItemFlags { get; set; }
 	}

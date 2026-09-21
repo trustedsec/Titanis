@@ -94,13 +94,17 @@ namespace Titanis.Info
 			}
 			return (type == typeof(byte[])) ? SqliteType.Blob : SqliteType.Text;
 		}
-		internal static object ToDataValue(object? value) => ToDataValue(value, false);
-		private static object ToDataValue(object? value, bool nested)
+		internal static object ToDataValue(object? value, out DataTypeCode dtc) => ToDataValue(value, false, out dtc);
+		private static object ToDataValue(object? value, bool nested, out DataTypeCode dtc)
 		{
 			if (value is byte[] bytes)
+			{
+				dtc = DataTypeCode.Blob;
 				return bytes;
+			}
 
-			switch (Convert.GetTypeCode(value))
+			dtc = (DataTypeCode)Convert.GetTypeCode(value);
+			switch ((TypeCode)dtc)
 			{
 				case TypeCode.Boolean:
 					return ((bool)value ? 1 : 0);
@@ -116,7 +120,7 @@ namespace Titanis.Info
 				case TypeCode.UInt32:
 					return Convert.ToInt64(value);
 				case TypeCode.UInt64:
-					return Convert.ToUInt64(value);
+					return (long)Convert.ToUInt64(value);
 				case TypeCode.Char:
 					return value.ToString();
 				case TypeCode.DateTime:
@@ -129,11 +133,30 @@ namespace Titanis.Info
 				case TypeCode.Object:
 				default:
 					if (!nested && value is IInfoValue info)
-						return ToDataValue(info.GetValue(), true);
+						return ToDataValue(info.GetValue(), true, out dtc);
 					else
 						return (object?)(value?.ToString()) ?? DBNull.Value;
 			}
 		}
+
+		internal static object? GetMultiValue(Schema.ItemMultiValue mv) => mv.ClrTypeCode switch
+		{
+			TypeCode.Boolean => (mv.IntValue.HasValue) ? (mv.IntValue.Value != 0) : null,
+			TypeCode.Byte => (byte?)mv.IntValue,
+			TypeCode.Char => string.IsNullOrEmpty(mv.TextValue) ? null : mv.TextValue[0],
+			TypeCode.DateTime => throw new NotImplementedException(),
+			TypeCode.Double => (double?)mv.RealValue,
+			TypeCode.Int16 => (short?)mv.IntValue,
+			TypeCode.Int32 => (int?)mv.IntValue,
+			TypeCode.Int64 => (long?)mv.IntValue,
+			TypeCode.SByte => (sbyte?)mv.IntValue,
+			TypeCode.Single => (float?)mv.RealValue,
+			TypeCode.String => mv.TextValue,
+			TypeCode.UInt16 => (ushort?)mv.IntValue,
+			TypeCode.UInt32 => (uint?)mv.IntValue,
+			TypeCode.UInt64 => (ulong?)mv.IntValue,
+			(TypeCode)DataTypeCode.Blob => (byte[]?)mv.BlobValue,
+		};
 
 		private static byte GetNullableContext(Type type)
 		{

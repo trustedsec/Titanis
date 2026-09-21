@@ -7,13 +7,13 @@ namespace Titanis.Info
 {
 	public class CommandHistory
 	{
-		private readonly CommandLog _log;
-		private readonly IList<CommandArg> args;
+		private readonly ActionLog _log;
+		private readonly IList<ActionArg> args;
 		private readonly InfoBase owner;
 
 		internal CommandHistory(
-			CommandLog log,
-			IList<CommandArg> args,
+			ActionLog log,
+			IList<ActionArg> args,
 			InfoBase owner
 			)
 		{
@@ -22,7 +22,7 @@ namespace Titanis.Info
 			this.owner = owner;
 		}
 
-		public string CommandName => this._log.CommandName;
+		public string CommandName => this._log.ActionName;
 		public string CommandLine => this._log.CommandLine;
 		public DateTime StartTime => this._log.StartTime;
 		public DateTime? EndTime => this._log.EndTime;

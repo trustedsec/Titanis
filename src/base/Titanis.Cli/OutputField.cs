@@ -8,9 +8,9 @@ namespace Titanis.Cli
 {
 	public struct OutputRecordContext
 	{
-		public object Record { get; set; }	
-		public object? FieldValue { get; set; }	
-		public OutputStyle OutputStyle { get; set; }	
+		public object Record { get; set; }
+		public object? FieldValue { get; set; }
+		public OutputStyle OutputStyle { get; set; }
 	}
 	/// <summary>
 	/// Describes an output field in a table or list.
@@ -60,11 +60,19 @@ namespace Titanis.Cli
 					(this.formatter is not null) ? this.formatter.FormatValue(value, fmt, this, outputStyle)
 					: (value is IFormattable f) ? (fmt.Contains("{0") ? string.Format(fmt, f) : f.ToString(fmt, null))
 					: value?.ToString()
-				) : value?.ToString();
+				) : FormatPrimitive(value);
 			if (str != null)
 				return new FormattedText(str);
 			else
 				return null;
+		}
+
+		private static string? FormatPrimitive(object? value)
+		{
+			if (value is byte[] bytes)
+				return bytes.ToHexString();
+			else
+				return value?.ToString();
 		}
 
 		class EnumValueProperty : PropertyDescriptor

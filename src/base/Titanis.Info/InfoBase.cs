@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -26,8 +27,8 @@ namespace Titanis.Info
 		private static readonly Table<ItemProperty> _tblItemProp = new Table<ItemProperty>();
 		private static readonly Table<SecDesc> _tblSecDesc = new Table<SecDesc>();
 		private static readonly Table<Ace> _tblAce = new Table<Ace>();
-		internal static readonly Table<CommandLog> _tblCommandLog = new Table<CommandLog>();
-		internal static readonly Table<CommandArg> _tblCommandArg = new Table<CommandArg>();
+		internal static readonly Table<ActionLog> _tblCommandLog = new Table<ActionLog>();
+		internal static readonly Table<ActionArg> _tblCommandArg = new Table<ActionArg>();
 		internal static readonly Table<ItemMultiValue> _tblItemMulti = new Table<ItemMultiValue>();
 		private static readonly Table<LogRecord> tblLogRecord = new Table<LogRecord>();
 		private static readonly Table<LogRecordParam> tblLogRecordValue = new Table<LogRecordParam>();
@@ -39,75 +40,85 @@ namespace Titanis.Info
 		internal static readonly TableInserter<ItemMultiValue> _itemMultiValueInserter = _tblItemMulti.BuildInserter();
 		internal static readonly TableInserter<SecDesc> _secdescInserter = _tblSecDesc.BuildInserter();
 		internal static readonly TableInserter<Ace> _aceInserter = _tblAce.BuildInserter();
-		internal static readonly TableInserter<CommandArg> cmdargInserter = _tblCommandArg.BuildInserter();
+		internal static readonly TableInserter<ActionArg> cmdargInserter = _tblCommandArg.BuildInserter();
 
 		private HashSet<string> _allItemDataFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
 		private readonly SemaphoreSlim _classLock = new SemaphoreSlim(1);
-		private Dictionary<int, ItemClassInfo> _itemClassesById = new Dictionary<int, ItemClassInfo>();
-		private Dictionary<string, ItemClassInfo> _itemClassesByName = new Dictionary<string, ItemClassInfo>(StringComparer.OrdinalIgnoreCase);
-		private Task<int> TryGetClassId(string name, CancellationToken cancellationToken) => this.GetOrCreateClass(name, false, cancellationToken);
-		private Task<int> GetOrCreateClass(string name, CancellationToken cancellationToken) => this.GetOrCreateClass(name, true, cancellationToken);
-		private async Task<int> GetOrCreateClass(string name, bool create, CancellationToken cancellationToken)
+		private readonly Dictionary<int, ItemClassInfo> _itemClassesById = new Dictionary<int, ItemClassInfo>();
+		private readonly Dictionary<string, int> _itemClassMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+		private int TryGetClassId(string name)
 		{
-			if (this._itemClassesByName.TryGetValue(name, out var classInfo))
+			this._itemClassMap.TryGetValue(name, out var id);
+			return id;
+		}
+
+		private ValueTask<int> GetOrCreateClass(string name, CancellationToken cancellationToken) => this.GetOrCreateClass(name, true, cancellationToken);
+		private async ValueTask<ItemClassInfo?> TryGetClass(int classId, SqliteTransaction txact, CancellationToken cancellationToken)
+		{
+			if (this._itemClassesById.TryGetValue(classId, out var classInfo))
 			{
-				return classInfo.ClassId;
+				return classInfo;
 			}
 			else
 			{
 				await this._classLock.WaitAsync(cancellationToken);
 				try
 				{
-					if (this._itemClassesByName.TryGetValue(name, out classInfo))
+					if (!this._itemClassesById.TryGetValue(classId, out classInfo))
 					{
-						return classInfo.ClassId;
+						classInfo = await this.TryLoadClass(classId, txact, cancellationToken);
+						this._itemClassesById.Add(classInfo.ClassId, classInfo);
+					}
+					return classInfo;
+				}
+				finally
+				{
+					this._classLock.Release();
+				}
+			}
+			return null;
+		}
+		private async ValueTask<int> GetOrCreateClass(string name, bool create, CancellationToken cancellationToken)
+		{
+			if (this._itemClassMap.TryGetValue(name, out var classId))
+			{
+				return classId;
+			}
+			else
+			{
+				await this._classLock.WaitAsync(cancellationToken);
+				try
+				{
+					if (this._itemClassMap.TryGetValue(name, out classId))
+					{
+						return classId;
 					}
 					else
 					{
-						bool isNew = false;
-						classInfo = await this.WithTransaction(async (txact, arg, cx) =>
+						// The class does not exist
+						ItemClassInfo? classInfo = null;
+						if (create)
 						{
-							var recs = await _tblItemClass.Select(txact, r => r.Name == name, default(SelectQueryInfo), cx);
-							var itemClass = recs.FirstOrDefault();
-
-							ItemClassInfo? classInfo;
-							if (itemClass != null)
+							classInfo = await this.WithTransaction(async (txact, arg, cx) =>
 							{
-								// Load properties
-								var classId = itemClass.Id;
-								var props = await _tblItemProp.Select(txact, r => r.ClassId == classId, default(SelectQueryInfo), cx);
+								ItemClassInfo? classInfo = null;
+								var itemClass = new ItemClass
+								{
+									Name = name
+								};
+								itemClass.Id = (int)await _classInserter.Insert(itemClass, txact, cx);
+								return new ItemClassInfo(this, itemClass);
+							}, (object)null, cancellationToken);
+						}
 
-								classInfo = new ItemClassInfo(this, itemClass);
-								foreach (var prop in props)
-								{
-									classInfo.AddProperty(new ItemPropertyInfo(prop));
-								}
-							}
-							else
-							{
-								if (create)
-								{
-									itemClass = new ItemClass
-									{
-										Name = name
-									};
-									isNew = true;
-									itemClass.Id = (int)await _classInserter.Insert(itemClass, txact, cx);
-									classInfo = new ItemClassInfo(this, itemClass);
-								}
-								else
-									classInfo = null;
-							}
-							return classInfo;
-						}, (object)null, cancellationToken);
 						if (classInfo != null)
 						{
-							this._itemClassesByName.Add(name, classInfo);
-							var classId = classInfo.ClassId;
+							classId = classInfo.ClassId;
+							this._itemClassMap.Add(name, classId);
 							this._itemClassesById.Add(classId, classInfo);
-							if (isNew)
-								classId = ~classId;
+							// Class is new
+							classId = ~classId;
 							return classId;
 						}
 						else
@@ -121,6 +132,27 @@ namespace Titanis.Info
 					this._classLock.Release();
 				}
 			}
+		}
+
+		private static readonly Func<SqliteTransaction, int, CancellationToken, IAsyncEnumerable<ItemClass>>? classLookup = _tblItemClass.BuildSelector<int>((r, c) => r.Id == c, default(SelectQueryInfo));
+		private static readonly Func<SqliteTransaction, int, CancellationToken, IAsyncEnumerable<ItemProperty>>? propsLookup = _tblItemProp.BuildSelector<int>((r, c) => r.ClassId == c, default(SelectQueryInfo));
+		private async Task<ItemClassInfo?> TryLoadClass(int classId, SqliteTransaction txact, CancellationToken cx)
+		{
+			var itemClass = (await classLookup(txact, classId, cx).FirstOrDefaultAsync());
+
+			if (itemClass != null)
+			{
+				// Load properties
+				var props = await propsLookup(txact, classId, cx).ToListAsync();
+				var classInfo = new ItemClassInfo(this, itemClass);
+				foreach (var prop in props)
+				{
+					classInfo.AddProperty(new ItemPropertyInfo(prop));
+				}
+				return classInfo;
+			}
+			else
+				return null;
 		}
 
 		internal async Task WithTransaction<TArg>(Func<SqliteTransaction, TArg, CancellationToken, Task> func, TArg arg, CancellationToken cancellationToken)
@@ -173,7 +205,17 @@ namespace Titanis.Info
 			}, (object?)null, cancellationToken);
 
 			if (schemaInfo?.SchemaVersion == CurrentSchemaVersion)
+			{
+				var map = await ib.WithTransaction(async (txact, arg, cx) =>
+				{
+					return await _tblItemClass.Select(txact, null, r => new { r.Name, r.Id }, default, cx);
+				}, (object?)null, cancellationToken);
+				foreach (var entry in map)
+				{
+					ib._itemClassMap[entry.Name] = entry.Id;
+				}
 				return ib;
+			}
 			else
 				throw new InvalidDataException($"The file '{fileName}' is not a valid infobase.");
 		}
@@ -191,8 +233,8 @@ namespace Titanis.Info
 					Type[] tableTypes = [
 						typeof(Partition),
 						typeof(SchemaInfo),
-						typeof(CommandLog),
-						typeof(CommandArg),
+						typeof(ActionLog),
+						typeof(ActionArg),
 						typeof(LogRecord),
 						typeof(LogRecordParam),
 						typeof(ItemData),
@@ -211,9 +253,10 @@ namespace Titanis.Info
 
 					await txact.ExecuteCommandText(@$"
 CREATE INDEX IX_{nameof(Partition)}_{nameof(Partition.Name)} ON {nameof(Partition)}({nameof(Partition.Name)});
-CREATE INDEX IX_{nameof(CommandLog)}_{nameof(CommandLog.CommandName)} ON {nameof(CommandLog)}({nameof(CommandLog.PartitionId)}, {nameof(CommandLog.CommandName)});
-CREATE INDEX IX_{nameof(CommandArg)} ON {nameof(CommandArg)}({nameof(CommandArg.CommandId)}, {nameof(CommandArg.Seq)});
+CREATE INDEX IX_{nameof(ActionLog)}_{nameof(ActionLog.ActionName)} ON {nameof(ActionLog)}({nameof(ActionLog.PartitionId)}, {nameof(ActionLog.ActionName)});
+CREATE INDEX IX_{nameof(ActionArg)} ON {nameof(ActionArg)}({nameof(ActionArg.ActionId)}, {nameof(ActionArg.Seq)});
 CREATE INDEX IX_{nameof(ItemClass)}_name ON {nameof(ItemClass)}({nameof(ItemClass.Name)});
+CREATE INDEX IX_{nameof(ItemMultiValue)}_itemPropEnd ON {nameof(ItemMultiValue)}({nameof(ItemMultiValue.ItemId)}, {nameof(ItemMultiValue.PropertyId)}, {nameof(ItemMultiValue.EndVersion)});
 CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5Hash)});
 ", cx);
 
@@ -234,13 +277,17 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 		}
 
 		private const int CurrentSchemaVersion = 1;
+		private static readonly Func<SqliteTransaction, string, CancellationToken, IAsyncEnumerable<long>>? partitionLookup = _tblPartition.BuildSelector<long, string>(
+			(r, n) => r.Name == n,
+			r => r.Id,
+			default);
 
 		private static async Task<int> LookupPartition(SqliteTransaction txact, string name, CancellationToken cancellationToken)
 		{
 			if (string.IsNullOrEmpty(name))
 				return 0;
 
-			var value = (int)(await _tblPartition.Select(txact, r => r.Name == name, r => r.Id, default, cancellationToken)).FirstOrDefault();
+			var value = (int)(await partitionLookup(txact, name, cancellationToken).FirstOrDefaultAsync());
 			if (value == 0)
 			{
 				value = (int)await _tblPartition.Insert(() => new Partition
@@ -267,15 +314,16 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 			{
 				var partitionId = await LookupPartition(txact, partition, cancellationToken);
 				var startTime = DateTime.UtcNow;
-				var commandId = (int)await _tblCommandLog.Insert(() => new CommandLog
+				var commandId = (int)await _tblCommandLog.Insert(() => new ActionLog
 				{
-					CommandName = name,
+					PartitionId = partitionId,
+					ActionName = name,
+					Kind = ActionKind.CommandLine,
 					Version = version,
 					LogComment = comment,
 					RunningAsUser = Environment.UserName,
 					RunningOnComputer = Environment.MachineName,
 					CommandLine = Environment.CommandLine,
-					PartitionId = partitionId,
 					StartTime = startTime
 				}, txact, cx);
 
@@ -287,9 +335,9 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 						foreach (var item in list)
 						{
 							seq++;
-							await cmdargInserter.Insert(new CommandArg
+							await cmdargInserter.Insert(new ActionArg
 							{
-								CommandId = commandId,
+								ActionId = commandId,
 								Name = arg.Key,
 								Seq = seq,
 								Value = item?.ToString() ?? string.Empty
@@ -298,9 +346,9 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 					}
 					else
 					{
-						await cmdargInserter.Insert(new CommandArg
+						await cmdargInserter.Insert(new ActionArg
 						{
-							CommandId = commandId,
+							ActionId = commandId,
 							Name = arg.Key,
 							Seq = 0,
 							Value = arg.Value?.ToString() ?? string.Empty
@@ -337,7 +385,7 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 				var args = await this.WithTransaction(async (txact, arg, cx) =>
 				{
 					var cmdId = arg.Id;
-					var args = await _tblCommandArg.Select(txact, r => r.CommandId == cmdId, default(SelectQueryInfo), cx);
+					var args = await _tblCommandArg.Select(txact, r => r.ActionId == cmdId, default(SelectQueryInfo), cx);
 					return args;
 				}, rec, cancellationToken);
 
@@ -354,7 +402,7 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 			// Item
 			nameof(ItemData.Id),
 			nameof(ItemData.Version),
-			nameof(ItemData.SourceCommandId),
+			nameof(ItemData.SourceActionId),
 			nameof(ItemData.ItemClassId),
 			nameof(ItemData.PartitionId),
 			nameof(ItemData.PropIdList),
@@ -364,6 +412,8 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 			nameof(ItemHistory.ItemFlags),
 			];
 
+		private static readonly Func<SqliteTransaction, byte[], CancellationToken, IAsyncEnumerable<SecDesc>>? sdSelector = _tblSecDesc.BuildSelector<byte[]>((r, h) => r.Md5Hash == h, default(SelectQueryInfo));
+
 		private async Task<long> CacheSecDesc(SqliteTransaction txact, SecurityDescriptor sd, CancellationToken cancellationToken)
 		{
 			var sddl = sd.ToSddlString(SecurityDescriptorSections.All);
@@ -371,7 +421,7 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 
 			var md5 = MD5.Create();
 			var hash = md5.ComputeHash(bytes);
-			var sdrecs = (await _tblSecDesc.Select(txact, r => r.Md5Hash == hash, default(SelectQueryInfo), cancellationToken));
+			var sdrecs = (await sdSelector(txact, hash, cancellationToken).ToListAsync());
 			foreach (var sdrec in sdrecs)
 			{
 				if (sdrec.Sddl == sddl)
@@ -437,9 +487,9 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 				classId = ~classId;
 			SortedSet<int> propIds = new SortedSet<int>();
 
-			var classInfo = this._itemClassesById[classId];
 			await this.WithTransaction(async (txact, arg, cx) =>
 			{
+				var classInfo = await this.TryGetClass(classId, txact, cancellationToken);
 				var classProps = classInfo.GetProperties();
 				var classPropsByName = classInfo.GetPropsByName();
 				var createdFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -561,9 +611,11 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 			};
 		}
 
+
+
 		public async Task<IList<Item>> GetItems(
 			string className,
-			int commandId,
+			int actionId,
 			CancellationToken cancellationToken)
 		{
 			int classId;
@@ -573,55 +625,141 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 			}
 			else
 			{
-				classId = await this.TryGetClassId(className, cancellationToken);
+				classId = this.TryGetClassId(className);
 				if (classId == 0)
 					return [];
 			}
 
-			var classInfo = this._itemClassesById[classId];
 
 			var itemData = await this.WithTransaction(async (txact, arg, cx) =>
 			{
-				var props = classInfo.GetProperties().Where(r => !r.IsMultiValued).ToArray();
+				var prov = new InfoQueryProvider(this);
 
-				Expression<Func<ItemData, bool>>? predicate =
-					(classId > 0) ? (r => r.ItemClassId == classId)
+				var query = prov.AllItems;
+				if (classId > 0)
+					query = query.Where(r => r.ItemClassId == classId);
+				if (actionId > 0)
+					query = query.Where(r => r.SourceActionId == actionId);
+
+				var predicate =
+					(query != null) ? QueryWalker.ExtractPredicate(query)
 					: null;
 
-				var items = await _tblItem.Select(
-					txact,
-					predicate,
-					r => new ItemInfo
-					{
-						ItemId = r.Id,
-						Version = r.Version,
-						ItemFlags = r.ItemFlags
-					},
-					new SelectQueryInfo()
-					{
-						extraFields = props.Select(r => r.GetExtraFieldInfo()).ToArray(),
-						sortFields = [nameof(ItemData.Id)]
-					},
-					cx);
-
-				foreach (var item in items)
+				if (classId > 0)
 				{
-					var itemId = item.ItemId;
-					var version = item.Version;
-					if (0 != (item.ItemFlags & ItemFlags.HasMultiValues))
-					{
-						item.multiValues = await _tblItemMulti.Select(
-							txact,
-							r => r.ItemId == itemId && r.EndVersion > version,
-							default,
-							cx);
-					}
-				}
+					var classInfo = await this.TryGetClass(classId, txact, cx);
+					var props = classInfo.GetProperties().Where(r => !r.IsMultiValued).ToArray();
+					var extraFields = props.Select(r => r.GetExtraFieldInfo()).ToArray();
 
-				return items;
+					//Expression<Func<ItemData, bool>>? predicate =
+					//	(classId > 0) ? (r => r.ItemClassId == classId)
+					//	: null;
+
+					var items = await _tblItem.Select(
+						txact,
+						predicate,
+						r => new ItemInfo
+						{
+							ItemId = r.Id,
+							Version = r.Version,
+							ItemFlags = r.ItemFlags
+						},
+						new SelectQueryInfo()
+						{
+							extraFields = extraFields,
+							sortFields = [nameof(ItemData.Id)]
+						},
+						cx);
+
+					foreach (var item in items)
+					{
+						var itemId = item.ItemId;
+						var version = item.Version;
+						if (0 != (item.ItemFlags & ItemFlags.HasMultiValues))
+						{
+							item.multiValues = await _tblItemMulti.Select(
+								txact,
+								r => r.ItemId == itemId && r.EndVersion > version,
+								default,
+								cx);
+						}
+					}
+
+					return items;
+				}
+				else
+				{
+					var items = await _tblItem.Select(
+						txact,
+						predicate,
+						r => new ItemInfo
+						{
+							ItemId = r.Id,
+							ItemClassId = r.ItemClassId,
+							Version = r.Version,
+							ItemFlags = r.ItemFlags
+						},
+						new SelectQueryInfo()
+						{
+							sortFields = [nameof(ItemData.Id)]
+						},
+						cx);
+
+					ItemClassInfo? classInfo = null;
+					ExtraFieldInfo[] extraFields = [];
+					//ItemPropertyInfo[]? props = null;
+					for (int i = 0; i < items.Count; i++)
+					{
+						ItemInfo? item = items[i];
+						if (classInfo is null || classInfo.ClassId != item.ItemClassId)
+						{
+							classInfo = await this.TryGetClass(item.ItemClassId, txact, cancellationToken);
+							extraFields = (classInfo != null) ? classInfo.GetProperties().Where(r => !r.IsMultiValued).Select(r => r.GetExtraFieldInfo()).ToArray() : [];
+						}
+						item.ItemClass = classInfo;
+						Debug.Assert(classInfo != null);
+
+						if (extraFields.Length > 0)
+						{
+							item = (await _tblItem.Select(
+								txact,
+								r => r.Id == item.ItemId,
+								r => new ItemInfo
+								{
+									ItemId = r.Id,
+									ItemClass = classInfo,
+									Version = r.Version,
+									ItemFlags = r.ItemFlags
+								},
+								new SelectQueryInfo()
+								{
+									extraFields = extraFields,
+									sortFields = [nameof(ItemData.Id)]
+								},
+								cx))?.FirstOrDefault();
+							items[i] = item;
+						}
+					}
+
+					foreach (var item in items)
+					{
+						var itemId = item.ItemId;
+						var version = item.Version;
+						if (0 != (item.ItemFlags & ItemFlags.HasMultiValues))
+						{
+							item.multiValues = await _tblItemMulti.Select(
+								txact,
+								r => r.ItemId == itemId && r.EndVersion > version,
+								default,
+								cx);
+						}
+					}
+
+					return items;
+				}
 			}, (object?)null, cancellationToken);
 
-			var items = itemData.Select(r => new Item(this, r, classInfo)).ToArray();
+			var items = itemData.Select(r => new Item(this, r)).ToArray();
 
 			return items;
 		}
@@ -639,5 +777,6 @@ CREATE INDEX IX_{nameof(SecDesc)}_hash ON {nameof(SecDesc)}({nameof(SecDesc.Md5H
 	enum DataTypeCode
 	{
 		SecDesc = -1,
+		Blob = -2,
 	}
 }

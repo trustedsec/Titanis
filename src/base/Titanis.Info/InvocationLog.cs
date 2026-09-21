@@ -30,7 +30,7 @@ namespace Titanis.Info
 			int exitCode = GetErrorCode(ex);
 			var endTime = DateTime.UtcNow;
 			return this.Owner.WithTransaction((txact, arg, cx) =>
-				arg.Update(txact, r => r.Id == this.id, r => new CommandLog
+				arg.Update(txact, r => r.Id == this.id, r => new ActionLog
 				{
 					EndTime = endTime,
 					ErrorDetails = details,
@@ -42,7 +42,7 @@ namespace Titanis.Info
 		{
 			var endTime = DateTime.UtcNow;
 			return this.Owner.WithTransaction((txact, arg, cx) =>
-				arg.Update(txact, r => r.Id == this.id, r => new CommandLog
+				arg.Update(txact, r => r.Id == this.id, r => new ActionLog
 				{
 					EndTime = endTime,
 					ExitCode = retval
@@ -113,7 +113,7 @@ namespace Titanis.Info
 					{
 						Version = 1,
 						PartitionId = this.partitionId,
-						SourceCommandId = this.id,
+						SourceActionId = this.id,
 						ItemClassId = itemSchema.classId,
 						PropIdList = propIdList,
 						ItemFlags = itemFlags,
@@ -136,13 +136,19 @@ namespace Titanis.Info
 					ItemId = itemId,
 					Version = version,
 					InsertedAt = insertedAt,
-					SourceCommandId = this.id,
+					SourceActionId = this.id,
 					PropIdList = propIdList,
 					Seq = seq,
 					ItemFlags = itemFlags
 				}, txact, cx, extFields);
 				foreach (var multiValue in multiValues)
 				{
+					await InfoBase._tblItemMulti.Update(txact, r => r.ItemId == itemId && r.PropertyId == multiValue.Key && r.EndVersion == int.MaxValue,
+						r => new ItemMultiValue
+						{
+							EndVersion = version
+						}, null, cx);
+
 					int seq = 0;
 					foreach (var value_ in multiValue.Value)
 					{
@@ -151,20 +157,17 @@ namespace Titanis.Info
 						if (value is IInfoValue info)
 							value = info.GetValue();
 						var tc = Convert.GetTypeCode(value);
-						value = DataHelpers.ToDataValue(value);
-
-						await InfoBase._tblItemMulti.Update(txact, r => r.ItemId == itemId && r.PropertyId == multiValue.Key && r.EndVersion == int.MaxValue,
-							r => new ItemMultiValue
-							{
-								EndVersion = version
-							}, null, cx);
+						value = DataHelpers.ToDataValue(value, out var dtc);
 
 						if (value != null)
 						{
-							var strValue = value.ToString();
+							// Always store as string
+							var strValue = value?.ToString();
 							var blobValue = value as byte[];
 							long? intValue = value as long?;
 							double? realValue = value as double?;
+							if ((TypeCode)dtc == TypeCode.Object)
+								dtc = (DataTypeCode)TypeCode.String;
 							await InfoBase._itemMultiValueInserter.Insert(new ItemMultiValue
 							{
 								ItemId = itemId,
@@ -172,7 +175,7 @@ namespace Titanis.Info
 								EndVersion = int.MaxValue,
 								PropertyId = multiValue.Key,
 								Seq = seq,
-								ClrTypeCode = tc,
+								ClrTypeCode = (TypeCode)dtc,
 
 								TextValue = strValue,
 								BlobValue = blobValue,
@@ -296,7 +299,7 @@ namespace Titanis.Info
 			{
 				var recId = (int)await InfoBase._logInserter.Insert(new LogRecord
 				{
-					CommandId = this.id,
+					ActionId = this.id,
 					Seq = Interlocked.Increment(ref this._logSeq),
 					MessageId = message.MessageId,
 					LoggedAt = message.LogDate,

@@ -78,21 +78,37 @@ namespace Titanis.Info
 			return results;
 		}
 
-		private static DateTime? ParseNullableDate(string? dateText)
-		{
-			if (string.IsNullOrEmpty(dateText))
-				return null;
-			else
-				return DateTime.Parse(dateText);
-		}
-
 		private static readonly ConstantExpression dbnullConstExpr = Expression.Constant(DBNull.Value);
-		private static readonly ConstantExpression nullConstExpr = Expression.Constant(null);
 
 		public Func<SqliteTransaction, CancellationToken, IAsyncEnumerable<TResult>> BuildSelector<TResult>(
 			Expression<Func<TRow, bool>>? predicate,
 			Expression<Func<TRow, TResult>> projection,
 			SelectQueryInfo queryInfo
+			)
+		{
+			var func = (Func<SqliteTransaction, CancellationToken, IAsyncEnumerable<TResult>>)this.BuildSelector2(predicate, projection, queryInfo, typeof(Func<SqliteTransaction, CancellationToken, IAsyncEnumerable<TResult>>));
+			return func;
+		}
+		public Func<SqliteTransaction, T, CancellationToken, IAsyncEnumerable<TRow>> BuildSelector<T>(
+			Expression<Func<TRow, T, bool>>? predicate,
+			SelectQueryInfo queryInfo
+			)
+		{
+			return (Func<SqliteTransaction, T, CancellationToken, IAsyncEnumerable<TRow>>)this.BuildSelector2<TRow>(predicate, BuildDefaultLambda(true), queryInfo, typeof(Func<SqliteTransaction, T, CancellationToken, IAsyncEnumerable<TRow>>));
+		}
+		public Func<SqliteTransaction, T, CancellationToken, IAsyncEnumerable<TResult>> BuildSelector<TResult, T>(
+			Expression<Func<TRow, T, bool>>? predicate,
+			Expression<Func<TRow, TResult>> projection,
+			SelectQueryInfo queryInfo
+			)
+		{
+			return (Func<SqliteTransaction, T, CancellationToken, IAsyncEnumerable<TResult>>)this.BuildSelector2<TResult>(predicate, projection, queryInfo, typeof(Func<SqliteTransaction, T, CancellationToken, IAsyncEnumerable<TResult>>));
+		}
+		public Delegate BuildSelector2<TResult>(
+			LambdaExpression? predicate,
+			Expression<Func<TRow, TResult>> projection,
+			SelectQueryInfo queryInfo,
+			Type delegateType
 			)
 		{
 			if (projection is null) throw new ArgumentNullException(nameof(projection));
@@ -101,9 +117,14 @@ namespace Titanis.Info
 			sb.Append("SELECT ");
 
 			var cmd = new SqliteCommand();
-			var b = new SqlSelectBuilder(sb, cmd);
-			b.DefineTableParameter(projection.Parameters[0], "t");
-			b.Visit(projection);
+			int selectedFieldCount;
+			Expression? projectionBody;
+			{
+				var b = new SqlSelectBuilder(sb);
+				b.DefineTable(projection.Parameters[0], "t");
+				projectionBody = b.Visit(projection.Body);
+				selectedFieldCount = b.selectedCount;
+			}
 
 			if (queryInfo.extraFields != null)
 			{
@@ -122,17 +143,27 @@ namespace Titanis.Info
 			}
 
 			sb.Append($" FROM [{this.Name}] t");
+			SqliteParameter[] predicateParams = [];
 			if (predicate != null || queryInfo.keys != null)
 			{
 				sb.Append(" WHERE (");
+				var pb = new SqlPredicateBuilder(sb, cmd);
 				if (predicate != null)
 				{
-					b.DefineTableParameter(predicate.Parameters[0], "t");
-					b.Visit(predicate);
+					predicateParams = new SqliteParameter[predicate.Parameters.Count];
+					pb.DefineTableParameter(predicate.Parameters[0], "t");
+					for (int i = 1; i < predicate.Parameters.Count; i++)
+					{
+						ParameterExpression? param = predicate.Parameters[i];
+						var cmdParam = cmd.Parameters.Add($"@p_{i}", DataHelpers.SqliteTypeFromType(param.Type));
+						predicateParams[i] = cmdParam;
+						pb.DefineParameter(param, cmdParam);
+					}
+					pb.Visit(predicate);
 				}
 
 				if (queryInfo.keys != null)
-					AppendKeysPredicate(queryInfo.keys, sb, b, (predicate != null));
+					AppendKeysPredicate(queryInfo.keys, sb, pb, (predicate != null));
 
 				sb.Append(")");
 			}
@@ -153,85 +184,65 @@ namespace Titanis.Info
 			string commandText = sb.ToString();
 			cmd.CommandText = commandText;
 
-			var selectedFields = b.selectedFields;
-			var selectedMembers = b.selectedMembers;
-			List<MemberBinding> bindings = new List<MemberBinding>(selectedFields.Count - b.ctorArgCount);
-			var parmArray = Expression.Parameter(typeof(object[]));
-			List<Expression> ctorArgs = new List<Expression>();
-			for (int i = 0; i < selectedFields.Count; i++)
+			var factory = Expression.Lambda<Func<object[], TResult>>(projectionBody, SqlSelectBuilder.ValueVectorParam).Compile();
+
+			var lambda = Expression.Lambda(
+				Expression.Parameter(typeof(SqliteTransaction), "txact"),
+				Expression.Parameter(typeof(CancellationToken), "cx")
+				);
+
+			var selectorInfo = new SelectorInfo<TResult>
 			{
-				var fieldValue = selectedFields[i];
-				var fieldMember = selectedMembers[i];
-				Expression columnValue = Expression.ArrayIndex(parmArray, Expression.Constant(i));
-
-				Type fieldClrType = fieldValue.Type;
-				bool isNullable = false;
-				var baseFieldType = Nullable.GetUnderlyingType(fieldClrType);
-				isNullable = baseFieldType != null;
-				baseFieldType ??= fieldClrType;
-				if (baseFieldType == typeof(DateTime))
+				cmd_ = cmd,
+				predicateParams = predicateParams,
+				factory = factory,
+				staticFieldCount = selectedFieldCount,
+				extraFields = queryInfo.extraFields
+			};
+			if (predicate != null && predicate.Parameters.Count > 1)
+			{
+				List<ParameterExpression> lambdaParams = new List<ParameterExpression>(2 - 1 + predicate.Parameters.Count)
 				{
-					columnValue = Expression.Convert(columnValue, typeof(string));
-					var parseMethod = isNullable ?
-						((Func<string, DateTime?>)ParseNullableDate).Method
-						: ((Func<string, DateTime>)DateTime.Parse).Method;
-					columnValue = Expression.Call(parseMethod, columnValue);
-					//columnValue = Expression.Call(Expression.Constant(null, typeof(DateTime)), parseMethod, columnValue);
-				}
-				else
+					txactParam
+				};
+
+				List<Expression> predicateArgs = new List<Expression>(predicate.Parameters.Count - 1);
+				for (int i = 1; i < predicate.Parameters.Count; i++)
 				{
-					var dbType = DataHelpers.SqliteTypeFromType(baseFieldType);
-					Type colClrType = dbType switch
-					{
-						SqliteType.Integer => typeof(long),
-						SqliteType.Real => typeof(double),
-						SqliteType.Text => typeof(string),
-						SqliteType.Blob => typeof(byte[]),
-					};
+					ParameterExpression? param = predicate.Parameters[i];
+					lambdaParams.Add(param);
 
-					if (isNullable)
-					{
-						if (colClrType.IsValueType)
-							colClrType = typeof(Nullable<>).MakeGenericType([colClrType]);
-						columnValue = Expression.Convert(columnValue, colClrType);
-					}
-					else if (fieldClrType.IsClass)
-					{
-						columnValue = Expression.Convert(columnValue, colClrType);
-					}
-					else
-					{
-						Expression<Func<SqlNullValueException>> exceptFactory = () => new SqlNullValueException($"Field '{fieldMember.Name}' contained a null value");
-						columnValue = Expression.Condition(Expression.NotEqual(columnValue, nullConstExpr), Expression.Convert(columnValue, colClrType), Expression.Throw(exceptFactory.Body, colClrType));
-					}
-
-					if (colClrType != fieldClrType)
-						columnValue = Expression.Convert(columnValue, fieldClrType);
+					predicateArgs.Add(Expression.Convert(param, typeof(object)));
 				}
 
-				if (i < b.ctorArgCount)
-					ctorArgs.Add(columnValue);
-				else
-					bindings.Add(Expression.Bind(fieldMember, columnValue));
-			}
+				lambdaParams.Add(cxParam);
 
+				var performSelect = ((Func<SqliteTransaction, SelectorInfo<TResult>, object[], CancellationToken, IAsyncEnumerable<TResult>>)this.PerformSelect).Method;
 
-			Func<object[], TResult> factory;
-			if (b.ctor is not null)
-			{
-				var factoryLambda = Expression.Lambda<Func<object[], TResult>>(Expression.MemberInit(Expression.New(b.ctor, ctorArgs), bindings), parmArray);
+				var result = Expression.Lambda(
+					delegateType,
+					Expression.Call(Expression.Constant(this), performSelect, [
+						txactParam,
+						Expression.Constant(selectorInfo),
+						Expression.NewArrayInit(typeof(object), predicateArgs),
+						cxParam
+					]),
+					lambdaParams
+					);
 
-				factory = factoryLambda.Compile();
+				return result.Compile();
 			}
 			else
 			{
-				factory = arr => (TResult)arr[0];
+				Func<SqliteTransaction, CancellationToken, IAsyncEnumerable<TResult>> func = (txact, cx) => this.PerformSelect(txact, selectorInfo, null, cx);
+				return func;
 			}
-
-			return (txact, cx) => this.PerformSelect<TResult>(cmd, txact, factory, selectedFields.Count, queryInfo.extraFields, cx);
 		}
 
-		private static bool AppendKeysPredicate(Dictionary<string, object> keys, StringBuilder sb, SqlSelectBuilder b, bool subseq)
+		private static readonly ParameterExpression txactParam = Expression.Parameter(typeof(SqliteTransaction));
+		private static readonly ParameterExpression cxParam = Expression.Parameter(typeof(CancellationToken));
+
+		private static bool AppendKeysPredicate(Dictionary<string, object> keys, StringBuilder sb, SqlPredicateBuilder b, bool subseq)
 		{
 			foreach (var key in keys)
 			{
@@ -246,24 +257,47 @@ namespace Titanis.Info
 			return subseq;
 		}
 
+
+		class SelectorInfo<TResult>
+		{
+			internal SqliteCommand cmd_;
+			internal SqliteParameter[] predicateParams;
+			internal Func<object?[], TResult> factory;
+			internal int staticFieldCount;
+			internal ExtraFieldInfo[]? extraFields;
+		}
+
 		private async IAsyncEnumerable<TResult> PerformSelect<TResult>(
-			SqliteCommand cmd_,
-			SqliteTransaction txact, Func<object?[], TResult> factory,
-			int staticFieldCount,
-			ExtraFieldInfo[]? extraFields,
+			SqliteTransaction txact,
+			SelectorInfo<TResult> info,
+			object[]? predicateArgs,
 			CancellationToken cancellationToken
 			)
 		{
-			var cmd = new SqliteCommand(cmd_.CommandText, txact.Connection, txact);
-			foreach (SqliteParameter param in cmd_.Parameters)
+			var cmd = new SqliteCommand(info.cmd_.CommandText, txact.Connection, txact);
 			{
-				var newParam = cmd.Parameters.Add(param.ParameterName, param.SqliteType);
-				newParam.Value = param.Value;
+				int i = 0;
+				System.Collections.IList paramList = info.cmd_.Parameters;
+				if (predicateArgs != null)
+				{
+					for (i = 0; i < predicateArgs.Length; i++)
+					{
+						SqliteParameter param = (SqliteParameter)paramList[i];
+						var newParam = cmd.Parameters.Add(param.ParameterName, param.SqliteType);
+						newParam.Value = DataHelpers.ToDataValue(predicateArgs[i], out _);
+					}
+				}
+				for (; i < paramList.Count; i++)
+				{
+					SqliteParameter param = (SqliteParameter)paramList[i];
+					var newParam = cmd.Parameters.Add(param.ParameterName, param.SqliteType);
+					newParam.Value = param.Value;
+				}
 			}
 
 			var reader = await cmd.ExecuteReaderAsync(cancellationToken);
 			object?[] values = new object[reader.FieldCount];
-			var extraCount = reader.FieldCount - staticFieldCount;
+			var extraCount = reader.FieldCount - info.staticFieldCount;
 			while (await reader.ReadAsync(cancellationToken))
 			{
 				reader.GetValues(values);
@@ -274,15 +308,15 @@ namespace Titanis.Info
 						values[i] = null;
 				}
 
-				var row = factory(values);
-				if (extraFields != null && (row is IWantExtraFields extra))
+				var row = info.factory(values);
+				if (info.extraFields != null && (row is IWantExtraFields extra))
 				{
 					Dictionary<string, object?> extraValues = new Dictionary<string, object?>(extraCount);
 					for (int i = 0; i < extraCount; i++)
 					{
-						ref var extraField = ref extraFields[i];
+						ref var extraField = ref info.extraFields[i];
 						var name = extraField.Name;
-						var value = values[i + staticFieldCount];
+						var value = values[i + info.staticFieldCount];
 						if (value is null or DBNull)
 						{
 							value = null;
@@ -429,7 +463,7 @@ namespace Titanis.Info
 				{
 					var paramName = $"@ext{++extIndex}";
 					sb.Append($",{paramName}");
-					cmd.Parameters.AddWithValue(paramName, DataHelpers.ToDataValue(item.Value));
+					cmd.Parameters.AddWithValue(paramName, DataHelpers.ToDataValue(item.Value, out _));
 				}
 			}
 			sb.Append(");SELECT last_insert_rowid()");
@@ -498,8 +532,39 @@ namespace Titanis.Info
 			this._sb = sb;
 			this.cmd = cmd;
 		}
-		protected readonly StringBuilder _sb;
+		private readonly StringBuilder _sb;
 		private readonly SqliteCommand cmd;
+
+		#region Field stuff
+		protected bool IsFieldDirty { get; private set; }
+		protected bool FieldSepPending { get; set; }
+
+		protected void AppendText(char c)
+		{
+			OnWritingField();
+			this._sb.Append(c);
+		}
+
+		protected void AppendText(string text)
+		{
+			OnWritingField();
+			this._sb.Append(text);
+		}
+
+		private void OnWritingField()
+		{
+			if (this.FieldSepPending)
+			{
+				this._sb.Append(',');
+				this.FieldSepPending = false;
+			}
+		}
+
+		protected void ResetField()
+		{
+			this.IsFieldDirty = false;
+		}
+		#endregion
 
 		private static object _validValue = new object();
 		protected static ConstantExpression Valid = Expression.Constant(_validValue);
@@ -512,7 +577,7 @@ namespace Titanis.Info
 		}
 		protected string AllocValueParam(ref object? value)
 		{
-			value = DataHelpers.ToDataValue(value);
+			value = DataHelpers.ToDataValue(value, out _);
 			string name = $"@c_{this.cmd.Parameters.Count}";
 			this.cmd.Parameters.AddWithValue(name, value);
 			return name;
@@ -523,7 +588,7 @@ namespace Titanis.Info
 		protected string EmitFieldRef(MemberInfo member) => this.EmitFieldRef(member.Name);
 		protected string EmitFieldRef(string fieldName)
 		{
-			this._sb.Append($"[{fieldName}]");
+			this.AppendText($"[{fieldName}]");
 			return fieldName;
 		}
 		#endregion
@@ -542,7 +607,7 @@ namespace Titanis.Info
 		protected override MemberBinding VisitMemberBinding(MemberBinding node)
 		{
 			this._supported = false;
-			base.VisitMemberBinding(node);
+			node = base.VisitMemberBinding(node);
 			if (!this._supported)
 				throw new NotSupportedException($"Not supported: {node.BindingType}");
 
@@ -615,11 +680,11 @@ namespace Titanis.Info
 				ExpressionType.OrElse => " OR ",
 			};
 
-			this._sb.Append('(');
+			this.AppendText('(');
 			this.Visit(node.Left);
-			this._sb.Append(op);
+			this.AppendText(op);
 			this.Visit(node.Right);
-			this._sb.Append(')');
+			this.AppendText(')');
 
 			return Supported(node);
 		}
@@ -627,7 +692,7 @@ namespace Titanis.Info
 
 		internal void AddCondition(string key, object? value)
 		{
-			this._sb.Append($"[{key}]=");
+			this.AppendText($"[{key}]=");
 			this.VisitConstant(value, value?.GetType());
 		}
 
@@ -659,8 +724,7 @@ namespace Titanis.Info
 		{
 			if (TryResolveConstInstance(node, out var constInst))
 			{
-				this.VisitConstant(constInst, node.Type);
-				return Supported(node);
+				return Supported(this.VisitConstant(constInst, node.Type) ?? node);
 			}
 			else if (node.Expression is ParameterExpression param && this._tableParams.TryGetValue(param, out var table))
 			{
@@ -669,17 +733,23 @@ namespace Titanis.Info
 				var type = node.Type;
 				bool isDate = (type == typeof(DateTime) || type == typeof(DateTime?));
 				if (isDate)
-					this._sb.Append("datetime(");
+					this.AppendText("datetime(");
 
-				this._sb.Append(table).Append('.');
+				this.AppendText(table);
+				this.AppendText('.');
 				this.EmitFieldRef(node.Member);
 
 				if (isDate)
-					this._sb.Append(')');
+					this.AppendText(')');
 
-				return Supported(node);
+				return Supported(this.VisitFieldReference(node));
 			}
 
+			return node;
+		}
+
+		protected virtual Expression VisitFieldReference(MemberExpression node)
+		{
 			return node;
 		}
 
@@ -689,18 +759,19 @@ namespace Titanis.Info
 			return Supported(node);
 		}
 
-		internal void VisitConstant(object? value, Type type)
+		internal virtual Expression? VisitConstant(object? value, Type type)
 		{
 			var paramName = this.AllocValueParam(ref value);
 			switch (Convert.GetTypeCode(value))
 			{
 				case TypeCode.DateTime:
-					this._sb.Append($"julianday({paramName})");
+					this.AppendText($"julianday({paramName})");
 					break;
 				default:
-					this._sb.Append(paramName);
+					this.AppendText(paramName);
 					break;
 			}
+			return null;
 		}
 	}
 
@@ -708,6 +779,20 @@ namespace Titanis.Info
 	{
 		internal SqlPredicateBuilder(StringBuilder sb, SqliteCommand cmd) : base(sb, cmd)
 		{
+		}
+
+		private Dictionary<ParameterExpression, SqliteParameter>? _params;
+
+		public void DefineParameter(ParameterExpression param, SqliteParameter cmdParam) => (this._params ??= new()).Add(param, cmdParam);
+		protected override Expression VisitParameter(ParameterExpression node)
+		{
+			if (this._params?.TryGetValue(node, out var cmdParam) ?? false)
+			{
+				this.AppendText(cmdParam.ParameterName);
+				return Supported(node);
+			}
+
+			return base.VisitParameter(node);
 		}
 	}
 
@@ -719,32 +804,36 @@ namespace Titanis.Info
 
 		protected override Expression VisitMemberInit(MemberInitExpression node)
 		{
-			if ((this.Parent?.NodeType ?? (ExpressionType)(-1)) != ExpressionType.Lambda)
+			if ((this.Parent?.NodeType ?? ExpressionType.Lambda) != ExpressionType.Lambda)
 				throw new ArgumentException($"A member-init expression may only appear directly under the root lamba expression: {node}", nameof(node));
 
 			return this.Supported(base.VisitMemberInit(node));
 		}
 
-		protected abstract void OnSetField(MemberInfo? member, Expression value, bool isConstructorArgument);
+		protected abstract Expression OnSetField(MemberInfo? member, Expression value, bool isConstructorArgument);
 		protected override MemberAssignment VisitMemberAssignment(MemberAssignment node)
 		{
-			this.OnSetField(node.Member, node.Expression, false);
+			var newValue = this.OnSetField(node.Member, node.Expression, false);
+			node = Expression.Bind(node.Member, newValue);
 			return this.Supported(node);
 		}
 
 		protected override Expression VisitNew(NewExpression node)
 		{
-			if ((this.Parent?.NodeType ?? (ExpressionType)(-1)) is not (ExpressionType.Lambda or ExpressionType.MemberInit))
+			if ((this.Parent?.NodeType ?? ExpressionType.Lambda) is not (ExpressionType.Lambda or ExpressionType.MemberInit))
 				throw new ArgumentException($"A new expression may only appear directly under the root lamba expression or a member-init: {node}", nameof(node));
 
 			if (node.Arguments.Count > 0)
 			{
+				Expression[] args = new Expression[node.Arguments.Count];
 				for (int i = 0; i < node.Arguments.Count; i++)
 				{
 					Expression? arg = node.Arguments[i];
 					var member = (i < node.Members.Count) ? node.Members[i] : null;
-					this.OnSetField(member, arg, true);
+					arg = this.OnSetField(member, arg, true);
+					args[i] = arg;
 				}
+				node = Expression.New(node.Constructor, args, node.Members);
 			}
 
 			return this.Supported(node);
@@ -758,23 +847,23 @@ namespace Titanis.Info
 		}
 
 		internal HashSet<string> _assigned = new HashSet<string>();
-		protected override void OnSetField(MemberInfo? member, Expression value, bool isConstructorArgument)
+		protected override Expression OnSetField(MemberInfo? member, Expression value, bool isConstructorArgument)
 		{
 			if (this._assigned.Count > 0)
-				this._sb.Append(',');
+				this.AppendText(',');
 
 			this._assigned.Add(this.EmitFieldRef(member));
-			this._sb.Append('=');
-			this.Visit(value);
+			this.AppendText('=');
+			return this.Visit(value);
 		}
 
 		public void SetField(string fieldName, object? value)
 		{
 			if (this._assigned.Count > 0)
-				this._sb.Append(',');
+				this.AppendText(',');
 
 			this._assigned.Add(this.EmitFieldRef(fieldName));
-			this._sb.Append('=');
+			this.AppendText('=');
 			this.Visit(Expression.Constant(value));
 		}
 	}
@@ -786,13 +875,15 @@ namespace Titanis.Info
 		}
 
 		internal List<Expression> _insertedValues = new List<Expression>();
-		protected override void OnSetField(MemberInfo? member, Expression value, bool isConstructorArgument)
+		protected override Expression OnSetField(MemberInfo? member, Expression value, bool isConstructorArgument)
 		{
 			if (this._insertedValues.Count > 0)
-				this._sb.Append(',');
+				this.AppendText(',');
 
 			this.EmitFieldRef(member);
 			this._insertedValues.Add(value);
+
+			return value;
 		}
 
 		internal void EmitInsertedValues()
@@ -800,7 +891,7 @@ namespace Titanis.Info
 			for (int i = 0; i < _insertedValues.Count; i++)
 			{
 				if (i > 0)
-					this._sb.Append(',');
+					this.AppendText(',');
 
 				var member = this._insertedValues[i];
 				this.Visit(member);
@@ -814,34 +905,99 @@ namespace Titanis.Info
 
 	}
 
-	class SqlSelectBuilder : SqlUpdateBuilderBase
+	class SqlSelectBuilder : ExpressionVisitor
 	{
-		public SqlSelectBuilder(StringBuilder sb, SqliteCommand cmd) : base(sb, cmd)
+		public SqlSelectBuilder(StringBuilder sb)
 		{
+			this.sb = sb;
 		}
 
-		private FieldCollector? _collector;
+		private readonly Dictionary<ParameterExpression, string> _tableParams = new Dictionary<ParameterExpression, string>();
+		public void DefineTable(ParameterExpression param, string name) => this._tableParams.Add(param, name);
 
-		internal readonly List<Expression> selectedFields = new List<Expression>();
-		internal readonly List<MemberInfo?> selectedMembers = new List<MemberInfo?>();
-		internal int ctorArgCount;
-		internal ConstructorInfo? ctor;
+		internal static readonly ParameterExpression ValueVectorParam = Expression.Parameter(typeof(object[]));
+		private static readonly ConstantExpression nullConstExpr = Expression.Constant(null);
+		private readonly StringBuilder sb;
+		internal int selectedCount;
 
-		protected override void OnSetField(MemberInfo? member, Expression value, bool isConstructorArgument)
+		private static DateTime? ParseNullableDate(string? dateText)
 		{
-			if (this.selectedFields.Count > 0)
-				this._sb.Append(',');
-
-			if (isConstructorArgument)
-				this.ctorArgCount++;
-
-			this.selectedFields.Add(value);
-			this.selectedMembers.Add(member);
-			this.Visit(value);
+			if (string.IsNullOrEmpty(dateText))
+				return null;
+			else
+				return DateTime.Parse(dateText);
 		}
+
+		protected override Expression VisitMember(MemberExpression node)
+		{
+			if (node.Expression is ParameterExpression param && this._tableParams.TryGetValue(param, out var table))
+			{
+				if (this.selectedCount > 0)
+					this.sb.Append(',');
+				this.sb.Append($"{table}.[{node.Member.Name}]");
+				var value = VisitColumn(node.Member, node.Type);
+				this.selectedCount++;
+				return value;
+			}
+			else
+				return base.VisitMember(node);
+		}
+
+		private Expression VisitColumn(MemberInfo? member, Type fieldClrType)
+		{
+			int selectIndex = this.selectedCount;
+
+			Expression columnValue = Expression.ArrayIndex(ValueVectorParam, Expression.Constant(selectIndex));
+
+			bool isNullable = false;
+			var baseFieldType = Nullable.GetUnderlyingType(fieldClrType);
+			isNullable = baseFieldType != null;
+			baseFieldType ??= fieldClrType;
+			if (baseFieldType == typeof(DateTime))
+			{
+				columnValue = Expression.Convert(columnValue, typeof(string));
+				var parseMethod = isNullable ?
+					((Func<string, DateTime?>)ParseNullableDate).Method
+					: ((Func<string, DateTime>)DateTime.Parse).Method;
+				columnValue = Expression.Call(parseMethod, columnValue);
+				//columnValue = Expression.Call(Expression.Constant(null, typeof(DateTime)), parseMethod, columnValue);
+			}
+			else
+			{
+				var dbType = DataHelpers.SqliteTypeFromType(baseFieldType);
+				Type colClrType = dbType switch
+				{
+					SqliteType.Integer => typeof(long),
+					SqliteType.Real => typeof(double),
+					SqliteType.Text => typeof(string),
+					SqliteType.Blob => typeof(byte[]),
+				};
+
+				if (isNullable)
+				{
+					if (colClrType.IsValueType)
+						colClrType = typeof(Nullable<>).MakeGenericType([colClrType]);
+					columnValue = Expression.Convert(columnValue, colClrType);
+				}
+				else if (fieldClrType.IsClass)
+				{
+					columnValue = Expression.Convert(columnValue, colClrType);
+				}
+				else
+				{
+					Expression<Func<SqlNullValueException>> exceptFactory = () => new SqlNullValueException($"Field '{member.Name}' contained a null value");
+					columnValue = Expression.Condition(Expression.NotEqual(columnValue, nullConstExpr), Expression.Convert(columnValue, colClrType), Expression.Throw(exceptFactory.Body, colClrType));
+				}
+
+				if (colClrType != fieldClrType)
+					columnValue = Expression.Convert(columnValue, fieldClrType);
+			}
+
+			return columnValue;
+		}
+
 		protected override Expression VisitNew(NewExpression node)
 		{
-			this.ctor = node.Constructor;
 			return base.VisitNew(node);
 		}
 	}

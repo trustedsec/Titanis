@@ -22,4 +22,10 @@ public abstract class InfobaseCommand : Command
 		InfoBase idb = await Titanis.Info.InfoBase.OpenAsync(idbFileName, cancellationToken);
 		return await this.RunAsync(idb, cancellationToken);
 	}
+
+	protected override void OnWritingRecord(object? record, RecordInfo? info = null)
+	{
+		// Prevent queries and such from being logged.
+		//base.OnWritingRecord(record, info);
+	}
 }
