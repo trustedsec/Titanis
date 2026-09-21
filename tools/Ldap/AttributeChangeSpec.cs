@@ -11,6 +11,7 @@ public enum AttributeEncoding
 	File,
 	Hex,
 	Base64,
+	Dns,
 }
 
 [TypeConverter(typeof(AttributeChangeSpecConverter))]
@@ -55,6 +56,7 @@ partial class AttributeChangeSpecConverter : TypeConverter
 				"file" => AttributeEncoding.File,
 				"hex" => AttributeEncoding.Hex,
 				"base64" => AttributeEncoding.Base64,
+				"dns" => AttributeEncoding.Dns,
 				_ => throw new FormatException($"Encoding type '{encName}' is not supported.  Use 'file' or 'hex'.")
 			};
 			var newValue = m.Groups["v"].Value;

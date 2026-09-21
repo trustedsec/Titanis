@@ -123,6 +123,7 @@ struct ChangeContext
 			AttributeEncoding.File => this._fileAccess.ReadAllBytesFrom(new FileSpec(change.Value, false)),
 			AttributeEncoding.Hex => BinaryHelper.ParseHexString(change.Value),
 			AttributeEncoding.Base64 => Convert.FromBase64String(change.Value),
+			AttributeEncoding.Dns => DnsRecordSyntax.ParseDns(change.Value),
 			_ => throw new FormatException($"Unsupported encoding {change.Encoding}.")
 		};
 		_values.Add(value);

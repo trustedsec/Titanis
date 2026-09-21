@@ -80,6 +80,11 @@ namespace Titanis.Ldap
 
 	partial struct DnsName : IPduStruct
 	{
+		public DnsName(string name)
+		{
+			this.Name = name;
+		}
+
 		public string Name { get; private set; }
 
 		public void ReadFrom<TSource>(TSource reader) where TSource : class, IByteSource
@@ -89,10 +94,6 @@ namespace Titanis.Ldap
 			StringBuilder sb = new StringBuilder(cbName - 2);
 
 			var bytes = reader.ReadBytes(cbName + 1);
-
-			// Not used
-			var cLabels = bytes[0];
-
 
 			int readIndex = 1;
 			while (readIndex < bytes.Length)
@@ -113,7 +114,25 @@ namespace Titanis.Ldap
 
 		public void WriteTo(ByteWriter writer)
 		{
-			throw new NotImplementedException();
+			int offStart = writer.Position;
+			writer.WriteByte(0);
+
+			string[] labels = this.Name.Split('.');
+			writer.WriteByte((byte)labels.Length);
+			int offRaw = writer.Position;
+			foreach (var label in labels)
+			{
+				// TODO: Enforce name length limit
+				writer.WriteByte((byte)Encoding.UTF8.GetByteCount(label));
+				writer.WriteStringUtf8(label);
+			}
+
+			writer.WriteByte(0);
+
+			int offEnd = writer.Position;
+			writer.SetPosition(offStart);
+			writer.WriteByte((byte)(offEnd - offRaw));
+			writer.SetPosition(offEnd);
 		}
 	}
 
