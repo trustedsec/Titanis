@@ -36,7 +36,7 @@ Backs up the WMI repository
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*FileName*&gt;||&lt;*String*&gt;|Name of the file to write the backup to|
 
 
@@ -52,6 +52,7 @@ Backs up the WMI repository
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -116,6 +117,23 @@ Backs up the WMI repository
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -190,7 +208,7 @@ Deletes a WMI object
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*ObjectPathOrWqlQuery*&gt;||&lt;*String[]*&gt;|Path to object or WQL query of objects to invoke on|
 
 
@@ -199,7 +217,6 @@ Deletes a WMI object
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continue even if errors occur|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
@@ -216,6 +233,7 @@ Deletes a WMI object
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -280,6 +298,23 @@ Deletes a WMI object
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -360,7 +395,7 @@ Executes a command on a remote system via WMI
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*CommandLine*&gt;||&lt;*String*&gt;|Command line to execute|
 
 
@@ -390,6 +425,7 @@ Executes a command on a remote system via WMI
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -454,6 +490,23 @@ Executes a command on a remote system via WMI
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -574,7 +627,7 @@ Gets an object with a WMI path
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*ObjectPath*&gt;||&lt;*String[]*&gt;|Path of object to get|
 
 
@@ -599,6 +652,7 @@ Gets an object with a WMI path
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -663,6 +717,23 @@ Gets an object with a WMI path
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -756,7 +827,7 @@ Invokes a method on a WMI class or object
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*ObjectPathOrWqlQuery*&gt;||&lt;*String[]*&gt;|Path to object or WQL query of objects to invoke on|
 |&lt;*Method*&gt;||&lt;*String*&gt;|Method to invoke|
 |&lt;*Arguments*&gt;||&lt;*String[]*&gt;|Arguments to pass to the method|
@@ -767,7 +838,6 @@ Invokes a method on a WMI class or object
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continue even if errors occur|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
@@ -785,6 +855,7 @@ Invokes a method on a WMI class or object
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -849,6 +920,23 @@ Invokes a method on a WMI class or object
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -953,7 +1041,7 @@ Lists the classes within a namespace.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -979,6 +1067,7 @@ Lists the classes within a namespace.
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1043,6 +1132,23 @@ Lists the classes within a namespace.
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -1118,7 +1224,7 @@ Lists the methods of a class or object.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*ObjectPathOrWqlQuery*&gt;||&lt;*String[]*&gt;|Path to object or WQL query of objects to invoke on|
 
 
@@ -1127,7 +1233,6 @@ Lists the methods of a class or object.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continue even if errors occur|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
 |    **-Namespace**||&lt;*String*&gt;|Namespace to query|
@@ -1144,6 +1249,7 @@ Lists the methods of a class or object.
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1208,6 +1314,23 @@ Lists the methods of a class or object.
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -1323,7 +1446,7 @@ Lists the available namespaces within a namespace.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -1349,6 +1472,7 @@ Lists the available namespaces within a namespace.
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1413,6 +1537,23 @@ Lists the available namespaces within a namespace.
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -1480,7 +1621,7 @@ Lists the properties of a class or object.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*ObjectPath*&gt;||&lt;*String[]*&gt;|Path of class or object to inspect|
 
 
@@ -1505,6 +1646,7 @@ Lists the properties of a class or object.
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1569,6 +1711,23 @@ Lists the properties of a class or object.
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -1681,7 +1840,7 @@ Mounts a WMI namespace as a file system
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*Mountpoint*&gt;||&lt;*String*&gt;|Path of mountpoint in local filesystem|
 
 
@@ -1709,6 +1868,7 @@ Mounts a WMI namespace as a file system
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1773,6 +1933,23 @@ Mounts a WMI namespace as a file system
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -1839,7 +2016,7 @@ Executes a WMI query
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*Query*&gt;||&lt;*String*&gt;|WQL query to execute|
 
 
@@ -1866,6 +2043,7 @@ Executes a WMI query
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1930,6 +2108,23 @@ Executes a WMI query
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -2029,7 +2224,7 @@ Restores the WMI repository
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*FileName*&gt;||&lt;*String*&gt;|Name of the file to read the backup from|
 
 
@@ -2050,6 +2245,7 @@ Restores the WMI repository
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -2114,6 +2310,23 @@ Restores the WMI repository
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -2194,7 +2407,7 @@ Deletes one or more registry keys and/or values
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*KeyPath*&gt;||&lt;*[HKLM|HKCU|HKCR|HKU|HKCC][\path]*&gt;|Path of target registry key|
 |&lt;*Items*&gt;||&lt;*RegistryItemSpec[]*&gt;|Keys and values to set|
 
@@ -2204,7 +2417,6 @@ Deletes one or more registry keys and/or values
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continue even if a deletion fails|
 |    **-DeleteKeys**||&lt;*SwitchParam*&gt;|Delete keys that have no values specified|
 |    **-Locale**||&lt;*String*&gt;|Locale|
 ||||  Default: en-US|
@@ -2219,6 +2431,7 @@ Deletes one or more registry keys and/or values
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -2283,6 +2496,23 @@ Deletes one or more registry keys and/or values
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -2406,7 +2636,7 @@ Export registry values to file
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*KeyPath*&gt;||&lt;*[HKLM|HKCU|HKCR|HKU|HKCC][\path]*&gt;|Path of target registry key|
 |&lt;*ValueNameFilter*&gt;||&lt;*String[]*&gt;|Limits results to listed value names|
 
@@ -2451,6 +2681,7 @@ Export registry values to file
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -2515,6 +2746,23 @@ Export registry values to file
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -2607,7 +2855,7 @@ Query registry values
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*KeyPath*&gt;||&lt;*[HKLM|HKCU|HKCR|HKU|HKCC][\path]*&gt;|Path of target registry key|
 |&lt;*ValueNameFilter*&gt;||&lt;*String[]*&gt;|Limits results to listed value names|
 
@@ -2650,6 +2898,7 @@ Query registry values
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -2716,6 +2965,23 @@ Query registry values
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -2752,6 +3018,7 @@ Query registry values
 ||||Possible values:|
 ||||  **ParentKeyName**|
 ||||  **Name**|
+||||  **ServerName**|
 ||||  **ItemType**|
 ||||  **ValueType**|
 ||||  **ClassName**|
@@ -2815,7 +3082,7 @@ Sets one or more values in a registry key
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|Name of the server to connect to|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*KeyPath*&gt;||&lt;*[HKLM|HKCU|HKCR|HKU|HKCC][\path]*&gt;|Path of target registry key|
 |&lt;*Items*&gt;||&lt;*RegistryItemSpec[]*&gt;|Keys and values to set|
 
@@ -2838,6 +3105,7 @@ Sets one or more values in a registry key
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -2902,6 +3170,23 @@ Sets one or more values in a registry key
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output

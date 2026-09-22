@@ -1,0 +1,8 @@
+#compdef Even6
+
+_Even6() {
+	local -a commands=(
+		'query:Queries the event log'
+	)
+	_comp_T_subcommands
+}

@@ -1,0 +1,27 @@
+# bash completion
+source "${BASH_SOURCE[0]%/*}/Titanis-comp"
+
+# ErrorLookup
+_ErrorLookup () {
+	declare -A params=(
+		['-errorcode']=$'ErrorCode::'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle:list:Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable'
+		['-outputfields']=$'OutputFields:list:Code;Kind;SymbolicName;Message;CodeHex'
+		['-outputheaders']=$'OutputHeaders::'
+		['-logbase']=$'LogBase::'
+		['-logpartition']=$'LogPartition::'
+		['-logcomment']=$'LogComment::'
+		['-logattributes']=$'LogAttributes::'
+		['-loglevel']=$'LogLevel:list:Debug;Diagnostic;Verbose;Info;Warning;Error;Critical'
+		['-consolelogformat']=$'ConsoleLogFormat:list:Text;TextWithTimestamp;Json'
+		['-verbose']=$'Verbose::'
+		['-diagnostic']=$'Diagnostic::'
+		['-debuglog']=$'DebugLog::'
+		['-humanreadable']=$'HumanReadable::'
+	)
+	declare -a paramsByPos=(
+		'ErrorCode'
+	)
+	_comp_Titanis
+}
+complete -F _ErrorLookup ErrorLookup

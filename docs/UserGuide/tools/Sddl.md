@@ -51,6 +51,16 @@ Describes a security descriptor
 |    **-PrintSddl**||&lt;*SwitchParam*&gt;|Prints the SDDL form|
 
 
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -130,6 +140,16 @@ Looks up a GUID representing an AD extended right, property, or property set
 ## Options
 
 
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -193,6 +213,16 @@ Looks up a well-known SID
 
 
 ## Options
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output

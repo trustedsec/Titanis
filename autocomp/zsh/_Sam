@@ -6,6 +6,7 @@ _Sam() {
 		'enumaliases:Enumerates aliases'
 		'enumgroups:Enumerates groups'
 		'enumusers:Enumerates user accounts'
+		'groupmembers:Gets the members of a group'
 	)
 	_comp_T_subcommands
 }

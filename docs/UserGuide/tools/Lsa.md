@@ -35,7 +35,7 @@ Adds one or more privileges to an account
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*Privileges*&gt;||&lt;*String[]*&gt;|Names or values of the privileges to add|
 ||||Possible values:|
 ||||  **SeCreateTokenPrivilege**|
@@ -92,6 +92,7 @@ Adds one or more privileges to an account
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -156,6 +157,23 @@ Adds one or more privileges to an account
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -248,7 +266,7 @@ Creates an account
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*Sid*&gt;||&lt;*SecurityIdentifier*&gt;|SID of account to create|
 
 
@@ -264,6 +282,7 @@ Creates an account
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -328,6 +347,23 @@ Creates an account
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -408,7 +444,7 @@ Enumerates accounts
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -423,6 +459,7 @@ Enumerates accounts
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -489,6 +526,23 @@ Enumerates accounts
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -523,7 +577,8 @@ Enumerates accounts
 ||||  **Critical**|
 |    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
 ||||Possible values:|
-||||  **Sid**|
+||||  **ServerName**|
+||||  **AccountSid**|
 ||||  **AccountName**|
 ||||  **DomainName**|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
@@ -579,7 +634,7 @@ Enumerates accounts that have a specific privilege or user right
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -645,6 +700,7 @@ Enumerates accounts that have a specific privilege or user right
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -711,6 +767,23 @@ Enumerates accounts that have a specific privilege or user right
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -745,7 +818,8 @@ Enumerates accounts that have a specific privilege or user right
 ||||  **Critical**|
 |    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
 ||||Possible values:|
-||||  **Sid**|
+||||  **ServerName**|
+||||  **AccountSid**|
 ||||  **AccountName**|
 ||||  **DomainName**|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
@@ -788,7 +862,7 @@ Gets the privileges assigned to an account.
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -809,6 +883,7 @@ Gets the privileges assigned to an account.
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -875,6 +950,23 @@ Gets the privileges assigned to an account.
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -909,6 +1001,8 @@ Gets the privileges assigned to an account.
 ||||  **Critical**|
 |    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
 ||||Possible values:|
+||||  **ServerName**|
+||||  **AccountSid**|
 ||||  **Privilege**|
 ||||  **Attributes**|
 ||||  **PrivilegeName**|
@@ -973,7 +1067,7 @@ Gets the user rights and privileges granted to an account
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -994,6 +1088,7 @@ Gets the user rights and privileges granted to an account
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1060,6 +1155,23 @@ Gets the user rights and privileges granted to an account
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -1094,6 +1206,8 @@ Gets the user rights and privileges granted to an account
 ||||  **Critical**|
 |    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
 ||||Possible values:|
+||||  **ServerName**|
+||||  **AccountSid**|
 ||||  **Name**|
 |    **-OutputHeaders**||&lt;*SwitchParam*&gt;|Print headers for table/list/CSV/TSV styles|
 ||||  Default: True|
@@ -1141,7 +1255,7 @@ Gets the system access rights granted to an account
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -1162,6 +1276,7 @@ Gets the system access rights granted to an account
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1226,6 +1341,23 @@ Gets the system access rights granted to an account
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -1309,7 +1441,7 @@ Gets the SID for one or more account names
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*AccountNames*&gt;||&lt;*String[]*&gt;|Names of accounts to look up|
 
 
@@ -1325,6 +1457,7 @@ Gets the SID for one or more account names
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1391,6 +1524,23 @@ Gets the SID for one or more account names
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -1426,6 +1576,7 @@ Gets the SID for one or more account names
 |    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
 ||||Possible values:|
 ||||  **AccountName**|
+||||  **ServerName**|
 ||||  **NameType**|
 ||||  **DomainName**|
 ||||  **DomainSid**|
@@ -1476,7 +1627,7 @@ Translates one or more SIDs to their account names
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*Sids*&gt;||&lt;*SecurityIdentifier[]*&gt;|SIDs to look up|
 
 
@@ -1492,6 +1643,7 @@ Translates one or more SIDs to their account names
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1558,6 +1710,23 @@ Translates one or more SIDs to their account names
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -1593,6 +1762,7 @@ Translates one or more SIDs to their account names
 |    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
 ||||Possible values:|
 ||||  **AccountName**|
+||||  **ServerName**|
 ||||  **NameType**|
 ||||  **DomainName**|
 ||||  **DomainSid**|
@@ -1654,7 +1824,7 @@ Removes one or more privileges from an account
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*Privileges*&gt;||&lt;*String[]*&gt;|Names or values of the privileges to add|
 ||||Possible values:|
 ||||  **SeCreateTokenPrivilege**|
@@ -1711,6 +1881,7 @@ Removes one or more privileges from an account
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1775,6 +1946,23 @@ Removes one or more privileges from an account
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -1877,7 +2065,7 @@ Sets the system access rights granted to an account
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 |&lt;*Rights*&gt;||&lt;*SystemAccessRights[]*&gt;|Access rights to grant|
 ||||Possible values:|
 ||||  **None**|
@@ -1912,6 +2100,7 @@ Sets the system access rights granted to an account
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1976,6 +2165,23 @@ Sets the system access rights granted to an account
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -2067,7 +2273,7 @@ Gets the name and domain of the connected user
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -2082,6 +2288,7 @@ Gets the name and domain of the connected user
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -2146,6 +2353,23 @@ Gets the name and domain of the connected user
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output

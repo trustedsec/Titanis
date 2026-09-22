@@ -46,6 +46,13 @@ Requests a TGT from the KDC.
 |    **-TicketComment**||&lt;*String*&gt;|Comment to associate with ticket|
 
 
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
+
+
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
@@ -94,6 +101,16 @@ Requests a TGT from the KDC.
 |**-S**, **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -232,6 +249,13 @@ Changes an account password
 ## Options
 
 
+### Authentication
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
+
+
 ### Authentication (Kerberos)
 
 |Name|Aliases|Value|Description|
@@ -240,7 +264,7 @@ Changes an account password
 |    **-DesKey**||&lt;*HexString*&gt;|DES key|
 |    **-Keytab**||&lt;*FileSpec*&gt;|Name of keytab file|
 |    **-NtlmHash**||&lt;*HexString*&gt;|NTLM hash (hex-encoded, no colons)|
-|**-P**, **-Password**||&lt;*String*&gt;|Password|
+|    **-Password**||&lt;*String*&gt;|Password|
 |**-R**, **-Realm**||&lt;*String*&gt;|Name of realm (domain)|
 |    **-UserCert**||&lt;*FileSpec*&gt;|Name of file containing user's certificate (for PKINIT)|
 |    **-UserKey**||&lt;*FileSpec*&gt;|Name of file containing user's key (for PKINIT)|
@@ -256,6 +280,16 @@ Changes an account password
 |**-S**, **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -363,6 +397,22 @@ Forges a ticket
 |    **-ResourceGroupRids**||&lt;*UInt32[]*&gt;|Group RIDs, relative to the resource domain|
 |    **-ServerKey**||&lt;*HexString*&gt;|Key of server to receive the ticket|
 |    **-ServiceRealm**||&lt;*String*&gt;|Service realm|
+|    **-SessionEType**||&lt;*EType*&gt;|Session encryption type|
+||||Possible values:|
+||||  **DesCbcMd5**|
+||||  **DesCbcCrc**|
+||||  **Rc4Hmac**|
+||||  **Rc4HmacExp**|
+||||  **Aes128CtsHmacSha1_96**|
+||||  **Aes256CtsHmacSha1_96**|
+||||  **DsaWithSha1**|
+||||  **Md5WithRsa**|
+||||  **Sha1WithRsa**|
+||||  **Rc2Cbc**|
+||||  **Rsa**|
+||||  **RsaesOaep**|
+||||  **DesEde3Cbc**|
+|    **-SessionKey**||&lt;*HexString*&gt;|Session key|
 |    **-TicketEType**||&lt;*EType*&gt;|Ticket encryption type|
 ||||Possible values:|
 ||||  **DesCbcMd5**|
@@ -390,6 +440,16 @@ Forges a ticket
 |-|-|-|-|
 |    **-TicketCache**||&lt;*FileSpec*&gt;|Name of ticket cache file|
 |**-W**, **-Workstation**||&lt;*String*&gt;|Name of client workstation|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -487,6 +547,16 @@ Gets server time and encryption types (with salts) for a user account.
 |**-S**, **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -619,6 +689,16 @@ Renews a ticket
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -722,6 +802,16 @@ Generates a protocol key from a string, such as a password
 |    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continue even if errors occur|
 
 
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -821,6 +911,16 @@ Selects and displays tickets from a file.
 ## Options
 
 
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -859,6 +959,7 @@ Selects and displays tickets from a file.
 ||||  **SourceFileName**|
 ||||  **SeqNbr**|
 ||||  **Comment**|
+||||  **KeyListKeys**|
 ||||  **ClientName**|
 ||||  **ClientRealm**|
 ||||  **TicketRealm**|
@@ -1034,6 +1135,7 @@ Sets the password of (another) account
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -1078,6 +1180,16 @@ Sets the password of (another) account
 |    **-Socks5**||&lt;*host-or-ip:port*&gt;|End point of SOCKS 5 server to use|
 |    **-UseTcp4Only**|**-4**|&lt;*SwitchParam*&gt;|Only use TCP over IPv4 endpoint|
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output
@@ -1209,6 +1321,16 @@ Requests a ticket from the KDC.
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -1320,6 +1442,16 @@ Lists the entries in a keytab file
 
 
 ## Options
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
 
 
 ### Output

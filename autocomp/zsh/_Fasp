@@ -1,0 +1,10 @@
+#compdef Fasp
+
+_Fasp() {
+	local -a commands=(
+		'addrule:Adds a firewall rule'
+		'enumrules:Enumerates firewall rules'
+		'query:Queries firewall rules'
+	)
+	_comp_T_subcommands
+}

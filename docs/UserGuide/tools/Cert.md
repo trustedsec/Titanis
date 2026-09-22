@@ -50,6 +50,16 @@ Create a self-signed certificate
 |**-T**, **-TemplateFile**||&lt;*FileSpec*&gt;|Name of file containing certificate to copy|
 
 
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|

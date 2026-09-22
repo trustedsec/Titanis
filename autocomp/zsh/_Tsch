@@ -1,0 +1,14 @@
+#compdef Tsch
+
+_Tsch() {
+	local -a commands=(
+		'add:Adds a scheduled task'
+		'enumfolders:Gets a list of task folders'
+		'enumtasks:Gets a list of tasks within folder'
+		'get:Gets a task definition'
+		'start:Starts a task'
+		'stop:Stops a task'
+		'stopinstance:Stops a running task instance'
+	)
+	_comp_T_subcommands
+}

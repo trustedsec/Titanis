@@ -1,0 +1,10 @@
+#compdef Infobase
+
+_Infobase() {
+	local -a commands=(
+		'analyze:Analyzes attack paths'
+		'history:Prints command history'
+		'query:Queries item data'
+	)
+	_comp_T_subcommands
+}

@@ -2,8 +2,10 @@
 
 _Scm() {
 	local -a commands=(
+		'config:Changes the configuration of a service'
 		'create:Creates and optionally starts a new service'
 		'delete:Deletes a service'
+		'qc:Queries the configuration of a service'
 		'qtriggers:Queries the status of a service'
 		'query:Queries the status of a service'
 		'start:Starts a service'

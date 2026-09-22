@@ -1,0 +1,14 @@
+#compdef Wkst
+
+_Wkst() {
+	local -a commands=(
+		'addaltname:Adds an alternate computer name'
+		'enumnames:Gets a list of names used by a computer'
+		'enumusers:Gets a list of logged on users'
+		'getinfo:Gets workstation info'
+		'join:Joins a workstation to a domain'
+		'joininfo:Gets workstation join info'
+		'unjoin:Joins a workstation to a domain'
+	)
+	_comp_T_subcommands
+}

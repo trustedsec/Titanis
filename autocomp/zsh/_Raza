@@ -1,0 +1,9 @@
+#compdef Raza
+
+_Raza() {
+	local -a commands=(
+		'check:Checks remote authorization'
+		'getinfo:Gets remote authorization, such as groups and claims'
+	)
+	_comp_T_subcommands
+}

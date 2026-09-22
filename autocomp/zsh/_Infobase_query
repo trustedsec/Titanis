@@ -1,0 +1,24 @@
+#compdef Infobase_query
+
+_Infobase_query() {
+	declare -A params=(
+		['-objectclass']=$'ObjectClass||String||||Object class to query for'
+		['-actionid']=$'ActionId||Int32||||Command to query results for'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle||OutputStyle|list|Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable|Output|Determines the output style'
+		['-outputfields']=$'OutputFields||String[]|||Output|Fields to display in output'
+		['-outputheaders']=$'OutputHeaders|@|SwitchParam|||Output|Print headers for table/list/CSV/TSV styles'
+		['-logpartition']=$'LogPartition|@|String|||Logging|Partition to associate log entries with'
+		['-logcomment']=$'LogComment|@|String|||Logging|Comment to associate with log entries'
+		['-logattributes']=$'LogAttributes|@|String[]|||Logging|Nema=Value pairs to associate with log entries'
+		['-loglevel']=$'LogLevel||LogMessageSeverity|list|Debug;Diagnostic;Verbose;Info;Warning;Error;Critical|Output|Sets the lowest level of messages to log'
+		['-consolelogformat']=$'ConsoleLogFormat|@|LogFormat|list|Text;TextWithTimestamp;Json|Output|Sets the format of log messages written to the console'
+		['-verbose']=$'Verbose||SwitchParam|||Output|Prints verbose messages'
+		['-diagnostic']=$'Diagnostic|@|SwitchParam|||Output|Prints diagnostic messages'
+		['-debuglog']=$'DebugLog|@|SwitchParam|||Output|Prints debug messages'
+		['-humanreadable']=$'HumanReadable|@|SwitchParam|||Output|Formats file sizes as human-readable values'
+	)
+	declare -a paramsByPos=(
+		'ObjectClass'
+	)
+	_comp_Titanis
+}

@@ -24,7 +24,7 @@ Lists the dynamic RPC endpoints registered with the endpoint mapper
 
 |Name|Aliases|Value|Description|
 |-|-|-|-|
-|&lt;*ServerName*&gt;||&lt;*String*&gt;|RPC server to interact with|
+|&lt;*ServerName*&gt;||&lt;*ServerSpec[]*&gt;|RPC server to interact with|
 
 
 ## Options
@@ -51,6 +51,7 @@ Lists the dynamic RPC endpoints registered with the endpoint mapper
 |    **-Delegate**||&lt;*SwitchParam*&gt;|Requests delegation (sends TGT and key for Kerberos)|
 |    **-NtlmHash**||&lt;*hexadecimal hash*&gt;|NTLM hash for NTLM authentication|
 |    **-Password**|**-p**|&lt;*String*&gt;|Password to authenticate with|
+|    **-PasswordBytes**||&lt;*HexString*&gt;|Password to authenticate with (as bytes)|
 |    **-Sspi**||&lt;*SwitchParam*&gt;|Uses SSPI authentication (Windows only)|
 |    **-UserDomain**|**-ud**|&lt;*String*&gt;|Domain of user to authenticate with|
 |    **-UserName**|**-u**|&lt;*UserPrincipalName*&gt;|User name to authenticate with, not including the domain|
@@ -117,6 +118,23 @@ Lists the dynamic RPC endpoints registered with the endpoint mapper
 |    **-UseTcp6Only**|**-6**|&lt;*SwitchParam*&gt;|Only use TCP over IPv6 endpoint|
 
 
+### Error Handling
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-ContinueOnError**||&lt;*SwitchParam*&gt;|Continues executing even if an error occurs|
+
+
+### Logging
+
+|Name|Aliases|Value|Description|
+|-|-|-|-|
+|    **-LogAttributes**||&lt;*String[]*&gt;|Nema=Value pairs to associate with log entries|
+|    **-LogBase**||&lt;*FileSpec*&gt;|Infobase file to log results to|
+|    **-LogComment**||&lt;*String*&gt;|Comment to associate with log entries|
+|    **-LogPartition**||&lt;*String*&gt;|Partition to associate log entries with|
+
+
 ### Output
 
 |Name|Aliases|Value|Description|
@@ -151,6 +169,7 @@ Lists the dynamic RPC endpoints registered with the endpoint mapper
 ||||  **Critical**|
 |    **-OutputFields**||&lt;*String[]*&gt;|Fields to display in output|
 ||||Possible values:|
+||||  **ServerName**|
 ||||  **ObjectGuid**|
 ||||  **annotation**|
 ||||  **Tower**|

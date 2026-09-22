@@ -2,9 +2,26 @@
 
 _Dsrep() {
 	local -a commands=(
+		'addsidhist:Adds SID history from one principal to another'
+		'attrmetadata:Gets metadata for attribute link values'
+		'crackname:Cracks a name'
+		'cursors:Gets replication cursor info'
 		'dcinfo:Gets information on domain controllers'
+		'domains:List domains in a forest'
+		'gcs:List GCs in a forest'
+		'kccfailures:Gets KCC failure information'
+		'neighbors:Gets replication (repsFrom) neighbors'
+		'objmetadata:Gets object metadata'
+		'partitions:List partitions (naming contexts) in a forest'
+		'queue:Gets pending replication operations'
+		'readngckey:Gets the msDS-KeyCredentialLink on an object.'
 		'rep:Requests replica changes'
 		'repnc:Replicates a naming context'
+		'repsto:Gets replication (repsTo) neighbors'
+		'roles:List roles in a forest'
+		'sites:List FSMO roles in a forest'
+		'utdvec:Gets up-to-date vector info'
+		'writengckey:Updates msDS-KeyCredentialLink on an object.'
 	)
 	_comp_T_subcommands
 }

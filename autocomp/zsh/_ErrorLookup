@@ -1,0 +1,24 @@
+#compdef ErrorLookup
+
+_ErrorLookup() {
+	declare -A params=(
+		['-errorcode']=$'ErrorCode|X|String[]||||Error code (decimal, hex, name)'
+		['-consoleoutputstyle']=$'ConsoleOutputStyle||OutputStyle|list|Freeform;Raw;Table;List;Csv;Tsv;Json;TreeTable|Output|Determines the output style'
+		['-outputfields']=$'OutputFields||String[]|list|Code;Kind;SymbolicName;Message;CodeHex|Output|Fields to display in output'
+		['-outputheaders']=$'OutputHeaders|@|SwitchParam|||Output|Print headers for table/list/CSV/TSV styles'
+		['-logbase']=$'LogBase|@|FileSpec|||Logging|Infobase file to log results to'
+		['-logpartition']=$'LogPartition|@|String|||Logging|Partition to associate log entries with'
+		['-logcomment']=$'LogComment|@|String|||Logging|Comment to associate with log entries'
+		['-logattributes']=$'LogAttributes|@|String[]|||Logging|Nema=Value pairs to associate with log entries'
+		['-loglevel']=$'LogLevel||LogMessageSeverity|list|Debug;Diagnostic;Verbose;Info;Warning;Error;Critical|Output|Sets the lowest level of messages to log'
+		['-consolelogformat']=$'ConsoleLogFormat|@|LogFormat|list|Text;TextWithTimestamp;Json|Output|Sets the format of log messages written to the console'
+		['-verbose']=$'Verbose||SwitchParam|||Output|Prints verbose messages'
+		['-diagnostic']=$'Diagnostic|@|SwitchParam|||Output|Prints diagnostic messages'
+		['-debuglog']=$'DebugLog|@|SwitchParam|||Output|Prints debug messages'
+		['-humanreadable']=$'HumanReadable|@|SwitchParam|||Output|Formats file sizes as human-readable values'
+	)
+	declare -a paramsByPos=(
+		'ErrorCode'
+	)
+	_comp_Titanis
+}
