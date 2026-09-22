@@ -1,6 +1,6 @@
 Change Log
 
-# Prerelease
+# 2026-09-28
 
 * Dsrep
 	* addsidhist
@@ -18,16 +18,44 @@ Change Log
 		* objmetadata
 		* attrmetadata
 		* queue
+* Even6 for querying the Windows event log
 * SSPI support (Windows only)
 * NDR64 enabled by default across the toolset
 	* Use `-OfferNdr64:no` to disable
+* RPC commands
+	* Accept list of servers
+		* Print server name if multiple are specified
+		* 10.66.0.11-13
+		* 10.66.0.11-10.66.0.13
+		* 10.66.0.11/4
+	* -ContinueOnError to continue if one address fails
+	* Accept names prefixed with // or \\\\ to prefer binding over named pipes
+* Fasp for interacting with the Windows Firewall service
+	* Enumerate and add rules
+* Scm
+	* `qc` and `config` commands for querying and updating service configuration
+* Raza for interacting with remote authorization
+	* Check groups and claims for users and devices
+	* Check access of a security descriptor
+* Wkst utility for [MS-WKST]
+* ErrorLookup utility
 
-## Minor Enhancements
+## Known Problems
+* `Smb2Client get` still needs some usability enhancements, mostly for retrieving multiple files or directories
+* `Smb2Client mountfs` is unstable
+* Infobase and -LogBase are HIGHLY experimental and the schema is almost certainly guaranteed to change.
+* `Wkst join` doesn't correctly encrypt the join password.
+
+## Minor Enhancements / Bug fixes
+* -PasswordBytes accepts hex-encoded password (for GMSA and computer accounts)
 * CSV supports multi-value output (semicolon-delimited)
+* CLI allows SPN erasure to remove the SPN from an NTLM request
 * LDAP
 	* If no -OutputFields, it requests 1.1 to prevent all attributes from being returned
 	* Filter attributes optionally replaced with OIDs (for evasion)
+	* DNS record syntax (for adding DNS records)
 * Enum argument parser is case-insensitive
+* Fixed decoding of NTLM hash in PKINIT tickets
 
 
 # 2026-08-05
