@@ -22,6 +22,9 @@ namespace Titanis.IO
 
 	public static class PduStructExtensions
 	{
+		public static Memory<byte> ToBytes<TStruct>(this TStruct struc)
+			where TStruct : struct, IPduStruct => struc.ToBytes(new ByteWriter());
+
 		public static Memory<byte> ToBytes<TStruct>(this TStruct struc, ByteWriter writer)
 			where TStruct : struct, IPduStruct
 		{
