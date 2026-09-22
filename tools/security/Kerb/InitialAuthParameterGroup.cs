@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Titanis.Security;
 using Titanis.Security.Kerberos;
 
@@ -35,6 +36,11 @@ public class InitialAuthParameterGroup : ParameterGroupBase
 	public string? Password { get; set; }
 
 	[Parameter]
+	[Description("Password to authenticate with (as bytes)")]
+	[Category(ParameterCategories.Authentication)]
+	public HexString? PasswordBytes { get; set; }
+
+	[Parameter]
 	[Category(ParameterCategories.AuthenticationKerberos)]
 	[Description("NTLM hash (hex-encoded, no colons)")]
 	public HexString? NtlmHash { get; set; }
@@ -65,6 +71,13 @@ public class InitialAuthParameterGroup : ParameterGroupBase
 		var realm = this.Realm ?? this.UserName.Realm;
 		if (string.IsNullOrEmpty(realm))
 			context.LogError(new ParameterValidationError(nameof(Realm), $"Realm must be specified either with -{nameof(Realm)} or as part of -{nameof(UserName)}"));
+
+			if (this.PasswordBytes!=null)
+		{
+			if (this.Password != null)
+				context.LogError(nameof(PasswordBytes), $"-{nameof(PasswordBytes)} cannot be used with -{nameof(Password)}");
+			this.Password = Encoding.Unicode.GetString(this.PasswordBytes.Bytes);
+		}
 
 		this._userCert = this.CertificateParameters?.Validate(context, ref this._userName);
 

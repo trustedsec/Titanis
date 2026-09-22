@@ -58,6 +58,11 @@ namespace Titanis.Cli
 		public string? Password { get; set; }
 
 		[Parameter]
+		[Description("Password to authenticate with (as bytes)")]
+		[Category(ParameterCategories.Authentication)]
+		public HexString? PasswordBytes { get; set; }
+
+		[Parameter]
 		[Description("NTLM hash for NTLM authentication")]
 		[Category(ParameterCategories.Authentication)]
 		[Placeholder("hexadecimal hash")]
@@ -223,6 +228,13 @@ namespace Titanis.Cli
 		public void Validate(bool isRequired, ParameterValidationContext context, bool requiresKerberos = false)
 		{
 			var log = this.Services?.GetService<ILog>();
+
+			if (this.PasswordBytes != null)
+			{
+				if (this.Password != null)
+					context.LogError(nameof(PasswordBytes), $"-{nameof(PasswordBytes)} cannot be used with -{nameof(Password)}");
+				this.Password = Encoding.Unicode.GetString(this.PasswordBytes.Bytes);
+			}
 
 			this._userCert = this.CertificateParameters?.Validate(context, ref this._userName);
 
