@@ -24,7 +24,11 @@ Titanis is a library of protocol implementations and command line utilities, wri
 	* Service Control Manager ([MS-SCMR](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-SCMR/%5bMS-SCMR%5d.pdf))
 	* Server service ([MS-SRVS](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-SRVS/%5bMS-SRVS%5d.pdf))
 	* WMI ([MS-WMI](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-WMI/%5bMS-WMI%5d.pdf) and [MS-WMIO](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-WMIO/%5bMS-WMIO%5d.pdf))
-	* Directory replication ([MS-DRSR]https://winprotocoldoc.z19.web.core.windows.net/MS-DRSR/%5bMS-DRSR%5d.pdf))
+	* Directory replication ([MS-DRSR](https://winprotocoldoc.z19.web.core.windows.net/MS-DRSR/%5bMS-DRSR%5d.pdf))
+	* EventLog Remoting Protocol Version 6.0 ([MS-EVEN6](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-EVEN6/%5bMS-EVEN6%5d.pdf))
+	* Task Scheduler Service Remoting Protocol ([MS-TSCH](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-TSCH/%5bMS-TSCH%5d.pdf))
+	* Remote Authorization API Protocol ([MS-RAA](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-RAA/%5bMS-RAA%5d.pdf))
+	* Firewall and Advanced Security Protocol ([MS-FASP](https://winprotocoldoc.z19.web.core.windows.net/MS-FASP/%5BMS-FASP%5D-230920.pdf))
 * LDAP ([RFC 4511](https://datatracker.ietf.org/doc/html/rfc4511) and parts of [MS-ADTS](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-ADTS/%5bMS-ADTS%5d.pdf))
 * Security
 	* NTLM ([MS-NLMP](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-NLMP/%5bMS-NLMP%5d.pdf))
@@ -41,6 +45,7 @@ Titanis is a library of protocol implementations and command line utilities, wri
 			* Support for .kirbi and [ccache](https://web.mit.edu/kerberos/krb5-1.21/doc/formats/ccache_file_format.html) files
 			* Support for [keytab](https://web.mit.edu/kerberos/krb5-devel/doc/formats/keytab_file_format.html) files
 		* Change / set password ([RFC3244](https://datatracker.ietf.org/doc/html/rfc3244))
+		* FAST / Armoring and compound identity
 	* SP-NEGO ([MS-SPNG](https://winprotocoldocs-bhdugrdyduf5h2e4.b02.azurefd.net/MS-SPNG/%5bMS-SPNG%5d.pdf))
 * Integrated SOCKS 5 support (`-Socks5` parameter) ([RFC1928](https://datatracker.ietf.org/doc/html/rfc1928))
 
@@ -66,10 +71,6 @@ For a list of command line tools and tasks you can perform with them, check the 
 If you are a user, see the [User Guide](docs/UserGuide/index.md) for a list of command line utilities and how to use them.
 
 If you are a developer, see the [Developer Guide](docs/DevGuide/index.md) for information on how to enhance the code base.
-
-# Planned Enhancements
-* Task Scheduler support ([MS-TSCH](https://winprotocoldoc.z19.web.core.windows.net/MS-TSCH/[MS-TSCH].pdf))
-* Integrated SOCKS 4a
 
 # Project Organization
 *  **doc/** - Project documentation
