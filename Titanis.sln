@@ -337,6 +337,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Cli.Registry", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Security.Sspi", "src\security\Titanis.Security.Sspi\Titanis.Security.Sspi.csproj", "{D79C2684-D9B2-4060-AA79-584726AA78B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanis.Msrpc.Msscmp", "src\net\msrpc\Titanis.Msrpc.Msscmp\Titanis.Msrpc.Msscmp.csproj", "{95247D5F-0364-44DA-83AD-0A69DC997738}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1785,6 +1787,18 @@ Global
 		{D79C2684-D9B2-4060-AA79-584726AA78B1}.Release|x64.Build.0 = Release|Any CPU
 		{D79C2684-D9B2-4060-AA79-584726AA78B1}.Release|x86.ActiveCfg = Release|Any CPU
 		{D79C2684-D9B2-4060-AA79-584726AA78B1}.Release|x86.Build.0 = Release|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Debug|x64.Build.0 = Debug|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Debug|x86.Build.0 = Debug|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Release|x64.ActiveCfg = Release|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Release|x64.Build.0 = Release|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Release|x86.ActiveCfg = Release|Any CPU
+		{95247D5F-0364-44DA-83AD-0A69DC997738}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
