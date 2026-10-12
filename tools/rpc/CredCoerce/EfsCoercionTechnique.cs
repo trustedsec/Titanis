@@ -1,4 +1,5 @@
 ﻿using ms_efsr;
+using System.ComponentModel;
 using System.Net;
 using Titanis.Cli;
 using Titanis.Msrpc;
@@ -9,6 +10,30 @@ using Titanis.Smb2;
 
 namespace Titanis.CredCoerce
 {
+	/// <summary>
+	/// Named pipe to use for EFSR coercion techniques; must match an entry in <see cref="EfsClient.PipeCandidates"/>.
+	/// </summary>
+	internal enum EfsPipe
+	{
+		All,
+		Efsr,
+		Lsarpc,
+		Samr,
+		Netlogon,
+		Lsass,
+	}
+
+	/// <summary>
+	/// Parameters specific to the EFSR coercion techniques.
+	/// </summary>
+	internal class EfsCoercionParameters : ParameterGroupBase
+	{
+		[Parameter]
+		[Description("Named pipe to use for EFSR techniques (default: Lsarpc)")]
+		[DefaultValue(EfsPipe.Lsarpc)]
+		public EfsPipe Pipe { get; set; }
+	}
+
 	abstract class EfsCoercionTechnique : CoercionTechnique
 	{
 		private readonly Func<EfsClient, CoercionContext, CancellationToken, Task> func;
@@ -17,36 +42,40 @@ namespace Titanis.CredCoerce
 		{
 		}
 
+		// Candidate that last connected successfully; tried first next time
+		private static int s_preferred;
+
 		public sealed override async Task Execute(CoercionContext context, CancellationToken cancellationToken)
 		{
-			var efs = context.TryGetService<EfsClient>();
-			if (efs is null)
+			var candidates = EfsClient.PipeCandidates;
+			var selectedPipe = context.Command.EfsOptions.Pipe;
+			if (selectedPipe != EfsPipe.All)
 			{
-				efs = new EfsClient();
-				//var epm = context.EpmClient;
-				//try
-				//{
-				//	var efsEP = await epm.TryMapTcp(efs.AbstractSyntaxId, IPAddress.Any, cancellationToken);
-				//}
-				//catch (TimeoutException ex)
-				//{
-				//	// This usually happens when the service is already running
-				//	context.Log.WriteVerbose("EPM lookup for EFS time out; this usually indicates the service is already running on the target");
-				//}
+				var pipeName = selectedPipe == EfsPipe.Efsr ? EfsClient.EfsPipeName : selectedPipe.ToString().ToLowerInvariant();
+				candidates = new[] { (pipeName, EfsClient.GetUuidForPipe(pipeName)) };
+			}
+			for (int n = 0; n < candidates.Length; n++)
+			{
+				int i = (s_preferred + n) % candidates.Length;
+				var (pipe, uuid) = candidates[i];
+				using var efs = new EfsClient(uuid);
+				try
+				{
+					await context.RpcClient.ConnectPipe(efs, context.SmbClient, new UncPath(context.ServerName, Smb2Client.IpcName, pipe), cancellationToken);
+				}
+				catch (Exception ex) when (ex is not OperationCanceledException)
+				{
+					context.Log.WriteVerbose($"EFS over pipe {pipe} failed: {ex.Message}");
+					continue;
+				}
 
-				ServicePrincipalName targetSpn = new(PrincipalNameType.ServiceInstance, ServiceClassNames.HostU,context.ServerName);
-
-				var rpcClient = context.RpcClient;
-				var smbClient = context.SmbClient;
-
-				// Connect to EFS
-				efs = new EfsClient();
-				await rpcClient.ConnectPipe(efs, smbClient, new UncPath(context.ServerName, Smb2Client.IpcName, EfsClient.EfsPipeName), cancellationToken);
-
-				context.AddService(efs);
+				s_preferred = i;
+				context.Log.WriteVerbose($"Connected to EFS over pipe {pipe}");
+				await this.Execute(efs, context, cancellationToken);
+				return;
 			}
 
-			await this.Execute(efs, context, cancellationToken);
+			throw new InvalidOperationException("Unable to connect to EFS over any known pipe");
 		}
 
 		protected abstract Task Execute(EfsClient? efs, CoercionContext context, CancellationToken cancellationToken);

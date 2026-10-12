@@ -16,6 +16,48 @@ namespace Titanis.Msrpc.Msefsr
 	{
 		public const string EfsPipeName = "efsrpc";
 
+		/// <summary>
+		/// Interface UUID of EFSR when hosted by the LSA (reachable via lsarpc, samr, netlogon, lsass pipes).
+		/// </summary>
+		public static readonly Guid LsaInterfaceUuid = new("c681d488-d850-11d0-8c52-00c04fd90f7e");
+
+		/// <summary>
+		/// Pipes, in order of preference, with the interface UUID each serves EFSR on (null = default efsrpc UUID).
+		/// </summary>
+		public static readonly (string Pipe, Guid? Uuid)[] PipeCandidates =
+		{
+			(EfsPipeName, null),
+			("lsarpc", LsaInterfaceUuid),
+			("samr", LsaInterfaceUuid),
+			("netlogon", LsaInterfaceUuid),
+			("lsass", LsaInterfaceUuid),
+		};
+
+		/// <summary>
+		/// Looks up the interface UUID to use for a named pipe, for callers that want to pin a single pipe
+		/// instead of trying every <see cref="PipeCandidates"/> entry.
+		/// </summary>
+		public static Guid? GetUuidForPipe(string pipe)
+		{
+			ArgumentException.ThrowIfNullOrEmpty(pipe);
+
+			foreach (var (candidatePipe, uuid) in PipeCandidates)
+			{
+				if (string.Equals(candidatePipe, pipe, StringComparison.OrdinalIgnoreCase))
+					return uuid;
+			}
+
+			throw new ArgumentException($"Unknown EFSR pipe '{pipe}'.", nameof(pipe));
+		}
+
+		// EFSR rejects unauthenticated RPC binds
+		public sealed override bool SupportsReauthOverNamedPipes => true;
+
+		public EfsClient(Guid? interfaceUuid = null)
+		{
+			this._proxy.OverrideInterfaceUuid = interfaceUuid;
+		}
+
 		public async Task<EfsOpenFile> OpenFile(string fileName, CancellationToken cancellationToken)
 		{
 			VerifyFileName(fileName);

